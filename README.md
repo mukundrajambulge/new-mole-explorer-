@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-The web app runs on `http://localhost:5173` and the API health endpoint runs on `http://localhost:4310/api/health`.
+The web app runs on `http://localhost:5174` so it can run alongside an existing app on port 5173. The API health endpoint runs on `http://localhost:4310/api/health`.
 
 ## Quality checks
 
@@ -23,7 +23,7 @@ npm run build
 npm run test:e2e
 ```
 
-The Playwright test expects the web app to be available at `http://localhost:5173`; it can start the Vite server automatically when run through the root script.
+The Playwright test expects the web app to be available at `http://localhost:5174`; it can start the Vite server automatically when run through the root script.
 
 ## Architecture
 
