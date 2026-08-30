@@ -1,15 +1,34 @@
+import type { StructureLoadResult } from "@molecular/contracts";
 import type { ActionId } from "../domain/registry";
+import type { RenderProjection } from "../rendering/renderProjection";
 import { Icon } from "./Icon";
 
-const displayRows = [
-  { label: "Style", value: "Projection preview", actionId: "REPRESENTATION.SET_STYLE" as ActionId },
-  { label: "Color", value: "Element", actionId: "COLOR.APPLY" as ActionId },
-];
+type InspectorPanelProps = {
+  collapsed: boolean;
+  onToggle: () => void;
+  onAction: (actionId: ActionId) => void;
+  structure: StructureLoadResult | null;
+  projection: RenderProjection;
+};
 
-export const InspectorPanel = ({ collapsed, onToggle, onAction }: { collapsed: boolean; onToggle: () => void; onAction: (actionId: ActionId) => void }) => {
+const styleLabel: Record<RenderProjection["representation"], string> = {
+  lines: "Lines",
+  sticks: "Sticks",
+  spheres: "Spheres",
+  "ball-and-stick": "Ball & Stick",
+  cartoon: "Cartoon",
+};
+
+export const InspectorPanel = ({ collapsed, onToggle, onAction, structure, projection }: InspectorPanelProps) => {
   if (collapsed) {
     return <button className="collapsed-panel-tab collapsed-panel-tab--right" onClick={onToggle} aria-label="Expand inspector panel"><Icon name="panelRightOpen" size={17} /></button>;
   }
+
+  const toggleRow = (label: string, enabled: boolean, actionId: ActionId, tone: "cyan" | "orange") => (
+    <button className="display-row display-row--button" onClick={() => onAction(actionId)} data-action-id={actionId} disabled={!structure}>
+      <span>{label}</span><span className={`switch switch--${tone} ${enabled ? "switch--on" : ""}`} role="switch" aria-checked={enabled}><span /></span>
+    </button>
+  );
 
   return (
     <aside className="side-column side-column--right" aria-label="Selection inspector and display panel">
@@ -19,16 +38,17 @@ export const InspectorPanel = ({ collapsed, onToggle, onAction }: { collapsed: b
         <div className="selection-meta">0 atoms · 0 residues</div>
         <div className="inspector-divider" />
         <span className="eyebrow">PROPERTIES</span>
-        <div className="empty-inspector"><span className="empty-orbit"><Icon name="target" size={22} /></span><strong>No selection</strong><span>Select atoms to view properties.</span></div>
+        <div className="empty-inspector"><span className="empty-orbit"><Icon name="target" size={22} /></span><strong>No selection</strong><span>Selection is reserved for a future gate.</span></div>
       </section>
       <section className="panel-card display-card">
         <div className="panel-heading"><div><span className="eyebrow">PROJECTION</span><h2>Display</h2></div><Icon name="sliders" size={16} /></div>
-        {displayRows.map((row) => <button className="display-row" key={row.label} onClick={() => onAction(row.actionId)} data-action-id={row.actionId}><span>{row.label}</span><span className="select-value">{row.value}<Icon name="arrowDown" size={14} /></span></button>)}
+        <button className="display-row display-row--button" onClick={() => onAction("REPRESENTATION.SET_STYLE")} data-action-id="REPRESENTATION.SET_STYLE"><span>Style</span><span className="select-value">{styleLabel[projection.representation]}<Icon name="arrowDown" size={14} /></span></button>
+        <button className="display-row display-row--button" onClick={() => onAction("COLOR.APPLY")} data-action-id="COLOR.APPLY"><span>Color</span><span className="select-value">Element<Icon name="arrowDown" size={14} /></span></button>
         <div className="display-row"><span>Background</span><span className="color-swatch" /></div>
-        <div className="display-row"><span>Axes</span><span className="switch switch--blue switch--on" role="switch" aria-checked="true"><span /></span></div>
-        <div className="display-row"><span>Orientation</span><span className="switch switch--blue switch--on" role="switch" aria-checked="true"><span /></span></div>
-        <div className="display-row"><span>Water</span><span className="switch switch--cyan" role="switch" aria-checked="false"><span /></span></div>
-        <div className="display-row"><span>Ions</span><span className="switch switch--orange" role="switch" aria-checked="false"><span /></span></div>
+        <div className="display-row"><span>Axes</span><span className="capability-tag">Coming Soon</span></div>
+        <div className="display-row"><span>Orientation</span><span className="capability-tag">Coming Soon</span></div>
+        {toggleRow("Water", projection.showWater, "REPRESENTATION.TOGGLE_WATER", "cyan")}
+        {toggleRow("Ions", projection.showIons, "REPRESENTATION.TOGGLE_IONS", "orange")}
         <button className="reset-view" onClick={() => onAction("VIEW.RESET")} data-action-id="VIEW.RESET"><Icon name="undo" size={14} /> Reset view</button>
       </section>
     </aside>

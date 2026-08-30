@@ -24,14 +24,14 @@ const toolbarItems: ToolbarItem[] = [
   { label: "Help", icon: "help", actionId: "HELP.OPEN" },
 ];
 
-export const ContextToolbar = ({ activeTool, onAction }: { activeTool: string; onAction: (actionId: ActionId) => void }) => (
+export const ContextToolbar = ({ activeTool, onAction, onImport }: { activeTool: string; onAction: (actionId: ActionId) => void; onImport?: () => void }) => (
   <div className="context-toolbar" aria-label="Contextual toolbar">
     <div className="toolbar-scroll">
       {toolbarItems.map((item) => (
         <div className={`toolbar-group ${item.dividerAfter ? "toolbar-group--divider" : ""}`} key={`${item.label}-${item.actionId}`}>
           <button
             className={`tool-button ${activeTool === item.label ? "tool-button--active" : ""}`}
-            onClick={() => onAction(item.actionId)}
+            onClick={() => item.actionId === "FILE.IMPORT" && onImport ? onImport() : onAction(item.actionId)}
             data-action-id={item.actionId}
             aria-label={item.label}
             title={item.label}

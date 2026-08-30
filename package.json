@@ -11,7 +11,7 @@
     "build": "npm run build --workspaces",
     "typecheck": "npm run typecheck --workspaces",
     "lint": "npm run lint --workspaces",
-    "test": "npm run test --workspace @molecular/web",
+    "test": "npm run test --workspace @molecular/web && npm run test --workspace @molecular/api",
     "test:e2e": "playwright test"
   },
   "devDependencies": {
@@ -21,6 +21,7 @@
     "concurrently": "^9.1.2",
     "eslint": "^9.17.0",
     "typescript-eslint": "^8.18.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
   }
 }
