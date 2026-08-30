@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { StructureLoadResult } from "@molecular/contracts";
+import type { ProjectRecord, StructureLoadResult } from "@molecular/contracts";
 import { CapabilityNotice } from "./components/CapabilityNotice";
 import { ConsolePanel } from "./components/ConsolePanel";
 import { ContextToolbar } from "./components/ContextToolbar";
@@ -11,7 +11,7 @@ import { StatusBar } from "./components/StatusBar";
 import { StructurePanel } from "./components/StructurePanel";
 import { ACTION_IDS, ACTION_REGISTRY, type ActionId, type ActionDefinition } from "./domain/registry";
 import { ApiClientError, apiClient } from "./lib/apiClient";
-import { DEFAULT_RENDER_PROJECTION, REPRESENTATION_STYLES, type RenderProjection } from "./rendering/renderProjection";
+import { createDefaultRenderProjection, fromProjectPresentation, REPRESENTATION_STYLES, setLayerVisibility, setProjectionStyle, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationStyle } from "./rendering/renderProjection";
 
 const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_SELECT]: "Select",
@@ -21,14 +21,15 @@ const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_FOCUS]: "Focus",
 };
 
-const representationActions: Record<string, RenderProjection["representation"]> = {
+const representationActions: Record<string, RepresentationStyle> = {
   [ACTION_IDS.REPRESENTATION_CARTOON]: "cartoon",
   [ACTION_IDS.REPRESENTATION_BALL_AND_STICK]: "ball-and-stick",
-  [ACTION_IDS.REPRESENTATION_LICORICE]: "sticks",
+  [ACTION_IDS.REPRESENTATION_LICORICE]: "licorice",
   [ACTION_IDS.REPRESENTATION_SPHERES]: "spheres",
 };
 
 const isAdmittedFile = (file: File) => /\.(pdb|cif|mmcif)$/i.test(file.name);
+const backgroundColors: Record<Exclude<BackgroundPreset, "Custom">, string> = { Black: "#05070a", White: "#ffffff", "Dark Gray": "#252b34", "Light Gray": "#d8dee7", Navy: "#071225", "Deep Blue": "#061b40" };
 
 export const App = () => {
   const [activeNav, setActiveNav] = useState("Home");
@@ -38,8 +39,9 @@ export const App = () => {
   const [consoleExpanded, setConsoleExpanded] = useState(true);
   const [notice, setNotice] = useState<ActionDefinition | null>(null);
   const [apiStatus, setApiStatus] = useState<"checking" | "connected" | "offline">("checking");
+  const [project, setProject] = useState<ProjectRecord | null>(null);
   const [structure, setStructure] = useState<StructureLoadResult | null>(null);
-  const [projection, setProjection] = useState<RenderProjection>(DEFAULT_RENDER_PROJECTION);
+  const [projection, setProjection] = useState<RenderProjection>(createDefaultRenderProjection());
   const [loadState, setLoadState] = useState<"idle" | "loading" | "error">("idle");
   const [loadError, setLoadError] = useState<string | null>(null);
   const [cameraCommand, setCameraCommand] = useState<{ actionId: ActionId; sequence: number }>();
@@ -63,7 +65,7 @@ export const App = () => {
     try {
       const result = await loader();
       setStructure(result);
-      setProjection(DEFAULT_RENDER_PROJECTION);
+      setProjection(createDefaultRenderProjection(result.structure));
       setLoadState("idle");
       commandSequence.current += 1;
       setCameraCommand({ actionId: ACTION_IDS.CANVAS_FOCUS, sequence: commandSequence.current });
@@ -76,13 +78,64 @@ export const App = () => {
   const importFile = (file: File) => {
     if (!isAdmittedFile(file)) {
       setLoadState("error");
-      setLoadError("Only PDB and mmCIF files are admitted in VIS-01. The current structure was kept.");
+      setLoadError("Only PDB and mmCIF files are admitted in G1B. The current structure was kept.");
       return;
     }
     void runLoad(() => apiClient.uploadStructure(file));
   };
 
   const fetchRcsb = (pdbId: string) => void runLoad(() => apiClient.fetchRcsb(pdbId));
+
+  const createProject = async () => {
+    try {
+      const created = await apiClient.createProject();
+      setProject(created);
+      setStructure(null);
+      setProjection(createDefaultRenderProjection());
+      setLoadError(null);
+      setLoadState("idle");
+    } catch (error) {
+      setLoadState("error");
+      setLoadError(error instanceof ApiClientError ? error.message : "The new project could not be created.");
+    }
+  };
+
+  const openProject = async () => {
+    const id = window.prompt("Project ID to open");
+    if (!id) return;
+    try {
+      const opened = await apiClient.openProject(id.trim());
+      setProject(opened);
+      setStructure(opened.structure);
+      setProjection(opened.structure ? fromProjectPresentation(opened.presentation, opened.structure.structure) : createDefaultRenderProjection());
+      setLoadError(null);
+      setLoadState("idle");
+    } catch (error) {
+      setLoadState("error");
+      setLoadError(error instanceof ApiClientError ? error.message : "The project could not be opened. The current workspace was kept.");
+    }
+  };
+
+  const saveProject = async () => {
+    try {
+      const target = project ?? await apiClient.createProject();
+      const saved = await apiClient.saveProject(target.id, { name: target.name, structure, presentation: toProjectPresentation(projection), expectedRevision: project ? project.revision : target.revision });
+      setProject(saved);
+      setLoadError(null);
+      setLoadState("idle");
+    } catch (error) {
+      setLoadState("error");
+      setLoadError(error instanceof ApiClientError ? error.message : "The project could not be saved. The current workspace was kept.");
+    }
+  };
+
+  const setColorMode = (mode: ColorMode) => {
+    setProjection((current) => ({ ...current, color: { ...current.color, mode, colorId: mode === "named" ? current.color.colorId ?? "pymol:marine" : mode === "uniform" ? "pymol:grey" : current.color.colorId } }));
+  };
+
+  const setBackgroundPreset = (preset: BackgroundPreset) => {
+    setProjection((current) => ({ ...current, background: { preset, color: preset === "Custom" ? current.background.color : backgroundColors[preset] } }));
+  };
 
   const handleAction = (actionId: ActionId) => {
     const capability = ACTION_REGISTRY[actionId];
@@ -98,17 +151,27 @@ export const App = () => {
         setCameraCommand({ actionId, sequence: commandSequence.current });
       }
     }
-    if (actionId === ACTION_IDS.FILE_IMPORT) {
+    if (actionId === ACTION_IDS.FILE_NEW || actionId === ACTION_IDS.PROJECT_CREATE) {
+      void createProject();
+      return;
+    }
+    if (actionId === ACTION_IDS.PROJECT_OPEN) {
+      void openProject();
+      return;
+    }
+    if (actionId === ACTION_IDS.FILE_OPEN || actionId === ACTION_IDS.FILE_IMPORT || actionId === ACTION_IDS.STRUCTURE_IMPORT) {
       fileInputRef.current?.click();
       return;
     }
-    if (representationActions[actionId] && capability.state === "SUPPORTED") {
-      setProjection((current) => ({ ...current, representation: representationActions[actionId] }));
+    if (actionId === ACTION_IDS.FILE_SAVE || actionId === ACTION_IDS.PROJECT_SAVE) {
+      void saveProject();
+      return;
     }
-    if (actionId === ACTION_IDS.REPRESENTATION_SET_STYLE && capability.state !== "COMING_SOON") {
+    if (representationActions[actionId] && capability.state === "SUPPORTED") setProjection((current) => setProjectionStyle(current, structure?.structure ?? null, representationActions[actionId]));
+    if (actionId === ACTION_IDS.REPRESENTATION_SET_STYLE && capability.state === "SUPPORTED") {
       setProjection((current) => {
         const index = REPRESENTATION_STYLES.indexOf(current.representation);
-        return { ...current, representation: REPRESENTATION_STYLES[(index + 1) % REPRESENTATION_STYLES.length] };
+        return setProjectionStyle(current, structure?.structure ?? null, REPRESENTATION_STYLES[(index + 1) % REPRESENTATION_STYLES.length]);
       });
     }
     const visibilityActions: Partial<Record<ActionId, keyof Pick<RenderProjection, "showProtein" | "showLigand" | "showWater" | "showIons" | "showOther">>> = {
@@ -119,13 +182,16 @@ export const App = () => {
       [ACTION_IDS.REPRESENTATION_TOGGLE_OTHER]: "showOther",
     };
     const visibilityKey = visibilityActions[actionId];
-    if (visibilityKey && capability.state === "SUPPORTED") setProjection((current) => ({ ...current, [visibilityKey]: !current[visibilityKey] }));
+    if (visibilityKey && capability.state === "SUPPORTED") setProjection((current) => setLayerVisibility(current, visibilityKey));
     if (actionId === ACTION_IDS.VIEW_RESET && capability.state === "SUPPORTED") {
       commandSequence.current += 1;
       setCameraCommand({ actionId: ACTION_IDS.VIEW_RESET, sequence: commandSequence.current });
     }
-    if (capability.state !== "SUPPORTED" || actionId === ACTION_IDS.REPRESENTATION_SET_STYLE) showNotice(capability);
+    if (capability.state !== "SUPPORTED") showNotice(capability);
   };
+
+  const updateCustomColor = (hex: string) => setProjection((current) => ({ ...current, color: { ...current.color, mode: "custom", customHex: hex } }));
+  const updateNamedColor = (colorId: string) => setProjection((current) => ({ ...current, color: { ...current.color, mode: "named", colorId } }));
 
   return (
     <div className="app-shell">
@@ -136,10 +202,10 @@ export const App = () => {
         <ContextToolbar activeTool={activeTool} onAction={handleAction} onImport={() => fileInputRef.current?.click()} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
           <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFetchRcsb={fetchRcsb} structure={structure} projection={projection} loading={loadState === "loading"} error={loadError} />
-          <MolecularCanvas structure={structure} projection={projection} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFileDrop={importFile} />
-          <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} />
+          <MolecularCanvas structure={structure} projection={projection} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFileDrop={importFile} consoleExpanded={consoleExpanded} />
+          <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} />
         </div>
-        <StatusBar apiStatus={apiStatus} structure={structure} />
+        <StatusBar apiStatus={apiStatus} structure={structure} project={project} />
         {notice && <CapabilityNotice capability={notice} onClose={() => setNotice(null)} />}
         <div className="console-layer"><ConsolePanel expanded={consoleExpanded} onToggle={() => setConsoleExpanded((value) => !value)} structure={structure} /></div>
       </main>

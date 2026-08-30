@@ -23,6 +23,6 @@ export const MenuBar = ({ onAction }: { onAction: (actionId: ActionId) => void }
         </button>
       ))}
     </nav>
-    <div className="menu-context"><span className="context-pill">G0</span><span className="context-label">FOUNDATION</span></div>
+    <div className="menu-context"><span className="context-pill">G1B</span><span className="context-label">PRESENTATION</span></div>
   </header>
 );

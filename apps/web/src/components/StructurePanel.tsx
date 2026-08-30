@@ -94,7 +94,7 @@ export const StructurePanel = ({
       </section>
 
       <section className="panel-card quick-card">
-        <div className="panel-heading"><div><span className="eyebrow">WORKBENCH</span><h2>Quick tools</h2></div><span className="capability-tag">G0</span></div>
+        <div className="panel-heading"><div><span className="eyebrow">WORKBENCH</span><h2>Quick tools</h2></div><span className="capability-tag">G1B</span></div>
         <div className="quick-grid">
           {quickTools.map((tool) => <button className="quick-tool" key={tool.label} onClick={() => onAction(tool.actionId)} data-action-id={tool.actionId}><span className="quick-icon"><Icon name={tool.icon} size={18} /></span><span>{tool.label}</span></button>)}
         </div>

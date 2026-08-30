@@ -1,8 +1,13 @@
 import { createHash } from "node:crypto";
 import { basename } from "node:path";
 import type {
+  BondOrder,
   CanonicalAtom,
+  CanonicalBond,
+  CanonicalChain,
+  CanonicalHierarchy,
   CanonicalMolecularStructure,
+  CanonicalResidue,
   CoordinateBounds,
   StructureFormat,
   StructureLoadResult,
@@ -10,6 +15,7 @@ import type {
 } from "@molecular/contracts";
 
 export const MAX_STRUCTURE_BYTES = 25 * 1024 * 1024;
+export const INGESTION_PARSER_PROFILE = "molecular-workstation-g1b-canonical-v1";
 
 const WATER_RESIDUES = new Set(["HOH", "WAT", "H2O", "DOD"]);
 const ION_ELEMENTS = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA", "ZN", "FE", "MN", "CU", "CO", "NI", "CL", "BR", "IOD"]);
@@ -17,19 +23,18 @@ const ION_RESIDUES = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA
 
 export class IngestionError extends Error {
   constructor(
-    public readonly code: "UNSUPPORTED_FORMAT" | "INVALID_INPUT" | "REMOTE_FETCH_FAILED" | "REMOTE_NOT_FOUND" | "PAYLOAD_TOO_LARGE",
+    public readonly code: "UNSUPPORTED_FORMAT" | "INVALID_INPUT" | "REMOTE_FETCH_FAILED" | "REMOTE_NOT_FOUND" | "PAYLOAD_TOO_LARGE" | "PROJECT_NOT_FOUND" | "PROJECT_INVALID",
     message: string,
-    public readonly status = code === "PAYLOAD_TOO_LARGE" ? 413 : code === "REMOTE_NOT_FOUND" ? 404 : 400,
+    public readonly status = code === "PAYLOAD_TOO_LARGE" ? 413 : code === "REMOTE_NOT_FOUND" || code === "PROJECT_NOT_FOUND" ? 404 : 400,
   ) {
     super(message);
     this.name = "IngestionError";
   }
 }
 
-type ParsedSource = {
-  format: StructureFormat;
-  atoms: CanonicalAtom[];
-};
+type AtomSeed = Omit<CanonicalAtom, "stableId">;
+type BondSeed = { atom1Serial: number; atom2Serial: number; order: BondOrder; source: CanonicalBond["source"] };
+type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[] };
 
 const parseNumber = (value: string, label: string): number => {
   const parsed = Number(value.replace(/\(.+\)$/, ""));
@@ -59,9 +64,19 @@ const classifyAtom = (recordType: "ATOM" | "HETATM", residueName: string, elemen
 };
 
 const parsePdb = (content: string): ParsedSource => {
-  const atoms: CanonicalAtom[] = [];
+  const atoms: AtomSeed[] = [];
+  const bonds: BondSeed[] = [];
   for (const line of content.split(/\r?\n/)) {
     const record = line.slice(0, 6).trim();
+    if (record === "CONECT") {
+      const sourceSerial = parseInteger(line.slice(6, 11).trim(), -1);
+      if (sourceSerial < 0) continue;
+      for (let offset = 11; offset < line.length; offset += 5) {
+        const targetSerial = parseInteger(line.slice(offset, offset + 5).trim(), -1);
+        if (targetSerial >= 0 && sourceSerial !== targetSerial) bonds.push({ atom1Serial: sourceSerial, atom2Serial: targetSerial, order: "SINGLE", source: "PDB_CONECT" });
+      }
+      continue;
+    }
     if (record !== "ATOM" && record !== "HETATM") continue;
     const recordType = record as "ATOM" | "HETATM";
     const atomName = line.slice(12, 16).trim() || "X";
@@ -89,7 +104,7 @@ const parsePdb = (content: string): ParsedSource => {
     });
   }
   if (atoms.length === 0) throw new IngestionError("INVALID_INPUT", "No ATOM or HETATM records with coordinates were found.");
-  return { format: "pdb", atoms };
+  return { format: "pdb", atoms, bonds };
 };
 
 const tokenizeCif = (content: string): string[] => {
@@ -116,9 +131,8 @@ const tokenizeCif = (content: string): string[] => {
       continue;
     }
     if (character === "'" || character === '"') {
-      if (token.length > 0) {
-        token += character;
-      } else quote = character;
+      if (token.length > 0) token += character;
+      else quote = character;
       continue;
     }
     if (/\s/.test(character)) {
@@ -134,6 +148,36 @@ const tokenizeCif = (content: string): string[] => {
   return tokens;
 };
 
+type CifLoop = { headers: string[]; rows: string[][] };
+
+const readCifLoops = (content: string): CifLoop[] => {
+  const tokens = tokenizeCif(content);
+  const loops: CifLoop[] = [];
+  let cursor = 0;
+  while (cursor < tokens.length) {
+    if (tokens[cursor]?.toLowerCase() !== "loop_") {
+      cursor += 1;
+      continue;
+    }
+    cursor += 1;
+    const headers: string[] = [];
+    while (tokens[cursor]?.startsWith("_")) {
+      headers.push(tokens[cursor]);
+      cursor += 1;
+    }
+    if (headers.length === 0) continue;
+    const rows: string[][] = [];
+    while (cursor < tokens.length && tokens[cursor]?.toLowerCase() !== "loop_" && !tokens[cursor]?.startsWith("data_")) {
+      if (tokens[cursor]?.startsWith("_")) break;
+      if (cursor + headers.length > tokens.length) break;
+      rows.push(tokens.slice(cursor, cursor + headers.length));
+      cursor += headers.length;
+    }
+    loops.push({ headers, rows });
+  }
+  return loops;
+};
+
 const cifValue = (row: string[], headers: string[], names: string[]): string | undefined => {
   const index = names.map((name) => headers.indexOf(name)).find((value) => value >= 0);
   if (index === undefined) return undefined;
@@ -141,47 +185,38 @@ const cifValue = (row: string[], headers: string[], names: string[]): string | u
   return value && value !== "." && value !== "?" ? value : undefined;
 };
 
+const parseBondOrder = (value: string | undefined): BondOrder => {
+  const normalized = (value ?? "").toUpperCase();
+  if (normalized.includes("DOUB")) return "DOUBLE";
+  if (normalized.includes("TRIP")) return "TRIPLE";
+  if (normalized.includes("AROM")) return "AROMATIC";
+  if (normalized.includes("SING")) return "SINGLE";
+  return "UNKNOWN";
+};
+
 const parseMmcif = (content: string): ParsedSource => {
-  const tokens = tokenizeCif(content);
-  const loopIndex = tokens.findIndex((token, index) => token.toLowerCase() === "loop_" && tokens[index + 1]?.startsWith("_atom_site."));
-  if (loopIndex < 0) throw new IngestionError("INVALID_INPUT", "No _atom_site loop was found in the mmCIF input.");
-
-  const headers: string[] = [];
-  let cursor = loopIndex + 1;
-  while (tokens[cursor]?.startsWith("_")) {
-    headers.push(tokens[cursor]);
-    cursor += 1;
-  }
-  if (headers.length === 0) throw new IngestionError("INVALID_INPUT", "The mmCIF atom loop has no column definitions.");
-
-  const atoms: CanonicalAtom[] = [];
-  let rowIndex = 0;
-  while (cursor + headers.length <= tokens.length) {
-    const next = tokens[cursor];
-    if (!next || next === "loop_" || next.startsWith("data_") || next.startsWith("_")) break;
-    const row = tokens.slice(cursor, cursor + headers.length);
-    cursor += headers.length;
-    const xValue = cifValue(row, headers, ["_atom_site.Cartn_x"]);
-    const yValue = cifValue(row, headers, ["_atom_site.Cartn_y"]);
-    const zValue = cifValue(row, headers, ["_atom_site.Cartn_z"]);
-    if (!xValue || !yValue || !zValue) {
-      rowIndex += 1;
-      continue;
-    }
-    const record = (cifValue(row, headers, ["_atom_site.group_PDB"]) ?? "ATOM").toUpperCase() === "HETATM" ? "HETATM" : "ATOM";
-    const atomName = cifValue(row, headers, ["_atom_site.label_atom_id", "_atom_site.auth_atom_id"]) ?? "X";
-    const residueName = cifValue(row, headers, ["_atom_site.label_comp_id", "_atom_site.auth_comp_id"]) ?? "UNK";
-    const chain = cifValue(row, headers, ["_atom_site.label_asym_id", "_atom_site.auth_asym_id"]) ?? "_";
-    const residueNumber = parseInteger(cifValue(row, headers, ["_atom_site.label_seq_id", "_atom_site.auth_seq_id"]), 0);
-    const insertionCode = cifValue(row, headers, ["_atom_site.pdbx_PDB_ins_code"]);
-    const element = normalizeElement(cifValue(row, headers, ["_atom_site.type_symbol"]) ?? "", atomName);
+  const loops = readCifLoops(content);
+  const atomLoop = loops.find((loop) => loop.headers.some((header) => header.startsWith("_atom_site.")));
+  if (!atomLoop) throw new IngestionError("INVALID_INPUT", "No _atom_site loop was found in the mmCIF input.");
+  const atoms: AtomSeed[] = [];
+  for (const [rowIndex, row] of atomLoop.rows.entries()) {
+    const xValue = cifValue(row, atomLoop.headers, ["_atom_site.Cartn_x"]);
+    const yValue = cifValue(row, atomLoop.headers, ["_atom_site.Cartn_y"]);
+    const zValue = cifValue(row, atomLoop.headers, ["_atom_site.Cartn_z"]);
+    if (!xValue || !yValue || !zValue) continue;
+    const record = (cifValue(row, atomLoop.headers, ["_atom_site.group_PDB"]) ?? "ATOM").toUpperCase() === "HETATM" ? "HETATM" : "ATOM";
+    const atomName = cifValue(row, atomLoop.headers, ["_atom_site.label_atom_id", "_atom_site.auth_atom_id"]) ?? "X";
+    const residueName = cifValue(row, atomLoop.headers, ["_atom_site.label_comp_id", "_atom_site.auth_comp_id"]) ?? "UNK";
+    const chain = cifValue(row, atomLoop.headers, ["_atom_site.label_asym_id", "_atom_site.auth_asym_id"]) ?? "_";
+    const residueNumber = parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.label_seq_id", "_atom_site.auth_seq_id"]), 0);
+    const element = normalizeElement(cifValue(row, atomLoop.headers, ["_atom_site.type_symbol"]) ?? "", atomName);
     atoms.push({
-      serial: parseInteger(cifValue(row, headers, ["_atom_site.id"]), rowIndex + 1),
+      serial: parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.id"]), rowIndex + 1),
       atomName,
       element,
       residueName,
       residueNumber,
-      insertionCode,
+      insertionCode: cifValue(row, atomLoop.headers, ["_atom_site.pdbx_PDB_ins_code"]),
       chain,
       x: parseNumber(xValue, "x coordinate"),
       y: parseNumber(yValue, "y coordinate"),
@@ -189,23 +224,71 @@ const parseMmcif = (content: string): ParsedSource => {
       recordType: record,
       ...classifyAtom(record, residueName, element),
     });
-    rowIndex += 1;
   }
   if (atoms.length === 0) throw new IngestionError("INVALID_INPUT", "No _atom_site rows with coordinates were found in the mmCIF input.");
-  return { format: "mmcif", atoms };
+
+  const serialFor = (chain: string, residue: number, atomName: string, residueName?: string): number[] => atoms
+    .filter((atom) => atom.chain === chain && atom.residueNumber === residue && atom.atomName === atomName && (!residueName || atom.residueName === residueName))
+    .map((atom) => atom.serial);
+  const bonds: BondSeed[] = [];
+  for (const loop of loops) {
+    if (loop.headers.some((header) => header.startsWith("_struct_conn."))) {
+      for (const row of loop.rows) {
+        const atom1 = serialFor(cifValue(row, loop.headers, ["_struct_conn.ptnr1_label_asym_id", "_struct_conn.ptnr1_auth_asym_id"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_struct_conn.ptnr1_label_seq_id", "_struct_conn.ptnr1_auth_seq_id"]), 0), cifValue(row, loop.headers, ["_struct_conn.ptnr1_label_atom_id", "_struct_conn.ptnr1_auth_atom_id"]) ?? "X", cifValue(row, loop.headers, ["_struct_conn.ptnr1_label_comp_id", "_struct_conn.ptnr1_auth_comp_id"]));
+        const atom2 = serialFor(cifValue(row, loop.headers, ["_struct_conn.ptnr2_label_asym_id", "_struct_conn.ptnr2_auth_asym_id"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_struct_conn.ptnr2_label_seq_id", "_struct_conn.ptnr2_auth_seq_id"]), 0), cifValue(row, loop.headers, ["_struct_conn.ptnr2_label_atom_id", "_struct_conn.ptnr2_auth_atom_id"]) ?? "X", cifValue(row, loop.headers, ["_struct_conn.ptnr2_label_comp_id", "_struct_conn.ptnr2_auth_comp_id"]));
+        if (atom1[0] !== undefined && atom2[0] !== undefined) bonds.push({ atom1Serial: atom1[0], atom2Serial: atom2[0], order: parseBondOrder(cifValue(row, loop.headers, ["_struct_conn.pdbx_value_order"])), source: "MMCIF_STRUCT_CONN" });
+      }
+    }
+    if (loop.headers.some((header) => header.startsWith("_geom_bond."))) {
+      for (const row of loop.rows) {
+        const atom1 = serialFor(cifValue(row, loop.headers, ["_geom_bond.atom_site_asym_id_1"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_geom_bond.atom_site_label_seq_id_1"]), 0), cifValue(row, loop.headers, ["_geom_bond.atom_site_label_atom_id_1"]) ?? "X");
+        const atom2 = serialFor(cifValue(row, loop.headers, ["_geom_bond.atom_site_asym_id_2"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_geom_bond.atom_site_label_seq_id_2"]), 0), cifValue(row, loop.headers, ["_geom_bond.atom_site_label_atom_id_2"]) ?? "X");
+        if (atom1[0] !== undefined && atom2[0] !== undefined) bonds.push({ atom1Serial: atom1[0], atom2Serial: atom2[0], order: parseBondOrder(cifValue(row, loop.headers, ["_geom_bond.value_order"])), source: "MMCIF_GEOM_BOND" });
+      }
+    }
+    if (loop.headers.some((header) => header.startsWith("_chem_comp_bond."))) {
+      for (const row of loop.rows) {
+        const component = cifValue(row, loop.headers, ["_chem_comp_bond.comp_id"]);
+        const atomName1 = cifValue(row, loop.headers, ["_chem_comp_bond.atom_id_1"]);
+        const atomName2 = cifValue(row, loop.headers, ["_chem_comp_bond.atom_id_2"]);
+        if (!component || !atomName1 || !atomName2) continue;
+        for (const atom1 of atoms.filter((atom) => atom.residueName === component && atom.atomName === atomName1)) {
+          const atom2 = atoms.find((candidate) => candidate.chain === atom1.chain && candidate.residueNumber === atom1.residueNumber && candidate.residueName === component && candidate.atomName === atomName2);
+          if (atom2) bonds.push({ atom1Serial: atom1.serial, atom2Serial: atom2.serial, order: parseBondOrder(cifValue(row, loop.headers, ["_chem_comp_bond.value_order"])), source: "MMCIF_CHEM_COMP_BOND" });
+        }
+      }
+    }
+  }
+  return { format: "mmcif", atoms, bonds };
 };
 
 const formatFromFilename = (filename: string): StructureFormat => {
   const extension = filename.toLowerCase().split(".").pop();
   if (extension === "pdb") return "pdb";
   if (extension === "cif" || extension === "mmcif") return "mmcif";
-  throw new IngestionError("UNSUPPORTED_FORMAT", "Only .pdb, .cif, and .mmcif files are admitted in VIS-01.");
+  throw new IngestionError("UNSUPPORTED_FORMAT", "Only .pdb, .cif, and .mmcif files are admitted in G1B.");
 };
 
 const parseSource = (filename: string, content: string): ParsedSource => {
   const format = formatFromFilename(filename);
-  if (format === "pdb") return parsePdb(content);
-  return parseMmcif(content);
+  return format === "pdb" ? parsePdb(content) : parseMmcif(content);
+};
+
+const makeHierarchy = (atoms: CanonicalAtom[]): CanonicalHierarchy => {
+  const chains: Record<string, CanonicalChain> = {};
+  const residues: Record<string, CanonicalResidue> = {};
+  for (const atom of atoms) {
+    const chainId = `chain:${atom.chain}`;
+    const residueId = `${chainId}:residue:${atom.residueNumber}:${atom.insertionCode ?? ""}`;
+    if (!chains[chainId]) chains[chainId] = { id: chainId, name: atom.chain, residueIds: [] };
+    if (!residues[residueId]) {
+      residues[residueId] = { id: residueId, name: atom.residueName, number: atom.residueNumber, ...(atom.insertionCode ? { insertionCode: atom.insertionCode } : {}), chainId, atomIds: [], isPolymer: atom.isPolymer };
+      chains[chainId].residueIds.push(residueId);
+    }
+    residues[residueId].atomIds.push(atom.stableId);
+    residues[residueId].isPolymer ||= atom.isPolymer;
+  }
+  return { chainIds: Object.keys(chains), chains, residues };
 };
 
 const summarize = (atoms: CanonicalAtom[]): { counts: CanonicalMolecularStructure["counts"]; bounds: CoordinateBounds } => {
@@ -230,6 +313,8 @@ const summarize = (atoms: CanonicalAtom[]): { counts: CanonicalMolecularStructur
     bounds,
   };
 };
+
+const canonicalBondKey = (atom1: string, atom2: string) => [atom1, atom2].sort().join("|");
 
 export class StructureIngestionService {
   private readonly structures = new Map<string, CanonicalMolecularStructure>();
@@ -261,7 +346,23 @@ export class StructureIngestionService {
     if (!content.trim()) throw new IngestionError("INVALID_INPUT", "The structure input is empty.");
     const parsed = parseSource(safeFilename, content);
     const hash = createHash("sha256").update(buffer).digest("hex");
-    const summary = summarize(parsed.atoms);
+    const atomIdsBySerial = new Map<number, string[]>();
+    const atoms: CanonicalAtom[] = parsed.atoms.map((atom, index) => {
+      const stableId = `${hash.slice(0, 16)}:atom:${index + 1}`;
+      const ids = atomIdsBySerial.get(atom.serial) ?? [];
+      ids.push(stableId);
+      atomIdsBySerial.set(atom.serial, ids);
+      return { ...atom, stableId };
+    });
+    const bondsByKey = new Map<string, CanonicalBond>();
+    for (const bond of parsed.bonds) {
+      const atom1 = atomIdsBySerial.get(bond.atom1Serial)?.[0];
+      const atom2 = atomIdsBySerial.get(bond.atom2Serial)?.[0];
+      if (!atom1 || !atom2 || atom1 === atom2) continue;
+      const key = canonicalBondKey(atom1, atom2);
+      if (!bondsByKey.has(key)) bondsByKey.set(key, { id: `${hash.slice(0, 16)}:bond:${bondsByKey.size + 1}`, atom1, atom2, order: bond.order, source: bond.source });
+    }
+    const summary = summarize(atoms);
     const source = {
       kind,
       originalFilename: safeFilename,
@@ -270,13 +371,21 @@ export class StructureIngestionService {
       byteLength: buffer.length,
       ...(uri ? { uri } : {}),
       ingestedAt: new Date().toISOString(),
+      parserProfile: INGESTION_PARSER_PROFILE,
     } as const;
+    const hierarchy = makeHierarchy(atoms);
+    const bonds = [...bondsByKey.values()];
+    const scientificPayload = { atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds };
+    const scientificHash = createHash("sha256").update(JSON.stringify(scientificPayload)).digest("hex");
     const structure: CanonicalMolecularStructure = {
       id: `structure_${hash.slice(0, 16)}`,
       name: safeFilename.replace(/\.(pdb|cif|mmcif)$/i, ""),
       format: parsed.format,
       source,
-      atoms: parsed.atoms,
+      atoms,
+      bonds,
+      hierarchy,
+      scientificHash,
       ...summary,
     };
     this.structures.set(structure.id, structure);

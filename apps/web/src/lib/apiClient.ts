@@ -1,4 +1,4 @@
-import type { BootstrapResponse, HealthResponse, StructureError, StructureLoadResult } from "@molecular/contracts";
+import type { BootstrapResponse, HealthResponse, ProjectRecord, ProjectSaveRequest, StructureError, StructureLoadResult } from "@molecular/contracts";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
@@ -36,5 +36,16 @@ export const apiClient = {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ pdbId }),
+  }),
+  createProject: (name?: string) => request<ProjectRecord>("/projects", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(name ? { name } : {}),
+  }),
+  openProject: (id: string) => request<ProjectRecord>(`/projects/${encodeURIComponent(id)}`),
+  saveProject: (id: string, body: ProjectSaveRequest) => request<ProjectRecord>(`/projects/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
   }),
 };

@@ -17,6 +17,7 @@ type MolecularCanvasProps = {
   onAction: (actionId: ActionId) => void;
   onImport: () => void;
   onFileDrop: (file: File) => void;
+  consoleExpanded: boolean;
 };
 
 const toolIcon = (activeTool: string) => {
@@ -36,12 +37,15 @@ export const MolecularCanvas = ({
   onAction,
   onImport,
   onFileDrop,
+  consoleExpanded,
 }: MolecularCanvasProps) => {
   const hostRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
   const adapterRef = useRef<ThreeDMolViewerAdapter | null>(null);
   const projectionRef = useRef(projection);
   const [dragActive, setDragActive] = useState(false);
   const [viewerError, setViewerError] = useState<string | null>(null);
+  const [viewerBottomInset, setViewerBottomInset] = useState(0);
   projectionRef.current = projection;
 
   useEffect(() => {
@@ -59,6 +63,46 @@ export const MolecularCanvas = ({
       adapter.destroy();
     };
   }, []);
+
+  useEffect(() => {
+    const adapter = adapterRef.current;
+    const host = hostRef.current;
+    if (!adapter || !host) return undefined;
+    const updateViewport = () => {
+      const canvasRect = canvasRef.current?.getBoundingClientRect();
+      const hostRect = host.getBoundingClientRect();
+      const width = hostRect.width;
+      const height = hostRect.height;
+      const visible = { top: 0, bottom: height, left: 0, right: width };
+      const occluder = document.querySelector<HTMLElement>(".console-layer")?.getBoundingClientRect();
+      let bottomInset = 0;
+      if (canvasRect && occluder && occluder.left < canvasRect.right && occluder.right > canvasRect.left && occluder.top < canvasRect.bottom && occluder.bottom > canvasRect.top) bottomInset = Math.max(0, Math.min(canvasRect.height, canvasRect.bottom - occluder.top));
+      setViewerBottomInset((current) => Math.abs(current - bottomInset) < 1 ? current : bottomInset);
+      if (occluder && occluder.left < hostRect.right && occluder.right > hostRect.left && occluder.top < hostRect.bottom && occluder.bottom > hostRect.top) {
+        const left = Math.max(0, occluder.left - hostRect.left);
+        const right = Math.min(width, occluder.right - hostRect.left);
+        const top = Math.max(0, occluder.top - hostRect.top);
+        const bottom = Math.min(height, occluder.bottom - hostRect.top);
+        if (bottom - top >= height / 2) visible.bottom = top;
+        else if (top <= height / 2) visible.top = bottom;
+        if (right - left >= width / 2) {
+          visible.left = left;
+          visible.right = right;
+        }
+      }
+      adapter.setViewport({ width, height, visibleTop: visible.top, visibleBottom: visible.bottom, visibleLeft: visible.left, visibleRight: visible.right });
+    };
+    updateViewport();
+    const observer = new ResizeObserver(updateViewport);
+    observer.observe(host);
+    const consoleLayer = document.querySelector<HTMLElement>(".console-layer");
+    if (consoleLayer) observer.observe(consoleLayer);
+    window.addEventListener("resize", updateViewport);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateViewport);
+    };
+  }, [consoleExpanded, structure, viewerBottomInset]);
 
   useEffect(() => {
     if (!structure || !adapterRef.current) return;
@@ -99,13 +143,14 @@ export const MolecularCanvas = ({
     <section className="canvas-stage" aria-label="Molecular render projection">
       <div className="canvas-status"><span className="live-dot" />3DMOL.JS <span className="canvas-status-separator">/</span> RENDER PROJECTION</div>
       <div
+        ref={canvasRef}
         className="molecular-canvas"
         onDragEnter={(event) => { event.preventDefault(); setDragActive(true); }}
         onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = "copy"; setDragActive(true); }}
         onDragLeave={(event) => { if (event.currentTarget === event.target) setDragActive(false); }}
         onDrop={handleDrop}
       >
-        <div ref={hostRef} className="viewer-host" data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} />
+        <div ref={hostRef} className="viewer-host" style={{ bottom: `${viewerBottomInset}px` }} data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} />
         {!structure && !loading && (
           <div className="empty-viewer-state">
             <div className="empty-viewer-card">

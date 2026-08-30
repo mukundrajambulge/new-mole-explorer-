@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ACTION_IDS, ACTION_REGISTRY } from "./registry";
 
-describe("G0 action registry", () => {
+describe("G1B action registry", () => {
   it("provides a capability for every canonical action", () => {
     for (const actionId of Object.values(ACTION_IDS)) {
       expect(ACTION_REGISTRY[actionId]).toMatchObject({ id: actionId });
