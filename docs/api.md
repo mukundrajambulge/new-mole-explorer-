@@ -1,6 +1,6 @@
 # G1C API contract
 
-The API is the authoritative ingestion and project boundary. The running local API is `http://localhost:4310`; the web app proxies `/api` to it.
+The API is the authoritative ingestion and project boundary. The running local API is `http://localhost:8100`; the web app proxies `/api` to it.
 
 ## Readiness
 

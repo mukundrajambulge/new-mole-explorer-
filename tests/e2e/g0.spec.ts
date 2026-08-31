@@ -10,11 +10,10 @@ test("G0 workstation shell renders and console collapses", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Expand console" })).toBeVisible();
 });
 
-test("unsupported actions report their G0 capability state", async ({ page }) => {
+test("surface actions report their bounded visualization capability", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Surface", exact: true }).first().click();
-  await expect(page.getByRole("status")).toContainText("Coming Soon");
-  await expect(page.getByRole("status")).toContainText("Surface calculation is not implemented in G1B");
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-projection", "van-der-waals-surface");
 });
 
 test("local PDB upload loads canonical metadata into the real viewer", async ({ page }) => {

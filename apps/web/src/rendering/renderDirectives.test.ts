@@ -58,15 +58,14 @@ describe("G1B-R1 canonical render directive diagnostics", () => {
     expect(visible.representation.SPHERES.atomContributors).toBe(2);
   });
 
-  it("G1B-REG-007 reports unsupported Ribbon without substituting Cartoon", () => {
+  it("VIS-REG-007 projects Ribbon distinctly without substituting Cartoon", () => {
     const projection = createDefaultRenderProjection(structure);
     const state = applyRepresentationOperation(projection.representationState, "SHOW", REPRESENTATION_MASKS.RIBBON, ["polymer-1"]);
     const diagnostics = buildRenderProjectionDiagnostics(structure, { ...projection, representationState: state });
-    expect(diagnostics.representation.RIBBON.supported).toBe(false);
-    expect(diagnostics.representation.RIBBON.active).toBe(false);
-    expect(diagnostics.representation.RIBBON.status).toBe("NOT_IMPLEMENTED");
-    expect(diagnostics.representation.RIBBON.diagnostic).toMatch(/Ribbon geometry/i);
-    expect(diagnostics.directives.some((directive) => directive.representation === "RIBBON")).toBe(false);
+    expect(diagnostics.representation.RIBBON.supported).toBe(true);
+    expect(diagnostics.representation.RIBBON.active).toBe(true);
+    expect(diagnostics.representation.RIBBON.status).toBe("IMPLEMENTED_WITH_LIMITATIONS");
+    expect(diagnostics.directives.some((directive) => directive.representation === "RIBBON" && directive.styleProfile === "ribbon")).toBe(true);
     expect(diagnostics.representation.CARTOON.active).toBe(true);
   });
 

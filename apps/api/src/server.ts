@@ -4,7 +4,7 @@ import { IngestionError, StructureIngestionService } from "./structures/ingestio
 import { parseMultipartFile } from "./structures/multipart.js";
 import { ProjectStore } from "./projects/projectStore.js";
 
-const port = Number(process.env.API_PORT ?? 4310);
+const port = Number(process.env.API_PORT ?? 8100);
 
 const sendJson = (response: ServerResponse, status: number, body: unknown) => {
   response.writeHead(status, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });

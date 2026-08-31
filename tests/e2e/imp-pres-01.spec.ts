@@ -23,8 +23,8 @@ test("IMP-PRES-01 keeps menu state and rail ownership truthful", async ({ page }
   await expect(file).toHaveAttribute("aria-expanded", "false");
   await expect(edit).toHaveAttribute("aria-expanded", "true");
   await expect(page.locator('.context-toolbar[data-ribbon-category="Edit"]')).toContainText("Delete atom");
-  await expect(page.getByLabel("Structure, context and tools panel")).toContainText("Context");
-  await expect(page.getByLabel("Structure, context and tools panel")).toContainText("Interaction / Measurements");
+  await expect(page.getByLabel("Structure, context and analysis panel")).toContainText("Context");
+  await expect(page.getByLabel("Structure, context and analysis panel")).toContainText("Analysis & Interaction");
   await expect(page.getByLabel("Projection & Display panel").getByRole("heading", { name: "Context" })).toHaveCount(0);
   await expect(page.getByLabel("Projection & Display panel").getByRole("heading", { name: "Interaction / Measurements" })).toHaveCount(0);
 });
@@ -41,14 +41,13 @@ test("IMP-PRES-01 derives label cardinality before renderer projection", async (
   await expect(viewer(page)).toHaveAttribute("data-label-count", "11");
 });
 
-test("IMP-PRES-01 rejects Ribbon without changing the loaded projection", async ({ page }) => {
+test("IMP-PRES-01 projects Ribbon with its bounded renderer profile", async ({ page }) => {
   await loadFixture(page);
   await expect(viewer(page)).toHaveAttribute("data-renderer-style-profile", "cartoon");
-  await page.getByRole("button", { name: "Ribbon", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText("Canonical Ribbon geometry is not implemented");
+  await page.getByRole("combobox", { name: "Style" }).selectOption("ribbon");
   await expect(viewer(page)).toHaveAttribute("data-viewer-state", "loaded");
-  await expect(viewer(page)).toHaveAttribute("data-renderer-style-profile", "cartoon");
-  await expect(viewer(page)).toHaveAttribute("data-renderer-ribbon-contributors", "0");
+  await expect(viewer(page)).toHaveAttribute("data-renderer-style-profile", "ribbon");
+  await expect(viewer(page)).toHaveAttribute("data-renderer-ribbon-contributors", "8");
 });
 
 test("IMP-PRES-01 keeps side-rail controls reachable at required workbench sizes", async ({ page }) => {

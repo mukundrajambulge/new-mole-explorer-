@@ -28,7 +28,7 @@ test("G1B-REG-003 exposes the RCSB fetch entry point in File", async ({ page }) 
   await page.getByRole("button", { name: "File", exact: true }).click();
   await expect(page.getByRole("button", { name: "Fetch", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Fetch", exact: true }).click();
-  await expect(page.getByRole("textbox", { name: "PDB ID" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "RCSB PDB ID" })).toBeVisible();
 });
 
 test("G1B-REG-004 renders Spheres without stick cylinders", async ({ page }) => {
@@ -73,16 +73,16 @@ test("G1B-REG-009 keeps Cartoon protein contributors separate from ligand sticks
   await expect(renderer(page)).toHaveAttribute("data-renderer-stick-cylinders", "1");
 });
 
-test("G1B-REG-010 marks Surface as Coming Soon", async ({ page }) => {
+test("VIS-REG-010 projects Surface with an explicit limited profile", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Surface", exact: true }).first().click();
-  await expect(page.getByRole("status")).toContainText("Coming Soon");
+  await expect(renderer(page)).toHaveAttribute("data-renderer-style-profile", "van-der-waals-surface");
 });
 
-test("G1B-REG-011 marks Ribbon as Coming Soon instead of substituting Cartoon", async ({ page }) => {
+test("VIS-REG-011 exposes Ribbon as a distinct limited profile", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Ribbon", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText("Ribbon geometry is not implemented");
+  await expect(renderer(page)).toHaveAttribute("data-renderer-style-profile", "ribbon");
 });
 
 test("G1B-REG-012 shows water spheres when the Water layer is ON", async ({ page }) => {

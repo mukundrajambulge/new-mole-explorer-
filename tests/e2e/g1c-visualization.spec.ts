@@ -17,7 +17,7 @@ test("G1C-UI-001 exposes the complete style dropdown with truthful capability st
   await expect(style.locator("option")).toHaveText([
     "Line", "Stick", "Ball-and-Stick", "Space-Filling", "Van der Waals Surface", "Solvent-Accessible Surface", "Solvent-Excluded Surface", "Mesh", "Dots", "Dot Surface", "Cartoon", "Ribbon", "Trace", "Putty", "Non-bonded (crosses)", "Non-bonded (spheres)", "Licorice",
   ]);
-  await expect(style.locator('option[value="van-der-waals-surface"]')).toHaveAttribute("data-capability-state", "COMING_SOON");
+  await expect(style.locator('option[value="van-der-waals-surface"]')).toHaveAttribute("data-capability-state", "SUPPORTED_WITH_LIMITATIONS");
 });
 
 test("G1C-REP-001 renders Lines, Sticks, Ball-and-Stick, and Space-Filling from canonical targets", async ({ page }) => {
@@ -42,13 +42,12 @@ test("G1C-REP-002 keeps Cartoon, Ribbon, Trace, and Putty capability truth expli
   const style = page.getByRole("combobox", { name: "Style" });
   await style.selectOption("cartoon");
   await expect(renderer(page)).toHaveAttribute("data-renderer-cartoon-contributors", "8");
-  await expect(style.locator('option[value="ribbon"]')).toHaveAttribute("data-capability-state", "COMING_SOON");
-  await expect(style.locator('option[value="ribbon"]')).toHaveAttribute("data-representation-status", "NOT_IMPLEMENTED");
-  await page.getByRole("button", { name: "Ribbon", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText("Canonical Ribbon geometry is not implemented");
-  await expect(renderer(page)).toHaveAttribute("data-renderer-ribbon-contributors", "0");
-  await expect(renderer(page)).toHaveAttribute("data-renderer-cartoon-contributors", "8");
-  await expect(renderer(page)).toHaveAttribute("data-renderer-style-profile", "cartoon");
+  await expect(style.locator('option[value="ribbon"]')).toHaveAttribute("data-capability-state", "SUPPORTED_WITH_LIMITATIONS");
+  await expect(style.locator('option[value="ribbon"]')).toHaveAttribute("data-representation-status", "IMPLEMENTED_WITH_LIMITATIONS");
+  await style.selectOption("ribbon");
+  await expect(renderer(page)).toHaveAttribute("data-renderer-ribbon-contributors", "8");
+  await expect(renderer(page)).toHaveAttribute("data-renderer-cartoon-contributors", "0");
+  await expect(renderer(page)).toHaveAttribute("data-renderer-style-profile", "ribbon");
   await style.selectOption("trace");
   await expect(renderer(page)).toHaveAttribute("data-renderer-trace-contributors", "8");
   await style.selectOption("putty");
@@ -63,6 +62,24 @@ test("G1C-REP-003 uses canonical topology for non-bonded crosses and spheres", a
   await style.selectOption("nonbonded-spheres");
   await expect(renderer(page)).toHaveAttribute("data-renderer-sphere-primitives", "1");
   await expect(renderer(page)).toHaveAttribute("data-renderer-stick-cylinders", "0");
+});
+
+test("G1C-REP-004 projects VDW, Mesh, Dots, and target-scoped surfaces", async ({ page }) => {
+  await loadFixture(page);
+  const style = page.getByRole("combobox", { name: "Style" });
+  await style.selectOption("van-der-waals-surface");
+  await expect(renderer(page)).toHaveAttribute("data-renderer-surface-contributors", "11");
+  await expect(renderer(page)).toHaveAttribute("data-surface-state", "ready", { timeout: 15000 });
+  await style.selectOption("mesh");
+  await expect(renderer(page)).toHaveAttribute("data-renderer-mesh-contributors", "11");
+  await expect(renderer(page)).toHaveAttribute("data-surface-state", "ready", { timeout: 15000 });
+  await style.selectOption("dots");
+  await expect(renderer(page)).toHaveAttribute("data-renderer-dot-contributors", "11");
+  await expect(renderer(page)).toHaveAttribute("data-surface-state", "ready", { timeout: 15000 });
+  await style.selectOption("cartoon");
+  await page.getByRole("combobox", { name: "Ligand representation" }).selectOption("dots");
+  await expect(renderer(page)).toHaveAttribute("data-renderer-dot-contributors", "2");
+  await expect(renderer(page)).toHaveAttribute("data-renderer-cartoon-contributors", "8");
 });
 
 test("G1C-COLOR-001 exposes all schemes and reports missing property datasets", async ({ page }) => {
@@ -105,9 +122,10 @@ test("G1C-PERF-001 changes presentation without recreating the canonical model",
 
 test("G1C-RCSB-001 loads an official RCSB mmCIF through the backend", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "RCSB fetch" }).click();
-  await page.getByRole("textbox", { name: "PDB ID" }).fill("1CRN");
+  await page.getByRole("button", { name: "File", exact: true }).click();
   await page.getByRole("button", { name: "Fetch", exact: true }).click();
+  await page.getByRole("textbox", { name: "RCSB PDB ID" }).fill("1CRN");
+  await page.getByRole("button", { name: "RCSB fetch" }).click();
   await expect(page.getByTitle("1CRN.cif")).toBeVisible({ timeout: 45000 });
   await expect(page.getByText(/RCSB · MMCIF · sha256/)).toBeVisible();
   await expect(renderer(page)).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });

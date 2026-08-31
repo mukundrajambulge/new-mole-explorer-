@@ -22,6 +22,7 @@ type MolecularCanvasProps = {
   consoleExpanded: boolean;
   onPick: (result: PickResult) => void;
   onHover: (result: PickResult | null) => void;
+  onBackgroundPick: () => void;
   measurements: readonly MeasurementObject[];
   measurementMode: MeasurementKind | null;
 };
@@ -46,6 +47,7 @@ export const MolecularCanvas = ({
   consoleExpanded,
   onPick,
   onHover,
+  onBackgroundPick,
   measurements,
   measurementMode,
 }: MolecularCanvasProps) => {
@@ -134,7 +136,7 @@ export const MolecularCanvas = ({
   }, [structure]);
 
   useEffect(() => {
-    if (!structure || !adapterRef.current) return;
+    if (!adapterRef.current) return;
     try {
       adapterRef.current.setProjection(projection);
     } catch (projectionError) {
@@ -161,6 +163,7 @@ export const MolecularCanvas = ({
 
   const gestureMode = activeTool === "Rotate" ? "rotate" : activeTool === "Pan" ? "pan" : activeTool === "Zoom" ? "zoom" : null;
   const beginPointerGesture = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!gestureMode && event.button === 0 && event.target instanceof HTMLCanvasElement) onBackgroundPick();
     if (!gestureMode || event.button !== 0 || (event.target instanceof HTMLElement && Boolean(event.target.closest("button")))) return;
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);

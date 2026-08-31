@@ -5,7 +5,8 @@
   "type": "module",
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace @molecular/api\" \"npm run dev --workspace @molecular/web\"",
+    "dev": "concurrently \"npm run dev --workspace @molecular/app\" \"npm run dev --workspace @molecular/api\" \"npm run dev --workspace @molecular/web\"",
+    "dev:landing": "npm run dev --workspace @molecular/app",
     "dev:web": "npm run dev --workspace @molecular/web",
     "dev:api": "npm run dev --workspace @molecular/api",
     "build": "npm run build --workspaces",

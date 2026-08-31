@@ -49,7 +49,6 @@ export const App = () => {
   const [projection, setProjection] = useState<RenderProjection>(createDefaultRenderProjection());
   const [loadState, setLoadState] = useState<"idle" | "loading" | "error">("idle");
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [openRcsbRequest, setOpenRcsbRequest] = useState(0);
   const [measurementMode, setMeasurementModeState] = useState<MeasurementKind | null>(null);
   const [measurementSlots, setMeasurementSlots] = useState<readonly string[]>([]);
   const [measurements, setMeasurements] = useState<readonly MeasurementObject[]>([]);
@@ -64,6 +63,18 @@ export const App = () => {
     let mounted = true;
     apiClient.health().then(() => mounted && setApiStatus("connected")).catch(() => mounted && setApiStatus("offline"));
     return () => { mounted = false; };
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      measurementAccumulatorRef.current.clear();
+      setMeasurementSlots([]);
+      setMeasurementModeState(null);
+      setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, measurementPickAtomIds: [] }));
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
   const showNotice = (capability: ActionDefinition) => {
@@ -173,7 +184,7 @@ export const App = () => {
     }
     if (definition.status === "VALID_EMPTY") showNotice({ id: ACTION_IDS.REPRESENTATION_SET_STYLE, group: "REPRESENTATION", state: "SUPPORTED_WITH_LIMITATIONS", label: definition.label, description: definition.diagnostic ?? "This representation has no eligible atoms in the current structure." });
     setTargetStyles((current) => ({ ...current, [category]: style }));
-    if (structure) setProjection((current) => setCategoryRepresentation(current, structure.structure, category, maskForStyle(style)));
+    if (structure) setProjection((current) => setCategoryRepresentation(current, structure.structure, category, maskForStyle(style), style));
   };
 
   const setLabelMode = (mode: LabelMode) => setProjection((current) => applyPresentationAction(current, structure?.structure ?? null, { type: "LABELS.SET", labels: { mode, expression: labelExpressionForMode(mode) } }));
@@ -193,15 +204,19 @@ export const App = () => {
     measurementAccumulatorRef.current.clear();
     setMeasurementSlots([]);
     setMeasurementModeState(kind);
+    setProjection((current) => setInteractionState(current, { pickedAtomId: null, measurementPickAtomIds: [] }));
   };
 
   const handlePick = (pick: PickResult) => {
     if (pick.pickKind !== "ATOM" || !structure) return;
     const stableAtomId = pick.atomRef.stableAtomId;
-    setProjection((current) => setInteractionState(current, { pickedAtomId: stableAtomId, selectedAtomIds: [stableAtomId] }));
-    if (!measurementMode) return;
+    if (!measurementMode) {
+      setProjection((current) => setInteractionState(current, { pickedAtomId: stableAtomId, selectedAtomIds: [stableAtomId], measurementPickAtomIds: [] }));
+      return;
+    }
     const slots = measurementAccumulatorRef.current.add(stableAtomId, measurementMode);
     setMeasurementSlots([...slots]);
+    setProjection((current) => setInteractionState(current, { pickedAtomId: stableAtomId, measurementPickAtomIds: [...slots] }));
     if (slots.length !== measurementCardinality(measurementMode)) return;
     try {
       measurementSequenceRef.current += 1;
@@ -210,15 +225,19 @@ export const App = () => {
       measurementAccumulatorRef.current.clear();
       setMeasurementSlots([]);
       setMeasurementModeState(null);
+      setProjection((current) => setInteractionState(current, { pickedAtomId: null, measurementPickAtomIds: [] }));
     } catch (error) {
       showNotice({ id: ACTION_IDS.MEASURE_DISTANCE, group: "MEASURE", state: "SUPPORTED_WITH_LIMITATIONS", label: "Measurement rejected", description: error instanceof Error ? error.message : "The selected coordinates could not form a measurement." });
       measurementAccumulatorRef.current.clear();
       setMeasurementSlots([]);
+      setProjection((current) => setInteractionState(current, { pickedAtomId: null, measurementPickAtomIds: [] }));
     }
   };
 
   const handleHover = (pick: PickResult | null) => setProjection((current) => setInteractionState(current, { hoveredAtomId: pick?.pickKind === "ATOM" ? pick.atomRef.stableAtomId : null }));
-  const clearMeasurementPicks = () => { measurementAccumulatorRef.current.clear(); setMeasurementSlots([]); };
+  const clearMeasurementPicks = () => { measurementAccumulatorRef.current.clear(); setMeasurementSlots([]); setProjection((current) => setInteractionState(current, { pickedAtomId: null, measurementPickAtomIds: [] })); };
+  const clearTransientInteraction = () => setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, measurementPickAtomIds: [] }));
+  const clearSelection = () => setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] }));
   const updateMeasurementVisibility = (id: string, visible: boolean) => setMeasurements((current) => current.map((measurement) => measurement.id === id ? { ...measurement, presentation: { ...measurement.presentation, visible }, status: visible ? "CURRENT" : "HIDDEN" } : measurement));
   const deleteMeasurement = (id: string) => setMeasurements((current) => current.filter((measurement) => measurement.id !== id));
 
@@ -229,13 +248,13 @@ export const App = () => {
       const query = trimmed.replace(/^select\s+/i, "").trim() || "all";
       try {
         const result: SelectionResult = resolveSelection(query, structure.structure);
-        setProjection((current) => setInteractionState(current, { selectedAtomIds: result.stableAtomIds, pickedAtomId: result.stableAtomIds[0] ?? null }));
+        setProjection((current) => setInteractionState(current, { selectedAtomIds: result.stableAtomIds, pickedAtomId: result.stableAtomIds[0] ?? null, measurementPickAtomIds: [] }));
         return { category: "SELECTION", status: `Selected ${result.stableAtomIds.length} atoms · revision ${result.molecularRevision.slice(0, 10)}…` };
       } catch (error) {
         return { category: "SELECTION", status: error instanceof Error ? error.message : "Selection query rejected." };
       }
     }
-    if (/^unpick$/i.test(trimmed)) { setProjection((current) => setInteractionState(current, { pickedAtomId: null, selectedAtomIds: [] })); return { category: "SELECTION", status: "Selection cleared." }; }
+    if (/^unpick$/i.test(trimmed)) { clearSelection(); return { category: "SELECTION", status: "Selection cleared." }; }
     try {
       const representationCommand = parseRepresentationCommand(trimmed);
       if (representationCommand) {
@@ -243,7 +262,7 @@ export const App = () => {
         const target = resolveSelection(representationCommand.query, structure.structure);
         const capability = representationCapabilityFor(representationStyleForCommand(representationCommand.representation) ?? "cartoon", structure.structure);
         if (!capability.maySelect) return { category: "PRESENTATION", status: `${capability.label} unavailable: ${capability.diagnostic ?? capability.unsupportedReason ?? "canonical capability is not implemented"}` };
-        setProjection((current) => applyRepresentationToSelection(current, representationCommand.operation, representationCommand.mask, target.stableAtomIds));
+        setProjection((current) => applyRepresentationToSelection(current, representationCommand.operation, representationCommand.mask, target.stableAtomIds, representationStyleForCommand(representationCommand.representation) ?? undefined));
         const capabilityNote = capability.status === "VALID_EMPTY" ? ` · ${capability.diagnostic ?? "valid empty result"}` : "";
         return { category: "PRESENTATION", status: `${representationCommand.operation} ${representationCommand.representation} on ${target.stableAtomIds.length} atoms${capabilityNote}.` };
       }
@@ -294,7 +313,10 @@ export const App = () => {
       return;
     }
     if (actionId === ACTION_IDS.STRUCTURE_FETCH_RCSB) {
-      setOpenRcsbRequest((value) => value + 1);
+      return;
+    }
+    if (actionId === ACTION_IDS.REPRESENTATION_SURFACE && capability.state === "SUPPORTED") {
+      applyStyle("van-der-waals-surface");
       return;
     }
     if (actionId === ACTION_IDS.FILE_OPEN || actionId === ACTION_IDS.FILE_IMPORT || actionId === ACTION_IDS.STRUCTURE_IMPORT) {
@@ -344,7 +366,7 @@ export const App = () => {
 
   const updateCustomColor = (hex: string) => setProjection((current) => ({ ...current, color: { ...current.color, mode: "custom", customHex: hex }, colorDiagnostic: null }));
   const updateNamedColor = (colorId: string) => setProjection((current) => ({ ...current, color: { ...current.color, mode: "named", colorId }, colorDiagnostic: null }));
-  const selectedAtom = structure?.structure.atoms.find((atom) => atom.stableId === projection.interaction.pickedAtomId) ?? null;
+  const selectedAtom = structure?.structure.atoms.find((atom) => atom.stableId === (projection.interaction.pickedAtomId ?? projection.interaction.selectedAtomIds[0])) ?? null;
 
   return (
     <div className="app-shell">
@@ -352,10 +374,10 @@ export const App = () => {
       <NavRail activeItem={activeNav} onAction={handleAction} />
       <main className="app-main">
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
-        <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
+        <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
-          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFetchRcsb={fetchRcsb} openRcsbRequest={openRcsbRequest} structure={structure} projection={projection} selectedAtom={selectedAtom} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} loading={loadState === "loading"} error={loadError} />
-          <MolecularCanvas structure={structure} projection={projection} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFileDrop={importFile} consoleExpanded={consoleExpanded} onPick={handlePick} onHover={handleHover} measurements={measurements} measurementMode={measurementMode} />
+          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} selectedAtom={selectedAtom} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} loading={loadState === "loading"} error={loadError} />
+          <MolecularCanvas structure={structure} projection={projection} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFileDrop={importFile} consoleExpanded={consoleExpanded} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} />
           <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
         </div>
         <StatusBar apiStatus={apiStatus} structure={structure} project={project} selectedAtomCount={projection.interaction.selectedAtomIds.length} />

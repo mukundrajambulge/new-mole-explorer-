@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CanonicalMolecularStructure } from "@molecular/contracts";
-import { applyRepresentationOperation, createDefaultRenderProjection, REPRESENTATION_MASKS, REPRESENTATION_PRESETS, setProjectionStyle } from "./presentationState";
+import { applyRepresentationOperation, createDefaultRenderProjection, REPRESENTATION_MASKS, REPRESENTATION_PRESETS, setInteractionState, setProjectionStyle } from "./presentationState";
 
 const structure = {
   id: "structure_test",
@@ -35,6 +35,17 @@ describe("G1B renderer-neutral presentation state", () => {
     const replaced = applyRepresentationOperation(hidden, "SHOW_AS", REPRESENTATION_MASKS.STICKS, ["a"]);
     expect(replaced.atomRepMasks.a).toBe(REPRESENTATION_MASKS.STICKS);
     expect(replaced.atomRepMasks.b).toBe(state.atomRepMasks.b);
+    expect(replaced.atomRepStyles.a).toBe(state.atomRepStyles.a);
+  });
+
+  it("keeps transient inspection and measurement picks separate from persistent selection", () => {
+    const projection = createDefaultRenderProjection(structure);
+    const next = setInteractionState(projection, { pickedAtomId: "a", selectedAtomIds: ["a", "b"], measurementPickAtomIds: ["b"] });
+    expect(next.interaction.pickedAtomId).toBe("a");
+    expect(next.interaction.selectedAtomIds).toEqual(["a", "b"]);
+    expect(next.interaction.measurementPickAtomIds).toEqual(["b"]);
+    const clearedTransient = setInteractionState(next, { pickedAtomId: null, measurementPickAtomIds: [] });
+    expect(clearedTransient.interaction.selectedAtomIds).toEqual(["a", "b"]);
   });
 
   it("rebuilds masks from canonical atoms without changing the structure", () => {

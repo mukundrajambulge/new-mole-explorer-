@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { CanonicalMolecularStructure } from "@molecular/contracts";
 import { COLOR_SCHEME_DEFINITIONS } from "./colorSchemes";
 import { buildRenderProjectionDiagnostics } from "./renderDirectives";
-import { createDefaultRenderProjection, setLayerVisibility, setProjectionStyle } from "./presentationState";
+import { createDefaultRenderProjection, maskForStyle, setCategoryRepresentation, setLayerVisibility, setProjectionStyle } from "./presentationState";
 import { representationCapabilityFor, STYLE_DEFINITIONS, SURFACE_PROFILES, surfaceProfileForStyle } from "./styleProfiles";
 
 const structure = {
@@ -62,10 +62,10 @@ describe("G1C representation matrix", () => {
     const trace = buildRenderProjectionDiagnostics(structure, setProjectionStyle(createDefaultRenderProjection(structure), structure, "trace"));
     const putty = buildRenderProjectionDiagnostics(structure, setProjectionStyle(createDefaultRenderProjection(structure), structure, "putty"));
     expect(cartoon.cartoonContributors).toBe(2);
-    expect(ribbon.ribbonContributors).toBe(0);
+    expect(ribbon.ribbonContributors).toBe(2);
     expect(ribbon.cartoonContributors).toBe(0);
-    expect(representationCapabilityFor("ribbon", structure).status).toBe("NOT_IMPLEMENTED");
-    expect(representationCapabilityFor("ribbon", structure).maySelect).toBe(false);
+    expect(representationCapabilityFor("ribbon", structure).status).toBe("IMPLEMENTED_WITH_LIMITATIONS");
+    expect(representationCapabilityFor("ribbon", structure).maySelect).toBe(true);
     expect(trace.traceContributors).toBe(2);
     expect(putty.puttyContributors).toBe(2);
   });
@@ -89,10 +89,10 @@ describe("G1C representation matrix", () => {
     expect(capability.diagnostic).toMatch(/0 eligible/i);
   });
 
-  it("reports unavailable geometry instead of substituting a surface", () => {
+  it("projects surface families with explicit profiles instead of substituting Cartoon", () => {
     for (const style of ["van-der-waals-surface", "solvent-accessible-surface", "solvent-excluded-surface", "mesh", "dots", "dot-surface"] as const) {
       const definition = STYLE_DEFINITIONS.find((candidate) => candidate.id === style);
-      expect(definition?.capability).toBe("COMING_SOON");
+      expect(definition?.capability).toBe("SUPPORTED_WITH_LIMITATIONS");
       expect(buildRenderProjectionDiagnostics(structure, setProjectionStyle(createDefaultRenderProjection(structure), structure, style)).directives.some((directive) => directive.primitive === "cartoon")).toBe(false);
     }
     expect(surfaceProfileForStyle("van-der-waals-surface")).toEqual(SURFACE_PROFILES.VDW);
@@ -106,6 +106,15 @@ describe("G1C representation matrix", () => {
     const projection = setProjectionStyle(createDefaultRenderProjection(structure), structure, "ribbon");
     expect(buildRenderProjectionDiagnostics(structure, projection).waterSphereContributors).toBe(0);
     expect(buildRenderProjectionDiagnostics(structure, setLayerVisibility(projection, "showWater")).waterSphereContributors).toBe(1);
+  });
+
+  it("keeps target-scoped representation changes off unrelated entities", () => {
+    const base = createDefaultRenderProjection(structure);
+    const ligandDots = setCategoryRepresentation(base, structure, "ligand", maskForStyle("dots"), "dots");
+    const diagnostics = buildRenderProjectionDiagnostics(structure, ligandDots);
+    expect(diagnostics.dotContributors).toBe(2);
+    expect(diagnostics.cartoonContributors).toBe(2);
+    expect(diagnostics.stickCylinderContributors).toBe(0);
   });
 });
 

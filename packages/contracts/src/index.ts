@@ -199,6 +199,10 @@ export type ProjectPresentationState = {
     farClip?: number;
     clippingMode?: "auto" | "manual";
   };
+  /** Renderer-neutral presentation parameters; canonical coordinates/topology never live here. */
+  representationParameters?: Record<string, number>;
+  /** Stable canonical atom identities mapped to the requested representation profile. */
+  atomRepresentationStyles?: Record<string, string>;
 };
 
 export type ProjectRecord = {

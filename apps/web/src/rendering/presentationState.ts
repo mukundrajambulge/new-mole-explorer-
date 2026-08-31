@@ -51,11 +51,32 @@ export type BackgroundPreset = (typeof BACKGROUND_PRESETS)[number];
 export type BackgroundColorState = { preset: BackgroundPreset; color: string };
 export type ClippingMode = "auto" | "manual";
 export type CameraState = { view: number[] | null; defaultView: number[] | null; projectionMode: "perspective" | "orthographic"; fov: number; nearClip: number; farClip: number; clippingMode: ClippingMode; viewport: { width: number; height: number; visibleTop: number; visibleBottom: number; visibleLeft: number; visibleRight: number } | null };
-export type InteractionState = { hoveredAtomId: string | null; pickedAtomId: string | null; selectedAtomIds: readonly string[] };
-export type RepresentationParameters = { stickRadius: number; sphereScale: number; lineWidth: number; cartoonThickness: number; quality: number };
+export type InteractionState = { hoveredAtomId: string | null; pickedAtomId: string | null; selectedAtomIds: readonly string[]; measurementPickAtomIds: readonly string[] };
+export type RepresentationParameters = {
+  stickRadius: number;
+  sphereScale: number;
+  lineWidth: number;
+  cartoonThickness: number;
+  quality: number;
+  lineOpacity: number;
+  stickOpacity: number;
+  sphereOpacity: number;
+  cartoonOpacity: number;
+  ribbonOpacity: number;
+  surfaceOpacity: number;
+  meshOpacity: number;
+  dotOpacity: number;
+  nonbondedOpacity: number;
+  surfaceProbeRadius: number;
+  surfaceQuality: number;
+  dotDensity: number;
+  meshWidth: number;
+  puttyMinRadius: number;
+  puttyMaxRadius: number;
+};
 
-export type RepresentationDirective = { operation: "SHOW" | "HIDE" | "SHOW_AS"; mask: RepresentationMask; targetStableAtomIds: string[]; presentationRevision: number };
-export type RepresentationState = { presentationRevision: number; objectEnabled: Record<string, boolean>; atomRepMasks: Record<string, RepresentationMask>; directives: RepresentationDirective[]; parameters: RepresentationParameters };
+export type RepresentationDirective = { operation: "SHOW" | "HIDE" | "SHOW_AS"; mask: RepresentationMask; targetStableAtomIds: string[]; presentationRevision: number; style?: RepresentationStyle };
+export type RepresentationState = { presentationRevision: number; objectEnabled: Record<string, boolean>; atomRepMasks: Record<string, RepresentationMask>; atomRepStyles: Record<string, RepresentationStyle>; directives: RepresentationDirective[]; parameters: RepresentationParameters };
 export type RenderProjection = {
   representation: RepresentationStyle;
   showProtein: boolean;
@@ -75,8 +96,8 @@ export type RenderProjection = {
 export const DEFAULT_COLOR: ColorState = { mode: "element", colorId: null, customHex: null, profileRef: "PYMOL_OSS_5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69", atomColors: {}, objectColors: {}, representationOverrides: {} };
 export const DEFAULT_BACKGROUND: BackgroundColorState = { preset: "Black", color: "#05070a" };
 export const DEFAULT_CAMERA: CameraState = { view: null, defaultView: null, projectionMode: "perspective", fov: 20, nearClip: 0.1, farClip: 1000, clippingMode: "auto", viewport: null };
-export const DEFAULT_INTERACTION: InteractionState = { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [] };
-export const DEFAULT_REPRESENTATION_PARAMETERS: RepresentationParameters = { stickRadius: 0.16, sphereScale: 1, lineWidth: 1, cartoonThickness: 0.92, quality: 8 };
+export const DEFAULT_INTERACTION: InteractionState = { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] };
+export const DEFAULT_REPRESENTATION_PARAMETERS: RepresentationParameters = { stickRadius: 0.16, sphereScale: 1, lineWidth: 1, cartoonThickness: 0.92, quality: 8, lineOpacity: 1, stickOpacity: 1, sphereOpacity: 1, cartoonOpacity: 1, ribbonOpacity: 1, surfaceOpacity: 0.55, meshOpacity: 0.7, dotOpacity: 0.85, nonbondedOpacity: 1, surfaceProbeRadius: 1.4, surfaceQuality: 0.5, dotDensity: 12, meshWidth: 1, puttyMinRadius: 0.18, puttyMaxRadius: 0.72 };
 
 export const maskForStyle = (style: RepresentationStyle): RepresentationMask => {
   if (style === "lines" || style === "line") return REPRESENTATION_MASKS.LINES;
@@ -114,6 +135,7 @@ export const createRepresentationState = (structure: CanonicalMolecularStructure
   presentationRevision: 1,
   objectEnabled: structure ? { [structure.id]: true } : {},
   atomRepMasks: structure ? Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, atomMaskForStyle(atom, style)])) : {},
+  atomRepStyles: structure ? Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, ["cartoon", "ribbon", "trace", "putty"].includes(style) ? atom.isPolymer ? style : atom.isLigand ? "ball-and-stick" : "spheres" : style])) : {},
   directives: [],
   parameters: DEFAULT_REPRESENTATION_PARAMETERS,
 });
@@ -146,17 +168,17 @@ export const setRepresentationParameters = (projection: RenderProjection, parame
   representationState: { ...projection.representationState, presentationRevision: projection.representationState.presentationRevision + 1, parameters: { ...projection.representationState.parameters, ...parameters } },
 });
 
-export const applyRepresentationToSelection = (projection: RenderProjection, operation: RepresentationDirective["operation"], mask: RepresentationMask, targetStableAtomIds: readonly string[]): RenderProjection => ({
+export const applyRepresentationToSelection = (projection: RenderProjection, operation: RepresentationDirective["operation"], mask: RepresentationMask, targetStableAtomIds: readonly string[], style?: RepresentationStyle): RenderProjection => ({
   ...projection,
-  representationState: applyRepresentationOperation(projection.representationState, operation, mask, [...targetStableAtomIds]),
+  representationState: applyRepresentationOperation(projection.representationState, operation, mask, [...targetStableAtomIds], style),
 });
 
-export const setCategoryRepresentation = (projection: RenderProjection, structure: CanonicalMolecularStructure, category: "protein" | "ligand" | "water" | "ions" | "other", mask: RepresentationMask): RenderProjection => {
+export const setCategoryRepresentation = (projection: RenderProjection, structure: CanonicalMolecularStructure, category: "protein" | "ligand" | "water" | "ions" | "other", mask: RepresentationMask, style?: RepresentationStyle): RenderProjection => {
   const target = structure.atoms.filter((atom) => category === "protein" ? atom.isPolymer : category === "ligand" ? atom.isLigand : category === "water" ? atom.isWater : category === "ions" ? atom.isIon : !atom.isPolymer && !atom.isLigand && !atom.isWater && !atom.isIon).map((atom) => atom.stableId);
-  return applyRepresentationToSelection(projection, "SHOW_AS", mask, target);
+  return { ...projection, representationState: applyRepresentationOperation(projection.representationState, "SHOW_AS", mask, target, style) };
 };
 
-export const setInteractionState = (projection: RenderProjection, interaction: Partial<InteractionState>): RenderProjection => ({ ...projection, interaction: { ...projection.interaction, ...interaction, selectedAtomIds: interaction.selectedAtomIds ?? projection.interaction.selectedAtomIds } });
+export const setInteractionState = (projection: RenderProjection, interaction: Partial<InteractionState>): RenderProjection => ({ ...projection, interaction: { ...projection.interaction, ...interaction, selectedAtomIds: interaction.selectedAtomIds ?? projection.interaction.selectedAtomIds, measurementPickAtomIds: interaction.measurementPickAtomIds ?? projection.interaction.measurementPickAtomIds } });
 
 export const setLabelState = (projection: RenderProjection, labels: Partial<LabelState>): RenderProjection => ({ ...projection, labels: { ...projection.labels, ...labels } });
 
@@ -178,14 +200,16 @@ export const setColorScheme = (projection: RenderProjection, mode: ColorMode, st
   colorDiagnostic: mode === "by-partial-charge" && !structure?.partialChargeDataset ? "Partial-charge data unavailable for this molecular revision." : mode === "esp" ? "ESP field unavailable: no electrostatic potential computation is registered for this molecular revision." : (mode === "secondary-structure-standard" || mode === "secondary-structure-jmol" || mode === "secondary-structure") && !structure?.secondaryStructureDataset ? "Secondary-structure assignment unavailable for this molecular revision." : null,
 });
 
-export const applyRepresentationOperation = (state: RepresentationState, operation: RepresentationDirective["operation"], mask: RepresentationMask, targetStableAtomIds: string[]): RepresentationState => {
+export const applyRepresentationOperation = (state: RepresentationState, operation: RepresentationDirective["operation"], mask: RepresentationMask, targetStableAtomIds: string[], style?: RepresentationStyle): RepresentationState => {
   const atomRepMasks = { ...state.atomRepMasks };
+  const atomRepStyles = { ...state.atomRepStyles };
   for (const stableId of new Set(targetStableAtomIds)) {
     const current = atomRepMasks[stableId] ?? 0;
     atomRepMasks[stableId] = operation === "SHOW" ? current | mask : operation === "HIDE" ? current & ~mask : mask;
+    if (operation === "SHOW_AS" && style) atomRepStyles[stableId] = style;
   }
   const presentationRevision = state.presentationRevision + 1;
-  return { ...state, presentationRevision, atomRepMasks, directives: [...state.directives, { operation, mask, targetStableAtomIds: [...targetStableAtomIds], presentationRevision }] };
+  return { ...state, presentationRevision, atomRepMasks, atomRepStyles, directives: [...state.directives, { operation, mask, targetStableAtomIds: [...targetStableAtomIds], presentationRevision, ...(style ? { style } : {}) }] };
 };
 
 export const toProjectPresentation = (projection: RenderProjection): ProjectPresentationState => ({
@@ -195,12 +219,15 @@ export const toProjectPresentation = (projection: RenderProjection): ProjectPres
   color: { mode: projection.color.mode, ...(projection.color.colorId ? { colorId: projection.color.colorId } : {}), ...(projection.color.customHex ? { customHex: projection.color.customHex } : {}) },
   background: projection.background,
   camera: { view: projection.camera.view, defaultView: projection.camera.defaultView, projectionMode: projection.camera.projectionMode, fov: projection.camera.fov, nearClip: projection.camera.nearClip, farClip: projection.camera.farClip, clippingMode: projection.camera.clippingMode },
+  representationParameters: projection.representationState.parameters,
+  atomRepresentationStyles: projection.representationState.atomRepStyles,
 });
 
 export const fromProjectPresentation = (presentation: ProjectPresentationState, structure: CanonicalMolecularStructure | null): RenderProjection => {
   const style = REPRESENTATION_STYLES.includes(presentation.representation as RepresentationStyle) ? presentation.representation as RepresentationStyle : "cartoon";
   const projection = setProjectionStyle(createDefaultRenderProjection(structure), structure, style);
   const mode = (COLOR_MODES.includes(presentation.color.mode as (typeof COLOR_MODES)[number]) ? presentation.color.mode : "element") as ColorMode;
+  const persistedStyles = Object.fromEntries(Object.entries(presentation.atomRepresentationStyles ?? {}).filter(([, value]) => REPRESENTATION_STYLES.includes(value as RepresentationStyle))) as Record<string, RepresentationStyle>;
   return {
     ...projection,
     showProtein: presentation.layerVisibility.protein,
@@ -210,6 +237,11 @@ export const fromProjectPresentation = (presentation: ProjectPresentationState, 
     showOther: presentation.layerVisibility.other,
     color: { ...DEFAULT_COLOR, mode, colorId: presentation.color.colorId ?? null, customHex: presentation.color.customHex ?? null },
     background: presentation.background as BackgroundColorState,
+    representationState: {
+      ...projection.representationState,
+      parameters: { ...projection.representationState.parameters, ...(presentation.representationParameters ?? {}) },
+      atomRepStyles: { ...projection.representationState.atomRepStyles, ...persistedStyles },
+    },
     camera: { ...DEFAULT_CAMERA, view: presentation.camera.view, defaultView: presentation.camera.defaultView, projectionMode: presentation.camera.projectionMode ?? DEFAULT_CAMERA.projectionMode, fov: presentation.camera.fov ?? DEFAULT_CAMERA.fov, nearClip: presentation.camera.nearClip ?? DEFAULT_CAMERA.nearClip, farClip: presentation.camera.farClip ?? DEFAULT_CAMERA.farClip, clippingMode: presentation.camera.clippingMode ?? (presentation.camera.nearClip !== undefined || presentation.camera.farClip !== undefined ? "manual" : DEFAULT_CAMERA.clippingMode) },
   };
 };
