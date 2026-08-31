@@ -7,6 +7,7 @@ import { buildRenderProjectionDiagnostics, emptyRenderProjectionDiagnostics, typ
 import { resolveSafeLabel } from "../interaction/labels";
 import { ReverseIdentityMap, type PickResult } from "../interaction/picking";
 import { measurementStatus, type MeasurementObject } from "../interaction/measurements";
+import { boundsForCoordinates, paddedClippingSlab, principalOrientationQuaternion, type Coordinate3, type ClippingSlab } from "./cameraController";
 
 const mountedAdapters = new WeakMap<HTMLElement, ThreeDMolViewerAdapter>();
 type Viewport = NonNullable<CameraState["viewport"]>;
@@ -60,6 +61,11 @@ export class ThreeDMolViewerAdapter {
   private gestureFrame: number | null = null;
   private gesture: { mode: "rotate" | "pan" | "zoom"; x: number; y: number } | null = null;
   private pendingGestureDelta = { x: 0, y: 0 };
+  private cameraPivot: Coordinate3 | null = null;
+  private baselineView: number[] | null = null;
+  private baselinePivot: Coordinate3 | null = null;
+  private autoSlab: ClippingSlab = paddedClippingSlab(null);
+  private lastCameraAction = "NONE";
 
   mount(container: HTMLElement): void {
     if (this.viewer && this.container === container) return;
@@ -86,6 +92,7 @@ export class ThreeDMolViewerAdapter {
     this.reverseIdentityMap.build(result.structure, this.rendererGeneration);
     if (this.container) this.container.dataset.rendererGeneration = String(this.rendererGeneration);
     this.viewer!.removeAllModels();
+    this.hasModel = false;
     const renderModel = this.viewer!.addModel();
     const indexByStableId = new Map(result.structure.atoms.map((atom, index) => [atom.stableId, index]));
     const adjacency = new Map<string, Array<{ index: number; order: number }>>();
@@ -121,37 +128,49 @@ export class ThreeDMolViewerAdapter {
     this.modelLoadCount += 1;
     this.hasModel = true;
     this.bindPicking();
-    this.setProjection(projection);
-    this.frameToCanonicalBounds();
-    if (projection.camera.view) { this.cameraState = projection.camera; this.viewer!.setView(projection.camera.view); this.appliedViewportShift = { x: 0, y: 0 }; this.applyViewportTranslation(); }
+    this.setProjection(projection, { preserveView: false });
+    if (projection.camera.view && this.validView(projection.camera.view)) {
+      this.viewer!.setView(projection.camera.view);
+      this.baselineView = [...(projection.camera.defaultView && this.validView(projection.camera.defaultView) ? projection.camera.defaultView : projection.camera.view)];
+      this.cameraPivot = this.boundsForCameraTarget(false)?.center ?? null;
+      this.baselinePivot = this.cameraPivot ? { ...this.cameraPivot } : null;
+      this.applyClipping();
+      this.appliedViewportShift = { x: 0, y: 0 };
+      this.applyViewportTranslation();
+      this.cameraState = { ...this.cameraState, view: this.viewer!.getView(), defaultView: [...this.baselineView], viewport: this.viewport };
+    } else {
+      this.frameToCanonicalBounds(true);
+    }
     this.viewer!.render();
   }
 
-  setProjection(projection: RenderProjection): void {
+  setProjection(projection: RenderProjection, options: { preserveView?: boolean } = {}): void {
     this.ensureMounted();
+    const preservedView = options.preserveView === false || !this.hasModel ? null : this.viewer!.getView();
     this.projection = projection;
-    this.cameraState = projection.camera;
+    this.cameraState = { ...projection.camera, view: preservedView ?? projection.camera.view, defaultView: this.baselineView ? [...this.baselineView] : projection.camera.defaultView };
     this.viewer!.setBackgroundColor(projection.background.color, 1);
     this.viewer!.setProjection(projection.camera.projectionMode);
     this.viewer!.setCameraParameters({ fov: projection.camera.fov, orthographic: projection.camera.projectionMode === "orthographic" });
-    this.viewer!.setSlab(projection.camera.nearClip, projection.camera.farClip);
     if (!this.hasModel || !this.structure) { this.diagnostics = emptyRenderProjectionDiagnostics(projection.representationState.presentationRevision, projection); this.writeDiagnostics(this.diagnostics); this.viewer!.render(); return; }
     this.applyProjection(projection);
+    this.applyClipping();
+    this.writeDiagnostics(this.diagnostics);
     this.viewer!.render();
   }
 
-  setViewport(viewport: Viewport): void { const changed = viewport.width !== this.viewport.width || viewport.height !== this.viewport.height; this.viewport = viewport; this.cameraState = { ...this.cameraState, viewport }; if (!this.viewer || !this.hasModel) return; this.viewer.resize(); if (changed) this.frameToCanonicalBounds(); this.applyViewportTranslation(); this.viewer.render(); }
-  getCameraState(): CameraState { return { ...this.cameraState, view: this.viewer?.getView() ?? this.cameraState.view, viewport: this.viewport }; }
+  setViewport(viewport: Viewport): void { this.viewport = viewport; this.cameraState = { ...this.cameraState, viewport }; if (!this.viewer || !this.hasModel) return; this.viewer.resize(); this.applyViewportTranslation(); if (this.cameraState.clippingMode === "auto") this.recalculateAutoClipping(); this.viewer.render(); }
+  getCameraState(): CameraState { return { ...this.cameraState, view: this.viewer?.getView() ?? this.cameraState.view, defaultView: this.baselineView ? [...this.baselineView] : this.cameraState.defaultView, viewport: this.viewport }; }
   resize(): void { this.viewer?.resize(); this.viewer?.render(); }
-  rotate(angle = 15): void { this.viewer?.rotate(angle, "y"); this.renderCamera(); }
-  pan(x = 70, y = 0): void { this.viewer?.translate(x, y); this.renderCamera(); }
-  zoom(factor = 1.2): void { this.viewer?.zoom(factor); this.renderCamera(); }
-  focus(): void { if (!this.viewer || !this.hasModel) return; this.frameToCanonicalBounds(); this.renderCamera(); }
-  center(): void { if (!this.viewer || !this.hasModel) return; this.viewer.center(this.canonicalSelection(() => true)); this.renderCamera(); }
-  orient(): void { if (!this.viewer || !this.hasModel) return; if (this.cameraState.defaultView) this.viewer.setView(this.cameraState.defaultView); else this.frameToCanonicalBounds(); this.renderCamera(); }
-  origin(): void { if (!this.viewer || !this.hasModel) return; this.viewer.center({}); this.renderCamera(); }
-  resetView(): void { if (!this.viewer || !this.hasModel) return; if (this.cameraState.defaultView) this.viewer.setView(this.cameraState.defaultView); else this.frameToCanonicalBounds(); this.renderCamera(); }
-  setCameraControls(camera: Partial<CameraState>): void { if (!this.viewer) return; this.cameraState = { ...this.cameraState, ...camera }; this.viewer.setProjection(this.cameraState.projectionMode); this.viewer.setCameraParameters({ fov: this.cameraState.fov, orthographic: this.cameraState.projectionMode === "orthographic" }); this.viewer.setSlab(this.cameraState.nearClip, this.cameraState.farClip); if (camera.view) this.viewer.setView(camera.view); this.renderCamera(); }
+  rotate(angle = 15): void { if (!this.viewer) return; this.viewer.rotate(angle, "y"); this.lastCameraAction = "ROTATE"; this.renderCamera(); }
+  pan(x = 70, y = 0): void { if (!this.viewer) return; this.viewer.translate(x, y); this.lastCameraAction = "PAN"; this.renderCamera(); }
+  zoom(factor = 1.2): void { if (!this.viewer) return; this.viewer.zoom(factor); this.lastCameraAction = "ZOOM"; this.renderCamera(); }
+  focus(): void { if (!this.viewer || !this.hasModel) return; this.lastCameraAction = "FIT"; this.frameToCanonicalBounds(false); this.renderCamera(); }
+  center(): void { if (!this.viewer || !this.hasModel) return; this.lastCameraAction = "CENTER"; const target = this.boundsForCameraTarget(true); if (!target) return; this.viewer.center(target.selection); this.cameraPivot = target.center; this.recalculateAutoClipping(); this.renderCamera(); }
+  orient(): void { if (!this.viewer || !this.hasModel) return; this.lastCameraAction = "ORIENT"; const target = this.boundsForCameraTarget(true); if (!target) return; this.viewer.center(target.selection); this.viewer.zoomTo(target.selection); const view = this.viewer.getView(); const quaternion = principalOrientationQuaternion(target.atoms); view[4] = quaternion[0]; view[5] = quaternion[1]; view[6] = quaternion[2]; view[7] = quaternion[3]; this.viewer.setView(view); this.cameraPivot = target.center; this.recalculateAutoClipping(); this.renderCamera(); }
+  origin(): void { if (!this.viewer || !this.hasModel) return; this.lastCameraAction = "ORIGIN"; const target = this.boundsForCameraTarget(false); if (!target) return; this.viewer.center({}); this.cameraPivot = target.center; this.recalculateAutoClipping(); this.renderCamera(); }
+  resetView(): void { if (!this.viewer || !this.hasModel) return; this.lastCameraAction = "RESET"; this.cameraState = { ...this.cameraState, projectionMode: DEFAULT_CAMERA.projectionMode, fov: DEFAULT_CAMERA.fov, nearClip: DEFAULT_CAMERA.nearClip, farClip: DEFAULT_CAMERA.farClip, clippingMode: "auto" }; this.viewer.setProjection(this.cameraState.projectionMode); this.viewer.setCameraParameters({ fov: this.cameraState.fov, orthographic: false }); if (this.baselineView && this.validView(this.baselineView)) { this.viewer.setView([...this.baselineView]); this.cameraPivot = this.baselinePivot ? { ...this.baselinePivot } : this.cameraPivot; this.recalculateAutoClipping(); } else this.frameToCanonicalBounds(true); this.renderCamera(); }
+  setCameraControls(camera: Partial<CameraState>): void { if (!this.viewer) return; const clippingMode = camera.clippingMode ?? (camera.nearClip !== undefined || camera.farClip !== undefined ? "manual" : this.cameraState.clippingMode); this.cameraState = { ...this.cameraState, ...camera, clippingMode }; this.viewer.setProjection(this.cameraState.projectionMode); this.viewer.setCameraParameters({ fov: this.cameraState.fov, orthographic: this.cameraState.projectionMode === "orthographic" }); if (camera.view && this.validView(camera.view)) this.viewer.setView(camera.view); this.applyClipping(); this.lastCameraAction = "SET"; this.renderCamera(); }
   beginGesture(mode: "rotate" | "pan" | "zoom", x: number, y: number): void { this.pendingGestureDelta = { x: 0, y: 0 }; this.gesture = { mode, x, y }; }
   updateGesture(x: number, y: number): void {
     if (!this.gesture || !this.viewer) return;
@@ -165,9 +184,9 @@ export class ThreeDMolViewerAdapter {
       if (!this.gesture || !this.viewer) return;
       const pending = this.pendingGestureDelta;
       this.pendingGestureDelta = { x: 0, y: 0 };
-      if (this.gesture.mode === "rotate") { this.viewer.rotate(pending.x * 0.55, "y"); this.viewer.rotate(pending.y * 0.55, "x"); }
-      else if (this.gesture.mode === "pan") this.viewer.translate(pending.x, pending.y);
-      else this.viewer.zoom(Math.max(0.2, 1 + pending.y * -0.012));
+       if (this.gesture.mode === "rotate") { this.viewer.rotate(pending.x * 0.55, "y"); this.viewer.rotate(pending.y * 0.55, "x"); this.lastCameraAction = "ROTATE"; }
+       else if (this.gesture.mode === "pan") this.viewer.translate(pending.x, pending.y);
+       else this.viewer.zoom(Math.max(0.2, 1 + pending.y * -0.012));
       this.renderCamera();
     });
   }
@@ -177,12 +196,62 @@ export class ThreeDMolViewerAdapter {
     if (this.container && mountedAdapters.get(this.container) === this) mountedAdapters.delete(this.container);
     this.resizeObserver?.disconnect(); this.resizeObserver = null;
     if (this.viewer) { this.viewer.clear(); this.viewer = null; }
-    this.measurementShapes = []; this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
+    this.measurementShapes = []; this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
   }
   getDiagnostics(): RenderProjectionDiagnostics { return this.diagnostics; }
 
   private ensureMounted(): void { if (!this.viewer) throw new Error("3Dmol viewer adapter is not mounted."); }
   private canonicalSelection(predicate: (atom: CanonicalMolecularStructure["atoms"][number]) => boolean): AtomSelectionSpec { const indices = new Set(this.structure!.atoms.map((atom, index) => predicate(atom) ? index : -1).filter((index) => index >= 0)); return { predicate: (atom) => atom.index !== undefined && indices.has(atom.index) }; }
+
+  private validView(view: number[] | null | undefined): view is number[] { return Array.isArray(view) && view.length >= 8 && view.slice(0, 8).every((value) => Number.isFinite(value)); }
+
+  private categoryVisible(atom: CanonicalMolecularStructure["atoms"][number]): boolean {
+    if (!this.projection) return true;
+    if (atom.isPolymer) return this.projection.showProtein;
+    if (atom.isLigand) return this.projection.showLigand;
+    if (atom.isWater) return this.projection.showWater;
+    if (atom.isIon) return this.projection.showIons;
+    return this.projection.showOther;
+  }
+
+  private renderedAtoms(): CanonicalMolecularStructure["atoms"] {
+    if (!this.structure) return [];
+    const diagnostics = this.projection ? buildRenderProjectionDiagnostics(this.structure, this.projection) : null;
+    const directiveIds = new Set(diagnostics?.directives.flatMap((directive) => directive.targetStableAtomIds) ?? []);
+    const atoms = this.structure.atoms.filter((atom) => this.categoryVisible(atom) && (directiveIds.size === 0 || directiveIds.has(atom.stableId)));
+    return atoms.length > 0 ? atoms : this.structure.atoms.filter((atom) => this.categoryVisible(atom));
+  }
+
+  private boundsForCameraTarget(preferSelection: boolean): { atoms: CanonicalMolecularStructure["atoms"]; selection: AtomSelectionSpec; center: Coordinate3 } | null {
+    if (!this.structure) return null;
+    const selectedIds = preferSelection ? new Set(this.projection?.interaction.selectedAtomIds ?? []) : new Set<string>();
+    const selected = selectedIds.size > 0 ? this.structure.atoms.filter((atom) => selectedIds.has(atom.stableId)) : [];
+    const atoms = selected.length > 0 ? selected : this.renderedAtoms();
+    if (atoms.length === 0) return null;
+    const bounds = boundsForCoordinates(atoms);
+    if (!bounds) return null;
+    return { atoms, selection: this.canonicalSelection((atom) => atoms.some((candidate) => candidate.stableId === atom.stableId)), center: bounds.center };
+  }
+
+  private applyClipping(): void {
+    if (!this.viewer) return;
+    if (this.cameraState.clippingMode === "manual") {
+      const near = Math.min(this.cameraState.nearClip, this.cameraState.farClip - 0.01);
+      const far = Math.max(this.cameraState.farClip, near + 1);
+      this.viewer.setSlab(near, far);
+      this.autoSlab = { near, far, padding: 0 };
+    } else this.recalculateAutoClipping();
+  }
+
+  private recalculateAutoClipping(): void {
+    if (!this.viewer || !this.structure || this.cameraState.clippingMode !== "auto") return;
+    const atoms = this.renderedAtoms();
+    if (atoms.length === 0) { this.autoSlab = paddedClippingSlab(null); this.viewer.setSlab(this.autoSlab.near, this.autoSlab.far); return; }
+    const pivot = this.cameraPivot ?? boundsForCoordinates(atoms)?.center ?? { x: 0, y: 0, z: 0 };
+    const relative = atoms.map((atom) => ({ x: atom.x - pivot.x, y: atom.y - pivot.y, z: atom.z - pivot.z }));
+    this.autoSlab = paddedClippingSlab(boundsForCoordinates(relative));
+    this.viewer.setSlab(this.autoSlab.near, this.autoSlab.far);
+  }
 
   private bindPicking(): void {
     if (!this.viewer || !this.structure) return;
@@ -289,6 +358,11 @@ export class ThreeDMolViewerAdapter {
     this.container.dataset.rendererCanonicalBondSource = diagnostics.stickCylinderContributors > 0 || diagnostics.lineContributors > 0 ? "canonical" : "none";
     this.container.dataset.rendererModelLoads = String(this.modelLoadCount);
     this.container.dataset.rendererGeneration = String(this.rendererGeneration);
+    this.container.dataset.cameraProjection = this.cameraState.projectionMode;
+    this.container.dataset.cameraClippingMode = this.cameraState.clippingMode;
+    this.container.dataset.cameraSlabNear = String(this.autoSlab.near);
+    this.container.dataset.cameraSlabFar = String(this.autoSlab.far);
+    this.container.dataset.cameraAction = this.lastCameraAction;
     this.container.dataset.pickedAtom = this.projection?.interaction.pickedAtomId ?? "";
     this.container.dataset.hoveredAtom = this.projection?.interaction.hoveredAtomId ?? "";
     this.container.dataset.labelMode = this.projection?.labels.mode ?? "off";
@@ -297,7 +371,7 @@ export class ThreeDMolViewerAdapter {
     if (diagnostics.colorDiagnostic) this.container.dataset.colorDiagnostic = diagnostics.colorDiagnostic; else delete this.container.dataset.colorDiagnostic;
     if ((this.projection?.representation === "lines" || this.projection?.representation === "sticks") && this.structure?.bonds.length === 0) this.container.dataset.rendererBondDiagnostic = "No authoritative bond geometry is available for this target."; else delete this.container.dataset.rendererBondDiagnostic;
   }
-  private frameToCanonicalBounds(): void { if (!this.viewer || !this.structure) return; this.viewer.resize(); const all = this.canonicalSelection(() => true); this.viewer.center(all); this.viewer.zoomTo(all); this.appliedViewportShift = { x: 0, y: 0 }; this.applyViewportTranslation(); this.cameraState = { ...this.cameraState, view: this.viewer.getView(), defaultView: this.viewer.getView(), viewport: this.viewport }; }
+  private frameToCanonicalBounds(setBaseline: boolean): void { if (!this.viewer || !this.structure) return; const target = this.boundsForCameraTarget(false); if (!target) return; this.viewer.resize(); this.viewer.center(target.selection); this.viewer.zoomTo(target.selection); this.cameraPivot = target.center; this.appliedViewportShift = { x: 0, y: 0 }; this.applyClipping(); this.applyViewportTranslation(); const view = this.viewer.getView(); this.cameraState = { ...this.cameraState, view, defaultView: this.baselineView ? [...this.baselineView] : this.cameraState.defaultView, viewport: this.viewport }; if (setBaseline || !this.baselineView) { this.baselineView = [...view]; this.baselinePivot = { ...target.center }; this.cameraState = { ...this.cameraState, defaultView: [...view] }; } }
   private applyViewportTranslation(): void { if (!this.viewer || !this.viewport.width || !this.viewport.height) return; const targetX = (this.viewport.visibleLeft + this.viewport.visibleRight - this.viewport.width) / 2; const targetY = (this.viewport.visibleTop + this.viewport.visibleBottom - this.viewport.height) / 2; const deltaX = targetX - this.appliedViewportShift.x; const deltaY = targetY - this.appliedViewportShift.y; if (deltaX || deltaY) this.viewer.translate(deltaX, deltaY); this.appliedViewportShift = { x: targetX, y: targetY }; this.cameraState = { ...this.cameraState, view: this.viewer.getView(), viewport: this.viewport }; }
-  private renderCamera(): void { if (!this.viewer) return; this.cameraState = { ...this.cameraState, view: this.viewer.getView(), viewport: this.viewport }; this.viewer.render(); }
+  private renderCamera(): void { if (!this.viewer) return; if (this.cameraState.clippingMode === "auto") this.recalculateAutoClipping(); this.cameraState = { ...this.cameraState, view: this.viewer.getView(), defaultView: this.baselineView ? [...this.baselineView] : this.cameraState.defaultView, viewport: this.viewport }; if (this.container) this.writeDiagnostics(this.diagnostics); this.viewer.render(); }
 }

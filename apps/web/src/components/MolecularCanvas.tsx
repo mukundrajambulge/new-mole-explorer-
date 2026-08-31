@@ -152,9 +152,10 @@ export const MolecularCanvas = ({
     if (cameraCommand.actionId === "CANVAS.ROTATE") adapter.rotate();
     if (cameraCommand.actionId === "CANVAS.PAN") adapter.pan();
     if (cameraCommand.actionId === "CANVAS.ZOOM") adapter.zoom();
-    if (cameraCommand.actionId === "CANVAS.FOCUS" || cameraCommand.actionId === "VIEW.FIT" || cameraCommand.actionId === "VIEW.RESET") adapter.focus();
+    if (cameraCommand.actionId === "CANVAS.FOCUS" || cameraCommand.actionId === "VIEW.FIT") adapter.focus();
     if (cameraCommand.actionId === "VIEW.CENTER") adapter.center();
     if (cameraCommand.actionId === "VIEW.ORIENT") adapter.orient();
+    if (cameraCommand.actionId === "VIEW.RESET") adapter.resetView();
     if (cameraCommand.actionId === "VIEW.ORIGIN") adapter.origin();
   }, [cameraCommand]);
 

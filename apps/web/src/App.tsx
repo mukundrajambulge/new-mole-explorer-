@@ -11,7 +11,7 @@ import { StatusBar } from "./components/StatusBar";
 import { StructurePanel } from "./components/StructurePanel";
 import { ACTION_IDS, ACTION_REGISTRY, type ActionId, type ActionDefinition } from "./domain/registry";
 import { ApiClientError, apiClient } from "./lib/apiClient";
-import { applyRepresentationToSelection, createDefaultRenderProjection, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setInteractionState, setLabelState, setProjectionStyle, setRepresentationParameters, styleProfileFor, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
+import { applyRepresentationToSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setInteractionState, setLabelState, setProjectionStyle, setRepresentationParameters, styleProfileFor, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
 import { applyPresentationAction, type PresentationComponent } from "./rendering/presentationActions";
 import { STYLE_DEFINITIONS, styleDefinition } from "./rendering/styleProfiles";
 import { resolveSelection, parseRepresentationCommand, type SelectionResult } from "./interaction/selectionResolver";
@@ -330,6 +330,7 @@ export const App = () => {
       return applyPresentationAction(current, structure?.structure ?? null, { type: "COMPONENT_VISIBILITY.SET", component: visibilityComponent, visible: !current[key] });
     });
     if (actionId === ACTION_IDS.VIEW_RESET && capability.state === "SUPPORTED") {
+      setProjection((current) => setCameraState(current, { projectionMode: DEFAULT_CAMERA.projectionMode, fov: DEFAULT_CAMERA.fov, nearClip: DEFAULT_CAMERA.nearClip, farClip: DEFAULT_CAMERA.farClip, clippingMode: "auto", view: null, defaultView: null }));
       commandSequence.current += 1;
       setCameraCommand({ actionId: ACTION_IDS.VIEW_RESET, sequence: commandSequence.current });
     }

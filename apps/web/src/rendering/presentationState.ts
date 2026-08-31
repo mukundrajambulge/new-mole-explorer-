@@ -49,7 +49,8 @@ export type ColorState = {
 export const BACKGROUND_PRESETS = ["Dark", "Black", "White", "Neutral", "Dark Gray", "Light Gray", "Navy", "Deep Blue", "Custom"] as const;
 export type BackgroundPreset = (typeof BACKGROUND_PRESETS)[number];
 export type BackgroundColorState = { preset: BackgroundPreset; color: string };
-export type CameraState = { view: number[] | null; defaultView: number[] | null; projectionMode: "perspective" | "orthographic"; fov: number; nearClip: number; farClip: number; viewport: { width: number; height: number; visibleTop: number; visibleBottom: number; visibleLeft: number; visibleRight: number } | null };
+export type ClippingMode = "auto" | "manual";
+export type CameraState = { view: number[] | null; defaultView: number[] | null; projectionMode: "perspective" | "orthographic"; fov: number; nearClip: number; farClip: number; clippingMode: ClippingMode; viewport: { width: number; height: number; visibleTop: number; visibleBottom: number; visibleLeft: number; visibleRight: number } | null };
 export type InteractionState = { hoveredAtomId: string | null; pickedAtomId: string | null; selectedAtomIds: readonly string[] };
 export type RepresentationParameters = { stickRadius: number; sphereScale: number; lineWidth: number; cartoonThickness: number; quality: number };
 
@@ -73,7 +74,7 @@ export type RenderProjection = {
 
 export const DEFAULT_COLOR: ColorState = { mode: "element", colorId: null, customHex: null, profileRef: "PYMOL_OSS_5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69", atomColors: {}, objectColors: {}, representationOverrides: {} };
 export const DEFAULT_BACKGROUND: BackgroundColorState = { preset: "Black", color: "#05070a" };
-export const DEFAULT_CAMERA: CameraState = { view: null, defaultView: null, projectionMode: "perspective", fov: 20, nearClip: 0.1, farClip: 1000, viewport: null };
+export const DEFAULT_CAMERA: CameraState = { view: null, defaultView: null, projectionMode: "perspective", fov: 20, nearClip: 0.1, farClip: 1000, clippingMode: "auto", viewport: null };
 export const DEFAULT_INTERACTION: InteractionState = { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [] };
 export const DEFAULT_REPRESENTATION_PARAMETERS: RepresentationParameters = { stickRadius: 0.16, sphereScale: 1, lineWidth: 1, cartoonThickness: 0.92, quality: 8 };
 
@@ -94,7 +95,10 @@ export const maskForStyle = (style: RepresentationStyle): RepresentationMask => 
 
 export const BACKGROUND_COLORS: Record<BackgroundPreset, string> = { Dark: "#0b1018", Black: "#05070a", White: "#ffffff", Neutral: "#747b85", "Dark Gray": "#20252d", "Light Gray": "#c8cdd3", Navy: "#071426", "Deep Blue": "#061d36", Custom: "#05070a" };
 
-export const setCameraState = (projection: RenderProjection, camera: Partial<CameraState>): RenderProjection => ({ ...projection, camera: { ...projection.camera, ...camera } });
+export const setCameraState = (projection: RenderProjection, camera: Partial<CameraState>): RenderProjection => {
+  const clippingMode = camera.clippingMode ?? (camera.nearClip !== undefined || camera.farClip !== undefined ? "manual" : projection.camera.clippingMode);
+  return { ...projection, camera: { ...projection.camera, ...camera, ...(clippingMode === "auto" ? { nearClip: DEFAULT_CAMERA.nearClip, farClip: DEFAULT_CAMERA.farClip } : {}), clippingMode } };
+};
 
 const atomMaskForStyle = (atom: CanonicalMolecularStructure["atoms"][number], style: RepresentationStyle): RepresentationMask => {
   if (style === "cartoon" || style === "ribbon" || style === "trace" || style === "putty") {
@@ -190,7 +194,7 @@ export const toProjectPresentation = (projection: RenderProjection): ProjectPres
   layerVisibility: { protein: projection.showProtein, ligand: projection.showLigand, water: projection.showWater, ions: projection.showIons, other: projection.showOther },
   color: { mode: projection.color.mode, ...(projection.color.colorId ? { colorId: projection.color.colorId } : {}), ...(projection.color.customHex ? { customHex: projection.color.customHex } : {}) },
   background: projection.background,
-  camera: { view: projection.camera.view, defaultView: projection.camera.defaultView, projectionMode: projection.camera.projectionMode, fov: projection.camera.fov, nearClip: projection.camera.nearClip, farClip: projection.camera.farClip },
+  camera: { view: projection.camera.view, defaultView: projection.camera.defaultView, projectionMode: projection.camera.projectionMode, fov: projection.camera.fov, nearClip: projection.camera.nearClip, farClip: projection.camera.farClip, clippingMode: projection.camera.clippingMode },
 });
 
 export const fromProjectPresentation = (presentation: ProjectPresentationState, structure: CanonicalMolecularStructure | null): RenderProjection => {
@@ -206,7 +210,7 @@ export const fromProjectPresentation = (presentation: ProjectPresentationState, 
     showOther: presentation.layerVisibility.other,
     color: { ...DEFAULT_COLOR, mode, colorId: presentation.color.colorId ?? null, customHex: presentation.color.customHex ?? null },
     background: presentation.background as BackgroundColorState,
-    camera: { ...DEFAULT_CAMERA, view: presentation.camera.view, defaultView: presentation.camera.defaultView, projectionMode: presentation.camera.projectionMode ?? DEFAULT_CAMERA.projectionMode, fov: presentation.camera.fov ?? DEFAULT_CAMERA.fov, nearClip: presentation.camera.nearClip ?? DEFAULT_CAMERA.nearClip, farClip: presentation.camera.farClip ?? DEFAULT_CAMERA.farClip },
+    camera: { ...DEFAULT_CAMERA, view: presentation.camera.view, defaultView: presentation.camera.defaultView, projectionMode: presentation.camera.projectionMode ?? DEFAULT_CAMERA.projectionMode, fov: presentation.camera.fov ?? DEFAULT_CAMERA.fov, nearClip: presentation.camera.nearClip ?? DEFAULT_CAMERA.nearClip, farClip: presentation.camera.farClip ?? DEFAULT_CAMERA.farClip, clippingMode: presentation.camera.clippingMode ?? (presentation.camera.nearClip !== undefined || presentation.camera.farClip !== undefined ? "manual" : DEFAULT_CAMERA.clippingMode) },
   };
 };
 

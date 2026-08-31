@@ -197,6 +197,7 @@ export type ProjectPresentationState = {
     fov?: number;
     nearClip?: number;
     farClip?: number;
+    clippingMode?: "auto" | "manual";
   };
 };
 
