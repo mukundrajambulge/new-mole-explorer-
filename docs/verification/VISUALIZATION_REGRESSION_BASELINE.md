@@ -8,6 +8,7 @@ This is the G1C post-change evidence record for the new greenfield Molecular Wor
 
 - Branch: `main`
 - Starting SHA: `daa19b97cf928579cd365ba613943f4b7080133e`
+- G1C implementation commit: `5ef3757d0e6b154b5318315f4a56088ec01343a5`
 - Starting worktree: clean
 - Previous baseline before edits: `npm run lint`, `npm run typecheck`, `npm test` (17 tests), `npm run build`, and `npm run test:e2e` (29 Playwright/WebGL tests) all passed.
 - G1C fixture hashes and source metadata are produced by the ingestion service; local fixture names are listed below.
