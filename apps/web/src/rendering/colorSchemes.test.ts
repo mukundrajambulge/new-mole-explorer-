@@ -27,5 +27,17 @@ describe("G1C renderer-neutral color schemes", () => {
   it("reports missing partial charge data without neutral fake coloring", () => { const result = resolveAtomColor("by-partial-charge", structure.atoms[0], structure); expect(result.status).toBe("UNAVAILABLE"); expect(result.diagnostic).toContain("Partial-charge data unavailable"); });
   it("uses a documented hydrophobicity scale and deterministic polymer order", () => { expect(resolveAtomColor("hydrophobicity", structure.atoms[0], structure).status).toBe("READY"); expect(resolveAtomColor("rainbow", structure.atoms[0], structure).color).toBe(resolveAtomColor("rainbow", structure.atoms[0], structure).color); });
   it("does not invent secondary structure or ESP", () => { expect(resolveAtomColor("secondary-structure-standard", structure.atoms[0], structure).status).toBe("UNAVAILABLE"); expect(resolveAtomColor("esp", structure.atoms[0], structure).status).toBe("EXPERIMENTAL"); });
+  it("uses the canonical assignment for both secondary-structure palettes", () => {
+    const withDataset = {
+      ...structure,
+      secondaryStructureDataset: { datasetId: "secondary:v1", molecularRevision: structure.scientificHash, assignmentSource: "PDB HELIX/SHEET", profileVersion: "v1" },
+      atoms: structure.atoms.map((atom, index) => ({ ...atom, secondaryStructure: index === 0 ? "HELIX" as const : "LOOP" as const })),
+    };
+    const standard = resolveAtomColor("secondary-structure-standard", withDataset.atoms[0], withDataset);
+    const jmol = resolveAtomColor("secondary-structure-jmol", withDataset.atoms[0], withDataset);
+    expect(standard.status).toBe("READY");
+    expect(jmol.status).toBe("READY");
+    expect(standard.color).not.toBe(jmol.color);
+  });
   it("renders a supplied partial-charge dataset", () => { const withDataset = { ...structure, partialChargeDataset: { datasetId: "charges:v1", molecularRevision: structure.scientificHash, chargeModel: "fixture", profileVersion: "v1", atomChargeMap: { c: -0.5, n: 0.5 }, units: "e", provenance: "deterministic fixture" } }; expect(resolveAtomColor("by-partial-charge", withDataset.atoms[0], withDataset).status).toBe("READY"); });
 });

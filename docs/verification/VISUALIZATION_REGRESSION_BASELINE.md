@@ -15,7 +15,7 @@ This is the G1C post-change evidence record for the new greenfield Molecular Wor
 
 ## G1C test matrix
 
-- Frontend unit: representation directives, all style profiles, surface distinction, shared actions, color inventory/property negatives, and non-mutation.
+- Frontend unit: representation directives, all style profiles, surface distinction, shared actions, color inventory/property readiness and negatives, and non-mutation.
 - Backend unit: local PDB/mmCIF ingestion, provenance/hash, explicit topology, B-factor, formal charge, and secondary-structure assignment.
 - Browser/WebGL: real 3Dmol mount, upload, RCSB fetch, line/stick topology, sphere vs Ball-and-Stick, cartoon/ligand layering, component visibility, camera controls, ribbon/style dropdown, color/background controls, non-destructive failure, and model-load count.
 
@@ -27,7 +27,7 @@ This is the G1C post-change evidence record for the new greenfield Molecular Wor
 
 - `npm run lint` — passed for API, web, and contracts.
 - `npm run typecheck` — passed for API, web, and contracts.
-- `npm test` — passed: 27 frontend tests and 9 backend tests.
+- `npm test` — passed: 31 frontend tests and 9 backend tests.
 - `npm run test:e2e` — passed: 37 real Chromium/WebGL tests (29 prior regression tests + 8 G1C tests).
 - `npm run build` — passed. Vite reports the existing 3Dmol `eval` warning and a large JavaScript chunk warning; neither is a test failure.
 - `git diff --check` — passed.
