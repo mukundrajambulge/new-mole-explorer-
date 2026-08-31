@@ -1,0 +1,7 @@
+HEADER    G1C ISOLATED/NONBONDED FIXTURE
+HETATM    1  C1  LIG A 101       0.000   0.000   0.000  1.00 12.00           C
+HETATM    2  O1  LIG A 101       1.200   0.000   0.000  1.00 12.00           O
+HETATM    3  ZN  ZN  B 201       5.000   0.000   0.000  1.00 12.00          ZN
+CONECT    1    2
+CONECT    2    1
+END

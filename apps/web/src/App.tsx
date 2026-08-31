@@ -11,7 +11,9 @@ import { StatusBar } from "./components/StatusBar";
 import { StructurePanel } from "./components/StructurePanel";
 import { ACTION_IDS, ACTION_REGISTRY, type ActionId, type ActionDefinition } from "./domain/registry";
 import { ApiClientError, apiClient } from "./lib/apiClient";
-import { createDefaultRenderProjection, fromProjectPresentation, REPRESENTATION_STYLES, setLayerVisibility, setProjectionStyle, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationStyle } from "./rendering/renderProjection";
+import { createDefaultRenderProjection, fromProjectPresentation, setProjectionStyle, styleProfileFor, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationStyle } from "./rendering/renderProjection";
+import { applyPresentationAction, type PresentationComponent } from "./rendering/presentationActions";
+import { STYLE_DEFINITIONS, styleDefinition } from "./rendering/styleProfiles";
 
 const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_SELECT]: "Select",
@@ -31,8 +33,6 @@ const representationActions: Record<string, RepresentationStyle> = {
 };
 
 const isAdmittedFile = (file: File) => /\.(pdb|cif|mmcif)$/i.test(file.name);
-const backgroundColors: Record<Exclude<BackgroundPreset, "Custom">, string> = { Black: "#05070a", White: "#ffffff", "Dark Gray": "#252b34", "Light Gray": "#d8dee7", Navy: "#071225", "Deep Blue": "#061b40" };
-
 const initialRibbonCategory = (): RibbonCategory => {
   const saved = window.sessionStorage.getItem("molecular-workstation.ribbon") as RibbonCategory | null;
   return saved && RIBBON_CATEGORIES.includes(saved) ? saved : "Display";
@@ -88,7 +88,7 @@ export const App = () => {
   const importFile = (file: File) => {
     if (!isAdmittedFile(file)) {
       setLoadState("error");
-      setLoadError("Only PDB and mmCIF files are admitted in G1B. The current structure was kept.");
+      setLoadError("Only PDB and mmCIF files are admitted in G1C. The current structure was kept.");
       return;
     }
     void runLoad(() => apiClient.uploadStructure(file));
@@ -139,13 +139,18 @@ export const App = () => {
     }
   };
 
-  const setColorMode = (mode: ColorMode) => {
-    setProjection((current) => ({ ...current, color: { ...current.color, mode, colorId: mode === "named" ? current.color.colorId ?? "pymol:marine" : mode === "uniform" ? "pymol:grey" : current.color.colorId } }));
+  const setColorMode = (mode: ColorMode) => setProjection((current) => applyPresentationAction(current, structure?.structure ?? null, { type: "COLOR.APPLY_SCHEME", mode }));
+
+  const applyStyle = (style: RepresentationStyle) => {
+    const definition = styleDefinition(styleProfileFor(style));
+    if (definition.capability === "COMING_SOON" || definition.capability === "UNAVAILABLE") {
+      showNotice({ id: ACTION_IDS.REPRESENTATION_SET_STYLE, group: "REPRESENTATION", state: definition.capability === "COMING_SOON" ? "COMING_SOON" : "UNAVAILABLE", label: definition.label, description: definition.unsupportedReason ?? `${definition.label} is not available in this gate.` });
+      return;
+    }
+    setProjection((current) => applyPresentationAction(current, structure?.structure ?? null, { type: "REPRESENTATION.APPLY", style }));
   };
 
-  const setBackgroundPreset = (preset: BackgroundPreset) => {
-    setProjection((current) => ({ ...current, background: { preset, color: preset === "Custom" ? current.background.color : backgroundColors[preset] } }));
-  };
+  const setBackgroundPreset = (preset: BackgroundPreset) => setProjection((current) => applyPresentationAction(current, structure?.structure ?? null, { type: "BACKGROUND.SET", preset }));
 
   const selectRibbon = (category: RibbonCategory) => {
     setActiveRibbon(category);
@@ -186,22 +191,26 @@ export const App = () => {
       void saveProject();
       return;
     }
-    if (representationActions[actionId] && capability.state === "SUPPORTED") setProjection((current) => setProjectionStyle(current, structure?.structure ?? null, representationActions[actionId]));
+    if (representationActions[actionId] && capability.state === "SUPPORTED") applyStyle(representationActions[actionId]);
     if (actionId === ACTION_IDS.REPRESENTATION_SET_STYLE && capability.state === "SUPPORTED") {
       setProjection((current) => {
-        const index = REPRESENTATION_STYLES.indexOf(current.representation);
-        return setProjectionStyle(current, structure?.structure ?? null, REPRESENTATION_STYLES[(index + 1) % REPRESENTATION_STYLES.length]);
+        const supportedStyles = STYLE_DEFINITIONS.filter((definition) => definition.capability !== "COMING_SOON" && definition.capability !== "UNAVAILABLE").map((definition) => definition.id as RepresentationStyle);
+        const index = supportedStyles.indexOf(current.representation);
+        return setProjectionStyle(current, structure?.structure ?? null, supportedStyles[(index + 1) % supportedStyles.length]);
       });
     }
-    const visibilityActions: Partial<Record<ActionId, keyof Pick<RenderProjection, "showProtein" | "showLigand" | "showWater" | "showIons" | "showOther">>> = {
-      [ACTION_IDS.REPRESENTATION_TOGGLE_PROTEIN]: "showProtein",
-      [ACTION_IDS.REPRESENTATION_TOGGLE_LIGAND]: "showLigand",
-      [ACTION_IDS.REPRESENTATION_TOGGLE_WATER]: "showWater",
-      [ACTION_IDS.REPRESENTATION_TOGGLE_IONS]: "showIons",
-      [ACTION_IDS.REPRESENTATION_TOGGLE_OTHER]: "showOther",
+    const visibilityActions: Partial<Record<ActionId, PresentationComponent>> = {
+      [ACTION_IDS.REPRESENTATION_TOGGLE_PROTEIN]: "protein",
+      [ACTION_IDS.REPRESENTATION_TOGGLE_LIGAND]: "ligand",
+      [ACTION_IDS.REPRESENTATION_TOGGLE_WATER]: "water",
+      [ACTION_IDS.REPRESENTATION_TOGGLE_IONS]: "ions",
+      [ACTION_IDS.REPRESENTATION_TOGGLE_OTHER]: "other",
     };
-    const visibilityKey = visibilityActions[actionId];
-    if (visibilityKey && capability.state === "SUPPORTED") setProjection((current) => setLayerVisibility(current, visibilityKey));
+    const visibilityComponent = visibilityActions[actionId];
+    if (visibilityComponent && capability.state === "SUPPORTED") setProjection((current) => {
+      const key = ({ protein: "showProtein", ligand: "showLigand", water: "showWater", ions: "showIons", other: "showOther" } as const)[visibilityComponent];
+      return applyPresentationAction(current, structure?.structure ?? null, { type: "COMPONENT_VISIBILITY.SET", component: visibilityComponent, visible: !current[key] });
+    });
     if (actionId === ACTION_IDS.VIEW_RESET && capability.state === "SUPPORTED") {
       commandSequence.current += 1;
       setCameraCommand({ actionId: ACTION_IDS.VIEW_RESET, sequence: commandSequence.current });
@@ -209,8 +218,8 @@ export const App = () => {
     if (capability.state !== "SUPPORTED") showNotice(capability);
   };
 
-  const updateCustomColor = (hex: string) => setProjection((current) => ({ ...current, color: { ...current.color, mode: "custom", customHex: hex } }));
-  const updateNamedColor = (colorId: string) => setProjection((current) => ({ ...current, color: { ...current.color, mode: "named", colorId } }));
+  const updateCustomColor = (hex: string) => setProjection((current) => ({ ...current, color: { ...current.color, mode: "custom", customHex: hex }, colorDiagnostic: null }));
+  const updateNamedColor = (colorId: string) => setProjection((current) => ({ ...current, color: { ...current.color, mode: "named", colorId }, colorDiagnostic: null }));
 
   return (
     <div className="app-shell">
@@ -218,11 +227,11 @@ export const App = () => {
       <NavRail activeItem={activeNav} onAction={handleAction} />
       <main className="app-main">
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
-        <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onColorMode={setColorMode} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
+        <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
           <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFetchRcsb={fetchRcsb} openRcsbRequest={openRcsbRequest} structure={structure} projection={projection} loading={loadState === "loading"} error={loadError} />
           <MolecularCanvas structure={structure} projection={projection} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFileDrop={importFile} consoleExpanded={consoleExpanded} />
-          <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} />
+          <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} />
         </div>
         <StatusBar apiStatus={apiStatus} structure={structure} project={project} />
         {notice && <CapabilityNotice capability={notice} onClose={() => setNotice(null)} />}

@@ -9,6 +9,7 @@ import type {
   CanonicalMolecularStructure,
   CanonicalResidue,
   CoordinateBounds,
+  SecondaryStructureKind,
   StructureFormat,
   StructureLoadResult,
   StructureSourceKind,
@@ -34,7 +35,8 @@ export class IngestionError extends Error {
 
 type AtomSeed = Omit<CanonicalAtom, "stableId">;
 type BondSeed = { atom1Serial: number; atom2Serial: number; order: BondOrder; source: CanonicalBond["source"] };
-type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[] };
+type SecondarySpan = { kind: Exclude<SecondaryStructureKind, "LOOP">; chain: string; start: number; end: number };
+type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[]; secondaryStructureSource?: string };
 
 const parseNumber = (value: string, label: string): number => {
   const parsed = Number(value.replace(/\(.+\)$/, ""));
@@ -45,6 +47,22 @@ const parseNumber = (value: string, label: string): number => {
 const parseInteger = (value: string | undefined, fallback: number): number => {
   const parsed = Number.parseInt(value ?? "", 10);
   return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const parseOptionalNumber = (value: string | undefined): number | null | undefined => {
+  const normalized = value?.trim();
+  if (!normalized || normalized === "." || normalized === "?") return undefined;
+  const parsed = Number(normalized.replace(/\(.+\)$/, ""));
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const parsePdbFormalCharge = (value: string): number | null | undefined => {
+  const normalized = value.trim();
+  if (!normalized) return undefined;
+  const match = normalized.match(/^(\d+)([+-])$/);
+  if (!match) return null;
+  const magnitude = Number(match[1]);
+  return match[2] === "+" ? magnitude : -magnitude;
 };
 
 const normalizeElement = (value: string, atomName: string): string => {
@@ -66,8 +84,18 @@ const classifyAtom = (recordType: "ATOM" | "HETATM", residueName: string, elemen
 const parsePdb = (content: string): ParsedSource => {
   const atoms: AtomSeed[] = [];
   const bonds: BondSeed[] = [];
+  const secondarySpans: SecondarySpan[] = [];
   for (const line of content.split(/\r?\n/)) {
     const record = line.slice(0, 6).trim();
+    if (record === "HELIX" || record === "SHEET") {
+      const isHelix = record === "HELIX";
+      const chain = line.slice(isHelix ? 19 : 21, isHelix ? 20 : 22).trim();
+      const endChain = line.slice(isHelix ? 31 : 32, isHelix ? 32 : 33).trim() || chain;
+      const start = parseInteger(line.slice(isHelix ? 21 : 22, isHelix ? 25 : 26).trim(), Number.NaN);
+      const end = parseInteger(line.slice(isHelix ? 33 : 33, isHelix ? 37 : 37).trim(), Number.NaN);
+      if (chain && endChain === chain && Number.isFinite(start) && Number.isFinite(end)) secondarySpans.push({ kind: isHelix ? "HELIX" : "SHEET", chain, start, end });
+      continue;
+    }
     if (record === "CONECT") {
       const sourceSerial = parseInteger(line.slice(6, 11).trim(), -1);
       if (sourceSerial < 0) continue;
@@ -100,11 +128,17 @@ const parsePdb = (content: string): ParsedSource => {
       y,
       z,
       recordType,
+      bFactor: parseOptionalNumber(line.slice(60, 66)),
+      formalCharge: parsePdbFormalCharge(line.slice(78, 80)),
       ...classifyAtom(recordType, residueName, element),
     });
   }
   if (atoms.length === 0) throw new IngestionError("INVALID_INPUT", "No ATOM or HETATM records with coordinates were found.");
-  return { format: "pdb", atoms, bonds };
+  for (const atom of atoms) {
+    const span = secondarySpans.find((candidate) => candidate.chain === atom.chain && atom.residueNumber >= candidate.start && atom.residueNumber <= candidate.end);
+    if (span) atom.secondaryStructure = span.kind;
+  }
+  return { format: "pdb", atoms, bonds, ...(secondarySpans.length ? { secondaryStructureSource: "PDB HELIX/SHEET records" } : {}) };
 };
 
 const tokenizeCif = (content: string): string[] => {
@@ -222,10 +256,40 @@ const parseMmcif = (content: string): ParsedSource => {
       y: parseNumber(yValue, "y coordinate"),
       z: parseNumber(zValue, "z coordinate"),
       recordType: record,
+      bFactor: parseOptionalNumber(cifValue(row, atomLoop.headers, ["_atom_site.B_iso_or_equiv"])),
+      formalCharge: parseOptionalNumber(cifValue(row, atomLoop.headers, ["_atom_site.pdbx_formal_charge"])),
       ...classifyAtom(record, residueName, element),
     });
   }
   if (atoms.length === 0) throw new IngestionError("INVALID_INPUT", "No _atom_site rows with coordinates were found in the mmCIF input.");
+
+  const secondarySpans: SecondarySpan[] = [];
+  for (const loop of loops) {
+    if (loop.headers.some((header) => header.startsWith("_struct_conf."))) {
+      for (const row of loop.rows) {
+        const type = (cifValue(row, loop.headers, ["_struct_conf.conf_type_id"]) ?? "").toUpperCase();
+        const kind = type.includes("HELX") ? "HELIX" : null;
+        const chain = cifValue(row, loop.headers, ["_struct_conf.beg_label_asym_id", "_struct_conf.beg_auth_asym_id"]);
+        const endChain = cifValue(row, loop.headers, ["_struct_conf.end_label_asym_id", "_struct_conf.end_auth_asym_id"]) ?? chain;
+        const start = parseInteger(cifValue(row, loop.headers, ["_struct_conf.beg_label_seq_id", "_struct_conf.beg_auth_seq_id"]), Number.NaN);
+        const end = parseInteger(cifValue(row, loop.headers, ["_struct_conf.end_label_seq_id", "_struct_conf.end_auth_seq_id"]), Number.NaN);
+        if (kind && chain && chain === endChain && Number.isFinite(start) && Number.isFinite(end)) secondarySpans.push({ kind, chain, start, end });
+      }
+    }
+    if (loop.headers.some((header) => header.startsWith("_struct_sheet_range."))) {
+      for (const row of loop.rows) {
+        const chain = cifValue(row, loop.headers, ["_struct_sheet_range.beg_label_asym_id", "_struct_sheet_range.beg_auth_asym_id"]);
+        const endChain = cifValue(row, loop.headers, ["_struct_sheet_range.end_label_asym_id", "_struct_sheet_range.end_auth_asym_id"]) ?? chain;
+        const start = parseInteger(cifValue(row, loop.headers, ["_struct_sheet_range.beg_label_seq_id", "_struct_sheet_range.beg_auth_seq_id"]), Number.NaN);
+        const end = parseInteger(cifValue(row, loop.headers, ["_struct_sheet_range.end_label_seq_id", "_struct_sheet_range.end_auth_seq_id"]), Number.NaN);
+        if (chain && chain === endChain && Number.isFinite(start) && Number.isFinite(end)) secondarySpans.push({ kind: "SHEET", chain, start, end });
+      }
+    }
+  }
+  for (const atom of atoms) {
+    const span = secondarySpans.find((candidate) => candidate.chain === atom.chain && atom.residueNumber >= candidate.start && atom.residueNumber <= candidate.end);
+    if (span) atom.secondaryStructure = span.kind;
+  }
 
   const serialFor = (chain: string, residue: number, atomName: string, residueName?: string): number[] => atoms
     .filter((atom) => atom.chain === chain && atom.residueNumber === residue && atom.atomName === atomName && (!residueName || atom.residueName === residueName))
@@ -259,14 +323,14 @@ const parseMmcif = (content: string): ParsedSource => {
       }
     }
   }
-  return { format: "mmcif", atoms, bonds };
+  return { format: "mmcif", atoms, bonds, ...(secondarySpans.length ? { secondaryStructureSource: "mmCIF struct_conf/struct_sheet_range records" } : {}) };
 };
 
 const formatFromFilename = (filename: string): StructureFormat => {
   const extension = filename.toLowerCase().split(".").pop();
   if (extension === "pdb") return "pdb";
   if (extension === "cif" || extension === "mmcif") return "mmcif";
-  throw new IngestionError("UNSUPPORTED_FORMAT", "Only .pdb, .cif, and .mmcif files are admitted in G1B.");
+  throw new IngestionError("UNSUPPORTED_FORMAT", "Only .pdb, .cif, and .mmcif files are admitted in G1C.");
 };
 
 const parseSource = (filename: string, content: string): ParsedSource => {
@@ -282,11 +346,12 @@ const makeHierarchy = (atoms: CanonicalAtom[]): CanonicalHierarchy => {
     const residueId = `${chainId}:residue:${atom.residueNumber}:${atom.insertionCode ?? ""}`;
     if (!chains[chainId]) chains[chainId] = { id: chainId, name: atom.chain, residueIds: [] };
     if (!residues[residueId]) {
-      residues[residueId] = { id: residueId, name: atom.residueName, number: atom.residueNumber, ...(atom.insertionCode ? { insertionCode: atom.insertionCode } : {}), chainId, atomIds: [], isPolymer: atom.isPolymer };
+      residues[residueId] = { id: residueId, name: atom.residueName, number: atom.residueNumber, ...(atom.insertionCode ? { insertionCode: atom.insertionCode } : {}), chainId, atomIds: [], isPolymer: atom.isPolymer, ...(atom.secondaryStructure ? { secondaryStructure: atom.secondaryStructure } : {}) };
       chains[chainId].residueIds.push(residueId);
     }
-    residues[residueId].atomIds.push(atom.stableId);
-    residues[residueId].isPolymer ||= atom.isPolymer;
+      residues[residueId].atomIds.push(atom.stableId);
+      residues[residueId].isPolymer ||= atom.isPolymer;
+      if (!residues[residueId].secondaryStructure && atom.secondaryStructure) residues[residueId].secondaryStructure = atom.secondaryStructure;
   }
   return { chainIds: Object.keys(chains), chains, residues };
 };
@@ -386,6 +451,7 @@ export class StructureIngestionService {
       bonds,
       hierarchy,
       scientificHash,
+      ...(parsed.secondaryStructureSource ? { secondaryStructureDataset: { datasetId: `${hash.slice(0, 16)}:secondary-structure`, molecularRevision: scientificHash, assignmentSource: parsed.secondaryStructureSource, profileVersion: "pdb-mmcif-structural-records-v1" } } : {}),
       ...summary,
     };
     this.structures.set(structure.id, structure);

@@ -1,0 +1,10 @@
+HEADER    G1C MULTI-CHAIN NUCLEIC ACID FIXTURE
+ATOM      1  P     A A   1       0.000   0.000   0.000  1.00 11.00           P
+ATOM      2  C4'   A A   1       1.500   0.000   0.000  1.00 11.00           C
+ATOM      3  P     U B   1       0.000   4.000   0.000  1.00 22.00           P
+ATOM      4  C4'   U B   1       1.500   4.000   0.000  1.00 22.00           C
+CONECT    1    2
+CONECT    2    1
+CONECT    3    4
+CONECT    4    3
+END

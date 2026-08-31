@@ -1,0 +1,8 @@
+HEADER    G1C SECONDARY/PROPERTY FIXTURE
+HELIX    1   1 ALA A   1  GLY A   2  1                                  
+SHEET    1   A 1 THR B   3  SER B   4  0
+ATOM      1  CA  ALA A   1       1.000   2.000   3.000  1.00 10.00           C  0+
+ATOM      2  CA  GLY A   2       2.000   2.000   3.000  1.00 30.00           C
+ATOM      3  CA  THR B   3       3.000   2.000   3.000  1.00 20.00           C
+ATOM      4  CA  SER B   4       4.000   2.000   3.000  1.00 40.00           C
+END

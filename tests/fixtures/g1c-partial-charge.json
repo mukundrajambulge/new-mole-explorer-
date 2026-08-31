@@ -1,0 +1,12 @@
+{
+  "dataset_id": "fixture:partial-charge:1",
+  "molecular_revision": "fixture-scientific-revision",
+  "charge_model": "AM1-BCC",
+  "profile_version": "partial-charge-diverging-v1",
+  "atom_charge_map": {
+    "fixture:atom:1": -0.42,
+    "fixture:atom:2": 0.42
+  },
+  "units": "e",
+  "provenance": "deterministic G1C test fixture; not an inference by the renderer"
+}

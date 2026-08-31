@@ -11,6 +11,6 @@ export const MenuBar = ({ activeCategory, onCategory }: { activeCategory: Ribbon
         </button>
       ))}
     </nav>
-    <div className="menu-context"><span className="context-pill">G1B</span><span className="context-label">PRESENTATION</span></div>
+    <div className="menu-context"><span className="context-pill">G1C</span><span className="context-label">PRESENTATION</span></div>
   </header>
 );

@@ -5,6 +5,26 @@ const pdbFixture = `HEADER    TEST\nATOM      1  CA  ALA A   1       1.000   2.0
 
 const cifFixture = `data_test\nloop_\n_atom_site.group_PDB\n_atom_site.id\n_atom_site.type_symbol\n_atom_site.label_atom_id\n_atom_site.label_comp_id\n_atom_site.label_asym_id\n_atom_site.label_seq_id\n_atom_site.Cartn_x\n_atom_site.Cartn_y\n_atom_site.Cartn_z\nATOM 1 C CA ALA A 1 1.0 2.0 3.0\nHETATM 2 O O HOH A 2 4.0 5.0 6.0\n`;
 
+const fixedPdbLine = (record: "ATOM" | "HETATM", serial: number, atomName: string, residueName: string, chain: string, residueNumber: number, element: string, bFactor: number | undefined, formalCharge: string | undefined) => {
+  const fields = Array.from({ length: 80 }, () => " ");
+  const put = (start: number, width: number, value: string) => value.slice(0, width).padStart(width, " ").split("").forEach((character, index) => { fields[start + index] = character; });
+  const putLeft = (start: number, width: number, value: string) => value.slice(0, width).padEnd(width, " ").split("").forEach((character, index) => { fields[start + index] = character; });
+  putLeft(0, 6, record);
+  put(6, 5, String(serial));
+  putLeft(12, 4, atomName);
+  putLeft(17, 3, residueName);
+  putLeft(21, 1, chain);
+  put(22, 4, String(residueNumber));
+  put(30, 8, "1.000");
+  put(38, 8, "2.000");
+  put(46, 8, "3.000");
+  put(54, 6, "1.00");
+  if (bFactor !== undefined) put(60, 6, bFactor.toFixed(2));
+  putLeft(76, 2, element);
+  if (formalCharge) putLeft(78, 2, formalCharge);
+  return fields.join("");
+};
+
 describe("VIS-01 structure ingestion", () => {
   it("creates canonical metadata and provenance for local PDB input", async () => {
     const result = await new StructureIngestionService().ingestLocal("sample.pdb", Buffer.from(pdbFixture));
@@ -48,5 +68,33 @@ describe("VIS-01 structure ingestion", () => {
     expect(result.structure.bonds).toHaveLength(1);
     expect(result.structure.bonds[0]).toMatchObject({ order: "SINGLE", source: "PDB_CONECT" });
     expect(result.structure.bonds[0].atom1).toBe(result.structure.atoms[0].stableId);
+  });
+
+  it("retains source B-factors, formal-charge zero, and unknown formal charge distinctly", async () => {
+    const content = [
+      fixedPdbLine("ATOM", 1, "CA", "ALA", "A", 1, "C", 12.5, "0+"),
+      fixedPdbLine("HETATM", 2, "NA", "NA", "A", 2, "NA", 8, undefined),
+      "END",
+    ].join("\n");
+    const result = await new StructureIngestionService().ingestLocal("properties.pdb", Buffer.from(content));
+    expect(result.structure.atoms[0]).toMatchObject({ bFactor: 12.5, formalCharge: 0 });
+    expect(result.structure.atoms[1]).toMatchObject({ bFactor: 8 });
+    expect(result.structure.atoms[1].formalCharge).toBeUndefined();
+  });
+
+  it("records admitted PDB HELIX/SHEET assignments as canonical secondary structure", async () => {
+    const content = [
+      "HELIX    1   1 ALA A   1  GLY A   2  1                                  ",
+      "SHEET    1   A 1 THR B   3  SER B   4  0",
+      fixedPdbLine("ATOM", 1, "CA", "ALA", "A", 1, "C", 1, undefined),
+      fixedPdbLine("ATOM", 2, "CA", "GLY", "A", 2, "C", 2, undefined),
+      fixedPdbLine("ATOM", 3, "CA", "THR", "B", 3, "C", 3, undefined),
+      fixedPdbLine("ATOM", 4, "CA", "SER", "B", 4, "C", 4, undefined),
+      "END",
+    ].join("\n");
+    const result = await new StructureIngestionService().ingestLocal("secondary.pdb", Buffer.from(content));
+    expect(result.structure.secondaryStructureDataset?.assignmentSource).toContain("HELIX/SHEET");
+    expect(result.structure.atoms.map((atom) => atom.secondaryStructure)).toEqual(["HELIX", "HELIX", "SHEET", "SHEET"]);
+    expect(result.structure.hierarchy.residues["chain:A:residue:1:"]?.secondaryStructure).toBe("HELIX");
   });
 });

@@ -143,6 +143,7 @@ export const getCapability = (actionId: ActionId): Capability => ACTION_REGISTRY
 
 export const capabilityTone = (state: CapabilityState): "positive" | "experimental" | "muted" | "danger" => {
   if (state === "SUPPORTED") return "positive";
+  if (state === "SUPPORTED_WITH_LIMITATIONS") return "experimental";
   if (state === "EXPERIMENTAL") return "experimental";
   if (state === "UNAVAILABLE") return "danger";
   return "muted";

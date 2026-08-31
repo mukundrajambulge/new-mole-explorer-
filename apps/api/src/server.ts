@@ -11,11 +11,11 @@ const sendJson = (response: ServerResponse, status: number, body: unknown) => {
   response.end(JSON.stringify(body));
 };
 
-const health: HealthResponse = { service: "molecular-api", status: "ok", gate: "G1B", timestamp: new Date().toISOString() };
+const health: HealthResponse = { service: "molecular-api", status: "ok", gate: "G1C", timestamp: new Date().toISOString() };
 
 const bootstrap: BootstrapResponse = {
   product: "Molecular Workstation",
-  gate: "G1B",
+  gate: "G1C",
   renderer: { mode: "3dmol", authoritative: true },
   capabilities: {
     "PROJECT.CREATE": { state: "SUPPORTED", label: "Supported", description: "Create an empty persisted project manifest." },

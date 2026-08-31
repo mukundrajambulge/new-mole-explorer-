@@ -1,6 +1,7 @@
 export {
   BACKGROUND_PRESETS,
   COLOR_MODES,
+  COLOR_SCHEMES,
   DEFAULT_BACKGROUND,
   DEFAULT_CAMERA,
   DEFAULT_COLOR,
@@ -13,7 +14,9 @@ export {
   createRepresentationState,
   fromProjectPresentation,
   setLayerVisibility,
+  setColorScheme,
   setProjectionStyle,
+  styleProfileFor,
   toProjectPresentation,
 } from "./presentationState";
 export type {
@@ -29,6 +32,7 @@ export type {
   RepresentationStyle,
   RepresentationType,
 } from "./presentationState";
+export type { ColorSchemeId } from "./colorSchemes";
 
 import { createDefaultRenderProjection } from "./presentationState";
 

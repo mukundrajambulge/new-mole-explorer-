@@ -1,10 +1,10 @@
-# G1B API contract
+# G1C API contract
 
 The API is the authoritative ingestion and project boundary. The running local API is `http://localhost:4310`; the web app proxies `/api` to it.
 
 ## Readiness
 
-- `GET /api/health` → `HealthResponse` (`gate: G1B`)
+- `GET /api/health` → `HealthResponse` (`gate: G1C`)
 - `GET /api/bootstrap` → `BootstrapResponse` with explicit capability states
 
 ## Structure ingestion
@@ -12,7 +12,7 @@ The API is the authoritative ingestion and project boundary. The running local A
 - `POST /api/structures/upload` with multipart field `file` → `StructureLoadResult`
 - `POST /api/structures/rcsb` with JSON `{ "pdbId": "1CRN" }` → `StructureLoadResult`
 
-`StructureLoadResult.structure` includes source kind, original filename, format, exact-byte SHA-256, byte length, optional RCSB URI, parser profile, stable atom IDs, explicit canonical bonds, chain/residue hierarchy, coordinate bounds, counts, and scientific hash. `renderSource` is the exact fetched/uploaded content used as the renderer input; it is not scientific authority.
+`StructureLoadResult.structure` includes source kind, original filename, format, exact-byte SHA-256, byte length, optional RCSB URI, parser profile, stable atom IDs, explicit canonical bonds, chain/residue hierarchy, coordinate bounds, counts, scientific hash, source B-factors/formal charges when supplied, and imported secondary-structure metadata when supplied. `renderSource` is the exact fetched/uploaded content used as the renderer input; it is not scientific authority.
 
 ## Project lifecycle
 

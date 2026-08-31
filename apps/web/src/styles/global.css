@@ -151,11 +151,17 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
 .display-row:hover { background: rgba(128, 158, 191, .08); }
 .select-value { display: flex; align-items: center; gap: 18px; padding: 5px 7px; color: #dbe4ee; border: 1px solid rgba(147, 169, 193, .16); border-radius: 5px; background: rgba(146, 167, 192, .05); font-size: 10px; }
 .display-row select { min-width: 0; max-width: 152px; padding: 5px 6px; color: #dbe4ee; border: 1px solid rgba(147, 169, 193, .16); border-radius: 5px; outline: 0; background: #101722; font-size: 10px; }
+.display-capability { margin: -2px 13px 4px; color: #738296; font-size: 8px; letter-spacing: .04em; text-transform: uppercase; }
+.presentation-diagnostic { margin: 4px 13px 6px; padding: 6px 7px; color: #ffc6bd; border: 1px solid rgba(236, 117, 107, .3); border-radius: 5px; background: rgba(236, 117, 107, .08); font-family: ui-monospace, monospace; font-size: 8px; line-height: 1.35; }
 .display-row input[type="color"] { width: 48px; height: 22px; padding: 1px; border: 1px solid #374150; border-radius: 4px; background: #101722; }
 .display-row--sub { min-height: 30px; padding-left: 25px; color: #8e9cad; font-size: 10px; }
 .color-swatch { width: 48px; height: 20px; border: 1px solid #374150; border-radius: 4px; background: #050609; }
 .reset-view { display: flex; align-items: center; gap: 6px; margin: 11px auto 0; padding: 7px 10px; color: #8492a4; border: 1px solid rgba(146, 169, 193, .13); border-radius: 6px; background: transparent; font-size: 10px; }
 .reset-view:hover { color: var(--text); background: rgba(126, 151, 180, .09); }
+.ribbon-select-label { display: flex; align-items: center; gap: 7px; color: #718196; font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.ribbon-select-label select { min-width: 190px; padding: 7px 8px; color: #e2edf7; border: 1px solid rgba(49, 216, 196, .25); border-radius: 6px; outline: 0; background: #101722; font-size: 10px; text-transform: none; }
+.ribbon-color-gallery { display: flex; align-items: center; gap: 5px; padding-left: 8px; border-left: 1px solid var(--line-strong); }
+.ribbon-scheme-count { padding-left: 4px; color: #647286; font-size: 8px; white-space: nowrap; }
 
 .canvas-stage { position: relative; min-width: 0; min-height: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: #05070a; }
 .canvas-status { position: absolute; z-index: 4; top: 14px; left: 15px; display: flex; align-items: center; gap: 7px; color: #7e8c9f; font-size: 9px; font-weight: 700; letter-spacing: .13em; pointer-events: none; }

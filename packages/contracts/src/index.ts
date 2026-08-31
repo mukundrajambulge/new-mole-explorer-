@@ -1,5 +1,6 @@
 export const CAPABILITY_STATES = [
   "SUPPORTED",
+  "SUPPORTED_WITH_LIMITATIONS",
   "EXPERIMENTAL",
   "COMING_SOON",
   "UNAVAILABLE",
@@ -16,13 +17,13 @@ export type Capability = {
 export type HealthResponse = {
   service: "molecular-api";
   status: "ok";
-  gate: "G1B";
+  gate: "G1C";
   timestamp: string;
 };
 
 export type BootstrapResponse = {
   product: "Molecular Workstation";
-  gate: "G1B";
+  gate: "G1C";
   renderer: {
     mode: "3dmol";
     authoritative: true;
@@ -53,6 +54,26 @@ export type CanonicalResidue = {
   chainId: string;
   atomIds: string[];
   isPolymer: boolean;
+  secondaryStructure?: SecondaryStructureKind | null;
+};
+
+export type SecondaryStructureKind = "HELIX" | "SHEET" | "LOOP";
+
+export type PartialChargeDataset = {
+  datasetId: string;
+  molecularRevision: string;
+  chargeModel: string;
+  profileVersion: string;
+  atomChargeMap: Record<string, number>;
+  units: string;
+  provenance: string;
+};
+
+export type SecondaryStructureDataset = {
+  datasetId: string;
+  molecularRevision: string;
+  assignmentSource: string;
+  profileVersion: string;
 };
 
 export type CanonicalChain = {
@@ -84,6 +105,11 @@ export type CanonicalAtom = {
   isLigand: boolean;
   isWater: boolean;
   isIon: boolean;
+  /** Authoritative formal charge. null means explicitly unknown; absent means not supplied. */
+  formalCharge?: number | null;
+  /** Authoritative temperature/B factor when supplied by the source. */
+  bFactor?: number | null;
+  secondaryStructure?: SecondaryStructureKind | null;
 };
 
 export type StructureCounts = {
@@ -124,6 +150,8 @@ export type CanonicalMolecularStructure = {
   bonds: CanonicalBond[];
   hierarchy: CanonicalHierarchy;
   scientificHash: string;
+  partialChargeDataset?: PartialChargeDataset;
+  secondaryStructureDataset?: SecondaryStructureDataset;
 };
 
 export type StructureLoadResult = {
