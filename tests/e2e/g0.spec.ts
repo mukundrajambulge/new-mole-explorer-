@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 test("G0 workstation shell renders and console collapses", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Structure" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Selection Inspector" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Projection & Display" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Command and selection console" })).toBeVisible();
   await page.getByRole("button", { name: "Collapse console" }).click();
   await expect(page.getByRole("button", { name: "Expand console" })).toBeVisible();

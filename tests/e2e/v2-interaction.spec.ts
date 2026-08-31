@@ -28,8 +28,8 @@ test("V2 keeps target-scoped presentation, inspection, labels, camera, and viewe
   await page.getByRole("button", { name: /Run/ }).click();
 
   await page.getByRole("button", { name: "Collapse console" }).click();
-  await expect(page.getByRole("heading", { name: "Molecular Inspector" })).toBeVisible({ timeout: 5000 });
-  await expect(page.getByTestId("molecular-inspector")).toContainText("Coordinates");
+  await expect(page.getByRole("heading", { name: "Context" })).toBeVisible({ timeout: 5000 });
+  await expect(page.getByTestId("context-panel")).toContainText("Coordinates");
 
   await page.locator('summary').filter({ hasText: "Labels" }).click();
   await page.getByRole("combobox", { name: "Label mode" }).selectOption("atom-name");

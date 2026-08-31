@@ -1,4 +1,4 @@
-import type { CanonicalAtom, CanonicalBond, CanonicalMolecularStructure } from "@molecular/contracts";
+import type { CanonicalBond, CanonicalMolecularStructure } from "@molecular/contracts";
 
 export type CoordinateContext = {
   coordinateStateId: string;

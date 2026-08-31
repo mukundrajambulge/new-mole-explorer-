@@ -4,10 +4,13 @@ import { colorRegistry } from "./colorRegistry";
 import { resolveAtomColor } from "./colorSchemes";
 import { DEFAULT_CAMERA, type CameraState, type RenderProjection } from "./renderProjection";
 import { buildRenderProjectionDiagnostics, emptyRenderProjectionDiagnostics, type RenderProjectionDiagnostics } from "./renderDirectives";
-import { resolveSafeLabel } from "../interaction/labels";
+import type { RepresentationType } from "./presentationState";
+import { labelPlanForState, resolveSafeLabel } from "../interaction/labels";
 import { ReverseIdentityMap, type PickResult } from "../interaction/picking";
 import { measurementStatus, type MeasurementObject } from "../interaction/measurements";
 import { boundsForCoordinates, paddedClippingSlab, principalOrientationQuaternion, type Coordinate3, type ClippingSlab } from "./cameraController";
+
+const diagnosticTypeForStyle = (style: string): RepresentationType => style === "ribbon" ? "RIBBON" : style === "putty" || style === "trace" || style === "cartoon" ? "CARTOON" : style === "nonbonded-crosses" ? "NONBONDED" : style === "nonbonded-spheres" ? "NB_SPHERES" : style === "line" ? "LINES" : style === "stick" || style === "licorice" || style === "ball-and-stick" ? "STICKS" : "SPHERES";
 
 const mountedAdapters = new WeakMap<HTMLElement, ThreeDMolViewerAdapter>();
 type Viewport = NonNullable<CameraState["viewport"]>;
@@ -302,9 +305,15 @@ export class ThreeDMolViewerAdapter {
   private projectLabels(projection: RenderProjection): void {
     if (!this.viewer || !this.structure) return;
     this.viewer.removeAllLabels();
-    if (projection.labels.mode === "off" || !projection.labels.expression) return;
     const visible = this.structure.atoms.filter((atom) => atom.isPolymer ? projection.showProtein : atom.isLigand ? projection.showLigand : atom.isWater ? projection.showWater : atom.isIon ? projection.showIons : projection.showOther);
-    for (const atom of visible) {
+    const plan = labelPlanForState(projection.labels, visible);
+    if (this.container) {
+      this.container.dataset.labelEligibleCount = String(plan.eligibleAtomCount);
+      this.container.dataset.labelCount = String(plan.labelCount);
+      if (plan.diagnostic) this.container.dataset.labelDiagnostic = plan.diagnostic; else delete this.container.dataset.labelDiagnostic;
+    }
+    for (const atom of plan.atoms) {
+      if (!projection.labels.expression) continue;
       const text = resolveSafeLabel(projection.labels.expression, atom, this.structure);
       this.viewer.addLabel(text, { font: projection.labels.font, fontSize: projection.labels.size, fontColor: projection.labels.color, borderThickness: 1, borderColor: projection.labels.outline, backgroundColor: "#05070a", backgroundOpacity: 0.72, showBackground: true, screenOffset: new Vector2(projection.labels.offset.x, projection.labels.offset.y), alignment: projection.labels.alignment, position: { x: atom.x, y: atom.y, z: atom.z } }, undefined, true);
     }
@@ -368,6 +377,11 @@ export class ThreeDMolViewerAdapter {
     this.container.dataset.labelMode = this.projection?.labels.mode ?? "off";
     this.container.dataset.measurementCount = String(this.measurements.length);
     this.container.dataset.rendererStyleProfile = diagnostics.styleProfile;
+    this.container.dataset.rendererRepresentationStatus = diagnostics.representation[diagnosticTypeForStyle(diagnostics.styleProfile)].status;
+    this.container.dataset.rendererRibbonStatus = diagnostics.representation.RIBBON.status;
+    this.container.dataset.rendererPuttyStatus = diagnostics.representation.CARTOON.status;
+    if (diagnostics.representation.RIBBON.diagnostic) this.container.dataset.rendererRibbonDiagnostic = diagnostics.representation.RIBBON.diagnostic; else delete this.container.dataset.rendererRibbonDiagnostic;
+    if (diagnostics.representation.CARTOON.diagnostic) this.container.dataset.rendererPuttyDiagnostic = diagnostics.representation.CARTOON.diagnostic; else delete this.container.dataset.rendererPuttyDiagnostic;
     if (diagnostics.colorDiagnostic) this.container.dataset.colorDiagnostic = diagnostics.colorDiagnostic; else delete this.container.dataset.colorDiagnostic;
     if ((this.projection?.representation === "lines" || this.projection?.representation === "sticks") && this.structure?.bonds.length === 0) this.container.dataset.rendererBondDiagnostic = "No authoritative bond geometry is available for this target."; else delete this.container.dataset.rendererBondDiagnostic;
   }

@@ -63,7 +63,9 @@ describe("G1B-R1 canonical render directive diagnostics", () => {
     const state = applyRepresentationOperation(projection.representationState, "SHOW", REPRESENTATION_MASKS.RIBBON, ["polymer-1"]);
     const diagnostics = buildRenderProjectionDiagnostics(structure, { ...projection, representationState: state });
     expect(diagnostics.representation.RIBBON.supported).toBe(false);
-    expect(diagnostics.representation.RIBBON.active).toBe(true);
+    expect(diagnostics.representation.RIBBON.active).toBe(false);
+    expect(diagnostics.representation.RIBBON.status).toBe("NOT_IMPLEMENTED");
+    expect(diagnostics.representation.RIBBON.diagnostic).toMatch(/Ribbon geometry/i);
     expect(diagnostics.directives.some((directive) => directive.representation === "RIBBON")).toBe(false);
     expect(diagnostics.representation.CARTOON.active).toBe(true);
   });

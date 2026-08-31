@@ -11,12 +11,12 @@ import { StatusBar } from "./components/StatusBar";
 import { StructurePanel } from "./components/StructurePanel";
 import { ACTION_IDS, ACTION_REGISTRY, type ActionId, type ActionDefinition } from "./domain/registry";
 import { ApiClientError, apiClient } from "./lib/apiClient";
-import { applyRepresentationToSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setInteractionState, setLabelState, setProjectionStyle, setRepresentationParameters, styleProfileFor, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
+import { applyRepresentationToSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setInteractionState, setLabelState, setProjectionStyle, setRepresentationParameters, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
 import { applyPresentationAction, type PresentationComponent } from "./rendering/presentationActions";
-import { STYLE_DEFINITIONS, styleDefinition } from "./rendering/styleProfiles";
+import { STYLE_DEFINITIONS, representationCapabilityFor, representationStyleForCommand } from "./rendering/styleProfiles";
 import { resolveSelection, parseRepresentationCommand, type SelectionResult } from "./interaction/selectionResolver";
 import { LabelExpressionError, labelExpressionForMode, parseSafeLabelExpression, type LabelMode } from "./interaction/labels";
-import { MeasurementAccumulator, createMeasurementObject, measurementCardinality, measurementStatus, type MeasurementKind, type MeasurementObject } from "./interaction/measurements";
+import { MeasurementAccumulator, createMeasurementObject, measurementCardinality, type MeasurementKind, type MeasurementObject } from "./interaction/measurements";
 import type { PickResult } from "./interaction/picking";
 import { colorRegistry } from "./rendering/colorRegistry";
 
@@ -26,15 +26,6 @@ const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_ROTATE]: "Rotate",
   [ACTION_IDS.CANVAS_ZOOM]: "Zoom",
   [ACTION_IDS.CANVAS_FOCUS]: "Focus",
-};
-
-const representationActions: Record<string, RepresentationStyle> = {
-  [ACTION_IDS.REPRESENTATION_LINES]: "lines",
-  [ACTION_IDS.REPRESENTATION_STICKS]: "sticks",
-  [ACTION_IDS.REPRESENTATION_CARTOON]: "cartoon",
-  [ACTION_IDS.REPRESENTATION_BALL_AND_STICK]: "ball-and-stick",
-  [ACTION_IDS.REPRESENTATION_LICORICE]: "licorice",
-  [ACTION_IDS.REPRESENTATION_SPHERES]: "spheres",
 };
 
 const isAdmittedFile = (file: File) => /\.(pdb|cif|mmcif)$/i.test(file.name);
@@ -163,22 +154,24 @@ export const App = () => {
   const setColorMode = (mode: ColorMode) => setProjection((current) => applyPresentationAction(current, structure?.structure ?? null, { type: "COLOR.APPLY_SCHEME", mode }));
 
   const applyStyle = (style: RepresentationStyle) => {
-    const definition = styleDefinition(styleProfileFor(style));
-    if (definition.capability === "COMING_SOON" || definition.capability === "UNAVAILABLE") {
-      showNotice({ id: ACTION_IDS.REPRESENTATION_SET_STYLE, group: "REPRESENTATION", state: definition.capability === "COMING_SOON" ? "COMING_SOON" : "UNAVAILABLE", label: definition.label, description: definition.unsupportedReason ?? `${definition.label} is not available in this gate.` });
+    const definition = representationCapabilityFor(style, structure?.structure ?? null);
+    if (!definition.maySelect) {
+      showNotice({ id: ACTION_IDS.REPRESENTATION_SET_STYLE, group: "REPRESENTATION", state: definition.capability, label: definition.label, description: definition.diagnostic ?? definition.unsupportedReason ?? `${definition.label} is not available in this gate.` });
       return;
     }
+    if (definition.status === "VALID_EMPTY") showNotice({ id: ACTION_IDS.REPRESENTATION_SET_STYLE, group: "REPRESENTATION", state: "SUPPORTED_WITH_LIMITATIONS", label: definition.label, description: definition.diagnostic ?? "This representation has no eligible atoms in the current structure." });
     setProjection((current) => applyPresentationAction(current, structure?.structure ?? null, { type: "REPRESENTATION.APPLY", style }));
   };
 
   const setBackgroundPreset = (preset: BackgroundPreset) => setProjection((current) => applyPresentationAction(current, structure?.structure ?? null, { type: "BACKGROUND.SET", preset }));
 
   const onTargetStyle = (category: "protein" | "ligand" | "water" | "ions" | "other", style: RepresentationStyle) => {
-    const definition = styleDefinition(styleProfileFor(style));
-    if (definition.capability === "COMING_SOON" || definition.capability === "UNAVAILABLE") {
-      showNotice({ id: ACTION_IDS.REPRESENTATION_SET_STYLE, group: "REPRESENTATION", state: definition.capability === "COMING_SOON" ? "COMING_SOON" : "UNAVAILABLE", label: definition.label, description: definition.unsupportedReason ?? `${definition.label} is not available in this gate.` });
+    const definition = representationCapabilityFor(style, structure?.structure ?? null);
+    if (!definition.maySelect) {
+      showNotice({ id: ACTION_IDS.REPRESENTATION_SET_STYLE, group: "REPRESENTATION", state: definition.capability, label: definition.label, description: definition.diagnostic ?? definition.unsupportedReason ?? `${definition.label} is not available in this gate.` });
       return;
     }
+    if (definition.status === "VALID_EMPTY") showNotice({ id: ACTION_IDS.REPRESENTATION_SET_STYLE, group: "REPRESENTATION", state: "SUPPORTED_WITH_LIMITATIONS", label: definition.label, description: definition.diagnostic ?? "This representation has no eligible atoms in the current structure." });
     setTargetStyles((current) => ({ ...current, [category]: style }));
     if (structure) setProjection((current) => setCategoryRepresentation(current, structure.structure, category, maskForStyle(style)));
   };
@@ -248,8 +241,10 @@ export const App = () => {
       if (representationCommand) {
         if (!structure) return { category: "PRESENTATION", status: "No structure loaded; presentation was not changed." };
         const target = resolveSelection(representationCommand.query, structure.structure);
+        const capability = representationCapabilityFor(representationStyleForCommand(representationCommand.representation) ?? "cartoon", structure.structure);
+        if (!capability.maySelect) return { category: "PRESENTATION", status: `${capability.label} unavailable: ${capability.diagnostic ?? capability.unsupportedReason ?? "canonical capability is not implemented"}` };
         setProjection((current) => applyRepresentationToSelection(current, representationCommand.operation, representationCommand.mask, target.stableAtomIds));
-        const capabilityNote = ["SURFACE", "MESH", "DOTS"].includes(representationCommand.representation) ? " · renderer capability remains Coming Soon" : "";
+        const capabilityNote = capability.status === "VALID_EMPTY" ? ` · ${capability.diagnostic ?? "valid empty result"}` : "";
         return { category: "PRESENTATION", status: `${representationCommand.operation} ${representationCommand.representation} on ${target.stableAtomIds.length} atoms${capabilityNote}.` };
       }
       const colorMatch = trimmed.match(/^color\s+([^,]+?)(?:\s*,\s*(.+))?$/i);
@@ -272,6 +267,7 @@ export const App = () => {
 
   const selectRibbon = (category: RibbonCategory) => {
     setActiveRibbon(category);
+    setRibbonCollapsed(false);
     window.sessionStorage.setItem("molecular-workstation.ribbon", category);
   };
 
@@ -309,10 +305,9 @@ export const App = () => {
       void saveProject();
       return;
     }
-    if (representationActions[actionId] && capability.state === "SUPPORTED") applyStyle(representationActions[actionId]);
     if (actionId === ACTION_IDS.REPRESENTATION_SET_STYLE && capability.state === "SUPPORTED") {
       setProjection((current) => {
-        const supportedStyles = STYLE_DEFINITIONS.filter((definition) => definition.capability !== "COMING_SOON" && definition.capability !== "UNAVAILABLE").map((definition) => definition.id as RepresentationStyle);
+        const supportedStyles = STYLE_DEFINITIONS.filter((definition) => representationCapabilityFor(definition.id, structure?.structure ?? null).maySelect).map((definition) => definition.id as RepresentationStyle);
         const index = supportedStyles.indexOf(current.representation);
         return setProjectionStyle(current, structure?.structure ?? null, supportedStyles[(index + 1) % supportedStyles.length]);
       });
@@ -359,9 +354,9 @@ export const App = () => {
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
         <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
-          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFetchRcsb={fetchRcsb} openRcsbRequest={openRcsbRequest} structure={structure} projection={projection} loading={loadState === "loading"} error={loadError} />
+          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFetchRcsb={fetchRcsb} openRcsbRequest={openRcsbRequest} structure={structure} projection={projection} selectedAtom={selectedAtom} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} loading={loadState === "loading"} error={loadError} />
           <MolecularCanvas structure={structure} projection={projection} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFileDrop={importFile} consoleExpanded={consoleExpanded} onPick={handlePick} onHover={handleHover} measurements={measurements} measurementMode={measurementMode} />
-          <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} selectedAtom={selectedAtom} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} />
+          <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
         </div>
         <StatusBar apiStatus={apiStatus} structure={structure} project={project} selectedAtomCount={projection.interaction.selectedAtomIds.length} />
         {notice && <CapabilityNotice capability={notice} onClose={() => setNotice(null)} />}

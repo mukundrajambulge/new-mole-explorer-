@@ -15,7 +15,7 @@ test("G1C-UI-001 exposes the complete style dropdown with truthful capability st
   await page.goto("/");
   const style = page.getByRole("combobox", { name: "Style" });
   await expect(style.locator("option")).toHaveText([
-    "Line", "Stick", "Ball-and-Stick", "Space-Filling", "Van der Waals Surface", "Solvent-Accessible Surface", "Solvent-Excluded Surface", "Mesh", "Dots", "Dot Surface", "Cartoon", "Ribbon", "Trace", "Putty", "Non-bonded (crosses)", "Non-bonded (spheres)",
+    "Line", "Stick", "Ball-and-Stick", "Space-Filling", "Van der Waals Surface", "Solvent-Accessible Surface", "Solvent-Excluded Surface", "Mesh", "Dots", "Dot Surface", "Cartoon", "Ribbon", "Trace", "Putty", "Non-bonded (crosses)", "Non-bonded (spheres)", "Licorice",
   ]);
   await expect(style.locator('option[value="van-der-waals-surface"]')).toHaveAttribute("data-capability-state", "COMING_SOON");
 });
@@ -26,7 +26,7 @@ test("G1C-REP-001 renders Lines, Sticks, Ball-and-Stick, and Space-Filling from 
   await style.selectOption("line");
   await expect(renderer(page)).toHaveAttribute("data-renderer-line-segments", "8");
   await expect(renderer(page)).toHaveAttribute("data-renderer-canonical-bond-source", "canonical");
-  await style.selectOption("stick");
+  await style.selectOption("sticks");
   await expect(renderer(page)).toHaveAttribute("data-renderer-stick-cylinders", "8");
   await style.selectOption("ball-and-stick");
   await expect(renderer(page)).toHaveAttribute("data-renderer-sphere-primitives", "11");
@@ -37,15 +37,18 @@ test("G1C-REP-001 renders Lines, Sticks, Ball-and-Stick, and Space-Filling from 
   await expect(renderer(page)).toHaveAttribute("data-renderer-style-profile", "space-filling");
 });
 
-test("G1C-REP-002 keeps Cartoon, Ribbon, Trace, and Putty as distinct profiles", async ({ page }) => {
+test("G1C-REP-002 keeps Cartoon, Ribbon, Trace, and Putty capability truth explicit", async ({ page }) => {
   await loadFixture(page);
   const style = page.getByRole("combobox", { name: "Style" });
   await style.selectOption("cartoon");
   await expect(renderer(page)).toHaveAttribute("data-renderer-cartoon-contributors", "8");
-  await style.selectOption("ribbon");
-  await expect(renderer(page)).toHaveAttribute("data-renderer-ribbon-contributors", "8");
-  await expect(renderer(page)).toHaveAttribute("data-renderer-cartoon-contributors", "0");
-  await expect(renderer(page)).toHaveAttribute("data-renderer-style-profile", "ribbon");
+  await expect(style.locator('option[value="ribbon"]')).toHaveAttribute("data-capability-state", "COMING_SOON");
+  await expect(style.locator('option[value="ribbon"]')).toHaveAttribute("data-representation-status", "NOT_IMPLEMENTED");
+  await page.getByRole("button", { name: "Ribbon", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Canonical Ribbon geometry is not implemented");
+  await expect(renderer(page)).toHaveAttribute("data-renderer-ribbon-contributors", "0");
+  await expect(renderer(page)).toHaveAttribute("data-renderer-cartoon-contributors", "8");
+  await expect(renderer(page)).toHaveAttribute("data-renderer-style-profile", "cartoon");
   await style.selectOption("trace");
   await expect(renderer(page)).toHaveAttribute("data-renderer-trace-contributors", "8");
   await style.selectOption("putty");
@@ -77,12 +80,13 @@ test("G1C-COLOR-001 exposes all schemes and reports missing property datasets", 
   await expect(page.getByRole("alert")).toHaveText("Secondary-structure assignment unavailable for this molecular revision.");
 });
 
-test("G1C-UI-002 converges left, right, and Display-ribbon component visibility", async ({ page }) => {
+test("G1C-UI-002 keeps component visibility in the Projection & Display authority", async ({ page }) => {
   await loadFixture(page);
   await page.getByRole("button", { name: "Toggle Water" }).click();
   await expect(page.locator('.display-row--button').filter({ hasText: "Water" }).getByRole("switch")).toHaveAttribute("aria-checked", "true");
-  await page.locator('[data-ribbon-category="Display"] button[aria-label="Protein"]').click();
+  await page.locator(".side-column--right .display-row--button").filter({ hasText: "Protein" }).click();
   await expect(page.getByRole("button", { name: "Toggle Protein" })).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator(".component-row").filter({ hasText: "Protein" })).toContainText("8");
   await page.locator(".side-column--right .display-row--button").filter({ hasText: "Protein" }).click();
   await expect(page.getByRole("button", { name: "Toggle Protein" })).toHaveAttribute("aria-pressed", "true");
 });

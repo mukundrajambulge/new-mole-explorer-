@@ -3,7 +3,7 @@ import type { CanonicalMolecularStructure } from "@molecular/contracts";
 import { COLOR_SCHEME_DEFINITIONS } from "./colorSchemes";
 import { buildRenderProjectionDiagnostics } from "./renderDirectives";
 import { createDefaultRenderProjection, setLayerVisibility, setProjectionStyle } from "./presentationState";
-import { STYLE_DEFINITIONS, SURFACE_PROFILES, surfaceProfileForStyle } from "./styleProfiles";
+import { representationCapabilityFor, STYLE_DEFINITIONS, SURFACE_PROFILES, surfaceProfileForStyle } from "./styleProfiles";
 
 const structure = {
   id: "g1c-matrix",
@@ -30,8 +30,8 @@ const structure = {
 
 describe("G1C representation matrix", () => {
   it("exposes the complete requested style inventory", () => {
-    expect(STYLE_DEFINITIONS.filter((definition) => definition.id !== "licorice").map((definition) => definition.label)).toEqual([
-      "Line", "Stick", "Ball-and-Stick", "Space-Filling", "Van der Waals Surface", "Solvent-Accessible Surface", "Solvent-Excluded Surface", "Mesh", "Dots", "Dot Surface", "Cartoon", "Ribbon", "Trace", "Putty", "Non-bonded (crosses)", "Non-bonded (spheres)",
+    expect(STYLE_DEFINITIONS.map((definition) => definition.label)).toEqual([
+      "Line", "Stick", "Ball-and-Stick", "Space-Filling", "Van der Waals Surface", "Solvent-Accessible Surface", "Solvent-Excluded Surface", "Mesh", "Dots", "Dot Surface", "Cartoon", "Ribbon", "Trace", "Putty", "Non-bonded (crosses)", "Non-bonded (spheres)", "Licorice",
     ]);
   });
 
@@ -56,16 +56,37 @@ describe("G1C representation matrix", () => {
     expect(crosses.representation.NONBONDED.atomContributors).toBe(1);
   });
 
-  it("keeps Cartoon, Ribbon, Trace, and Putty as distinct polymer projections", () => {
+  it("keeps Cartoon, Ribbon, Trace, and Putty capability truth explicit", () => {
     const cartoon = buildRenderProjectionDiagnostics(structure, setProjectionStyle(createDefaultRenderProjection(structure), structure, "cartoon"));
     const ribbon = buildRenderProjectionDiagnostics(structure, setProjectionStyle(createDefaultRenderProjection(structure), structure, "ribbon"));
     const trace = buildRenderProjectionDiagnostics(structure, setProjectionStyle(createDefaultRenderProjection(structure), structure, "trace"));
     const putty = buildRenderProjectionDiagnostics(structure, setProjectionStyle(createDefaultRenderProjection(structure), structure, "putty"));
     expect(cartoon.cartoonContributors).toBe(2);
-    expect(ribbon.ribbonContributors).toBe(2);
+    expect(ribbon.ribbonContributors).toBe(0);
     expect(ribbon.cartoonContributors).toBe(0);
+    expect(representationCapabilityFor("ribbon", structure).status).toBe("NOT_IMPLEMENTED");
+    expect(representationCapabilityFor("ribbon", structure).maySelect).toBe(false);
     expect(trace.traceContributors).toBe(2);
     expect(putty.puttyContributors).toBe(2);
+  });
+
+  it("guards Putty when the canonical source has no B-factor values", () => {
+    const missingB = { ...structure, atoms: structure.atoms.map((atom) => { const withoutB = { ...atom }; delete withoutB.bFactor; return withoutB; }) };
+    const capability = representationCapabilityFor("putty", missingB);
+    const diagnostics = buildRenderProjectionDiagnostics(missingB, setProjectionStyle(createDefaultRenderProjection(structure), missingB, "putty"));
+    expect(capability.status).toBe("INSUFFICIENT_DATA");
+    expect(capability.maySelect).toBe(false);
+    expect(capability.diagnostic).toMatch(/B-factor/i);
+    expect(diagnostics.puttyContributors).toBe(0);
+    expect(diagnostics.directives.some((directive) => directive.representation === "CARTOON")).toBe(false);
+  });
+
+  it("reports a valid-empty non-bonded result instead of inventing contributors", () => {
+    const fullyBonded = { ...structure, bonds: structure.atoms.slice(1).map((atom, index) => ({ id: `bond-${index}`, atom1: structure.atoms[index].stableId, atom2: atom.stableId, order: "SINGLE" as const, source: "PDB_CONECT" as const })) };
+    const capability = representationCapabilityFor("nonbonded-crosses", fullyBonded);
+    expect(capability.status).toBe("VALID_EMPTY");
+    expect(capability.eligibleAtomCount).toBe(0);
+    expect(capability.diagnostic).toMatch(/0 eligible/i);
   });
 
   it("reports unavailable geometry instead of substituting a surface", () => {

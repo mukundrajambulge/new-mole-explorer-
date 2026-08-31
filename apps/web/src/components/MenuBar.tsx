@@ -6,7 +6,7 @@ export const MenuBar = ({ activeCategory, onCategory }: { activeCategory: Ribbon
     <div className="menu-brand"><span className="brand-pulse" /> <span>WORKSTATION</span></div>
     <nav className="menu-links" aria-label="Application menu">
       {RIBBON_CATEGORIES.map((category) => (
-        <button key={category} className={activeCategory === category ? "menu-link--active" : ""} onClick={() => onCategory(category)} aria-pressed={activeCategory === category} data-ribbon-category={category}>
+        <button key={category} className={activeCategory === category ? "menu-link--active" : ""} onClick={() => onCategory(category)} aria-pressed={activeCategory === category} aria-expanded={activeCategory === category} data-ribbon-category={category} data-menu-active={activeCategory === category}>
           {category}
         </button>
       ))}
