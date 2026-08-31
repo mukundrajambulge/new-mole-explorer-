@@ -6,8 +6,8 @@ import { Icon } from "./Icon";
 
 const quickTools: Array<{ label: string; icon: "ruler" | "target" | "activity" | "waves" | "shapes" | "sparkles" | "box" | "circleHelp" | "move3d" | "rotate"; actionId: ActionId }> = [
   { label: "Distance", icon: "ruler", actionId: "MEASURE.DISTANCE" },
-  { label: "Angle", icon: "move3d", actionId: "MEASURE.DISTANCE" },
-  { label: "Dihedral", icon: "rotate", actionId: "MEASURE.DISTANCE" },
+  { label: "Angle", icon: "move3d", actionId: "MEASURE.ANGLE" },
+  { label: "Dihedral", icon: "rotate", actionId: "MEASURE.DIHEDRAL" },
   { label: "H-Bonds", icon: "waves", actionId: "REPRESENTATION.SURFACE" },
   { label: "Contacts", icon: "shapes", actionId: "SELECTION.EVALUATE" },
   { label: "Clash", icon: "activity", actionId: "SELECTION.EVALUATE" },
@@ -50,11 +50,11 @@ export const StructurePanel = ({
   }, [openRcsbRequest]);
   const counts = structure?.structure.counts;
   const components = [
-    { label: "Protein", count: counts?.polymerAtoms ?? 0, tone: "blue", enabled: projection.showProtein, actionId: "REPRESENTATION.TOGGLE_PROTEIN" as ActionId },
-    { label: "Ligand", count: counts?.ligandAtoms ?? 0, tone: "purple", enabled: projection.showLigand, actionId: "REPRESENTATION.TOGGLE_LIGAND" as ActionId },
-    { label: "Water", count: counts?.waterAtoms ?? 0, tone: "cyan", enabled: projection.showWater, actionId: "REPRESENTATION.TOGGLE_WATER" as ActionId },
-    { label: "Ions", count: counts?.ionAtoms ?? 0, tone: "orange", enabled: projection.showIons, actionId: "REPRESENTATION.TOGGLE_IONS" as ActionId },
-    { label: "Other", count: counts?.otherAtoms ?? 0, tone: "slate", enabled: projection.showOther, actionId: "REPRESENTATION.TOGGLE_OTHER" as ActionId },
+    { label: "Protein", count: counts?.polymerAtoms ?? 0, tone: "blue", visible: projection.showProtein },
+    { label: "Ligand", count: counts?.ligandAtoms ?? 0, tone: "purple", visible: projection.showLigand },
+    { label: "Water", count: counts?.waterAtoms ?? 0, tone: "cyan", visible: projection.showWater },
+    { label: "Ions", count: counts?.ionAtoms ?? 0, tone: "orange", visible: projection.showIons },
+    { label: "Other", count: counts?.otherAtoms ?? 0, tone: "slate", visible: projection.showOther },
   ];
 
   if (collapsed) {
@@ -87,11 +87,11 @@ export const StructurePanel = ({
       </section>
 
       <section className="panel-card components-card">
-        <div className="panel-heading"><div><span className="eyebrow">VISIBILITY LAYERS</span><h2>Components</h2></div><div className="panel-actions"><button className="icon-button" onClick={() => onAction("SELECTION.EVALUATE")} aria-label="Filter components" data-action-id="SELECTION.EVALUATE"><Icon name="sliders" size={15} /></button><button className="icon-button" onClick={onImport} aria-label="Add component" data-action-id="FILE.IMPORT"><Icon name="plus" size={16} /></button></div></div>
+        <div className="panel-heading"><div><span className="eyebrow">STRUCTURE INVENTORY</span><h2>Components</h2></div><span className="capability-tag">View in Projection &amp; Display</span></div>
         <div className="component-list">
           {components.map((component) => (
             <div className="component-row" key={component.label}>
-              <button className={`switch switch--${component.tone} ${component.enabled ? "switch--on" : ""}`} onClick={() => onAction(component.actionId)} aria-label={`Toggle ${component.label}`} aria-pressed={component.enabled} disabled={!structure} data-action-id={component.actionId}><span /></button>
+              <span className={`component-dot component-dot--${component.tone} ${component.visible ? "component-dot--visible" : "component-dot--hidden"}`} aria-hidden="true" />
               <span>{component.label}</span><span className="component-count">{formatCount(component.count)}</span>
             </div>
           ))}

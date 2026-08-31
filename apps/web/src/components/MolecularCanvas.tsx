@@ -3,6 +3,8 @@ import type { StructureLoadResult } from "@molecular/contracts";
 import type { ActionId } from "../domain/registry";
 import type { RenderProjection } from "../rendering/renderProjection";
 import { ThreeDMolViewerAdapter } from "../rendering/ThreeDMolViewerAdapter";
+import type { PickResult } from "../interaction/picking";
+import type { MeasurementKind, MeasurementObject } from "../interaction/measurements";
 import { Icon } from "./Icon";
 
 type CameraCommand = { actionId: ActionId; sequence: number };
@@ -18,6 +20,10 @@ type MolecularCanvasProps = {
   onImport: () => void;
   onFileDrop: (file: File) => void;
   consoleExpanded: boolean;
+  onPick: (result: PickResult) => void;
+  onHover: (result: PickResult | null) => void;
+  measurements: readonly MeasurementObject[];
+  measurementMode: MeasurementKind | null;
 };
 
 const toolIcon = (activeTool: string) => {
@@ -38,6 +44,10 @@ export const MolecularCanvas = ({
   onImport,
   onFileDrop,
   consoleExpanded,
+  onPick,
+  onHover,
+  measurements,
+  measurementMode,
 }: MolecularCanvasProps) => {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -46,6 +56,11 @@ export const MolecularCanvas = ({
   const [dragActive, setDragActive] = useState(false);
   const [viewerError, setViewerError] = useState<string | null>(null);
   const [viewerBottomInset, setViewerBottomInset] = useState(0);
+  const pickRef = useRef(onPick);
+  const hoverRef = useRef(onHover);
+  const pointerGestureRef = useRef(false);
+  pickRef.current = onPick;
+  hoverRef.current = onHover;
   projectionRef.current = projection;
 
   useEffect(() => {
@@ -62,6 +77,10 @@ export const MolecularCanvas = ({
       if (adapterRef.current === adapter) adapterRef.current = null;
       adapter.destroy();
     };
+  }, []);
+
+  useEffect(() => {
+    adapterRef.current?.setInteractionHandlers({ onPick: (result) => pickRef.current(result), onHover: (result) => hoverRef.current(result) });
   }, []);
 
   useEffect(() => {
@@ -124,13 +143,40 @@ export const MolecularCanvas = ({
   }, [projection, structure]);
 
   useEffect(() => {
+    adapterRef.current?.setMeasurements(measurements);
+  }, [measurements]);
+
+  useEffect(() => {
     const adapter = adapterRef.current;
     if (!adapter || !cameraCommand) return;
     if (cameraCommand.actionId === "CANVAS.ROTATE") adapter.rotate();
     if (cameraCommand.actionId === "CANVAS.PAN") adapter.pan();
     if (cameraCommand.actionId === "CANVAS.ZOOM") adapter.zoom();
-    if (cameraCommand.actionId === "CANVAS.FOCUS" || cameraCommand.actionId === "VIEW.RESET") adapter.focus();
+    if (cameraCommand.actionId === "CANVAS.FOCUS" || cameraCommand.actionId === "VIEW.FIT" || cameraCommand.actionId === "VIEW.RESET") adapter.focus();
+    if (cameraCommand.actionId === "VIEW.CENTER") adapter.center();
+    if (cameraCommand.actionId === "VIEW.ORIENT") adapter.orient();
+    if (cameraCommand.actionId === "VIEW.ORIGIN") adapter.origin();
   }, [cameraCommand]);
+
+  const gestureMode = activeTool === "Rotate" ? "rotate" : activeTool === "Pan" ? "pan" : activeTool === "Zoom" ? "zoom" : null;
+  const beginPointerGesture = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!gestureMode || event.button !== 0 || (event.target instanceof HTMLElement && Boolean(event.target.closest("button")))) return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    pointerGestureRef.current = true;
+    adapterRef.current?.beginGesture(gestureMode, event.clientX, event.clientY);
+  };
+  const movePointerGesture = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!pointerGestureRef.current) return;
+    event.preventDefault();
+    adapterRef.current?.updateGesture(event.clientX, event.clientY);
+  };
+  const endPointerGesture = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!pointerGestureRef.current) return;
+    pointerGestureRef.current = false;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    adapterRef.current?.endGesture();
+  };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -149,6 +195,10 @@ export const MolecularCanvas = ({
         onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = "copy"; setDragActive(true); }}
         onDragLeave={(event) => { if (event.currentTarget === event.target) setDragActive(false); }}
         onDrop={handleDrop}
+        onPointerDown={beginPointerGesture}
+        onPointerMove={movePointerGesture}
+        onPointerUp={endPointerGesture}
+        onPointerCancel={endPointerGesture}
       >
         <div ref={hostRef} className="viewer-host" style={{ bottom: `${viewerBottomInset}px` }} data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} />
         {!structure && !loading && (
@@ -166,7 +216,7 @@ export const MolecularCanvas = ({
         {dragActive && <div className="drop-overlay"><Icon name="upload" size={24} /><strong>Drop PDB or mmCIF</strong><span>Backend validation will keep the current structure safe.</span></div>}
         <div className="canvas-axis-readout" aria-label="Orientation axes"><span className="axis-readout-y">Y</span><span className="axis-readout-x">X</span><span className="axis-readout-z">Z</span></div>
         <button className="canvas-reset" onClick={() => onAction("VIEW.RESET")} aria-label="Reset view" data-action-id="VIEW.RESET"><Icon name="plus" size={16} /></button>
-        <div className="canvas-tool-readout"><span className="tool-readout-icon"><Icon name={toolIcon(activeTool)} size={13} /></span>{activeTool.toUpperCase()}</div>
+        <div className="canvas-tool-readout"><span className="tool-readout-icon"><Icon name={toolIcon(activeTool)} size={13} /></span>{measurementMode ? `MEASURE ${measurementMode}` : activeTool.toUpperCase()}</div>
       </div>
     </section>
   );
