@@ -9,20 +9,20 @@ import type { CanonicalMolecularStructure, StructureLoadResult } from "@molecula
 import { colorRegistry } from "./colorRegistry";
 import {
   DEFAULT_CAMERA,
-  REPRESENTATION_MASKS,
   type CameraState,
-  type ColorState,
   type RenderProjection,
-  type RepresentationMask,
-  type RepresentationStyle,
 } from "./renderProjection";
+import { buildRenderProjectionDiagnostics, emptyRenderProjectionDiagnostics, type RenderProjectionDiagnostics } from "./renderDirectives";
 
 const selection = (predicate: (atom: AtomSpec) => boolean): AtomSelectionSpec => ({ predicate });
 const mountedAdapters = new WeakMap<HTMLElement, ThreeDMolViewerAdapter>();
 
 type Viewport = NonNullable<CameraState["viewport"]>;
 
-const styleFor = (representation: RepresentationStyle, color: ColorState): AtomStyleSpec => {
+type StyleRepresentation = "lines" | "sticks" | "spheres" | "cartoon" | "licorice";
+type StyleProfile = "default" | "water" | "nonbonded" | "ball";
+
+const styleFor = (representation: StyleRepresentation, color: RenderProjection["color"], profile: StyleProfile = "default"): AtomStyleSpec => {
   const colorScheme = color.mode === "element" ? "Jmol" : color.mode === "chain" ? "chain" : color.mode === "residue" ? "amino" : color.mode === "secondary-structure" ? "ssPyMol" : undefined;
   const explicitColor = colorRegistry.cssColor(color);
   const atomColor = explicitColor ? { color: explicitColor } : colorScheme ? { colorscheme: colorScheme } : { colorscheme: "Jmol" };
@@ -32,11 +32,7 @@ const styleFor = (representation: RepresentationStyle, color: ColorState): AtomS
     case "sticks":
       return { stick: { radius: 0.16, ...atomColor } } as AtomStyleSpec;
     case "spheres":
-      return { sphere: { scale: 0.3, ...atomColor } } as AtomStyleSpec;
-    case "ball-and-stick":
-      return { stick: { radius: 0.16, ...atomColor }, sphere: { scale: 0.28, ...atomColor } } as AtomStyleSpec;
-    case "licorice":
-      return { stick: { radius: 0.23, ...atomColor }, sphere: { scale: 0.15, ...atomColor } } as AtomStyleSpec;
+      return { sphere: { scale: profile === "water" ? 0.18 : profile === "nonbonded" ? 0.15 : profile === "ball" ? 0.28 : 0.3, ...atomColor } } as AtomStyleSpec;
     case "cartoon":
       return {
         cartoon: {
@@ -45,10 +41,10 @@ const styleFor = (representation: RepresentationStyle, color: ColorState): AtomS
           opacity: 0.92,
         },
       } as AtomStyleSpec;
+    case "licorice":
+      return { stick: { radius: 0.23, ...atomColor } } as AtomStyleSpec;
   }
 };
-
-const hiddenStyle: AtomStyleSpec = { line: { hidden: true }, stick: { hidden: true }, sphere: { hidden: true }, cartoon: { hidden: true } };
 
 export class ThreeDMolViewerAdapter {
   private viewer: GLViewer | null = null;
@@ -61,6 +57,7 @@ export class ThreeDMolViewerAdapter {
   private appliedViewportShift = { x: 0, y: 0 };
   private centeredView: number[] | null = null;
   private cameraState: CameraState = DEFAULT_CAMERA;
+  private diagnostics: RenderProjectionDiagnostics = emptyRenderProjectionDiagnostics();
 
   mount(container: HTMLElement): void {
     if (this.viewer && this.container === container) return;
@@ -81,7 +78,9 @@ export class ThreeDMolViewerAdapter {
     this.ensureMounted();
     this.structure = result.structure;
     this.viewer!.removeAllModels();
-    this.viewer!.addModel(result.renderSource.content, result.renderSource.format === "mmcif" ? "cif" : "pdb");
+    // Do not let 3Dmol infer bonds from coordinates. Canonical backend bonds
+    // are the only scientific topology allowed to drive stick cylinders.
+    this.viewer!.addModel(result.renderSource.content, result.renderSource.format === "mmcif" ? "cif" : "pdb", { assignBonds: false });
     this.hasModel = true;
     this.setProjection(projection);
     this.frameToCanonicalBounds();
@@ -100,6 +99,8 @@ export class ThreeDMolViewerAdapter {
     this.cameraState = projection.camera;
     this.viewer!.setBackgroundColor(projection.background.color, 1);
     if (!this.hasModel) {
+      this.diagnostics = emptyRenderProjectionDiagnostics(projection.representationState.presentationRevision);
+      this.writeDiagnostics(this.diagnostics);
       this.viewer!.render();
       return;
     }
@@ -163,6 +164,11 @@ export class ThreeDMolViewerAdapter {
     this.projection = null;
     this.centeredView = null;
     this.cameraState = DEFAULT_CAMERA;
+    this.diagnostics = emptyRenderProjectionDiagnostics();
+  }
+
+  getDiagnostics(): RenderProjectionDiagnostics {
+    return this.diagnostics;
   }
 
   private ensureMounted(): void {
@@ -178,52 +184,37 @@ export class ThreeDMolViewerAdapter {
     return selection((atom) => (atom.index !== undefined && indices.has(atom.index)) || (atom.serial !== undefined && serials.has(atom.serial)));
   }
 
-  private selectionForMask(mask: RepresentationMask): AtomSelectionSpec {
-    return this.canonicalSelection((atom) => (this.projection?.representationState.atomRepMasks[atom.stableId] ?? 0) & mask ? true : false);
-  }
-
-  private atomIdsWithCanonicalBonds(): Set<string> {
-    const bonded = new Set<string>();
-    for (const bond of this.structure?.bonds ?? []) {
-      bonded.add(bond.atom1);
-      bonded.add(bond.atom2);
-    }
-    return bonded;
-  }
-
   private applyProjection(projection: RenderProjection): void {
     const viewer = this.viewer!;
-    const bondedIds = this.atomIdsWithCanonicalBonds();
-    const styles: Array<[RepresentationMask, RepresentationStyle]> = [
-      [REPRESENTATION_MASKS.LINES, "lines"],
-      [REPRESENTATION_MASKS.STICKS, "sticks"],
-      [REPRESENTATION_MASKS.SPHERES, "spheres"],
-      [REPRESENTATION_MASKS.CARTOON, "cartoon"],
-      [REPRESENTATION_MASKS.RIBBON, "cartoon"],
-      [REPRESENTATION_MASKS.NB_SPHERES, "spheres"],
-    ];
+    const diagnostics = buildRenderProjectionDiagnostics(this.structure, projection);
+    this.diagnostics = diagnostics;
+    this.writeDiagnostics(diagnostics);
     viewer.setStyle({}, {});
-    for (const [mask, representation] of styles) {
-      const target = this.canonicalSelection((atom) => {
-        if (!((projection.representationState.atomRepMasks[atom.stableId] ?? 0) & mask)) return false;
-        if ((mask === REPRESENTATION_MASKS.STICKS || mask === REPRESENTATION_MASKS.LINES) && !bondedIds.has(atom.stableId)) return false;
-        if (mask === REPRESENTATION_MASKS.NB_SPHERES && bondedIds.has(atom.stableId)) return false;
-        return true;
-      });
-      const spec = styleFor(representation, projection.color);
-      if (mask === REPRESENTATION_MASKS.RIBBON) viewer.setStyle(target, { cartoon: { ...spec.cartoon, style: "oval" } } as AtomStyleSpec);
-      else viewer.setStyle(target, spec);
+    for (const directive of diagnostics.directives) {
+      const targetIds = new Set(directive.targetStableAtomIds);
+      const target = this.canonicalSelection((atom) => targetIds.has(atom.stableId));
+      if (directive.primitive === "line") viewer.addStyle(target, styleFor("lines", projection.color));
+      if (directive.primitive === "stick") viewer.addStyle(target, styleFor(projection.representation === "licorice" ? "licorice" : "sticks", projection.color));
+      if (directive.representation === "SPHERES") viewer.addStyle(target, styleFor("spheres", projection.color, projection.representation === "ball-and-stick" ? "ball" : "default"));
+      if (directive.representation === "NB_SPHERES") viewer.addStyle(target, styleFor("spheres", projection.color, "nonbonded"));
+      if (directive.primitive === "cartoon") viewer.addStyle(target, styleFor("cartoon", projection.color));
     }
-    const layerTargets = [
-      ["showProtein", (atom: CanonicalMolecularStructure["atoms"][number]) => atom.isPolymer],
-      ["showLigand", (atom: CanonicalMolecularStructure["atoms"][number]) => atom.isLigand],
-      ["showWater", (atom: CanonicalMolecularStructure["atoms"][number]) => atom.isWater],
-      ["showIons", (atom: CanonicalMolecularStructure["atoms"][number]) => atom.isIon],
-      ["showOther", (atom: CanonicalMolecularStructure["atoms"][number]) => !atom.isPolymer && !atom.isLigand && !atom.isWater && !atom.isIon],
-    ] as const;
-    for (const [key, predicate] of layerTargets) if (!projection[key]) viewer.setStyle(this.canonicalSelection(predicate), hiddenStyle);
-    // Water is hidden in the default presentation without changing canonical data.
-    if (!projection.showWater) viewer.setStyle(this.canonicalSelection((atom) => atom.isWater), hiddenStyle);
+    // Water visibility is a layer concern, while this smaller sphere profile is
+    // purely presentation. It cannot change canonical coordinates or topology.
+    if (diagnostics.waterSphereContributors > 0) {
+      viewer.addStyle(this.canonicalSelection((atom) => atom.isWater), styleFor("spheres", projection.color, "water"));
+    }
+  }
+
+  private writeDiagnostics(diagnostics: RenderProjectionDiagnostics): void {
+    if (!this.container) return;
+    this.container.dataset.rendererSpherePrimitives = String(diagnostics.sphereContributors);
+    this.container.dataset.rendererStickCylinders = String(diagnostics.stickCylinderContributors);
+    this.container.dataset.rendererLineSegments = String(diagnostics.lineContributors);
+    this.container.dataset.rendererCartoonContributors = String(diagnostics.cartoonContributors);
+    this.container.dataset.rendererWaterSpheres = String(diagnostics.waterSphereContributors);
+    this.container.dataset.rendererIonSpheres = String(diagnostics.ionSphereContributors);
+    this.container.dataset.rendererCanonicalBondSource = diagnostics.stickCylinderContributors > 0 ? "canonical" : "none";
   }
 
   private frameToCanonicalBounds(): void {

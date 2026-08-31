@@ -1,0 +1,30 @@
+{
+  "gate": "G1B-R1",
+  "startingSha": "914de2bbaa2e9118cbe672ac810138e2bbaf5ba3",
+  "branch": "main",
+  "route": "http://localhost:5174/molstudio",
+  "fixture": {
+    "path": "tests/fixtures/mini-protein.pdb",
+    "sha256": "30e7eff33d94fb3b39f57a8a6f3e344da776ce1d237eb9ea56c6a44d543e268a",
+    "counts": { "atoms": 12, "residues": 5, "chains": 2, "protein": 8, "ligand": 2, "water": 1, "ions": 1, "other": 0 }
+  },
+  "renderer": { "dependency": "3Dmol.js", "bondInference": false, "scientificAuthority": "backend canonical molecular structure" },
+  "tests": [
+    "G1B-REG-001", "G1B-REG-002", "G1B-REG-003", "G1B-REG-004", "G1B-REG-005", "G1B-REG-006",
+    "G1B-REG-007", "G1B-REG-008", "G1B-REG-009", "G1B-REG-010", "G1B-REG-011", "G1B-REG-012",
+    "G1B-REG-013", "G1B-REG-014", "G1B-REG-015", "G1B-REG-016", "G1B-REG-017", "G1B-REG-018",
+    "G1B-REG-019", "G1B-REG-020", "G1B-REG-021", "G1B-REG-022", "G1B-REG-023", "G1B-REG-024"
+  ],
+  "manual": {
+    "rcsb": "4DJW",
+    "rcsbSourceSha256": "c816a3b9e947cc71bf5390b2d10aeb117f0b6a2e7b16efbba3bf4c56c8d044f2",
+    "rcsbCounts": { "atoms": 7079, "residues": 786, "chains": 9, "protein": 6112, "ligand": 82, "water": 885, "ions": 0, "other": 0 },
+    "screenshots": [
+      "docs/screenshots/g1b-r1-empty.png",
+      "docs/screenshots/g1b-r1-uploaded-protein.png",
+      "docs/screenshots/g1b-r1-rcsb-4djw.png",
+      "docs/screenshots/g1b-r1-cartoon-ligand-sticks.png"
+    ]
+  },
+  "endingSha": "recorded in final handoff after evidence commit"
+}

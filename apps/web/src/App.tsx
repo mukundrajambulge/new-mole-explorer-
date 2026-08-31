@@ -4,7 +4,7 @@ import { CapabilityNotice } from "./components/CapabilityNotice";
 import { ConsolePanel } from "./components/ConsolePanel";
 import { ContextToolbar } from "./components/ContextToolbar";
 import { InspectorPanel } from "./components/InspectorPanel";
-import { MenuBar } from "./components/MenuBar";
+import { MenuBar, RIBBON_CATEGORIES, type RibbonCategory } from "./components/MenuBar";
 import { MolecularCanvas } from "./components/MolecularCanvas";
 import { NavRail } from "./components/NavRail";
 import { StatusBar } from "./components/StatusBar";
@@ -22,6 +22,8 @@ const canvasTools: Record<string, string> = {
 };
 
 const representationActions: Record<string, RepresentationStyle> = {
+  [ACTION_IDS.REPRESENTATION_LINES]: "lines",
+  [ACTION_IDS.REPRESENTATION_STICKS]: "sticks",
   [ACTION_IDS.REPRESENTATION_CARTOON]: "cartoon",
   [ACTION_IDS.REPRESENTATION_BALL_AND_STICK]: "ball-and-stick",
   [ACTION_IDS.REPRESENTATION_LICORICE]: "licorice",
@@ -31,9 +33,16 @@ const representationActions: Record<string, RepresentationStyle> = {
 const isAdmittedFile = (file: File) => /\.(pdb|cif|mmcif)$/i.test(file.name);
 const backgroundColors: Record<Exclude<BackgroundPreset, "Custom">, string> = { Black: "#05070a", White: "#ffffff", "Dark Gray": "#252b34", "Light Gray": "#d8dee7", Navy: "#071225", "Deep Blue": "#061b40" };
 
+const initialRibbonCategory = (): RibbonCategory => {
+  const saved = window.sessionStorage.getItem("molecular-workstation.ribbon") as RibbonCategory | null;
+  return saved && RIBBON_CATEGORIES.includes(saved) ? saved : "Display";
+};
+
 export const App = () => {
   const [activeNav, setActiveNav] = useState("Home");
   const [activeTool, setActiveTool] = useState("Select");
+  const [activeRibbon, setActiveRibbon] = useState<RibbonCategory>(initialRibbonCategory);
+  const [ribbonCollapsed, setRibbonCollapsed] = useState(false);
   const [leftCollapsed, setLeftCollapsed] = useState(false);
   const [rightCollapsed, setRightCollapsed] = useState(false);
   const [consoleExpanded, setConsoleExpanded] = useState(true);
@@ -44,6 +53,7 @@ export const App = () => {
   const [projection, setProjection] = useState<RenderProjection>(createDefaultRenderProjection());
   const [loadState, setLoadState] = useState<"idle" | "loading" | "error">("idle");
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [openRcsbRequest, setOpenRcsbRequest] = useState(0);
   const [cameraCommand, setCameraCommand] = useState<{ actionId: ActionId; sequence: number }>();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const commandSequence = useRef(0);
@@ -137,6 +147,11 @@ export const App = () => {
     setProjection((current) => ({ ...current, background: { preset, color: preset === "Custom" ? current.background.color : backgroundColors[preset] } }));
   };
 
+  const selectRibbon = (category: RibbonCategory) => {
+    setActiveRibbon(category);
+    window.sessionStorage.setItem("molecular-workstation.ribbon", category);
+  };
+
   const handleAction = (actionId: ActionId) => {
     const capability = ACTION_REGISTRY[actionId];
     if (actionId.startsWith("WORKSPACE.")) {
@@ -157,6 +172,10 @@ export const App = () => {
     }
     if (actionId === ACTION_IDS.PROJECT_OPEN) {
       void openProject();
+      return;
+    }
+    if (actionId === ACTION_IDS.STRUCTURE_FETCH_RCSB) {
+      setOpenRcsbRequest((value) => value + 1);
       return;
     }
     if (actionId === ACTION_IDS.FILE_OPEN || actionId === ACTION_IDS.FILE_IMPORT || actionId === ACTION_IDS.STRUCTURE_IMPORT) {
@@ -198,10 +217,10 @@ export const App = () => {
       <input id="structure-file" ref={fileInputRef} className="visually-hidden-input" type="file" accept=".pdb,.cif,.mmcif,text/plain" onChange={(event) => { const file = event.target.files?.[0]; if (file) importFile(file); event.target.value = ""; }} />
       <NavRail activeItem={activeNav} onAction={handleAction} />
       <main className="app-main">
-        <MenuBar onAction={handleAction} />
-        <ContextToolbar activeTool={activeTool} onAction={handleAction} onImport={() => fileInputRef.current?.click()} />
+        <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
+        <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onColorMode={setColorMode} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
-          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFetchRcsb={fetchRcsb} structure={structure} projection={projection} loading={loadState === "loading"} error={loadError} />
+          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFetchRcsb={fetchRcsb} openRcsbRequest={openRcsbRequest} structure={structure} projection={projection} loading={loadState === "loading"} error={loadError} />
           <MolecularCanvas structure={structure} projection={projection} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFileDrop={importFile} consoleExpanded={consoleExpanded} />
           <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} />
         </div>

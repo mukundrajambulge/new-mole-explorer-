@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { StructureLoadResult } from "@molecular/contracts";
 import type { ActionId } from "../domain/registry";
 import type { RenderProjection } from "../rendering/renderProjection";
@@ -22,6 +22,7 @@ type StructurePanelProps = {
   onAction: (actionId: ActionId) => void;
   onImport: () => void;
   onFetchRcsb: (pdbId: string) => void;
+  openRcsbRequest: number;
   structure: StructureLoadResult | null;
   projection: RenderProjection;
   loading: boolean;
@@ -36,6 +37,7 @@ export const StructurePanel = ({
   onAction,
   onImport,
   onFetchRcsb,
+  openRcsbRequest,
   structure,
   projection,
   loading,
@@ -43,6 +45,9 @@ export const StructurePanel = ({
 }: StructurePanelProps) => {
   const [showRcsb, setShowRcsb] = useState(false);
   const [pdbId, setPdbId] = useState("");
+  useEffect(() => {
+    if (openRcsbRequest > 0) setShowRcsb(true);
+  }, [openRcsbRequest]);
   const counts = structure?.structure.counts;
   const components = [
     { label: "Protein", count: counts?.polymerAtoms ?? 0, tone: "blue", enabled: projection.showProtein, actionId: "REPRESENTATION.TOGGLE_PROTEIN" as ActionId },

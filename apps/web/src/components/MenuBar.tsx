@@ -1,25 +1,13 @@
-import type { ActionId } from "../domain/registry";
+export const RIBBON_CATEGORIES = ["File", "Edit", "Select", "Display", "Color", "Measure", "Analyze", "Dock", "View", "Help"] as const;
+export type RibbonCategory = (typeof RIBBON_CATEGORIES)[number];
 
-const menus: Array<{ label: string; actionId: ActionId }> = [
-  { label: "File", actionId: "FILE.OPEN" },
-  { label: "Edit", actionId: "EDIT.ATOM_DELETE" },
-  { label: "Select", actionId: "SELECTION.EVALUATE" },
-  { label: "Display", actionId: "REPRESENTATION.SET_STYLE" },
-  { label: "Color", actionId: "COLOR.APPLY" },
-  { label: "Measure", actionId: "MEASURE.DISTANCE" },
-  { label: "Analyze", actionId: "SELECTION.EVALUATE" },
-  { label: "Dock", actionId: "DOCKING.CONFIGURE" },
-  { label: "View", actionId: "VIEW.RESET" },
-  { label: "Help", actionId: "HELP.OPEN" },
-];
-
-export const MenuBar = ({ onAction }: { onAction: (actionId: ActionId) => void }) => (
+export const MenuBar = ({ activeCategory, onCategory }: { activeCategory: RibbonCategory; onCategory: (category: RibbonCategory) => void }) => (
   <header className="menu-bar">
     <div className="menu-brand"><span className="brand-pulse" /> <span>WORKSTATION</span></div>
     <nav className="menu-links" aria-label="Application menu">
-      {menus.map((menu) => (
-        <button key={`${menu.label}-${menu.actionId}`} onClick={() => onAction(menu.actionId)} data-action-id={menu.actionId}>
-          {menu.label}
+      {RIBBON_CATEGORIES.map((category) => (
+        <button key={category} className={activeCategory === category ? "menu-link--active" : ""} onClick={() => onCategory(category)} aria-pressed={activeCategory === category} data-ribbon-category={category}>
+          {category}
         </button>
       ))}
     </nav>

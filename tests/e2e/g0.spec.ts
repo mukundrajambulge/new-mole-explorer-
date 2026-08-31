@@ -38,6 +38,7 @@ test("failed structure loads keep the current canonical structure", async ({ pag
 
 test("New creates a clean persisted project and Open uses the same structure picker", async ({ page }) => {
   await page.goto("/");
+  await page.getByRole("button", { name: "File", exact: true }).click();
   await page.getByRole("button", { name: "New", exact: true }).click();
   await expect(page.getByText("Untitled Project · r1", { exact: false })).toBeVisible();
   const chooserPromise = page.waitForEvent("filechooser");

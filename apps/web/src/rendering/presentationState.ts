@@ -101,7 +101,10 @@ const atomMaskForStyle = (structure: CanonicalMolecularStructure, atom: Canonica
   if (atom.isPolymer) return REPRESENTATION_MASKS.CARTOON;
   if (atom.isLigand) return REPRESENTATION_MASKS.STICKS;
   if (atom.isIon) return REPRESENTATION_MASKS.SPHERES;
-  if (atom.isWater) return 0;
+  // Water is hidden by the default layer visibility, not by removing its
+  // representation membership. This keeps the component toggle independent
+  // from the active representation and gives water an explicit sphere profile.
+  if (atom.isWater) return REPRESENTATION_MASKS.SPHERES;
   return REPRESENTATION_MASKS.STICKS;
 };
 
