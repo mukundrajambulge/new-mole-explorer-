@@ -27,6 +27,21 @@ The earlier greenfield/V2 implementation remains the product context. The pasted
 - Added Advanced-panel visibility for clipping mode and a truthful “Reset clipping to Auto” action.
 - Added focused unit and Playwright coverage for camera modes, clipping, camera commands, real canvas drag rotation, and model-load stability.
 
+Exact paths changed by the P0-A implementation and its verification record:
+
+- `apps/web/src/App.tsx`
+- `apps/web/src/components/InspectorPanel.tsx`
+- `apps/web/src/components/MolecularCanvas.tsx`
+- `apps/web/src/rendering/ThreeDMolViewerAdapter.ts`
+- `apps/web/src/rendering/cameraController.ts`
+- `apps/web/src/rendering/cameraController.test.ts`
+- `apps/web/src/rendering/presentationState.ts`
+- `packages/contracts/src/index.ts`
+- `tests/e2e/p0a-camera.spec.ts`
+- `docs/screenshots/p0a-4djw-rotated-safe-clipping.png`
+- `docs/verification/IMPLEMENTATION_AUDIT_STABILIZATION_P0A.md`
+- `docs/verification/STABILIZATION_P0A_EVIDENCE.md`
+
 ## Architecture decisions
 
 `CameraController` contains renderer-independent geometry calculations. `ThreeDMolViewerAdapter` is the only layer that converts those calculations to 3Dmol calls. UI components dispatch camera intents and do not own molecular data or call 3Dmol directly.
