@@ -59,7 +59,6 @@ Tests:
 - `apps/web/src/rendering/g1cVisualization.test.ts`
 - `apps/web/src/rendering/renderDirectives.test.ts`
 - `tests/e2e/g0.spec.ts`
-- `tests/e2e/g1b-r1.spec.ts` (unchanged; existing coverage retained)
 - `tests/e2e/g1c-visualization.spec.ts`
 - `tests/e2e/imp-pres-01.spec.ts`
 - `tests/e2e/p0a-camera.spec.ts`
@@ -112,4 +111,3 @@ Manual localhost verification:
 ## Handoff
 
 The next bounded stage is to implement the full R-PYMOL-02 stable representation-mask engine. It should preserve the current `RenderProjection` → `ThreeDMolViewerAdapter` boundary, stable canonical atom IDs, truthful capability diagnostics, and the no-fallback behavior established here. Do not begin R07 in that stage.
-
