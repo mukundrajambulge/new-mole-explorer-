@@ -109,6 +109,10 @@ export type CanonicalAtom = {
   formalCharge?: number | null;
   /** Authoritative temperature/B factor when supplied by the source. */
   bFactor?: number | null;
+  /** Authoritative occupancy when supplied by the source. */
+  occupancy?: number | null;
+  /** Authoritative alternate-location identifier when supplied by the source. */
+  altLoc?: string | null;
   secondaryStructure?: SecondaryStructureKind | null;
 };
 
@@ -189,6 +193,10 @@ export type ProjectPresentationState = {
   camera: {
     view: number[] | null;
     defaultView: number[] | null;
+    projectionMode?: "perspective" | "orthographic";
+    fov?: number;
+    nearClip?: number;
+    farClip?: number;
   };
 };
 

@@ -1,6 +1,8 @@
 import type { CanonicalMolecularStructure } from "@molecular/contracts";
 import {
   setColorScheme,
+  setCameraState,
+  setLabelState,
   setLayerVisibility,
   setProjectionStyle,
   type BackgroundPreset,
@@ -15,16 +17,11 @@ export type PresentationAction =
   | { type: "REPRESENTATION.APPLY"; style: RepresentationStyle }
   | { type: "COLOR.APPLY_SCHEME"; mode: ColorMode }
   | { type: "BACKGROUND.SET"; preset: BackgroundPreset; color?: string }
+  | { type: "LABELS.SET"; labels: Partial<import("../interaction/labels").LabelState> }
+  | { type: "CAMERA.SET"; camera: Partial<import("./presentationState").CameraState> }
   | { type: "COMPONENT_VISIBILITY.SET"; component: PresentationComponent; visible: boolean };
 
-const BACKGROUND_COLORS: Record<Exclude<BackgroundPreset, "Custom">, string> = {
-  Black: "#05070a",
-  White: "#ffffff",
-  "Dark Gray": "#252b34",
-  "Light Gray": "#d8dee7",
-  Navy: "#071225",
-  "Deep Blue": "#061b40",
-};
+const BACKGROUND_COLORS: Record<Exclude<BackgroundPreset, "Custom">, string> = { Dark: "#0b1018", Black: "#05070a", White: "#ffffff", Neutral: "#747b85", "Dark Gray": "#252b34", "Light Gray": "#d8dee7", Navy: "#071225", "Deep Blue": "#061b40" };
 
 const visibilityKey: Record<PresentationComponent, keyof Pick<RenderProjection, "showProtein" | "showLigand" | "showWater" | "showIons" | "showOther">> = {
   protein: "showProtein",
@@ -42,6 +39,8 @@ export const applyPresentationAction = (
 ): RenderProjection => {
   if (action.type === "REPRESENTATION.APPLY") return setProjectionStyle(projection, structure, action.style);
   if (action.type === "COLOR.APPLY_SCHEME") return setColorScheme(projection, action.mode, structure);
+  if (action.type === "LABELS.SET") return setLabelState(projection, action.labels);
+  if (action.type === "CAMERA.SET") return setCameraState(projection, action.camera);
   if (action.type === "BACKGROUND.SET") {
     return {
       ...projection,

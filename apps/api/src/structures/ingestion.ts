@@ -129,6 +129,8 @@ const parsePdb = (content: string): ParsedSource => {
       z,
       recordType,
       bFactor: parseOptionalNumber(line.slice(60, 66)),
+      occupancy: parseOptionalNumber(line.slice(54, 60)),
+      altLoc: line.slice(16, 17).trim() || undefined,
       formalCharge: parsePdbFormalCharge(line.slice(78, 80)),
       ...classifyAtom(recordType, residueName, element),
     });
@@ -257,6 +259,8 @@ const parseMmcif = (content: string): ParsedSource => {
       z: parseNumber(zValue, "z coordinate"),
       recordType: record,
       bFactor: parseOptionalNumber(cifValue(row, atomLoop.headers, ["_atom_site.B_iso_or_equiv"])),
+      occupancy: parseOptionalNumber(cifValue(row, atomLoop.headers, ["_atom_site.occupancy"])),
+      altLoc: cifValue(row, atomLoop.headers, ["_atom_site.label_alt_id", "_atom_site.pdbx_PDB_alt_id"]),
       formalCharge: parseOptionalNumber(cifValue(row, atomLoop.headers, ["_atom_site.pdbx_formal_charge"])),
       ...classifyAtom(record, residueName, element),
     });
