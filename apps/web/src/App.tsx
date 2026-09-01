@@ -19,6 +19,7 @@ import { LabelExpressionError, labelExpressionForMode, parseSafeLabelExpression,
 import { MeasurementAccumulator, createMeasurementObject, measurementCardinality, type MeasurementKind, type MeasurementObject } from "./interaction/measurements";
 import type { PickResult } from "./interaction/picking";
 import { colorRegistry } from "./rendering/colorRegistry";
+import { analyzeStructure, overlaysForAnalysis, type StructuralAnalysisKind, type StructuralAnalysisResult } from "./analysis/structuralAnalysis";
 
 const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_SELECT]: "Select",
@@ -52,6 +53,7 @@ export const App = () => {
   const [measurementMode, setMeasurementModeState] = useState<MeasurementKind | null>(null);
   const [measurementSlots, setMeasurementSlots] = useState<readonly string[]>([]);
   const [measurements, setMeasurements] = useState<readonly MeasurementObject[]>([]);
+  const [analysisResults, setAnalysisResults] = useState<readonly StructuralAnalysisResult[]>([]);
   const [targetStyles, setTargetStyles] = useState<Record<"protein" | "ligand" | "water" | "ions" | "other", RepresentationStyle>>({ protein: "cartoon", ligand: "ball-and-stick", water: "spheres", ions: "spheres", other: "sticks" });
   const [cameraCommand, setCameraCommand] = useState<{ actionId: ActionId; sequence: number }>();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -93,6 +95,7 @@ export const App = () => {
       measurementAccumulatorRef.current.clear();
       setMeasurementSlots([]);
       setMeasurements([]);
+      setAnalysisResults([]);
       setLoadState("idle");
       commandSequence.current += 1;
       setCameraCommand({ actionId: ACTION_IDS.CANVAS_FOCUS, sequence: commandSequence.current });
@@ -122,6 +125,7 @@ export const App = () => {
       measurementAccumulatorRef.current.clear();
       setMeasurementSlots([]);
       setMeasurements([]);
+      setAnalysisResults([]);
       setLoadError(null);
       setLoadState("idle");
     } catch (error) {
@@ -141,6 +145,7 @@ export const App = () => {
       measurementAccumulatorRef.current.clear();
       setMeasurementSlots([]);
       setMeasurements([]);
+      setAnalysisResults([]);
       setLoadError(null);
       setLoadState("idle");
     } catch (error) {
@@ -241,6 +246,15 @@ export const App = () => {
   const updateMeasurementVisibility = (id: string, visible: boolean) => setMeasurements((current) => current.map((measurement) => measurement.id === id ? { ...measurement, presentation: { ...measurement.presentation, visible }, status: visible ? "CURRENT" : "HIDDEN" } : measurement));
   const deleteMeasurement = (id: string) => setMeasurements((current) => current.filter((measurement) => measurement.id !== id));
 
+  const runAnalysis = (kind: StructuralAnalysisKind) => {
+    if (!structure) {
+      showNotice({ id: ACTION_IDS.ANALYSIS_CONTACTS, group: "ANALYSIS", state: "SUPPORTED_WITH_LIMITATIONS", label: "Analysis requires a structure", description: "Load a PDB or mmCIF structure before running this diagnostic." });
+      return;
+    }
+    const result = analyzeStructure(structure.structure, kind);
+    setAnalysisResults((current) => [...current.filter((entry) => entry.kind !== kind), result]);
+  };
+
   const runConsoleCommand = (input: string): ConsoleCommandResult => {
     const trimmed = input.trim();
     if (/^(select|select\s+all)\b/i.test(trimmed)) {
@@ -315,6 +329,10 @@ export const App = () => {
     if (actionId === ACTION_IDS.STRUCTURE_FETCH_RCSB) {
       return;
     }
+    if (actionId === ACTION_IDS.ANALYSIS_H_BONDS || actionId === ACTION_IDS.ANALYSIS_CONTACTS || actionId === ACTION_IDS.ANALYSIS_CLASH) {
+      runAnalysis(actionId === ACTION_IDS.ANALYSIS_H_BONDS ? "H_BONDS" : actionId === ACTION_IDS.ANALYSIS_CONTACTS ? "CONTACTS" : "CLASH");
+      return;
+    }
     if (actionId === ACTION_IDS.REPRESENTATION_SURFACE && capability.state === "SUPPORTED") {
       applyStyle("van-der-waals-surface");
       return;
@@ -376,8 +394,8 @@ export const App = () => {
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
         <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
-          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} selectedAtom={selectedAtom} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} loading={loadState === "loading"} error={loadError} />
-          <MolecularCanvas structure={structure} projection={projection} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFileDrop={importFile} consoleExpanded={consoleExpanded} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} />
+          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} selectedAtom={selectedAtom} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} loading={loadState === "loading"} error={loadError} />
+          <MolecularCanvas structure={structure} projection={projection} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFileDrop={importFile} consoleExpanded={consoleExpanded} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} analysisOverlays={overlaysForAnalysis(analysisResults)} />
           <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
         </div>
         <StatusBar apiStatus={apiStatus} structure={structure} project={project} selectedAtomCount={projection.interaction.selectedAtomIds.length} />

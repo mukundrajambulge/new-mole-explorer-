@@ -97,7 +97,7 @@ export const DEFAULT_COLOR: ColorState = { mode: "element", colorId: null, custo
 export const DEFAULT_BACKGROUND: BackgroundColorState = { preset: "Black", color: "#05070a" };
 export const DEFAULT_CAMERA: CameraState = { view: null, defaultView: null, projectionMode: "perspective", fov: 20, nearClip: 0.1, farClip: 1000, clippingMode: "auto", viewport: null };
 export const DEFAULT_INTERACTION: InteractionState = { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] };
-export const DEFAULT_REPRESENTATION_PARAMETERS: RepresentationParameters = { stickRadius: 0.16, sphereScale: 1, lineWidth: 1, cartoonThickness: 0.92, quality: 8, lineOpacity: 1, stickOpacity: 1, sphereOpacity: 1, cartoonOpacity: 1, ribbonOpacity: 1, surfaceOpacity: 0.55, meshOpacity: 0.7, dotOpacity: 0.85, nonbondedOpacity: 1, surfaceProbeRadius: 1.4, surfaceQuality: 0.5, dotDensity: 12, meshWidth: 1, puttyMinRadius: 0.18, puttyMaxRadius: 0.72 };
+export const DEFAULT_REPRESENTATION_PARAMETERS: RepresentationParameters = { stickRadius: 0.16, sphereScale: 1, lineWidth: 1, cartoonThickness: 0.92, quality: 8, lineOpacity: 1, stickOpacity: 1, sphereOpacity: 1, cartoonOpacity: 1, ribbonOpacity: 1, surfaceOpacity: 1, meshOpacity: 1, dotOpacity: 1, nonbondedOpacity: 1, surfaceProbeRadius: 1.4, surfaceQuality: 0.5, dotDensity: 12, meshWidth: 1, puttyMinRadius: 0.18, puttyMaxRadius: 0.72 };
 
 export const maskForStyle = (style: RepresentationStyle): RepresentationMask => {
   if (style === "lines" || style === "line") return REPRESENTATION_MASKS.LINES;

@@ -5,6 +5,7 @@ import type { RenderProjection } from "../rendering/renderProjection";
 import { ThreeDMolViewerAdapter } from "../rendering/ThreeDMolViewerAdapter";
 import type { PickResult } from "../interaction/picking";
 import type { MeasurementKind, MeasurementObject } from "../interaction/measurements";
+import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
 import { Icon } from "./Icon";
 
 type CameraCommand = { actionId: ActionId; sequence: number };
@@ -25,6 +26,7 @@ type MolecularCanvasProps = {
   onBackgroundPick: () => void;
   measurements: readonly MeasurementObject[];
   measurementMode: MeasurementKind | null;
+  analysisOverlays: readonly AnalysisOverlay[];
 };
 
 const toolIcon = (activeTool: string) => {
@@ -50,6 +52,7 @@ export const MolecularCanvas = ({
   onBackgroundPick,
   measurements,
   measurementMode,
+  analysisOverlays,
 }: MolecularCanvasProps) => {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -147,6 +150,10 @@ export const MolecularCanvas = ({
   useEffect(() => {
     adapterRef.current?.setMeasurements(measurements);
   }, [measurements]);
+
+  useEffect(() => {
+    adapterRef.current?.setAnalysisOverlays(analysisOverlays);
+  }, [analysisOverlays]);
 
   useEffect(() => {
     const adapter = adapterRef.current;

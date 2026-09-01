@@ -8,10 +8,11 @@ import type { RepresentationType } from "./presentationState";
 import { labelPlanForState, resolveSafeLabel } from "../interaction/labels";
 import { ReverseIdentityMap, type PickResult } from "../interaction/picking";
 import { measurementStatus, type MeasurementObject } from "../interaction/measurements";
-import { boundsForCoordinates, paddedClippingSlab, principalOrientationQuaternion, type Coordinate3, type ClippingSlab } from "./cameraController";
-import { buildDotSurfacePoints } from "./surfaceGenerator";
+import { boundsForCoordinates, CameraController, paddedClippingSlab, principalOrientationQuaternion, type Coordinate3, type ClippingSlab } from "./cameraController";
+import { buildDotSurfacePoints, type SurfacePoint } from "./surfaceGenerator";
 import { SurfaceGeometryCache, SurfaceRequestCoordinator, surfaceRequestFor } from "./surfaceProfiles";
 import { puttyProfileFor, puttyRadiusForResidue, puttyResidueRadii } from "./putty";
+import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
 
 const diagnosticTypeForStyle = (style: string): RepresentationType => style === "ribbon" ? "RIBBON" : style === "putty" || style === "trace" || style === "cartoon" ? "CARTOON" : style === "nonbonded-crosses" ? "NONBONDED" : style === "nonbonded-spheres" ? "NB_SPHERES" : style === "line" ? "LINES" : style === "stick" || style === "licorice" || style === "ball-and-stick" ? "STICKS" : "SPHERES";
 
@@ -47,8 +48,56 @@ const styleFor = (representation: StyleRepresentation, projection: RenderProject
 const orderNumber = (order: CanonicalMolecularStructure["bonds"][number]["order"]): number => order === "DOUBLE" ? 2 : order === "TRIPLE" ? 3 : order === "AROMATIC" ? 4 : 1;
 const secondaryCode = (value: CanonicalMolecularStructure["atoms"][number]["secondaryStructure"]): string | undefined => value === "HELIX" ? "h" : value === "SHEET" ? "s" : value === "LOOP" ? "c" : undefined;
 
+/** Connect nearby exposed samples into a visible renderer-native mesh lattice. */
+const meshSegmentsFor = (points: readonly SurfacePoint[]): Array<[SurfacePoint, SurfacePoint]> => {
+  const byAtom = new Map<string, SurfacePoint[]>();
+  points.forEach((point) => byAtom.set(point.stableAtomId, [...(byAtom.get(point.stableAtomId) ?? []), point]));
+  const segments: Array<[SurfacePoint, SurfacePoint]> = [];
+  const seen = new Set<string>();
+  for (const atomPoints of byAtom.values()) {
+    for (const [index, point] of atomPoints.entries()) {
+      const nearest = atomPoints
+        .map((candidate, candidateIndex) => ({ candidate, candidateIndex, distance: Math.hypot(point.x - candidate.x, point.y - candidate.y, point.z - candidate.z) }))
+        .filter((candidate) => candidate.candidateIndex !== index)
+        .sort((left, right) => left.distance - right.distance)
+        .slice(0, 1);
+      for (const candidate of nearest) {
+        const key = [index, candidate.candidateIndex].sort((a, b) => a - b).join(":");
+        if (seen.has(`${point.stableAtomId}:${key}`)) continue;
+        seen.add(`${point.stableAtomId}:${key}`);
+        segments.push([point, candidate.candidate]);
+      }
+    }
+  }
+  return segments;
+};
+
+const boundedDisplayPoints = (points: readonly SurfacePoint[], maxPoints: number): SurfacePoint[] => {
+  if (points.length <= maxPoints) return [...points];
+  const stride = Math.ceil(points.length / maxPoints);
+  return points.filter((_, index) => index % stride === 0).slice(0, maxPoints);
+};
+
+const brightenHex = (hex: string, amount = 0.65): string => {
+  const normalized = hex.replace("#", "");
+  if (!/^[0-9a-f]{6}$/i.test(normalized)) return hex;
+  const channel = (offset: number): number => Math.min(255, Math.round(parseInt(normalized.slice(offset, offset + 2), 16) + (255 - parseInt(normalized.slice(offset, offset + 2), 16)) * amount));
+  return `#${[0, 2, 4].map((offset) => channel(offset).toString(16).padStart(2, "0")).join("")}`;
+};
+
+const boundedAnalysisOverlays = (overlays: readonly AnalysisOverlay[]): AnalysisOverlay[] => {
+  const limits: Record<AnalysisOverlay["kind"], number> = { H_BONDS: 24, CONTACTS: 24, CLASH: 24 };
+  const counts: Record<AnalysisOverlay["kind"], number> = { H_BONDS: 0, CONTACTS: 0, CLASH: 0 };
+  return overlays.filter((overlay) => {
+    if (counts[overlay.kind] >= limits[overlay.kind]) return false;
+    counts[overlay.kind] += 1;
+    return true;
+  });
+};
+
 export class ThreeDMolViewerAdapter {
   private viewer: GLViewer | null = null;
+  private cameraController: CameraController | null = null;
   private container: HTMLElement | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private hasModel = false;
@@ -64,10 +113,13 @@ export class ThreeDMolViewerAdapter {
   private interactionHandlers: ViewerInteractionHandlers = {};
   private measurementShapes: GLShape[] = [];
   private interactionShapes: GLShape[] = [];
+  private analysisShapes: GLShape[] = [];
+  private analysisOverlays: readonly AnalysisOverlay[] = [];
   private dotSurfaceShapes: GLShape[] = [];
   private surfaceIds: number[] = [];
   private activeSurfaceKey: string | null = null;
-  private readonly surfaceCache = new SurfaceGeometryCache<readonly { x: number; y: number; z: number; stableAtomId: string; colorElement: string }[]>();
+  private activeSurfaceGeometryKey: string | null = null;
+  private readonly surfaceCache = new SurfaceGeometryCache<readonly SurfacePoint[]>();
   private readonly surfaceCoordinator = new SurfaceRequestCoordinator();
   private measurements: readonly MeasurementObject[] = [];
   private gestureFrame: number | null = null;
@@ -78,6 +130,7 @@ export class ThreeDMolViewerAdapter {
   private baselinePivot: Coordinate3 | null = null;
   private autoSlab: ClippingSlab = paddedClippingSlab(null);
   private lastCameraAction = "NONE";
+  private performance = { viewerCreations: 0, sceneRebuilds: 0, renderCalls: 0, surfaceCacheHits: 0, surfaceCacheMisses: 0, surfaceGenerations: 0, meshGenerations: 0, dotGenerations: 0, staleSurfaceResults: 0 };
 
   mount(container: HTMLElement): void {
     if (this.viewer && this.container === container) return;
@@ -87,8 +140,10 @@ export class ThreeDMolViewerAdapter {
     this.container = container;
     mountedAdapters.set(container, this);
     this.viewer = createViewer(container, { backgroundColor: "#05070a", antialias: true, disableFog: true, cartoonQuality: 8 });
+    this.cameraController = new CameraController(this.viewer);
+    this.performance.viewerCreations += 1;
     container.dataset.rendererGeneration = String(this.rendererGeneration);
-    this.resizeObserver = new ResizeObserver(() => { this.viewer?.resize(); this.viewer?.render(); });
+    this.resizeObserver = new ResizeObserver(() => { this.viewer?.resize(); this.render(); });
     this.resizeObserver.observe(container);
   }
 
@@ -97,9 +152,34 @@ export class ThreeDMolViewerAdapter {
     if (this.viewer && this.hasModel) this.bindPicking();
   }
 
+  setAnalysisOverlays(overlays: readonly AnalysisOverlay[]): void {
+    // Keep the canonical analysis result complete; only renderer line count is bounded.
+    this.analysisOverlays = boundedAnalysisOverlays(overlays);
+    this.analysisShapes.forEach((shape) => this.viewer?.removeShape(shape));
+    this.analysisShapes = [];
+    if (!this.viewer || !this.structure) return;
+    const atomMap = new Map(this.structure.atoms.map((atom) => [atom.stableId, atom]));
+    const shapes = new Map<AnalysisOverlay["kind"], GLShape>();
+    for (const overlay of this.analysisOverlays) {
+      const left = atomMap.get(overlay.atom1Id); const right = atomMap.get(overlay.atom2Id);
+      if (!left || !right) continue;
+      const color = overlay.kind === "CLASH" ? "#f36f6f" : overlay.kind === "H_BONDS" ? "#45dec2" : "#65b8ff";
+      const shape = shapes.get(overlay.kind) ?? this.viewer.addShape({ color, linewidth: overlay.kind === "CLASH" ? 2.2 : 1.4, opacity: overlay.kind === "CLASH" ? 0.95 : 0.78 });
+      shapes.set(overlay.kind, shape);
+      shape.addLine({ start: left, end: right, dashed: overlay.kind !== "CLASH" });
+      if (overlay.kind === "CLASH") {
+        const center = { x: (left.x + right.x) / 2, y: (left.y + right.y) / 2, z: (left.z + right.z) / 2 };
+        shape.addSphere({ center, radius: 0.13, wireframe: true, color, opacity: 0.95 });
+      }
+    }
+    this.analysisShapes = [...shapes.values()];
+    this.render();
+  }
+
   load(result: StructureLoadResult, projection: RenderProjection): void {
     this.ensureMounted();
     this.structure = result.structure;
+    this.performance.sceneRebuilds += 1;
     this.rendererGeneration += 1;
     this.reverseIdentityMap.build(result.structure, this.rendererGeneration);
     if (this.container) this.container.dataset.rendererGeneration = String(this.rendererGeneration);
@@ -110,7 +190,10 @@ export class ThreeDMolViewerAdapter {
     this.surfaceIds = [];
     this.dotSurfaceShapes = [];
     this.activeSurfaceKey = null;
+    this.activeSurfaceGeometryKey = null;
     this.interactionShapes = [];
+    this.analysisShapes = [];
+    this.analysisOverlays = [];
     this.hasModel = false;
     const renderModel = this.viewer!.addModel();
     const indexByStableId = new Map(result.structure.atoms.map((atom, index) => [atom.stableId, index]));
@@ -160,7 +243,7 @@ export class ThreeDMolViewerAdapter {
     } else {
       this.frameToCanonicalBounds(true);
     }
-    this.viewer!.render();
+    this.render();
   }
 
   setProjection(projection: RenderProjection, options: { preserveView?: boolean } = {}): void {
@@ -171,21 +254,21 @@ export class ThreeDMolViewerAdapter {
     this.viewer!.setBackgroundColor(projection.background.color, 1);
     this.viewer!.setProjection(projection.camera.projectionMode);
     this.viewer!.setCameraParameters({ fov: projection.camera.fov, orthographic: projection.camera.projectionMode === "orthographic" });
-    if (!this.hasModel || !this.structure) { this.diagnostics = emptyRenderProjectionDiagnostics(projection.representationState.presentationRevision, projection); this.writeDiagnostics(this.diagnostics); this.viewer!.render(); return; }
+    if (!this.hasModel || !this.structure) { this.diagnostics = emptyRenderProjectionDiagnostics(projection.representationState.presentationRevision, projection); this.writeDiagnostics(this.diagnostics); this.render(); return; }
     this.applyProjection(projection);
     this.applyClipping();
     this.writeDiagnostics(this.diagnostics);
-    this.viewer!.render();
+    this.render();
   }
 
-  setViewport(viewport: Viewport): void { this.viewport = viewport; this.cameraState = { ...this.cameraState, viewport }; if (!this.viewer || !this.hasModel) return; this.viewer.resize(); this.applyViewportTranslation(); if (this.cameraState.clippingMode === "auto") this.recalculateAutoClipping(); this.viewer.render(); }
+  setViewport(viewport: Viewport): void { this.viewport = viewport; this.cameraState = { ...this.cameraState, viewport }; if (!this.viewer || !this.hasModel) return; this.viewer.resize(); this.applyViewportTranslation(); if (this.cameraState.clippingMode === "auto") this.recalculateAutoClipping(); this.render(); }
   getCameraState(): CameraState { return { ...this.cameraState, view: this.viewer?.getView() ?? this.cameraState.view, defaultView: this.baselineView ? [...this.baselineView] : this.cameraState.defaultView, viewport: this.viewport }; }
-  resize(): void { this.viewer?.resize(); this.viewer?.render(); }
+  resize(): void { this.viewer?.resize(); this.render(); }
   rotate(angle = 15): void { if (!this.viewer) return; this.viewer.rotate(angle, "y"); this.lastCameraAction = "ROTATE"; this.renderCamera(); }
   pan(x = 70, y = 0): void { if (!this.viewer) return; this.viewer.translate(x, y); this.lastCameraAction = "PAN"; this.renderCamera(); }
   zoom(factor = 1.2): void { if (!this.viewer) return; this.viewer.zoom(factor); this.lastCameraAction = "ZOOM"; this.renderCamera(); }
   focus(): void { if (!this.viewer || !this.hasModel) return; this.lastCameraAction = "FIT"; this.frameToCanonicalBounds(false); this.renderCamera(); }
-  center(): void { if (!this.viewer || !this.hasModel) return; this.lastCameraAction = "CENTER"; const target = this.boundsForCameraTarget(true); if (!target) return; this.viewer.center(target.selection); this.cameraPivot = target.center; this.recalculateAutoClipping(); this.renderCamera(); }
+  center(): void { if (!this.viewer || !this.cameraController || !this.hasModel) return; this.lastCameraAction = "CENTER"; const target = this.boundsForCameraTarget(true); if (!target) return; this.cameraController.center(target.selection); this.cameraPivot = target.center; this.recalculateAutoClipping(); this.renderCamera(); }
   orient(): void { if (!this.viewer || !this.hasModel) return; this.lastCameraAction = "ORIENT"; const target = this.boundsForCameraTarget(true); if (!target) return; this.viewer.center(target.selection); this.viewer.zoomTo(target.selection); const view = this.viewer.getView(); const quaternion = principalOrientationQuaternion(target.atoms); view[4] = quaternion[0]; view[5] = quaternion[1]; view[6] = quaternion[2]; view[7] = quaternion[3]; this.viewer.setView(view); this.cameraPivot = target.center; this.recalculateAutoClipping(); this.renderCamera(); }
   origin(): void { if (!this.viewer || !this.hasModel) return; this.lastCameraAction = "ORIGIN"; const target = this.boundsForCameraTarget(false); if (!target) return; this.viewer.center({}); this.cameraPivot = target.center; this.recalculateAutoClipping(); this.renderCamera(); }
   resetView(): void { if (!this.viewer || !this.hasModel) return; this.lastCameraAction = "RESET"; this.cameraState = { ...this.cameraState, projectionMode: DEFAULT_CAMERA.projectionMode, fov: DEFAULT_CAMERA.fov, nearClip: DEFAULT_CAMERA.nearClip, farClip: DEFAULT_CAMERA.farClip, clippingMode: "auto" }; this.viewer.setProjection(this.cameraState.projectionMode); this.viewer.setCameraParameters({ fov: this.cameraState.fov, orthographic: false }); if (this.baselineView && this.validView(this.baselineView)) { this.viewer.setView([...this.baselineView]); this.cameraPivot = this.baselinePivot ? { ...this.baselinePivot } : this.cameraPivot; this.recalculateAutoClipping(); } else this.frameToCanonicalBounds(true); this.renderCamera(); }
@@ -215,7 +298,8 @@ export class ThreeDMolViewerAdapter {
     if (this.container && mountedAdapters.get(this.container) === this) mountedAdapters.delete(this.container);
     this.resizeObserver?.disconnect(); this.resizeObserver = null;
     if (this.viewer) { this.viewer.clear(); this.viewer = null; }
-    this.measurementShapes = []; this.interactionShapes = []; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
+    this.cameraController = null;
+    this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
   }
   getDiagnostics(): RenderProjectionDiagnostics { return this.diagnostics; }
 
@@ -308,6 +392,7 @@ export class ThreeDMolViewerAdapter {
     this.projectLabels(projection);
     this.projectMeasurementShapes();
     this.applySurfaceDirectives(diagnostics, projection);
+    this.setAnalysisOverlays(this.analysisOverlays);
   }
 
   private applyPuttyStyles(target: AtomSelectionSpec, projection: RenderProjection, structure: CanonicalMolecularStructure, targetIds: readonly string[]): void {
@@ -333,21 +418,31 @@ export class ThreeDMolViewerAdapter {
     if (!this.viewer || !this.structure) return;
     const surfaceDirectives = diagnostics.directives.filter((directive) => directive.primitive === "surface" || directive.primitive === "mesh" || directive.primitive === "dots");
     const materialKey = JSON.stringify({ opacity: projection.representation === "mesh" ? projection.representationState.parameters.meshOpacity : projection.representation === "dots" || projection.representation === "dot-surface" ? projection.representationState.parameters.dotOpacity : projection.representationState.parameters.surfaceOpacity, meshWidth: projection.representationState.parameters.meshWidth, color: projection.color });
-    const nextKey = `${surfaceDirectives.map((directive) => directive.surfaceCacheKey ?? "").join("||")}::${materialKey}`;
+    const geometryKey = surfaceDirectives.map((directive) => directive.surfaceCacheKey ?? "").join("||");
+    const nextKey = `${geometryKey}::${materialKey}`;
     if (!surfaceDirectives.length) {
       this.viewer.removeAllSurfaces();
       this.dotSurfaceShapes.forEach((shape) => this.viewer?.removeShape(shape));
       this.dotSurfaceShapes = [];
       this.surfaceIds = [];
       this.activeSurfaceKey = null;
+      this.activeSurfaceGeometryKey = null;
       this.surfaceCoordinator.invalidate();
       this.container?.removeAttribute("data-surface-ready");
       this.container?.removeAttribute("data-surface-state");
       this.container?.removeAttribute("data-surface-generation");
+      this.container?.removeAttribute("data-renderer-surface-point-count");
       return;
     }
     if (this.activeSurfaceKey === nextKey) {
       for (const surfaceId of this.surfaceIds) this.viewer.setSurfaceMaterialStyle(surfaceId, { opacity: projection.representation === "mesh" ? projection.representationState.parameters.meshOpacity : projection.representationState.parameters.surfaceOpacity });
+      return;
+    }
+    if (this.activeSurfaceGeometryKey === geometryKey) {
+      const opacity = projection.representation === "mesh" ? projection.representationState.parameters.meshOpacity : projection.representationState.parameters.surfaceOpacity;
+      for (const surfaceId of this.surfaceIds) this.viewer.setSurfaceMaterialStyle(surfaceId, { opacity });
+      this.dotSurfaceShapes.forEach((shape) => shape.updateStyle({ opacity, linewidth: projection.representationState.parameters.meshWidth }));
+      this.activeSurfaceKey = nextKey;
       return;
     }
     this.viewer.removeAllSurfaces();
@@ -355,6 +450,7 @@ export class ThreeDMolViewerAdapter {
     this.dotSurfaceShapes = [];
     this.surfaceIds = [];
     this.activeSurfaceKey = nextKey;
+    this.activeSurfaceGeometryKey = geometryKey;
     const generation = this.surfaceCoordinator.begin();
     this.container?.setAttribute("data-surface-generation", String(generation));
     this.container?.setAttribute("data-surface-state", "generating");
@@ -366,25 +462,52 @@ export class ThreeDMolViewerAdapter {
       if (directive.primitive === "dots") {
         const profile = kind === "DOT_SURFACE" ? "SES" : kind === "DOTS" ? "VDW" : kind;
         const request = surfaceRequestFor(structure, kind, directive.targetStableAtomIds, structure.atoms.map((atom) => atom.stableId), { probeRadius: profile === "SAS" || profile === "SES" ? projection.representationState.parameters.surfaceProbeRadius : 0, quality: projection.representationState.parameters.surfaceQuality, sampling: projection.representationState.parameters.dotDensity });
-        const cached = this.surfaceCache.get({ ...request, profileId: directive.surfaceCacheKey ?? request.profileId });
-        const points = cached ?? buildDotSurfacePoints(structure, directive.targetStableAtomIds, structure.atoms.map((atom) => atom.stableId), profile, projection.representationState.parameters.surfaceProbeRadius, projection.representationState.parameters.dotDensity);
-        this.surfaceCache.set({ ...request, profileId: directive.surfaceCacheKey ?? request.profileId }, points);
+        const cacheRequest = { ...request, profileId: directive.surfaceCacheKey ?? request.profileId };
+        const cached = this.surfaceCache.get(cacheRequest);
+        if (cached) this.performance.surfaceCacheHits += 1; else this.performance.surfaceCacheMisses += 1;
+        const points = cached ?? buildDotSurfacePoints(structure, directive.targetStableAtomIds, structure.atoms.map((atom) => atom.stableId), profile, projection.representationState.parameters.surfaceProbeRadius, projection.representationState.parameters.surfaceQuality, projection.representationState.parameters.dotDensity, 2);
+        if (!cached) this.performance.surfaceGenerations += 1;
+        this.surfaceCache.set(cacheRequest, points);
+        this.container?.setAttribute("data-renderer-surface-point-count", String(points.length));
         if (!this.surfaceCoordinator.isCurrent(generation)) continue;
+        const displayPoints = boundedDisplayPoints(points, 1600);
         const shape = this.viewer.addShape({ opacity: projection.representationState.parameters.dotOpacity, linewidth: projection.representationState.parameters.meshWidth });
-        for (const point of points) {
+        for (const point of displayPoints) {
           const atom = structure.atoms.find((candidate) => candidate.stableId === point.stableAtomId);
-          shape.addSphere({ center: point, radius: 0.055, color: atom ? resolveAtomColor(projection.color.mode, atom, structure, projection.color.customHex).color : "#8fd9ff" });
+          const pointColor = atom ? resolveAtomColor(projection.color.mode, atom, structure, projection.color.customHex).color : "#8fd9ff";
+          shape.addSphere({ center: point, radius: kind === "DOT_SURFACE" ? 0.68 : 0.82, color: projection.color.mode === "named" ? brightenHex(pointColor) : "#e8f7ff" });
         }
+        this.performance.dotGenerations += cached ? 0 : 1;
         this.dotSurfaceShapes.push(shape);
         this.container?.setAttribute("data-surface-ready", "true");
         this.container?.setAttribute("data-surface-state", "ready");
         continue;
       }
+      if (directive.primitive === "mesh") {
+        const request = surfaceRequestFor(structure, "MESH", directive.targetStableAtomIds, structure.atoms.map((atom) => atom.stableId), { probeRadius: 0, quality: projection.representationState.parameters.surfaceQuality, sampling: projection.representationState.parameters.dotDensity });
+        const cacheRequest = { ...request, profileId: directive.surfaceCacheKey ?? request.profileId };
+        const cached = this.surfaceCache.get(cacheRequest);
+        if (cached) this.performance.surfaceCacheHits += 1; else this.performance.surfaceCacheMisses += 1;
+        const points = cached ?? buildDotSurfacePoints(structure, directive.targetStableAtomIds, structure.atoms.map((atom) => atom.stableId), "VDW", 0, projection.representationState.parameters.surfaceQuality, Math.min(6, projection.representationState.parameters.dotDensity));
+        if (!cached) { this.surfaceCache.set(cacheRequest, points); this.performance.surfaceGenerations += 1; }
+        if (!this.surfaceCoordinator.isCurrent(generation)) { this.performance.staleSurfaceResults += 1; continue; }
+        this.container?.setAttribute("data-renderer-surface-point-count", String(points.length));
+        const shape = this.viewer.addShape({ opacity: projection.representationState.parameters.meshOpacity, linewidth: projection.representationState.parameters.meshWidth, color: "#83b8d7" });
+        const meshSegments = meshSegmentsFor(points);
+        const displaySegments = meshSegments.length <= 640 ? meshSegments : meshSegments.filter((_, index) => index % Math.ceil(meshSegments.length / 640) === 0).slice(0, 640);
+        for (const [start, end] of displaySegments) shape.addCylinder({ start, end, radius: 0.11, color: "#a9e2ff", opacity: projection.representationState.parameters.meshOpacity });
+        for (const point of boundedDisplayPoints(displaySegments.flatMap(([start]) => [start]), 320)) shape.addSphere({ center: point, radius: 0.36, wireframe: true, color: "#a9e2ff", opacity: projection.representationState.parameters.meshOpacity });
+        this.dotSurfaceShapes.push(shape);
+        this.performance.meshGenerations += cached ? 0 : 1;
+        this.container?.setAttribute("data-surface-ready", "true");
+        this.container?.setAttribute("data-surface-state", "ready");
+        continue;
+      }
       const surfaceType = kind === "SAS" ? "SAS" : kind === "SES" ? "SES" : "VDW";
-      const opacity = directive.primitive === "mesh" ? projection.representationState.parameters.meshOpacity : projection.representationState.parameters.surfaceOpacity;
+      const opacity = projection.representationState.parameters.surfaceOpacity;
       const firstTarget = structure.atoms.find((atom) => directive.targetStableAtomIds.includes(atom.stableId));
       const surfaceColor = firstTarget ? resolveAtomColor(projection.color.mode, firstTarget, structure, projection.color.customHex).color : "#829bb5";
-      const result = this.viewer.addSurface(surfaceType, { opacity, wireframe: directive.primitive === "mesh", color: surfaceColor }, target, contributors, undefined, (surfaceId: number) => {
+      const result = this.viewer.addSurface(surfaceType, { opacity, color: surfaceColor }, target, contributors, undefined, (surfaceId: number) => {
         if (!this.surfaceCoordinator.isCurrent(generation) || this.activeSurfaceKey !== nextKey) {
           this.viewer?.removeSurface(surfaceId);
           return;
@@ -392,7 +515,7 @@ export class ThreeDMolViewerAdapter {
         this.surfaceIds.push(surfaceId);
         this.container?.setAttribute("data-surface-ready", "true");
         this.container?.setAttribute("data-surface-state", "ready");
-        this.viewer?.render();
+          this.render();
       });
       if (typeof result === "number" && this.surfaceCoordinator.isCurrent(generation)) this.surfaceIds.push(result);
     }
@@ -404,7 +527,9 @@ export class ThreeDMolViewerAdapter {
     this.interactionShapes = [];
     const hoverId = projection.interaction.hoveredAtomId;
     const pickedId = projection.interaction.pickedAtomId;
-    const selectedIds = new Set(projection.interaction.selectedAtomIds);
+    // Keep selection state complete in the presentation model; cap only per-atom
+    // highlight geometry so selecting an entire large structure stays responsive.
+    const selectedIds = new Set(projection.interaction.selectedAtomIds.slice(0, 128));
     const addMarker = (stableId: string, color: string, radius: number, wireframe: boolean, opacity: number) => {
       const atom = this.structure!.atoms.find((candidate) => candidate.stableId === stableId);
       if (!atom) return;
@@ -412,7 +537,14 @@ export class ThreeDMolViewerAdapter {
     };
     if (hoverId) addMarker(hoverId, "#31d8c4", 0.18, true, 0.7);
     if (pickedId) addMarker(pickedId, "#e5ae32", 0.28, true, 0.8);
-    for (const selectedId of selectedIds) addMarker(selectedId, "#55d9ff", 0.22, false, 0.28);
+    if (selectedIds.size) {
+      const selectionShape = this.viewer.addShape({ color: "#55d9ff", opacity: 0.28 });
+      for (const selectedId of selectedIds) {
+        const atom = this.structure.atoms.find((candidate) => candidate.stableId === selectedId);
+        if (atom) selectionShape.addSphere({ center: atom, radius: 0.22, wireframe: false, opacity: 0.28 });
+      }
+      this.interactionShapes.push(selectionShape);
+    }
     for (const measurementId of projection.interaction.measurementPickAtomIds) addMarker(measurementId, "#f5c451", 0.23, true, 0.95);
   }
 
@@ -440,7 +572,7 @@ export class ThreeDMolViewerAdapter {
     if (this.projection) this.projectLabels(this.projection);
     this.projectMeasurementShapes();
     this.writeDiagnostics(this.diagnostics);
-    this.viewer.render();
+    this.render();
   }
 
   private projectMeasurementShapes(): void {
@@ -476,6 +608,8 @@ export class ThreeDMolViewerAdapter {
     this.container.dataset.rendererTraceContributors = String(diagnostics.traceContributors);
     this.container.dataset.rendererPuttyContributors = String(diagnostics.puttyContributors);
     this.container.dataset.rendererCrossContributors = String(diagnostics.crossContributors);
+    this.container.dataset.rendererNonbondedEligible = String(diagnostics.representation.NONBONDED.eligibleAtomCount ?? 0);
+    this.container.dataset.rendererNonbondedSphereEligible = String(diagnostics.representation.NB_SPHERES.eligibleAtomCount ?? 0);
     this.container.dataset.rendererWaterSpheres = String(diagnostics.waterSphereContributors);
     this.container.dataset.rendererIonSpheres = String(diagnostics.ionSphereContributors);
     this.container.dataset.rendererSurfaceContributors = String(diagnostics.surfaceContributors);
@@ -485,6 +619,15 @@ export class ThreeDMolViewerAdapter {
     this.container.dataset.rendererSurfaceCacheKey = diagnostics.surfaceCacheKey ?? "";
     this.container.dataset.rendererCanonicalBondSource = diagnostics.stickCylinderContributors > 0 || diagnostics.lineContributors > 0 ? "canonical" : "none";
     this.container.dataset.rendererModelLoads = String(this.modelLoadCount);
+    this.container.dataset.rendererViewerCreations = String(this.performance.viewerCreations);
+    this.container.dataset.rendererSceneRebuilds = String(this.performance.sceneRebuilds);
+    this.container.dataset.rendererRenderCalls = String(this.performance.renderCalls);
+    this.container.dataset.rendererSurfaceCacheHits = String(this.performance.surfaceCacheHits);
+    this.container.dataset.rendererSurfaceCacheMisses = String(this.performance.surfaceCacheMisses);
+    this.container.dataset.rendererSurfaceGenerations = String(this.performance.surfaceGenerations);
+    this.container.dataset.rendererMeshGenerations = String(this.performance.meshGenerations);
+    this.container.dataset.rendererDotGenerations = String(this.performance.dotGenerations);
+    this.container.dataset.rendererStaleSurfaceResults = String(this.performance.staleSurfaceResults);
     this.container.dataset.rendererGeneration = String(this.rendererGeneration);
     this.container.dataset.cameraProjection = this.cameraState.projectionMode;
     this.container.dataset.cameraClippingMode = this.cameraState.clippingMode;
@@ -508,5 +651,6 @@ export class ThreeDMolViewerAdapter {
   }
   private frameToCanonicalBounds(setBaseline: boolean): void { if (!this.viewer || !this.structure) return; const target = this.boundsForCameraTarget(false); if (!target) return; this.viewer.resize(); this.viewer.center(target.selection); this.viewer.zoomTo(target.selection); this.cameraPivot = target.center; this.appliedViewportShift = { x: 0, y: 0 }; this.applyClipping(); this.applyViewportTranslation(); const view = this.viewer.getView(); this.cameraState = { ...this.cameraState, view, defaultView: this.baselineView ? [...this.baselineView] : this.cameraState.defaultView, viewport: this.viewport }; if (setBaseline || !this.baselineView) { this.baselineView = [...view]; this.baselinePivot = { ...target.center }; this.cameraState = { ...this.cameraState, defaultView: [...view] }; } }
   private applyViewportTranslation(): void { if (!this.viewer || !this.viewport.width || !this.viewport.height) return; const targetX = (this.viewport.visibleLeft + this.viewport.visibleRight - this.viewport.width) / 2; const targetY = (this.viewport.visibleTop + this.viewport.visibleBottom - this.viewport.height) / 2; const deltaX = targetX - this.appliedViewportShift.x; const deltaY = targetY - this.appliedViewportShift.y; if (deltaX || deltaY) this.viewer.translate(deltaX, deltaY); this.appliedViewportShift = { x: targetX, y: targetY }; this.cameraState = { ...this.cameraState, view: this.viewer.getView(), viewport: this.viewport }; }
-  private renderCamera(): void { if (!this.viewer) return; if (this.cameraState.clippingMode === "auto") this.recalculateAutoClipping(); this.cameraState = { ...this.cameraState, view: this.viewer.getView(), defaultView: this.baselineView ? [...this.baselineView] : this.cameraState.defaultView, viewport: this.viewport }; if (this.container) this.writeDiagnostics(this.diagnostics); this.viewer.render(); }
+  private renderCamera(): void { if (!this.viewer) return; if (this.cameraState.clippingMode === "auto") this.recalculateAutoClipping(); this.cameraState = { ...this.cameraState, view: this.viewer.getView(), defaultView: this.baselineView ? [...this.baselineView] : this.cameraState.defaultView, viewport: this.viewport }; if (this.container) this.writeDiagnostics(this.diagnostics); this.render(); }
+  private render(): void { if (!this.viewer) return; this.performance.renderCalls += 1; this.viewer.render(); }
 }

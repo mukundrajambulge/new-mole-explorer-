@@ -181,6 +181,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
 .analysis-divider { height: 1px; margin: 0 13px; background: var(--line); }
 .analysis-tool-grid .quick-tool { position: relative; }
 .analysis-tool-grid .quick-tool small { color: var(--amber); font-size: 7px; line-height: 8px; }
+.analysis-results { display: flex; flex-direction: column; gap: 5px; max-height: 116px; margin: 0 10px 8px; overflow: auto; }
+.analysis-result { display: flex; flex-direction: column; gap: 3px; padding: 7px 8px; border: 1px solid rgba(49,216,196,.16); border-radius: 5px; background: rgba(49,216,196,.045); }
+.analysis-result > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.analysis-result strong { color: #a9e9dd; font-size: 9px; letter-spacing: .04em; }
+.analysis-result span { overflow: hidden; color: #8496a9; font-size: 8px; line-height: 1.35; text-overflow: ellipsis; }
+.analysis-result small { overflow: hidden; color: #637d88; font-family: ui-monospace, monospace; font-size: 7px; text-overflow: ellipsis; white-space: nowrap; }
 .quick-tool { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; padding: 10px 3px 8px; color: #bdc7d3; background: transparent; font-size: 10px; }
 .quick-tool:hover { color: var(--cyan); background: rgba(69, 145, 176, .08); border-radius: 7px; }
 .quick-icon { display: grid; place-items: center; width: 30px; height: 27px; color: #91c6ea; }

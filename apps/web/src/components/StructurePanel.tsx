@@ -2,15 +2,16 @@ import type { CanonicalAtom, StructureLoadResult } from "@molecular/contracts";
 import type { ActionId } from "../domain/registry";
 import { formatMeasurement, measurementStatus, type MeasurementKind, type MeasurementObject } from "../interaction/measurements";
 import type { RenderProjection } from "../rendering/renderProjection";
+import type { StructuralAnalysisResult } from "../analysis/structuralAnalysis";
 import { Icon } from "./Icon";
 
 const analysisTools: Array<{ label: string; icon: "target" | "activity" | "waves" | "shapes" | "box" | "circleHelp"; actionId: ActionId; capability?: string }> = [
-  { label: "H-Bonds", icon: "waves", actionId: "SELECTION.EVALUATE", capability: "Coming Soon" },
-  { label: "Contacts", icon: "shapes", actionId: "SELECTION.EVALUATE", capability: "Coming Soon" },
-  { label: "Clash", icon: "activity", actionId: "SELECTION.EVALUATE", capability: "Coming Soon" },
-  { label: "Pocket", icon: "box", actionId: "SELECTION.EVALUATE", capability: "Coming Soon" },
+  { label: "H-Bonds", icon: "waves", actionId: "ANALYSIS.H_BONDS" },
+  { label: "Contacts", icon: "shapes", actionId: "ANALYSIS.CONTACTS" },
+  { label: "Clash", icon: "activity", actionId: "ANALYSIS.CLASH" },
+  { label: "Pocket", icon: "box", actionId: "ANALYSIS.POCKET", capability: "Unavailable" },
   { label: "Surface", icon: "circleHelp", actionId: "REPRESENTATION.SURFACE" },
-  { label: "Center", icon: "target", actionId: "CANVAS.FOCUS" },
+  { label: "Center", icon: "target", actionId: "VIEW.CENTER" },
 ];
 
 type StructurePanelProps = {
@@ -28,6 +29,7 @@ type StructurePanelProps = {
   onMeasurementVisibility: (id: string, visible: boolean) => void;
   onMeasurementDelete: (id: string) => void;
   onMeasurementClear: () => void;
+  analysisResults: readonly StructuralAnalysisResult[];
   loading: boolean;
   error: string | null;
 };
@@ -56,11 +58,12 @@ const ContextCard = ({ selectedAtom, onAction, onClearSelection }: { selectedAto
   </section>
 );
 
-const MeasurementCard = ({ measurementMode, measurementSlots, measurements, structure, onAction, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear }: { measurementMode: MeasurementKind | null; measurementSlots: readonly string[]; measurements: readonly MeasurementObject[]; structure: StructureLoadResult | null; onAction: (actionId: ActionId) => void; onMeasurementMode: (kind: MeasurementKind | null) => void; onMeasurementVisibility: (id: string, visible: boolean) => void; onMeasurementDelete: (id: string) => void; onMeasurementClear: () => void }) => {
+const MeasurementCard = ({ measurementMode, measurementSlots, measurements, structure, onAction, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear, analysisResults }: { measurementMode: MeasurementKind | null; measurementSlots: readonly string[]; measurements: readonly MeasurementObject[]; structure: StructureLoadResult | null; onAction: (actionId: ActionId) => void; onMeasurementMode: (kind: MeasurementKind | null) => void; onMeasurementVisibility: (id: string, visible: boolean) => void; onMeasurementDelete: (id: string) => void; onMeasurementClear: () => void; analysisResults: readonly StructuralAnalysisResult[] }) => {
   const measurementKinds: MeasurementKind[] = ["DISTANCE", "ANGLE", "DIHEDRAL"];
   return <section className="panel-card analysis-card measurement-card" data-testid="measurements-panel">
     <div className="panel-heading"><div><span className="eyebrow">ANALYSIS &amp; INTERACTION</span><h2>Analysis &amp; Interaction</h2></div><span className="measurement-count" aria-label={`${measurements.length} measurements`}>{measurements.length}</span></div>
     <div className="analysis-tool-grid">{analysisTools.map((tool) => <button className="quick-tool" key={tool.label} onClick={() => onAction(tool.actionId)} data-action-id={tool.actionId} title={tool.capability ? `${tool.label} — ${tool.capability}` : tool.label}><span className="quick-icon"><Icon name={tool.icon} size={18} /></span><span>{tool.label}</span>{tool.capability && <small>{tool.capability}</small>}</button>)}</div>
+    {analysisResults.length > 0 && <div className="analysis-results" data-testid="analysis-results">{analysisResults.map((result) => <div className="analysis-result" key={result.kind} data-analysis-kind={result.kind}><div><strong>{result.kind === "H_BONDS" ? "H-BONDS" : result.kind} · {result.status === "VALID_EMPTY" ? "EMPTY" : result.items.length}</strong><span>{result.diagnostic}</span></div><small>{result.profileId}</small></div>)}</div>}
     <div className="analysis-divider" />
     <div className="analysis-subheading"><span>Measurements</span><span className="capability-tag">CANONICAL PICKS</span></div>
     <div className="measurement-toolbar">{measurementKinds.map((kind) => <button type="button" className={`measurement-button ${measurementMode === kind ? "measurement-button--active" : ""}`} key={kind} aria-pressed={measurementMode === kind} onClick={() => { if (!structure) { onAction(`MEASURE.${kind}` as ActionId); return; } onMeasurementMode(measurementMode === kind ? null : kind); }}>{measurementLabel(kind)}</button>)}</div>
@@ -70,7 +73,7 @@ const MeasurementCard = ({ measurementMode, measurementSlots, measurements, stru
   </section>;
 };
 
-export const StructurePanel = ({ collapsed, onToggle, onAction, structure, projection, selectedAtom, onClearSelection, measurementMode, measurementSlots, measurements, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear, loading, error }: StructurePanelProps) => {
+export const StructurePanel = ({ collapsed, onToggle, onAction, structure, projection, selectedAtom, onClearSelection, measurementMode, measurementSlots, measurements, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear, analysisResults, loading, error }: StructurePanelProps) => {
   const counts = structure?.structure.counts;
   const components = [
     { label: "Protein", count: counts?.polymerAtoms ?? 0, tone: "blue", visible: projection.showProtein },
@@ -91,6 +94,6 @@ export const StructurePanel = ({ collapsed, onToggle, onAction, structure, proje
     </section>
     <section className="panel-card components-card"><div className="panel-heading"><div><span className="eyebrow">STRUCTURE INVENTORY</span><h2>Components</h2></div><span className="capability-tag">Projection only</span></div><div className="component-list">{components.map((component) => <div className="component-row" key={component.label}><span className={`component-dot component-dot--${component.tone} ${component.visible ? "component-dot--visible" : "component-dot--hidden"}`} aria-hidden="true" /><span>{component.label}</span><span className="component-count">{formatCount(component.count)}</span></div>)}</div></section>
     <ContextCard selectedAtom={selectedAtom} onAction={onAction} onClearSelection={onClearSelection} />
-    <MeasurementCard measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} structure={structure} onAction={onAction} onMeasurementMode={onMeasurementMode} onMeasurementVisibility={onMeasurementVisibility} onMeasurementDelete={onMeasurementDelete} onMeasurementClear={onMeasurementClear} />
+    <MeasurementCard measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} structure={structure} onAction={onAction} onMeasurementMode={onMeasurementMode} onMeasurementVisibility={onMeasurementVisibility} onMeasurementDelete={onMeasurementDelete} onMeasurementClear={onMeasurementClear} analysisResults={analysisResults} />
   </aside>;
 };

@@ -61,6 +61,10 @@ export const ACTION_IDS = {
   MEASURE_ANGLE: "MEASURE.ANGLE",
   MEASURE_DIHEDRAL: "MEASURE.DIHEDRAL",
   MEASURE_CLEAR: "MEASURE.CLEAR",
+  ANALYSIS_H_BONDS: "ANALYSIS.H_BONDS",
+  ANALYSIS_CONTACTS: "ANALYSIS.CONTACTS",
+  ANALYSIS_CLASH: "ANALYSIS.CLASH",
+  ANALYSIS_POCKET: "ANALYSIS.POCKET",
   HELP_OPEN: "HELP.OPEN",
 } as const;
 
@@ -68,7 +72,7 @@ export type ActionId = (typeof ACTION_IDS)[keyof typeof ACTION_IDS];
 
 export type ActionDefinition = Capability & {
   id: ActionId;
-  group: "WORKSPACE" | "FILE" | "SELECTION" | "CANVAS" | "REPRESENTATION" | "COLOR" | "MEASURE" | "EDIT" | "HISTORY" | "DOCKING" | "VIEW" | "HELP";
+  group: "WORKSPACE" | "FILE" | "SELECTION" | "CANVAS" | "REPRESENTATION" | "COLOR" | "MEASURE" | "ANALYSIS" | "EDIT" | "HISTORY" | "DOCKING" | "VIEW" | "HELP";
 };
 
 const supported = (id: ActionId, group: ActionDefinition["group"], label: string, description: string): ActionDefinition => ({
@@ -91,6 +95,14 @@ const unavailable = (id: ActionId, group: ActionDefinition["group"], label: stri
   id,
   group,
   state: "UNAVAILABLE",
+  label,
+  description,
+});
+
+const limited = (id: ActionId, group: ActionDefinition["group"], label: string, description: string): ActionDefinition => ({
+  id,
+  group,
+  state: "SUPPORTED_WITH_LIMITATIONS",
   label,
   description,
 });
@@ -139,6 +151,10 @@ export const ACTION_REGISTRY: Record<ActionId, ActionDefinition> = {
   [ACTION_IDS.MEASURE_ANGLE]: supported(ACTION_IDS.MEASURE_ANGLE, "MEASURE", "Measure angle", "Accumulate three ordered stable atom picks and create a persistent angle object."),
   [ACTION_IDS.MEASURE_DIHEDRAL]: supported(ACTION_IDS.MEASURE_DIHEDRAL, "MEASURE", "Measure dihedral", "Accumulate four ordered stable atom picks and create a persistent dihedral object."),
   [ACTION_IDS.MEASURE_CLEAR]: supported(ACTION_IDS.MEASURE_CLEAR, "MEASURE", "Clear measurement picks", "Clear transient measurement pick slots without deleting measurements."),
+  [ACTION_IDS.ANALYSIS_H_BONDS]: limited(ACTION_IDS.ANALYSIS_H_BONDS, "ANALYSIS", "H-bonds", "Show inferred donor–acceptor contacts from canonical coordinates using the bounded 3.5 Å profile."),
+  [ACTION_IDS.ANALYSIS_CONTACTS]: limited(ACTION_IDS.ANALYSIS_CONTACTS, "ANALYSIS", "Contacts", "Show non-bonded heavy-atom contacts within the bounded 4.0 Å profile."),
+  [ACTION_IDS.ANALYSIS_CLASH]: limited(ACTION_IDS.ANALYSIS_CLASH, "ANALYSIS", "Clash", "Show non-bonded heavy-atom pairs with more than 0.4 Å VDW overlap."),
+  [ACTION_IDS.ANALYSIS_POCKET]: unavailable(ACTION_IDS.ANALYSIS_POCKET, "ANALYSIS", "Pocket", "Unavailable: no validated pocket-detection algorithm or research profile is admitted in this gate."),
   [ACTION_IDS.EDIT_ATOM_DELETE]: unavailable(ACTION_IDS.EDIT_ATOM_DELETE, "EDIT", "Delete atom", "Scientific molecular editing is intentionally unavailable in G1B."),
   [ACTION_IDS.EDIT_BOND_CREATE]: unavailable(ACTION_IDS.EDIT_BOND_CREATE, "EDIT", "Create bond", "Scientific molecular editing is intentionally unavailable in G1B."),
   [ACTION_IDS.EDIT_BOND_DELETE]: unavailable(ACTION_IDS.EDIT_BOND_DELETE, "EDIT", "Delete bond", "Scientific molecular editing is intentionally unavailable in G1B."),
