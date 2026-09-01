@@ -7,8 +7,8 @@
 - Branch: `fix/visualization-final-closure`
 - Remote used: `new-origin` → `https://github.com/mukundrajambulge/new-mole-explorer-.git`
 - Base/start SHA: `b436c91c1fe425e981818c51a7fcf122475a5a8a`
-- Implementation ending SHA: recorded after the implementation commit below
-- Final repository HEAD: recorded after the closure-report commit below
+- Implementation ending SHA: `9d3e99e2a6222f0e1dcc5a5b5a2f727a984702b5`
+- Final repository HEAD: the follow-up closure-report commit; the exact final HEAD is included in the handoff after that commit because a commit cannot contain its own hash.
 - Legacy application on port 5173: not modified
 
 The attached V-FINAL brief was treated as the implementation gate. Earlier pasted briefs and screenshots were treated as historical context/reference material, not as additional authority to expand this gate into editing, docking, HTS, alignment, or R-PYMOL-07 work.
