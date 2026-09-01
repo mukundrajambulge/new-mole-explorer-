@@ -19,6 +19,10 @@ const structure = {
 } satisfies CanonicalMolecularStructure;
 
 describe("G1B renderer-neutral presentation state", () => {
+  it("starts new structures with a clear ordered-polymer color presentation", () => {
+    expect(createDefaultRenderProjection().color.mode).toBe("rainbow");
+  });
+
   it("keeps licorice and ball-and-stick as distinct canonical masks", () => {
     expect(REPRESENTATION_PRESETS.LICORICE).not.toBe(REPRESENTATION_PRESETS.BALL_AND_STICK);
     expect(REPRESENTATION_PRESETS.LICORICE & REPRESENTATION_MASKS.NB_SPHERES).toBeTruthy();

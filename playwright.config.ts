@@ -3,6 +3,9 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
+  // Real 3Dmol surface generation is GPU/memory intensive; two contexts keep
+  // the visual suite deterministic on the supported local runner.
+  workers: 2,
   reporter: "list",
   use: { baseURL: "http://localhost:3101", trace: "on-first-retry" },
   webServer: [

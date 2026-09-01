@@ -1,4 +1,4 @@
-import { createViewer, Vector2, type AtomSelectionSpec, type AtomSpec, type AtomStyleSpec, type GLShape, type GLViewer } from "3dmol";
+import { createViewer, Vector2, type AtomSelectionSpec, type AtomSpec, type AtomStyleSpec, type GLShape, type GLViewer, type SurfaceStyleSpec } from "3dmol";
 import type { CanonicalMolecularStructure, StructureLoadResult } from "@molecular/contracts";
 import { colorRegistry } from "./colorRegistry";
 import { resolveAtomColor } from "./colorSchemes";
@@ -38,8 +38,8 @@ const styleFor = (representation: StyleRepresentation, projection: RenderProject
     case "spheres": return { sphere: { scale: profile === "water" ? 0.18 : profile === "nonbonded" ? 0.15 : profile === "ball" ? 0.28 : profile === "space" ? projection.representationState.parameters.sphereScale : 0.3, opacity: projection.representationState.parameters.sphereOpacity, ...atomColor } } as AtomStyleSpec;
     case "cross": return { cross: { scale: 0.35, radius: 0.12, opacity: projection.representationState.parameters.nonbondedOpacity, ...atomColor } } as AtomStyleSpec;
     case "cartoon": {
-      const cartoonStyle = profile === "ribbon" ? "oval" : profile === "trace" || profile === "putty" ? "trace" : undefined;
-      return { cartoon: { ...(cartoonStyle ? { style: cartoonStyle } : {}), ...atomColor, arrows: true, thickness: thicknessOverride ?? projection.representationState.parameters.cartoonThickness, opacity: profile === "ribbon" ? projection.representationState.parameters.ribbonOpacity : projection.representationState.parameters.cartoonOpacity } } as AtomStyleSpec;
+      const cartoonStyle = profile === "ribbon" || profile === "putty" ? "oval" : profile === "trace" ? "trace" : undefined;
+      return { cartoon: { ...(cartoonStyle ? { style: cartoonStyle } : {}), ...(profile === "putty" ? { tubes: true } : {}), ...atomColor, arrows: true, thickness: thicknessOverride ?? projection.representationState.parameters.cartoonThickness, opacity: profile === "ribbon" ? projection.representationState.parameters.ribbonOpacity : projection.representationState.parameters.cartoonOpacity } } as AtomStyleSpec;
     }
     case "licorice": return { stick: { radius: 0.23, opacity: projection.representationState.parameters.stickOpacity, ...atomColor } } as AtomStyleSpec;
   }
@@ -47,30 +47,6 @@ const styleFor = (representation: StyleRepresentation, projection: RenderProject
 
 const orderNumber = (order: CanonicalMolecularStructure["bonds"][number]["order"]): number => order === "DOUBLE" ? 2 : order === "TRIPLE" ? 3 : order === "AROMATIC" ? 4 : 1;
 const secondaryCode = (value: CanonicalMolecularStructure["atoms"][number]["secondaryStructure"]): string | undefined => value === "HELIX" ? "h" : value === "SHEET" ? "s" : value === "LOOP" ? "c" : undefined;
-
-/** Connect nearby exposed samples into a visible renderer-native mesh lattice. */
-const meshSegmentsFor = (points: readonly SurfacePoint[]): Array<[SurfacePoint, SurfacePoint]> => {
-  const byAtom = new Map<string, SurfacePoint[]>();
-  points.forEach((point) => byAtom.set(point.stableAtomId, [...(byAtom.get(point.stableAtomId) ?? []), point]));
-  const segments: Array<[SurfacePoint, SurfacePoint]> = [];
-  const seen = new Set<string>();
-  for (const atomPoints of byAtom.values()) {
-    for (const [index, point] of atomPoints.entries()) {
-      const nearest = atomPoints
-        .map((candidate, candidateIndex) => ({ candidate, candidateIndex, distance: Math.hypot(point.x - candidate.x, point.y - candidate.y, point.z - candidate.z) }))
-        .filter((candidate) => candidate.candidateIndex !== index)
-        .sort((left, right) => left.distance - right.distance)
-        .slice(0, 1);
-      for (const candidate of nearest) {
-        const key = [index, candidate.candidateIndex].sort((a, b) => a - b).join(":");
-        if (seen.has(`${point.stableAtomId}:${key}`)) continue;
-        seen.add(`${point.stableAtomId}:${key}`);
-        segments.push([point, candidate.candidate]);
-      }
-    }
-  }
-  return segments;
-};
 
 const boundedDisplayPoints = (points: readonly SurfacePoint[], maxPoints: number): SurfacePoint[] => {
   if (points.length <= maxPoints) return [...points];
@@ -84,6 +60,24 @@ const brightenHex = (hex: string, amount = 0.65): string => {
   const channel = (offset: number): number => Math.min(255, Math.round(parseInt(normalized.slice(offset, offset + 2), 16) + (255 - parseInt(normalized.slice(offset, offset + 2), 16)) * amount));
   return `#${[0, 2, 4].map((offset) => channel(offset).toString(16).padStart(2, "0")).join("")}`;
 };
+
+const quantizeHex = (hex: string, step = 32): string => {
+  const normalized = hex.replace("#", "");
+  if (!/^[0-9a-f]{6}$/i.test(normalized)) return hex;
+  const channel = (offset: number): number => Math.min(255, Math.round(parseInt(normalized.slice(offset, offset + 2), 16) / step) * step);
+  return `#${[0, 2, 4].map((offset) => channel(offset).toString(16).padStart(2, "0")).join("")}`;
+};
+
+const surfaceStyleFor = (projection: RenderProjection, structure: CanonicalMolecularStructure, opacity: number, wireframe = false): SurfaceStyleSpec => ({
+  opacity,
+  ...(wireframe ? { wireframe: true, wireframeLinewidth: projection.representationState.parameters.meshWidth } : { onesided: true }),
+  colorscheme: {
+    prop: "canonicalStableId",
+    map: Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, projection.color.mode === "named"
+      ? colorRegistry.cssColor(projection.color) ?? resolveAtomColor(projection.color.mode, atom, structure, projection.color.customHex).color
+      : resolveAtomColor(projection.color.mode, atom, structure, projection.color.customHex).color])),
+  },
+}) as SurfaceStyleSpec;
 
 const boundedAnalysisOverlays = (overlays: readonly AnalysisOverlay[]): AnalysisOverlay[] => {
   const limits: Record<AnalysisOverlay["kind"], number> = { H_BONDS: 24, CONTACTS: 24, CLASH: 24 };
@@ -117,6 +111,7 @@ export class ThreeDMolViewerAdapter {
   private analysisOverlays: readonly AnalysisOverlay[] = [];
   private dotSurfaceShapes: GLShape[] = [];
   private surfaceIds: number[] = [];
+  private surfaceKinds: Array<"surface" | "mesh"> = [];
   private activeSurfaceKey: string | null = null;
   private activeSurfaceGeometryKey: string | null = null;
   private readonly surfaceCache = new SurfaceGeometryCache<readonly SurfacePoint[]>();
@@ -188,6 +183,7 @@ export class ThreeDMolViewerAdapter {
     this.viewer!.removeAllShapes();
     this.surfaceCoordinator.invalidate();
     this.surfaceIds = [];
+    this.surfaceKinds = [];
     this.dotSurfaceShapes = [];
     this.activeSurfaceKey = null;
     this.activeSurfaceGeometryKey = null;
@@ -299,7 +295,7 @@ export class ThreeDMolViewerAdapter {
     this.resizeObserver?.disconnect(); this.resizeObserver = null;
     if (this.viewer) { this.viewer.clear(); this.viewer = null; }
     this.cameraController = null;
-    this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
+    this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceKinds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
   }
   getDiagnostics(): RenderProjectionDiagnostics { return this.diagnostics; }
 
@@ -417,14 +413,15 @@ export class ThreeDMolViewerAdapter {
   private applySurfaceDirectives(diagnostics: RenderProjectionDiagnostics, projection: RenderProjection): void {
     if (!this.viewer || !this.structure) return;
     const surfaceDirectives = diagnostics.directives.filter((directive) => directive.primitive === "surface" || directive.primitive === "mesh" || directive.primitive === "dots");
-    const materialKey = JSON.stringify({ opacity: projection.representation === "mesh" ? projection.representationState.parameters.meshOpacity : projection.representation === "dots" || projection.representation === "dot-surface" ? projection.representationState.parameters.dotOpacity : projection.representationState.parameters.surfaceOpacity, meshWidth: projection.representationState.parameters.meshWidth, color: projection.color });
-    const geometryKey = surfaceDirectives.map((directive) => directive.surfaceCacheKey ?? "").join("||");
+    const materialKey = JSON.stringify(surfaceDirectives.map((directive) => ({ primitive: directive.primitive, opacity: directive.primitive === "mesh" ? projection.representationState.parameters.meshOpacity : directive.primitive === "dots" ? projection.representationState.parameters.dotOpacity : projection.representationState.parameters.surfaceOpacity, meshWidth: directive.primitive === "mesh" ? projection.representationState.parameters.meshWidth : undefined, color: projection.color })));
+    const geometryKey = surfaceDirectives.map((directive) => `${directive.surfaceCacheKey ?? ""}${directive.primitive === "dots" ? `::color:${JSON.stringify(projection.color)}` : ""}`).join("||");
     const nextKey = `${geometryKey}::${materialKey}`;
     if (!surfaceDirectives.length) {
       this.viewer.removeAllSurfaces();
       this.dotSurfaceShapes.forEach((shape) => this.viewer?.removeShape(shape));
       this.dotSurfaceShapes = [];
       this.surfaceIds = [];
+      this.surfaceKinds = [];
       this.activeSurfaceKey = null;
       this.activeSurfaceGeometryKey = null;
       this.surfaceCoordinator.invalidate();
@@ -435,13 +432,21 @@ export class ThreeDMolViewerAdapter {
       return;
     }
     if (this.activeSurfaceKey === nextKey) {
-      for (const surfaceId of this.surfaceIds) this.viewer.setSurfaceMaterialStyle(surfaceId, { opacity: projection.representation === "mesh" ? projection.representationState.parameters.meshOpacity : projection.representationState.parameters.surfaceOpacity });
+      this.surfaceIds.forEach((surfaceId, index) => {
+        const kind = this.surfaceKinds[index] ?? "surface";
+        const opacity = kind === "mesh" ? projection.representationState.parameters.meshOpacity : projection.representationState.parameters.surfaceOpacity;
+        this.viewer!.setSurfaceMaterialStyle(surfaceId, surfaceStyleFor(projection, this.structure!, opacity, kind === "mesh"));
+      });
       return;
     }
     if (this.activeSurfaceGeometryKey === geometryKey) {
-      const opacity = projection.representation === "mesh" ? projection.representationState.parameters.meshOpacity : projection.representationState.parameters.surfaceOpacity;
-      for (const surfaceId of this.surfaceIds) this.viewer.setSurfaceMaterialStyle(surfaceId, { opacity });
-      this.dotSurfaceShapes.forEach((shape) => shape.updateStyle({ opacity, linewidth: projection.representationState.parameters.meshWidth }));
+      this.surfaceIds.forEach((surfaceId, index) => {
+        const kind = this.surfaceKinds[index] ?? "surface";
+        const opacity = kind === "mesh" ? projection.representationState.parameters.meshOpacity : projection.representationState.parameters.surfaceOpacity;
+        this.viewer!.setSurfaceMaterialStyle(surfaceId, surfaceStyleFor(projection, this.structure!, opacity, kind === "mesh"));
+      });
+      const dotOpacity = projection.representationState.parameters.dotOpacity;
+      this.dotSurfaceShapes.forEach((shape) => shape.updateStyle({ opacity: dotOpacity }));
       this.activeSurfaceKey = nextKey;
       return;
     }
@@ -449,12 +454,14 @@ export class ThreeDMolViewerAdapter {
     this.dotSurfaceShapes.forEach((shape) => this.viewer?.removeShape(shape));
     this.dotSurfaceShapes = [];
     this.surfaceIds = [];
+    this.surfaceKinds = [];
     this.activeSurfaceKey = nextKey;
     this.activeSurfaceGeometryKey = geometryKey;
     const generation = this.surfaceCoordinator.begin();
     this.container?.setAttribute("data-surface-generation", String(generation));
     this.container?.setAttribute("data-surface-state", "generating");
     const structure = this.structure;
+    const atomByStableId = new Map(structure.atoms.map((atom) => [atom.stableId, atom]));
     for (const directive of surfaceDirectives) {
       const target = this.canonicalSelection((atom) => directive.targetStableAtomIds.includes(atom.stableId));
       const contributors = this.canonicalSelection(() => true);
@@ -471,53 +478,62 @@ export class ThreeDMolViewerAdapter {
         this.container?.setAttribute("data-renderer-surface-point-count", String(points.length));
         if (!this.surfaceCoordinator.isCurrent(generation)) continue;
         const displayPoints = boundedDisplayPoints(points, 1600);
-        const shape = this.viewer.addShape({ opacity: projection.representationState.parameters.dotOpacity, linewidth: projection.representationState.parameters.meshWidth });
+        const pointBatches = new Map<string, SurfacePoint[]>();
         for (const point of displayPoints) {
-          const atom = structure.atoms.find((candidate) => candidate.stableId === point.stableAtomId);
-          const pointColor = atom ? resolveAtomColor(projection.color.mode, atom, structure, projection.color.customHex).color : "#8fd9ff";
-          shape.addSphere({ center: point, radius: kind === "DOT_SURFACE" ? 0.68 : 0.82, color: projection.color.mode === "named" ? brightenHex(pointColor) : "#e8f7ff" });
+          const atom = atomByStableId.get(point.stableAtomId);
+          const pointColor = atom
+            ? projection.color.mode === "named"
+              ? colorRegistry.cssColor(projection.color) ?? resolveAtomColor(projection.color.mode, atom, structure, projection.color.customHex).color
+              : resolveAtomColor(projection.color.mode, atom, structure, projection.color.customHex).color
+            : "#8fd9ff";
+          const batchColor = brightenHex(quantizeHex(pointColor));
+          pointBatches.set(batchColor, [...(pointBatches.get(batchColor) ?? []), point]);
+        }
+        for (const [batchColor, batchPoints] of pointBatches) {
+          const shape = this.viewer.addShape({ color: batchColor, opacity: projection.representationState.parameters.dotOpacity, linewidth: projection.representationState.parameters.meshWidth });
+          for (const point of batchPoints) shape.addSphere({ center: point, radius: kind === "DOT_SURFACE" ? 0.68 : 0.82 });
+          this.dotSurfaceShapes.push(shape);
         }
         this.performance.dotGenerations += cached ? 0 : 1;
-        this.dotSurfaceShapes.push(shape);
         this.container?.setAttribute("data-surface-ready", "true");
         this.container?.setAttribute("data-surface-state", "ready");
         continue;
       }
       if (directive.primitive === "mesh") {
-        const request = surfaceRequestFor(structure, "MESH", directive.targetStableAtomIds, structure.atoms.map((atom) => atom.stableId), { probeRadius: 0, quality: projection.representationState.parameters.surfaceQuality, sampling: projection.representationState.parameters.dotDensity });
-        const cacheRequest = { ...request, profileId: directive.surfaceCacheKey ?? request.profileId };
-        const cached = this.surfaceCache.get(cacheRequest);
-        if (cached) this.performance.surfaceCacheHits += 1; else this.performance.surfaceCacheMisses += 1;
-        const points = cached ?? buildDotSurfacePoints(structure, directive.targetStableAtomIds, structure.atoms.map((atom) => atom.stableId), "VDW", 0, projection.representationState.parameters.surfaceQuality, Math.min(6, projection.representationState.parameters.dotDensity));
-        if (!cached) { this.surfaceCache.set(cacheRequest, points); this.performance.surfaceGenerations += 1; }
-        if (!this.surfaceCoordinator.isCurrent(generation)) { this.performance.staleSurfaceResults += 1; continue; }
-        this.container?.setAttribute("data-renderer-surface-point-count", String(points.length));
-        const shape = this.viewer.addShape({ opacity: projection.representationState.parameters.meshOpacity, linewidth: projection.representationState.parameters.meshWidth, color: "#83b8d7" });
-        const meshSegments = meshSegmentsFor(points);
-        const displaySegments = meshSegments.length <= 640 ? meshSegments : meshSegments.filter((_, index) => index % Math.ceil(meshSegments.length / 640) === 0).slice(0, 640);
-        for (const [start, end] of displaySegments) shape.addCylinder({ start, end, radius: 0.11, color: "#a9e2ff", opacity: projection.representationState.parameters.meshOpacity });
-        for (const point of boundedDisplayPoints(displaySegments.flatMap(([start]) => [start]), 320)) shape.addSphere({ center: point, radius: 0.36, wireframe: true, color: "#a9e2ff", opacity: projection.representationState.parameters.meshOpacity });
-        this.dotSurfaceShapes.push(shape);
-        this.performance.meshGenerations += cached ? 0 : 1;
-        this.container?.setAttribute("data-surface-ready", "true");
-        this.container?.setAttribute("data-surface-state", "ready");
+        const meshStyle = surfaceStyleFor(projection, structure, projection.representationState.parameters.meshOpacity, true);
+        const result = this.viewer.addSurface("VDW", meshStyle, target, contributors, undefined, (surfaceId: number) => {
+          if (!this.surfaceCoordinator.isCurrent(generation) || this.activeSurfaceKey !== nextKey) {
+            this.viewer?.removeSurface(surfaceId);
+            return;
+          }
+          this.surfaceIds.push(surfaceId);
+          this.surfaceKinds.push("mesh");
+          this.performance.meshGenerations += 1;
+          this.writeDiagnostics(this.diagnostics);
+          this.container?.setAttribute("data-renderer-surface-point-count", "native");
+          this.container?.setAttribute("data-surface-ready", "true");
+          this.container?.setAttribute("data-surface-state", "ready");
+          this.render();
+        });
+        void result;
         continue;
       }
       const surfaceType = kind === "SAS" ? "SAS" : kind === "SES" ? "SES" : "VDW";
       const opacity = projection.representationState.parameters.surfaceOpacity;
-      const firstTarget = structure.atoms.find((atom) => directive.targetStableAtomIds.includes(atom.stableId));
-      const surfaceColor = firstTarget ? resolveAtomColor(projection.color.mode, firstTarget, structure, projection.color.customHex).color : "#829bb5";
-      const result = this.viewer.addSurface(surfaceType, { opacity, color: surfaceColor }, target, contributors, undefined, (surfaceId: number) => {
+      const result = this.viewer.addSurface(surfaceType, surfaceStyleFor(projection, structure, opacity), target, contributors, undefined, (surfaceId: number) => {
         if (!this.surfaceCoordinator.isCurrent(generation) || this.activeSurfaceKey !== nextKey) {
           this.viewer?.removeSurface(surfaceId);
           return;
         }
-        this.surfaceIds.push(surfaceId);
+        if (!this.surfaceIds.includes(surfaceId)) {
+          this.surfaceIds.push(surfaceId);
+          this.surfaceKinds.push("surface");
+        }
         this.container?.setAttribute("data-surface-ready", "true");
         this.container?.setAttribute("data-surface-state", "ready");
           this.render();
       });
-      if (typeof result === "number" && this.surfaceCoordinator.isCurrent(generation)) this.surfaceIds.push(result);
+      if (typeof result === "number" && this.surfaceCoordinator.isCurrent(generation)) { this.surfaceIds.push(result); this.surfaceKinds.push("surface"); }
     }
   }
 

@@ -73,6 +73,33 @@ test("V-FINAL updates surface material opacity without rebuilding the canonical 
   await expect(target).toHaveAttribute("data-renderer-surface-generations", generations ?? "1");
 });
 
+test("V-FINAL keeps rapid representation switching on the final projection", async ({ page }) => {
+  await loadFixture(page);
+  const target = viewer(page);
+  const style = page.getByRole("combobox", { name: "Style" });
+  await style.selectOption("dots");
+  await style.selectOption("mesh");
+  await style.selectOption("solvent-accessible-surface");
+  await style.selectOption("cartoon");
+  await expect(target).toHaveAttribute("data-renderer-style-profile", "cartoon");
+  await expect(target).toHaveAttribute("data-renderer-model-loads", "1");
+  await expect(target).not.toHaveAttribute("data-surface-state", "ready");
+});
+
+test("V-FINAL exposes only relevant representation controls", async ({ page }) => {
+  await loadFixture(page);
+  const settings = page.getByText("Representation Settings", { exact: true });
+  await settings.click();
+  await expect(page.getByRole("slider", { name: "Cartoon thickness" })).toBeVisible();
+  await expect(page.getByRole("slider", { name: "Dot density" })).toHaveCount(0);
+  await page.getByRole("combobox", { name: "Style" }).selectOption("mesh");
+  await expect(page.getByRole("slider", { name: "Mesh width" })).toBeVisible();
+  await expect(page.getByRole("slider", { name: "Dot density" })).toHaveCount(0);
+  await page.getByRole("combobox", { name: "Style" }).selectOption("dots");
+  await expect(page.getByRole("slider", { name: "Dot density" })).toBeVisible();
+  await expect(page.getByRole("slider", { name: "Mesh width" })).toHaveCount(0);
+});
+
 test("V-FINAL Center routes through the camera controller and labels remain canonical", async ({ page }) => {
   await loadFixture(page);
   const target = viewer(page);

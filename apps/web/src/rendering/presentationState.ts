@@ -93,7 +93,7 @@ export type RenderProjection = {
   interaction: InteractionState;
 };
 
-export const DEFAULT_COLOR: ColorState = { mode: "element", colorId: null, customHex: null, profileRef: "PYMOL_OSS_5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69", atomColors: {}, objectColors: {}, representationOverrides: {} };
+export const DEFAULT_COLOR: ColorState = { mode: "rainbow", colorId: null, customHex: null, profileRef: "PYMOL_OSS_5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69", atomColors: {}, objectColors: {}, representationOverrides: {} };
 export const DEFAULT_BACKGROUND: BackgroundColorState = { preset: "Black", color: "#05070a" };
 export const DEFAULT_CAMERA: CameraState = { view: null, defaultView: null, projectionMode: "perspective", fov: 20, nearClip: 0.1, farClip: 1000, clippingMode: "auto", viewport: null };
 export const DEFAULT_INTERACTION: InteractionState = { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] };

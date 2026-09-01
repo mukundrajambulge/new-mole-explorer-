@@ -11,7 +11,7 @@ The canonical representation masks are `LINES`, `STICKS`, `SPHERES`, `CARTOON`, 
 | Van der Waals Surface | `surface.vdw.element-vdw.v1` | target + canonical coordinate occluders | 3Dmol native surface | SUPPORTED_WITH_LIMITATIONS |
 | Solvent-Accessible Surface | `surface.sas.element-vdw.probe-1.4A.v1` | target + canonical coordinate occluders | 3Dmol native surface with explicit probe | SUPPORTED_WITH_LIMITATIONS |
 | Solvent-Excluded Surface | `surface.ses.element-vdw.probe-1.4A.v1` | target + canonical coordinate occluders | 3Dmol native surface with explicit probe | SUPPORTED_WITH_LIMITATIONS |
-| Mesh | `surface-mesh.v2` | target + canonical coordinate occluders | application-native exposed VDW sample points joined as a wire/lattice network | SUPPORTED_WITH_LIMITATIONS |
+| Mesh | `surface-mesh.v3` | target + canonical coordinate occluders | 3Dmol-native VDW surface rendered as a wireframe mesh | SUPPORTED_WITH_LIMITATIONS |
 | Dots | `surface-dots.v1` | target + canonical coordinate occluders | deterministic canonical exposed-point projection | SUPPORTED_WITH_LIMITATIONS |
 | Dot Surface | `surface-dot-surface.v1` | target + canonical coordinate occluders | deterministic probe-expanded exposed-point projection | SUPPORTED_WITH_LIMITATIONS |
 | Cartoon | `canonical-polymer-cartoon.v1` | canonical polymer hierarchy/order | 3Dmol cartoon | SUPPORTED_WITH_LIMITATIONS |

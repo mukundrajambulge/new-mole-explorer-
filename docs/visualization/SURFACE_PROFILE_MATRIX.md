@@ -7,7 +7,7 @@ Each profile has distinct parameters, cache identity, target/contributor semanti
 | VDW | `surface.vdw.element-vdw.v1` | canonical element VDW radius | 0.0 Å | all canonical coordinate atoms | configurable quality | 3Dmol native VDW surface | SUPPORTED_WITH_LIMITATIONS |
 | SAS | `surface.sas.element-vdw.probe-1.4A.v1` | canonical element VDW radius | configurable, default 1.4 Å | all canonical coordinate atoms | configurable quality | 3Dmol native surface with probe | SUPPORTED_WITH_LIMITATIONS |
 | SES | `surface.ses.element-vdw.probe-1.4A.v1` | canonical element VDW radius | configurable, default 1.4 Å | all canonical coordinate atoms | configurable quality | 3Dmol native surface with probe | SUPPORTED_WITH_LIMITATIONS |
-| MESH | `surface-mesh.v2` | canonical element VDW radius | 0.0 Å | all canonical coordinate atoms | configurable quality | Mole Explorer native exposed-point lattice built from VDW samples | SUPPORTED_WITH_LIMITATIONS |
+| MESH | `surface-mesh.v3` | canonical element VDW radius | 0.0 Å | canonical VDW surface atoms | configurable quality | 3Dmol-native VDW surface with wireframe material | SUPPORTED_WITH_LIMITATIONS |
 | DOTS | `surface-dots.v1` | canonical element VDW radius | 0.0 Å | all canonical coordinate atoms | configurable density | deterministic exposed-point GLShape | SUPPORTED_WITH_LIMITATIONS |
 | DOT_SURFACE | `surface-dot-surface.v1` | canonical element VDW radius | configurable, default 1.4 Å | all canonical coordinate atoms | configurable density | deterministic probe-expanded exposed-point GLShape | SUPPORTED_WITH_LIMITATIONS |
 
