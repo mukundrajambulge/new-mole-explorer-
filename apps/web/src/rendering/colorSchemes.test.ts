@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CanonicalMolecularStructure } from "@molecular/contracts";
 import { COLOR_SCHEME_DEFINITIONS, resolveAtomColor, resolveProjectedAtomColor } from "./colorSchemes";
-import { clearColorForSelection, createDefaultRenderProjection, setColorForSelection, setColorScheme, setComponentColor, setLayerVisibility, setProjectionStyle } from "./presentationState";
+import { clearColorForSelection, createDefaultRenderProjection, setColorForSelection, setColorScheme, setComponentColor, setLayerVisibility, setProjectionStyle, setRepresentationColorForSelection } from "./presentationState";
 
 const structure = {
   id: "structure:color-fixture",
@@ -71,5 +71,9 @@ describe("G1C renderer-neutral color schemes", () => {
     expect(resolveProjectedAtomColor(selected.color, "STICKS", ligand, structure).color).toBe("#ff00ff");
     expect(structure.atoms[3].stableId).toBe("lig");
     expect(selected.color.componentColors.ligand?.mode).toBe("custom");
+    const representationSpecific = setRepresentationColorForSelection(selected, [ligand.stableId], "STICKS", "#112233");
+    const inherited = clearColorForSelection(representationSpecific, [ligand.stableId]);
+    expect(inherited.color.componentColors.ligand?.mode).toBe("custom");
+    expect(inherited.color.representationOverrides[ligand.stableId]).toBeUndefined();
   });
 });
