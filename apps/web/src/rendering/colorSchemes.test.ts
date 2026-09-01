@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CanonicalMolecularStructure } from "@molecular/contracts";
 import { COLOR_SCHEME_DEFINITIONS, resolveAtomColor, resolveProjectedAtomColor } from "./colorSchemes";
-import { clearColorForSelection, createDefaultRenderProjection, setColorForSelection, setColorScheme, setLayerVisibility, setProjectionStyle } from "./presentationState";
+import { clearColorForSelection, createDefaultRenderProjection, setColorForSelection, setColorScheme, setComponentColor, setLayerVisibility, setProjectionStyle } from "./presentationState";
 
 const structure = {
   id: "structure:color-fixture",
@@ -61,5 +61,15 @@ describe("G1C renderer-neutral color schemes", () => {
 
     const reset = clearColorForSelection(recoloredGlobally, [ligand.stableId]);
     expect(resolveProjectedAtomColor(reset.color, "STICKS", ligand, structure).color).toBe(resolveAtomColor("modern-jmol", ligand, structure).color);
+  });
+  it("applies component color precedence without changing canonical identity", () => {
+    const ligand = structure.atoms[3];
+    const base = createDefaultRenderProjection(structure);
+    const component = setComponentColor(setColorScheme(base, "modern-jmol", structure), "ligand", "custom", "#00ff88");
+    expect(resolveProjectedAtomColor(component.color, "STICKS", ligand, structure).color).toBe("#00ff88");
+    const selected = setColorForSelection(component, [ligand.stableId], "#ff00ff");
+    expect(resolveProjectedAtomColor(selected.color, "STICKS", ligand, structure).color).toBe("#ff00ff");
+    expect(structure.atoms[3].stableId).toBe("lig");
+    expect(selected.color.componentColors.ligand?.mode).toBe("custom");
   });
 });

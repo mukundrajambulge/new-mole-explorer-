@@ -52,4 +52,9 @@ describe("safe labels and reverse identity picking", () => {
     expect(plan.atoms).toHaveLength(0);
     expect(plan.diagnostic).toMatch(new RegExp(String(LABEL_ATOM_SAFETY_LIMIT)));
   });
+
+  it("binds labels to canonical target membership", () => {
+    const plan = labelPlanForState({ ...DEFAULT_LABEL_STATE, mode: "custom", expression: parseSafeLabelExpression("{name}"), targetStableAtomIds: [structure.atoms[0].stableId] }, [structure.atoms[0], { ...structure.atoms[0], stableId: "other" }]);
+    expect(plan.atoms.map((atom) => atom.stableId)).toEqual(["stable-ca"]);
+  });
 });

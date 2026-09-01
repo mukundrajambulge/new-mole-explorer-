@@ -1,5 +1,6 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { StructureLoadResult } from "@molecular/contracts";
+import { commandSuggestions } from "../commands/commandRegistry";
 import { Icon } from "./Icon";
 
 type ConsoleEntry = { category: "SYSTEM" | "SELECTION" | "PRESENTATION" | "MEASURE" | "CAPABILITY"; command: string; status: string; timestamp: string };
@@ -13,6 +14,7 @@ const initialEntries: ConsoleEntry[] = [
 export const ConsolePanel = ({ expanded, onToggle, structure, onCommand }: { expanded: boolean; onToggle: () => void; structure: StructureLoadResult | null; onCommand?: (command: string) => ConsoleCommandResult }) => {
   const [query, setQuery] = useState("");
   const [entries, setEntries] = useState(initialEntries);
+  const [historyIndex, setHistoryIndex] = useState(-1);
   const visibleEntries = entries.map((entry, index) => index === 0 && entry.command === "renderer status" ? {
     ...entry,
     status: structure ? `3Dmol.js adapter ready · ${structure.structure.source.originalFilename} loaded` : "3Dmol.js adapter ready · no structure loaded",
@@ -25,6 +27,15 @@ export const ConsolePanel = ({ expanded, onToggle, structure, onCommand }: { exp
     const result = onCommand?.(trimmed) ?? { category: "CAPABILITY" as const, status: "Not executed · authoritative command service is not connected in G1C" };
     setEntries((current) => [...current, { category: result.category, command: trimmed, status: result.status, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }) }]);
     setQuery("");
+    setHistoryIndex(-1);
+  };
+  const commandHistory = entries.filter((entry) => entry.command !== "renderer status" && entry.command !== "dock run").map((entry) => entry.command);
+  const suggestions = commandSuggestions(query);
+  const onInputKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "l") { event.preventDefault(); setQuery(""); setHistoryIndex(-1); return; }
+    if (event.key === "ArrowUp") { event.preventDefault(); if (commandHistory.length === 0) return; const next = historyIndex < 0 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1); setHistoryIndex(next); setQuery(commandHistory[next]); }
+    if (event.key === "ArrowDown") { event.preventDefault(); if (historyIndex < 0) return; const next = historyIndex + 1; if (next >= commandHistory.length) { setHistoryIndex(-1); setQuery(""); } else { setHistoryIndex(next); setQuery(commandHistory[next]); } }
+    if (event.key === "Tab" && suggestions.length > 0) { event.preventDefault(); setQuery(`${suggestions[0]} `); }
   };
 
   return (
@@ -39,8 +50,9 @@ export const ConsolePanel = ({ expanded, onToggle, structure, onCommand }: { exp
           {entries.length === 0 && <div className="console-empty">No command events yet. G1C does not execute scientific queries.</div>}
           {visibleEntries.map((entry, index) => <div className="console-entry" key={`${entry.timestamp}-${index}`}><span className="console-prompt">›</span><div className="console-entry-body"><div className="console-command"><span className={`console-category console-category--${entry.category.toLowerCase()}`}>{entry.category}</span><code>{entry.command}</code></div><div className="console-result"><span className="result-dot">●</span>{entry.status}</div></div><time>{entry.timestamp}</time></div>)}
         </div>
-        <form className="console-input-row" onSubmit={submit}><span className="console-prompt">›</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Type a selection query or command" aria-label="Command or selection query" /><button className="console-submit" type="submit">Run <span>↵</span></button></form>
-        <div className="console-examples"><span className="examples-label">Examples</span><button type="button" onClick={() => setQuery("select all")}>select all</button><button type="button" onClick={() => setQuery("show sticks, all")}>show sticks, all</button><button type="button" onClick={() => setQuery("hide sticks, chain A")}>hide sticks, chain A</button><button type="button" onClick={() => setQuery("dock run")}>dock run</button></div>
+        <form className="console-input-row" onSubmit={submit}><span className="console-prompt">›</span><input value={query} onChange={(event) => { setQuery(event.target.value); setHistoryIndex(-1); }} onKeyDown={onInputKeyDown} placeholder="Type a selection query or command" aria-label="Command or selection query" /><button className="console-submit" type="submit">Run <span>↵</span></button></form>
+        {query.trim() && suggestions.length > 0 && <div className="console-suggestions" role="listbox" aria-label="Command suggestions">{suggestions.slice(0, 6).map((suggestion) => <button type="button" role="option" key={suggestion} onClick={() => setQuery(`${suggestion} `)}>{suggestion}</button>)}</div>}
+        <div className="console-examples"><span className="examples-label">Examples · ↑↓ history · Ctrl/Cmd+L clear</span><button type="button" onClick={() => setQuery("select all")}>select all</button><button type="button" onClick={() => setQuery("show sticks, all")}>show sticks, all</button><button type="button" onClick={() => setQuery("select active_site, chain A and resi 50-80")}>named selection</button><button type="button" onClick={() => setQuery("label active_site, {resn}{resi}:{name}")}>safe labels</button></div>
       </>}
     </section>
   );

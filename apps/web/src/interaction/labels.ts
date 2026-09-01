@@ -13,9 +13,11 @@ export type LabelState = {
   outline: string;
   offset: { x: number; y: number };
   alignment: "topLeft" | "topCenter" | "center" | "bottomCenter";
+  /** Canonical target membership; omitted means the current visible projection. */
+  targetStableAtomIds?: readonly string[];
 };
 
-export const LABEL_ATOM_SAFETY_LIMIT = 250;
+export const LABEL_ATOM_SAFETY_LIMIT = 120;
 export type LabelPlan = {
   atoms: readonly CanonicalAtom[];
   eligibleAtomCount: number;
@@ -92,20 +94,22 @@ const residueKey = (atom: CanonicalAtom): string => `${atom.chain}\u0000${atom.r
 /** Resolves label cardinality from canonical fields before the adapter sees renderer atoms. */
 export const labelPlanForState = (state: LabelState, visibleAtoms: readonly CanonicalAtom[]): LabelPlan => {
   if (state.mode === "off" || !state.expression) return { atoms: [], eligibleAtomCount: 0, labelCount: 0, status: "OFF" };
-  if ((state.mode === "atom-name" || state.mode === "custom") && visibleAtoms.length > LABEL_ATOM_SAFETY_LIMIT) {
-    return { atoms: [], eligibleAtomCount: visibleAtoms.length, labelCount: 0, status: "GUARDED", diagnostic: `Atom-level labels are guarded above ${LABEL_ATOM_SAFETY_LIMIT} eligible atoms (${visibleAtoms.length} requested). Narrow the target before rendering.` };
+  const target = state.targetStableAtomIds ? new Set(state.targetStableAtomIds) : null;
+  const targetedAtoms = target ? visibleAtoms.filter((atom) => target.has(atom.stableId)) : visibleAtoms;
+  if ((state.mode === "atom-name" || state.mode === "custom") && targetedAtoms.length > LABEL_ATOM_SAFETY_LIMIT) {
+    return { atoms: [], eligibleAtomCount: targetedAtoms.length, labelCount: 0, status: "GUARDED", diagnostic: `Atom-level labels are guarded above ${LABEL_ATOM_SAFETY_LIMIT} eligible atoms (${targetedAtoms.length} requested). Narrow the target before rendering.` };
   }
   if (state.mode === "residue" || state.mode === "residue-number") {
     const seen = new Set<string>();
-    const atoms = visibleAtoms.filter((atom) => { const key = residueKey(atom); if (seen.has(key)) return false; seen.add(key); return true; });
-    return { atoms, eligibleAtomCount: visibleAtoms.length, labelCount: atoms.length, status: "READY" };
+    const atoms = targetedAtoms.filter((atom) => { const key = residueKey(atom); if (seen.has(key)) return false; seen.add(key); return true; });
+    return { atoms, eligibleAtomCount: targetedAtoms.length, labelCount: atoms.length, status: "READY" };
   }
   if (state.mode === "chain") {
     const seen = new Set<string>();
-    const atoms = visibleAtoms.filter((atom) => { const key = atom.chain || " "; if (seen.has(key)) return false; seen.add(key); return true; });
-    return { atoms, eligibleAtomCount: visibleAtoms.length, labelCount: atoms.length, status: "READY" };
+    const atoms = targetedAtoms.filter((atom) => { const key = atom.chain || " "; if (seen.has(key)) return false; seen.add(key); return true; });
+    return { atoms, eligibleAtomCount: targetedAtoms.length, labelCount: atoms.length, status: "READY" };
   }
-  return { atoms: [...visibleAtoms], eligibleAtomCount: visibleAtoms.length, labelCount: visibleAtoms.length, status: "READY" };
+  return { atoms: [...targetedAtoms], eligibleAtomCount: targetedAtoms.length, labelCount: targetedAtoms.length, status: "READY" };
 };
 
 export const DEFAULT_LABEL_STATE: LabelState = { mode: "off", expression: null, font: "Inter", size: 12, color: "#e8edf5", outline: "#05070a", offset: { x: 0, y: 0 }, alignment: "topCenter" };
