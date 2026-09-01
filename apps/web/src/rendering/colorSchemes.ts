@@ -76,18 +76,24 @@ const representationTypeFor = (representation: "lines" | "sticks" | "spheres" | 
 
 /** Resolve explicit presentation colors before the inherited global scheme. */
 export const resolveProjectedAtomColor = (
-  color: Pick<ColorState, "mode" | "customHex" | "atomColors" | "representationOverrides">,
+  color: Pick<ColorState, "mode" | "customHex" | "atomColors" | "representationOverrides"> & Partial<Pick<ColorState, "componentColors">>,
   representation: "lines" | "sticks" | "spheres" | "cartoon" | "licorice" | "cross" | RepresentationType,
   atom: CanonicalAtom | undefined,
   structure: CanonicalMolecularStructure,
   explicitGlobalColor?: string,
 ): ColorResolution => {
   const stableId = atom?.stableId;
-  const representationOverride = stableId ? color.representationOverrides[stableId]?.[representationTypeFor(representation)] : undefined;
-  if (representationOverride) return { status: "READY", color: representationOverride };
   const atomOverride = stableId ? color.atomColors[stableId] : undefined;
   if (atomOverride) return { status: "READY", color: atomOverride };
+  const representationOverride = stableId ? color.representationOverrides[stableId]?.[representationTypeFor(representation)] : undefined;
+  if (representationOverride) return { status: "READY", color: representationOverride };
   if (!atom) return { status: "READY", color: explicitGlobalColor ?? "#7f8791" };
+  const category = atom.isPolymer ? "protein" : atom.isLigand ? "ligand" : atom.isWater ? "water" : atom.isIon ? "ions" : "other";
+  const componentOverride = color.componentColors?.[category];
+  if (componentOverride && componentOverride.mode !== "inherit") {
+    if (componentOverride.mode === "custom") return { status: "READY", color: componentOverride.customHex ?? "#d7e0ea" };
+    return resolveAtomColor(componentOverride.mode, atom, structure);
+  }
   if (color.mode === "named" && explicitGlobalColor) return { status: "READY", color: explicitGlobalColor };
   return resolveAtomColor(color.mode, atom, structure, color.customHex);
 };

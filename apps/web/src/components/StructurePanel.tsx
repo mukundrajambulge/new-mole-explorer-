@@ -32,6 +32,8 @@ type StructurePanelProps = {
   analysisResults: readonly StructuralAnalysisResult[];
   loading: boolean;
   error: string | null;
+  namedSelections: readonly { name: string; count: number }[];
+  onNamedSelectionAction: (name: string, action: "A" | "S" | "H" | "L" | "C") => void;
 };
 
 const formatCount = (value: number) => value.toLocaleString("en-US");
@@ -73,7 +75,7 @@ const MeasurementCard = ({ measurementMode, measurementSlots, measurements, stru
   </section>;
 };
 
-export const StructurePanel = ({ collapsed, onToggle, onAction, structure, projection, selectedAtom, onClearSelection, measurementMode, measurementSlots, measurements, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear, analysisResults, loading, error }: StructurePanelProps) => {
+export const StructurePanel = ({ collapsed, onToggle, onAction, structure, projection, selectedAtom, onClearSelection, measurementMode, measurementSlots, measurements, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear, analysisResults, loading, error, namedSelections, onNamedSelectionAction }: StructurePanelProps) => {
   const counts = structure?.structure.counts;
   const components = [
     { label: "Protein", count: counts?.polymerAtoms ?? 0, tone: "blue", visible: projection.showProtein },
@@ -91,6 +93,11 @@ export const StructurePanel = ({ collapsed, onToggle, onAction, structure, proje
       {error && <div className="ingestion-error" role="alert">{error}</div>}
       {!structure && !loading && <div className="structure-empty">No structure loaded<span>Use File → Import or File → Fetch. Admitted formats: PDB · mmCIF</span></div>}
       {structure && <><div className="tree-item tree-item--root"><span className="tree-badge tree-badge--blue">P</span><span className="tree-label" title={structure.structure.source.originalFilename}>{structure.structure.source.originalFilename}</span><Icon name="eye" size={16} /></div><div className="tree-item tree-item--child"><span className="tree-plus">+</span><span className="tree-label">Polymer <span className="muted">({formatCount(structure.structure.counts.polymerAtoms)} atoms)</span></span><span className="tag tag--green">P</span><Icon name="eye" size={16} /></div><div className="tree-item tree-item--child"><span className="tree-plus">+</span><span className="tree-label">Non-polymer <span className="muted">({formatCount(structure.structure.counts.ligandAtoms)} atoms)</span></span><span className="tag tag--purple">L</span><Icon name="eye" size={16} /></div><div className="structure-source-meta">{structure.structure.source.kind === "RCSB" ? "RCSB" : "LOCAL FILE"} · {structure.structure.format.toUpperCase()} · sha256 {structure.structure.source.sha256.slice(0, 10)}…</div></>}
+    </section>
+    <section className="panel-card selections-card" data-testid="objects-selections-panel">
+      <div className="panel-heading"><div><span className="eyebrow">CANONICAL SCOPE</span><h2>Objects &amp; Selections</h2></div><span className="capability-tag">SNAPSHOTS</span></div>
+      <div className="selection-object-row"><span className="tree-badge tree-badge--blue">O</span><span className="tree-label">{structure?.structure.name ?? "No object"}</span><span className="muted">{structure ? structure.structure.counts.atoms.toLocaleString("en-US") : "—"}</span></div>
+      {namedSelections.length === 0 ? <div className="selection-empty">No named selections. Use <code>select active_site, …</code>.</div> : <div className="named-selection-list">{namedSelections.map((selection) => <div className="named-selection-row" key={selection.name}><span className="tree-badge tree-badge--purple">S</span><span className="tree-label" title={selection.name}>{selection.name}</span><span className="muted">{selection.count}</span><div className="named-selection-actions">{(["A", "S", "H", "L", "C"] as const).map((action) => <button type="button" key={action} title={`${action} ${selection.name}`} aria-label={`${action} ${selection.name}`} onClick={() => onNamedSelectionAction(selection.name, action)}>{action}</button>)}</div></div>)}</div>}
     </section>
     <section className="panel-card components-card"><div className="panel-heading"><div><span className="eyebrow">STRUCTURE INVENTORY</span><h2>Components</h2></div><span className="capability-tag">Projection only</span></div><div className="component-list">{components.map((component) => <div className="component-row" key={component.label}><span className={`component-dot component-dot--${component.tone} ${component.visible ? "component-dot--visible" : "component-dot--hidden"}`} aria-hidden="true" /><span>{component.label}</span><span className="component-count">{formatCount(component.count)}</span></div>)}</div></section>
     <ContextCard selectedAtom={selectedAtom} onAction={onAction} onClearSelection={onClearSelection} />

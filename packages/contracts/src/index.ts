@@ -185,6 +185,7 @@ export type ProjectPresentationState = {
     mode: string;
     colorId?: string;
     customHex?: string;
+    componentColors?: Partial<Record<"protein" | "ligand" | "water" | "ions" | "other", { mode: "inherit" | "element" | "chain" | "custom"; customHex?: string | null }>>;
   };
   background: {
     preset: string;
