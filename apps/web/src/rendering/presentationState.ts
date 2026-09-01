@@ -187,6 +187,13 @@ export const setColorForSelection = (projection: RenderProjection, targetStableA
   color: { ...projection.color, atomColors: { ...projection.color.atomColors, ...Object.fromEntries(targetStableAtomIds.map((stableId) => [stableId, color])) } },
 });
 
+export const clearColorForSelection = (projection: RenderProjection, targetStableAtomIds: readonly string[]): RenderProjection => {
+  const target = new Set(targetStableAtomIds);
+  const atomColors = Object.fromEntries(Object.entries(projection.color.atomColors).filter(([stableId]) => !target.has(stableId)));
+  const representationOverrides = Object.fromEntries(Object.entries(projection.color.representationOverrides).filter(([stableId]) => !target.has(stableId)));
+  return { ...projection, color: { ...projection.color, atomColors, representationOverrides } };
+};
+
 export const setRepresentationColorForSelection = (projection: RenderProjection, targetStableAtomIds: readonly string[], representation: RepresentationType, color: string): RenderProjection => ({
   ...projection,
   color: { ...projection.color, representationOverrides: { ...projection.color.representationOverrides, ...Object.fromEntries(targetStableAtomIds.map((stableId) => [stableId, { ...(projection.color.representationOverrides[stableId] ?? {}), [representation]: color }])) } },

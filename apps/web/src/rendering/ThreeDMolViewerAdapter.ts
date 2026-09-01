@@ -1,7 +1,7 @@
 import { createViewer, Vector2, type AtomSelectionSpec, type AtomSpec, type AtomStyleSpec, type GLShape, type GLViewer, type SurfaceStyleSpec } from "3dmol";
 import type { CanonicalMolecularStructure, StructureLoadResult } from "@molecular/contracts";
 import { colorRegistry } from "./colorRegistry";
-import { resolveAtomColor } from "./colorSchemes";
+import { resolveAtomColor, resolveProjectedAtomColor } from "./colorSchemes";
 import { DEFAULT_CAMERA, type CameraState, type RenderProjection } from "./renderProjection";
 import { buildRenderProjectionDiagnostics, emptyRenderProjectionDiagnostics, type RenderProjectionDiagnostics } from "./renderDirectives";
 import type { RepresentationType } from "./presentationState";
@@ -28,8 +28,7 @@ const styleFor = (representation: StyleRepresentation, projection: RenderProject
   const colorfunc = (atom: AtomSpec) => {
     const stableId = typeof atom.properties?.canonicalStableId === "string" ? atom.properties.canonicalStableId : undefined;
     const canonical = stableId ? canonicalByStableId.get(stableId) : undefined;
-    const override = stableId ? projection.color.representationOverrides[stableId]?.[representation === "lines" ? "LINES" : representation === "sticks" || representation === "licorice" ? "STICKS" : representation === "spheres" || representation === "cross" ? "SPHERES" : "CARTOON"] : undefined;
-    return override ?? (stableId ? projection.color.atomColors[stableId] : undefined) ?? (canonical && projection.color.mode !== "named" ? resolveAtomColor(projection.color.mode, canonical, structure, projection.color.customHex).color : explicitColor ?? "#7f8791");
+    return resolveProjectedAtomColor(projection.color, representation, canonical, structure, explicitColor).color;
   };
   const atomColor = { colorfunc };
   switch (representation) {
@@ -73,9 +72,7 @@ const surfaceStyleFor = (projection: RenderProjection, structure: CanonicalMolec
   ...(wireframe ? { wireframe: true, wireframeLinewidth: projection.representationState.parameters.meshWidth } : { onesided: true }),
   colorscheme: {
     prop: "canonicalStableId",
-    map: Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, projection.color.mode === "named"
-      ? colorRegistry.cssColor(projection.color) ?? resolveAtomColor(projection.color.mode, atom, structure, projection.color.customHex).color
-      : resolveAtomColor(projection.color.mode, atom, structure, projection.color.customHex).color])),
+    map: Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, resolveProjectedAtomColor(projection.color, "SURFACE", atom, structure, colorRegistry.cssColor(projection.color)).color])),
   },
 }) as SurfaceStyleSpec;
 
@@ -125,7 +122,7 @@ export class ThreeDMolViewerAdapter {
   private baselinePivot: Coordinate3 | null = null;
   private autoSlab: ClippingSlab = paddedClippingSlab(null);
   private lastCameraAction = "NONE";
-  private performance = { viewerCreations: 0, sceneRebuilds: 0, renderCalls: 0, surfaceCacheHits: 0, surfaceCacheMisses: 0, surfaceGenerations: 0, meshGenerations: 0, dotGenerations: 0, staleSurfaceResults: 0 };
+  private performance = { viewerCreations: 0, sceneRebuilds: 0, projectionRebuilds: 0, renderCalls: 0, surfaceCacheHits: 0, surfaceCacheMisses: 0, surfaceGenerations: 0, meshGenerations: 0, dotGenerations: 0, staleSurfaceResults: 0 };
 
   mount(container: HTMLElement): void {
     if (this.viewer && this.container === container) return;
@@ -191,6 +188,7 @@ export class ThreeDMolViewerAdapter {
     this.analysisShapes = [];
     this.analysisOverlays = [];
     this.hasModel = false;
+    this.projection = null;
     const renderModel = this.viewer!.addModel();
     const indexByStableId = new Map(result.structure.atoms.map((atom, index) => [atom.stableId, index]));
     const adjacency = new Map<string, Array<{ index: number; order: number }>>();
@@ -244,15 +242,28 @@ export class ThreeDMolViewerAdapter {
 
   setProjection(projection: RenderProjection, options: { preserveView?: boolean } = {}): void {
     this.ensureMounted();
+    const previousProjection = this.projection;
     const preservedView = options.preserveView === false || !this.hasModel ? null : this.viewer!.getView();
+    const sceneDirty = options.preserveView === false || !previousProjection || previousProjection.representation !== projection.representation || previousProjection.showProtein !== projection.showProtein || previousProjection.showLigand !== projection.showLigand || previousProjection.showWater !== projection.showWater || previousProjection.showIons !== projection.showIons || previousProjection.showOther !== projection.showOther || previousProjection.representationState !== projection.representationState || previousProjection.color !== projection.color;
+    const backgroundDirty = !previousProjection || previousProjection.background !== projection.background;
+    const cameraDirty = options.preserveView === false || !previousProjection || previousProjection.camera !== projection.camera;
+    const labelsDirty = !previousProjection || previousProjection.labels !== projection.labels;
+    const interactionDirty = !previousProjection || previousProjection.interaction !== projection.interaction;
     this.projection = projection;
     this.cameraState = { ...projection.camera, view: preservedView ?? projection.camera.view, defaultView: this.baselineView ? [...this.baselineView] : projection.camera.defaultView };
-    this.viewer!.setBackgroundColor(projection.background.color, 1);
-    this.viewer!.setProjection(projection.camera.projectionMode);
-    this.viewer!.setCameraParameters({ fov: projection.camera.fov, orthographic: projection.camera.projectionMode === "orthographic" });
+    if (backgroundDirty) this.viewer!.setBackgroundColor(projection.background.color, 1);
+    if (cameraDirty) {
+      this.viewer!.setProjection(projection.camera.projectionMode);
+      this.viewer!.setCameraParameters({ fov: projection.camera.fov, orthographic: projection.camera.projectionMode === "orthographic" });
+      if (!preservedView && this.validView(projection.camera.view)) this.viewer!.setView(projection.camera.view);
+    }
     if (!this.hasModel || !this.structure) { this.diagnostics = emptyRenderProjectionDiagnostics(projection.representationState.presentationRevision, projection); this.writeDiagnostics(this.diagnostics); this.render(); return; }
-    this.applyProjection(projection);
-    this.applyClipping();
+    if (sceneDirty) this.applyProjection(projection);
+    else {
+      if (labelsDirty) this.projectLabels(projection);
+      if (interactionDirty) this.projectInteractionHighlights(projection);
+    }
+    if (cameraDirty) this.applyClipping();
     this.writeDiagnostics(this.diagnostics);
     this.render();
   }
@@ -369,6 +380,7 @@ export class ThreeDMolViewerAdapter {
   }
 
   private applyProjection(projection: RenderProjection): void {
+    this.performance.projectionRebuilds += 1;
     const viewer = this.viewer!; const structure = this.structure!; const diagnostics = buildRenderProjectionDiagnostics(structure, projection); this.diagnostics = diagnostics; this.writeDiagnostics(diagnostics); viewer.setStyle({}, {});
     for (const directive of diagnostics.directives) {
       const target = this.canonicalSelection((atom) => directive.targetStableAtomIds.includes(atom.stableId));
@@ -481,11 +493,7 @@ export class ThreeDMolViewerAdapter {
         const pointBatches = new Map<string, SurfacePoint[]>();
         for (const point of displayPoints) {
           const atom = atomByStableId.get(point.stableAtomId);
-          const pointColor = atom
-            ? projection.color.mode === "named"
-              ? colorRegistry.cssColor(projection.color) ?? resolveAtomColor(projection.color.mode, atom, structure, projection.color.customHex).color
-              : resolveAtomColor(projection.color.mode, atom, structure, projection.color.customHex).color
-            : "#8fd9ff";
+          const pointColor = atom ? resolveProjectedAtomColor(projection.color, "DOTS", atom, structure, colorRegistry.cssColor(projection.color)).color : "#8fd9ff";
           const batchColor = brightenHex(quantizeHex(pointColor));
           pointBatches.set(batchColor, [...(pointBatches.get(batchColor) ?? []), point]);
         }
@@ -637,6 +645,7 @@ export class ThreeDMolViewerAdapter {
     this.container.dataset.rendererModelLoads = String(this.modelLoadCount);
     this.container.dataset.rendererViewerCreations = String(this.performance.viewerCreations);
     this.container.dataset.rendererSceneRebuilds = String(this.performance.sceneRebuilds);
+    this.container.dataset.rendererProjectionRebuilds = String(this.performance.projectionRebuilds);
     this.container.dataset.rendererRenderCalls = String(this.performance.renderCalls);
     this.container.dataset.rendererSurfaceCacheHits = String(this.performance.surfaceCacheHits);
     this.container.dataset.rendererSurfaceCacheMisses = String(this.performance.surfaceCacheMisses);

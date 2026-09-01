@@ -1,5 +1,5 @@
 import type { CanonicalAtom, CanonicalMolecularStructure } from "@molecular/contracts";
-import type { ColorMode } from "./presentationState";
+import type { ColorMode, ColorState, RepresentationType } from "./presentationState";
 
 export type ColorSchemeId =
   | "classic-cpk"
@@ -65,6 +65,32 @@ const diverging = (value: number): string => { const normalized = Math.max(-1, M
 const residueFor = (structure: CanonicalMolecularStructure, atom: CanonicalAtom) => Object.values(structure.hierarchy.residues).find((residue) => residue.chainId === `chain:${atom.chain}` && residue.number === atom.residueNumber && (residue.insertionCode ?? "") === (atom.insertionCode ?? ""));
 
 export type ColorResolution = { status: "READY" | "UNAVAILABLE" | "EXPERIMENTAL"; color: string; diagnostic?: string };
+
+const representationTypeFor = (representation: "lines" | "sticks" | "spheres" | "cartoon" | "licorice" | "cross" | RepresentationType): RepresentationType => {
+  if (representation === "lines") return "LINES";
+  if (representation === "sticks" || representation === "licorice") return "STICKS";
+  if (representation === "spheres" || representation === "cross") return "SPHERES";
+  if (representation === "cartoon") return "CARTOON";
+  return representation;
+};
+
+/** Resolve explicit presentation colors before the inherited global scheme. */
+export const resolveProjectedAtomColor = (
+  color: Pick<ColorState, "mode" | "customHex" | "atomColors" | "representationOverrides">,
+  representation: "lines" | "sticks" | "spheres" | "cartoon" | "licorice" | "cross" | RepresentationType,
+  atom: CanonicalAtom | undefined,
+  structure: CanonicalMolecularStructure,
+  explicitGlobalColor?: string,
+): ColorResolution => {
+  const stableId = atom?.stableId;
+  const representationOverride = stableId ? color.representationOverrides[stableId]?.[representationTypeFor(representation)] : undefined;
+  if (representationOverride) return { status: "READY", color: representationOverride };
+  const atomOverride = stableId ? color.atomColors[stableId] : undefined;
+  if (atomOverride) return { status: "READY", color: atomOverride };
+  if (!atom) return { status: "READY", color: explicitGlobalColor ?? "#7f8791" };
+  if (color.mode === "named" && explicitGlobalColor) return { status: "READY", color: explicitGlobalColor };
+  return resolveAtomColor(color.mode, atom, structure, color.customHex);
+};
 
 export const colorSchemeDefinition = (id: ColorMode): ColorSchemeDefinition => COLOR_SCHEME_DEFINITIONS.find((definition) => definition.id === id) ?? COLOR_SCHEME_DEFINITIONS[0];
 

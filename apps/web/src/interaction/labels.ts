@@ -26,29 +26,35 @@ export type LabelPlan = {
 
 const fieldSet = new Set<string>(LABEL_FIELDS);
 
+export type LabelExpressionErrorCode = "EMPTY" | "UNSUPPORTED_FIELD" | "UNSAFE_SYNTAX" | "MISSING_FIELD";
+
 export class LabelExpressionError extends Error {
-  constructor(message: string) {
+  readonly code: LabelExpressionErrorCode;
+
+  constructor(message: string, code: LabelExpressionErrorCode) {
     super(message);
     this.name = "LabelExpressionError";
+    this.code = code;
   }
 }
 
 export const parseSafeLabelExpression = (input: string): SafeLabelExpression => {
   const parts: Array<{ kind: "text"; value: string } | { kind: "field"; field: LabelField }> = [];
   const expression = input.trim();
-  if (!expression) throw new LabelExpressionError("A label expression is required.");
+  if (!expression) throw new LabelExpressionError("A label expression is required.", "EMPTY");
+  if (/[;()=\x60]|=>/.test(expression)) throw new LabelExpressionError("Label expressions accept fields and plain text only; executable syntax is not allowed.", "UNSAFE_SYNTAX");
   const pattern = /\{([^{}]+)\}/g;
   let cursor = 0;
-  let match: RegExpExecArray | null;
-  while ((match = pattern.exec(expression))) {
+  for (const match of expression.matchAll(pattern)) {
     if (match.index > cursor) parts.push({ kind: "text", value: expression.slice(cursor, match.index) });
     const field = match[1].trim().toLowerCase();
-    if (!fieldSet.has(field)) throw new LabelExpressionError(`Unsupported safe label field: ${field}`);
+    if (!fieldSet.has(field)) throw new LabelExpressionError(`Unsupported safe label field: ${field}`, "UNSUPPORTED_FIELD");
     parts.push({ kind: "field", field: field as LabelField });
     cursor = match.index + match[0].length;
   }
+  if (/[{}]/.test(expression.replace(/\{[^{}]+\}/g, ""))) throw new LabelExpressionError("Unbalanced braces are not valid in a label expression.", "UNSAFE_SYNTAX");
   if (cursor < expression.length) parts.push({ kind: "text", value: expression.slice(cursor) });
-  if (!parts.some((part) => part.kind === "field")) throw new LabelExpressionError("A label must contain at least one supported field such as {name}.");
+  if (!parts.some((part) => part.kind === "field")) throw new LabelExpressionError("A label must contain at least one supported field such as {name}.", "MISSING_FIELD");
   return { kind: "template", parts };
 };
 
@@ -78,6 +84,8 @@ const fieldValue = (field: LabelField, atom: CanonicalAtom, structure: Canonical
 };
 
 export const resolveSafeLabel = (expression: SafeLabelExpression, atom: CanonicalAtom, structure: CanonicalMolecularStructure): string => expression.parts.map((part) => part.kind === "text" ? part.value : fieldValue(part.field, atom, structure)).join("");
+
+export const serializeSafeLabelExpression = (expression: SafeLabelExpression): string => expression.parts.map((part) => part.kind === "text" ? part.value : `{${part.field}}`).join("");
 
 const residueKey = (atom: CanonicalAtom): string => `${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}`;
 

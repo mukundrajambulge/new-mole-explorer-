@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ProjectRecord, StructureLoadResult } from "@molecular/contracts";
 import { CapabilityNotice } from "./components/CapabilityNotice";
 import { ConsolePanel, type ConsoleCommandResult } from "./components/ConsolePanel";
@@ -11,7 +11,7 @@ import { StatusBar } from "./components/StatusBar";
 import { StructurePanel } from "./components/StructurePanel";
 import { ACTION_IDS, ACTION_REGISTRY, type ActionId, type ActionDefinition } from "./domain/registry";
 import { ApiClientError, apiClient } from "./lib/apiClient";
-import { applyRepresentationToSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setInteractionState, setLabelState, setProjectionStyle, setRepresentationParameters, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
+import { applyRepresentationToSelection, clearColorForSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setInteractionState, setLabelState, setProjectionStyle, setRepresentationParameters, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
 import { applyPresentationAction, type PresentationComponent } from "./rendering/presentationActions";
 import { STYLE_DEFINITIONS, representationCapabilityFor, representationStyleForCommand } from "./rendering/styleProfiles";
 import { resolveSelection, parseRepresentationCommand, type SelectionResult } from "./interaction/selectionResolver";
@@ -60,6 +60,8 @@ export const App = () => {
   const commandSequence = useRef(0);
   const measurementAccumulatorRef = useRef(new MeasurementAccumulator());
   const measurementSequenceRef = useRef(0);
+  const demoLoadStartedRef = useRef(false);
+  const analysisOverlays = useMemo(() => overlaysForAnalysis(analysisResults), [analysisResults]);
 
   useEffect(() => {
     let mounted = true;
@@ -115,6 +117,14 @@ export const App = () => {
   };
 
   const fetchRcsb = (pdbId: string) => void runLoad(() => apiClient.fetchRcsb(pdbId));
+
+  useEffect(() => {
+    if (demoLoadStartedRef.current) return;
+    const demoId = new URLSearchParams(window.location.search).get("demo")?.trim().toUpperCase();
+    if (!demoId || !/^[A-Z0-9]{4}$/.test(demoId)) return;
+    demoLoadStartedRef.current = true;
+    void runLoad(() => apiClient.fetchRcsb(demoId));
+  }, []);
 
   const createProject = async () => {
     try {
@@ -193,12 +203,14 @@ export const App = () => {
   };
 
   const setLabelMode = (mode: LabelMode) => setProjection((current) => applyPresentationAction(current, structure?.structure ?? null, { type: "LABELS.SET", labels: { mode, expression: labelExpressionForMode(mode) } }));
-  const setLabelExpression = (input: string) => {
+  const setLabelExpression = (input: string): boolean => {
     try {
       const expression = parseSafeLabelExpression(input);
       setProjection((current) => setLabelState(current, { mode: "custom", expression }));
+      return true;
     } catch (error) {
       showNotice({ id: ACTION_IDS.LABELS_SET, group: "VIEW", state: "SUPPORTED_WITH_LIMITATIONS", label: "Invalid label expression", description: error instanceof LabelExpressionError ? error.message : "The label expression was rejected by the safe field parser." });
+      return false;
     }
   };
   const setCameraProjection = (projectionMode: RenderProjection["camera"]["projectionMode"]) => setProjection((current) => applyPresentationAction(current, structure?.structure ?? null, { type: "CAMERA.SET", camera: { projectionMode } }));
@@ -283,6 +295,11 @@ export const App = () => {
       const colorMatch = trimmed.match(/^color\s+([^,]+?)(?:\s*,\s*(.+))?$/i);
       if (colorMatch) {
         if (!structure) return { category: "PRESENTATION", status: "No structure loaded; color was not changed." };
+        if (/^(inherit|default|reset)$/i.test(colorMatch[1].trim())) {
+          const target = resolveSelection(colorMatch[2]?.trim() || "all", structure.structure);
+          setProjection((current) => clearColorForSelection(current, target.stableAtomIds));
+          return { category: "PRESENTATION", status: `Cleared explicit colors for ${target.stableAtomIds.length} atoms; inherited scheme restored.` };
+        }
         const color = colorRegistry.resolveInputWithDiagnostic(colorMatch[1].trim());
         if (!color.definition) return { category: "PRESENTATION", status: "COLOR_NOT_FOUND" };
         const target = resolveSelection(colorMatch[2]?.trim() || "all", structure.structure);
@@ -395,7 +412,7 @@ export const App = () => {
         <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
           <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} selectedAtom={selectedAtom} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} loading={loadState === "loading"} error={loadError} />
-          <MolecularCanvas structure={structure} projection={projection} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFileDrop={importFile} consoleExpanded={consoleExpanded} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} analysisOverlays={overlaysForAnalysis(analysisResults)} />
+          <MolecularCanvas structure={structure} projection={projection} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFileDrop={importFile} consoleExpanded={consoleExpanded} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} />
           <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
         </div>
         <StatusBar apiStatus={apiStatus} structure={structure} project={project} selectedAtomCount={projection.interaction.selectedAtomIds.length} />

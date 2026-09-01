@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CanonicalMolecularStructure } from "@molecular/contracts";
-import { COLOR_SCHEME_DEFINITIONS, resolveAtomColor } from "./colorSchemes";
+import { COLOR_SCHEME_DEFINITIONS, resolveAtomColor, resolveProjectedAtomColor } from "./colorSchemes";
+import { clearColorForSelection, createDefaultRenderProjection, setColorForSelection, setColorScheme, setLayerVisibility, setProjectionStyle } from "./presentationState";
 
 const structure = {
   id: "structure:color-fixture",
@@ -40,4 +41,25 @@ describe("G1C renderer-neutral color schemes", () => {
     expect(standard.color).not.toBe(jmol.color);
   });
   it("renders a supplied partial-charge dataset", () => { const withDataset = { ...structure, partialChargeDataset: { datasetId: "charges:v1", molecularRevision: structure.scientificHash, chargeModel: "fixture", profileVersion: "v1", atomChargeMap: { c: -0.5, n: 0.5 }, units: "e", provenance: "deterministic fixture" } }; expect(resolveAtomColor("by-partial-charge", withDataset.atoms[0], withDataset).status).toBe("READY"); });
+  it("uses explicit ligand color before representation changes, visibility, or global scheme changes", () => {
+    const ligand = structure.atoms[3];
+    const base = createDefaultRenderProjection(structure);
+    const inherited = resolveProjectedAtomColor(base.color, "STICKS", ligand, structure);
+    expect(inherited.color).toBe(resolveAtomColor("rainbow", ligand, structure).color);
+
+    const cpk = setColorScheme(base, "classic-cpk", structure);
+    expect(resolveProjectedAtomColor(cpk.color, "STICKS", ligand, structure).color).toBe(resolveAtomColor("classic-cpk", ligand, structure).color);
+
+    const red = setColorForSelection(cpk, [ligand.stableId], "#ff0000");
+    const ballAndStick = setProjectionStyle(red, structure, "ball-and-stick");
+    const hidden = setLayerVisibility(ballAndStick, "showLigand", false);
+    const shown = setLayerVisibility(hidden, "showLigand", true);
+    const recoloredGlobally = setColorScheme(shown, "modern-jmol", structure);
+    expect(resolveProjectedAtomColor(ballAndStick.color, "STICKS", ligand, structure).color).toBe("#ff0000");
+    expect(resolveProjectedAtomColor(shown.color, "SPHERES", ligand, structure).color).toBe("#ff0000");
+    expect(resolveProjectedAtomColor(recoloredGlobally.color, "STICKS", ligand, structure).color).toBe("#ff0000");
+
+    const reset = clearColorForSelection(recoloredGlobally, [ligand.stableId]);
+    expect(resolveProjectedAtomColor(reset.color, "STICKS", ligand, structure).color).toBe(resolveAtomColor("modern-jmol", ligand, structure).color);
+  });
 });

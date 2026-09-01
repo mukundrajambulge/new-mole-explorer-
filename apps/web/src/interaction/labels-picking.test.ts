@@ -14,7 +14,8 @@ describe("safe labels and reverse identity picking", () => {
     const expression = parseSafeLabelExpression("{name} {resn}{resi} / {chain}");
     expect(resolveSafeLabel(expression, structure.atoms[0], structure)).toBe("CA ALA104 / A");
     expect(() => parseSafeLabelExpression("{constructor}" )).toThrow(/Unsupported/);
-    expect(() => parseSafeLabelExpression("{name}; eval(1)" )).not.toThrow();
+    expect(() => parseSafeLabelExpression("{name}; unsupported-call(1)" )).toThrow(/executable syntax/i);
+    expect(() => parseSafeLabelExpression("{name" )).toThrow(/Unbalanced braces/i);
   });
 
   it("resolves renderer hits through O(1) reverse maps and validates revision", () => {
