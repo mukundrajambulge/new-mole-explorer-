@@ -27,7 +27,8 @@ const bootstrap: BootstrapResponse = {
     "FILE.OPEN": { state: "SUPPORTED", label: "Supported", description: "Choose a PDB or mmCIF structure file; this converges with Import and Drop." },
     "FILE.IMPORT": { state: "SUPPORTED", label: "Supported", description: "Choose a PDB or mmCIF structure file." },
     "FILE.EXPORT": { state: "COMING_SOON", label: "Coming Soon", description: "Export is not implemented in G1B." },
-    "SELECTION.EVALUATE": { state: "COMING_SOON", label: "Coming Soon", description: "Authoritative selection evaluation is reserved for a later gate." },
+    "SELECTION.EVALUATE": { state: "SUPPORTED", label: "Supported", description: "The web client evaluates the typed canonical selection language against the loaded molecular revision." },
+    "SELECTION.CREATE_NAMED": { state: "SUPPORTED", label: "Supported", description: "The web client can create immutable named selection snapshots for the active molecular revision." },
     "DOCKING.RUN": { state: "UNAVAILABLE", label: "Unavailable", description: "No docking engine or scores are available in this foundation." },
   },
 };

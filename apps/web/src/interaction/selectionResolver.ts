@@ -1,6 +1,6 @@
 import { REPRESENTATION_MASKS, REPRESENTATION_PRESETS, type RepresentationMask, type RepresentationType } from "../rendering/presentationState";
-export { evaluateSelectionQuery, lexSelection, parseSelection, requireValidSelection, resolveSelection, selectionForStableIds, combineSelections, NamedSelectionStore, SelectionResolutionError } from "../selection/selectionEngine";
-export type { SelectionResult, SelectionStatus, SelectionAst, SelectionDiagnostic, SelectionToken, SelectionEvaluationOptions, NamedSelectionSnapshot, SourceSpan } from "../selection/selectionEngine";
+export { bindSelectionPlan, evaluateSelectionQuery, lexSelection, parseSelection, requireValidSelection, resolveSelection, selectionForStableIds, combineSelections, NamedSelectionStore, SelectionResolutionError } from "../selection/selectionEngine";
+export type { BoundSelectionPlan, SelectionResult, SelectionStatus, SelectionAst, SelectionDiagnostic, SelectionToken, SelectionEvaluationOptions, SelectionBindingDependencies, NamedSelectionSnapshot, SourceSpan } from "../selection/selectionEngine";
 
 export type RepresentationCommand = {
   operation: "SHOW" | "HIDE" | "SHOW_AS";

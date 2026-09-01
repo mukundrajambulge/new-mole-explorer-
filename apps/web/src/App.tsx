@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ProjectRecord, StructureLoadResult } from "@molecular/contracts";
 import { CapabilityNotice } from "./components/CapabilityNotice";
 import { ConsolePanel, type ConsoleCommandResult } from "./components/ConsolePanel";
@@ -14,12 +14,13 @@ import { ApiClientError, apiClient } from "./lib/apiClient";
 import { applyRepresentationToSelection, clearColorForSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setComponentColor, setInteractionState, setLabelState, setProjectionStyle, setRepresentationParameters, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
 import { applyPresentationAction, type PresentationComponent } from "./rendering/presentationActions";
 import { STYLE_DEFINITIONS, representationCapabilityFor, representationStyleForCommand } from "./rendering/styleProfiles";
-import { combineSelections, evaluateSelectionQuery, NamedSelectionStore, resolveSelection, parseRepresentationCommand, requireValidSelection, selectionForStableIds, type SelectionResult } from "./interaction/selectionResolver";
+import { combineSelections, evaluateSelectionQuery, NamedSelectionStore, resolveSelection, parseRepresentationCommand, requireValidSelection, SelectionResolutionError, selectionForStableIds, type SelectionResult } from "./interaction/selectionResolver";
 import { LabelExpressionError, labelExpressionForMode, parseSafeLabelExpression, type LabelMode } from "./interaction/labels";
 import { MeasurementAccumulator, createMeasurementObject, measurementCardinality, type MeasurementKind, type MeasurementObject } from "./interaction/measurements";
 import type { PickResult } from "./interaction/picking";
 import { colorRegistry } from "./rendering/colorRegistry";
 import { analyzeStructure, overlaysForAnalysis, type StructuralAnalysisKind, type StructuralAnalysisResult } from "./analysis/structuralAnalysis";
+import { commandHelp, parseCommand } from "./commands/commandRegistry";
 
 const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_SELECT]: "Select",
@@ -54,7 +55,6 @@ export const App = () => {
   const [measurementSlots, setMeasurementSlots] = useState<readonly string[]>([]);
   const [measurements, setMeasurements] = useState<readonly MeasurementObject[]>([]);
   const [analysisResults, setAnalysisResults] = useState<readonly StructuralAnalysisResult[]>([]);
-  const [activeSelectionResult, setActiveSelectionResult] = useState<SelectionResult | null>(null);
   const [namedSelections, setNamedSelections] = useState<readonly { name: string; count: number }[]>([]);
   const [targetStyles, setTargetStyles] = useState<Record<"protein" | "ligand" | "water" | "ions" | "other", RepresentationStyle>>({ protein: "cartoon", ligand: "ball-and-stick", water: "spheres", ions: "spheres", other: "sticks" });
   const [cameraCommand, setCameraCommand] = useState<{ actionId: ActionId; sequence: number }>();
@@ -64,7 +64,12 @@ export const App = () => {
   const measurementSequenceRef = useRef(0);
   const demoLoadStartedRef = useRef(false);
   const namedSelectionsRef = useRef<NamedSelectionStore | null>(null);
+  const activeSelectionResultRef = useRef<SelectionResult | null>(null);
   const analysisOverlays = useMemo(() => overlaysForAnalysis(analysisResults), [analysisResults]);
+
+  const setActiveSelection = (result: SelectionResult | null) => {
+    activeSelectionResultRef.current = result;
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -89,7 +94,7 @@ export const App = () => {
     window.setTimeout(() => setNotice((current) => current?.id === capability.id ? null : current), 4600);
   };
 
-  const runLoad = async (loader: () => Promise<StructureLoadResult>) => {
+  const runLoad = useCallback(async (loader: () => Promise<StructureLoadResult>) => {
     setLoadState("loading");
     setLoadError(null);
     try {
@@ -102,7 +107,7 @@ export const App = () => {
       setMeasurementSlots([]);
       setMeasurements([]);
       setAnalysisResults([]);
-      setActiveSelectionResult(null);
+      setActiveSelection(null);
       setNamedSelections([]);
       setLoadState("idle");
       commandSequence.current += 1;
@@ -111,7 +116,7 @@ export const App = () => {
       setLoadState("error");
       setLoadError(error instanceof ApiClientError ? error.message : "The structure could not be loaded. The current structure was kept.");
     }
-  };
+  }, []);
 
   const importFile = (file: File) => {
     if (!isAdmittedFile(file)) {
@@ -130,7 +135,7 @@ export const App = () => {
     if (!demoId || !/^[A-Z0-9]{4}$/.test(demoId)) return;
     demoLoadStartedRef.current = true;
     void runLoad(() => apiClient.fetchRcsb(demoId));
-  }, []);
+  }, [runLoad]);
 
   const createProject = async () => {
     try {
@@ -142,7 +147,7 @@ export const App = () => {
       setMeasurementSlots([]);
       setMeasurements([]);
       setAnalysisResults([]);
-      setActiveSelectionResult(null);
+      setActiveSelection(null);
       setNamedSelections([]);
       setLoadError(null);
       setLoadState("idle");
@@ -165,7 +170,7 @@ export const App = () => {
       setMeasurementSlots([]);
       setMeasurements([]);
       setAnalysisResults([]);
-      setActiveSelectionResult(null);
+      setActiveSelection(null);
       setNamedSelections([]);
       setLoadError(null);
       setLoadState("idle");
@@ -213,7 +218,7 @@ export const App = () => {
     if (structure) setProjection((current) => setCategoryRepresentation(current, structure.structure, category, maskForStyle(style), style));
   };
 
-  const setLabelMode = (mode: LabelMode) => setProjection((current) => applyPresentationAction(current, structure?.structure ?? null, { type: "LABELS.SET", labels: { mode, expression: labelExpressionForMode(mode), targetStableAtomIds: [] } }));
+  const setLabelMode = (mode: LabelMode) => setProjection((current) => applyPresentationAction(current, structure?.structure ?? null, { type: "LABELS.SET", labels: { mode, expression: labelExpressionForMode(mode), targetStableAtomIds: undefined } }));
   const setLabelExpression = (input: string): boolean => {
     try {
       const expression = parseSafeLabelExpression(input);
@@ -239,7 +244,7 @@ export const App = () => {
     if (pick.pickKind !== "ATOM" || !structure) return;
     const stableAtomId = pick.atomRef.stableAtomId;
     if (!measurementMode) {
-      setActiveSelectionResult(selectionForStableIds([stableAtomId], structure.structure));
+      setActiveSelection(selectionForStableIds([stableAtomId], structure.structure));
       setProjection((current) => setInteractionState(current, { pickedAtomId: stableAtomId, selectedAtomIds: [stableAtomId], measurementPickAtomIds: [] }));
       return;
     }
@@ -266,7 +271,7 @@ export const App = () => {
   const handleHover = (pick: PickResult | null) => setProjection((current) => setInteractionState(current, { hoveredAtomId: pick?.pickKind === "ATOM" ? pick.atomRef.stableAtomId : null }));
   const clearMeasurementPicks = () => { measurementAccumulatorRef.current.clear(); setMeasurementSlots([]); setProjection((current) => setInteractionState(current, { pickedAtomId: null, measurementPickAtomIds: [] })); };
   const clearTransientInteraction = () => setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, measurementPickAtomIds: [] }));
-  const clearSelection = () => { setActiveSelectionResult(null); setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] })); };
+  const clearSelection = () => { setActiveSelection(null); setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] })); };
   const updateMeasurementVisibility = (id: string, visible: boolean) => setMeasurements((current) => current.map((measurement) => measurement.id === id ? { ...measurement, presentation: { ...measurement.presentation, visible }, status: visible ? "CURRENT" : "HIDDEN" } : measurement));
   const deleteMeasurement = (id: string) => setMeasurements((current) => current.filter((measurement) => measurement.id !== id));
 
@@ -279,9 +284,19 @@ export const App = () => {
     setAnalysisResults((current) => [...current.filter((entry) => entry.kind !== kind), result]);
   };
 
+  const commandError = (error: unknown, category: ConsoleCommandResult["category"]): ConsoleCommandResult => {
+    if (error instanceof SelectionResolutionError && error.result) return { category, status: error.message, count: error.result.count, diagnostics: error.result.diagnostics.map((diagnostic) => ({ message: diagnostic.message, span: diagnostic.span })) };
+    return { category, status: error instanceof Error ? error.message : "Command rejected." };
+  };
+
   const runConsoleCommand = (input: string): ConsoleCommandResult => {
     const trimmed = input.trim();
-    if (/^select\b/i.test(trimmed)) {
+    const parsedResult = parseCommand(trimmed);
+    if (parsedResult.error) return { category: "CAPABILITY", status: `${parsedResult.error.message}${parsedResult.error.span ? ` (characters ${parsedResult.error.span.start + 1}–${parsedResult.error.span.end})` : ""}` };
+    const parsed = parsedResult.command;
+    if (!parsed) return { category: "CAPABILITY", status: "Command was not parsed and no state was changed." };
+    if (parsed.verb === "help") return { category: "SYSTEM", status: commandHelp(parsed.argument).map((definition) => `${definition.synopsis} — ${definition.description}`).join(" · ") || "No command matches that help topic." };
+    if (parsed.verb === "select") {
       if (!structure) return { category: "SELECTION", status: "No structure loaded; selection was not changed." };
       try {
         const namedMatch = trimmed.match(/^select\s+([A-Za-z_][A-Za-z0-9_]*)\s*,\s*(.+)$/i);
@@ -290,22 +305,44 @@ export const App = () => {
           const result = requireValidSelection(evaluateSelectionQuery(namedMatch[2], structure.structure, { named: namedSelectionsRef.current ?? undefined }));
           const snapshot = namedSelectionsRef.current?.createSnapshot(namedMatch[1], result);
           if (snapshot) setNamedSelections(namedSelectionsRef.current?.list().map((selection) => ({ name: selection.name, count: selection.stableAtomIds.length })) ?? []);
-          setActiveSelectionResult(result);
+          setActiveSelection(result);
           setProjection((current) => setInteractionState(current, { selectedAtomIds: result.stableAtomIds, pickedAtomId: result.stableAtomIds[0] ?? null, measurementPickAtomIds: [] }));
           return { category: "SELECTION", status: `Named selection ${namedMatch[1]} created · ${result.count} atoms.` };
         }
         const query = operationMatch?.[2]?.trim() || "all";
         const operation = (operationMatch?.[1]?.toLowerCase() ?? "replace") as "replace" | "add" | "subtract" | "intersect";
         const target = requireValidSelection(evaluateSelectionQuery(query, structure.structure, { named: namedSelectionsRef.current ?? undefined }));
-        const result = operation === "replace" || !activeSelectionResult ? target : combineSelections(activeSelectionResult, target, operation);
-        setActiveSelectionResult(result);
+        const currentSelection = activeSelectionResultRef.current;
+        const result = operation === "replace" || !currentSelection ? target : combineSelections(currentSelection, target, operation);
+        setActiveSelection(result);
         setProjection((current) => setInteractionState(current, { selectedAtomIds: result.stableAtomIds, pickedAtomId: result.stableAtomIds[0] ?? null, measurementPickAtomIds: [] }));
         return { category: "SELECTION", status: `Selected ${result.count} atoms · ${operation} · revision ${result.molecularRevision.slice(0, 10)}…` };
       } catch (error) {
-        return { category: "SELECTION", status: error instanceof Error ? error.message : "Selection query rejected." };
+        return commandError(error, "SELECTION");
       }
     }
-    if (/^unpick$/i.test(trimmed)) { clearSelection(); return { category: "SELECTION", status: "Selection cleared." }; }
+    if (parsed.verb === "unpick") { clearSelection(); return { category: "SELECTION", status: "Selection cleared." }; }
+    if (parsed.verb === "rename" || parsed.verb === "delete" || parsed.verb === "update") {
+      if (!structure || !namedSelectionsRef.current) return { category: "OBJECT", status: "No structure loaded; the named-selection namespace was not changed." };
+      try {
+        if (parsed.verb === "rename") {
+          if (!parsed.target) return { category: "OBJECT", status: "rename requires `rename old_name, new_name`." };
+          namedSelectionsRef.current.rename(parsed.argument, parsed.target);
+          setNamedSelections(namedSelectionsRef.current.list().map((selection) => ({ name: selection.name, count: selection.stableAtomIds.length })));
+          return { category: "OBJECT", status: `Named selection ${parsed.argument} renamed to ${parsed.target}.` };
+        }
+        if (parsed.verb === "delete") {
+          if (!namedSelectionsRef.current.delete(parsed.argument)) return { category: "OBJECT", status: `Named selection ${parsed.argument} does not exist.` };
+          setNamedSelections(namedSelectionsRef.current.list().map((selection) => ({ name: selection.name, count: selection.stableAtomIds.length })));
+          return { category: "OBJECT", status: `Named selection ${parsed.argument} deleted.` };
+        }
+        if (!parsed.target) return { category: "OBJECT", status: "update requires `update name, query`." };
+        const result = requireValidSelection(evaluateSelectionQuery(parsed.target, structure.structure, { named: namedSelectionsRef.current }));
+        const snapshot = namedSelectionsRef.current.updateSnapshot(parsed.argument, result);
+        setNamedSelections(namedSelectionsRef.current.list().map((selection) => ({ name: selection.name, count: selection.stableAtomIds.length })));
+        return { category: "OBJECT", status: `Named selection ${snapshot.name} updated · ${snapshot.stableAtomIds.length} atoms.` };
+      } catch (error) { return commandError(error, "OBJECT"); }
+    }
     try {
       const representationCommand = parseRepresentationCommand(trimmed);
       if (representationCommand) {
@@ -351,11 +388,11 @@ export const App = () => {
         setCameraCommand({ actionId: viewTarget[1].toLowerCase() === "center" ? ACTION_IDS.VIEW_CENTER : ACTION_IDS.VIEW_FIT, sequence: commandSequence.current });
         return { category: "PRESENTATION", status: `${viewTarget[1]} applied to ${target.count} canonical atoms.` };
       }
-      if (/^get_view$/i.test(trimmed)) return { category: "PRESENTATION", status: JSON.stringify(projection.camera.view ?? { projection: projection.camera.projectionMode }) };
+      if (parsed.verb === "get_view") return { category: "VIEW", status: JSON.stringify(projection.camera.view ?? { projection: projection.camera.projectionMode }) };
       if (/^measure\s+(distance|angle|dihedral)$/i.test(trimmed)) { setMeasurementMode(trimmed.split(/\s+/)[1].toUpperCase() as MeasurementKind); return { category: "MEASURE", status: `Measurement mode started: ${trimmed.split(/\s+/)[1].toUpperCase()}.` }; }
       if (/^measure\s+clear$/i.test(trimmed)) { clearMeasurementPicks(); return { category: "MEASURE", status: "Measurement picks cleared." }; }
     } catch (error) {
-      return { category: "PRESENTATION", status: error instanceof Error ? error.message : "Command rejected." };
+      return commandError(error, "PRESENTATION");
     }
     return { category: "CAPABILITY", status: "Command is not implemented in the current bounded presentation/interaction gate." };
   };
@@ -366,8 +403,9 @@ export const App = () => {
     if (!snapshot) return;
     const target = snapshot.selectionResult;
     if (action === "A" || action === "S") {
-      const result = action === "S" || !activeSelectionResult ? target : combineSelections(activeSelectionResult, target, "add");
-      setActiveSelectionResult(result);
+      const currentSelection = activeSelectionResultRef.current;
+      const result = action === "S" || !currentSelection ? target : combineSelections(currentSelection, target, "add");
+      setActiveSelection(result);
       setProjection((current) => setInteractionState(current, { selectedAtomIds: result.stableAtomIds, pickedAtomId: result.stableAtomIds[0] ?? null, measurementPickAtomIds: [] }));
     } else if (action === "H") {
       setProjection((current) => applyRepresentationToSelection(current, "HIDE", (1 << 10) - 1, target.stableAtomIds));
@@ -407,6 +445,11 @@ export const App = () => {
       return;
     }
     if (actionId === ACTION_IDS.STRUCTURE_FETCH_RCSB) {
+      return;
+    }
+    if (actionId === ACTION_IDS.SELECTION_EVALUATE || actionId === ACTION_IDS.SELECTION_CREATE_NAMED) {
+      setActiveNav("Console");
+      setConsoleExpanded(true);
       return;
     }
     if (actionId === ACTION_IDS.ANALYSIS_H_BONDS || actionId === ACTION_IDS.ANALYSIS_CONTACTS || actionId === ACTION_IDS.ANALYSIS_CLASH) {
@@ -477,11 +520,11 @@ export const App = () => {
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
           <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} selectedAtom={selectedAtom} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} />
           <MolecularCanvas structure={structure} projection={projection} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => fileInputRef.current?.click()} onFileDrop={importFile} consoleExpanded={consoleExpanded} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} />
-          <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
+          <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
         </div>
         <StatusBar apiStatus={apiStatus} structure={structure} project={project} selectedAtomCount={projection.interaction.selectedAtomIds.length} />
         {notice && <CapabilityNotice capability={notice} onClose={() => setNotice(null)} />}
-        <div className="console-layer"><ConsolePanel expanded={consoleExpanded} onToggle={() => setConsoleExpanded((value) => !value)} structure={structure} onCommand={runConsoleCommand} /></div>
+        <div className="console-layer"><ConsolePanel expanded={consoleExpanded} onToggle={() => setConsoleExpanded((value) => !value)} structure={structure} namedSelections={namedSelections} onCommand={runConsoleCommand} /></div>
       </main>
     </div>
   );

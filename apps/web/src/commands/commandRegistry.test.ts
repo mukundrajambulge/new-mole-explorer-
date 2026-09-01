@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { commandSuggestions, parseCommand } from "./commandRegistry";
+import { commandHelp, commandSuggestions, parseCommand } from "./commandRegistry";
 
 describe("typed command registry boundary", () => {
   it("separates command head, domain, argument, and target from selection text", () => {
@@ -11,5 +11,8 @@ describe("typed command registry boundary", () => {
     expect(parseCommand("wat do something").error?.code).toBe("UNKNOWN_COMMAND");
     expect(parseCommand("color").error?.code).toBe("MISSING_ARGUMENT");
     expect(commandSuggestions("sh")).toEqual(["show", "show_as"]);
+    expect(commandSuggestions("select ")).toContain("chain");
+    expect(commandHelp("select")[0]?.domain).toBe("SELECTION");
+    expect(parseCommand("rename active_site, binding_site").command).toMatchObject({ domain: "OBJECT", argument: "active_site", target: "binding_site" });
   });
 });

@@ -20,6 +20,8 @@ describe("canonical selection engine", () => {
   it("lexes and applies boolean precedence without splitting raw text", () => {
     const parsed = parseSelection("not polymer or ligand and chain A");
     expect(parsed.ast?.kind).toBe("or");
+    expect(parseSelection("not polymer and chain A").ast?.kind).toBe("and");
+    expect(parseSelection("(polymer or ligand) and chain A").ast?.kind).toBe("and");
     expect(resolveSelection("chain A and polymer", structure).stableAtomIds).toEqual(["a1", "a2", "a3"]);
     expect(resolveSelection("ligand or water", structure).stableAtomIds).toEqual(["l1", "w1"]);
   });
@@ -29,6 +31,8 @@ describe("canonical selection engine", () => {
     expect(resolveSelection("index 2", structure).stableAtomIds).toEqual(["a2"]);
     expect(resolveSelection("rank 0", structure).stableAtomIds).toEqual(["a1"]);
     expect(resolveSelection("byres name CA and chain A", structure).stableAtomIds).toEqual(["a1", "a2", "a3"]);
+    expect(resolveSelection("byres (name CA or ligand)", structure).stableAtomIds).toEqual(["a1", "a2", "a3", "b1", "l1"]);
+    expect(resolveSelection("bychain chain A and ligand", structure).stableAtomIds).toEqual(["a1", "a2", "a3", "l1", "w1"]);
   });
 
   it("evaluates topology and exact spatial boundaries through canonical data", () => {
@@ -36,12 +40,18 @@ describe("canonical selection engine", () => {
     expect(resolveSelection("bound_to ligand", structure).stableAtomIds).toEqual(["a2"]);
     expect(resolveSelection("within 2 of ligand", structure).stableAtomIds).toEqual(["a1", "a2", "a3", "l1"]);
     expect(resolveSelection("around 2 ligand", structure).stableAtomIds).toEqual(["a1", "a2", "a3"]);
+    expect(resolveSelection("chain A within 4 of ligand or water", structure).stableAtomIds).toEqual(["a1", "a2", "a3", "l1", "w1"]);
+    expect(evaluateSelectionQuery("within -1 of ligand", structure).status).toBe("SYNTAX_ERROR");
+    expect(evaluateSelectionQuery("gap 4 of ligand", structure).status).toBe("UNSUPPORTED_OPERATOR_OR_PROFILE");
   });
 
   it("returns truthful structured failures and never turns unknown names into empty success", () => {
     expect(evaluateSelectionQuery("nearest 5", structure).status).toBe("SYNTAX_ERROR");
+    expect(evaluateSelectionQuery("foo bar", structure).status).toBe("UNKNOWN_PROPERTY");
     expect(evaluateSelectionQuery("segi A", structure).status).toBe("UNSUPPORTED_OPERATOR_OR_PROFILE");
     expect(evaluateSelectionQuery("missing_selection", structure).status).toBe("UNKNOWN_NAME");
+    expect(evaluateSelectionQuery("index zero", structure).status).toBe("INVALID_VALUE");
+    expect(evaluateSelectionQuery("resi nonsense", structure).status).toBe("INVALID_VALUE");
     expect(evaluateSelectionQuery("all", structure, { expectedRevision: "stale" }).status).toBe("STALE_REVISION");
   });
 
@@ -52,7 +62,22 @@ describe("canonical selection engine", () => {
     expect(resolveSelection("%active_site", structure, { named: store }).stableAtomIds).toEqual(result.stableAtomIds);
     expect(resolveSelection("?missing", structure, { named: store }).status).toBe("VALID_EMPTY");
     expect(snapshot.immutable).toBe(true);
+    expect(store.namespaceRevision).not.toBe("");
+    expect(store.rename("active_site", "binding_site").name).toBe("binding_site");
+    expect(store.updateSnapshot("binding_site", resolveSelection("ligand", structure)).stableAtomIds).toEqual(["l1"]);
+    expect(store.delete("binding_site")).toBe(true);
     expect(selectionForStableIds(["l1", "a1", "l1"], structure).stableAtomIds).toEqual(["a1", "l1"]);
     expect(combineSelections(result, selectionForStableIds(["l1"], structure), "add").stableAtomIds).toEqual(["a1", "a2", "a3", "l1"]);
+  });
+
+  it("binds an explicit plan and keeps stable identity fields distinct", () => {
+    const result = resolveSelection("id a2", structure);
+    expect(result.boundPlan?.molecularRevision).toBe(structure.scientificHash);
+    expect(result.boundPlan?.objectScope.objectId).toBe(structure.id);
+    expect(resolveSelection("index 2", structure).stableAtomIds).toEqual(["a2"]);
+    expect(resolveSelection("rank 1", structure).stableAtomIds).toEqual(["a2"]);
+    expect(resolveSelection("id 2", structure).stableAtomIds).toEqual(["a2"]);
+    expect(resolveSelection("name CA and not chain B", structure).stableAtomIds).toEqual(["a1", "a3"]);
+    expect(resolveSelection("name != CA", structure).stableAtomIds).toEqual(["a2", "l1", "w1"]);
   });
 });

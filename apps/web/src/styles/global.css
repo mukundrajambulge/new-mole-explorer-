@@ -123,6 +123,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
 .workspace-grid--right-collapsed { --right-width: 32px; }
 .side-column { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 .side-column--left .structure-card { flex: 0 0 auto; }
+.side-column--left .selections-card { flex: 0 0 auto; }
 .side-column--left .components-card { flex: 0 0 auto; }
 .side-column--left .context-card { flex: 0 0 auto; }
 .side-column--left .analysis-card { flex: 0 0 auto; min-height: 0; overflow: visible; }
@@ -218,6 +219,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
 .display-row select { min-width: 0; max-width: 152px; padding: 5px 6px; color: #dbe4ee; border: 1px solid rgba(147, 169, 193, .16); border-radius: 5px; outline: 0; background: #101722; font-size: 10px; }
 .display-capability { margin: -2px 13px 4px; color: #738296; font-size: 8px; letter-spacing: .04em; text-transform: uppercase; }
 .presentation-diagnostic { margin: 4px 13px 6px; padding: 6px 7px; color: #ffc6bd; border: 1px solid rgba(236, 117, 107, .3); border-radius: 5px; background: rgba(236, 117, 107, .08); font-family: ui-monospace, monospace; font-size: 8px; line-height: 1.35; }
+.label-editor-actions { display: flex; gap: 8px; margin: 8px 0 4px; }
+.label-editor-actions button { border: 1px solid var(--line-strong); border-radius: 7px; background: var(--surface-2); color: var(--text-primary); padding: 5px 10px; cursor: pointer; }
+.label-editor-actions button:hover, .label-editor-actions button:focus-visible { border-color: var(--accent); color: var(--accent); }
 .display-row input[type="color"] { width: 48px; height: 22px; padding: 1px; border: 1px solid #374150; border-radius: 4px; background: #101722; }
 .display-row--sub { min-height: 30px; padding-left: 25px; color: #8e9cad; font-size: 10px; }
 .color-swatch { width: 48px; height: 20px; border: 1px solid #374150; border-radius: 4px; background: #050609; }
@@ -291,6 +295,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
 .console-suggestions { display: flex; gap: 5px; padding: 0 42px 7px; overflow-x: auto; }
 .console-suggestions button { padding: 4px 7px; color: #9fdcd4; border: 1px solid rgba(49, 216, 196, .2); border-radius: 4px; background: rgba(49, 216, 196, .06); font-family: ui-monospace, monospace; font-size: 8px; }
 .console-suggestions button:hover { color: #fff; border-color: rgba(49, 216, 196, .5); }
+.console-diagnostic { color: #ffd36b; font-size: 11px; margin-top: 4px; }
 .console-input-row input { flex: 1; min-width: 0; padding: 6px 0; color: #e8eef6; border: 0; outline: 0; background: transparent; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11px; }
 .console-input-row input::placeholder { color: #667386; }
 .console-submit { display: flex; align-items: center; gap: 8px; padding: 9px 13px; color: #f5fbff; border-radius: 7px; background: linear-gradient(180deg, #298cff, #1465c9); box-shadow: inset 0 1px rgba(255,255,255,.2); font-size: 10px; font-weight: 700; }

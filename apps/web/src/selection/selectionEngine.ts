@@ -40,6 +40,21 @@ export type SelectionProvenance = {
   parentResultIds?: readonly string[];
 };
 
+export type BoundSelectionPlan = {
+  schemaVersion: 1;
+  query: string;
+  ast: SelectionAst;
+  normalizedAst: string;
+  structureId: string;
+  molecularRevision: string;
+  objectScope: { kind: "structure"; objectId: string };
+  universeFingerprint: string;
+  coordinateContext: { structureId: string; revision: string; stateId: string } | null;
+  topologyRevision: string | null;
+  namespaceRevision: string;
+  dependencyVector: { needsCoordinates: boolean; needsTopology: boolean; needsNamespaces: boolean };
+};
+
 export type SelectionResult = {
   schemaVersion: 2;
   resultId: string;
@@ -63,6 +78,7 @@ export type SelectionResult = {
   status: SelectionStatus;
   diagnostics: readonly SelectionDiagnostic[];
   dependencyVector: { needsCoordinates: boolean; needsTopology: boolean; needsNamespaces: boolean };
+  boundPlan: BoundSelectionPlan | null;
 };
 
 export class SelectionResolutionError extends Error {
@@ -101,7 +117,8 @@ export const lexSelection = (query: string): { tokens: readonly SelectionToken[]
     if (char === "(") { cursor += 1; tokens.push({ kind: "LPAREN", lexeme: char, span: spanAt(query, start, cursor) }); continue; }
     if (char === ")") { cursor += 1; tokens.push({ kind: "RPAREN", lexeme: char, span: spanAt(query, start, cursor) }); continue; }
     if (char === ",") { cursor += 1; tokens.push({ kind: "COMMA", lexeme: char, span: spanAt(query, start, cursor) }); continue; }
-    if (char === "!" || char === "&" || char === "|") { cursor += 1; tokens.push({ kind: "OPERATOR", lexeme: char, span: spanAt(query, start, cursor) }); continue; }
+    if (char === "!" && query[cursor + 1] === "=") { cursor += 2; tokens.push({ kind: "OPERATOR", lexeme: "!=", span: spanAt(query, start, cursor) }); continue; }
+    if (char === "=" || char === "!" || char === "&" || char === "|") { cursor += 1; tokens.push({ kind: "OPERATOR", lexeme: char, span: spanAt(query, start, cursor) }); continue; }
     if (char === "\"" || char === "'") {
       const quote = char; cursor += 1; let value = ""; let closed = false;
       while (cursor < query.length) { const next = query[cursor++]; if (next === "\\" && cursor < query.length) { value += query[cursor++]; continue; } if (next === quote) { closed = true; break; } value += next; }
@@ -109,7 +126,7 @@ export const lexSelection = (query: string): { tokens: readonly SelectionToken[]
       if (!closed) diagnostics.push({ code: "SYNTAX_ERROR", message: "Unterminated quoted value.", span });
       tokens.push({ kind: "STRING", lexeme: value, span }); continue;
     }
-    while (cursor < query.length && !/\s/.test(query[cursor]) && !/[(),!&|]/.test(query[cursor])) cursor += 1;
+    while (cursor < query.length && !/\s/.test(query[cursor]) && !/[(),!&|=]/.test(query[cursor])) cursor += 1;
     tokens.push({ kind: "WORD", lexeme: query.slice(start, cursor), span: spanAt(query, start, cursor) });
   }
   tokens.push({ kind: "EOF", lexeme: "", span: spanAt(query, query.length, query.length) });
@@ -127,6 +144,7 @@ class SelectionParser {
   private current() { return this.tokens[this.cursor]; }
   private take() { return this.tokens[this.cursor++]; }
   private fail(message: string, token = this.current()): never { const diagnostic = { code: "SYNTAX_ERROR" as const, message, span: token?.span }; this.diagnostics.push(diagnostic); throw new Error(message); }
+  private failWith(code: SelectionDiagnostic["code"], message: string, token = this.current()): never { this.diagnostics.push({ code, message, span: token?.span }); throw new Error(message); }
   private expectWord(value: string) { if (!isWord(this.current(), value)) this.fail(`Expected \`${value}\`.`); return this.take(); }
   parse(): SelectionAst {
     const ast = this.expression(0);
@@ -170,13 +188,16 @@ class SelectionParser {
     const category = categoryNames.get(word as "polymer" | "protein" | "ligand" | "organic" | "water" | "ion" | "ions" | "other");
     if (category) return { kind: "category", category, span: token.span };
     if (propertyNames.has(word as SelectionProperty)) {
+      let operator: "EQ" | "NE" = "EQ";
+      if (this.current().kind === "OPERATOR" && (this.current().lexeme === "=" || this.current().lexeme === "!=")) { operator = this.take().lexeme === "!=" ? "NE" : "EQ"; }
       const value = this.take();
       if (!value || value.kind === "EOF" || value.kind === "RPAREN") this.fail(`Property \`${word}\` requires a value.`, value);
-      return { kind: "predicate", property: word as SelectionProperty, operator: "EQ", value: value.lexeme, span: token.span };
+      return { kind: "predicate", property: word as SelectionProperty, operator, value: value.lexeme, span: token.span };
     }
     if (token.kind === "STRING" || token.kind === "WORD") {
       if (token.lexeme.startsWith("%")) return { kind: "named", name: token.lexeme.slice(1), required: true, span: token.span };
       if (token.lexeme.startsWith("?") && token.lexeme.length > 1) return { kind: "named", name: token.lexeme.slice(1), required: false, span: token.span };
+      if (this.current().kind === "WORD" && !/^-?\d+(?:\.\d+)?$/.test(this.current().lexeme)) this.failWith("UNKNOWN_PROPERTY", `Unknown property or malformed selector \`${token.lexeme}\`.`, token);
       return { kind: "named", name: token.lexeme, required: true, span: token.span };
     }
     this.fail(`Unexpected token \`${token.lexeme}\`.`, token);
@@ -189,13 +210,23 @@ class SelectionParser {
 }
 
 export const parseSelection = (query: string): { ast: SelectionAst | null; tokens: readonly SelectionToken[]; diagnostics: readonly SelectionDiagnostic[] } => {
+  const cached = selectionParseCache.get(query);
+  if (cached) return cached;
   const lexical = lexSelection(query);
-  if (lexical.diagnostics.length > 0) return { ast: null, tokens: lexical.tokens, diagnostics: lexical.diagnostics };
+  if (lexical.diagnostics.length > 0) {
+    const result = { ast: null, tokens: lexical.tokens, diagnostics: lexical.diagnostics };
+    selectionParseCache.set(query, result);
+    return result;
+  }
   const parser = new SelectionParser(query, lexical.tokens);
-  try {
-    return { ast: parser.parse(), tokens: lexical.tokens, diagnostics: parser.diagnostics };
-  } catch { return { ast: null, tokens: lexical.tokens, diagnostics: parser.diagnostics }; }
+  let result: { ast: SelectionAst | null; tokens: readonly SelectionToken[]; diagnostics: readonly SelectionDiagnostic[] };
+  try { result = { ast: parser.parse(), tokens: lexical.tokens, diagnostics: parser.diagnostics }; }
+  catch { result = { ast: null, tokens: lexical.tokens, diagnostics: parser.diagnostics }; }
+  selectionParseCache.set(query, result);
+  return result;
 };
+
+const selectionParseCache = new Map<string, { ast: SelectionAst | null; tokens: readonly SelectionToken[]; diagnostics: readonly SelectionDiagnostic[] }>();
 
 const normalize = (ast: SelectionAst): SelectionAst => {
   if (ast.kind === "and" || ast.kind === "or") return { ...ast, left: normalize(ast.left), right: normalize(ast.right) };
@@ -217,7 +248,7 @@ const serialize = (ast: SelectionAst): string => {
   return "invalid";
 };
 
-type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; named?: NamedSelectionStore; query: string };
+type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; named?: NamedSelectionStore; query: string; indexByStableId: Map<string, number>; rankByStableId: Map<string, number> };
 const wildcardMatch = (value: string, pattern: string): boolean => {
   const escaped = [...pattern].map((char) => char === "*" ? ".*" : char === "?" ? "." : char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("");
   return new RegExp(`^${escaped}$`, "i").test(value);
@@ -230,26 +261,31 @@ const residueMatch = (atom: CanonicalAtom, value: string): boolean => {
   const exact = residueParts(value); return !!exact && current.number === exact.number && current.insertion === exact.insertion;
 };
 const atomCategory = (atom: CanonicalAtom): "polymer" | "ligand" | "water" | "ion" | "other" => atom.isPolymer ? "polymer" : atom.isLigand ? "ligand" : atom.isWater ? "water" : atom.isIon ? "ion" : "other";
-const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, value: string, structure: CanonicalMolecularStructure, context: EvalContext): boolean => {
+const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, operator: "EQ" | "NE", value: string, structure: CanonicalMolecularStructure, context: EvalContext): boolean => {
   if (property === "segi") { if (!context.diagnostics.some((diagnostic) => diagnostic.code === "UNSUPPORTED_OPERATOR_OR_PROFILE")) context.diagnostics.push({ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: "Segment identity is not present in the current canonical structure; the query was not mapped to chain identity." }); return false; }
-  if (property === "name") return wildcardMatch(atom.atomName, value);
-  if (property === "resn") return wildcardMatch(atom.residueName, value);
-  if (property === "resi") return residueMatch(atom, value);
-  if (property === "chain") return wildcardMatch(atom.chain, value);
-  if (property === "elem") return wildcardMatch(atom.element, value);
-  if (property === "alt") return wildcardMatch(atom.altLoc ?? "", value);
-  if (property === "id") return atom.stableId === value || String(atom.serial) === value;
-  if (property === "index") { const index = structure.atoms.findIndex((candidate) => candidate.stableId === atom.stableId) + 1; return index === Number(value); }
-  if (property === "rank") { const index = structure.atoms.findIndex((candidate) => candidate.stableId === atom.stableId); return index === Number(value); }
-  if (property === "model" || property === "object") return wildcardMatch(structure.id, value) || wildcardMatch(structure.name, value);
-  context.diagnostics.push({ code: "UNKNOWN_PROPERTY", message: `Unknown canonical property: ${property}.` }); return false;
+  const markInvalid = (message: string) => { if (!context.diagnostics.some((diagnostic) => diagnostic.code === "INVALID_VALUE" && diagnostic.message === message)) context.diagnostics.push({ code: "INVALID_VALUE", message }); };
+  if ((property === "index" && (!/^\d+$/.test(value) || Number(value) < 1)) || (property === "rank" && (!/^\d+$/.test(value) || Number(value) < 0))) { markInvalid(`${property} requires a non-negative integer with ${property === "index" ? "one-based" : "zero-based"} semantics.`); return false; }
+  if (property === "resi" && !/^-?\d+[A-Za-z]?(?:[-:]-?\d+[A-Za-z]?)?$/.test(value)) { markInvalid(`Residue selector \`${value}\` is not an integer, insertion-aware value, or range.`); return false; }
+  let matches = false;
+  if (property === "name") matches = wildcardMatch(atom.atomName, value);
+  else if (property === "resn") matches = wildcardMatch(atom.residueName, value);
+  else if (property === "resi") matches = residueMatch(atom, value);
+  else if (property === "chain") matches = wildcardMatch(atom.chain, value);
+  else if (property === "elem") matches = wildcardMatch(atom.element, value);
+  else if (property === "alt") matches = wildcardMatch(atom.altLoc ?? "", value);
+  else if (property === "id") matches = atom.stableId === value || String(atom.serial) === value;
+  else if (property === "index") matches = context.indexByStableId.get(atom.stableId) === Number(value);
+  else if (property === "rank") matches = context.rankByStableId.get(atom.stableId) === Number(value);
+  else if (property === "model" || property === "object") matches = wildcardMatch(structure.id, value) || wildcardMatch(structure.name, value);
+  else { context.diagnostics.push({ code: "UNKNOWN_PROPERTY", message: `Unknown canonical property: ${property}.` }); return false; }
+  return operator === "NE" ? !matches : matches;
 };
 const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, context: EvalContext): Set<string> => {
   const all = () => new Set(context.universe);
   if (ast.kind === "all") return all();
   if (ast.kind === "none") return new Set();
   if (ast.kind === "category") return new Set(structure.atoms.filter((atom) => atomCategory(atom) === ast.category).map((atom) => atom.stableId).filter((id) => context.universe.has(id)));
-  if (ast.kind === "predicate") return new Set(structure.atoms.filter((atom) => context.universe.has(atom.stableId) && predicateMatches(atom, ast.property, ast.value, structure, context)).map((atom) => atom.stableId));
+  if (ast.kind === "predicate") return new Set(structure.atoms.filter((atom) => context.universe.has(atom.stableId) && predicateMatches(atom, ast.property, ast.operator, ast.value, structure, context)).map((atom) => atom.stableId));
   if (ast.kind === "named") {
     const named = context.named?.get(ast.name);
     if (!named) { if (ast.required) context.diagnostics.push({ code: "UNKNOWN_NAME", message: `Named selection \`${ast.name}\` does not exist.` }); return new Set(); }
@@ -282,27 +318,73 @@ const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, 
 };
 
 const resultId = (query: string, structure: CanonicalMolecularStructure, ids: readonly string[]) => hash(`${query}\u0000${structure.id}\u0000${structure.scientificHash}\u0000${ids.join("\u0000")}`);
-const baseResult = (query: string, structure: CanonicalMolecularStructure, source: SelectionProvenance, status: SelectionStatus, diagnostics: readonly SelectionDiagnostic[], astText: string, ids: readonly string[], deps: EvalContext): SelectionResult => {
+const topologyRevisionFor = (structure: CanonicalMolecularStructure): string => hash(structure.bonds.map((bond) => `${bond.atom1}:${bond.atom2}:${bond.order}`).join("\u0000"));
+const namespaceRevisionFor = (structure: CanonicalMolecularStructure, named?: NamedSelectionStore): string => hash(`${structure.atoms.map((atom) => `${atom.stableId}:${atom.chain}:${atom.residueNumber}:${atom.insertionCode ?? ""}`).join("\u0000")}\u0000${named?.namespaceRevision ?? "none"}`);
+const baseResult = (query: string, structure: CanonicalMolecularStructure, source: SelectionProvenance, status: SelectionStatus, diagnostics: readonly SelectionDiagnostic[], astText: string, ids: readonly string[], deps: EvalContext, boundPlan: BoundSelectionPlan | null = null): SelectionResult => {
   const stableAtomIds = stableSort(ids, structure); const normalizedAstHash = hash(astText); const membershipHash = hash(stableAtomIds.join("\u0000"));
-  return { schemaVersion: 2, resultId: resultId(query, structure, stableAtomIds), source, query, grammarVersion: GRAMMAR_VERSION, normalizedAst: astText, normalizedAstHash, profile: PROFILE, molecularIdentity: { structureId: structure.id, molecularRevision: structure.scientificHash }, structureId: structure.id, molecularRevision: structure.scientificHash, objectScope: { kind: "structure", objectId: structure.id }, universeFingerprint: hash(structure.atoms.map((atom) => atom.stableId).join("\u0000")), coordinateContext: deps.needsCoordinates ? { structureId: structure.id, revision: structure.scientificHash, stateId: "active" } : null, topologyRevision: deps.needsTopology ? hash(structure.bonds.map((bond) => `${bond.atom1}:${bond.atom2}:${bond.order}`).join("\u0000")) : null, namespaceRevision: hash(structure.atoms.map((atom) => `${atom.stableId}:${atom.chain}:${atom.residueNumber}`).join("\u0000")), stableAtomIds, membershipHash, count: stableAtomIds.length, status, diagnostics, dependencyVector: { needsCoordinates: deps.needsCoordinates, needsTopology: deps.needsTopology, needsNamespaces: true } };
+  return { schemaVersion: 2, resultId: resultId(query, structure, stableAtomIds), source, query, grammarVersion: GRAMMAR_VERSION, normalizedAst: astText, normalizedAstHash, profile: PROFILE, molecularIdentity: { structureId: structure.id, molecularRevision: structure.scientificHash }, structureId: structure.id, molecularRevision: structure.scientificHash, objectScope: { kind: "structure", objectId: structure.id }, universeFingerprint: hash(structure.atoms.map((atom) => atom.stableId).join("\u0000")), coordinateContext: deps.needsCoordinates ? { structureId: structure.id, revision: structure.scientificHash, stateId: "active" } : null, topologyRevision: deps.needsTopology ? topologyRevisionFor(structure) : null, namespaceRevision: namespaceRevisionFor(structure, deps.named), stableAtomIds, membershipHash, count: stableAtomIds.length, status, diagnostics, dependencyVector: { needsCoordinates: deps.needsCoordinates, needsTopology: deps.needsTopology, needsNamespaces: true }, boundPlan };
 };
 
 export type SelectionEvaluationOptions = { named?: NamedSelectionStore; expectedRevision?: string; source?: SelectionProvenance };
+type CachedEvaluation = { normalized: string; ast: SelectionAst; ids: readonly string[]; status: SelectionStatus; diagnostics: readonly SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean };
+const selectionEvaluationCache = new Map<string, CachedEvaluation>();
+const contextFor = (structure: CanonicalMolecularStructure, query: string, named?: NamedSelectionStore, diagnostics: SelectionDiagnostic[] = []): EvalContext => ({
+  universe: new Set(structure.atoms.map((atom) => atom.stableId)),
+  diagnostics,
+  needsCoordinates: false,
+  needsTopology: false,
+  named,
+  query,
+  indexByStableId: new Map(structure.atoms.map((atom, index) => [atom.stableId, index + 1])),
+  rankByStableId: new Map(structure.atoms.map((atom, index) => [atom.stableId, index])),
+});
+
+export type SelectionBindingDependencies = { needsCoordinates: boolean; needsTopology: boolean; named?: NamedSelectionStore };
+export const bindSelectionPlan = (query: string, ast: SelectionAst, normalizedAst: string, structure: CanonicalMolecularStructure, dependencies: SelectionBindingDependencies): BoundSelectionPlan => ({
+  schemaVersion: 1,
+  query,
+  ast,
+  normalizedAst,
+  structureId: structure.id,
+  molecularRevision: structure.scientificHash,
+  objectScope: { kind: "structure", objectId: structure.id },
+  universeFingerprint: hash(structure.atoms.map((atom) => atom.stableId).join("\u0000")),
+  coordinateContext: dependencies.needsCoordinates ? { structureId: structure.id, revision: structure.scientificHash, stateId: "active" } : null,
+  topologyRevision: dependencies.needsTopology ? topologyRevisionFor(structure) : null,
+  namespaceRevision: namespaceRevisionFor(structure, dependencies.named),
+  dependencyVector: { needsCoordinates: dependencies.needsCoordinates, needsTopology: dependencies.needsTopology, needsNamespaces: true },
+});
+
 export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecularStructure, options: SelectionEvaluationOptions = {}): SelectionResult => {
   const trimmed = query.trim(); const parsed = parseSelection(trimmed); const source = options.source ?? { kind: "query", rawQuery: trimmed };
-  const emptyContext: EvalContext = { universe: new Set(structure.atoms.map((atom) => atom.stableId)), diagnostics: [...parsed.diagnostics], needsCoordinates: false, needsTopology: false, named: options.named, query: trimmed };
+  const emptyContext = contextFor(structure, trimmed, options.named, [...parsed.diagnostics]);
   if (options.expectedRevision && options.expectedRevision !== structure.scientificHash) return baseResult(trimmed, structure, source, "STALE_REVISION", [{ code: "STALE_REVISION", message: "The selection context revision is stale; the active structure was not changed." }], "", [], emptyContext);
   const gated = trimmed.match(/\b(gap|pbc|bycell|symmetry|byring|byfragment)\b/i);
   if (gated) return baseResult(trimmed, structure, source, "UNSUPPORTED_OPERATOR_OR_PROFILE", [{ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: `Selection operator \`${gated[1]}\` is gated until its validated scientific profile is available.` }], "", [], emptyContext);
-  if (!trimmed || !parsed.ast) return baseResult(trimmed, structure, source, "SYNTAX_ERROR", parsed.diagnostics.length ? parsed.diagnostics : [{ code: "SYNTAX_ERROR", message: "A selection expression is required." }], "", [], emptyContext);
+  if (!trimmed || !parsed.ast) {
+    const diagnostics = parsed.diagnostics.length ? parsed.diagnostics : [{ code: "SYNTAX_ERROR" as const, message: "A selection expression is required." }];
+    const parseStatus: SelectionStatus = diagnostics.some((diagnostic) => diagnostic.code === "UNKNOWN_PROPERTY") ? "UNKNOWN_PROPERTY" : "SYNTAX_ERROR";
+    return baseResult(trimmed, structure, source, parseStatus, diagnostics, "", [], emptyContext);
+  }
   const ast = normalize(parsed.ast); const normalized = serialize(ast); const context: EvalContext = { ...emptyContext, diagnostics: [] };
+  const cacheKey = hash(`${trimmed}\u0000${structure.id}\u0000${structure.scientificHash}\u0000${namespaceRevisionFor(structure, options.named)}\u0000${topologyRevisionFor(structure)}\u0000${PROFILE.fingerprint}`);
+  const cached = selectionEvaluationCache.get(cacheKey);
+  if (cached) {
+    context.needsCoordinates = cached.needsCoordinates;
+    context.needsTopology = cached.needsTopology;
+    return baseResult(trimmed, structure, source, cached.status, cached.diagnostics, cached.normalized, cached.ids, context, bindSelectionPlan(trimmed, cached.ast, cached.normalized, structure, { named: options.named, needsCoordinates: cached.needsCoordinates, needsTopology: cached.needsTopology }));
+  }
   const ids = evaluateAst(ast, structure, context);
   let status: SelectionStatus = ids.size > 0 ? "VALID_NONEMPTY" : "VALID_EMPTY";
   if (context.diagnostics.some((diagnostic) => diagnostic.code === "UNSUPPORTED_OPERATOR_OR_PROFILE")) status = "UNSUPPORTED_OPERATOR_OR_PROFILE";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "UNKNOWN_PROPERTY")) status = "UNKNOWN_PROPERTY";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "UNKNOWN_NAME")) status = "UNKNOWN_NAME";
+  else if (context.diagnostics.some((diagnostic) => diagnostic.code === "INVALID_VALUE")) status = "INVALID_VALUE";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "TOPOLOGY_CONTEXT_ERROR")) status = "TOPOLOGY_CONTEXT_ERROR";
-  return baseResult(trimmed, structure, source, status, context.diagnostics, normalized, [...ids], context);
+  const boundPlan = bindSelectionPlan(trimmed, ast, normalized, structure, { named: options.named, needsCoordinates: context.needsCoordinates, needsTopology: context.needsTopology });
+  const cachedValue: CachedEvaluation = { normalized, ast, ids: [...ids], status, diagnostics: [...context.diagnostics], needsCoordinates: context.needsCoordinates, needsTopology: context.needsTopology };
+  selectionEvaluationCache.set(cacheKey, cachedValue);
+  return baseResult(trimmed, structure, source, status, context.diagnostics, normalized, [...ids], context, boundPlan);
 };
 
 export const requireValidSelection = (result: SelectionResult): SelectionResult => {
@@ -310,7 +392,7 @@ export const requireValidSelection = (result: SelectionResult): SelectionResult 
   return result;
 };
 export const resolveSelection = (query: string, structure: CanonicalMolecularStructure, options?: SelectionEvaluationOptions): SelectionResult => requireValidSelection(evaluateSelectionQuery(query, structure, options));
-export const selectionForStableIds = (stableAtomIds: readonly string[], structure: CanonicalMolecularStructure): SelectionResult => baseResult("<pick>", structure, { kind: "pick" }, stableAtomIds.length ? "VALID_NONEMPTY" : "VALID_EMPTY", [], "pick", stableAtomIds, { universe: new Set(), diagnostics: [], needsCoordinates: false, needsTopology: false, query: "<pick>" });
+export const selectionForStableIds = (stableAtomIds: readonly string[], structure: CanonicalMolecularStructure): SelectionResult => baseResult("<pick>", structure, { kind: "pick" }, stableAtomIds.length ? "VALID_NONEMPTY" : "VALID_EMPTY", [], "pick", stableAtomIds, contextFor(structure, "<pick>"));
 
 export const combineSelections = (left: SelectionResult, right: SelectionResult, operation: "replace" | "add" | "subtract" | "intersect"): SelectionResult => {
   if (left.structureId !== right.structureId || left.molecularRevision !== right.molecularRevision) throw new SelectionResolutionError("Selections belong to different molecular revisions.");
@@ -321,15 +403,30 @@ export const combineSelections = (left: SelectionResult, right: SelectionResult,
 export type NamedSelectionSnapshot = { name: string; stableAtomIds: readonly string[]; selectionResult: SelectionResult; createdAtRevision: string; immutable: true };
 export class NamedSelectionStore {
   private readonly snapshots = new Map<string, NamedSelectionSnapshot>();
+  private revision = 0;
   constructor(private readonly structure: CanonicalMolecularStructure) {}
+  get namespaceRevision(): string { return hash(`${this.structure.scientificHash}:${this.revision}:${[...this.snapshots.keys()].sort().join("\u0000")}`); }
   get(name: string) { return this.snapshots.get(name); }
   list() { return [...this.snapshots.values()]; }
+  has(name: string) { return this.snapshots.has(name); }
   createSnapshot(name: string, result: SelectionResult): NamedSelectionSnapshot {
     if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) throw new SelectionResolutionError("Named selections must use an identifier such as active_site.");
     if (result.structureId !== this.structure.id || result.molecularRevision !== this.structure.scientificHash) throw new SelectionResolutionError("A named selection cannot be created from a stale molecular revision.");
     const snapshot: NamedSelectionSnapshot = { name, stableAtomIds: [...result.stableAtomIds], selectionResult: { ...result, source: { kind: "named-snapshot", parentResultIds: [result.resultId] } }, createdAtRevision: this.structure.scientificHash, immutable: true };
-    this.snapshots.set(name, snapshot); return snapshot;
+    this.snapshots.set(name, snapshot); this.revision += 1; return snapshot;
   }
-  delete(name: string) { return this.snapshots.delete(name); }
-  clear() { this.snapshots.clear(); }
+  updateSnapshot(name: string, result: SelectionResult): NamedSelectionSnapshot {
+    if (!this.snapshots.has(name)) throw new SelectionResolutionError(`Named selection \`${name}\` does not exist.`);
+    return this.createSnapshot(name, result);
+  }
+  rename(name: string, nextName: string): NamedSelectionSnapshot {
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(nextName)) throw new SelectionResolutionError("Named selections must use an identifier such as active_site.");
+    const snapshot = this.snapshots.get(name);
+    if (!snapshot) throw new SelectionResolutionError(`Named selection \`${name}\` does not exist.`);
+    if (name !== nextName && this.snapshots.has(nextName)) throw new SelectionResolutionError(`Named selection \`${nextName}\` already exists.`);
+    const renamed: NamedSelectionSnapshot = { ...snapshot, name: nextName };
+    this.snapshots.delete(name); this.snapshots.set(nextName, renamed); this.revision += 1; return renamed;
+  }
+  delete(name: string) { const deleted = this.snapshots.delete(name); if (deleted) this.revision += 1; return deleted; }
+  clear() { if (this.snapshots.size > 0) { this.snapshots.clear(); this.revision += 1; } }
 }
