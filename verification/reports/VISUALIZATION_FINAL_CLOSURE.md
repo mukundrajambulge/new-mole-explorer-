@@ -7,7 +7,7 @@
 - Branch: `fix/visualization-final-closure`
 - Remote used: `new-origin` → `https://github.com/mukundrajambulge/new-mole-explorer-.git`
 - Base/start SHA: `8215121464db70e6a99a5000dc802ad977882ea7` for this visualization-correction pass.
-- Implementation ending SHA: pending the implementation commit below; the final report commit is recorded in the handoff.
+- Implementation ending SHA: `40619e6` (`fix: close visualization presentation regressions`).
 - Legacy application on port 5173: not modified
 
 The attached V-FINAL brief was treated as the implementation gate. Earlier pasted briefs and screenshots were treated as historical context/reference material, not as additional authority to expand this gate into editing, docking, HTS, alignment, or R-PYMOL-07 work.
@@ -154,6 +154,6 @@ All files are under `verification/evidence/visualization-final/`:
 
 ## Git and push
 
-Source, tests, docs, and evidence are ready to be committed on `fix/visualization-final-closure`. The implementation commit SHA and final remote verification are recorded in the handoff after the commit/push step.
+Source, tests, docs, and evidence are committed on `fix/visualization-final-closure` in implementation commit `40619e6`. The report-finalization commit and final remote verification are recorded in the handoff after the push step.
 
 VISUALIZATION FINAL CLOSURE: PASS
