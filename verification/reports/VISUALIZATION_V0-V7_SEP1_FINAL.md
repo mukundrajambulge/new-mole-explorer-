@@ -4,7 +4,7 @@ Date: 2026-09-01
 Repository: `mukundrajambulge/new-mole-explorer-`
 Remote: `https://github.com/mukundrajambulge/new-mole-explorer-.git`
 Starting SHA: `5693526a955e0199631839985ebf0b92a0f5d4d6`
-Ending SHA: filled after the final commit
+Ending SHA: `fc0fd3f` (implementation and evidence commit; this report is a documentation-only follow-up)
 
 ## V0 — repository and runtime lock
 
