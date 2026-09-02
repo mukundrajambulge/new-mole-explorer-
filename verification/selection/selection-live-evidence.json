@@ -319,39 +319,30 @@
     {
       "query": "visible",
       "expected": {
-        "semanticStatus": "MISSING_DEPENDENCY",
-        "atomCount": 0,
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 11,
         "membershipHash": null
       },
       "observed": {
-        "semanticStatus": "MISSING_DEPENDENCY",
+        "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nPresentation visibility is not bound into this selection context.\n· 0 atoms",
-        "atomCount": 0,
-        "membershipHash": null,
-        "viewerMembershipHash": null,
-        "selectionIndicator": null,
-        "selectionVisible": false,
-        "selectionIndicationConsistent": null
+        "result": "●\nSelected 11 atoms · replace · revision 6305887eeb…\n· 11 atoms",
+        "atomCount": 11,
+        "membershipHash": "c9c5e093",
+        "viewerMembershipHash": "c9c5e093",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
       },
       "subsequentTargeting": {
-        "attempted": false,
-        "command": "show sticks, all"
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c9c5e093",
+        "unchanged": true
       },
-      "failureDiagnostics": [
-        "Presentation visibility is not bound into this selection context.",
-        "Presentation visibility is not bound into this selection context.",
-        "Presentation visibility is not bound into this selection context.",
-        "Presentation visibility is not bound into this selection context.",
-        "Presentation visibility is not bound into this selection context.",
-        "Presentation visibility is not bound into this selection context.",
-        "Presentation visibility is not bound into this selection context.",
-        "Presentation visibility is not bound into this selection context.",
-        "Presentation visibility is not bound into this selection context.",
-        "Presentation visibility is not bound into this selection context.",
-        "Presentation visibility is not bound into this selection context.",
-        "Presentation visibility is not bound into this selection context."
-      ]
+      "failureDiagnostics": []
     },
     {
       "query": "polymer.nucleic",

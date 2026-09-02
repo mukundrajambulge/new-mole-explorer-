@@ -3,8 +3,8 @@
   "source": "verification/selection/SELECTION_OPERATOR_MATRIX.md",
   "rowCount": 87,
   "implementationStatusCounts": {
-    "VERIFIED_WORKING": 68,
-    "MISSING_DEPENDENCY": 12,
+    "VERIFIED_WORKING": 69,
+    "MISSING_DEPENDENCY": 11,
     "INTENTIONALLY_UNSUPPORTED": 6,
     "UNKNOWN_PROPERTY": 1
   },
@@ -66,10 +66,10 @@
     },
     {
       "operator": "`visible`",
-      "implementationStatus": "MISSING_DEPENDENCY",
+      "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PENDING",
-      "decision": "fail closed until projection is an explicit dependency"
+      "decision": "requires explicit presentation visibility context; never aliases `all`"
     },
     {
       "operator": "`name`",

@@ -50,10 +50,10 @@ The current application was exercised with a real 4DJW RCSB load:
 The machine-readable ledger is [selection-operator-matrix.json](../selection/selection-operator-matrix.json), generated from [SELECTION_OPERATOR_MATRIX.md](../selection/SELECTION_OPERATOR_MATRIX.md).
 
 - Rows: **87**
-- Implementation: **68 VERIFIED_WORKING**, **12 MISSING_DEPENDENCY**, **6 INTENTIONALLY_UNSUPPORTED**, **1 UNKNOWN_PROPERTY**
+- Implementation: **69 VERIFIED_WORKING**, **11 MISSING_DEPENDENCY**, **6 INTENTIONALLY_UNSUPPORTED**, **1 UNKNOWN_PROPERTY**
 - Live-browser status: **85 pass/accepted diagnostic outcomes** across the expanded matrix exercise
 - Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **85** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
-- `in`, `bycalpha`, and `bymolecule` now use canonical tuple, residue-CA, and bond-component semantics respectively. `like`, the application implicit-adjacency profile, and the new spatial/topology forms are live-verified; malformed shorthand and missing scientific dependencies remain truthful diagnostics.
+- `in`, `bycalpha`, and `bymolecule` now use canonical tuple, residue-CA, and bond-component semantics respectively. `visible` is now bound to an explicit presentation context derived from render directives; it never aliases scientific `all`. `like`, the application implicit-adjacency profile, and the new spatial/topology forms are live-verified; malformed shorthand and missing scientific dependencies remain truthful diagnostics.
 - Oracle comparison ledger: **18 ORACLE_PASS**, **7 ORACLE_EQUIVALENT**, **2 ORACLE_PENDING**; the full direct probe is [pymol-matrix-probe.json](../selection/pymol-matrix-probe.json).
 - Pinned oracle evidence: [pymol-oracle-results.json](../selection/pymol-oracle-results.json); runner: [run-pymol-oracle.py](../selection/run-pymol-oracle.py)
 - Missing dependency and research rows are explicit gates. No unsupported operator is silently aliased to a different scientific meaning.
@@ -86,6 +86,7 @@ Verification:
 
 - `tests/e2e/multi-object-state.spec.ts`
 - `tests/e2e/real-structure-workspace.spec.ts`
+- `tests/e2e/selection-closure.spec.ts`
 - `tests/e2e/selection-matrix-live.spec.ts`
 - `verification/selection/SELECTION_OPERATOR_MATRIX.md`
 - `verification/selection/generate-matrix-summary.mjs`
@@ -112,6 +113,7 @@ Verification:
 - Reverse picking identity map with object and coordinate-state context: **PASS**
 - Object/state-scoped surfaces and unrelated-state cache isolation: **PASS**
 - Object-scoped measurement picks reject mixed-object ambiguity and resolve against the canonical target object: **PASS**
+- Cross-object spatial selection without an explicit coordinate frame: **BLOCKED / fail-closed with a structured dependency diagnostic**
 
 ## Multi-state closure
 
@@ -136,14 +138,14 @@ Verification:
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm run test --workspace @molecular/web` — **PASS: 16 files / 67 tests**
+- `npm run test --workspace @molecular/web` — **PASS: 16 files / 69 tests**
 - `npm run test --workspace @molecular/api` — **PASS: 2 files / 11 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 6 / 6**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/real-structure-workspace.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/closure-evidence.spec.ts` — **PASS: 1 / 1**
-- `npm run test:e2e` — **PASS: 66 / 66**
+- `npm run test:e2e` — **PASS: 67 / 67**
 - `npm run build` — **PASS**
 - `git diff --check` — **PASS**
 
@@ -170,6 +172,7 @@ Verification:
 
 - The pinned PyMOL source was executed in a temporary Ubuntu-20.04/Python-3.9.2 compatibility build. The 64 remaining `ORACLE_PENDING` matrix rows are not promoted without matching coverage; this is the reason for the blocked final verdict.
 - `segi`, crystallographic `pbc`/`symmetry`/`bycell`, fragment/ring perception, donor/acceptor chemistry, and `gap` remain explicit unsupported or missing-dependency gates. Unknown properties fail closed.
-- Partial charge, peptide sequence, label-property, and presentation-visibility selection require datasets not present in this gate and return structured missing-dependency diagnostics.
+- Partial charge, peptide sequence, and label-property selection require datasets not present in this gate and return structured missing-dependency diagnostics. `visible` requires the explicit presentation context supplied by the frontend selection router.
 - `like` and implicit-adjacency still need a direct native oracle case even though their canonical application-profile behavior is live-verified.
+- Cross-object spatial queries are intentionally not evaluated until the workspace declares whether coordinates are `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD`; same-object spatial queries remain supported.
 - The production bundle retains the existing 3Dmol `eval` warning and exceeds the default 500 kB warning threshold; all build and runtime tests pass.

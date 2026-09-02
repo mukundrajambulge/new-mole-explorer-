@@ -35,6 +35,24 @@ test("selection commands bind canonical membership and named selection actions",
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded");
 });
 
+test("visible selection follows presentation layer changes without changing canonical atom counts", async ({ page }) => {
+  await loadFixture(page);
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
+  const run = async (value: string, expectedCount: number) => {
+    await command.fill(value);
+    await page.getByRole("button", { name: /Run/ }).click();
+    await expect(consoleRegion).toContainText(`Selected ${expectedCount} atoms`);
+  };
+
+  await run("visible", 11);
+  await page.getByRole("button", { name: "Toggle Water" }).click();
+  await run("visible", 12);
+  await page.getByRole("button", { name: "Toggle Protein" }).click();
+  await run("visible", 4);
+  await expect(page.locator(".status-metrics")).toContainText("Atoms 12");
+});
+
 test("component colors persist independently from global color and representation", async ({ page }) => {
   await loadFixture(page);
   const viewer = page.getByTestId("molecular-viewer");

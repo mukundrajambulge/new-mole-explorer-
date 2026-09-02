@@ -58,6 +58,34 @@ describe("canonical selection engine", () => {
     expect(evaluateSelectionQuery("gap 4 of ligand", structure).status).toBe("UNSUPPORTED_OPERATOR_OR_PROFILE");
   });
 
+  it("fails closed for cross-object spatial queries without an explicit coordinate frame", () => {
+    const workspace = {
+      ...structure,
+      id: "workspace",
+      name: "workspace",
+      scientificHash: "workspace-spatial-revision".padEnd(64, "0"),
+      atoms: [
+        { ...structure.atoms[0]!, stableId: "object:a::a1", workspaceObjectId: "object:a", workspaceObjectName: "A" },
+        { ...structure.atoms[4]!, stableId: "object:b::l1", workspaceObjectId: "object:b", workspaceObjectName: "B", x: 0.5 },
+      ],
+      bonds: [],
+    } satisfies CanonicalMolecularStructure;
+    const result = evaluateSelectionQuery("object A within 4 of object B", workspace);
+    expect(result.status).toBe("MISSING_DEPENDENCY");
+    expect(result.count).toBe(0);
+    expect(result.diagnostics[0]?.message).toContain("explicit LOCAL_SCIENTIFIC or EFFECTIVE_WORLD coordinate context");
+  });
+
+  it("binds visible selection to an explicit presentation context and invalidates its cache", () => {
+    expect(evaluateSelectionQuery("visible", structure).status).toBe("MISSING_DEPENDENCY");
+    const first = resolveSelection("visible", structure, { presentation: { visibleStableAtomIds: ["a1", "l1"], revision: "projection-1" } });
+    expect(first.stableAtomIds).toEqual(["a1", "l1"]);
+    expect(first.presentationContext?.revision).toBe("projection-1");
+    expect(first.dependencyVector.needsPresentation).toBe(true);
+    const second = resolveSelection("visible", structure, { presentation: { visibleStableAtomIds: ["b1"], revision: "projection-2" } });
+    expect(second.stableAtomIds).toEqual(["b1"]);
+  });
+
   it("returns truthful structured failures and never turns unknown names into empty success", () => {
     expect(evaluateSelectionQuery("nearest 5", structure).status).toBe("SYNTAX_ERROR");
     expect(evaluateSelectionQuery("foo bar", structure).status).toBe("UNKNOWN_PROPERTY");

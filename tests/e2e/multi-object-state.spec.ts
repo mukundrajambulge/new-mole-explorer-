@@ -30,6 +30,9 @@ test("multiple canonical objects share one viewer and keep object scope independ
   await command.fill("object mini-protein.pdb or object g1c-small-molecule.pdb");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 15 atoms");
+  await command.fill("visible");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 14 atoms");
 
   const ligandRow = panel.locator("[data-object-id]").filter({ hasText: "g1c-small-molecule.pdb" });
   await ligandRow.getByRole("button", { name: "Focus g1c-small-molecule.pdb" }).click();
@@ -63,6 +66,9 @@ test("multiple canonical objects share one viewer and keep object scope independ
   await command.fill("select all");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 24 atoms");
+  await command.fill("visible");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 22 atoms");
 });
 
 test("multi-model ingestion exposes explicit state order and state switching", async ({ page }) => {
@@ -171,6 +177,10 @@ test("console presentation commands target canonical workspace objects and keep 
   expect(ligandId).toBeTruthy();
   const beforeMini = await objectState(miniId!);
   const beforeLigand = await objectState(ligandId!);
+
+  await command.fill("object mini-protein.pdb within 4 of object g1c-small-molecule.pdb");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Cross-object spatial selection requires an explicit LOCAL_SCIENTIFIC or EFFECTIVE_WORLD coordinate context");
 
   await command.fill("show lines, object g1c-small-molecule.pdb");
   await page.getByRole("button", { name: /Run/ }).click();

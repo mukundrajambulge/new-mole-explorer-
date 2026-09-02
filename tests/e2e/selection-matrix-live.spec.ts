@@ -10,7 +10,7 @@ const expectedCounts = new Map<string, number>([
   ["none", 0],
   ["enabled", 12],
   ["present", 12],
-  ["visible", 0],
+  ["visible", 11],
   ["polymer.nucleic", 0],
   ["name CA", 2],
   ["%active_site", 11],
@@ -78,7 +78,7 @@ const expectedSemanticStatus = (value: string): string => {
   if (query.startsWith("select ")) return query === "select active_site, chain a" ? "VALID_NONEMPTY" : "SELECTION_RESULT";
   if (/^(rep|cartoon_color|ribbon_color)\b/.test(query)) return "MISSING_DEPENDENCY";
   if (/^(segi|bysegi|byfragment|byring|bycell|gap|donors|acceptors)\b/.test(query)) return "UNSUPPORTED_OPERATOR_OR_PROFILE";
-  if (/^(visible|partial_charge|pepseq|polymer\.nucleic)\b/.test(query) || query === "label foo") return "MISSING_DEPENDENCY";
+  if (/^(partial_charge|pepseq|polymer\.nucleic)\b/.test(query) || query === "label foo") return "MISSING_DEPENDENCY";
   if (query === "foo = bar") return "SYNTAX_ERROR";
   if (query === "groupa") return "UNKNOWN_NAME";
   if (query === "name like ca" || query === "near_to ligand") return "SYNTAX_ERROR";
