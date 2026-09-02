@@ -13,7 +13,8 @@
     "typecheck": "npm run typecheck --workspaces",
     "lint": "npm run lint --workspaces",
     "test": "npm run test --workspace @molecular/web && npm run test --workspace @molecular/api",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "verify:selection-matrix": "node verification/selection/generate-matrix-summary.mjs --write"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

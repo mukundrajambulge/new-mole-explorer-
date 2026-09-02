@@ -32,7 +32,7 @@ const displayLabelFor = (id: string, label: string): string => id === "line" ? "
 const displayItems = (): RibbonItem[] => STYLE_DEFINITIONS.map((definition) => ({ label: displayLabelFor(definition.id, definition.label), icon: displayIconFor(definition.id), actionId: definition.actionId as ActionId, style: definition.id as RepresentationStyle, capability: definition.maySelect ? undefined : definition.capability === "UNAVAILABLE" ? "Unavailable" : "Coming Soon", representationStatus: definition.status }));
 const quickColorSchemes: Array<[ColorMode, string]> = [["classic-cpk", "Classic CPK"], ["chain", "Chain"], ["monochrome", "Uniform"], ["hydrophobicity", "Hydrophobicity"], ["secondary-structure-standard", "Secondary Structure"]];
 
-type ContextToolbarProps = { activeTool: string; activeCategory: RibbonCategory; collapsed: boolean; representation: RepresentationStyle; colorMode: ColorMode; onAction: (actionId: ActionId) => void; onImport?: () => void; onFetchRcsb: (pdbId: string) => void; onColorMode: (mode: ColorMode) => void; onStyleChange: (style: RepresentationStyle) => void; onToggleCollapsed: () => void };
+type ContextToolbarProps = { activeTool: string; activeCategory: RibbonCategory; collapsed: boolean; representation: RepresentationStyle; colorMode: ColorMode; onAction: (actionId: ActionId) => void; onImport?: () => void; onFetchRcsb: (pdbId: string, mode?: "replace" | "add") => void; onColorMode: (mode: ColorMode) => void; onStyleChange: (style: RepresentationStyle) => void; onToggleCollapsed: () => void };
 
 export const ContextToolbar = ({ activeTool, activeCategory, collapsed, representation, colorMode, onAction, onImport, onFetchRcsb, onColorMode, onStyleChange, onToggleCollapsed }: ContextToolbarProps) => {
   const [pdbId, setPdbId] = useState("");
@@ -40,7 +40,8 @@ export const ContextToolbar = ({ activeTool, activeCategory, collapsed, represen
   const rcsbInputRef = useRef<HTMLInputElement>(null);
   const items = activeCategory === "Display" ? displayItems() : activeCategory === "Color" ? [] : ribbonItems[activeCategory] ?? [];
   const actionForItem = (item: RibbonItem) => { if (item.actionId === "FILE.IMPORT" && onImport) onImport(); else if (item.actionId === "STRUCTURE.FETCH_RCSB") { setShowRcsb(true); window.setTimeout(() => rcsbInputRef.current?.focus(), 0); } else if (item.style) onStyleChange(item.style); else onAction(item.actionId); };
-  const submitRcsb = (event: React.FormEvent<HTMLFormElement>) => { event.preventDefault(); const normalized = pdbId.trim().toUpperCase(); if (normalized) onFetchRcsb(normalized); };
+  const submitRcsb = (event: React.FormEvent<HTMLFormElement>) => { event.preventDefault(); const normalized = pdbId.trim().toUpperCase(); if (normalized) onFetchRcsb(normalized, "replace"); };
+  const addRcsb = () => { const normalized = pdbId.trim().toUpperCase(); if (normalized) onFetchRcsb(normalized, "add"); };
   return (
     <section className={`context-toolbar ${collapsed ? "context-toolbar--collapsed" : ""}`} aria-label="Contextual toolbar" data-ribbon-category={activeCategory}>
       <div className="ribbon-heading"><div><span className="eyebrow">PRESENTATION RIBBON</span><strong>{activeCategory}</strong></div><button className="icon-button ribbon-toggle" type="button" onClick={onToggleCollapsed} aria-label={collapsed ? "Expand ribbon" : "Collapse ribbon"} title={collapsed ? "Expand ribbon" : "Collapse ribbon"}><Icon name={collapsed ? "panelLeftOpen" : "panelLeftClose"} size={15} /></button></div>
@@ -50,7 +51,7 @@ export const ContextToolbar = ({ activeTool, activeCategory, collapsed, represen
           <div className="ribbon-color-gallery" role="group" aria-label="Quick color schemes">{quickColorSchemes.map(([mode, label]) => <button key={mode} className={`ribbon-color-button ${colorMode === mode ? "ribbon-color-button--active" : ""}`} type="button" onClick={() => onColorMode(mode)} aria-pressed={colorMode === mode} data-color-mode={mode}>{label}</button>)}</div>
           <span className="ribbon-scheme-count">{COLOR_MODES.length} schemes</span>
         </div> : <>
-          {activeCategory === "File" && showRcsb && <form className="ribbon-rcsb-form" onSubmit={submitRcsb} aria-label="RCSB structure fetch"><label htmlFor="ribbon-pdb-id">RCSB PDB ID</label><input id="ribbon-pdb-id" ref={rcsbInputRef} aria-label="RCSB PDB ID" placeholder="4DJW" value={pdbId} onChange={(event) => setPdbId(event.target.value)} maxLength={4} /><button type="submit" aria-label="RCSB fetch">Fetch</button><span>Official mmCIF via backend</span></form>}
+          {activeCategory === "File" && showRcsb && <form className="ribbon-rcsb-form" onSubmit={submitRcsb} aria-label="RCSB structure fetch"><label htmlFor="ribbon-pdb-id">RCSB PDB ID</label><input id="ribbon-pdb-id" ref={rcsbInputRef} aria-label="RCSB PDB ID" placeholder="4DJW" value={pdbId} onChange={(event) => setPdbId(event.target.value)} maxLength={4} /><button type="submit" aria-label="RCSB fetch">Fetch</button><button type="button" aria-label="RCSB add" onClick={addRcsb}>Add</button><span>Official mmCIF via backend</span></form>}
           {items.map((item) => {
           const active = item.style ? styleProfileFor(representation) === styleProfileFor(item.style) : activeTool === item.label;
           const resolved = item.style ? representationCapabilityFor(item.style) : null;

@@ -140,7 +140,7 @@ export const App = () => {
     void runLoad(() => apiClient.uploadStructure(file), mode);
   };
 
-  const fetchRcsb = (pdbId: string) => void runLoad(() => apiClient.fetchRcsb(pdbId));
+  const fetchRcsb = (pdbId: string, mode: "replace" | "add" = "replace") => void runLoad(() => apiClient.fetchRcsb(pdbId), mode);
 
   const activateWorkspaceObject = (objectId: string) => {
     const current = workspaceObjectsRef.current.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object);
@@ -303,7 +303,7 @@ export const App = () => {
   const handlePick = (pick: PickResult) => {
     if (pick.pickKind !== "ATOM" || !structure) return;
     const pickedObject = workspaceObjectsRef.current.find((object) => object.objectId === pick.atomRef.objectId);
-    const targetStructure = pickedObject?.loadResult ?? structure;
+    const targetStructure = pickedObject ? { ...pickedObject.loadResult, structure: structureForWorkspaceObjectState(pickedObject) } : structure;
     const stableAtomId = pick.atomRef.stableAtomId;
     if (pickedObject && pickedObject.objectId !== activeObjectId) {
       const current = workspaceObjectsRef.current.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object);
@@ -321,13 +321,20 @@ export const App = () => {
       setProjection((current) => setInteractionState(current, { pickedAtomId: stableAtomId, selectedAtomIds: [projectedId], measurementPickAtomIds: [] }));
       return;
     }
-    const slots = measurementAccumulatorRef.current.add(stableAtomId, measurementMode);
+    let slots: readonly string[];
+    try {
+      slots = measurementAccumulatorRef.current.add(stableAtomId, measurementMode, pickedObject?.objectId);
+    } catch (error) {
+      showNotice({ id: ACTION_IDS.MEASURE_DISTANCE, group: "MEASURE", state: "SUPPORTED_WITH_LIMITATIONS", label: "Measurement pick rejected", description: error instanceof Error ? error.message : "The selected atom belongs to a different workspace object." });
+      return;
+    }
     setMeasurementSlots([...slots]);
     setProjection((current) => setInteractionState(current, { pickedAtomId: stableAtomId, measurementPickAtomIds: [...slots] }));
     if (slots.length !== measurementCardinality(measurementMode)) return;
     try {
       measurementSequenceRef.current += 1;
-      const measurement = createMeasurementObject(measurementMode, slots, targetStructure.structure, pick.coordinateContext, measurementSequenceRef.current);
+      const measurementObjectId = measurementAccumulatorRef.current.currentObjectId();
+      const measurement = createMeasurementObject(measurementMode, slots, targetStructure.structure, pick.coordinateContext, measurementSequenceRef.current, measurementObjectId);
       setMeasurements((current) => [...current, measurement]);
       measurementAccumulatorRef.current.clear();
       setMeasurementSlots([]);
@@ -464,11 +471,13 @@ export const App = () => {
           return { category: "SELECTION", status: `State ${parsed.argument.trim()} selected ${result.count} atoms.`, count: result.count };
         } catch (error) { return commandError(error, "SELECTION"); }
       }
-      const resolved = resolveWorkspaceObject(parsed.argument);
+      const objectReference = parsed.target && /^\d+$/.test(parsed.argument.trim()) ? parsed.target : parsed.argument;
+      const requestedState = parsed.target && /^\d+$/.test(parsed.argument.trim()) ? parsed.argument.trim() : parsed.target?.trim();
+      const resolved = resolveWorkspaceObject(objectReference);
       if (resolved.ambiguous) return { category: "OBJECT", status: ambiguousObjectStatus(parsed.argument) };
       const target = resolved.object;
-      if (!target || !parsed.target) return { category: "OBJECT", status: "state requires `state object, state-id` and an existing object." };
-      const requested = parsed.target.trim();
+      if (!target || !requestedState) return { category: "OBJECT", status: "state requires `state object, state-id` or `state state-id, object` and an existing object." };
+      const requested = requestedState;
       const ordinal = /^\d+$/.test(requested) ? Number(requested) : null;
       const stateId = ordinal ? target.stateOrder[ordinal - 1] : target.stateOrder.find((id) => id.toLowerCase() === requested.toLowerCase());
       if (!stateId) return { category: "OBJECT", status: `State ${requested} is not available for ${target.displayName}; no state changed.` };
@@ -512,12 +521,16 @@ export const App = () => {
       if (parsed.verb === "create") return { category: "OBJECT", status: "create is unavailable without a canonical structure source; no object was created." };
       if (parsed.verb === "split_states") return { category: "OBJECT", status: "split_states is unavailable until canonical state-to-object lineage is defined; no object was created." };
       if (parsed.verb === "join_states") return { category: "OBJECT", status: "join_states is unavailable until compatible canonical state lineage is validated; no object was changed." };
-      const resolved = resolveWorkspaceObject(parsed.argument);
-      if (resolved.ambiguous) return { category: "OBJECT", status: ambiguousObjectStatus(parsed.argument) };
-      if (!resolved.object || !parsed.target?.trim()) return { category: "OBJECT", status: "copy requires `copy object, new_name` and an existing unambiguous object." };
-      const copied = renameWorkspaceObject(createWorkspaceObject(resolved.object.loadResult, workspaceObjectsRef.current.map((object) => object.objectId)), parsed.target);
+      const left = resolveWorkspaceObject(parsed.argument);
+      const right = parsed.target ? resolveWorkspaceObject(parsed.target) : { object: undefined, ambiguous: false };
+      if (left.ambiguous || right.ambiguous) return { category: "OBJECT", status: ambiguousObjectStatus(left.ambiguous ? parsed.argument : parsed.target ?? "") };
+      const source = left.object ?? right.object;
+      const displayName = left.object ? parsed.target?.trim() : parsed.argument.trim();
+      if (!source || !displayName) return { category: "OBJECT", status: "copy requires `copy target, source` and an existing unambiguous source object." };
+      const copiedBase = createWorkspaceObject(source.loadResult, workspaceObjectsRef.current.map((object) => object.objectId));
+      const copied = renameWorkspaceObject({ ...copiedBase, enabled: source.enabled, projection: source.projection, stateOrder: [...source.stateOrder], currentStateId: source.currentStateId, allStates: source.allStates }, displayName);
       appendWorkspaceObject(copied);
-      return { category: "OBJECT", status: `Copied ${resolved.object.displayName} to ${copied.displayName}; canonical source and state order preserved.` };
+      return { category: "OBJECT", status: `Copied ${source.displayName} to ${copied.displayName}; canonical source and state order preserved.` };
     }
     if (parsed.verb === "rename" || parsed.verb === "set_name") {
       const resolved = resolveWorkspaceObject(parsed.argument);

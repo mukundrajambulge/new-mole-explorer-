@@ -13,6 +13,24 @@ export type WorkspaceObject = {
   allStates: boolean;
 };
 
+export type StateSelector =
+  | { kind: "coordinate-state"; stateId: string }
+  | { kind: "ordinal"; ordinal: number };
+
+export type ObjectDisplayState = {
+  enabled: boolean;
+  currentStateId: string;
+  allStates: boolean;
+};
+
+export const objectDisplayStateFor = (object: WorkspaceObject): ObjectDisplayState => ({
+  enabled: object.enabled,
+  currentStateId: object.currentStateId,
+  allStates: object.allStates,
+});
+
+export type FrameStateResolver = (object: WorkspaceObject, globalFrameIndex: number) => CanonicalCoordinateState | null;
+
 export type MolecularWorkspace = {
   objects: WorkspaceObject[];
   activeObjectId: string | null;
@@ -66,7 +84,7 @@ export const structureForWorkspaceObjectState = (object: WorkspaceObject): Canon
   return { ...object.loadResult.structure, atoms: object.loadResult.structure.atoms.map((atom) => ({ ...atom, ...(state.coordinates[atom.stableId] ?? {}) })) };
 };
 
-export const resolveGlobalFrameState = (object: WorkspaceObject, globalFrameIndex: number): CanonicalCoordinateState | null => {
+export const resolveGlobalFrameState: FrameStateResolver = (object, globalFrameIndex) => {
   if (object.allStates) return null;
   const states = coordinateStatesFor(object.loadResult.structure);
   if (states.length === 1) return states[0] ?? null;
@@ -93,7 +111,11 @@ export const workspaceSelectionStructure = (objects: readonly WorkspaceObject[])
   const enabled = objects.filter((object) => object.enabled);
   const first = enabled[0]?.loadResult.structure;
   if (!first) return null;
-  const atoms = enabled.flatMap((object) => structureForWorkspaceObjectState(object).atoms.map((atom) => ({ ...atom, stableId: workspaceScopedStableAtomId(object.objectId, atom.stableId), workspaceObjectId: object.objectId, workspaceObjectName: object.displayName })));
+  const atoms = enabled.flatMap((object) => {
+    const state = stateForObject(object);
+    const ordinal = state?.ordinal ?? Math.max(1, object.stateOrder.indexOf(object.currentStateId) + 1);
+    return structureForWorkspaceObjectState(object).atoms.map((atom) => ({ ...atom, stableId: workspaceScopedStableAtomId(object.objectId, atom.stableId), workspaceObjectId: object.objectId, workspaceObjectName: object.displayName, workspaceCoordinateStateId: state?.id, workspaceStateOrdinal: ordinal }));
+  });
   const bonds = enabled.flatMap((object) => object.loadResult.structure.bonds.map((bond) => ({ ...bond, atom1: workspaceScopedStableAtomId(object.objectId, bond.atom1), atom2: workspaceScopedStableAtomId(object.objectId, bond.atom2) })));
   const chains = new Set(atoms.map((atom) => `${atom.workspaceObjectId}\u0000${atom.chain}`));
   const residues = new Set(atoms.map((atom) => `${atom.workspaceObjectId}\u0000${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}`));
@@ -109,5 +131,5 @@ export const workspaceSelectionStructure = (objects: readonly WorkspaceObject[])
   };
   const points = atoms;
   const bounds = points.reduce((current, atom) => ({ min: { x: Math.min(current.min.x, atom.x), y: Math.min(current.min.y, atom.y), z: Math.min(current.min.z, atom.z) }, max: { x: Math.max(current.max.x, atom.x), y: Math.max(current.max.y, atom.y), z: Math.max(current.max.z, atom.z) } }), { min: { x: points[0]!.x, y: points[0]!.y, z: points[0]!.z }, max: { x: points[0]!.x, y: points[0]!.y, z: points[0]!.z } });
-  return { ...first, id: "workspace", name: "workspace", atoms, bonds, counts, bounds, scientificHash: `workspace:${enabled.map((object) => `${object.objectId}:${object.loadResult.structure.scientificHash}:${object.currentStateId}`).join("|")}` };
+  return { ...first, id: "workspace", name: "workspace", atoms, bonds, counts, bounds, scientificHash: `workspace:${enabled.map((object) => `${object.objectId}:${object.loadResult.structure.scientificHash}:${stateForObject(object)?.id ?? object.currentStateId}:${stateForObject(object)?.coordinateHash ?? ""}`).join("|")}` };
 };

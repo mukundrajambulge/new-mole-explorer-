@@ -72,7 +72,11 @@ export const MolecularCanvas = ({
   pickRef.current = onPick;
   hoverRef.current = onHover;
   projectionRef.current = projection;
-  const workspaceKey = workspaceObjects.map((object) => `${object.objectId}:${object.loadResult.structure.id}:${object.enabled}:${object.currentStateId}:${object.allStates}`).join("|");
+  const workspaceObjectsForLoadRef = useRef(workspaceObjects);
+  workspaceObjectsForLoadRef.current = workspaceObjects;
+  // State and enable/disable changes are reconciled in-place by the adapter;
+  // only object/model-layout changes require a scene rebuild.
+  const workspaceKey = workspaceObjects.map((object) => `${object.objectId}:${object.loadResult.structure.id}:${object.allStates}`).join("|");
 
   useEffect(() => {
     const host = hostRef.current;
@@ -138,13 +142,13 @@ export const MolecularCanvas = ({
     if (!structure || !adapterRef.current) return;
     try {
       setViewerError(null);
-      const objects = workspaceObjects.length ? workspaceObjects : [{ objectId: `object:${structure.structure.id}`, displayName: structure.structure.name, loadResult: structure, enabled: true, projection: projectionRef.current, stateOrder: structure.structure.stateOrder ?? [], currentStateId: structure.structure.stateOrder?.[0] ?? `${structure.structure.id}:state:1`, allStates: false }];
+      const objects = workspaceObjectsForLoadRef.current.length ? workspaceObjectsForLoadRef.current : [{ objectId: `object:${structure.structure.id}`, displayName: structure.structure.name, loadResult: structure, enabled: true, projection: projectionRef.current, stateOrder: structure.structure.stateOrder ?? [], currentStateId: structure.structure.stateOrder?.[0] ?? `${structure.structure.id}:state:1`, allStates: false }];
       if (objects.length > 1 || objects.some((object) => object.stateOrder.length > 1 || object.allStates)) adapterRef.current.loadWorkspace(objects);
       else adapterRef.current.load(structure, projectionRef.current);
     } catch (loadError) {
       setViewerError(loadError instanceof Error ? loadError.message : "The structure could not be rendered.");
     }
-  }, [structure, workspaceKey, workspaceObjects]);
+  }, [structure, workspaceKey]);
 
   useEffect(() => {
     if (!adapterRef.current) return;

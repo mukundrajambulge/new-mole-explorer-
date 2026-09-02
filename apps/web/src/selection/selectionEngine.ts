@@ -252,7 +252,7 @@ const serialize = (ast: SelectionAst): string => {
   return "invalid";
 };
 
-type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; named?: NamedSelectionStore; query: string; indexByStableId: Map<string, number>; rankByStableId: Map<string, number>; coordinateStateId?: string; stateOrdinal?: number };
+type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; named?: NamedSelectionStore; query: string; indexByStableId: Map<string, number>; rankByStableId: Map<string, number>; coordinateStateId?: string; stateOrdinal?: number; objectMatches: Map<string, Set<string>> };
 const wildcardMatch = (value: string, pattern: string): boolean => {
   const escaped = [...pattern].map((char) => char === "*" ? ".*" : char === "?" ? "." : char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("");
   return new RegExp(`^${escaped}$`, "i").test(value);
@@ -302,8 +302,11 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
   else if (property === "rank") matches = context.rankByStableId.get(atom.stableId) === Number(value);
   else if (property === "model" || property === "object") {
     if (atom.workspaceObjectId) {
-      const scopedAtoms = structure.atoms.filter((candidate) => candidate.workspaceObjectId && (wildcardMatch(candidate.workspaceObjectId, value) || wildcardMatch(candidate.workspaceObjectId.replace(/^object:/i, ""), value) || wildcardMatch(candidate.workspaceObjectName ?? "", value)));
-      const matchingObjects = new Set(scopedAtoms.map((candidate) => candidate.workspaceObjectId));
+      let matchingObjects = context.objectMatches.get(value);
+      if (!matchingObjects) {
+        matchingObjects = new Set(structure.atoms.filter((candidate) => candidate.workspaceObjectId && (wildcardMatch(candidate.workspaceObjectId, value) || wildcardMatch(candidate.workspaceObjectId.replace(/^object:/i, ""), value) || wildcardMatch(candidate.workspaceObjectName ?? "", value))).map((candidate) => candidate.workspaceObjectId!));
+        context.objectMatches.set(value, matchingObjects);
+      }
       const exactObjectId = wildcardMatch(atom.workspaceObjectId, value) || wildcardMatch(atom.workspaceObjectId.replace(/^object:/i, ""), value);
       if (matchingObjects.size > 1 && !exactObjectId) {
         if (!context.diagnostics.some((diagnostic) => diagnostic.code === "AMBIGUOUS_NAME")) context.diagnostics.push({ code: "AMBIGUOUS_NAME", message: `Object name \`${value}\` resolves to multiple workspace objects; use a durable ObjectID.` });
@@ -313,7 +316,7 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
     } else matches = wildcardMatch(structure.id, value) || wildcardMatch(structure.name, value) || wildcardMatch(structure.source.originalFilename, value);
   }
   else if (["b", "q", "occupancy", "formal_charge", "partial_charge", "x", "y", "z", "state"].includes(property)) {
-    const numeric = property === "b" ? atom.bFactor : property === "q" || property === "occupancy" ? atom.occupancy : property === "formal_charge" ? atom.formalCharge : property === "x" ? atom.x : property === "y" ? atom.y : property === "z" ? atom.z : property === "state" ? context.stateOrdinal : undefined;
+    const numeric = property === "b" ? atom.bFactor : property === "q" || property === "occupancy" ? atom.occupancy : property === "formal_charge" ? atom.formalCharge : property === "x" ? atom.x : property === "y" ? atom.y : property === "z" ? atom.z : property === "state" ? atom.workspaceStateOrdinal ?? context.stateOrdinal : undefined;
     const requested = Number(value);
     if (!Number.isFinite(requested)) { markInvalid(`${property} requires a finite numeric value.`); return false; }
     if (numeric === undefined || numeric === null || !Number.isFinite(numeric)) { if (property === "partial_charge" || property === "state" || !context.diagnostics.some((diagnostic) => diagnostic.code === "MISSING_DEPENDENCY")) context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: `Canonical ${property} data is unavailable for this selection context.` }); return false; }
@@ -398,6 +401,7 @@ const contextFor = (structure: CanonicalMolecularStructure, query: string, named
   query,
   indexByStableId: new Map(structure.atoms.map((atom, index) => [atom.stableId, index + 1])),
   rankByStableId: new Map(structure.atoms.map((atom, index) => [atom.stableId, index])),
+  objectMatches: new Map(),
 });
 
 export type SelectionBindingDependencies = { needsCoordinates: boolean; needsTopology: boolean; named?: NamedSelectionStore };

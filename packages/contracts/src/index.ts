@@ -117,6 +117,9 @@ export type CanonicalAtom = {
   /** Workspace-only scope metadata used by derived multi-object selection views. */
   workspaceObjectId?: string;
   workspaceObjectName?: string;
+  /** Workspace-only coordinate-state metadata used by state-aware selection. */
+  workspaceCoordinateStateId?: string;
+  workspaceStateOrdinal?: number;
 };
 
 export type StructureCounts = {

@@ -27,6 +27,9 @@ test("multiple canonical objects share one viewer and keep object scope independ
   await command.fill("chain A and object mini-protein.pdb");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 11 atoms");
+  await command.fill("object mini-protein.pdb or object g1c-small-molecule.pdb");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 15 atoms");
 
   const ligandRow = panel.locator("[data-object-id]").filter({ hasText: "g1c-small-molecule.pdb" });
   await ligandRow.getByRole("button", { name: "Focus g1c-small-molecule.pdb" }).click();
@@ -35,12 +38,21 @@ test("multiple canonical objects share one viewer and keep object scope independ
   await expect(page.getByRole("combobox", { name: "Style" })).toHaveValue("cartoon");
   await ligandRow.getByRole("button", { name: "Focus g1c-small-molecule.pdb" }).click();
   await expect(page.getByRole("combobox", { name: "Style" })).toHaveValue("sticks");
+  await page.getByRole("combobox", { name: "Color mode" }).selectOption("monochrome");
+  await panel.locator("[data-object-id]").filter({ hasText: "mini-protein.pdb" }).getByRole("button", { name: "Focus mini-protein.pdb" }).click();
+  await expect(page.getByRole("combobox", { name: "Color mode" })).toHaveValue("rainbow");
+  await ligandRow.getByRole("button", { name: "Focus g1c-small-molecule.pdb" }).click();
+  await expect(page.getByRole("combobox", { name: "Color mode" })).toHaveValue("monochrome");
 
   await command.fill("copy mini-protein.pdb, copied-mini");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(panel.locator("[data-object-id]")).toHaveCount(3);
   await expect(panel).toContainText("copied-mini");
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-renderer-model-count", "3");
+
+  await command.fill("set_name copied-mini, copied-renamed");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(panel).toContainText("copied-renamed");
 
   await command.fill("create unsupported-object");
   await page.getByRole("button", { name: /Run/ }).click();
@@ -63,10 +75,16 @@ test("multi-model ingestion exposes explicit state order and state switching", a
   await expect(row).toContainText("1/2");
   await row.getByRole("button", { name: "Next state for multistate.pdb" }).click();
   await expect(row).toContainText("2/2");
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  await command.fill("state 1, multistate.pdb");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(row).toContainText("1/2");
+  await command.fill("state multistate.pdb, 2");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(row).toContainText("2/2");
   await row.getByRole("button", { name: "Show all states for multistate.pdb" }).click();
   await expect(row.getByRole("button", { name: "Hide all states for multistate.pdb" })).toBeVisible();
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-renderer-model-count", "2");
-  const command = page.getByRole("textbox", { name: "Command or selection query" });
   await command.fill("count_states multistate.pdb");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("has 2 canonical coordinate states");
@@ -91,4 +109,38 @@ test("duplicate display names require a durable object identity", async ({ page 
   await command.fill(`object ${objectId}`);
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 12 atoms");
+});
+
+test("object-scoped surfaces survive an unrelated coordinate-state change", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(multiState);
+  await expect(page.getByTitle("multistate.pdb").first()).toBeVisible();
+  const chooserPromise = page.waitForEvent("filechooser");
+  await page.getByRole("button", { name: "File", exact: true }).click();
+  await page.getByRole("button", { name: "Add Structure", exact: true }).click();
+  await (await chooserPromise).setFiles(mini);
+  const panel = page.getByTestId("objects-selections-panel");
+  const stateRow = panel.locator("[data-object-id]").filter({ hasText: "multistate.pdb" });
+  const miniRow = panel.locator("[data-object-id]").filter({ hasText: "mini-protein.pdb" });
+  const renderer = page.getByTestId("molecular-viewer");
+
+  await stateRow.getByRole("button", { name: "Focus multistate.pdb" }).click();
+  await page.getByRole("combobox", { name: "Style" }).selectOption("van-der-waals-surface");
+  await miniRow.getByRole("button", { name: "Focus mini-protein.pdb" }).click();
+  await page.getByRole("combobox", { name: "Style" }).selectOption("van-der-waals-surface");
+  await expect(renderer).toHaveAttribute("data-renderer-surface-object-count", "2");
+  const before = await renderer.getAttribute("data-renderer-surface-rebuilds");
+  expect(before).toBeTruthy();
+  const beforeCounts = JSON.parse(before!) as Record<string, number>;
+  const miniId = await miniRow.getAttribute("data-object-id");
+  expect(miniId).toBeTruthy();
+  expect(Object.entries(beforeCounts).find(([key]) => key.startsWith(`${miniId}:`))?.[1]).toBe(1);
+
+  await stateRow.getByRole("button", { name: "Next state for multistate.pdb" }).click();
+  await expect(stateRow).toContainText("2/2");
+  await expect(renderer).toHaveAttribute("data-renderer-surface-object-count", "2");
+  const after = await renderer.getAttribute("data-renderer-surface-rebuilds");
+  expect(after).toBeTruthy();
+  const afterCounts = JSON.parse(after!) as Record<string, number>;
+  expect(Object.entries(afterCounts).find(([key]) => key.startsWith(`${miniId}:`))?.[1]).toBe(1);
 });

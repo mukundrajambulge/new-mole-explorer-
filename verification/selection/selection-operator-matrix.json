@@ -1,0 +1,576 @@
+{
+  "schemaVersion": 1,
+  "source": "verification/selection/SELECTION_OPERATOR_MATRIX.md",
+  "rowCount": 79,
+  "implementationStatusCounts": {
+    "VERIFIED_WORKING": 57,
+    "MISSING_DEPENDENCY": 10,
+    "INTENTIONALLY_UNSUPPORTED": 10,
+    "RESEARCH_REQUIRED": 2
+  },
+  "liveBrowserStatusCounts": {
+    "PASS (`select all`)": 1,
+    "PASS (selection-matrix-live.spec.ts)": 71,
+    "PASS indirectly": 4,
+    "PASS via named-selection E2E": 1,
+    "PASS": 2
+  },
+  "oracleStatusCounts": {
+    "ORACLE_PENDING": 79
+  },
+  "entries": [
+    {
+      "operator": "`all`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (`select all`)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "canonical universe"
+    },
+    {
+      "operator": "`*`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "retained alias"
+    },
+    {
+      "operator": "`everything`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "retained explicit alias"
+    },
+    {
+      "operator": "`none`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "canonical empty result"
+    },
+    {
+      "operator": "`enabled`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "derived universe is enabled-only"
+    },
+    {
+      "operator": "`present`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "current coordinate universe"
+    },
+    {
+      "operator": "`visible`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "fail closed until projection is an explicit dependency"
+    },
+    {
+      "operator": "`name`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS indirectly",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "exact/wildcard tuple match"
+    },
+    {
+      "operator": "`%name`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS via named-selection E2E",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "immutable stable-ID snapshot"
+    },
+    {
+      "operator": "`?name`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "missing optional name is valid empty"
+    },
+    {
+      "operator": "`not`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "strongest unary precedence"
+    },
+    {
+      "operator": "`!`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "symbolic alias"
+    },
+    {
+      "operator": "`and`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "parser-owned bare query path"
+    },
+    {
+      "operator": "`&`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "symbolic alias"
+    },
+    {
+      "operator": "`or`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "deterministic stable ordering"
+    },
+    {
+      "operator": "`|`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "symbolic alias"
+    },
+    {
+      "operator": "`first`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "first selected atom only"
+    },
+    {
+      "operator": "`last`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "last selected atom only"
+    },
+    {
+      "operator": "`model`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "ID/name matching"
+    },
+    {
+      "operator": "`object`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "object scope annotations"
+    },
+    {
+      "operator": "`chain`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS indirectly",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "canonical chain field"
+    },
+    {
+      "operator": "`segi`",
+      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "no segment field is fabricated"
+    },
+    {
+      "operator": "`resn`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "exact/wildcard match"
+    },
+    {
+      "operator": "`resi`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "insertion-aware range"
+    },
+    {
+      "operator": "`alt`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "canonical altLoc only"
+    },
+    {
+      "operator": "`index`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "one-based"
+    },
+    {
+      "operator": "`id`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "stable ID and serial remain distinct"
+    },
+    {
+      "operator": "`rank`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "zero-based"
+    },
+    {
+      "operator": "`label`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "no arbitrary label namespace"
+    },
+    {
+      "operator": "`pepseq`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "no fabricated sequence index"
+    },
+    {
+      "operator": "`S1 in S2`",
+      "implementationStatus": "RESEARCH_REQUIRED",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "not added without exact grammar"
+    },
+    {
+      "operator": "`S1 like S2`",
+      "implementationStatus": "RESEARCH_REQUIRED",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "not reduced to string containment"
+    },
+    {
+      "operator": "`byobject`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "object-scoped expansion"
+    },
+    {
+      "operator": "`bysegi`",
+      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "segment data unavailable"
+    },
+    {
+      "operator": "`bychain`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "weak modifier precedence preserved"
+    },
+    {
+      "operator": "`byres`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "insertion-aware residue groups"
+    },
+    {
+      "operator": "`bycalpha`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "expands matched residue groups"
+    },
+    {
+      "operator": "`bymolecule`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "object scope only in current profile"
+    },
+    {
+      "operator": "`byfragment`",
+      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "fragment perception not present"
+    },
+    {
+      "operator": "`byring`",
+      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "ring perception not present"
+    },
+    {
+      "operator": "`bycell`",
+      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "unit-cell data not present"
+    },
+    {
+      "operator": "`neighbor`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "excludes seed atoms"
+    },
+    {
+      "operator": "`bound_to`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "includes directly bonded atoms"
+    },
+    {
+      "operator": "`extend`",
+      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "no unvalidated breadth semantics"
+    },
+    {
+      "operator": "`within`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "exact boundary equality"
+    },
+    {
+      "operator": "`around`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "excludes reference atoms"
+    },
+    {
+      "operator": "`expand`",
+      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "use `within` only until grammar is pinned"
+    },
+    {
+      "operator": "`near_to`",
+      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "distance semantics not pinned"
+    },
+    {
+      "operator": "`beyond`",
+      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "complement boundary needs profile"
+    },
+    {
+      "operator": "`gap`",
+      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "no hidden radius table"
+    },
+    {
+      "operator": "`formal_charge`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "missing values fail closed"
+    },
+    {
+      "operator": "`partial_charge`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "no charge fabrication"
+    },
+    {
+      "operator": "`b`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "numeric comparison operators"
+    },
+    {
+      "operator": "`q` / `occupancy`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "numeric occupancy alias"
+    },
+    {
+      "operator": "`ss`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "canonical assignment only"
+    },
+    {
+      "operator": "`elem`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "canonical element"
+    },
+    {
+      "operator": "`x`, `y`, `z`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "numeric coordinate comparisons"
+    },
+    {
+      "operator": "`state`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "command and selection namespaces remain explicit"
+    },
+    {
+      "operator": "`=`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "equality"
+    },
+    {
+      "operator": "`!=`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "inequality"
+    },
+    {
+      "operator": "`<`, `<=`, `>`, `>=`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "fail closed for text properties"
+    },
+    {
+      "operator": "`hydrogens` / `hydro`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "element H only"
+    },
+    {
+      "operator": "`hetatm`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "source record authority"
+    },
+    {
+      "operator": "`organic`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS indirectly",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "ligand alias"
+    },
+    {
+      "operator": "`inorganic`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "canonical ion classifier"
+    },
+    {
+      "operator": "`solvent`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "water alias"
+    },
+    {
+      "operator": "`polymer`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS indirectly",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "canonical polymer flag"
+    },
+    {
+      "operator": "`polymer.protein` / `protein`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "accepted protein alias"
+    },
+    {
+      "operator": "`backbone`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "conservative backbone name set"
+    },
+    {
+      "operator": "`sidechain`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "complement of conservative backbone set"
+    },
+    {
+      "operator": "`guide`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "CA guide atoms"
+    },
+    {
+      "operator": "`metals`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "explicit element set"
+    },
+    {
+      "operator": "`bonded`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "bond endpoint membership"
+    },
+    {
+      "operator": "`donors`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "no heuristic donor claim"
+    },
+    {
+      "operator": "`acceptors`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "no heuristic acceptor claim"
+    },
+    {
+      "operator": "`rep`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "presentation dependency not bound into engine"
+    },
+    {
+      "operator": "`color`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "command exists; query selector gated"
+    },
+    {
+      "operator": "`cartoon_color`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "no presentation leakage"
+    },
+    {
+      "operator": "`ribbon_color`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "no presentation leakage"
+    }
+  ]
+}

@@ -46,6 +46,30 @@ describe("VIS-01 structure ingestion", () => {
     expect(result.structure.counts).toMatchObject({ atoms: 2, polymerAtoms: 1, waterAtoms: 1 });
   });
 
+  it("preserves multi-model mmCIF coordinates as explicit canonical states", async () => {
+    const content = `data_states
+loop_
+_atom_site.group_PDB
+_atom_site.id
+_atom_site.type_symbol
+_atom_site.label_atom_id
+_atom_site.label_comp_id
+_atom_site.label_asym_id
+_atom_site.label_seq_id
+_atom_site.Cartn_x
+_atom_site.Cartn_y
+_atom_site.Cartn_z
+_atom_site.pdbx_PDB_model_num
+ATOM 1 C CA ALA A 1 1.0 2.0 3.0 1
+ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
+`;
+    const result = await new StructureIngestionService().ingestLocal("states.mmcif", Buffer.from(content));
+    expect(result.structure.coordinateStates).toHaveLength(2);
+    expect(result.structure.stateOrder).toEqual(result.structure.coordinateStates?.map((state) => state.id));
+    expect(result.structure.coordinateStates?.map((state) => state.sourceModelNumber)).toEqual([1, 2]);
+    expect(result.structure.coordinateStates?.[1]?.coordinates[result.structure.atoms[0]!.stableId]).toEqual({ x: 4, y: 5, z: 6 });
+  });
+
   it("rejects unadmitted formats without creating a structure", async () => {
     await expect(new StructureIngestionService().ingestLocal("sample.sdf", Buffer.from("not admitted"))).rejects.toMatchObject({ code: "UNSUPPORTED_FORMAT" });
   });

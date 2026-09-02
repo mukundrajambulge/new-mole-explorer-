@@ -38,10 +38,10 @@ export type BondPickResult = PickBase & { pickKind: "BOND"; bondRef: StableBondR
 export type BackgroundPickResult = PickBase & { pickKind: "BACKGROUND" };
 export type PickResult = AtomPickResult | BondPickResult | BackgroundPickResult;
 
-export const coordinateContextFor = (structure: CanonicalMolecularStructure): CoordinateContext => ({
-  coordinateStateId: `${structure.id}:coordinates:active`,
-  modelId: structure.id,
-  stateId: "active",
+export const coordinateContextFor = (structure: CanonicalMolecularStructure, objectId = structure.id, stateId = "active"): CoordinateContext => ({
+  coordinateStateId: `${objectId}:coordinates:${stateId}`,
+  modelId: objectId,
+  stateId,
   molecularRevision: structure.scientificHash,
 });
 
@@ -62,7 +62,7 @@ export class ReverseIdentityMap {
     this.buildMany([{ structure, objectId: structure.id }], generation);
   }
 
-  buildMany(entries: readonly { structure: CanonicalMolecularStructure; objectId: string }[], generation: number): void {
+  buildMany(entries: readonly { structure: CanonicalMolecularStructure; objectId: string; stateId?: string }[], generation: number): void {
     this.byRendererIndex.clear();
     this.byStableId.clear();
     this.byObjectAndStableId.clear();
@@ -74,7 +74,7 @@ export class ReverseIdentityMap {
     this.generation = generation;
     let rendererIndex = 0;
     for (const entry of entries) {
-      const coordinateContext = coordinateContextFor(entry.structure);
+      const coordinateContext = coordinateContextFor(entry.structure, entry.objectId, entry.stateId ?? "active");
       entry.structure.atoms.forEach((atom) => {
         const ref: StableAtomRef = { structureId: entry.structure.id, objectId: entry.objectId, stableAtomId: atom.stableId, molecularRevision: entry.structure.scientificHash, coordinateContext };
         this.byRendererIndex.set(rendererIndex++, ref);
