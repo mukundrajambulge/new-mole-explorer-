@@ -14,10 +14,10 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `b87a0388b57859ecf4d038997352a9d0178abe5a`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
-- Current implementation commit: `6605630f9256b549e807978e23e30e5af302c26e` (`feat(selection): bind canonical peptide sequence profile`)
-- Ending implementation SHA: `6605630f9256b549e807978e23e30e5af302c26e`
-- Latest pushed implementation/evidence base SHA before this report update: `78262a535b98eb5ff87a9daf85a16a3b396cb3a9`
-- Working tree: clean after the recorded implementation, evidence, and report commits; no unrelated files were changed
+- Current implementation commit: `2a44540c9dfd24dd7241f569c00e8c0c22e9de83` (`fix(selection): preserve peptide sequence scope across workspace objects`)
+- Ending implementation SHA: `2a44540c9dfd24dd7241f569c00e8c0c22e9de83`
+- Latest implementation/evidence base SHA before this report update: `2a44540c9dfd24dd7241f569c00e8c0c22e9de83`
+- Working tree: modified only by the evidence screenshots and this report update; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
 - API health: `http://localhost:8100/api/health`
@@ -45,6 +45,7 @@ The current application was exercised with a real 4DJW RCSB load:
 - Backend canonical structure, topology, coordinates, provenance, source hash, and coordinate-state metadata remain the scientific authority.
 - `RenderProjection` is the renderer-neutral presentation boundary consumed by `ThreeDMolViewerAdapter`; UI components do not own 3Dmol scientific state.
 - `pepseq` consumes only the revision-matched `canonical-peptide-sequence-v1` dataset produced by ingestion and propagated through derived-object workflows; the evaluator does not infer sequence from renderer state or a residue-name heuristic at query time.
+- Workspace peptide-sequence datasets namespace each object and residue ID, so identical chain/residue labels in separate objects cannot collide; the multi-object regression selects the expected 8 atoms from the protein object only.
 - One mounted molecular canvas owns one authoritative adapter/viewer instance. Multiple workspace objects become separate 3Dmol models within that viewer.
 - Durable `ObjectID`, display name, and renderer model identity are distinct. Duplicate names require an ObjectID and never silently select the first match.
 - Multi-object selection uses a derived workspace universe containing every loaded object, including disabled presentation objects, with object-scoped atom IDs; source canonical IDs are unchanged. `enabled` and `visible` remain separate presentation-scoped selectors.
@@ -166,6 +167,7 @@ Verification:
 - Strict join_states correspondence and topology validation: **PASS**
 - Non-destructive organizational group lifecycle: **PASS**
 - Bare object and group-name resolution: **PASS** through the canonical workspace selection context
+- Workspace-scoped `pepseq`: **PASS**; object and residue namespaces remain distinct when multiple canonical objects share one viewer.
 - Cross-object spatial selection with `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD`: **PASS**; undeclared policy remains **fail-closed with a structured dependency diagnostic**
 
 ## Multi-state closure
