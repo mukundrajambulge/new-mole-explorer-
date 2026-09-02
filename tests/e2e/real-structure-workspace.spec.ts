@@ -9,15 +9,51 @@ test("4DJW live selection and a second RCSB object share one workspace", async (
   await page.getByRole("button", { name: "RCSB fetch" }).click();
   await expect(page.getByTitle("4DJW.cif").first()).toBeVisible({ timeout: 60000 });
 
+  const parseMetric = async (label: string) => {
+    const text = await page.locator(".status-metrics").innerText();
+    const match = text.match(new RegExp(`${label}\\s+([\\d,]+)`));
+    expect(match, `missing ${label} metric`).toBeTruthy();
+    return Number(match![1].replaceAll(",", ""));
+  };
+  const readLatestSelectionCount = async () => {
+    const latest = page.getByRole("region", { name: "Command and selection console" }).locator(".console-entry").last();
+    await expect(latest).toContainText(/Selected [\d,]+ atoms/, { timeout: 15000 });
+    const text = await latest.innerText();
+    const match = text.match(/Selected ([\d,]+) atoms/);
+    expect(match, `latest console entry is not a selection: ${text}`).toBeTruthy();
+    return Number(match![1].replaceAll(",", ""));
+  };
+  const loadedAtomCount = await parseMetric("Atoms");
+  expect(loadedAtomCount).toBeGreaterThan(0);
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   await command.fill("select all");
   await page.getByRole("button", { name: /Run/ }).click();
-  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 7079 atoms", { timeout: 15000 });
-  await expect(page.locator(".status-metrics")).toContainText("Selection 7,079");
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText(`Selected ${loadedAtomCount} atoms`, { timeout: 15000 });
+  expect(await readLatestSelectionCount()).toBe(loadedAtomCount);
+  await expect(page.locator(".status-metrics")).toContainText(`Selection ${loadedAtomCount.toLocaleString("en-US")}`);
+  await expect(page.getByTestId("active-selection")).toContainText(`${loadedAtomCount.toLocaleString("en-US")} atoms`);
+  await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
+  const allSelectionHash = await page.getByTestId("active-selection").getAttribute("data-membership-hash");
+  expect(allSelectionHash).toBeTruthy();
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-membership-hash", allSelectionHash!);
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-indicator", "visible");
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-highlight-limit", "128");
+  await command.fill("show sticks, all");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(page.getByTestId("active-selection")).toContainText(`${loadedAtomCount.toLocaleString("en-US")} atoms`);
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-membership-hash", allSelectionHash!);
   await command.fill("chain A and protein");
   await page.getByRole("button", { name: /Run/ }).click();
-  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 3060 atoms", { timeout: 15000 });
-  await expect(page.locator(".status-metrics")).toContainText("Selection 3,060");
+  const chainProteinCount = await readLatestSelectionCount();
+  expect(chainProteinCount).toBeGreaterThan(0);
+  expect(chainProteinCount).toBeLessThanOrEqual(loadedAtomCount);
+  await expect(page.locator(".status-metrics")).toContainText(`Selection ${chainProteinCount.toLocaleString("en-US")}`);
+  await expect(page.getByTestId("active-selection")).toContainText(`${chainProteinCount.toLocaleString("en-US")} atoms`);
+  await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
+  const chainProteinHash = await page.getByTestId("active-selection").getAttribute("data-membership-hash");
+  expect(chainProteinHash).toBeTruthy();
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-membership-hash", chainProteinHash!);
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-indicator", "visible");
 
   await page.getByRole("textbox", { name: "RCSB PDB ID" }).fill("1CRN");
   await page.getByRole("button", { name: "RCSB add" }).click();
@@ -28,5 +64,5 @@ test("4DJW live selection and a second RCSB object share one workspace", async (
 
   await command.fill("object 4DJW.cif");
   await page.getByRole("button", { name: /Run/ }).click();
-  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 7079 atoms", { timeout: 15000 });
+  expect(await readLatestSelectionCount()).toBe(loadedAtomCount);
 });

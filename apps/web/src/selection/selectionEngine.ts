@@ -423,6 +423,8 @@ export const bindSelectionPlan = (query: string, ast: SelectionAst, normalizedAs
 export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecularStructure, options: SelectionEvaluationOptions = {}): SelectionResult => {
   const trimmed = query.trim(); const parsed = parseSelection(trimmed); const source = options.source ?? { kind: "query", rawQuery: trimmed };
   const emptyContext = { ...contextFor(structure, trimmed, options.named, [...parsed.diagnostics]), coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal };
+  const presentationSelector = trimmed.match(/^(rep|cartoon_color|ribbon_color)\b/i);
+  if (presentationSelector) return baseResult(trimmed, structure, source, "MISSING_DEPENDENCY", [{ code: "MISSING_DEPENDENCY", message: `Presentation selector \`${presentationSelector[1]}\` is not evaluated in the scientific selection context; use a registered presentation command.` }], "", [], emptyContext);
   if (options.expectedRevision && options.expectedRevision !== structure.scientificHash) return baseResult(trimmed, structure, source, "STALE_REVISION", [{ code: "STALE_REVISION", message: "The selection context revision is stale; the active structure was not changed." }], "", [], emptyContext);
   const gated = trimmed.match(/\b(gap|pbc|bycell|symmetry|byring|byfragment|extend|expand|near_to|beyond|donors|acceptors|arbitrary)\b/i);
   if (gated) return baseResult(trimmed, structure, source, "UNSUPPORTED_OPERATOR_OR_PROFILE", [{ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: `Selection operator \`${gated[1]}\` is gated until its validated scientific profile is available.` }], "", [], emptyContext);

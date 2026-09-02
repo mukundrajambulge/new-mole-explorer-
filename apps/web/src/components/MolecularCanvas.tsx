@@ -16,6 +16,7 @@ type MolecularCanvasProps = {
   workspaceObjects?: readonly WorkspaceObject[];
   globalFrameIndex?: number;
   projection: RenderProjection;
+  activeSelectionMembershipHash?: string;
   activeTool: string;
   cameraCommand?: CameraCommand;
   loading: boolean;
@@ -44,6 +45,7 @@ export const MolecularCanvas = ({
   workspaceObjects = [],
   globalFrameIndex = 0,
   projection,
+  activeSelectionMembershipHash = "",
   activeTool,
   cameraCommand,
   loading,
@@ -224,7 +226,7 @@ export const MolecularCanvas = ({
         onPointerUp={endPointerGesture}
         onPointerCancel={endPointerGesture}
       >
-        <div ref={hostRef} className="viewer-host" style={{ bottom: `${viewerBottomInset}px` }} data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} data-global-frame-index={globalFrameIndex} data-renderer-object-count={workspaceObjects.length || (structure ? 1 : 0)} />
+        <div ref={hostRef} className="viewer-host" style={{ bottom: `${viewerBottomInset}px` }} data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} data-global-frame-index={globalFrameIndex} data-renderer-object-count={workspaceObjects.length || (structure ? 1 : 0)} data-selection-membership-hash={activeSelectionMembershipHash} />
         {!structure && !loading && (
           <div className="empty-viewer-state">
             <div className="empty-viewer-card">

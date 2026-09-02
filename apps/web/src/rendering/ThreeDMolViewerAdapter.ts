@@ -813,6 +813,11 @@ export class ThreeDMolViewerAdapter {
     // Keep selection state complete in the presentation model; cap only per-atom
     // highlight geometry so selecting an entire large structure stays responsive.
     const selectedIds = new Set(projection.interaction.selectedAtomIds.slice(0, 128));
+    if (this.container) {
+      this.container.dataset.selectionIndicator = selectedIds.size ? "visible" : "none";
+      this.container.dataset.selectionHighlightedAtomCount = String(selectedIds.size);
+      this.container.dataset.selectionHighlightLimit = "128";
+    }
     const workspaceAtoms = this.workspaceObjects.length ? this.workspaceObjects.flatMap((object) => structureForWorkspaceObjectState(object).atoms.map((atom) => ({ ...atom, stableId: workspaceScopedStableAtomId(object.objectId, atom.stableId) }))) : this.structure.atoms;
     const addMarker = (stableId: string, color: string, radius: number, wireframe: boolean, opacity: number) => {
       const atoms = workspaceAtoms.filter((candidate) => candidate.stableId === stableId || candidate.stableId.endsWith(`::${stableId}`));

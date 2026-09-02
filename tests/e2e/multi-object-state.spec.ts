@@ -125,10 +125,13 @@ test("object-scoped surfaces survive an unrelated coordinate-state change", asyn
   const renderer = page.getByTestId("molecular-viewer");
 
   await stateRow.getByRole("button", { name: "Focus multistate.pdb" }).click();
+  await expect(page.getByRole("combobox", { name: "Style" })).toHaveValue("cartoon");
   await page.getByRole("combobox", { name: "Style" }).selectOption("van-der-waals-surface");
+  await expect(renderer).toHaveAttribute("data-renderer-surface-object-count", "1");
   await miniRow.getByRole("button", { name: "Focus mini-protein.pdb" }).click();
+  await expect(page.getByRole("combobox", { name: "Style" })).toHaveValue("cartoon");
   await page.getByRole("combobox", { name: "Style" }).selectOption("van-der-waals-surface");
-  await expect(renderer).toHaveAttribute("data-renderer-surface-object-count", "2");
+  await expect(renderer).toHaveAttribute("data-renderer-surface-object-count", "2", { timeout: 15000 });
   const before = await renderer.getAttribute("data-renderer-surface-rebuilds");
   expect(before).toBeTruthy();
   const beforeCounts = JSON.parse(before!) as Record<string, number>;

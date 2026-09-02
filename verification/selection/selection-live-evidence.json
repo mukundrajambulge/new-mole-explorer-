@@ -1,0 +1,2186 @@
+{
+  "schemaVersion": 1,
+  "fixture": "tests/fixtures/mini-protein.pdb",
+  "generatedBy": "tests/e2e/selection-matrix-live.spec.ts",
+  "expectedMembershipHashPolicy": "null when no independent application-fixture hash is pinned; observed hashes are recorded from the active canonical selection result",
+  "attemptedQueryCount": 79,
+  "browserConsoleErrors": [],
+  "pageErrors": [],
+  "networkErrors": [],
+  "attempts": [
+    {
+      "query": "select active_site, chain A",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 11,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nNamed selection active_site created · 11 atoms.",
+        "atomCount": 11,
+        "membershipHash": "cac5e226",
+        "viewerMembershipHash": "cac5e226",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "cac5e226",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "all",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 12,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 12 atoms · replace · revision 6305887eeb…\n· 12 atoms",
+        "atomCount": 12,
+        "membershipHash": "c29d701e",
+        "viewerMembershipHash": "c29d701e",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c29d701e",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "*",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 12,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 12 atoms · replace · revision 6305887eeb…\n· 12 atoms",
+        "atomCount": 12,
+        "membershipHash": "c29d701e",
+        "viewerMembershipHash": "c29d701e",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c29d701e",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "everything",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 12,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 12 atoms · replace · revision 6305887eeb…\n· 12 atoms",
+        "atomCount": 12,
+        "membershipHash": "c29d701e",
+        "viewerMembershipHash": "c29d701e",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c29d701e",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "none",
+      "expected": {
+        "semanticStatus": "VALID_EMPTY",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_EMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 0 atoms · replace · revision 6305887eeb…\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": "811c9dc5",
+        "viewerMembershipHash": "811c9dc5",
+        "selectionIndicator": "none",
+        "selectionVisible": false,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "811c9dc5",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "enabled",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 12,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 12 atoms · replace · revision 6305887eeb…\n· 12 atoms",
+        "atomCount": 12,
+        "membershipHash": "c29d701e",
+        "viewerMembershipHash": "c29d701e",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c29d701e",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "present",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 12,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 12 atoms · replace · revision 6305887eeb…\n· 12 atoms",
+        "atomCount": 12,
+        "membershipHash": "c29d701e",
+        "viewerMembershipHash": "c29d701e",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c29d701e",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "visible",
+      "expected": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "category": "SELECTION",
+        "result": "●\nPresentation visibility is not bound into this selection context.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Presentation visibility is not bound into this selection context.",
+        "Presentation visibility is not bound into this selection context.",
+        "Presentation visibility is not bound into this selection context.",
+        "Presentation visibility is not bound into this selection context.",
+        "Presentation visibility is not bound into this selection context.",
+        "Presentation visibility is not bound into this selection context.",
+        "Presentation visibility is not bound into this selection context.",
+        "Presentation visibility is not bound into this selection context.",
+        "Presentation visibility is not bound into this selection context.",
+        "Presentation visibility is not bound into this selection context.",
+        "Presentation visibility is not bound into this selection context.",
+        "Presentation visibility is not bound into this selection context."
+      ]
+    },
+    {
+      "query": "name CA",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 2,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 2 atoms · replace · revision 6305887eeb…\n· 2 atoms",
+        "atomCount": 2,
+        "membershipHash": "c49cc517",
+        "viewerMembershipHash": "c49cc517",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c49cc517",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "%active_site",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 11,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 11 atoms · replace · revision 6305887eeb…\n· 11 atoms",
+        "atomCount": 11,
+        "membershipHash": "cac5e226",
+        "viewerMembershipHash": "cac5e226",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "cac5e226",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "?missing",
+      "expected": {
+        "semanticStatus": "VALID_EMPTY",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_EMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 0 atoms · replace · revision 6305887eeb…\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": "811c9dc5",
+        "viewerMembershipHash": "811c9dc5",
+        "selectionIndicator": "none",
+        "selectionVisible": false,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "811c9dc5",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "active_site",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 11,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 11 atoms · replace · revision 6305887eeb…\n· 11 atoms",
+        "atomCount": 11,
+        "membershipHash": "cac5e226",
+        "viewerMembershipHash": "cac5e226",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "cac5e226",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "groupA",
+      "expected": {
+        "semanticStatus": "UNKNOWN_NAME",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "UNKNOWN_NAME",
+        "category": "SELECTION",
+        "result": "●\nNamed selection `groupA` does not exist.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Named selection `groupA` does not exist."
+      ]
+    },
+    {
+      "query": "not water",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 11,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 11 atoms · replace · revision 6305887eeb…\n· 11 atoms",
+        "atomCount": 11,
+        "membershipHash": "c9c5e093",
+        "viewerMembershipHash": "c9c5e093",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c9c5e093",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "!water",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 11,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 11 atoms · replace · revision 6305887eeb…\n· 11 atoms",
+        "atomCount": 11,
+        "membershipHash": "c9c5e093",
+        "viewerMembershipHash": "c9c5e093",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c9c5e093",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "chain A and protein",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 8,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 8 atoms · replace · revision 6305887eeb…\n· 8 atoms",
+        "atomCount": 8,
+        "membershipHash": "646bf637",
+        "viewerMembershipHash": "646bf637",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "646bf637",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "chain A & protein",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 8,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 8 atoms · replace · revision 6305887eeb…\n· 8 atoms",
+        "atomCount": 8,
+        "membershipHash": "646bf637",
+        "viewerMembershipHash": "646bf637",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "646bf637",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "ligand or water",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 3,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 3 atoms · replace · revision 6305887eeb…\n· 3 atoms",
+        "atomCount": 3,
+        "membershipHash": "33bd2b36",
+        "viewerMembershipHash": "33bd2b36",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "33bd2b36",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "ligand | water",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 3,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 3 atoms · replace · revision 6305887eeb…\n· 3 atoms",
+        "atomCount": 3,
+        "membershipHash": "33bd2b36",
+        "viewerMembershipHash": "33bd2b36",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "33bd2b36",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "(chain A or chain B) and name CA",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 2,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 2 atoms · replace · revision 6305887eeb…\n· 2 atoms",
+        "atomCount": 2,
+        "membershipHash": "c49cc517",
+        "viewerMembershipHash": "c49cc517",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c49cc517",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "chain A protein",
+      "expected": {
+        "semanticStatus": "SYNTAX_ERROR",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "SYNTAX_ERROR",
+        "category": "SELECTION",
+        "result": "●\nUnexpected token `protein`.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Unexpected token `protein`. · characters 9–15"
+      ]
+    },
+    {
+      "query": "first all",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 1,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 1 atoms · replace · revision 6305887eeb…\n· 1 atoms",
+        "atomCount": 1,
+        "membershipHash": "ee701b59",
+        "viewerMembershipHash": "ee701b59",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "ee701b59",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "last all",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 1,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 1 atoms · replace · revision 6305887eeb…\n· 1 atoms",
+        "atomCount": 1,
+        "membershipHash": "c57b2971",
+        "viewerMembershipHash": "c57b2971",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c57b2971",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "model mini-protein.pdb",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 12,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 12 atoms · replace · revision 6305887eeb…\n· 12 atoms",
+        "atomCount": 12,
+        "membershipHash": "c29d701e",
+        "viewerMembershipHash": "c29d701e",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c29d701e",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "object mini-protein.pdb",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 12,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 12 atoms · replace · revision 6305887eeb…\n· 12 atoms",
+        "atomCount": 12,
+        "membershipHash": "c29d701e",
+        "viewerMembershipHash": "c29d701e",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c29d701e",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "chain A",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 11,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 11 atoms · replace · revision 6305887eeb…\n· 11 atoms",
+        "atomCount": 11,
+        "membershipHash": "cac5e226",
+        "viewerMembershipHash": "cac5e226",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "cac5e226",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "segi A",
+      "expected": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "category": "SELECTION",
+        "result": "●\nSegment identity is not present in the current canonical structure; the query was not mapped to chain identity.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Segment identity is not present in the current canonical structure; the query was not mapped to chain identity."
+      ]
+    },
+    {
+      "query": "resn ALA",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 4,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 4 atoms · replace · revision 6305887eeb…\n· 4 atoms",
+        "atomCount": 4,
+        "membershipHash": "5df44c2b",
+        "viewerMembershipHash": "5df44c2b",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "5df44c2b",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "resi 1",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 4,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 4 atoms · replace · revision 6305887eeb…\n· 4 atoms",
+        "atomCount": 4,
+        "membershipHash": "5df44c2b",
+        "viewerMembershipHash": "5df44c2b",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "5df44c2b",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "alt A",
+      "expected": {
+        "semanticStatus": "VALID_EMPTY",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_EMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 0 atoms · replace · revision 6305887eeb…\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": "811c9dc5",
+        "viewerMembershipHash": "811c9dc5",
+        "selectionIndicator": "none",
+        "selectionVisible": false,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "811c9dc5",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "index 2",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 1,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 1 atoms · replace · revision 6305887eeb…\n· 1 atoms",
+        "atomCount": 1,
+        "membershipHash": "eb7016a0",
+        "viewerMembershipHash": "eb7016a0",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "eb7016a0",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "id 2",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 1,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 1 atoms · replace · revision 6305887eeb…\n· 1 atoms",
+        "atomCount": 1,
+        "membershipHash": "eb7016a0",
+        "viewerMembershipHash": "eb7016a0",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "eb7016a0",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "rank 0",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 1,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 1 atoms · replace · revision 6305887eeb…\n· 1 atoms",
+        "atomCount": 1,
+        "membershipHash": "ee701b59",
+        "viewerMembershipHash": "ee701b59",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "ee701b59",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "name != CA",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 10,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 10 atoms · replace · revision 6305887eeb…\n· 10 atoms",
+        "atomCount": 10,
+        "membershipHash": "c08dd2b6",
+        "viewerMembershipHash": "c08dd2b6",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c08dd2b6",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "label all, {name}",
+      "expected": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "category": "PRESENTATION",
+        "result": "●\nApplied safe labels to 12 atoms.",
+        "atomCount": null,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "pepseq 10",
+      "expected": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "category": "SELECTION",
+        "result": "●\nCanonical pepseq data is unavailable for this molecular revision.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Canonical pepseq data is unavailable for this molecular revision.",
+        "Canonical pepseq data is unavailable for this molecular revision.",
+        "Canonical pepseq data is unavailable for this molecular revision.",
+        "Canonical pepseq data is unavailable for this molecular revision.",
+        "Canonical pepseq data is unavailable for this molecular revision.",
+        "Canonical pepseq data is unavailable for this molecular revision.",
+        "Canonical pepseq data is unavailable for this molecular revision.",
+        "Canonical pepseq data is unavailable for this molecular revision.",
+        "Canonical pepseq data is unavailable for this molecular revision.",
+        "Canonical pepseq data is unavailable for this molecular revision.",
+        "Canonical pepseq data is unavailable for this molecular revision.",
+        "Canonical pepseq data is unavailable for this molecular revision."
+      ]
+    },
+    {
+      "query": "name CA in chain A",
+      "expected": {
+        "semanticStatus": "RESEARCH_REQUIRED",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "SYNTAX_ERROR",
+        "category": "SELECTION",
+        "result": "●\nUnexpected token `in`.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Unexpected token `in`. · characters 9–10"
+      ]
+    },
+    {
+      "query": "name like CA",
+      "expected": {
+        "semanticStatus": "RESEARCH_REQUIRED",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "SYNTAX_ERROR",
+        "category": "SELECTION",
+        "result": "●\nUnexpected token `CA`.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Unexpected token `CA`. · characters 11–12"
+      ]
+    },
+    {
+      "query": "byobject chain A",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 12,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 12 atoms · replace · revision 6305887eeb…\n· 12 atoms",
+        "atomCount": 12,
+        "membershipHash": "c29d701e",
+        "viewerMembershipHash": "c29d701e",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c29d701e",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "bysegi chain A",
+      "expected": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "category": "SELECTION",
+        "result": "●\nSegment identity is not present in the current canonical structure.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Segment identity is not present in the current canonical structure."
+      ]
+    },
+    {
+      "query": "bychain ligand",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 11,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 11 atoms · replace · revision 6305887eeb…\n· 11 atoms",
+        "atomCount": 11,
+        "membershipHash": "cac5e226",
+        "viewerMembershipHash": "cac5e226",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "cac5e226",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "byres name CA",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 8,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 8 atoms · replace · revision 6305887eeb…\n· 8 atoms",
+        "atomCount": 8,
+        "membershipHash": "646bf637",
+        "viewerMembershipHash": "646bf637",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "646bf637",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "bycalpha name CA",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 8,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 8 atoms · replace · revision 6305887eeb…\n· 8 atoms",
+        "atomCount": 8,
+        "membershipHash": "646bf637",
+        "viewerMembershipHash": "646bf637",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "646bf637",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "bymolecule ligand",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 12,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 12 atoms · replace · revision 6305887eeb…\n· 12 atoms",
+        "atomCount": 12,
+        "membershipHash": "c29d701e",
+        "viewerMembershipHash": "c29d701e",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c29d701e",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "byfragment ligand",
+      "expected": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "category": "SELECTION",
+        "result": "●\nSelection operator `byfragment` is gated until its validated scientific profile is available.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Selection operator `byfragment` is gated until its validated scientific profile is available."
+      ]
+    },
+    {
+      "query": "byring ligand",
+      "expected": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "category": "SELECTION",
+        "result": "●\nSelection operator `byring` is gated until its validated scientific profile is available.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Selection operator `byring` is gated until its validated scientific profile is available."
+      ]
+    },
+    {
+      "query": "bycell chain A",
+      "expected": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "category": "SELECTION",
+        "result": "●\nSelection operator `bycell` is gated until its validated scientific profile is available.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Selection operator `bycell` is gated until its validated scientific profile is available."
+      ]
+    },
+    {
+      "query": "neighbor ligand",
+      "expected": {
+        "semanticStatus": "VALID_EMPTY",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_EMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 0 atoms · replace · revision 6305887eeb…\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": "811c9dc5",
+        "viewerMembershipHash": "811c9dc5",
+        "selectionIndicator": "none",
+        "selectionVisible": false,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "811c9dc5",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "bound_to ligand",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 2,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 2 atoms · replace · revision 6305887eeb…\n· 2 atoms",
+        "atomCount": 2,
+        "membershipHash": "d993317d",
+        "viewerMembershipHash": "d993317d",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "d993317d",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "extend 1 ligand",
+      "expected": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "category": "SELECTION",
+        "result": "●\nSelection operator `extend` is gated until its validated scientific profile is available.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Selection operator `extend` is gated until its validated scientific profile is available."
+      ]
+    },
+    {
+      "query": "within 4 of ligand",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 6 atoms · replace · revision 6305887eeb…\n· 6 atoms",
+        "atomCount": 6,
+        "membershipHash": "79d0c150",
+        "viewerMembershipHash": "79d0c150",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "79d0c150",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "around 4 ligand",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 4 atoms · replace · revision 6305887eeb…\n· 4 atoms",
+        "atomCount": 4,
+        "membershipHash": "5cf44a98",
+        "viewerMembershipHash": "5cf44a98",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "5cf44a98",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "expand 4 ligand",
+      "expected": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "category": "SELECTION",
+        "result": "●\nSelection operator `expand` is gated until its validated scientific profile is available.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Selection operator `expand` is gated until its validated scientific profile is available."
+      ]
+    },
+    {
+      "query": "near_to ligand",
+      "expected": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "category": "SELECTION",
+        "result": "●\nSelection operator `near_to` is gated until its validated scientific profile is available.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Selection operator `near_to` is gated until its validated scientific profile is available."
+      ]
+    },
+    {
+      "query": "beyond 4 ligand",
+      "expected": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "category": "SELECTION",
+        "result": "●\nSelection operator `beyond` is gated until its validated scientific profile is available.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Selection operator `beyond` is gated until its validated scientific profile is available."
+      ]
+    },
+    {
+      "query": "gap 4 ligand",
+      "expected": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "category": "SELECTION",
+        "result": "●\nSelection operator `gap` is gated until its validated scientific profile is available.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Selection operator `gap` is gated until its validated scientific profile is available."
+      ]
+    },
+    {
+      "query": "formal_charge = 0",
+      "expected": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "category": "SELECTION",
+        "result": "●\nCanonical formal_charge data is unavailable for this selection context.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Canonical formal_charge data is unavailable for this selection context."
+      ]
+    },
+    {
+      "query": "partial_charge > 0",
+      "expected": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "category": "SELECTION",
+        "result": "●\nCanonical partial_charge data is unavailable for this selection context.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Canonical partial_charge data is unavailable for this selection context.",
+        "Canonical partial_charge data is unavailable for this selection context.",
+        "Canonical partial_charge data is unavailable for this selection context.",
+        "Canonical partial_charge data is unavailable for this selection context.",
+        "Canonical partial_charge data is unavailable for this selection context.",
+        "Canonical partial_charge data is unavailable for this selection context.",
+        "Canonical partial_charge data is unavailable for this selection context.",
+        "Canonical partial_charge data is unavailable for this selection context.",
+        "Canonical partial_charge data is unavailable for this selection context.",
+        "Canonical partial_charge data is unavailable for this selection context.",
+        "Canonical partial_charge data is unavailable for this selection context.",
+        "Canonical partial_charge data is unavailable for this selection context."
+      ]
+    },
+    {
+      "query": "b > 20",
+      "expected": {
+        "semanticStatus": "VALID_EMPTY",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_EMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 0 atoms · replace · revision 6305887eeb…\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": "811c9dc5",
+        "viewerMembershipHash": "811c9dc5",
+        "selectionIndicator": "none",
+        "selectionVisible": false,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "811c9dc5",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "q >= 0.5",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 12,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 12 atoms · replace · revision 6305887eeb…\n· 12 atoms",
+        "atomCount": 12,
+        "membershipHash": "c29d701e",
+        "viewerMembershipHash": "c29d701e",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c29d701e",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "ss HELIX",
+      "expected": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "category": "SELECTION",
+        "result": "●\nCanonical secondary-structure data is unavailable for this molecular revision.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Canonical secondary-structure data is unavailable for this molecular revision.",
+        "Canonical secondary-structure data is unavailable for this molecular revision.",
+        "Canonical secondary-structure data is unavailable for this molecular revision.",
+        "Canonical secondary-structure data is unavailable for this molecular revision.",
+        "Canonical secondary-structure data is unavailable for this molecular revision.",
+        "Canonical secondary-structure data is unavailable for this molecular revision.",
+        "Canonical secondary-structure data is unavailable for this molecular revision.",
+        "Canonical secondary-structure data is unavailable for this molecular revision.",
+        "Canonical secondary-structure data is unavailable for this molecular revision.",
+        "Canonical secondary-structure data is unavailable for this molecular revision.",
+        "Canonical secondary-structure data is unavailable for this molecular revision.",
+        "Canonical secondary-structure data is unavailable for this molecular revision."
+      ]
+    },
+    {
+      "query": "elem C",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 5,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 5 atoms · replace · revision 6305887eeb…\n· 5 atoms",
+        "atomCount": 5,
+        "membershipHash": "a3933ff1",
+        "viewerMembershipHash": "a3933ff1",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "a3933ff1",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "x < 2",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 4,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 4 atoms · replace · revision 6305887eeb…\n· 4 atoms",
+        "atomCount": 4,
+        "membershipHash": "a31e0eec",
+        "viewerMembershipHash": "a31e0eec",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "a31e0eec",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "x <= 2",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 5,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 5 atoms · replace · revision 6305887eeb…\n· 5 atoms",
+        "atomCount": 5,
+        "membershipHash": "f827a93c",
+        "viewerMembershipHash": "f827a93c",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "f827a93c",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "y >= 0",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 10,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 10 atoms · replace · revision 6305887eeb…\n· 10 atoms",
+        "atomCount": 10,
+        "membershipHash": "7739eb0c",
+        "viewerMembershipHash": "7739eb0c",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "7739eb0c",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "z <= 100",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 12,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 12 atoms · replace · revision 6305887eeb…\n· 12 atoms",
+        "atomCount": 12,
+        "membershipHash": "c29d701e",
+        "viewerMembershipHash": "c29d701e",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c29d701e",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "state 2",
+      "expected": {
+        "semanticStatus": "VALID_EMPTY",
+        "atomCount": 0,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_EMPTY",
+        "category": "SELECTION",
+        "result": "●\nState 2 selected 0 atoms.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": "811c9dc5",
+        "viewerMembershipHash": "811c9dc5",
+        "selectionIndicator": "none",
+        "selectionVisible": false,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "811c9dc5",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "foo = bar",
+      "expected": {
+        "semanticStatus": "INTENTIONALLY_UNSUPPORTED",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "SYNTAX_ERROR",
+        "category": "SELECTION",
+        "result": "●\nUnexpected token `=`.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Unexpected token `=`. · characters 5–5"
+      ]
+    },
+    {
+      "query": "rep cartoon",
+      "expected": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "category": "SELECTION",
+        "result": "●\nPresentation selector `rep` is not evaluated in the scientific selection context; use a registered presentation command.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Presentation selector `rep` is not evaluated in the scientific selection context; use a registered presentation command."
+      ]
+    },
+    {
+      "query": "color red",
+      "expected": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "category": "PRESENTATION",
+        "result": "●\nApplied red to 12 atoms.",
+        "atomCount": null,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "show sticks, all",
+      "expected": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "atomCount": null,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "hide sticks, all",
+      "expected": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "category": "PRESENTATION",
+        "result": "●\nHIDE STICKS on 12 atoms.",
+        "atomCount": null,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "center all",
+      "expected": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "category": "PRESENTATION",
+        "result": "●\ncenter applied to 12 canonical atoms.",
+        "atomCount": null,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "zoom all",
+      "expected": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "category": "PRESENTATION",
+        "result": "●\nzoom applied to 12 canonical atoms.",
+        "atomCount": null,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "measure distance",
+      "expected": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "category": "MEASURE",
+        "result": "●\nMeasurement mode started: DISTANCE.",
+        "atomCount": null,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "measure clear",
+      "expected": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "category": "MEASURE",
+        "result": "●\nMeasurement picks cleared.",
+        "atomCount": null,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "get_view",
+      "expected": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "category": "VIEW",
+        "result": "●\n{\"projection\":\"perspective\"}",
+        "atomCount": null,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "cartoon_color red",
+      "expected": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "category": "SELECTION",
+        "result": "●\nPresentation selector `cartoon_color` is not evaluated in the scientific selection context; use a registered presentation command.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Presentation selector `cartoon_color` is not evaluated in the scientific selection context; use a registered presentation command."
+      ]
+    },
+    {
+      "query": "ribbon_color red",
+      "expected": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "category": "SELECTION",
+        "result": "●\nPresentation selector `ribbon_color` is not evaluated in the scientific selection context; use a registered presentation command.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": [
+        "Presentation selector `ribbon_color` is not evaluated in the scientific selection context; use a registered presentation command."
+      ]
+    }
+  ]
+}
