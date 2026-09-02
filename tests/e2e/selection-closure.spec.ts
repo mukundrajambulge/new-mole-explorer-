@@ -7,6 +7,7 @@ const edgeIdentityFixture = resolve("tests/fixtures/edge-identity.mmcif");
 const ringFixture = resolve("tests/fixtures/ring-ligand.pdb");
 const typedPropertiesFixture = resolve("tests/fixtures/typed-properties.pdb");
 const segmentIdentityFixture = resolve("tests/fixtures/segment-identity.pdb");
+const sidechainIdentityFixture = resolve("tests/fixtures/sidechain-identity.pdb");
 const loadFixture = async (page: Page) => {
   await page.goto("/molstudio");
   await page.locator('input[type="file"]').setInputFiles(fixture);
@@ -81,6 +82,23 @@ test("canonical ring topology expands byring from a seed atom", async ({ page })
   await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
 });
 
+test("canonical sidechain selection matches the pinned backbone partition fixture", async ({ page }) => {
+  await page.goto("/molstudio");
+  await page.locator('input[type="file"]').setInputFiles(sidechainIdentityFixture);
+  await expect(page.getByTitle("sidechain-identity.pdb")).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
+  const run = async (value: string, count: number) => {
+    await command.fill(value);
+    await page.getByRole("button", { name: /Run/ }).click();
+    await expect(consoleRegion.locator(".console-entry").last()).toContainText(`Selected ${count} atoms`);
+    await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
+  };
+  await run("backbone", 4);
+  await run("sidechain", 1);
+});
+
 test("canonical PDB formal charge and secondary structure predicates run live", async ({ page }) => {
   await page.goto("/molstudio");
   await page.locator('input[type="file"]').setInputFiles(typedPropertiesFixture);
@@ -96,9 +114,14 @@ test("canonical PDB formal charge and secondary structure predicates run live", 
   };
   await run("formal_charge = 0", 2);
   await run("formal_charge > 0", 1);
+  await run("formal_charge != 0", 2);
+  await run("formal_charge < 0", 1);
+  await run("formal_charge <= 0", 3);
+  await run("formal_charge >= 0", 3);
   await run("ss HELIX", 2);
   await run("ss SHEET", 2);
   await run("b > 20", 1);
+  await run("b <= 20", 3);
 });
 
 test("selection commands bind canonical membership and named selection actions", async ({ page }) => {
