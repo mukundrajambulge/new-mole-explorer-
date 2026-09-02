@@ -13,7 +13,7 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Local root: `C:\Users\mukun\Documents\Codex\2026-08-30\files-pasted-by-the-user-new\outputs\molecular-workstation`
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `36182da52e9cdd651d95f25d675f350b114749ad`
-- Ending implementation SHA: `d20da6a612f369f7ebe2c1200d9fcf7e1b18a997`
+- Ending implementation SHA: `ec5212be295da1eaaa3debf32c0dda5902ee02b8`
 - Working tree: clean after the recorded implementation, evidence, and report commits; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -71,7 +71,7 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - `group create|add|remove|open|close|toggle|empty`: **PASS** as organizational state; destructive `purge`, `excise`, and `delete` remain unavailable.
 - `coordinate_frame local_scientific|effective_world`: **PASS**; the policy is visible in the workspace and included in spatial selection metadata.
 - Cross-object spatial selection: **PASS when explicitly declared; fail-closed without a declared coordinate frame**.
-- State-dependent coordinate predicates: **PASS**; live `x < 1.5` changes from 3 atoms in state 1 to 1 atom in state 2 and exposes the consulted state scope in the active-selection panel.
+- State-dependent coordinate predicates: **PASS**; live `x < 1.5` changes from 3 atoms in state 1 to 1 atom in state 2, and live `within 1.5 of name N` changes from 2 atoms in state 1 to 1 atom in state 2 while exposing the consulted state scope in the active-selection panel.
 
 ## Files changed in this closure
 
@@ -103,6 +103,7 @@ Application/contracts:
 Verification:
 
 - `tests/e2e/multi-object-state.spec.ts`
+- `tests/fixtures/multistate.pdb`
 - `tests/e2e/real-structure-workspace.spec.ts`
 - `tests/e2e/selection-closure.spec.ts`
 - `tests/e2e/selection-matrix-live.spec.ts`
@@ -148,7 +149,7 @@ Verification:
 - Multi-model PDB and mmCIF ingestion coverage: **PASS**
 - Explicit state UI, state commands in both accepted argument orders, and bounded `all_states`: **PASS**
 - In-place state coordinate replacement without duplicate models: **PASS**
-- State-aware derived selection metadata and state-dependent spatial/numeric selection scopes: **PASS**; state 1/state 2 live boundary regression is 3 atoms → 1 atom.
+- State-aware derived selection metadata and state-dependent spatial/numeric selection scopes: **PASS**; state 1/state 2 live regressions are `x < 1.5`: 3 atoms → 1 atom and `within 1.5 of name N`: 2 atoms → 1 atom.
 - Heterogeneous object/state layout reconciliation: **PASS**
 - split_states and join_states preserve source-state lineage: **PASS**
 
@@ -186,7 +187,7 @@ Verification:
 5. Use RCSB Add for `1CRN`; confirm two object rows, one viewer, independent focus/style/enable controls, and object-qualified selection.
 6. Import `tests/fixtures/multistate.pdb`; confirm `2 states`, switch state, toggle bounded all-state overlay, and run `count_states multistate.pdb`.
 7. Add `1CRN`, run a cross-object spatial query without a frame and confirm the structured fail-closed diagnostic; choose `LOCAL_SCIENTIFIC` in the panel or run `coordinate_frame local_scientific`, then repeat the query and confirm a non-empty active selection with recorded frame policy.
-8. Import `tests/fixtures/multistate.pdb`, run `x < 1.5` in state 1 and state 2, and confirm the canonical result changes from 3 atoms to 1 atom while the active-selection panel reports state scopes 1 and 2.
+8. Import `tests/fixtures/multistate.pdb`, run `x < 1.5` and `within 1.5 of name N` in state 1 and state 2, and confirm the canonical results change from 3 to 1 atoms and 2 to 1 atoms respectively while the active-selection panel reports state scopes 1 and 2.
 9. Create a group, add an object, and enter the bare group name in the console; confirm the member object atoms are selected without changing canonical objects.
 10. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
 
