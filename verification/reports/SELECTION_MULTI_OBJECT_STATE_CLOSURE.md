@@ -13,7 +13,7 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Local root: `C:\Users\mukun\Documents\Codex\2026-08-30\files-pasted-by-the-user-new\outputs\molecular-workstation`
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `36182da52e9cdd651d95f25d675f350b114749ad`
-- Ending implementation SHA: `3c31c53` (`feat(selection): support source-backed polymer typing`)
+- Ending implementation SHA: `bfd1d1e` (`feat(selection): verify canonical edge identity`)
 - Working tree: clean after the recorded implementation, evidence, and report commits; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -56,11 +56,11 @@ The current application was exercised with a real 4DJW RCSB load:
 The machine-readable ledger is [selection-operator-matrix.json](../selection/selection-operator-matrix.json), generated from [SELECTION_OPERATOR_MATRIX.md](../selection/SELECTION_OPERATOR_MATRIX.md).
 
 - Rows: **87**
-- Implementation: **71 VERIFIED_WORKING**, **9 MISSING_DEPENDENCY**, **6 INTENTIONALLY_UNSUPPORTED**, **1 UNKNOWN_PROPERTY**
+- Implementation: **73 VERIFIED_WORKING**, **9 MISSING_DEPENDENCY**, **4 INTENTIONALLY_UNSUPPORTED**, **1 UNKNOWN_PROPERTY**
 - Live-browser status: **85 pass/accepted diagnostic outcomes** across the expanded matrix exercise
 - Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **85** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
 - `in`, `bycalpha`, and `bymolecule` now use canonical tuple, residue-CA, and bond-component semantics respectively. `visible` is now bound to an explicit presentation context derived from render directives; it never aliases scientific `all`. `like`, the application implicit-adjacency profile, and the new spatial/topology forms are live-verified; malformed shorthand and missing scientific dependencies remain truthful diagnostics.
-- Oracle comparison ledger: **18 ORACLE_PASS**, **13 ORACLE_EQUIVALENT**, **0 ORACLE_PENDING** across the intentionally conservative 31-row comparison ledger; the full direct probe is [pymol-matrix-probe.json](../selection/pymol-matrix-probe.json) (**85 forms: 79 successful, 6 native errors**).
+- Oracle comparison ledger: **39 ORACLE_PASS**, **20 ORACLE_EQUIVALENT**, **28 ORACLE_PENDING** across the 87-row comparison ledger; the full direct probe is [pymol-matrix-probe.json](../selection/pymol-matrix-probe.json) (**85 forms: 79 successful, 6 native errors**).
 - Pinned oracle evidence: [pymol-oracle-results.json](../selection/pymol-oracle-results.json); runner: [run-pymol-oracle.py](../selection/run-pymol-oracle.py)
 - Missing dependency and research rows are explicit gates. No unsupported operator is silently aliased to a different scientific meaning.
 
@@ -73,6 +73,7 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - `coordinate_frame local_scientific|effective_world`: **PASS**; the policy is visible in the workspace and included in spatial selection metadata.
 - Cross-object spatial selection: **PASS when explicitly declared; fail-closed without a declared coordinate frame**.
 - State-dependent coordinate predicates: **PASS**; live `x < 1.5` changes from 3 atoms in state 1 to 1 atom in state 2, and live `within 1.5 of name N` changes from 2 atoms in state 1 to 1 atom in state 2 while exposing the consulted state scope in the active-selection panel.
+- Canonical segment, alternate-location, occupancy, and B-factor identity: **PASS**; `segi SEG_A` and `bysegi segi SEG_A` select the source-backed segment, while `alt A`, `b > 20`, and `q >= 0.5` use the preserved canonical fields.
 
 ## Files changed in this closure
 
@@ -98,6 +99,7 @@ Application/contracts:
 - `apps/web/src/workspace/workspaceModel.ts`
 - `apps/web/src/workspace/workspaceModel.test.ts`
 - `apps/api/src/structures/ingestion.ts`
+- `apps/api/src/structures/ingestion.test.ts`
 - `packages/contracts/src/index.ts`
 - `package.json`
 
@@ -109,6 +111,7 @@ Verification:
 - `tests/e2e/selection-closure.spec.ts`
 - `tests/e2e/selection-matrix-live.spec.ts`
 - `tests/fixtures/typed-nucleic.mmcif`
+- `tests/fixtures/edge-identity.mmcif`
 - `verification/selection/SELECTION_OPERATOR_MATRIX.md`
 - `verification/selection/generate-matrix-summary.mjs`
 - `verification/selection/selection-operator-matrix.json`
@@ -172,14 +175,15 @@ Verification:
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
 - `npm run test --workspace @molecular/web` — **PASS: 17 files / 78 tests**
-- `npm run test --workspace @molecular/api` — **PASS: 2 files / 12 tests**
+- `npm run test --workspace @molecular/api` — **PASS: 2 files / 13 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 10 / 10**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/real-structure-workspace.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/closure-evidence.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "source-backed mmCIF polymer typing"` — **PASS: 1 / 1**
-- `npm run test:e2e` — **PASS: 72 / 72**
+- `npx playwright test tests/e2e/selection-closure.spec.ts --grep "canonical mmCIF segment identity"` — **PASS: 1 / 1**
+- `npm run test:e2e` — **PASS: 73 / 73**
 - `npm run build` — **PASS**
 - `git diff --check` — **PASS**
 
@@ -195,7 +199,8 @@ Verification:
 8. Import `tests/fixtures/multistate.pdb`, run `x < 1.5` and `within 1.5 of name N` in state 1 and state 2, and confirm the canonical results change from 3 to 1 atoms and 2 to 1 atoms respectively while the active-selection panel reports state scopes 1 and 2.
 9. Create a group, add an object, and enter the bare group name in the console; confirm the member object atoms are selected without changing canonical objects.
 10. Import `tests/fixtures/typed-nucleic.mmcif`, run `polymer.nucleic`, and confirm two atoms are selected; run `protein` on the same source to confirm only the two protein atoms are selected.
-11. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
+11. Import `tests/fixtures/edge-identity.mmcif`, run `segi SEG_A`, `bysegi segi SEG_A`, `alt A`, `b > 20`, and `q >= 0.5`, and confirm the source-backed identity fields drive the expected non-empty selections.
+12. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
 
 ## Screenshot evidence
 
@@ -212,7 +217,7 @@ Verification:
 ## Known limitations and blockers
 
 - The pinned PyMOL source was executed in a temporary Ubuntu-20.04/Python-3.9.2 compatibility build. The 28 remaining `ORACLE_PENDING` matrix rows are not promoted without matching coverage; this is one reason for the blocked final verdict.
-- `segi`, crystallographic `pbc`/`symmetry`/`bycell`, fragment/ring perception, donor/acceptor chemistry, and `gap` remain explicit unsupported or missing-dependency gates. Unknown properties fail closed.
+- Crystallographic `pbc`/`symmetry`/`bycell`, fragment/ring perception, donor/acceptor chemistry, and `gap` remain explicit unsupported or missing-dependency gates. Unknown properties fail closed.
 - Partial-charge selection is implemented only when a complete, revision-matched canonical charge dataset is present; the admitted PDB/mmCIF ingestion path does not create one, so current loaded structures return a structured missing-dependency diagnostic. Peptide sequence and label-property selection likewise require datasets not present in this gate. `visible` requires the explicit presentation context supplied by the frontend selection router.
 - `polymer.nucleic` and typed `polymer.protein` require complete source-backed `_entity_poly.type` mapping in mmCIF; legacy PDB inputs without that annotation intentionally retain the prior generic polymer behavior and report a truthful dependency diagnostic for nucleic selection.
 - Native `like`, implicit adjacency, topology, corrected spatial forms, and the new object-lineage workflows now have direct coverage; the six native parser errors and the remaining conservative matrix rows are retained as evidence rather than treated as application support.

@@ -7,6 +7,8 @@ const cifFixture = `data_test\nloop_\n_atom_site.group_PDB\n_atom_site.id\n_atom
 
 const typedNucleicCifFixture = `data_typed\nloop_\n_entity_poly.entity_id\n_entity_poly.type\n1 polyribonucleotide\n2 polypeptide(L)\nloop_\n_atom_site.group_PDB\n_atom_site.id\n_atom_site.type_symbol\n_atom_site.label_atom_id\n_atom_site.label_comp_id\n_atom_site.label_asym_id\n_atom_site.label_seq_id\n_atom_site.label_entity_id\n_atom_site.Cartn_x\n_atom_site.Cartn_y\n_atom_site.Cartn_z\nATOM 1 P P A A 1 1 0.0 0.0 0.0\nATOM 2 C C4 A A 1 1 1.0 0.0 0.0\nATOM 3 C CA ALA B 1 2 2.0 0.0 0.0\nATOM 4 N N ALA B 1 2 3.0 0.0 0.0\n`;
 
+const edgeIdentityCifFixture = `data_edge\nloop_\n_atom_site.group_PDB\n_atom_site.id\n_atom_site.type_symbol\n_atom_site.label_atom_id\n_atom_site.label_comp_id\n_atom_site.label_asym_id\n_atom_site.label_seq_id\n_atom_site.label_alt_id\n_atom_site.pdbx_PDB_segment_id\n_atom_site.Cartn_x\n_atom_site.Cartn_y\n_atom_site.Cartn_z\n_atom_site.occupancy\n_atom_site.B_iso_or_equiv\nATOM 1 C CA ALA A 10 A SEG_A 0.0 0.0 0.0 1.00 25.00\nATOM 2 N N ALA A 10 . SEG_A 1.0 0.0 0.0 1.00 10.00\nATOM 3 C CA GLY B 10 . SEG_B 2.0 0.0 0.0 1.00 5.00\nHETATM 4 C C1 LIG B 20 . SEG_L 3.0 0.0 0.0 0.50 30.00\n`;
+
 const fixedPdbLine = (record: "ATOM" | "HETATM", serial: number, atomName: string, residueName: string, chain: string, residueNumber: number, element: string, bFactor: number | undefined, formalCharge: string | undefined) => {
   const fields = Array.from({ length: 80 }, () => " ");
   const put = (start: number, width: number, value: string) => value.slice(0, width).padStart(width, " ").split("").forEach((character, index) => { fields[start + index] = character; });
@@ -52,6 +54,13 @@ describe("VIS-01 structure ingestion", () => {
     const result = await new StructureIngestionService().ingestLocal("typed.mmcif", Buffer.from(typedNucleicCifFixture));
     expect(result.structure.polymerTypingSource).toBe("mmCIF _entity_poly.type mapped by _atom_site.label_entity_id");
     expect(result.structure.atoms.map((atom) => atom.polymerType)).toEqual(["NUCLEIC_ACID", "NUCLEIC_ACID", "PROTEIN", "PROTEIN"]);
+  });
+
+  it("preserves mmCIF segment, alternate-location, occupancy, and B-factor identity fields", async () => {
+    const result = await new StructureIngestionService().ingestLocal("edge-identity.mmcif", Buffer.from(edgeIdentityCifFixture));
+    expect(result.structure.atoms.map((atom) => atom.segmentId)).toEqual(["SEG_A", "SEG_A", "SEG_B", "SEG_L"]);
+    expect(result.structure.atoms[0]).toMatchObject({ altLoc: "A", occupancy: 1, bFactor: 25 });
+    expect(result.structure.atoms[3]).toMatchObject({ recordType: "HETATM", occupancy: 0.5, bFactor: 30 });
   });
 
   it("preserves multi-model mmCIF coordinates as explicit canonical states", async () => {

@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 
 const fixture = resolve("tests/fixtures/mini-protein.pdb");
 const typedNucleicFixture = resolve("tests/fixtures/typed-nucleic.mmcif");
+const edgeIdentityFixture = resolve("tests/fixtures/edge-identity.mmcif");
 const loadFixture = async (page: Page) => {
   await page.goto("/molstudio");
   await page.locator('input[type="file"]').setInputFiles(fixture);
@@ -22,6 +23,24 @@ test("source-backed mmCIF polymer typing drives nucleic selection", async ({ pag
   await expect(consoleRegion).toContainText("Selected 2 atoms");
   await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
   await page.screenshot({ path: "verification/evidence/selection-polymer-nucleic-mmcif.png", animations: "disabled" });
+});
+
+test("canonical mmCIF segment identity drives segi and bysegi selection", async ({ page }) => {
+  await page.goto("/molstudio");
+  await page.locator('input[type="file"]').setInputFiles(edgeIdentityFixture);
+  await expect(page.getByTitle("edge-identity.mmcif")).toBeVisible({ timeout: 15000 });
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
+  const run = async (value: string, count: number) => {
+    await command.fill(value);
+    await page.getByRole("button", { name: /Run/ }).click();
+    await expect(consoleRegion.locator(".console-entry").last()).toContainText(`Selected ${count} atoms`);
+  };
+  await run("segi SEG_A", 2);
+  await run("bysegi segi SEG_A", 2);
+  await run("alt A", 1);
+  await run("b > 20", 2);
+  await run("q >= 0.5", 4);
 });
 
 test("selection commands bind canonical membership and named selection actions", async ({ page }) => {
