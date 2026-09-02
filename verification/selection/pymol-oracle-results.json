@@ -8,7 +8,7 @@
     "Native-equivalent rows preserve the application's explicit protein, water, and ligand aliases without claiming those aliases are PyMOL spellings.",
     "The source commit is pinned; the temporary Python compatibility layer only adds future annotations and legacy runtime shims needed by this environment.",
     "The complete direct probe is recorded in `pymol-matrix-probe.json`: 85 native forms, 79 successful and 6 native errors. The comparison ledger below promotes only exact forms or documented application aliases.",
-    "The direct probe now includes corrected native topology and spatial forms; this comparison ledger remains intentionally conservative and contains 40 selected exact/equivalent rows across the shared mini fixture and the fixture-scoped canonical-property and identity cases below.",
+    "The direct probe now includes corrected native topology and spatial forms; this comparison ledger remains intentionally conservative and contains 41 selected exact/equivalent rows across the shared mini fixture and the fixture-scoped canonical-property, identity, and ring-topology cases below.",
     "The typed-properties rows use the same pinned source and identify their fixture explicitly; application ss HELIX/SHEET maps to PyMOL ss h/s without treating the long-form tokens as native spellings."
   ],
   "rows": [
@@ -51,6 +51,7 @@
     { "applicationQuery": "ss SHEET", "oracleQuery": "ss s", "oracleStatus": "ORACLE_EQUIVALENT", "count": 2, "membershipHash": "966385cd2836bc749ca1748ed49511ffeecf1db00ac7b470e1ab9a15f861358c", "mapping": "application long-form secondary-structure token -> PyMOL one-letter token", "fixture": "tests/fixtures/typed-properties.pdb" },
     { "applicationQuery": "segi SEGA", "oracleQuery": "segi SEGA", "oracleStatus": "ORACLE_PASS", "count": 2, "membershipHash": "be3aed9430e99793e8bcb371ffa180ef8946b4d3d88a833a06ad9c226924f73a", "fixture": "tests/fixtures/segment-identity.pdb" },
     { "applicationQuery": "bysegi segi SEGA", "oracleQuery": "bysegi segi SEGA", "oracleStatus": "ORACLE_PASS", "count": 2, "membershipHash": "be3aed9430e99793e8bcb371ffa180ef8946b4d3d88a833a06ad9c226924f73a", "fixture": "tests/fixtures/segment-identity.pdb" },
-    { "applicationQuery": "alt A", "oracleQuery": "alt A", "oracleStatus": "ORACLE_PASS", "count": 1, "membershipHash": "700a91d4385d49f31211c9e64dd02c93b8f2b84f98b20d8ec26d31200e342c3b", "fixture": "tests/fixtures/segment-identity.pdb" }
+    { "applicationQuery": "alt A", "oracleQuery": "alt A", "oracleStatus": "ORACLE_PASS", "count": 1, "membershipHash": "700a91d4385d49f31211c9e64dd02c93b8f2b84f98b20d8ec26d31200e342c3b", "fixture": "tests/fixtures/segment-identity.pdb" },
+    { "applicationQuery": "byring ligand", "oracleQuery": "byring organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 6, "membershipHash": "2581a4f84ad082438bdc2d011608f2326e30ed18b507d053661809ce02b35ec1", "mapping": "application ligand alias -> PyMOL organic; both expand the six-member ring fixture", "fixture": "tests/fixtures/ring-ligand.pdb" }
   ]
 }

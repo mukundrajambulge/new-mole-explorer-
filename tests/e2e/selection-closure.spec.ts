@@ -75,6 +75,10 @@ test("canonical ring topology expands byring from a seed atom", async ({ page })
   await expect(consoleRegion.locator(".console-entry").last()).toContainText("Selected 6 atoms");
   await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-indicator", "visible");
+  await command.fill("byring organic");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(consoleRegion.locator(".console-entry").last()).toContainText("Selected 6 atoms");
+  await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
 });
 
 test("canonical PDB formal charge and secondary structure predicates run live", async ({ page }) => {
