@@ -4,7 +4,7 @@
 
 **SELECTION + MULTI-OBJECT/MULTI-STATE CLOSURE INCOMPLETE — BLOCKED**
 
-The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. Cross-object spatial queries now require and record an explicit coordinate-frame policy; every coordinate-dependent selection also records the exact per-object coordinate state scope consulted, including cached and bound plans. The pinned PyMOL source has executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The application now also binds RenderProjection representation, color, label, and representation-specific color selectors, evaluates fragment/ring expansion from the canonical bond graph, implements a versioned VDW surface-gap profile with strict missing-radius handling, and binds `pepseq` to a revision-stamped canonical one-letter peptide sequence dataset. The gate remains blocked because 19 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
+The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. Cross-object spatial queries now require and record an explicit coordinate-frame policy; every coordinate-dependent selection also records the exact per-object coordinate state scope consulted, including cached and bound plans. The pinned PyMOL source has executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The application now also binds RenderProjection representation, color, label, and representation-specific color selectors, evaluates fragment/ring expansion from the canonical bond graph, implements a versioned VDW surface-gap profile with strict missing-radius handling, and binds `pepseq` to a revision-stamped canonical one-letter peptide sequence dataset. The gate remains blocked because 14 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
 
 ## Repository and run evidence
 
@@ -14,9 +14,9 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `b87a0388b57859ecf4d038997352a9d0178abe5a`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
-- Current implementation commit: `6c8df45` (`test(selection): verify ring expansion against oracle`)
-- Ending implementation SHA: `6c8df45`
-- Latest implementation/evidence base SHA before this report update: `6c8df45`
+- Current implementation commit: `5e26618` (`test(selection): document alias and inequality conformance`)
+- Ending implementation SHA: `5e26618`
+- Latest implementation/evidence base SHA before this report update: `5e26618`
 - Working tree: modified only by this report update; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -72,8 +72,8 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - Live-browser status: **89 pass/accepted diagnostic outcomes** across the expanded matrix exercise
 - Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **89** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
 - `in`, `bycalpha`, `bymolecule`, `byfragment`, and `byring` now use canonical tuple, residue-CA, connected-component, and bounded-cycle semantics respectively. `visible` is now bound to an explicit presentation context derived from render directives; `rep`, `color`, `label`, `cartoon_color`, and `ribbon_color` are likewise evaluated from the current RenderProjection and never from 3Dmol internals. These selectors never alias scientific `all`. `like`, the application implicit-adjacency profile, and the new spatial/topology forms are live-verified; malformed shorthand and missing scientific dependencies remain truthful diagnostics.
-- Oracle comparison ledger: **45 ORACLE_PASS**, **23 ORACLE_EQUIVALENT**, **19 ORACLE_PENDING** across the 87-row comparison ledger; the full direct probe is [pymol-matrix-probe.json](../selection/pymol-matrix-probe.json) (**85 forms: 79 successful, 6 native errors**).
-- Exact-oracle reproduction: **PASS** in the local Ubuntu-20.04 compatibility environment using the pinned source commit; PyMOL **3.2.0a**, 85 forms, 79 successful and 6 native errors, with row payloads byte-identical to the committed direct probe. The comparison ledger now contains 41 selected exact/equivalent rows, including fixture-scoped formal-charge, B-factor, secondary-structure, segment-identity, alternate-location, and ring-topology cases.
+- Oracle comparison ledger: **47 ORACLE_PASS**, **26 ORACLE_EQUIVALENT**, **14 ORACLE_PENDING** across the 87-row comparison ledger; the full direct probe is [pymol-matrix-probe.json](../selection/pymol-matrix-probe.json) (**85 forms: 79 successful, 6 native errors**).
+- Exact-oracle reproduction: **PASS** in the local Ubuntu-20.04 compatibility environment using the pinned source commit; PyMOL **3.2.0a**, 85 forms, 79 successful and 6 native errors, with row payloads byte-identical to the committed direct probe. The comparison ledger now contains 48 selected exact/equivalent rows, including fixture-scoped formal-charge, B-factor, secondary-structure, segment-identity, alternate-location, ring-topology, backbone-partition, numeric-comparison, alias, and inequality cases.
 - Pinned oracle evidence: [pymol-oracle-results.json](../selection/pymol-oracle-results.json); runner: [run-pymol-oracle.py](../selection/run-pymol-oracle.py)
 - Missing dependency and research rows are explicit gates. No unsupported operator is silently aliased to a different scientific meaning.
 
@@ -87,7 +87,7 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - Cross-object spatial selection: **PASS when explicitly declared; fail-closed without a declared coordinate frame**.
 - State-dependent coordinate predicates: **PASS**; live `x < 1.5` changes from 3 atoms in state 1 to 1 atom in state 2, and live `within 1.5 of name N` changes from 2 atoms in state 1 to 1 atom in state 2 while exposing the consulted state scope in the active-selection panel.
 - Canonical segment, alternate-location, occupancy, and B-factor identity: **PASS**; `segi SEG_A` and `bysegi segi SEG_A` select source-backed segments, while `alt A`, `b > 20`, and `q >= 0.5` use the preserved canonical fields. PDB segment and alternate-location membership match the pinned identity fixture exactly.
-- Canonical formal charge and secondary structure: **PASS**; source charge predicates and PDB HELIX/SHEET predicates select positive live subsets without renderer-derived values.
+- Canonical formal charge and secondary structure: **PASS**; source charge predicates and PDB HELIX/SHEET predicates select positive live subsets without renderer-derived values. Strict/inclusive numeric comparisons are covered on formal charge, B-factor, and coordinates; direct `!=` spelling remains an explicit PyMOL parser difference documented as an equivalent complement.
 - Presentation-dependent selection: **PASS** for effective `rep`, `color`, `label`, `cartoon_color`, and `ribbon_color` selectors; the selection result records the projection revision and remains stable under subsequent targeting.
 - Canonical fragment/ring topology: **PASS** for the declared application profiles; `byfragment` uses canonical-bond connected components and `byring` uses bounded simple cycles of size 3–7. The ring fixture’s six-atom expansion is oracle-equivalent to pinned PyMOL `byring organic`.
 - VDW surface-gap selection: **PASS** for the declared `canonical-element-vdw-radius@1` profile; non-empty and valid-empty live cases are covered, and unknown radius data fails closed without changing the workspace.
@@ -137,6 +137,7 @@ Verification:
 - `tests/fixtures/edge-identity.mmcif`
 - `tests/fixtures/typed-properties.pdb`
 - `tests/fixtures/segment-identity.pdb`
+- `tests/fixtures/sidechain-identity.pdb`
 - `verification/selection/SELECTION_OPERATOR_MATRIX.md`
 - `verification/selection/generate-matrix-summary.mjs`
 - `verification/selection/selection-operator-matrix.json`
@@ -211,8 +212,9 @@ Verification:
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "ring topology"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "formal charge"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "PDB segment identity"` — **PASS: 1 / 1**
+- `npx playwright test tests/e2e/selection-closure.spec.ts --grep "sidechain"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "presentation-dependent"` — **PASS: 1 / 1**
-- `npm run test:e2e` — **PASS: 77 / 77**
+- `npm run test:e2e` — **PASS: 78 / 78**
 - `npm run build` — **PASS**
 - `git diff --check` — **PASS**
 - Pinned PyMOL oracle reproduction — **PASS: PyMOL 3.2.0a; 85 forms; 79 successful / 6 native errors; committed probe row payload identical**
@@ -232,9 +234,10 @@ Verification:
 11. Import `tests/fixtures/edge-identity.mmcif`, run `segi SEG_A`, `bysegi segi SEG_A`, `alt A`, `b > 20`, and `q >= 0.5`, and confirm the source-backed identity fields drive the expected non-empty selections.
 12. Import `tests/fixtures/mini-protein.pdb`, run `gap 0 ligand` and `gap 4 ligand`, and confirm the active-selection counts are 6 and 0; the selection result should expose the `canonical-element-vdw-radius@1` scientific profile.
 13. Import `tests/fixtures/mini-protein.pdb`, run `pepseq AG`, and confirm 8 canonical atoms are selected; run `pepseq 10` and confirm the invalid-value diagnostic leaves the previous workspace and active selection unchanged.
-14. Import `tests/fixtures/typed-properties.pdb`, run `formal_charge = 0` (2 atoms), `formal_charge > 0` (1), `ss HELIX` (2), `ss SHEET` (2), and `b > 20` (1), and confirm `VALID NONEMPTY` status.
+14. Import `tests/fixtures/typed-properties.pdb`, run `formal_charge = 0` (2), `formal_charge > 0` (1), `formal_charge != 0` (2), `formal_charge < 0` (1), `formal_charge <= 0` (3), `formal_charge >= 0` (3), `ss HELIX` (2), `ss SHEET` (2), `b > 20` (1), and `b <= 20` (3); confirm `VALID NONEMPTY` status.
 15. Import `tests/fixtures/segment-identity.pdb`, run `segi SEGA`, `bysegi segi SEGA`, and `alt A`, and confirm counts 2, 2, and 1 with `VALID NONEMPTY` status.
-16. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
+16. Import `tests/fixtures/sidechain-identity.pdb`, run `backbone` (4 atoms) and `sidechain` (1 atom), and confirm the canonical partition is visible and non-empty.
+17. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
 
 ## Screenshot evidence
 
@@ -250,7 +253,7 @@ Verification:
 
 ## Known limitations and blockers
 
-- The pinned PyMOL source was executed in an isolated Ubuntu-20.04/Python-3.9 compatibility build. The 19 remaining `ORACLE_PENDING` matrix rows are not promoted without matching coverage; this is one reason for the blocked final verdict.
+- The pinned PyMOL source was executed in an isolated Ubuntu-20.04/Python-3.9 compatibility build. The 14 remaining `ORACLE_PENDING` matrix rows are not promoted without matching coverage; this is one reason for the blocked final verdict.
 - Crystallographic `pbc`/`symmetry`/`bycell` and donor/acceptor chemistry remain explicit unsupported or missing-dependency gates. Unknown properties and unknown VDW radii fail closed. `gap` is implemented only for the declared versioned element-radius profile; `byfragment` and `byring` are implemented only for the declared canonical-bond component and bounded-cycle profiles; they are not claimed as full PyMOL chemistry perception.
 - Partial-charge selection is implemented only when a complete, revision-matched canonical charge dataset is present; the admitted PDB/mmCIF ingestion path does not create one, so current loaded structures return a structured missing-dependency diagnostic. `visible` and presentation selectors require the explicit RenderProjection context supplied by the frontend selection router; bare `label …` remains a label command, while `select label …` matches rendered safe-label text. `pepseq` currently supports canonical one-letter motifs and the standard amino-acid mapping profile only; modified residues are represented as `X` and cannot satisfy an exact motif.
 - `polymer.nucleic` and typed `polymer.protein` require complete source-backed `_entity_poly.type` mapping in mmCIF; legacy PDB inputs without that annotation intentionally retain the prior generic polymer behavior and report a truthful dependency diagnostic for nucleic selection.
