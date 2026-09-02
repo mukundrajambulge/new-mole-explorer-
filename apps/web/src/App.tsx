@@ -14,9 +14,10 @@ import { ApiClientError, apiClient } from "./lib/apiClient";
 import { applyRepresentationToSelection, clearColorForSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setComponentColor, setInteractionState, setLabelState, setProjectionStyle, setRepresentationParameters, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
 import { applyPresentationAction, type PresentationComponent } from "./rendering/presentationActions";
 import { buildRenderProjectionDiagnostics } from "./rendering/renderDirectives";
+import { resolveProjectedAtomColor } from "./rendering/colorSchemes";
 import { STYLE_DEFINITIONS, representationCapabilityFor, representationStyleForCommand } from "./rendering/styleProfiles";
 import { combineSelections, evaluateSelectionQuery, NamedSelectionStore, resolveSelection, parseRepresentationCommand, requireValidSelection, SelectionResolutionError, selectionForStableIds, type CoordinateFramePolicy, type SelectionPresentationContext, type SelectionResult } from "./interaction/selectionResolver";
-import { LabelExpressionError, labelExpressionForMode, parseSafeLabelExpression, type LabelMode } from "./interaction/labels";
+import { LabelExpressionError, labelExpressionForMode, labelPlanForState, parseSafeLabelExpression, resolveSafeLabel, type LabelMode } from "./interaction/labels";
 import { MeasurementAccumulator, createMeasurementObject, measurementCardinality, type MeasurementKind, type MeasurementObject } from "./interaction/measurements";
 import type { PickResult } from "./interaction/picking";
 import { colorRegistry } from "./rendering/colorRegistry";
@@ -82,21 +83,71 @@ export const App = () => {
   const presentationSelectionContext = (): SelectionPresentationContext | undefined => {
     if (!viewerWorkspaceObjects.length) return undefined;
     const multiObject = viewerWorkspaceObjects.length > 1;
-    const visibleStableAtomIds = viewerWorkspaceObjects.flatMap((object) => {
-      if (!object.enabled) return [];
-      const diagnostics = buildRenderProjectionDiagnostics(structureForWorkspaceObjectState(object), object.projection);
-      const ids = [...new Set(diagnostics.directives.flatMap((directive) => directive.targetStableAtomIds))];
-      return multiObject ? ids.map((stableId) => workspaceScopedStableAtomId(object.objectId, stableId)) : ids;
-    });
+    const visibleStableAtomIds: string[] = [];
+    const representationTokensByStableAtomId: Record<string, string[]> = {};
+    const colorTokensByStableAtomId: Record<string, string[]> = {};
+    const representationColorTokensByStableAtomId: Record<string, Record<string, string[]>> = {};
+    const labelTokensByStableAtomId: Record<string, string[]> = {};
+    const addToken = (target: Record<string, string[]>, stableId: string, token: string) => { if (!target[stableId]) target[stableId] = []; if (!target[stableId].includes(token)) target[stableId].push(token); };
+    const addRepresentationTokens = (stableId: string, representation: string, styleProfile?: string) => {
+      const normalized = representation.toLowerCase().replaceAll("_", "-");
+      const tokens = new Set<string>([normalized, ...(styleProfile ? [styleProfile.toLowerCase().replaceAll("_", "-")] : [])]);
+      const aliases: Record<string, readonly string[]> = {
+        lines: ["line"], line: ["lines"], sticks: ["stick"], stick: ["sticks"], spheres: ["sphere", "space-filling"], sphere: ["spheres", "space-filling"],
+        cartoon: [], ribbon: [], nonbonded: ["nonbonded-crosses"], "nb-spheres": ["nonbonded-spheres"], surface: ["van-der-waals-surface"], dots: ["dot-surface"],
+      };
+      for (const token of aliases[normalized] ?? []) tokens.add(token);
+      for (const token of tokens) addToken(representationTokensByStableAtomId, stableId, token);
+    };
+    const colorTokens = (color: string): string[] => {
+      const normalized = color.trim().toLowerCase();
+      const tokens = new Set<string>([normalized]);
+      for (const definition of colorRegistry.list()) {
+        const hex = `#${definition.rgbSrgb.map((value) => Math.round(value * 255).toString(16).padStart(2, "0")).join("")}`.toLowerCase();
+        if (hex === normalized) { tokens.add(definition.canonicalName.toLowerCase()); tokens.add(definition.colorId.toLowerCase()); }
+      }
+      return [...tokens];
+    };
+    for (const object of viewerWorkspaceObjects) {
+      if (!object.enabled) continue;
+      const canonical = structureForWorkspaceObjectState(object);
+      const diagnostics = buildRenderProjectionDiagnostics(canonical, object.projection);
+      const canonicalAtoms = new Map(canonical.atoms.map((atom) => [atom.stableId, atom]));
+      const projectedAtomIds = new Set(diagnostics.directives.flatMap((directive) => directive.targetStableAtomIds));
+      const labelPlan = labelPlanForState(object.projection.labels, canonical.atoms.filter((atom) => projectedAtomIds.has(atom.stableId)));
+      if (labelPlan.status === "READY" && object.projection.labels.expression) {
+        for (const atom of labelPlan.atoms) {
+          const scopedStableId = multiObject ? workspaceScopedStableAtomId(object.objectId, atom.stableId) : atom.stableId;
+          addToken(labelTokensByStableAtomId, scopedStableId, resolveSafeLabel(object.projection.labels.expression, atom, canonical));
+        }
+      }
+      const explicitGlobalColor = colorRegistry.cssColor(object.projection.color);
+      for (const directive of diagnostics.directives) {
+        for (const stableId of directive.targetStableAtomIds) {
+          const scopedStableId = multiObject ? workspaceScopedStableAtomId(object.objectId, stableId) : stableId;
+          if (!visibleStableAtomIds.includes(scopedStableId)) visibleStableAtomIds.push(scopedStableId);
+          addRepresentationTokens(scopedStableId, directive.representation, directive.styleProfile);
+          const atom = canonicalAtoms.get(stableId);
+          if (!atom) continue;
+          const resolvedColor = resolveProjectedAtomColor(object.projection.color, directive.representation, atom, canonical, explicitGlobalColor).color;
+          for (const token of colorTokens(resolvedColor)) addToken(colorTokensByStableAtomId, scopedStableId, token);
+          const byRepresentation = representationColorTokensByStableAtomId[scopedStableId] ?? (representationColorTokensByStableAtomId[scopedStableId] = {});
+          const representationTokens = byRepresentation[directive.representation] ?? (byRepresentation[directive.representation] = []);
+          for (const token of colorTokens(resolvedColor)) if (!representationTokens.includes(token)) representationTokens.push(token);
+        }
+      }
+    }
     const revision = JSON.stringify(viewerWorkspaceObjects.map((object) => ({
       objectId: object.objectId,
       enabled: object.enabled,
       stateId: object.currentStateId,
       presentationRevision: object.projection.representationState.presentationRevision,
+      color: object.projection.color,
+      labels: object.projection.labels,
       visibility: [object.projection.showProtein, object.projection.showLigand, object.projection.showWater, object.projection.showIons, object.projection.showOther],
       visibleStableAtomIds: multiObject ? visibleStableAtomIds.filter((stableId) => stableId.startsWith(`${object.objectId}::`)) : visibleStableAtomIds,
     })));
-    return { visibleStableAtomIds, revision };
+    return { visibleStableAtomIds, representationTokensByStableAtomId, colorTokensByStableAtomId, representationColorTokensByStableAtomId, labelTokensByStableAtomId, revision };
   };
 
   const setActiveSelection = (result: SelectionResult | null) => {

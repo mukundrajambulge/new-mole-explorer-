@@ -45,7 +45,7 @@ export type SelectionDiagnostic = { code: SelectionStatus | "EXPECTED_TOKEN"; me
 export type SelectionTokenKind = "WORD" | "STRING" | "LPAREN" | "RPAREN" | "COMMA" | "OPERATOR" | "EOF";
 export type SelectionToken = { kind: SelectionTokenKind; lexeme: string; span: SourceSpan };
 
-export type SelectionProperty = "name" | "resn" | "resi" | "chain" | "segi" | "elem" | "id" | "index" | "rank" | "model" | "object" | "alt" | "formal_charge" | "partial_charge" | "b" | "q" | "occupancy" | "ss" | "x" | "y" | "z" | "state" | "label" | "pepseq";
+export type SelectionProperty = "name" | "resn" | "resi" | "chain" | "segi" | "elem" | "id" | "index" | "rank" | "model" | "object" | "alt" | "formal_charge" | "partial_charge" | "b" | "q" | "occupancy" | "ss" | "x" | "y" | "z" | "state" | "label" | "pepseq" | "rep" | "color" | "cartoon_color" | "ribbon_color";
 export type SelectionCategory = "polymer" | "ligand" | "water" | "ion" | "other" | "hydrogen" | "hetatm" | "inorganic" | "solvent" | "protein" | "nucleic" | "backbone" | "sidechain" | "guide" | "metals" | "bonded" | "enabled" | "present" | "visible";
 export type SelectionAst =
   | { kind: "all" }
@@ -55,7 +55,7 @@ export type SelectionAst =
   | { kind: "named"; name: string; required: boolean; span?: SourceSpan }
   | { kind: "not"; operand: SelectionAst }
   | { kind: "and" | "or"; left: SelectionAst; right: SelectionAst }
-  | { kind: "byobject" | "bysegi" | "bychain" | "byres" | "bycalpha" | "bymolecule" | "first" | "last"; operand: SelectionAst }
+  | { kind: "byobject" | "bysegi" | "bychain" | "byres" | "bycalpha" | "bymolecule" | "byfragment" | "byring" | "first" | "last"; operand: SelectionAst }
   | { kind: "neighbor" | "bound_to"; operand: SelectionAst }
   | { kind: "extend"; distance: number; operand: SelectionAst }
   | { kind: "identifier_match"; mode: "in" | "like"; left: SelectionAst; right: SelectionAst }
@@ -122,6 +122,14 @@ export class SelectionResolutionError extends Error {
 export type SelectionPresentationContext = {
   /** Stable IDs that currently contribute to at least one visible render directive. */
   visibleStableAtomIds: readonly string[];
+  /** Presentation representation tokens contributed by each visible canonical atom. */
+  representationTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>;
+  /** Effective color tokens (hex, canonical name, and color id) for each visible atom. */
+  colorTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>;
+  /** Effective colors partitioned by renderer representation for representation-specific selectors. */
+  representationColorTokensByStableAtomId?: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>>;
+  /** Text emitted by the active safe label projection for each labeled atom. */
+  labelTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>;
   /** Changes whenever presentation visibility or its target directives change. */
   revision: string;
 };
@@ -176,7 +184,7 @@ export const lexSelection = (query: string): { tokens: readonly SelectionToken[]
 };
 
 const isWord = (token: SelectionToken | undefined, value?: string): boolean => token?.kind === "WORD" && (value === undefined || token.lexeme.toLowerCase() === value);
-const propertyNames = new Set<SelectionProperty>(["name", "resn", "resi", "chain", "segi", "elem", "id", "index", "rank", "model", "object", "alt", "formal_charge", "partial_charge", "b", "q", "occupancy", "ss", "x", "y", "z", "state", "label", "pepseq"]);
+const propertyNames = new Set<SelectionProperty>(["name", "resn", "resi", "chain", "segi", "elem", "id", "index", "rank", "model", "object", "alt", "formal_charge", "partial_charge", "b", "q", "occupancy", "ss", "x", "y", "z", "state", "label", "pepseq", "rep", "color", "cartoon_color", "ribbon_color"]);
 const categoryNames = new Map<string, SelectionCategory>([
   ["polymer", "polymer"], ["protein", "protein"], ["polymer.protein", "protein"], ["nucleic", "nucleic"], ["polymer.nucleic", "nucleic"], ["ligand", "ligand"], ["organic", "ligand"], ["water", "water"], ["solvent", "solvent"], ["ion", "ion"], ["ions", "ion"], ["inorganic", "inorganic"], ["hetatm", "hetatm"], ["hydrogens", "hydrogen"], ["hydrogen", "hydrogen"], ["hydro", "hydrogen"], ["backbone", "backbone"], ["sidechain", "sidechain"], ["guide", "guide"], ["metals", "metals"], ["bonded", "bonded"], ["enabled", "enabled"], ["present", "present"], ["visible", "visible"], ["other", "other"],
 ] as const);
@@ -238,7 +246,7 @@ class SelectionParser {
     if (token.kind === "LPAREN") { const nested = this.expression(0); if (this.current().kind !== "RPAREN") this.fail("Expected `)`."); this.take(); return nested; }
     if (token.kind === "OPERATOR" && token.lexeme === "!") return { kind: "not", operand: this.expression(60) };
     if (word === "not") return { kind: "not", operand: this.expression(60) };
-    if (["byobject", "bysegi", "byres", "bychain", "bycalpha", "bymolecule"].includes(word)) return { kind: word as "byobject" | "bysegi" | "byres" | "bychain" | "bycalpha" | "bymolecule", operand: this.expression(0) };
+    if (["byobject", "bysegi", "byres", "bychain", "bycalpha", "bymolecule", "byfragment", "byring"].includes(word)) return { kind: word as "byobject" | "bysegi" | "byres" | "bychain" | "bycalpha" | "bymolecule" | "byfragment" | "byring", operand: this.expression(0) };
     if (word === "first" || word === "last") return { kind: word, operand: this.expression(60) };
     if (word === "neighbor" || word === "bound_to" || word === "bound-to") return { kind: word === "bound-to" ? "bound_to" : word, operand: this.expression(35) };
     if (word === "extend") return { kind: "extend", distance: this.distance(), operand: this.expression(35) };
@@ -302,7 +310,7 @@ const selectionParseCache = new Map<string, { ast: SelectionAst | null; tokens: 
 
 const normalize = (ast: SelectionAst): SelectionAst => {
   if (ast.kind === "and" || ast.kind === "or") return { ...ast, left: normalize(ast.left), right: normalize(ast.right) };
-  if (ast.kind === "not" || ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to" || ast.kind === "extend") return { ...ast, operand: normalize(ast.operand) };
+  if (ast.kind === "not" || ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "byfragment" || ast.kind === "byring" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to" || ast.kind === "extend") return { ...ast, operand: normalize(ast.operand) };
   if (ast.kind === "identifier_match") return { ...ast, left: normalize(ast.left), right: normalize(ast.right) };
   if (ast.kind === "within" || ast.kind === "around" || ast.kind === "expand" || ast.kind === "near_to" || ast.kind === "beyond") return { ...ast, reference: normalize(ast.reference), ...(ast.candidate ? { candidate: normalize(ast.candidate) } : {}) };
   if (ast.kind === "predicate") return { ...ast, property: ast.property.toLowerCase() as SelectionProperty, value: ast.value.trim() };
@@ -317,13 +325,13 @@ const serialize = (ast: SelectionAst): string => {
   if (ast.kind === "not") return `not(${serialize(ast.operand)})`;
   if (ast.kind === "and" || ast.kind === "or") return `(${serialize(ast.left)} ${ast.kind} ${serialize(ast.right)})`;
   if (ast.kind === "extend") return `extend(${ast.distance},${serialize(ast.operand)})`;
-  if (ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to") return `${ast.kind}(${serialize(ast.operand)})`;
+  if (ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "byfragment" || ast.kind === "byring" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to") return `${ast.kind}(${serialize(ast.operand)})`;
   if (ast.kind === "identifier_match") return `${ast.kind}:${ast.mode}(${serialize(ast.left)},${serialize(ast.right)})`;
   if (ast.kind === "within" || ast.kind === "around" || ast.kind === "expand" || ast.kind === "near_to" || ast.kind === "beyond") return `${ast.kind}(${ast.distance},${serialize(ast.reference)}${ast.candidate ? `,${serialize(ast.candidate)}` : ""})`;
   return "invalid";
 };
 
-type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; presentationRevision: string | null; visibleAtomIds?: ReadonlySet<string>; named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; query: string; indexByStableId: Map<string, number>; rankByStableId: Map<string, number>; coordinateStateId?: string; stateOrdinal?: number; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds: Set<string>; coordinateObjectStates: Map<string, SelectionCoordinateStateScope>; objectMatches: Map<string, Set<string>> };
+type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; presentationRevision: string | null; visibleAtomIds?: ReadonlySet<string>; representationTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; colorTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; representationColorTokensByStableAtomId?: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>>; labelTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; query: string; indexByStableId: Map<string, number>; rankByStableId: Map<string, number>; coordinateStateId?: string; stateOrdinal?: number; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds: Set<string>; coordinateObjectStates: Map<string, SelectionCoordinateStateScope>; objectMatches: Map<string, Set<string>> };
 const wildcardMatch = (value: string, pattern: string): boolean => {
   const escaped = [...pattern].map((char) => char === "*" ? ".*" : char === "?" ? "." : char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("");
   return new RegExp(`^${escaped}$`, "i").test(value);
@@ -338,6 +346,98 @@ const residueMatch = (atom: CanonicalAtom, value: string): boolean => {
 const atomCategory = (atom: CanonicalAtom): "polymer" | "ligand" | "water" | "ion" | "other" => atom.isPolymer ? "polymer" : atom.isLigand ? "ligand" : atom.isWater ? "water" : atom.isIon ? "ion" : "other";
 const backboneNames = new Set(["N", "CA", "C", "O", "OXT"]);
 const metalElements = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA", "ZN", "FE", "MN", "CU", "CO", "NI"]);
+const normalizedPresentationToken = (value: string): string => value.trim().toLowerCase().replaceAll("_", "-");
+const representationAliases = (value: string): readonly string[] => {
+  const normalized = normalizedPresentationToken(value);
+  const aliases: Record<string, readonly string[]> = {
+    line: ["line", "lines"], lines: ["line", "lines"],
+    stick: ["stick", "sticks"], sticks: ["stick", "sticks"],
+    sphere: ["sphere", "spheres", "space-filling"], spheres: ["sphere", "spheres", "space-filling"], "space-filling": ["sphere", "spheres", "space-filling"],
+    cartoon: ["cartoon"], ribbon: ["ribbon"], trace: ["trace"], putty: ["putty"],
+    "ball-and-stick": ["ball-and-stick", "ball&stick"], "ball&stick": ["ball-and-stick", "ball&stick"], licorice: ["licorice"],
+    surface: ["surface", "van-der-waals-surface"], "van-der-waals-surface": ["surface", "van-der-waals-surface"],
+    mesh: ["mesh"], dots: ["dots", "dot-surface"], "dot-surface": ["dots", "dot-surface"],
+    nonbonded: ["nonbonded", "nonbonded-crosses"], "nonbonded-crosses": ["nonbonded", "nonbonded-crosses"],
+    "nonbonded-spheres": ["nonbonded-spheres"],
+  };
+  return aliases[normalized] ?? [normalized];
+};
+const presentationTokensMatch = (tokens: readonly string[] | undefined, value: string, aliases = false): boolean => {
+  if (!tokens) return false;
+  const requested = aliases ? representationAliases(value) : [normalizedPresentationToken(value)];
+  return requested.some((candidate) => tokens.some((token) => wildcardMatch(token, candidate)));
+};
+type CanonicalTopologyGraph = { adjacency: Map<string, Set<string>>; componentByAtom: Map<string, string> };
+const canonicalTopologyGraphFor = (structure: CanonicalMolecularStructure): CanonicalTopologyGraph => {
+  const atomIds = new Set(structure.atoms.map((atom) => atom.stableId));
+  const adjacency = new Map<string, Set<string>>();
+  for (const atomId of atomIds) adjacency.set(atomId, new Set());
+  for (const bond of structure.bonds) {
+    if (!atomIds.has(bond.atom1) || !atomIds.has(bond.atom2)) continue;
+    adjacency.get(bond.atom1)!.add(bond.atom2);
+    adjacency.get(bond.atom2)!.add(bond.atom1);
+  }
+  const componentByAtom = new Map<string, string>();
+  for (const atom of structure.atoms) {
+    if (componentByAtom.has(atom.stableId)) continue;
+    const componentId = atom.stableId;
+    const stack = [atom.stableId];
+    componentByAtom.set(atom.stableId, componentId);
+    while (stack.length) {
+      const current = stack.pop()!;
+      for (const next of adjacency.get(current) ?? []) {
+        if (!componentByAtom.has(next)) { componentByAtom.set(next, componentId); stack.push(next); }
+      }
+    }
+  }
+  return { adjacency, componentByAtom };
+};
+/**
+ * Returns atoms belonging to canonical simple cycles of size 3..7.  The
+ * minimum-ordered atom is used as the DFS root to deduplicate cycles; a path
+ * budget keeps malformed or very dense source graphs from blocking selection.
+ */
+const canonicalRingsFor = (structure: CanonicalMolecularStructure, context: EvalContext): Set<string>[] | null => {
+  context.needsTopology = true;
+  if (structure.bonds.length === 0) {
+    context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical bond topology is unavailable; ring membership cannot be established." });
+    return null;
+  }
+  const graph = canonicalTopologyGraphFor(structure);
+  const order = new Map(structure.atoms.map((atom, index) => [atom.stableId, index]));
+  const rings: Set<string>[] = [];
+  const cycleKeys = new Set<string>();
+  const maxPaths = 250_000;
+  let exploredPaths = 0;
+  let budgetExceeded = false;
+  const visit = (start: string, current: string, path: string[]) => {
+    if (budgetExceeded) return;
+    exploredPaths += 1;
+    if (exploredPaths > maxPaths) { budgetExceeded = true; return; }
+    for (const next of graph.adjacency.get(current) ?? []) {
+      if (next === start) {
+        if (path.length >= 3 && path.length <= 7) {
+          const key = [...path].sort((left, right) => (order.get(left) ?? 0) - (order.get(right) ?? 0)).join("\u0000");
+          if (!cycleKeys.has(key)) { cycleKeys.add(key); rings.push(new Set(path)); }
+        }
+        continue;
+      }
+      if (path.length >= 7 || path.includes(next) || (order.get(next) ?? Number.MAX_SAFE_INTEGER) < (order.get(start) ?? Number.MAX_SAFE_INTEGER)) continue;
+      visit(start, next, [...path, next]);
+    }
+  };
+  for (const atom of structure.atoms) {
+    if (budgetExceeded) break;
+    for (const next of graph.adjacency.get(atom.stableId) ?? []) {
+      if ((order.get(next) ?? Number.MAX_SAFE_INTEGER) > (order.get(atom.stableId) ?? Number.MAX_SAFE_INTEGER)) visit(atom.stableId, next, [atom.stableId, next]);
+    }
+  }
+  if (budgetExceeded) {
+    context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical ring search exceeded its bounded cycle budget; ring membership was not returned." });
+    return null;
+  }
+  return rings;
+};
 const coordinateStateScopeFor = (atom: CanonicalAtom, structure: CanonicalMolecularStructure, context: EvalContext): SelectionCoordinateStateScope => {
   const objectId = atom.workspaceObjectId ?? structure.id;
   const stateId = atom.workspaceCoordinateStateId ?? context.coordinateStateId ?? structure.stateOrder?.[0] ?? structure.coordinateStates?.[0]?.id ?? `${structure.id}:state:1`;
@@ -399,6 +499,30 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
     if (!context.diagnostics.some((diagnostic) => diagnostic.code === "UNSUPPORTED_OPERATOR_OR_PROFILE")) context.diagnostics.push({ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: "Segment identity is not present in the current canonical structure." });
     return false;
   }
+  if (["rep", "color", "cartoon_color", "ribbon_color", "label"].includes(property)) {
+    context.needsPresentation = true;
+    if (!context.presentationRevision) {
+      context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Presentation state is not bound into this selection context." });
+      return false;
+    }
+    const representationTokens = context.representationTokensByStableAtomId?.[atom.stableId];
+    const colorTokens = context.colorTokensByStableAtomId?.[atom.stableId];
+    const representationColorTokens = context.representationColorTokensByStableAtomId?.[atom.stableId];
+    const labelTokens = context.labelTokensByStableAtomId?.[atom.stableId];
+    const matches = property === "rep"
+      ? presentationTokensMatch(representationTokens, value, true)
+      : property === "color"
+        ? presentationTokensMatch(colorTokens, value)
+        : property === "label"
+          ? presentationTokensMatch(labelTokens, value)
+          : presentationTokensMatch(representationColorTokens?.[property === "cartoon_color" ? "CARTOON" : "RIBBON"], value);
+    if (operator === "NE") return !matches;
+    if (operator !== "EQ") {
+      context.diagnostics.push({ code: "INVALID_VALUE", message: `${property} only supports equality and inequality matching.` });
+      return false;
+    }
+    return matches;
+  }
   const markInvalid = (message: string) => { if (!context.diagnostics.some((diagnostic) => diagnostic.code === "INVALID_VALUE" && diagnostic.message === message)) context.diagnostics.push({ code: "INVALID_VALUE", message }); };
   if ((property === "index" && (!/^\d+$/.test(value) || Number(value) < 1)) || (property === "rank" && (!/^\d+$/.test(value) || Number(value) < 0))) { markInvalid(`${property} requires a non-negative integer with ${property === "index" ? "one-based" : "zero-based"} semantics.`); return false; }
   if (property === "resi" && !/^-?\d+[A-Za-z]?(?:[-:]-?\d+[A-Za-z]?)?$/.test(value)) { markInvalid(`Residue selector \`${value}\` is not an integer, insertion-aware value, or range.`); return false; }
@@ -456,12 +580,12 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
   } else if (property === "ss") {
     if (!atom.secondaryStructure) { context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical secondary-structure data is unavailable for this molecular revision." }); return false; }
     matches = wildcardMatch(atom.secondaryStructure, value);
-  } else if (property === "label" || property === "pepseq") {
+  } else if (property === "pepseq") {
     context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: `Canonical ${property} data is unavailable for this molecular revision.` }); return false;
   }
   else { context.diagnostics.push({ code: "UNKNOWN_PROPERTY", message: `Unknown canonical property: ${property}.` }); return false; }
   if (["EQ", "NE"].includes(operator)) return operator === "NE" ? !matches : matches;
-  if (["name", "resn", "chain", "segi", "elem", "alt", "id", "model", "object", "ss"].includes(property)) { context.diagnostics.push({ code: "INVALID_VALUE", message: `${property} only supports equality and inequality matching.` }); return false; }
+  if (["name", "resn", "chain", "segi", "elem", "alt", "id", "model", "object", "ss", "rep", "color", "cartoon_color", "ribbon_color", "label"].includes(property)) { context.diagnostics.push({ code: "INVALID_VALUE", message: `${property} only supports equality and inequality matching.` }); return false; }
   return matches;
 };
 const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, context: EvalContext): Set<string> => {
@@ -504,31 +628,22 @@ const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, 
     const rightKeys = new Set(structure.atoms.filter((atom) => right.has(atom.stableId)).map(key));
     return new Set(structure.atoms.filter((atom) => left.has(atom.stableId) && rightKeys.has(key(atom))).map((atom) => atom.stableId));
   }
-  if (ast.kind === "byobject" || ast.kind === "bymolecule" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha") {
+  if (ast.kind === "byobject" || ast.kind === "bymolecule" || ast.kind === "byfragment" || ast.kind === "byring" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha") {
     const operand = evaluateAst(ast.operand, structure, context); const scope = (atom: CanonicalAtom) => `${atom.workspaceObjectId ?? structure.id}\u0000`; const groups = new Set(structure.atoms.filter((atom) => operand.has(atom.stableId)).map((atom) => ast.kind === "byobject" ? scope(atom) : ast.kind === "byres" || ast.kind === "bycalpha" ? `${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}` : ast.kind === "bysegi" ? `${scope(atom)}${atom.segmentId ?? ""}` : `${scope(atom)}${atom.chain}`));
     if (ast.kind === "byobject") return new Set(structure.atoms.filter((atom) => groups.has(scope(atom)) && context.universe.has(atom.stableId)).map((atom) => atom.stableId));
-    if (ast.kind === "bymolecule") {
+    if (ast.kind === "bymolecule" || ast.kind === "byfragment") {
       context.needsTopology = true;
-      const adjacency = new Map<string, Set<string>>();
-      for (const bond of structure.bonds) {
-        adjacency.set(bond.atom1, new Set([...(adjacency.get(bond.atom1) ?? []), bond.atom2]));
-        adjacency.set(bond.atom2, new Set([...(adjacency.get(bond.atom2) ?? []), bond.atom1]));
-      }
-      const componentByAtom = new Map<string, string>();
-      for (const atom of structure.atoms) {
-        if (componentByAtom.has(atom.stableId)) continue;
-        const componentId = atom.stableId;
-        const stack = [atom.stableId];
-        componentByAtom.set(atom.stableId, componentId);
-        while (stack.length) {
-          const current = stack.pop()!;
-          for (const next of adjacency.get(current) ?? []) {
-            if (!componentByAtom.has(next)) { componentByAtom.set(next, componentId); stack.push(next); }
-          }
-        }
-      }
+      if (ast.kind === "byfragment" && structure.bonds.length === 0) { context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical bond topology is unavailable; fragment membership cannot be established." }); return new Set(); }
+      const { componentByAtom } = canonicalTopologyGraphFor(structure);
       const selectedComponents = new Set([...operand].map((id) => componentByAtom.get(id)).filter((id): id is string => Boolean(id)));
       return new Set(structure.atoms.filter((atom) => context.universe.has(atom.stableId) && selectedComponents.has(componentByAtom.get(atom.stableId)!)).map((atom) => atom.stableId));
+    }
+    if (ast.kind === "byring") {
+      const rings = canonicalRingsFor(structure, context);
+      if (!rings) return new Set();
+      const selectedRingAtoms = new Set<string>();
+      for (const ring of rings) if ([...ring].some((atomId) => operand.has(atomId))) for (const atomId of ring) selectedRingAtoms.add(atomId);
+      return new Set(structure.atoms.filter((atom) => context.universe.has(atom.stableId) && selectedRingAtoms.has(atom.stableId)).map((atom) => atom.stableId));
     }
     if (ast.kind === "bysegi" && !structure.atoms.some((atom) => atom.segmentId)) { context.diagnostics.push({ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: "Segment identity is not present in the current canonical structure." }); return new Set(); }
     if (ast.kind === "bycalpha") {
@@ -646,6 +761,10 @@ const contextFor = (structure: CanonicalMolecularStructure, query: string, named
   needsPresentation: false,
   presentationRevision: presentation?.revision ?? null,
   visibleAtomIds: presentation ? new Set(presentation.visibleStableAtomIds) : undefined,
+  representationTokensByStableAtomId: presentation?.representationTokensByStableAtomId,
+  colorTokensByStableAtomId: presentation?.colorTokensByStableAtomId,
+  representationColorTokensByStableAtomId: presentation?.representationColorTokensByStableAtomId,
+  labelTokensByStableAtomId: presentation?.labelTokensByStableAtomId,
   named,
   groups,
   query,
@@ -677,10 +796,8 @@ export const bindSelectionPlan = (query: string, ast: SelectionAst, normalizedAs
 export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecularStructure, options: SelectionEvaluationOptions = {}): SelectionResult => {
   const trimmed = query.trim(); const parsed = parseSelection(trimmed); const source = options.source ?? { kind: "query", rawQuery: trimmed };
   const emptyContext = { ...contextFor(structure, trimmed, options.named, [...parsed.diagnostics], options.presentation, options.coordinateFrame, options.groups), coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal };
-  const presentationSelector = trimmed.match(/^(rep|cartoon_color|ribbon_color)\b/i);
-  if (presentationSelector) return baseResult(trimmed, structure, source, "MISSING_DEPENDENCY", [{ code: "MISSING_DEPENDENCY", message: `Presentation selector \`${presentationSelector[1]}\` is not evaluated in the scientific selection context; use a registered presentation command.` }], "", [], emptyContext);
   if (options.expectedRevision && options.expectedRevision !== structure.scientificHash) return baseResult(trimmed, structure, source, "STALE_REVISION", [{ code: "STALE_REVISION", message: "The selection context revision is stale; the active structure was not changed." }], "", [], emptyContext);
-  const gated = trimmed.match(/\b(gap|pbc|bycell|symmetry|byring|byfragment|donors|acceptors|arbitrary)\b/i);
+  const gated = trimmed.match(/\b(gap|pbc|bycell|symmetry|donors|acceptors|arbitrary)\b/i);
   if (gated) return baseResult(trimmed, structure, source, "UNSUPPORTED_OPERATOR_OR_PROFILE", [{ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: `Selection operator \`${gated[1]}\` is gated until its validated scientific profile is available.` }], "", [], emptyContext);
   if (!trimmed || !parsed.ast) {
     const diagnostics = parsed.diagnostics.length ? parsed.diagnostics : [{ code: "SYNTAX_ERROR" as const, message: "A selection expression is required." }];

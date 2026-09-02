@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 const fixture = resolve("tests/fixtures/mini-protein.pdb");
 const typedNucleicFixture = resolve("tests/fixtures/typed-nucleic.mmcif");
 const edgeIdentityFixture = resolve("tests/fixtures/edge-identity.mmcif");
+const ringFixture = resolve("tests/fixtures/ring-ligand.pdb");
 const loadFixture = async (page: Page) => {
   await page.goto("/molstudio");
   await page.locator('input[type="file"]').setInputFiles(fixture);
@@ -43,6 +44,20 @@ test("canonical mmCIF segment identity drives segi and bysegi selection", async 
   await run("q >= 0.5", 4);
 });
 
+test("canonical ring topology expands byring from a seed atom", async ({ page }) => {
+  await page.goto("/molstudio");
+  await page.locator('input[type="file"]').setInputFiles(ringFixture);
+  await expect(page.getByTitle("ring-ligand.pdb")).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
+  await command.fill("byring name C1");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(consoleRegion.locator(".console-entry").last()).toContainText("Selected 6 atoms");
+  await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-indicator", "visible");
+});
+
 test("selection commands bind canonical membership and named selection actions", async ({ page }) => {
   await loadFixture(page);
   const command = page.getByRole("textbox", { name: "Command or selection query" });
@@ -54,6 +69,8 @@ test("selection commands bind canonical membership and named selection actions",
   await run("show sticks, active_site");
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("SHOW STICKS on");
   await run("label active_site, {resn}{resi}:{name}");
+  await run("select label ALA1:CA");
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 1 atoms");
   await run("center active_site");
   await run("help select");
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Evaluate canonical atom membership");
@@ -85,6 +102,33 @@ test("visible selection follows presentation layer changes without changing cano
   await page.getByRole("button", { name: "Toggle Protein" }).click();
   await run("visible", 4);
   await expect(page.locator(".status-metrics")).toContainText("Atoms 12");
+});
+
+test("presentation-dependent selectors use the current RenderProjection", async ({ page }) => {
+  await loadFixture(page);
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
+  const viewer = page.getByTestId("molecular-viewer");
+  const atomMetrics = page.locator(".status-metrics");
+  const runSelection = async (value: string, count: number, status: "VALID NONEMPTY" | "VALID EMPTY") => {
+    await command.fill(value);
+    await page.getByRole("button", { name: /Run/ }).click();
+    await expect(consoleRegion.locator(".console-entry").last()).toContainText(`Selected ${count} atoms`);
+    await expect(page.getByTestId("active-selection")).toContainText(status);
+    await expect(page.getByTestId("active-selection")).toHaveAttribute("data-presentation-revision", /.+/);
+    await expect(viewer).toHaveAttribute("data-selection-indicator", count > 0 ? "visible" : "none");
+  };
+
+  const before = await atomMetrics.innerText();
+  await runSelection("rep cartoon", 8, "VALID NONEMPTY");
+  await command.fill("color red, all");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(consoleRegion.locator(".console-entry").last()).toContainText(/Applied red to 12 atoms/i);
+  await runSelection("select color red", 11, "VALID NONEMPTY");
+  await runSelection("select cartoon_color red", 8, "VALID NONEMPTY");
+  await runSelection("select ribbon_color red", 0, "VALID EMPTY");
+  expect((await atomMetrics.innerText()).replace(/\s+/g, "")).toBe(before.replace(/\s+/g, ""));
+  await expect(viewer).toHaveAttribute("data-viewer-state", "loaded");
 });
 
 test("component colors persist independently from global color and representation", async ({ page }) => {

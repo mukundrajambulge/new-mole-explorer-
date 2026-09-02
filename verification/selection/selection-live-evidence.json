@@ -3,7 +3,7 @@
   "fixture": "tests/fixtures/mini-protein.pdb",
   "generatedBy": "tests/e2e/selection-matrix-live.spec.ts",
   "expectedMembershipHashPolicy": "null when no independent application-fixture hash is pinned; observed hashes are recorded from the active canonical selection result",
-  "attemptedQueryCount": 85,
+  "attemptedQueryCount": 87,
   "browserConsoleErrors": [],
   "pageErrors": [],
   "networkErrors": [],
@@ -1119,6 +1119,34 @@
       "failureDiagnostics": []
     },
     {
+      "query": "select label CA",
+      "expected": {
+        "semanticStatus": "SELECTION_RESULT",
+        "atomCount": 2,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 2 atoms · replace · revision 3342815df0…",
+        "atomCount": 2,
+        "membershipHash": "c49cc517",
+        "viewerMembershipHash": "c49cc517",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c49cc517",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
       "query": "pepseq 10",
       "expected": {
         "semanticStatus": "MISSING_DEPENDENCY",
@@ -1406,54 +1434,58 @@
     {
       "query": "byfragment ligand",
       "expected": {
-        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
-        "atomCount": 0,
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 2,
         "membershipHash": null
       },
       "observed": {
-        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelection operator `byfragment` is gated until its validated scientific profile is available.\n· 0 atoms",
-        "atomCount": 0,
-        "membershipHash": null,
-        "viewerMembershipHash": null,
-        "selectionIndicator": null,
-        "selectionVisible": false,
-        "selectionIndicationConsistent": null
+        "result": "●\nSelected 2 atoms · replace · revision 3342815df0…\n· 2 atoms",
+        "atomCount": 2,
+        "membershipHash": "d993317d",
+        "viewerMembershipHash": "d993317d",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
       },
       "subsequentTargeting": {
-        "attempted": false,
-        "command": "show sticks, all"
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "d993317d",
+        "unchanged": true
       },
-      "failureDiagnostics": [
-        "Selection operator `byfragment` is gated until its validated scientific profile is available."
-      ]
+      "failureDiagnostics": []
     },
     {
       "query": "byring ligand",
       "expected": {
-        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "semanticStatus": "VALID_EMPTY",
         "atomCount": 0,
         "membershipHash": null
       },
       "observed": {
-        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "semanticStatus": "VALID_EMPTY",
         "category": "SELECTION",
-        "result": "●\nSelection operator `byring` is gated until its validated scientific profile is available.\n· 0 atoms",
+        "result": "●\nSelected 0 atoms · replace · revision 3342815df0…\n· 0 atoms",
         "atomCount": 0,
-        "membershipHash": null,
-        "viewerMembershipHash": null,
-        "selectionIndicator": null,
+        "membershipHash": "811c9dc5",
+        "viewerMembershipHash": "811c9dc5",
+        "selectionIndicator": "none",
         "selectionVisible": false,
-        "selectionIndicationConsistent": null
+        "selectionIndicationConsistent": true
       },
       "subsequentTargeting": {
-        "attempted": false,
-        "command": "show sticks, all"
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "811c9dc5",
+        "unchanged": true
       },
-      "failureDiagnostics": [
-        "Selection operator `byring` is gated until its validated scientific profile is available."
-      ]
+      "failureDiagnostics": []
     },
     {
       "query": "bycell chain A",
@@ -1594,7 +1626,7 @@
       "failureDiagnostics": []
     },
     {
-      "query": "around 4 ligand",
+      "query": "around 4 of ligand",
       "expected": {
         "semanticStatus": "VALID_NONEMPTY",
         "atomCount": null,
@@ -2082,28 +2114,30 @@
     {
       "query": "rep cartoon",
       "expected": {
-        "semanticStatus": "MISSING_DEPENDENCY",
-        "atomCount": null,
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 8,
         "membershipHash": null
       },
       "observed": {
-        "semanticStatus": "MISSING_DEPENDENCY",
+        "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nPresentation selector `rep` is not evaluated in the scientific selection context; use a registered presentation command.\n· 0 atoms",
-        "atomCount": 0,
-        "membershipHash": null,
-        "viewerMembershipHash": null,
-        "selectionIndicator": null,
-        "selectionVisible": false,
-        "selectionIndicationConsistent": null
+        "result": "●\nSelected 8 atoms · replace · revision 3342815df0…\n· 8 atoms",
+        "atomCount": 8,
+        "membershipHash": "646bf637",
+        "viewerMembershipHash": "646bf637",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
       },
       "subsequentTargeting": {
-        "attempted": false,
-        "command": "show sticks, all"
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "646bf637",
+        "unchanged": true
       },
-      "failureDiagnostics": [
-        "Presentation selector `rep` is not evaluated in the scientific selection context; use a registered presentation command."
-      ]
+      "failureDiagnostics": []
     },
     {
       "query": "color red",
@@ -2126,6 +2160,34 @@
       "subsequentTargeting": {
         "attempted": false,
         "command": "show sticks, all"
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "select color red",
+      "expected": {
+        "semanticStatus": "SELECTION_RESULT",
+        "atomCount": 11,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 11 atoms · replace · revision 3342815df0…",
+        "atomCount": 11,
+        "membershipHash": "c9c5e093",
+        "viewerMembershipHash": "c9c5e093",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "c9c5e093",
+        "unchanged": true
       },
       "failureDiagnostics": []
     },
@@ -2300,54 +2362,58 @@
     {
       "query": "cartoon_color red",
       "expected": {
-        "semanticStatus": "MISSING_DEPENDENCY",
-        "atomCount": null,
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 8,
         "membershipHash": null
       },
       "observed": {
-        "semanticStatus": "MISSING_DEPENDENCY",
+        "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nPresentation selector `cartoon_color` is not evaluated in the scientific selection context; use a registered presentation command.\n· 0 atoms",
-        "atomCount": 0,
-        "membershipHash": null,
-        "viewerMembershipHash": null,
-        "selectionIndicator": null,
-        "selectionVisible": false,
-        "selectionIndicationConsistent": null
+        "result": "●\nSelected 8 atoms · replace · revision 3342815df0…\n· 8 atoms",
+        "atomCount": 8,
+        "membershipHash": "646bf637",
+        "viewerMembershipHash": "646bf637",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
       },
       "subsequentTargeting": {
-        "attempted": false,
-        "command": "show sticks, all"
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "646bf637",
+        "unchanged": true
       },
-      "failureDiagnostics": [
-        "Presentation selector `cartoon_color` is not evaluated in the scientific selection context; use a registered presentation command."
-      ]
+      "failureDiagnostics": []
     },
     {
       "query": "ribbon_color red",
       "expected": {
-        "semanticStatus": "MISSING_DEPENDENCY",
-        "atomCount": null,
+        "semanticStatus": "VALID_EMPTY",
+        "atomCount": 0,
         "membershipHash": null
       },
       "observed": {
-        "semanticStatus": "MISSING_DEPENDENCY",
+        "semanticStatus": "VALID_EMPTY",
         "category": "SELECTION",
-        "result": "●\nPresentation selector `ribbon_color` is not evaluated in the scientific selection context; use a registered presentation command.\n· 0 atoms",
+        "result": "●\nSelected 0 atoms · replace · revision 3342815df0…\n· 0 atoms",
         "atomCount": 0,
-        "membershipHash": null,
-        "viewerMembershipHash": null,
-        "selectionIndicator": null,
+        "membershipHash": "811c9dc5",
+        "viewerMembershipHash": "811c9dc5",
+        "selectionIndicator": "none",
         "selectionVisible": false,
-        "selectionIndicationConsistent": null
+        "selectionIndicationConsistent": true
       },
       "subsequentTargeting": {
-        "attempted": false,
-        "command": "show sticks, all"
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "811c9dc5",
+        "unchanged": true
       },
-      "failureDiagnostics": [
-        "Presentation selector `ribbon_color` is not evaluated in the scientific selection context; use a registered presentation command."
-      ]
+      "failureDiagnostics": []
     }
   ]
 }

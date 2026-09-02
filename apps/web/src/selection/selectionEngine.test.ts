@@ -38,12 +38,28 @@ describe("canonical selection engine", () => {
     expect(resolveSelection("chain A protein", structure).stableAtomIds).toEqual(["a1", "a2", "a3", "b1", "l1", "w1"]);
     expect(resolveSelection("bycalpha name CA", structure).stableAtomIds).toEqual(["a1", "a3", "b1"]);
     expect(resolveSelection("bymolecule ligand", structure).stableAtomIds).toEqual(["a1", "a2", "l1"]);
+    expect(resolveSelection("byfragment ligand", structure).stableAtomIds).toEqual(["a1", "a2", "l1"]);
     expect(resolveSelection("name CA in chain A", structure).stableAtomIds).toEqual(["a1", "a3"]);
     expect(resolveSelection("(chain A and name CA) like (chain A and name CA)", structure).stableAtomIds).toEqual(["a1", "a3"]);
     const segmented = { ...structure, atoms: structure.atoms.map((atom) => ({ ...atom, segmentId: atom.chain === "A" ? "SEG_A" : "SEG_B" })), scientificHash: "c".repeat(64) } satisfies CanonicalMolecularStructure;
     expect(resolveSelection("segi SEG_A", segmented).stableAtomIds).toEqual(["a1", "a2", "a3", "l1", "w1"]);
     expect(resolveSelection("bysegi (name CA and segi SEG_A)", segmented).stableAtomIds).toEqual(["a1", "a2", "a3", "l1", "w1"]);
     expect(resolveSelection("name CA in segi SEG_A", segmented).stableAtomIds).toEqual(["a1", "a3"]);
+  });
+
+  it("expands byring from bounded cycles in the canonical bond graph", () => {
+    const ring = { ...structure, bonds: [
+      { id: "r1", atom1: "a1", atom2: "a2", order: "AROMATIC" as const, source: "PDB_CONECT" as const },
+      { id: "r2", atom1: "a2", atom2: "a3", order: "AROMATIC" as const, source: "PDB_CONECT" as const },
+      { id: "r3", atom1: "a3", atom2: "b1", order: "AROMATIC" as const, source: "PDB_CONECT" as const },
+      { id: "r4", atom1: "b1", atom2: "l1", order: "AROMATIC" as const, source: "PDB_CONECT" as const },
+      { id: "r5", atom1: "l1", atom2: "w1", order: "AROMATIC" as const, source: "PDB_CONECT" as const },
+      { id: "r6", atom1: "w1", atom2: "a1", order: "AROMATIC" as const, source: "PDB_CONECT" as const },
+    ], scientificHash: "ring-revision".padEnd(64, "0") } satisfies CanonicalMolecularStructure;
+    const result = resolveSelection("byring water", ring);
+    expect(result.stableAtomIds).toEqual(["a1", "a2", "a3", "b1", "l1", "w1"]);
+    expect(result.dependencyVector.needsTopology).toBe(true);
+    expect(result.topologyRevision).not.toBeNull();
   });
 
   it("evaluates topology and exact spatial boundaries through canonical data", () => {
@@ -98,6 +114,32 @@ describe("canonical selection engine", () => {
     expect(first.dependencyVector.needsPresentation).toBe(true);
     const second = resolveSelection("visible", structure, { presentation: { visibleStableAtomIds: ["b1"], revision: "projection-2" } });
     expect(second.stableAtomIds).toEqual(["b1"]);
+  });
+
+  it("evaluates presentation selectors only from an explicit projection context", () => {
+    expect(evaluateSelectionQuery("rep cartoon", structure).status).toBe("MISSING_DEPENDENCY");
+    const presentation = {
+      visibleStableAtomIds: ["a1", "a2", "l1"],
+      representationTokensByStableAtomId: { a1: ["cartoon"], a2: ["cartoon"], l1: ["sticks", "ball-and-stick"] },
+      colorTokensByStableAtomId: { a1: ["#ff0000", "red"], a2: ["#ff0000", "red"], l1: ["#3050f8", "blue"] },
+      representationColorTokensByStableAtomId: {
+        a1: { CARTOON: ["#ff0000", "red"] },
+        a2: { CARTOON: ["#ff0000", "red"] },
+        l1: { STICKS: ["#3050f8", "blue"] },
+      },
+      labelTokensByStableAtomId: { a1: ["ALA10:CA"], a2: ["ALA10:N"] },
+      revision: "projection-selectors-1",
+    };
+    expect(resolveSelection("rep cartoon", structure, { presentation }).stableAtomIds).toEqual(["a1", "a2"]);
+    expect(resolveSelection("color red", structure, { presentation }).stableAtomIds).toEqual(["a1", "a2"]);
+    expect(resolveSelection("cartoon_color red", structure, { presentation }).stableAtomIds).toEqual(["a1", "a2"]);
+    expect(resolveSelection("ribbon_color red", structure, { presentation }).stableAtomIds).toEqual([]);
+    expect(resolveSelection("label ALA10:CA", structure, { presentation }).stableAtomIds).toEqual(["a1"]);
+    expect(evaluateSelectionQuery("rep cartoon !=", structure, { presentation }).status).toBe("SYNTAX_ERROR");
+    const result = resolveSelection("rep sticks", structure, { presentation });
+    expect(result.stableAtomIds).toEqual(["l1"]);
+    expect(result.presentationContext?.revision).toBe("projection-selectors-1");
+    expect(result.dependencyVector.needsPresentation).toBe(true);
   });
 
   it("returns truthful structured failures and never turns unknown names into empty success", () => {
