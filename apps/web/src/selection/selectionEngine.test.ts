@@ -83,6 +83,27 @@ describe("canonical selection engine", () => {
     expect(combineSelections(result, selectionForStableIds(["l1"], structure), "add").stableAtomIds).toEqual(["a1", "a2", "a3", "l1"]);
   });
 
+  it("invalidates the selection cache when a workspace object display name changes", () => {
+    const workspaceForName = (workspaceObjectName: string): CanonicalMolecularStructure => ({
+      ...structure,
+      id: "workspace",
+      name: "workspace",
+      scientificHash: "workspace-revision".padEnd(64, "0"),
+      atoms: structure.atoms.map((atom) => ({
+        ...atom,
+        stableId: `object:engine::${atom.stableId}`,
+        workspaceObjectId: "object:engine",
+        workspaceObjectName,
+      })),
+    });
+
+    const original = workspaceForName("engine.pdb");
+    const renamed = workspaceForName("renamed-engine.pdb");
+    expect(resolveSelection("object engine.pdb", original).count).toBe(6);
+    expect(resolveSelection("object renamed-engine.pdb", renamed).count).toBe(6);
+    expect(resolveSelection("object engine.pdb", renamed).count).toBe(0);
+  });
+
   it("binds an explicit plan and keeps stable identity fields distinct", () => {
     const result = resolveSelection("id a2", structure);
     expect(result.boundPlan?.molecularRevision).toBe(structure.scientificHash);

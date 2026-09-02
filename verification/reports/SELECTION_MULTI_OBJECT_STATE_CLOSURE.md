@@ -28,6 +28,7 @@ The current application was exercised with a real 4DJW RCSB load:
 - Bare `chain A and protein` selected **3,060 atoms**. It is routed by the typed InputRouter to the canonical selection parser, not the command parser.
 - The active-selection panel, status bar, and viewer all reported the same live membership hash for both selections; selection marker geometry was capped at 128 atoms while the full stable-ID membership remained in the canonical projection.
 - Running `show sticks, all` after each live selection preserved the active membership hash.
+- On the same real 4DJW selection, `color red, all` preserved membership, `center all` and `zoom all` routed to the camera adapter, and `unpick` removed the active selection card and viewer indicator without changing the loaded structure.
 - A second live RCSB load (`1CRN`) was added without replacing 4DJW. Both objects rendered in one mounted viewer and `object 4DJW.cif` selected 7,079 atoms.
 
 ## Architecture decisions
@@ -41,6 +42,7 @@ The current application was exercised with a real 4DJW RCSB load:
 - `all_states` is bounded to explicit auxiliary state models. State changes reconcile model coordinates in place when layout is unchanged.
 - Object `copy` preserves canonical source, state order, current state, enablement, and projection while receiving a new durable ObjectID. `create`, `split_states`, and `join_states` remain explicitly gated where lineage semantics are not defined.
 - Workspace presentation commands are applied per canonical object scope. The viewer adapter projects each object’s representation directives onto its own model, and single-object disable/enable transitions stay in the same workspace projection path.
+- Selection cache identity includes canonical selector fields and workspace namespace metadata, including durable object ID, mutable display name, segment identity, and coordinate-state annotations; renaming cannot reuse a stale object-name result.
 - Failed loads are non-destructive: the current workspace and viewer remain intact.
 
 ## Operator matrix
@@ -133,7 +135,7 @@ Verification:
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm run test --workspace @molecular/web` — **PASS: 16 files / 66 tests**
+- `npm run test --workspace @molecular/web` — **PASS: 16 files / 67 tests**
 - `npm run test --workspace @molecular/api` — **PASS: 2 files / 11 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 6 / 6**

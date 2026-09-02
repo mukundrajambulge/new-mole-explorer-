@@ -468,7 +468,22 @@ const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, 
 
 const resultId = (query: string, structure: CanonicalMolecularStructure, ids: readonly string[]) => hash(`${query}\u0000${structure.id}\u0000${structure.scientificHash}\u0000${ids.join("\u0000")}`);
 const topologyRevisionFor = (structure: CanonicalMolecularStructure): string => hash(structure.bonds.map((bond) => `${bond.atom1}:${bond.atom2}:${bond.order}`).join("\u0000"));
-const namespaceRevisionFor = (structure: CanonicalMolecularStructure, named?: NamedSelectionStore): string => hash(`${structure.atoms.map((atom) => `${atom.stableId}:${atom.chain}:${atom.residueNumber}:${atom.insertionCode ?? ""}`).join("\u0000")}\u0000${named?.namespaceRevision ?? "none"}`);
+const namespaceRevisionFor = (structure: CanonicalMolecularStructure, named?: NamedSelectionStore): string => hash(JSON.stringify({
+  atoms: structure.atoms.map((atom) => ({
+    stableId: atom.stableId,
+    atomName: atom.atomName,
+    residueName: atom.residueName,
+    residueNumber: atom.residueNumber,
+    insertionCode: atom.insertionCode ?? "",
+    chain: atom.chain,
+    segmentId: atom.segmentId ?? "",
+    workspaceObjectId: atom.workspaceObjectId ?? "",
+    workspaceObjectName: atom.workspaceObjectName ?? "",
+    workspaceCoordinateStateId: atom.workspaceCoordinateStateId ?? "",
+    workspaceStateOrdinal: atom.workspaceStateOrdinal ?? null,
+  })),
+  namedNamespaceRevision: named?.namespaceRevision ?? "none",
+}));
 const baseResult = (query: string, structure: CanonicalMolecularStructure, source: SelectionProvenance, status: SelectionStatus, diagnostics: readonly SelectionDiagnostic[], astText: string, ids: readonly string[], deps: EvalContext, boundPlan: BoundSelectionPlan | null = null): SelectionResult => {
   const stableAtomIds = stableSort(ids, structure); const normalizedAstHash = hash(astText); const membershipHash = hash(stableAtomIds.join("\u0000"));
   return { schemaVersion: 2, resultId: resultId(query, structure, stableAtomIds), source, query, grammarVersion: GRAMMAR_VERSION, normalizedAst: astText, normalizedAstHash, profile: PROFILE, molecularIdentity: { structureId: structure.id, molecularRevision: structure.scientificHash }, structureId: structure.id, molecularRevision: structure.scientificHash, objectScope: { kind: "structure", objectId: structure.id }, universeFingerprint: hash(structure.atoms.map((atom) => atom.stableId).join("\u0000")), coordinateContext: deps.needsCoordinates ? { structureId: structure.id, revision: structure.scientificHash, stateId: deps.coordinateStateId ?? "active" } : null, topologyRevision: deps.needsTopology ? topologyRevisionFor(structure) : null, namespaceRevision: namespaceRevisionFor(structure, deps.named), stableAtomIds, membershipHash, count: stableAtomIds.length, status, diagnostics, dependencyVector: { needsCoordinates: deps.needsCoordinates, needsTopology: deps.needsTopology, needsNamespaces: true }, boundPlan };
