@@ -12,8 +12,8 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Remote: `new-origin https://github.com/mukundrajambulge/new-mole-explorer-.git`
 - Local root: `C:\Users\mukun\Documents\Codex\2026-08-30\files-pasted-by-the-user-new\outputs\molecular-workstation`
 - Branch: `fix/visualization-final-closure`
-- Starting SHA for this closure pass: `e6ab3a781f9db8f3ed39c37e08003476eed88703`
-- Ending implementation SHA: `3b49e10` (includes the active-selection/status-bar closure fix)
+- Starting SHA for this closure pass: `278379a9eda32b36d0e82654594082190cfd3e37`
+- Ending implementation SHA: `ec242a9776ac4dc083fc945c9745c99bb51fd1e5` (includes durable active-selection feedback and workspace projection synchronization)
 - Working tree before commit: modified by this closure pass; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -26,6 +26,8 @@ The current application was exercised with a real 4DJW RCSB load:
 
 - `select all` selected **7,079 atoms** and remained the active selection.
 - Bare `chain A and protein` selected **3,060 atoms**. It is routed by the typed InputRouter to the canonical selection parser, not the command parser.
+- The active-selection panel, status bar, and viewer all reported the same live membership hash for both selections; selection marker geometry was capped at 128 atoms while the full stable-ID membership remained in the canonical projection.
+- Running `show sticks, all` after each live selection preserved the active membership hash.
 - A second live RCSB load (`1CRN`) was added without replacing 4DJW. Both objects rendered in one mounted viewer and `object 4DJW.cif` selected 7,079 atoms.
 
 ## Architecture decisions
@@ -47,6 +49,8 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - Rows: **79**
 - Implementation: **57 VERIFIED_WORKING**, **10 MISSING_DEPENDENCY**, **10 INTENTIONALLY_UNSUPPORTED**, **2 RESEARCH_REQUIRED**
 - Live-browser status: **79 pass/accepted diagnostic outcomes** across the expanded matrix exercise
+- Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **79** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
+- The two `in`/`like` forms remain research-gated and fail closed with syntax diagnostics; `foo = bar` is rejected without dynamic property evaluation. These are recorded as policy-gated outcomes rather than scientific successes.
 - Oracle status: **13 ORACLE_PASS**, **6 ORACLE_EQUIVALENT**, **60 ORACLE_PENDING**
 - Pinned oracle evidence: [pymol-oracle-results.json](../selection/pymol-oracle-results.json); runner: [run-pymol-oracle.py](../selection/run-pymol-oracle.py)
 - Missing dependency and research rows are explicit gates. No unsupported operator is silently aliased to a different scientific meaning.
@@ -62,11 +66,13 @@ Application/contracts:
 - `apps/web/src/commands/commandRegistry.ts`
 - `apps/web/src/components/ContextToolbar.tsx`
 - `apps/web/src/components/MolecularCanvas.tsx`
+- `apps/web/src/components/StructurePanel.tsx`
 - `apps/web/src/interaction/measurements.ts`
 - `apps/web/src/interaction/picking.ts`
 - `apps/web/src/rendering/ThreeDMolViewerAdapter.ts`
 - `apps/web/src/rendering/surfaceProfiles.ts`
 - `apps/web/src/selection/selectionEngine.ts`
+- `apps/web/src/styles/global.css`
 - `apps/web/src/workspace/workspaceModel.ts`
 - `packages/contracts/src/index.ts`
 - `package.json`
@@ -81,6 +87,7 @@ Verification:
 - `verification/selection/selection-operator-matrix.json`
 - `verification/selection/pymol-oracle-results.json`
 - `verification/selection/run-pymol-oracle.py`
+- `verification/selection/selection-live-evidence.json`
 - `verification/evidence/closure-empty-state.png`
 - `verification/evidence/closure-uploaded-cartoon-ligand-sticks.png`
 - `verification/evidence/closure-rcsb-1crn-cartoon.png`
