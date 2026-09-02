@@ -73,6 +73,7 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **89** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
 - `in`, `bycalpha`, `bymolecule`, `byfragment`, and `byring` now use canonical tuple, residue-CA, connected-component, and bounded-cycle semantics respectively. `visible` is now bound to an explicit presentation context derived from render directives; `rep`, `color`, `label`, `cartoon_color`, and `ribbon_color` are likewise evaluated from the current RenderProjection and never from 3Dmol internals. These selectors never alias scientific `all`. `like`, the application implicit-adjacency profile, and the new spatial/topology forms are live-verified; malformed shorthand and missing scientific dependencies remain truthful diagnostics.
 - Oracle comparison ledger: **40 ORACLE_PASS**, **21 ORACLE_EQUIVALENT**, **26 ORACLE_PENDING** across the 87-row comparison ledger; the full direct probe is [pymol-matrix-probe.json](../selection/pymol-matrix-probe.json) (**85 forms: 79 successful, 6 native errors**).
+- Exact-oracle reproduction: **PASS** in the local Ubuntu-20.04 compatibility environment using the pinned source commit; PyMOL **3.2.0a**, 85 forms, 79 successful and 6 native errors, with row payloads byte-identical to the committed direct probe.
 - Pinned oracle evidence: [pymol-oracle-results.json](../selection/pymol-oracle-results.json); runner: [run-pymol-oracle.py](../selection/run-pymol-oracle.py)
 - Missing dependency and research rows are explicit gates. No unsupported operator is silently aliased to a different scientific meaning.
 
@@ -208,6 +209,7 @@ Verification:
 - `npm run test:e2e` — **PASS: 75 / 75**
 - `npm run build` — **PASS**
 - `git diff --check` — **PASS**
+- Pinned PyMOL oracle reproduction — **PASS: PyMOL 3.2.0a; 85 forms; 79 successful / 6 native errors; committed probe row payload identical**
 
 ## Manual verification
 
@@ -253,4 +255,4 @@ Verification:
 - `donors` / `acceptors`: the exact compatibility question is whether these selectors should be differential-only or derived from the same Mole chemistry model. The current canonical contract lacks validated component definitions, complete bond order/valence, protonation/tautomer state, and a provenance-stamped perception profile. Required next research fixture set: benzene, pyridine, pyrrole, amide, carboxylate, protonated amine, and unknown-component cases; suggested stage: R03-04 chemistry-perception addendum plus Research-02 chemical-graph/CCD integration.
 - `bycell` / crystallographic symmetry: the exact question is whether the operator means source unit-cell membership, symmetry mates, or periodic-image expansion under the compatibility profile. The current contract lacks validated unit-cell parameters, symmetry operators, and an explicit coordinate-frame policy for mates; suggested stage: SQ-R05 symmetry/PBC addendum with a pinned oracle fixture.
 - `partial_charge`: the missing dependency is a complete atom-to-charge dataset with charge model, units, provenance, and molecular-revision binding. PDB/mmCIF ingestion alone does not supply that dataset; no fallback charge is permitted.
-- Additional `ORACLE_PENDING` rows require direct pinned-PyMOL comparison or a documented native-equivalent mapping. The current host has no PyMOL module installed, so new oracle execution requires the already-used pinned compatibility environment; existing direct-probe artifacts remain preserved.
+- Additional `ORACLE_PENDING` rows require a matching direct pinned-PyMOL comparison or a documented native-equivalent mapping. The exact pinned probe is reproducible locally; remaining pending rows are retained because they require application presentation/workspace context, have intentionally divergent Mole extensions, lack discriminative fixture data, or need an explicit native-equivalent decision. Existing direct-probe artifacts remain preserved.
