@@ -4,7 +4,7 @@
 
 **SELECTION + MULTI-OBJECT/MULTI-STATE CLOSURE INCOMPLETE — BLOCKED**
 
-The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. The pinned PyMOL source has now executed against the shared fixture for 92 direct forms: 72 pass and 20 return native errors; the comparison ledger promotes only exact forms or documented aliases. The gate remains blocked because 64 of the 87 matrix rows still require a pinned oracle result or a deliberately unresolved native grammar decision. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
+The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. The pinned PyMOL source has now executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The gate remains blocked because 28 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
 
 ## Repository and run evidence
 
@@ -13,7 +13,7 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Local root: `C:\Users\mukun\Documents\Codex\2026-08-30\files-pasted-by-the-user-new\outputs\molecular-workstation`
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `900552e18e5eccabaaaedbae0853ef9956585084`
-- Ending implementation SHA: `01805d13990c70a1b02d3b0bcba53a5687469f76` (selection semantics, segment identity metadata, workspace presentation synchronization, selection namespace cache safety, explicit presentation-bound visibility selection, and verification evidence)
+- Ending implementation SHA: pending final evidence commit (selection semantics, segment identity metadata, workspace presentation synchronization, selection namespace cache safety, explicit presentation-bound visibility selection, and pinned-oracle verification evidence)
 - Working tree before commit: modified by this closure pass; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -54,7 +54,7 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - Live-browser status: **85 pass/accepted diagnostic outcomes** across the expanded matrix exercise
 - Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **85** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
 - `in`, `bycalpha`, and `bymolecule` now use canonical tuple, residue-CA, and bond-component semantics respectively. `visible` is now bound to an explicit presentation context derived from render directives; it never aliases scientific `all`. `like`, the application implicit-adjacency profile, and the new spatial/topology forms are live-verified; malformed shorthand and missing scientific dependencies remain truthful diagnostics.
-- Oracle comparison ledger: **18 ORACLE_PASS**, **7 ORACLE_EQUIVALENT**, **2 ORACLE_PENDING**; the full direct probe is [pymol-matrix-probe.json](../selection/pymol-matrix-probe.json).
+- Oracle comparison ledger: **18 ORACLE_PASS**, **13 ORACLE_EQUIVALENT**, **0 ORACLE_PENDING** across the intentionally conservative 31-row comparison ledger; the full direct probe is [pymol-matrix-probe.json](../selection/pymol-matrix-probe.json) (**85 forms: 79 successful, 6 native errors**).
 - Pinned oracle evidence: [pymol-oracle-results.json](../selection/pymol-oracle-results.json); runner: [run-pymol-oracle.py](../selection/run-pymol-oracle.py)
 - Missing dependency and research rows are explicit gates. No unsupported operator is silently aliased to a different scientific meaning.
 
@@ -170,9 +170,9 @@ Verification:
 
 ## Known limitations and blockers
 
-- The pinned PyMOL source was executed in a temporary Ubuntu-20.04/Python-3.9.2 compatibility build. The 64 remaining `ORACLE_PENDING` matrix rows are not promoted without matching coverage; this is the reason for the blocked final verdict.
+- The pinned PyMOL source was executed in a temporary Ubuntu-20.04/Python-3.9.2 compatibility build. The 28 remaining `ORACLE_PENDING` matrix rows are not promoted without matching coverage; this is one reason for the blocked final verdict.
 - `segi`, crystallographic `pbc`/`symmetry`/`bycell`, fragment/ring perception, donor/acceptor chemistry, and `gap` remain explicit unsupported or missing-dependency gates. Unknown properties fail closed.
 - Partial charge, peptide sequence, and label-property selection require datasets not present in this gate and return structured missing-dependency diagnostics. `visible` requires the explicit presentation context supplied by the frontend selection router.
-- `like` and implicit-adjacency still need a direct native oracle case even though their canonical application-profile behavior is live-verified.
+- Native `like`, implicit adjacency, topology, and corrected spatial forms now have direct probe coverage; the six native parser errors and the remaining conservative matrix rows are retained as evidence rather than treated as application support.
 - Cross-object spatial queries are intentionally not evaluated until the workspace declares whether coordinates are `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD`; same-object spatial queries remain supported.
 - The production bundle retains the existing 3Dmol `eval` warning and exceeds the default 500 kB warning threshold; all build and runtime tests pass.

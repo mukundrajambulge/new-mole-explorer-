@@ -7,8 +7,8 @@
   "notes": [
     "Native-equivalent rows preserve the application's explicit protein, water, and ligand aliases without claiming those aliases are PyMOL spellings.",
     "The source commit is pinned; the temporary Python compatibility layer only adds future annotations and legacy runtime shims needed by this environment.",
-    "The complete direct probe is recorded in `pymol-matrix-probe.json`: 92 native forms, 72 successful and 20 native errors. The comparison ledger below promotes only exact forms or documented application aliases.",
-    "Spatial forms remain pending in this comparison ledger because the application's accepted forms were not silently translated to an unverified PyMOL form."
+    "The complete direct probe is recorded in `pymol-matrix-probe.json`: 85 native forms, 79 successful and 6 native errors. The comparison ledger below promotes only exact forms or documented application aliases.",
+    "The direct probe now includes corrected native topology and spatial forms; this comparison ledger remains intentionally conservative and contains 31 selected exact/equivalent rows."
   ],
   "rows": [
     { "applicationQuery": "all", "oracleQuery": "all", "oracleStatus": "ORACLE_PASS", "count": 12, "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a" },
@@ -36,7 +36,11 @@
     { "applicationQuery": "neighbor ligand", "oracleQuery": "neighbor organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 0, "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "mapping": "application ligand alias -> PyMOL organic" },
     { "applicationQuery": "bound_to ligand", "oracleQuery": "bound_to organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 2, "membershipHash": "f1a7a9815562e93a9cc9321e9842cdda93caf16003517d83b5f7344643f588ab", "mapping": "application ligand alias -> PyMOL organic" },
     { "applicationQuery": "polymer.nucleic", "oracleQuery": "polymer.nucleic", "oracleStatus": "ORACLE_PASS", "count": 0, "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" },
-    { "applicationQuery": "within 4 of ligand", "oracleQuery": null, "oracleStatus": "ORACLE_PENDING", "reason": "native PyMOL grammar equivalent not pinned" },
-    { "applicationQuery": "around 4 ligand", "oracleQuery": null, "oracleStatus": "ORACLE_PENDING", "reason": "native PyMOL grammar equivalent not pinned" }
+    { "applicationQuery": "within 4 of ligand", "oracleQuery": "all within 4 of organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 6, "membershipHash": "09afc26b25d9ee1b66db33cd0f42878b51651e480a73f02334ea8b2a6554c778", "mapping": "application ligand alias -> PyMOL organic; application candidate universe -> PyMOL all" },
+    { "applicationQuery": "around 4 ligand", "oracleQuery": "all and (organic around 4)", "oracleStatus": "ORACLE_EQUIVALENT", "count": 4, "membershipHash": "3b6fe510caacbdbd06dd04531291201b2a1f69fe48bef46b806df59f496d1f99", "mapping": "application ligand alias -> PyMOL organic; application candidate universe -> PyMOL all" },
+    { "applicationQuery": "extend 1 ligand", "oracleQuery": "organic extend 1", "oracleStatus": "ORACLE_EQUIVALENT", "count": 2, "membershipHash": "f1a7a9815562e93a9cc9321e9842cdda93caf16003517d83b5f7344643f588ab", "mapping": "application ligand alias -> PyMOL organic; application prefix form -> PyMOL infix form" },
+    { "applicationQuery": "expand 4 ligand", "oracleQuery": "organic expand 4", "oracleStatus": "ORACLE_EQUIVALENT", "count": 6, "membershipHash": "09afc26b25d9ee1b66db33cd0f42878b51651e480a73f02334ea8b2a6554c778", "mapping": "application ligand alias -> PyMOL organic" },
+    { "applicationQuery": "all near_to 4 of ligand", "oracleQuery": "all near_to 4 of organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 4, "membershipHash": "3b6fe510caacbdbd06dd04531291201b2a1f69fe48bef46b806df59f496d1f99", "mapping": "application ligand alias -> PyMOL organic" },
+    { "applicationQuery": "beyond 4 ligand", "oracleQuery": "all beyond 4 of organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 6, "membershipHash": "9ff1c4cc6da97079493e4060fceac7dc79eb5615582f738cdd13c108adaf1900", "mapping": "application ligand alias -> PyMOL organic; application candidate universe -> PyMOL all" }
   ]
 }

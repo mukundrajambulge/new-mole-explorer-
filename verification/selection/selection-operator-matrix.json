@@ -17,9 +17,9 @@
     "PASS (structured diagnostic)": 1
   },
   "oracleStatusCounts": {
-    "ORACLE_PASS": 17,
-    "ORACLE_PENDING": 64,
-    "ORACLE_EQUIVALENT": 6
+    "ORACLE_PASS": 39,
+    "ORACLE_PENDING": 28,
+    "ORACLE_EQUIVALENT": 20
   },
   "entries": [
     {
@@ -33,7 +33,7 @@
       "operator": "`*`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "retained alias"
     },
     {
@@ -54,14 +54,14 @@
       "operator": "`enabled`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "derived universe is enabled-only"
     },
     {
       "operator": "`present`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "current coordinate universe"
     },
     {
@@ -75,35 +75,35 @@
       "operator": "`name`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS indirectly",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "exact/wildcard tuple match"
     },
     {
       "operator": "`%name`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS via named-selection E2E",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "immutable stable-ID snapshot"
     },
     {
       "operator": "`?name`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "missing optional name is valid empty"
     },
     {
       "operator": "bare named selection",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "InputRouter sends non-command heads to selection parser"
     },
     {
       "operator": "object-name resolution",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "derived workspace scope metadata"
     },
     {
@@ -131,7 +131,7 @@
       "operator": "`!`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "symbolic alias"
     },
     {
@@ -145,36 +145,36 @@
       "operator": "`&`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "symbolic alias"
     },
     {
       "operator": "`or`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "deterministic stable ordering"
     },
     {
       "operator": "`|`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "symbolic alias"
     },
     {
       "operator": "parentheses",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "Pratt parser precedence"
     },
     {
       "operator": "implicit adjacency",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "implicit adjacency is an explicit application-profile OR; native alias spelling still requires a pinned direct case"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "implicit adjacency is an explicit application-profile OR; native alias spelling is directly probed"
     },
     {
       "operator": "`first`",
@@ -194,14 +194,14 @@
       "operator": "`model`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "ID/name matching"
     },
     {
       "operator": "`object`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "object scope annotations"
     },
     {
@@ -229,7 +229,7 @@
       "operator": "`resi`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "insertion-aware range"
     },
     {
@@ -243,21 +243,21 @@
       "operator": "`index`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "one-based"
     },
     {
       "operator": "`id`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "stable ID and serial remain distinct"
     },
     {
       "operator": "`rank`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "zero-based"
     },
     {
@@ -285,14 +285,14 @@
       "operator": "`S1 like S2`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "matches name and residue identity; invalid `name like CA` remains a syntax error"
     },
     {
       "operator": "`byobject`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "object-scoped expansion"
     },
     {
@@ -369,42 +369,42 @@
       "operator": "`extend`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "bounded inclusive breadth-first expansion over canonical bonds; pinned native infix case remains pending"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "bounded inclusive breadth-first expansion over canonical bonds"
     },
     {
       "operator": "`within`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "exact boundary equality"
     },
     {
       "operator": "`around`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "excludes reference atoms"
     },
     {
       "operator": "`expand`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "inclusive Cartesian expansion over the active coordinate state; native grammar remains pending"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "inclusive Cartesian expansion over the active coordinate state"
     },
     {
       "operator": "`near_to`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "candidate atoms within the boundary excluding reference atoms; missing-distance shorthand fails syntax"
     },
     {
       "operator": "`beyond`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "candidate atoms outside the inclusive Cartesian boundary"
     },
     {
@@ -439,7 +439,7 @@
       "operator": "`q` / `occupancy`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "numeric occupancy alias"
     },
     {
@@ -460,14 +460,14 @@
       "operator": "`x`, `y`, `z`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "numeric coordinate comparisons"
     },
     {
       "operator": "`state`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "command and selection namespaces remain explicit"
     },
     {
@@ -537,7 +537,7 @@
       "operator": "`polymer`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS indirectly",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "canonical polymer flag"
     },
     {
@@ -558,7 +558,7 @@
       "operator": "`backbone`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "conservative backbone name set"
     },
     {
@@ -572,21 +572,21 @@
       "operator": "`guide`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "CA guide atoms"
     },
     {
       "operator": "`metals`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "explicit element set"
     },
     {
       "operator": "`bonded`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "bond endpoint membership"
     },
     {

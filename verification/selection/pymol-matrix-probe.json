@@ -1,14 +1,19 @@
 {
+  "schemaVersion": 1,
   "source": "schrodinger/pymol-open-source@5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+  "oracleSource": "schrodinger/pymol-open-source@5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+  "runtime": "PyMOL 3.2.0a",
   "fixture": "/mnt/c/Users/mukun/Documents/Codex/2026-08-30/files-pasted-by-the-user-new/outputs/molecular-workstation/tests/fixtures/mini-protein.pdb",
-  "queryCount": 92,
-  "summary": { "pass": 72, "errors": 20 },
-  "generatedBy": "temporary pinned PyMOL compatibility probe against the shared mini-protein fixture",
+  "queryCount": 85,
+  "summary": {
+    "pass": 79,
+    "errors": 6
+  },
+  "generatedBy": "verification/selection/run-pymol-oracle.py",
   "rows": [
     {
       "query": "all",
       "returnCode": 12,
-      "status": "PASS",
       "count": 12,
       "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
       "tuples": [
@@ -24,12 +29,12 @@
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O",
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "*",
       "returnCode": 12,
-      "status": "PASS",
       "count": 12,
       "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
       "tuples": [
@@ -45,7 +50,8 @@
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O",
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "everything",
@@ -55,15 +61,14 @@
     {
       "query": "none",
       "returnCode": 0,
-      "status": "PASS",
       "count": 0,
       "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
+      "tuples": [],
+      "status": "PASS"
     },
     {
       "query": "enabled",
       "returnCode": 12,
-      "status": "PASS",
       "count": 12,
       "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
       "tuples": [
@@ -79,12 +84,12 @@
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O",
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "present",
       "returnCode": 12,
-      "status": "PASS",
       "count": 12,
       "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
       "tuples": [
@@ -100,12 +105,12 @@
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O",
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "visible",
       "returnCode": 12,
-      "status": "PASS",
       "count": 12,
       "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
       "tuples": [
@@ -121,23 +126,23 @@
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O",
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "name CA",
       "returnCode": 2,
-      "status": "PASS",
       "count": 2,
       "membershipHash": "f249bc605c5b2026858b16111b3affdc513a9e68a53d6687cb58e395bbd5d591",
       "tuples": [
         "2|A|ALA|1|CA|C",
         "6|A|GLY|2|CA|C"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "%active_site",
       "returnCode": 8,
-      "status": "PASS",
       "count": 8,
       "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
       "tuples": [
@@ -149,20 +154,20 @@
         "6|A|GLY|2|CA|C",
         "7|A|GLY|2|C|C",
         "8|A|GLY|2|O|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "?missing",
       "returnCode": 0,
-      "status": "PASS",
       "count": 0,
       "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
+      "tuples": [],
+      "status": "PASS"
     },
     {
       "query": "active_site",
       "returnCode": 8,
-      "status": "PASS",
       "count": 8,
       "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
       "tuples": [
@@ -174,17 +179,33 @@
         "6|A|GLY|2|CA|C",
         "7|A|GLY|2|C|C",
         "8|A|GLY|2|O|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "groupA",
-      "status": "ERROR",
-      "error": "CmdException('Invalid selection name \"groupA\".\\ngroupA<--')"
+      "returnCode": 12,
+      "count": 12,
+      "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "5|A|GLY|2|N|N",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O",
+        "9|A|LIG|101|C1|C",
+        "10|A|LIG|101|O1|O",
+        "11|A|HOH|201|O|O",
+        "12|B|NA|301|NA|NA"
+      ],
+      "status": "PASS"
     },
     {
       "query": "not solvent",
       "returnCode": 11,
-      "status": "PASS",
       "count": 11,
       "membershipHash": "a026ddea65f6845646345536441d3f8808c6687abe353b1e881499c01896ea58",
       "tuples": [
@@ -199,12 +220,12 @@
         "9|A|LIG|101|C1|C",
         "10|A|LIG|101|O1|O",
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "!solvent",
       "returnCode": 11,
-      "status": "PASS",
       "count": 11,
       "membershipHash": "a026ddea65f6845646345536441d3f8808c6687abe353b1e881499c01896ea58",
       "tuples": [
@@ -219,12 +240,32 @@
         "9|A|LIG|101|C1|C",
         "10|A|LIG|101|O1|O",
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "chain A",
+      "returnCode": 11,
+      "count": 11,
+      "membershipHash": "1dcb79441de393fa447723e626d083633130aadb7bf27f9ed87596b7881db096",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "5|A|GLY|2|N|N",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O",
+        "9|A|LIG|101|C1|C",
+        "10|A|LIG|101|O1|O",
+        "11|A|HOH|201|O|O"
+      ],
+      "status": "PASS"
     },
     {
       "query": "chain A and polymer.protein",
       "returnCode": 8,
-      "status": "PASS",
       "count": 8,
       "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
       "tuples": [
@@ -236,12 +277,32 @@
         "6|A|GLY|2|CA|C",
         "7|A|GLY|2|C|C",
         "8|A|GLY|2|O|O"
-      ]
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "chain A polymer.protein",
+      "returnCode": 11,
+      "count": 11,
+      "membershipHash": "1dcb79441de393fa447723e626d083633130aadb7bf27f9ed87596b7881db096",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "5|A|GLY|2|N|N",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O",
+        "9|A|LIG|101|C1|C",
+        "10|A|LIG|101|O1|O",
+        "11|A|HOH|201|O|O"
+      ],
+      "status": "PASS"
     },
     {
       "query": "chain A & polymer.protein",
       "returnCode": 8,
-      "status": "PASS",
       "count": 8,
       "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
       "tuples": [
@@ -253,42 +314,43 @@
         "6|A|GLY|2|CA|C",
         "7|A|GLY|2|C|C",
         "8|A|GLY|2|O|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "organic or solvent",
       "returnCode": 3,
-      "status": "PASS",
       "count": 3,
       "membershipHash": "62bd88d301ca1f27aa6c40e1a5b664e31bf76a5201054b577066d8117f9616c4",
       "tuples": [
         "9|A|LIG|101|C1|C",
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "organic | solvent",
       "returnCode": 3,
-      "status": "PASS",
       "count": 3,
       "membershipHash": "62bd88d301ca1f27aa6c40e1a5b664e31bf76a5201054b577066d8117f9616c4",
       "tuples": [
         "9|A|LIG|101|C1|C",
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "(chain A or chain B) and name CA",
       "returnCode": 2,
-      "status": "PASS",
       "count": 2,
       "membershipHash": "f249bc605c5b2026858b16111b3affdc513a9e68a53d6687cb58e395bbd5d591",
       "tuples": [
         "2|A|ALA|1|CA|C",
         "6|A|GLY|2|CA|C"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "chain A protein",
@@ -298,27 +360,26 @@
     {
       "query": "first all",
       "returnCode": 1,
-      "status": "PASS",
       "count": 1,
       "membershipHash": "eb7674fed3646839030b00957c80e0e663a875ba732ce82ef46d8f7aee1c7e7e",
       "tuples": [
         "1|A|ALA|1|N|N"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "last all",
       "returnCode": 1,
-      "status": "PASS",
       "count": 1,
       "membershipHash": "fd35d6fe72936e087801f9ec4812f8a4316605b1e82396341d78c0b6a27384e9",
       "tuples": [
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "model oracle_fixture",
       "returnCode": 12,
-      "status": "PASS",
       "count": 12,
       "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
       "tuples": [
@@ -334,12 +395,12 @@
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O",
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "object oracle_fixture",
       "returnCode": 12,
-      "status": "PASS",
       "count": 12,
       "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
       "tuples": [
@@ -355,40 +416,20 @@
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O",
         "12|B|NA|301|NA|NA"
-      ]
-    },
-    {
-      "query": "chain A",
-      "returnCode": 11,
-      "status": "PASS",
-      "count": 11,
-      "membershipHash": "1dcb79441de393fa447723e626d083633130aadb7bf27f9ed87596b7881db096",
-      "tuples": [
-        "1|A|ALA|1|N|N",
-        "2|A|ALA|1|CA|C",
-        "3|A|ALA|1|C|C",
-        "4|A|ALA|1|O|O",
-        "5|A|GLY|2|N|N",
-        "6|A|GLY|2|CA|C",
-        "7|A|GLY|2|C|C",
-        "8|A|GLY|2|O|O",
-        "9|A|LIG|101|C1|C",
-        "10|A|LIG|101|O1|O",
-        "11|A|HOH|201|O|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "segi A",
       "returnCode": 0,
-      "status": "PASS",
       "count": 0,
       "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
+      "tuples": [],
+      "status": "PASS"
     },
     {
       "query": "resn ALA",
       "returnCode": 4,
-      "status": "PASS",
       "count": 4,
       "membershipHash": "37f84737cae8462dad78696fd75f3ed69c7f0beab20500eef9a77eb82ad7dc8a",
       "tuples": [
@@ -396,12 +437,12 @@
         "2|A|ALA|1|CA|C",
         "3|A|ALA|1|C|C",
         "4|A|ALA|1|O|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "resi 1",
       "returnCode": 4,
-      "status": "PASS",
       "count": 4,
       "membershipHash": "37f84737cae8462dad78696fd75f3ed69c7f0beab20500eef9a77eb82ad7dc8a",
       "tuples": [
@@ -409,69 +450,57 @@
         "2|A|ALA|1|CA|C",
         "3|A|ALA|1|C|C",
         "4|A|ALA|1|O|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "alt A",
       "returnCode": 0,
-      "status": "PASS",
       "count": 0,
       "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
+      "tuples": [],
+      "status": "PASS"
     },
     {
       "query": "index 2",
       "returnCode": 1,
-      "status": "PASS",
       "count": 1,
       "membershipHash": "1875dd454bcf5ce23807cbcc1f76a54cfb824dd91c87b7f80869dfa4b22829dc",
       "tuples": [
         "2|A|ALA|1|CA|C"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "id 2",
       "returnCode": 1,
-      "status": "PASS",
       "count": 1,
       "membershipHash": "1875dd454bcf5ce23807cbcc1f76a54cfb824dd91c87b7f80869dfa4b22829dc",
       "tuples": [
         "2|A|ALA|1|CA|C"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "rank 0",
       "returnCode": 1,
-      "status": "PASS",
       "count": 1,
       "membershipHash": "eb7674fed3646839030b00957c80e0e663a875ba732ce82ef46d8f7aee1c7e7e",
       "tuples": [
         "1|A|ALA|1|N|N"
-      ]
-    },
-    {
-      "query": "label all, {name}",
-      "status": "ERROR",
-      "error": "CmdException('Invalid selection name \"{name}\".\\nlabel all, {name}<--')"
-    },
-    {
-      "query": "pepseq 10",
-      "returnCode": 0,
-      "status": "PASS",
-      "count": 0,
-      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
+      ],
+      "status": "PASS"
     },
     {
       "query": "name CA in chain A",
       "returnCode": 2,
-      "status": "PASS",
       "count": 2,
       "membershipHash": "f249bc605c5b2026858b16111b3affdc513a9e68a53d6687cb58e395bbd5d591",
       "tuples": [
         "2|A|ALA|1|CA|C",
         "6|A|GLY|2|CA|C"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "name like CA",
@@ -479,9 +508,19 @@
       "error": "CmdException('Invalid selection name \"CA\".\\nname like CA<--')"
     },
     {
+      "query": "(chain A and name CA) like (chain A and name CA)",
+      "returnCode": 2,
+      "count": 2,
+      "membershipHash": "f249bc605c5b2026858b16111b3affdc513a9e68a53d6687cb58e395bbd5d591",
+      "tuples": [
+        "2|A|ALA|1|CA|C",
+        "6|A|GLY|2|CA|C"
+      ],
+      "status": "PASS"
+    },
+    {
       "query": "byobject chain A",
       "returnCode": 12,
-      "status": "PASS",
       "count": 12,
       "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
       "tuples": [
@@ -497,12 +536,12 @@
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O",
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "bysegi chain A",
       "returnCode": 12,
-      "status": "PASS",
       "count": 12,
       "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
       "tuples": [
@@ -518,12 +557,12 @@
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O",
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "bychain organic",
       "returnCode": 11,
-      "status": "PASS",
       "count": 11,
       "membershipHash": "1dcb79441de393fa447723e626d083633130aadb7bf27f9ed87596b7881db096",
       "tuples": [
@@ -538,12 +577,12 @@
         "9|A|LIG|101|C1|C",
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "byres name CA",
       "returnCode": 8,
-      "status": "PASS",
       "count": 8,
       "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
       "tuples": [
@@ -555,381 +594,88 @@
         "6|A|GLY|2|CA|C",
         "7|A|GLY|2|C|C",
         "8|A|GLY|2|O|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "bycalpha name CA",
       "returnCode": 2,
-      "status": "PASS",
       "count": 2,
       "membershipHash": "f249bc605c5b2026858b16111b3affdc513a9e68a53d6687cb58e395bbd5d591",
       "tuples": [
         "2|A|ALA|1|CA|C",
         "6|A|GLY|2|CA|C"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "bymolecule organic",
       "returnCode": 2,
-      "status": "PASS",
       "count": 2,
       "membershipHash": "f1a7a9815562e93a9cc9321e9842cdda93caf16003517d83b5f7344643f588ab",
       "tuples": [
         "9|A|LIG|101|C1|C",
         "10|A|LIG|101|O1|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "byfragment organic",
       "returnCode": 0,
-      "status": "PASS",
       "count": 0,
       "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
+      "tuples": [],
+      "status": "PASS"
     },
     {
       "query": "byring organic",
       "returnCode": 0,
-      "status": "PASS",
       "count": 0,
       "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
+      "tuples": [],
+      "status": "PASS"
     },
     {
       "query": "bycell chain A",
       "returnCode": 0,
-      "status": "PASS",
       "count": 0,
       "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
+      "tuples": [],
+      "status": "PASS"
     },
     {
       "query": "neighbor organic",
       "returnCode": 0,
-      "status": "PASS",
       "count": 0,
       "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
+      "tuples": [],
+      "status": "PASS"
     },
     {
       "query": "bound_to organic",
       "returnCode": 2,
-      "status": "PASS",
       "count": 2,
       "membershipHash": "f1a7a9815562e93a9cc9321e9842cdda93caf16003517d83b5f7344643f588ab",
       "tuples": [
         "9|A|LIG|101|C1|C",
         "10|A|LIG|101|O1|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
-      "query": "extend 1 organic",
-      "status": "ERROR",
-      "error": "CmdException('Malformed selection.')"
-    },
-    {
-      "query": "within 4 of organic",
-      "status": "ERROR",
-      "error": "CmdException('Malformed selection.')"
-    },
-    {
-      "query": "around 4 organic",
-      "status": "ERROR",
-      "error": "CmdException('Malformed selection.')"
-    },
-    {
-      "query": "expand 4 organic",
-      "status": "ERROR",
-      "error": "CmdException('Malformed selection.')"
-    },
-    {
-      "query": "near_to organic",
-      "status": "ERROR",
-      "error": "CmdException('Malformed selection.')"
-    },
-    {
-      "query": "beyond 4 organic",
-      "status": "ERROR",
-      "error": "CmdException('Malformed selection.')"
-    },
-    {
-      "query": "gap 4 organic",
-      "status": "ERROR",
-      "error": "CmdException('Malformed selection.')"
-    },
-    {
-      "query": "formal_charge = 0",
-      "returnCode": 12,
-      "status": "PASS",
-      "count": 12,
-      "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
+      "query": "organic extend 1",
+      "returnCode": 2,
+      "count": 2,
+      "membershipHash": "f1a7a9815562e93a9cc9321e9842cdda93caf16003517d83b5f7344643f588ab",
       "tuples": [
-        "1|A|ALA|1|N|N",
-        "2|A|ALA|1|CA|C",
-        "3|A|ALA|1|C|C",
-        "4|A|ALA|1|O|O",
-        "5|A|GLY|2|N|N",
-        "6|A|GLY|2|CA|C",
-        "7|A|GLY|2|C|C",
-        "8|A|GLY|2|O|O",
         "9|A|LIG|101|C1|C",
-        "10|A|LIG|101|O1|O",
-        "11|A|HOH|201|O|O",
-        "12|B|NA|301|NA|NA"
-      ]
-    },
-    {
-      "query": "partial_charge > 0",
-      "returnCode": 0,
-      "status": "PASS",
-      "count": 0,
-      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
-    },
-    {
-      "query": "b > 20",
-      "returnCode": 0,
-      "status": "PASS",
-      "count": 0,
-      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
-    },
-    {
-      "query": "q >= 0.5",
-      "returnCode": 12,
-      "status": "PASS",
-      "count": 12,
-      "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
-      "tuples": [
-        "1|A|ALA|1|N|N",
-        "2|A|ALA|1|CA|C",
-        "3|A|ALA|1|C|C",
-        "4|A|ALA|1|O|O",
-        "5|A|GLY|2|N|N",
-        "6|A|GLY|2|CA|C",
-        "7|A|GLY|2|C|C",
-        "8|A|GLY|2|O|O",
-        "9|A|LIG|101|C1|C",
-        "10|A|LIG|101|O1|O",
-        "11|A|HOH|201|O|O",
-        "12|B|NA|301|NA|NA"
-      ]
-    },
-    {
-      "query": "ss HELIX",
-      "returnCode": 0,
-      "status": "PASS",
-      "count": 0,
-      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
-    },
-    {
-      "query": "elem C",
-      "returnCode": 5,
-      "status": "PASS",
-      "count": 5,
-      "membershipHash": "faeaeeb8183d745ca498cb14cad23f658f8739810d49466ae93a88263e3db027",
-      "tuples": [
-        "2|A|ALA|1|CA|C",
-        "3|A|ALA|1|C|C",
-        "6|A|GLY|2|CA|C",
-        "7|A|GLY|2|C|C",
-        "9|A|LIG|101|C1|C"
-      ]
-    },
-    {
-      "query": "x < 2",
-      "returnCode": 4,
-      "status": "PASS",
-      "count": 4,
-      "membershipHash": "cd62a6d47e5c76b2c229f573f93f8db90e55b6e842f38bb982b22988c2b6a17b",
-      "tuples": [
-        "1|A|ALA|1|N|N",
-        "2|A|ALA|1|CA|C",
-        "4|A|ALA|1|O|O",
-        "11|A|HOH|201|O|O"
-      ]
-    },
-    {
-      "query": "x <= 2",
-      "returnCode": 5,
-      "status": "PASS",
-      "count": 5,
-      "membershipHash": "adb916c92311da2a7899b3a1a8871be270477b0c449c2383e03a5e8bd7aa8ec3",
-      "tuples": [
-        "1|A|ALA|1|N|N",
-        "2|A|ALA|1|CA|C",
-        "3|A|ALA|1|C|C",
-        "4|A|ALA|1|O|O",
-        "11|A|HOH|201|O|O"
-      ]
-    },
-    {
-      "query": "y >= 0",
-      "returnCode": 10,
-      "status": "PASS",
-      "count": 10,
-      "membershipHash": "6da58662cb63463b15ef21c2fd47409fda4954a41b1cca5ce016cc52d22c4270",
-      "tuples": [
-        "1|A|ALA|1|N|N",
-        "2|A|ALA|1|CA|C",
-        "3|A|ALA|1|C|C",
-        "4|A|ALA|1|O|O",
-        "5|A|GLY|2|N|N",
-        "6|A|GLY|2|CA|C",
-        "7|A|GLY|2|C|C",
-        "8|A|GLY|2|O|O",
-        "11|A|HOH|201|O|O",
-        "12|B|NA|301|NA|NA"
-      ]
-    },
-    {
-      "query": "z <= 100",
-      "returnCode": 12,
-      "status": "PASS",
-      "count": 12,
-      "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
-      "tuples": [
-        "1|A|ALA|1|N|N",
-        "2|A|ALA|1|CA|C",
-        "3|A|ALA|1|C|C",
-        "4|A|ALA|1|O|O",
-        "5|A|GLY|2|N|N",
-        "6|A|GLY|2|CA|C",
-        "7|A|GLY|2|C|C",
-        "8|A|GLY|2|O|O",
-        "9|A|LIG|101|C1|C",
-        "10|A|LIG|101|O1|O",
-        "11|A|HOH|201|O|O",
-        "12|B|NA|301|NA|NA"
-      ]
-    },
-    {
-      "query": "state 2",
-      "returnCode": 0,
-      "status": "PASS",
-      "count": 0,
-      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
-    },
-    {
-      "query": "foo = bar",
-      "status": "ERROR",
-      "error": "CmdException('Invalid selection name \"foo\".\\nfoo = bar<--')"
-    },
-    {
-      "query": "rep cartoon",
-      "returnCode": 8,
-      "status": "PASS",
-      "count": 8,
-      "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
-      "tuples": [
-        "1|A|ALA|1|N|N",
-        "2|A|ALA|1|CA|C",
-        "3|A|ALA|1|C|C",
-        "4|A|ALA|1|O|O",
-        "5|A|GLY|2|N|N",
-        "6|A|GLY|2|CA|C",
-        "7|A|GLY|2|C|C",
-        "8|A|GLY|2|O|O"
-      ]
-    },
-    {
-      "query": "color red",
-      "returnCode": 0,
-      "status": "PASS",
-      "count": 0,
-      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
-    },
-    {
-      "query": "show sticks, all",
-      "status": "ERROR",
-      "error": "CmdException('Invalid selection name \"show\".\\nshow sticks, all<--')"
-    },
-    {
-      "query": "hide sticks, all",
-      "status": "ERROR",
-      "error": "CmdException('Invalid selection name \"hide\".\\nhide sticks, all<--')"
-    },
-    {
-      "query": "center all",
-      "returnCode": 12,
-      "status": "PASS",
-      "count": 12,
-      "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
-      "tuples": [
-        "1|A|ALA|1|N|N",
-        "2|A|ALA|1|CA|C",
-        "3|A|ALA|1|C|C",
-        "4|A|ALA|1|O|O",
-        "5|A|GLY|2|N|N",
-        "6|A|GLY|2|CA|C",
-        "7|A|GLY|2|C|C",
-        "8|A|GLY|2|O|O",
-        "9|A|LIG|101|C1|C",
-        "10|A|LIG|101|O1|O",
-        "11|A|HOH|201|O|O",
-        "12|B|NA|301|NA|NA"
-      ]
-    },
-    {
-      "query": "zoom all",
-      "status": "ERROR",
-      "error": "CmdException('Invalid selection name \"zoom\".\\nzoom all<--')"
-    },
-    {
-      "query": "measure distance",
-      "status": "ERROR",
-      "error": "CmdException('Invalid selection name \"measure\".\\nmeasure distance<--')"
-    },
-    {
-      "query": "measure clear",
-      "status": "ERROR",
-      "error": "CmdException('Invalid selection name \"measure\".\\nmeasure clear<--')"
-    },
-    {
-      "query": "get_view",
-      "status": "ERROR",
-      "error": "CmdException('Invalid selection name \"get_view\".\\nget_view<--')"
-    },
-    {
-      "query": "cartoon_color red",
-      "returnCode": 0,
-      "status": "PASS",
-      "count": 0,
-      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
-    },
-    {
-      "query": "ribbon_color red",
-      "returnCode": 0,
-      "status": "PASS",
-      "count": 0,
-      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
-    },
-    {
-      "query": "polymer",
-      "returnCode": 8,
-      "status": "PASS",
-      "count": 8,
-      "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
-      "tuples": [
-        "1|A|ALA|1|N|N",
-        "2|A|ALA|1|CA|C",
-        "3|A|ALA|1|C|C",
-        "4|A|ALA|1|O|O",
-        "5|A|GLY|2|N|N",
-        "6|A|GLY|2|CA|C",
-        "7|A|GLY|2|C|C",
-        "8|A|GLY|2|O|O"
-      ]
+        "10|A|LIG|101|O1|O"
+      ],
+      "status": "PASS"
     },
     {
       "query": "polymer.protein",
       "returnCode": 8,
-      "status": "PASS",
       "count": 8,
       "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
       "tuples": [
@@ -941,15 +687,16 @@
         "6|A|GLY|2|CA|C",
         "7|A|GLY|2|C|C",
         "8|A|GLY|2|O|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "polymer.nucleic",
       "returnCode": 0,
-      "status": "PASS",
       "count": 0,
       "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
+      "tuples": [],
+      "status": "PASS"
     },
     {
       "query": "protein",
@@ -957,9 +704,60 @@
       "error": "CmdException('Invalid selection name \"protein\".\\nprotein<--')"
     },
     {
+      "query": "solvent",
+      "returnCode": 1,
+      "count": 1,
+      "membershipHash": "e8d745048e2ab948d7f24ddbb4c405c80e731da553909c5dee9199cb0098601a",
+      "tuples": [
+        "11|A|HOH|201|O|O"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "inorganic",
+      "returnCode": 1,
+      "count": 1,
+      "membershipHash": "fd35d6fe72936e087801f9ec4812f8a4316605b1e82396341d78c0b6a27384e9",
+      "tuples": [
+        "12|B|NA|301|NA|NA"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "organic",
+      "returnCode": 2,
+      "count": 2,
+      "membershipHash": "f1a7a9815562e93a9cc9321e9842cdda93caf16003517d83b5f7344643f588ab",
+      "tuples": [
+        "9|A|LIG|101|C1|C",
+        "10|A|LIG|101|O1|O"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "hetatm",
+      "returnCode": 4,
+      "count": 4,
+      "membershipHash": "dd5e06b4c99dfe1c7671e215dfd1e6cd69b462b517753447c427f6c929fb42fb",
+      "tuples": [
+        "9|A|LIG|101|C1|C",
+        "10|A|LIG|101|O1|O",
+        "11|A|HOH|201|O|O",
+        "12|B|NA|301|NA|NA"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "hydro",
+      "returnCode": 0,
+      "count": 0,
+      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tuples": [],
+      "status": "PASS"
+    },
+    {
       "query": "backbone",
       "returnCode": 8,
-      "status": "PASS",
       "count": 8,
       "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
       "tuples": [
@@ -971,41 +769,41 @@
         "6|A|GLY|2|CA|C",
         "7|A|GLY|2|C|C",
         "8|A|GLY|2|O|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "sidechain",
       "returnCode": 0,
-      "status": "PASS",
       "count": 0,
       "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
+      "tuples": [],
+      "status": "PASS"
     },
     {
       "query": "guide",
       "returnCode": 2,
-      "status": "PASS",
       "count": 2,
       "membershipHash": "f249bc605c5b2026858b16111b3affdc513a9e68a53d6687cb58e395bbd5d591",
       "tuples": [
         "2|A|ALA|1|CA|C",
         "6|A|GLY|2|CA|C"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "metals",
       "returnCode": 1,
-      "status": "PASS",
       "count": 1,
       "membershipHash": "fd35d6fe72936e087801f9ec4812f8a4316605b1e82396341d78c0b6a27384e9",
       "tuples": [
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "bonded",
       "returnCode": 10,
-      "status": "PASS",
       "count": 10,
       "membershipHash": "40f3c8e5a0f4844f50eb01a03aba971a436b308a5bfbdc03b54389e72a10ce03",
       "tuples": [
@@ -1019,12 +817,12 @@
         "8|A|GLY|2|O|O",
         "9|A|LIG|101|C1|C",
         "10|A|LIG|101|O1|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "donors",
       "returnCode": 7,
-      "status": "PASS",
       "count": 7,
       "membershipHash": "db67538a8a28ee1d24e655518825d074507d50bfda51095e67628f273790588e",
       "tuples": [
@@ -1035,12 +833,12 @@
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O",
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
       "query": "acceptors",
       "returnCode": 4,
-      "status": "PASS",
       "count": 4,
       "membershipHash": "dcadb915a4668c1f97866ea933cb83ce6fe800eedd6d49c0d8cef3b4d943753a",
       "tuples": [
@@ -1048,48 +846,291 @@
         "8|A|GLY|2|O|O",
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O"
-      ]
+      ],
+      "status": "PASS"
     },
     {
-      "query": "hydro",
+      "query": "all within 4 of organic",
+      "returnCode": 6,
+      "count": 6,
+      "membershipHash": "09afc26b25d9ee1b66db33cd0f42878b51651e480a73f02334ea8b2a6554c778",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "5|A|GLY|2|N|N",
+        "9|A|LIG|101|C1|C",
+        "10|A|LIG|101|O1|O"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "all and (organic around 4)",
+      "returnCode": 4,
+      "count": 4,
+      "membershipHash": "3b6fe510caacbdbd06dd04531291201b2a1f69fe48bef46b806df59f496d1f99",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "5|A|GLY|2|N|N"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "organic expand 4",
+      "returnCode": 6,
+      "count": 6,
+      "membershipHash": "09afc26b25d9ee1b66db33cd0f42878b51651e480a73f02334ea8b2a6554c778",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "5|A|GLY|2|N|N",
+        "9|A|LIG|101|C1|C",
+        "10|A|LIG|101|O1|O"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "all near_to 4 of organic",
+      "returnCode": 4,
+      "count": 4,
+      "membershipHash": "3b6fe510caacbdbd06dd04531291201b2a1f69fe48bef46b806df59f496d1f99",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "5|A|GLY|2|N|N"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "all beyond 4 of organic",
+      "returnCode": 6,
+      "count": 6,
+      "membershipHash": "9ff1c4cc6da97079493e4060fceac7dc79eb5615582f738cdd13c108adaf1900",
+      "tuples": [
+        "4|A|ALA|1|O|O",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O",
+        "11|A|HOH|201|O|O",
+        "12|B|NA|301|NA|NA"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "all and (organic gap 4)",
       "returnCode": 0,
-      "status": "PASS",
       "count": 0,
       "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "tuples": []
+      "tuples": [],
+      "status": "PASS"
     },
     {
-      "query": "hetatm",
-      "returnCode": 4,
-      "status": "PASS",
-      "count": 4,
-      "membershipHash": "dd5e06b4c99dfe1c7671e215dfd1e6cd69b462b517753447c427f6c929fb42fb",
+      "query": "formal_charge = 0",
+      "returnCode": 12,
+      "count": 12,
+      "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
       "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "5|A|GLY|2|N|N",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O",
         "9|A|LIG|101|C1|C",
         "10|A|LIG|101|O1|O",
         "11|A|HOH|201|O|O",
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
-      "query": "inorganic",
-      "returnCode": 1,
-      "status": "PASS",
-      "count": 1,
-      "membershipHash": "fd35d6fe72936e087801f9ec4812f8a4316605b1e82396341d78c0b6a27384e9",
+      "query": "partial_charge > 0",
+      "returnCode": 0,
+      "count": 0,
+      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tuples": [],
+      "status": "PASS"
+    },
+    {
+      "query": "b > 20",
+      "returnCode": 0,
+      "count": 0,
+      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tuples": [],
+      "status": "PASS"
+    },
+    {
+      "query": "q >= 0.5",
+      "returnCode": 12,
+      "count": 12,
+      "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
       "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "5|A|GLY|2|N|N",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O",
+        "9|A|LIG|101|C1|C",
+        "10|A|LIG|101|O1|O",
+        "11|A|HOH|201|O|O",
         "12|B|NA|301|NA|NA"
-      ]
+      ],
+      "status": "PASS"
     },
     {
-      "query": "solvent",
-      "returnCode": 1,
-      "status": "PASS",
-      "count": 1,
-      "membershipHash": "e8d745048e2ab948d7f24ddbb4c405c80e731da553909c5dee9199cb0098601a",
+      "query": "q != 0.5",
+      "status": "ERROR",
+      "error": "CmdException('q ! = 0.5<--')"
+    },
+    {
+      "query": "ss HELIX",
+      "returnCode": 0,
+      "count": 0,
+      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tuples": [],
+      "status": "PASS"
+    },
+    {
+      "query": "x < 2",
+      "returnCode": 4,
+      "count": 4,
+      "membershipHash": "cd62a6d47e5c76b2c229f573f93f8db90e55b6e842f38bb982b22988c2b6a17b",
       "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "4|A|ALA|1|O|O",
         "11|A|HOH|201|O|O"
-      ]
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "x <= 2",
+      "returnCode": 5,
+      "count": 5,
+      "membershipHash": "adb916c92311da2a7899b3a1a8871be270477b0c449c2383e03a5e8bd7aa8ec3",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "11|A|HOH|201|O|O"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "y >= 0",
+      "returnCode": 10,
+      "count": 10,
+      "membershipHash": "6da58662cb63463b15ef21c2fd47409fda4954a41b1cca5ce016cc52d22c4270",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "5|A|GLY|2|N|N",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O",
+        "11|A|HOH|201|O|O",
+        "12|B|NA|301|NA|NA"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "z <= 100",
+      "returnCode": 12,
+      "count": 12,
+      "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "5|A|GLY|2|N|N",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O",
+        "9|A|LIG|101|C1|C",
+        "10|A|LIG|101|O1|O",
+        "11|A|HOH|201|O|O",
+        "12|B|NA|301|NA|NA"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "state 2",
+      "returnCode": 0,
+      "count": 0,
+      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tuples": [],
+      "status": "PASS"
+    },
+    {
+      "query": "foo = bar",
+      "status": "ERROR",
+      "error": "CmdException('Invalid selection name \"foo\".\\nfoo = bar<--')"
+    },
+    {
+      "query": "label \"CA\"",
+      "returnCode": 2,
+      "count": 2,
+      "membershipHash": "f249bc605c5b2026858b16111b3affdc513a9e68a53d6687cb58e395bbd5d591",
+      "tuples": [
+        "2|A|ALA|1|CA|C",
+        "6|A|GLY|2|CA|C"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "pepseq AG",
+      "returnCode": 8,
+      "count": 8,
+      "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "5|A|GLY|2|N|N",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "rep cartoon",
+      "returnCode": 8,
+      "count": 8,
+      "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "5|A|GLY|2|N|N",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "color red",
+      "returnCode": 0,
+      "count": 0,
+      "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tuples": [],
+      "status": "PASS"
     }
   ]
 }
