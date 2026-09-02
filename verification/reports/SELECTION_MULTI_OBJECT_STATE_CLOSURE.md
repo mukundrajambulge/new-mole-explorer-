@@ -14,10 +14,10 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `b87a0388b57859ecf4d038997352a9d0178abe5a`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
-- Current implementation commit: `5e26618` (`test(selection): document alias and inequality conformance`)
-- Ending implementation SHA: `5e26618`
-- Latest implementation/evidence base SHA before this report update: `5e26618`
-- Working tree: modified only by this report update; no unrelated files were changed
+- Current implementation commit: `d32aa87` (`fix(selection): gate fragment expansion on canonical assignments`)
+- Ending implementation SHA: `d32aa87`
+- Latest implementation/evidence base SHA before this report update: `d32aa87`
+- Working tree: clean after the implementation/evidence commit; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
 - API health: `http://localhost:8100/api/health`
