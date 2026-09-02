@@ -155,7 +155,7 @@ export const MolecularCanvas = ({
   useEffect(() => {
     if (!adapterRef.current) return;
     try {
-      if (workspaceObjects.length > 1 || workspaceObjects.some((object) => object.stateOrder.length > 1 || object.allStates)) adapterRef.current.setWorkspaceObjects(workspaceObjects, projection);
+      if (workspaceObjects.length > 1 || workspaceObjects.some((object) => object.stateOrder.length > 1 || object.allStates || !object.enabled) || adapterRef.current.isWorkspaceMode()) adapterRef.current.setWorkspaceObjects(workspaceObjects, projection);
       else adapterRef.current.setProjection(projection);
     } catch (projectionError) {
       setViewerError(projectionError instanceof Error ? projectionError.message : "The display projection could not be applied.");

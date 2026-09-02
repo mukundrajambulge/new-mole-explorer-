@@ -401,6 +401,23 @@ export const App = () => {
     return { object: candidates.length === 1 ? candidates[0] : undefined, ambiguous: candidates.length > 1 };
   };
 
+  const updateWorkspaceProjections = (targetStableIds: readonly string[], update: (projection: RenderProjection, objectStableIds: readonly string[]) => RenderProjection) => {
+    const multipleObjects = workspaceObjectsRef.current.length > 1;
+    const next = workspaceObjectsRef.current.map((object) => {
+      const prefix = `${object.objectId}::`;
+      const objectStableIds = multipleObjects
+        ? targetStableIds.filter((stableId) => stableId.startsWith(prefix)).map((stableId) => stableId.slice(prefix.length))
+        : [...targetStableIds];
+      if (!objectStableIds.length) return object;
+      const baseProjection = object.objectId === activeObjectId ? projection : object.projection;
+      return { ...object, projection: update(baseProjection, objectStableIds) };
+    });
+    workspaceObjectsRef.current = next;
+    setWorkspaceObjects(next);
+    const active = next.find((object) => object.objectId === activeObjectId);
+    if (active) setProjection(active.projection);
+  };
+
   const ambiguousObjectStatus = (name: string) => `Object reference ${name} is ambiguous; use a durable ObjectID (object:<structure-id>[:suffix]) and no object state changed.`;
 
   const appendWorkspaceObject = (object: WorkspaceObject) => {
@@ -581,11 +598,13 @@ export const App = () => {
     try {
       const representationCommand = parseRepresentationCommand(trimmed);
       if (representationCommand) {
-        if (!structure) return { category: "PRESENTATION", status: "No structure loaded; presentation was not changed." };
-        const target = resolveSelection(representationCommand.query, structure.structure, { named: namedSelectionsRef.current ?? undefined });
-        const capability = representationCapabilityFor(representationStyleForCommand(representationCommand.representation) ?? "cartoon", structure.structure);
+        const context = commandSelectionContext();
+        if (!context.structure) return { category: "PRESENTATION", status: "No structure loaded; presentation was not changed." };
+        const target = resolveSelection(representationCommand.query, context.structure, { named: context.named, coordinateStateId: context.coordinateStateId, stateOrdinal: context.stateOrdinal });
+        const style = representationStyleForCommand(representationCommand.representation) ?? undefined;
+        const capability = representationCapabilityFor(style ?? "cartoon", context.structure);
         if (!capability.maySelect) return { category: "PRESENTATION", status: `${capability.label} unavailable: ${capability.diagnostic ?? capability.unsupportedReason ?? "canonical capability is not implemented"}` };
-        setProjection((current) => applyRepresentationToSelection(current, representationCommand.operation, representationCommand.mask, target.stableAtomIds, representationStyleForCommand(representationCommand.representation) ?? undefined));
+        updateWorkspaceProjections(target.stableAtomIds, (current, objectStableIds) => applyRepresentationToSelection(current, representationCommand.operation, representationCommand.mask, objectStableIds, style));
         const capabilityNote = capability.status === "VALID_EMPTY" ? ` · ${capability.diagnostic ?? "valid empty result"}` : "";
         return { category: "PRESENTATION", status: `${representationCommand.operation} ${representationCommand.representation} on ${target.stableAtomIds.length} atoms${capabilityNote}.` };
       }
@@ -593,14 +612,19 @@ export const App = () => {
       if (colorMatch) {
         if (!structure) return { category: "PRESENTATION", status: "No structure loaded; color was not changed." };
         if (/^(inherit|default|reset)$/i.test(colorMatch[1].trim())) {
-          const target = resolveSelection(colorMatch[2]?.trim() || "all", structure.structure, { named: namedSelectionsRef.current ?? undefined });
-          setProjection((current) => clearColorForSelection(current, target.stableAtomIds));
+          const context = commandSelectionContext();
+          if (!context.structure) return { category: "PRESENTATION", status: "No structure loaded; color was not changed." };
+          const target = resolveSelection(colorMatch[2]?.trim() || "all", context.structure, { named: context.named, coordinateStateId: context.coordinateStateId, stateOrdinal: context.stateOrdinal });
+          updateWorkspaceProjections(target.stableAtomIds, (current, objectStableIds) => clearColorForSelection(current, objectStableIds));
           return { category: "PRESENTATION", status: `Cleared explicit colors for ${target.stableAtomIds.length} atoms; inherited scheme restored.` };
         }
         const color = colorRegistry.resolveInputWithDiagnostic(colorMatch[1].trim());
         if (!color.definition) return { category: "PRESENTATION", status: "COLOR_NOT_FOUND" };
-        const target = resolveSelection(colorMatch[2]?.trim() || "all", structure.structure, { named: namedSelectionsRef.current ?? undefined });
-        setProjection((current) => setColorForSelection(current, target.stableAtomIds, `#${color.definition!.rgbSrgb.map((value) => Math.round(value * 255).toString(16).padStart(2, "0")).join("")}`));
+        const context = commandSelectionContext();
+        if (!context.structure) return { category: "PRESENTATION", status: "No structure loaded; color was not changed." };
+        const target = resolveSelection(colorMatch[2]?.trim() || "all", context.structure, { named: context.named, coordinateStateId: context.coordinateStateId, stateOrdinal: context.stateOrdinal });
+        const colorHex = `#${color.definition.rgbSrgb.map((value) => Math.round(value * 255).toString(16).padStart(2, "0")).join("")}`;
+        updateWorkspaceProjections(target.stableAtomIds, (current, objectStableIds) => setColorForSelection(current, objectStableIds, colorHex));
         return { category: "PRESENTATION", status: `Applied ${color.definition.canonicalName} to ${target.stableAtomIds.length} atoms.` };
       }
       const labelMatch = trimmed.match(/^label\s+([^,]+?)\s*,\s*(.+)$/i);

@@ -40,6 +40,7 @@ The current application was exercised with a real 4DJW RCSB load:
 - Coordinate states use explicit `CoordinateStateID` and `StateOrder`. One-state structures receive a compatibility singleton state; renderer model order is never treated as scientific state identity.
 - `all_states` is bounded to explicit auxiliary state models. State changes reconcile model coordinates in place when layout is unchanged.
 - Object `copy` preserves canonical source, state order, current state, enablement, and projection while receiving a new durable ObjectID. `create`, `split_states`, and `join_states` remain explicitly gated where lineage semantics are not defined.
+- Workspace presentation commands are applied per canonical object scope. The viewer adapter projects each object’s representation directives onto its own model, and single-object disable/enable transitions stay in the same workspace projection path.
 - Failed loads are non-destructive: the current workspace and viewer remain intact.
 
 ## Operator matrix
@@ -103,6 +104,7 @@ Verification:
 - Durable object registry and duplicate-name ambiguity handling: **PASS**
 - Simultaneous objects in one mounted viewer: **PASS**
 - Independent object enable/disable and projection/style/color state: **PASS**
+- Object-qualified console representation/color targeting and single-object disable/enable synchronization: **PASS**
 - Cross-object selection and object-qualified queries: **PASS**
 - Reverse picking identity map with object and coordinate-state context: **PASS**
 - Object/state-scoped surfaces and unrelated-state cache isolation: **PASS**
@@ -134,11 +136,11 @@ Verification:
 - `npm run test --workspace @molecular/web` — **PASS: 16 files / 66 tests**
 - `npm run test --workspace @molecular/api` — **PASS: 2 files / 11 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
-- `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 4 / 4**
+- `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 6 / 6**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/real-structure-workspace.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/closure-evidence.spec.ts` — **PASS: 1 / 1**
-- `npm run test:e2e` — **PASS: 64 / 64**
+- `npm run test:e2e` — **PASS: 66 / 66**
 - `npm run build` — **PASS**
 - `git diff --check` — **PASS**
 

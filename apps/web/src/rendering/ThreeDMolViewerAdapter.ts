@@ -153,6 +153,9 @@ export class ThreeDMolViewerAdapter {
     if (this.viewer && this.hasModel) this.bindPicking();
   }
 
+  /** True after a workspace model layout has been installed, including a single disabled object. */
+  isWorkspaceMode(): boolean { return this.workspaceObjects.length > 0; }
+
   setAnalysisOverlays(overlays: readonly AnalysisOverlay[]): void {
     // Keep the canonical analysis result complete; only renderer line count is bounded.
     this.analysisOverlays = boundedAnalysisOverlays(overlays);
@@ -248,6 +251,7 @@ export class ThreeDMolViewerAdapter {
     this.clearStandaloneSurfaceHandles();
     this.applyWorkspaceSurfaces(objects);
     this.bindWorkspacePicking();
+    this.writeWorkspaceProjectionState();
     this.container?.setAttribute("data-renderer-model-count", String(auxiliaryObjects.length + 1));
     this.render();
   }
@@ -277,6 +281,7 @@ export class ThreeDMolViewerAdapter {
     this.renderAuxiliaryModels();
     this.applyWorkspaceSurfaces(objects);
     this.bindWorkspacePicking();
+    this.writeWorkspaceProjectionState();
     this.container?.setAttribute("data-renderer-model-count", String(this.auxiliaryModels.length + 1));
     if (this.projection) this.projectInteractionHighlights(this.projection);
     this.render();
@@ -353,6 +358,19 @@ export class ThreeDMolViewerAdapter {
   getDiagnostics(): RenderProjectionDiagnostics { return this.diagnostics; }
 
   private ensureMounted(): void { if (!this.viewer) throw new Error("3Dmol viewer adapter is not mounted."); }
+  private writeWorkspaceProjectionState(): void {
+    if (!this.container) return;
+    const state = Object.fromEntries(this.workspaceObjects.map((object) => [object.objectId, {
+      enabled: object.enabled,
+      currentStateId: object.currentStateId,
+      allStates: object.allStates,
+      representation: object.projection.representation,
+      presentationRevision: object.projection.representationState.presentationRevision,
+      directiveCount: object.projection.representationState.directives.length,
+      explicitColorCount: Object.keys(object.projection.color.atomColors).length,
+    }]));
+    this.container.dataset.rendererObjectProjection = JSON.stringify(state);
+  }
   private atomSpecsFor(structure: CanonicalMolecularStructure, objectId?: string): AtomSpec[] {
     const indexByStableId = new Map(structure.atoms.map((atom, index) => [atom.stableId, index]));
     const adjacency = new Map<string, Array<{ index: number; order: number }>>();
@@ -395,11 +413,23 @@ export class ThreeDMolViewerAdapter {
   }
 
   private renderWorkspaceModel(model: ReturnType<GLViewer["addModel"]>, object: WorkspaceObject): void {
-    const structure = object.loadResult.structure;
+    const structure = structureForWorkspaceObjectState(object);
     if (!object.enabled) { model.setStyle({}, { cartoon: { hidden: true }, stick: { hidden: true }, sphere: { hidden: true }, line: { hidden: true } }); return; }
-    const style = object.projection.representation === "cartoon" || object.projection.representation === "ribbon" ? styleFor("cartoon", object.projection, structure, object.projection.representation === "ribbon" ? "ribbon" : "cartoon") : object.projection.representation === "spheres" || object.projection.representation === "space-filling" ? styleFor("spheres", object.projection, structure, "space") : styleFor(object.projection.representation === "lines" || object.projection.representation === "line" ? "lines" : "sticks", object.projection, structure);
-    model.setStyle({}, style);
-    if (object.projection.representation === "cartoon" || object.projection.representation === "ribbon") model.setStyle({ hetflag: true }, styleFor("sticks", object.projection, structure), true);
+    const diagnostics = buildRenderProjectionDiagnostics(structure, object.projection);
+    model.setStyle({}, {});
+    const targetFor = (stableIds: readonly string[]): AtomSelectionSpec => {
+      const ids = new Set(stableIds);
+      return { predicate: (atom) => typeof atom.properties?.canonicalStableId === "string" && ids.has(atom.properties.canonicalStableId) };
+    };
+    for (const directive of diagnostics.directives) {
+      const target = targetFor(directive.targetStableAtomIds);
+      if (directive.primitive === "line") model.setStyle(target, styleFor("lines", object.projection, structure), true);
+      if (directive.primitive === "stick") model.setStyle(target, styleFor(object.projection.representation === "licorice" ? "licorice" : "sticks", object.projection, structure), true);
+      if (directive.primitive === "sphere") model.setStyle(target, styleFor("spheres", object.projection, structure, object.projection.representation === "ball-and-stick" ? "ball" : object.projection.representation === "space-filling" || object.projection.representation === "spheres" ? "space" : directive.representation === "NB_SPHERES" ? "nonbonded" : "default"), true);
+      if (directive.primitive === "cross") model.setStyle(target, styleFor("cross", object.projection, structure), true);
+      if (directive.primitive === "cartoon") model.setStyle(target, styleFor("cartoon", object.projection, structure, (directive.styleProfile as StyleProfile | undefined) ?? "cartoon"), true);
+    }
+    if (diagnostics.waterSphereContributors > 0) model.setStyle(targetFor(structure.atoms.filter((atom) => atom.isWater).map((atom) => atom.stableId)), styleFor("spheres", object.projection, structure, "water"), true);
   }
   private renderPrimaryWorkspaceModel(): void {
     const object = this.workspaceObjects[0];
