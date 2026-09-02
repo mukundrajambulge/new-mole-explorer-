@@ -114,6 +114,9 @@ export type CanonicalAtom = {
   /** Authoritative alternate-location identifier when supplied by the source. */
   altLoc?: string | null;
   secondaryStructure?: SecondaryStructureKind | null;
+  /** Workspace-only scope metadata used by derived multi-object selection views. */
+  workspaceObjectId?: string;
+  workspaceObjectName?: string;
 };
 
 export type StructureCounts = {
@@ -130,6 +133,17 @@ export type StructureCounts = {
 export type CoordinateBounds = {
   min: { x: number; y: number; z: number };
   max: { x: number; y: number; z: number };
+};
+
+export type Coordinate3D = { x: number; y: number; z: number };
+
+/** A coordinate realization of one molecular object. Identity/topology live on the object. */
+export type CanonicalCoordinateState = {
+  id: string;
+  ordinal: number;
+  sourceModelNumber?: number;
+  coordinates: Record<string, Coordinate3D>;
+  coordinateHash: string;
 };
 
 export type StructureSourceMetadata = {
@@ -154,6 +168,10 @@ export type CanonicalMolecularStructure = {
   bonds: CanonicalBond[];
   hierarchy: CanonicalHierarchy;
   scientificHash: string;
+  /** Optional multi-model foundation; omitted by older persisted G1C records. */
+  coordinateStates?: CanonicalCoordinateState[];
+  /** Explicit presentation order; never infer scientific identity from array insertion order. */
+  stateOrder?: string[];
   partialChargeDataset?: PartialChargeDataset;
   secondaryStructureDataset?: SecondaryStructureDataset;
 };

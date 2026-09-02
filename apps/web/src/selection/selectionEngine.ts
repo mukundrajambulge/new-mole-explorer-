@@ -21,16 +21,17 @@ export type SelectionDiagnostic = { code: SelectionStatus | "EXPECTED_TOKEN"; me
 export type SelectionTokenKind = "WORD" | "STRING" | "LPAREN" | "RPAREN" | "COMMA" | "OPERATOR" | "EOF";
 export type SelectionToken = { kind: SelectionTokenKind; lexeme: string; span: SourceSpan };
 
-export type SelectionProperty = "name" | "resn" | "resi" | "chain" | "segi" | "elem" | "id" | "index" | "rank" | "model" | "object" | "alt";
+export type SelectionProperty = "name" | "resn" | "resi" | "chain" | "segi" | "elem" | "id" | "index" | "rank" | "model" | "object" | "alt" | "formal_charge" | "partial_charge" | "b" | "q" | "occupancy" | "ss" | "x" | "y" | "z" | "state" | "label" | "pepseq";
+export type SelectionCategory = "polymer" | "ligand" | "water" | "ion" | "other" | "hydrogen" | "hetatm" | "inorganic" | "solvent" | "protein" | "backbone" | "sidechain" | "guide" | "metals" | "bonded" | "enabled" | "present" | "visible";
 export type SelectionAst =
   | { kind: "all" }
   | { kind: "none" }
-  | { kind: "predicate"; property: SelectionProperty; operator: "EQ" | "NE"; value: string; span?: SourceSpan }
-  | { kind: "category"; category: "polymer" | "ligand" | "water" | "ion" | "other"; span?: SourceSpan }
+  | { kind: "predicate"; property: SelectionProperty; operator: "EQ" | "NE" | "LT" | "LTE" | "GT" | "GTE"; value: string; span?: SourceSpan }
+  | { kind: "category"; category: SelectionCategory; span?: SourceSpan }
   | { kind: "named"; name: string; required: boolean; span?: SourceSpan }
   | { kind: "not"; operand: SelectionAst }
   | { kind: "and" | "or"; left: SelectionAst; right: SelectionAst }
-  | { kind: "byres" | "bychain"; operand: SelectionAst }
+  | { kind: "byobject" | "bysegi" | "bychain" | "byres" | "bycalpha" | "bymolecule" | "first" | "last"; operand: SelectionAst }
   | { kind: "neighbor" | "bound_to"; operand: SelectionAst }
   | { kind: "within" | "around"; distance: number; reference: SelectionAst; candidate?: SelectionAst };
 
@@ -118,7 +119,7 @@ export const lexSelection = (query: string): { tokens: readonly SelectionToken[]
     if (char === ")") { cursor += 1; tokens.push({ kind: "RPAREN", lexeme: char, span: spanAt(query, start, cursor) }); continue; }
     if (char === ",") { cursor += 1; tokens.push({ kind: "COMMA", lexeme: char, span: spanAt(query, start, cursor) }); continue; }
     if (char === "!" && query[cursor + 1] === "=") { cursor += 2; tokens.push({ kind: "OPERATOR", lexeme: "!=", span: spanAt(query, start, cursor) }); continue; }
-    if (char === "=" || char === "!" || char === "&" || char === "|") { cursor += 1; tokens.push({ kind: "OPERATOR", lexeme: char, span: spanAt(query, start, cursor) }); continue; }
+    if (char === "=" || char === "!" || char === "&" || char === "|" || char === "<" || char === ">") { cursor += 1; if ((char === "<" || char === ">") && query[cursor] === "=") cursor += 1; tokens.push({ kind: "OPERATOR", lexeme: query.slice(start, cursor), span: spanAt(query, start, cursor) }); continue; }
     if (char === "\"" || char === "'") {
       const quote = char; cursor += 1; let value = ""; let closed = false;
       while (cursor < query.length) { const next = query[cursor++]; if (next === "\\" && cursor < query.length) { value += query[cursor++]; continue; } if (next === quote) { closed = true; break; } value += next; }
@@ -134,8 +135,10 @@ export const lexSelection = (query: string): { tokens: readonly SelectionToken[]
 };
 
 const isWord = (token: SelectionToken | undefined, value?: string): boolean => token?.kind === "WORD" && (value === undefined || token.lexeme.toLowerCase() === value);
-const propertyNames = new Set<SelectionProperty>(["name", "resn", "resi", "chain", "segi", "elem", "id", "index", "rank", "model", "object", "alt"]);
-const categoryNames = new Map([["polymer", "polymer"], ["protein", "polymer"], ["ligand", "ligand"], ["organic", "ligand"], ["water", "water"], ["ion", "ion"], ["ions", "ion"], ["other", "other"]] as const);
+const propertyNames = new Set<SelectionProperty>(["name", "resn", "resi", "chain", "segi", "elem", "id", "index", "rank", "model", "object", "alt", "formal_charge", "partial_charge", "b", "q", "occupancy", "ss", "x", "y", "z", "state", "label", "pepseq"]);
+const categoryNames = new Map<string, SelectionCategory>([
+  ["polymer", "polymer"], ["protein", "protein"], ["polymer.protein", "protein"], ["ligand", "ligand"], ["organic", "ligand"], ["water", "water"], ["solvent", "solvent"], ["ion", "ion"], ["ions", "ion"], ["inorganic", "inorganic"], ["hetatm", "hetatm"], ["hydrogens", "hydrogen"], ["hydrogen", "hydrogen"], ["hydro", "hydrogen"], ["backbone", "backbone"], ["sidechain", "sidechain"], ["guide", "guide"], ["metals", "metals"], ["bonded", "bonded"], ["enabled", "enabled"], ["present", "present"], ["visible", "visible"], ["other", "other"],
+] as const);
 
 class SelectionParser {
   private cursor = 0;
@@ -175,7 +178,8 @@ class SelectionParser {
     if (token.kind === "LPAREN") { const nested = this.expression(0); if (this.current().kind !== "RPAREN") this.fail("Expected `)`."); this.take(); return nested; }
     if (token.kind === "OPERATOR" && token.lexeme === "!") return { kind: "not", operand: this.expression(60) };
     if (word === "not") return { kind: "not", operand: this.expression(60) };
-    if (word === "byres" || word === "bychain") return { kind: word, operand: this.expression(15) };
+    if (["byobject", "bysegi", "byres", "bychain", "bycalpha", "bymolecule"].includes(word)) return { kind: word as "byobject" | "bysegi" | "byres" | "bychain" | "bycalpha" | "bymolecule", operand: this.expression(15) };
+    if (word === "first" || word === "last") return { kind: word, operand: this.expression(60) };
     if (word === "neighbor" || word === "bound_to" || word === "bound-to") return { kind: word === "bound-to" ? "bound_to" : word, operand: this.expression(35) };
     if (word === "within" || word === "around") {
       const distance = this.distance();
@@ -188,8 +192,8 @@ class SelectionParser {
     const category = categoryNames.get(word as "polymer" | "protein" | "ligand" | "organic" | "water" | "ion" | "ions" | "other");
     if (category) return { kind: "category", category, span: token.span };
     if (propertyNames.has(word as SelectionProperty)) {
-      let operator: "EQ" | "NE" = "EQ";
-      if (this.current().kind === "OPERATOR" && (this.current().lexeme === "=" || this.current().lexeme === "!=")) { operator = this.take().lexeme === "!=" ? "NE" : "EQ"; }
+      let operator: "EQ" | "NE" | "LT" | "LTE" | "GT" | "GTE" = "EQ";
+      if (this.current().kind === "OPERATOR" && ["=", "!=", "<", "<=", ">", ">="].includes(this.current().lexeme)) { const operatorToken = this.take().lexeme; operator = operatorToken === "!=" ? "NE" : operatorToken === "<" ? "LT" : operatorToken === "<=" ? "LTE" : operatorToken === ">" ? "GT" : operatorToken === ">=" ? "GTE" : "EQ"; }
       const value = this.take();
       if (!value || value.kind === "EOF" || value.kind === "RPAREN") this.fail(`Property \`${word}\` requires a value.`, value);
       return { kind: "predicate", property: word as SelectionProperty, operator, value: value.lexeme, span: token.span };
@@ -230,7 +234,7 @@ const selectionParseCache = new Map<string, { ast: SelectionAst | null; tokens: 
 
 const normalize = (ast: SelectionAst): SelectionAst => {
   if (ast.kind === "and" || ast.kind === "or") return { ...ast, left: normalize(ast.left), right: normalize(ast.right) };
-  if (ast.kind === "not" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "neighbor" || ast.kind === "bound_to") return { ...ast, operand: normalize(ast.operand) };
+  if (ast.kind === "not" || ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to") return { ...ast, operand: normalize(ast.operand) };
   if (ast.kind === "within" || ast.kind === "around") return { ...ast, reference: normalize(ast.reference), ...(ast.candidate ? { candidate: normalize(ast.candidate) } : {}) };
   if (ast.kind === "predicate") return { ...ast, property: ast.property.toLowerCase() as SelectionProperty, value: ast.value.trim() };
   if (ast.kind === "named") return { ...ast, name: ast.name.trim() };
@@ -240,15 +244,15 @@ const serialize = (ast: SelectionAst): string => {
   if (ast.kind === "all" || ast.kind === "none") return ast.kind;
   if (ast.kind === "category") return ast.category;
   if (ast.kind === "named") return `${ast.required ? "%" : "?"}${ast.name}`;
-  if (ast.kind === "predicate") return `${ast.property}=${JSON.stringify(ast.value)}`;
+  if (ast.kind === "predicate") return `${ast.property}${ast.operator === "EQ" ? "=" : ast.operator === "NE" ? "!=" : ast.operator === "LT" ? "<" : ast.operator === "LTE" ? "<=" : ast.operator === "GT" ? ">" : ">="}${JSON.stringify(ast.value)}`;
   if (ast.kind === "not") return `not(${serialize(ast.operand)})`;
   if (ast.kind === "and" || ast.kind === "or") return `(${serialize(ast.left)} ${ast.kind} ${serialize(ast.right)})`;
-  if (ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "neighbor" || ast.kind === "bound_to") return `${ast.kind}(${serialize(ast.operand)})`;
+  if (ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to") return `${ast.kind}(${serialize(ast.operand)})`;
   if (ast.kind === "within" || ast.kind === "around") return `${ast.kind}(${ast.distance},${serialize(ast.reference)}${ast.candidate ? `,${serialize(ast.candidate)}` : ""})`;
   return "invalid";
 };
 
-type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; named?: NamedSelectionStore; query: string; indexByStableId: Map<string, number>; rankByStableId: Map<string, number> };
+type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; named?: NamedSelectionStore; query: string; indexByStableId: Map<string, number>; rankByStableId: Map<string, number>; coordinateStateId?: string; stateOrdinal?: number };
 const wildcardMatch = (value: string, pattern: string): boolean => {
   const escaped = [...pattern].map((char) => char === "*" ? ".*" : char === "?" ? "." : char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("");
   return new RegExp(`^${escaped}$`, "i").test(value);
@@ -261,7 +265,27 @@ const residueMatch = (atom: CanonicalAtom, value: string): boolean => {
   const exact = residueParts(value); return !!exact && current.number === exact.number && current.insertion === exact.insertion;
 };
 const atomCategory = (atom: CanonicalAtom): "polymer" | "ligand" | "water" | "ion" | "other" => atom.isPolymer ? "polymer" : atom.isLigand ? "ligand" : atom.isWater ? "water" : atom.isIon ? "ion" : "other";
-const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, operator: "EQ" | "NE", value: string, structure: CanonicalMolecularStructure, context: EvalContext): boolean => {
+const backboneNames = new Set(["N", "CA", "C", "O", "OXT"]);
+const metalElements = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA", "ZN", "FE", "MN", "CU", "CO", "NI"]);
+const categoryMatches = (atom: CanonicalAtom, category: SelectionCategory, structure: CanonicalMolecularStructure, context: EvalContext): boolean => {
+  if (category === "enabled" || category === "present") return true;
+  if (category === "visible") { context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Presentation visibility is not bound into this selection context." }); return false; }
+  if (category === "polymer" || category === "protein") return atom.isPolymer;
+  if (category === "ligand") return atom.isLigand;
+  if (category === "water" || category === "solvent") return atom.isWater;
+  if (category === "ion" || category === "inorganic") return atom.isIon;
+  if (category === "other") return atomCategory(atom) === "other";
+  if (category === "hydrogen") return atom.element.toUpperCase() === "H";
+  if (category === "hetatm") return atom.recordType === "HETATM";
+  if (category === "backbone") return atom.isPolymer && backboneNames.has(atom.atomName.toUpperCase());
+  if (category === "sidechain") return atom.isPolymer && !backboneNames.has(atom.atomName.toUpperCase());
+  if (category === "guide") return atom.isPolymer && atom.atomName.toUpperCase() === "CA";
+  if (category === "metals") return atom.isIon && metalElements.has(atom.element.toUpperCase());
+  if (category === "bonded") { context.needsTopology = true; return structure.bonds.some((bond) => bond.atom1 === atom.stableId || bond.atom2 === atom.stableId); }
+  return false;
+};
+type SelectionOperator = "EQ" | "NE" | "LT" | "LTE" | "GT" | "GTE";
+const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, operator: SelectionOperator, value: string, structure: CanonicalMolecularStructure, context: EvalContext): boolean => {
   if (property === "segi") { if (!context.diagnostics.some((diagnostic) => diagnostic.code === "UNSUPPORTED_OPERATOR_OR_PROFILE")) context.diagnostics.push({ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: "Segment identity is not present in the current canonical structure; the query was not mapped to chain identity." }); return false; }
   const markInvalid = (message: string) => { if (!context.diagnostics.some((diagnostic) => diagnostic.code === "INVALID_VALUE" && diagnostic.message === message)) context.diagnostics.push({ code: "INVALID_VALUE", message }); };
   if ((property === "index" && (!/^\d+$/.test(value) || Number(value) < 1)) || (property === "rank" && (!/^\d+$/.test(value) || Number(value) < 0))) { markInvalid(`${property} requires a non-negative integer with ${property === "index" ? "one-based" : "zero-based"} semantics.`); return false; }
@@ -276,15 +300,40 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
   else if (property === "id") matches = atom.stableId === value || String(atom.serial) === value;
   else if (property === "index") matches = context.indexByStableId.get(atom.stableId) === Number(value);
   else if (property === "rank") matches = context.rankByStableId.get(atom.stableId) === Number(value);
-  else if (property === "model" || property === "object") matches = wildcardMatch(structure.id, value) || wildcardMatch(structure.name, value);
+  else if (property === "model" || property === "object") {
+    if (atom.workspaceObjectId) {
+      const scopedAtoms = structure.atoms.filter((candidate) => candidate.workspaceObjectId && (wildcardMatch(candidate.workspaceObjectId, value) || wildcardMatch(candidate.workspaceObjectId.replace(/^object:/i, ""), value) || wildcardMatch(candidate.workspaceObjectName ?? "", value)));
+      const matchingObjects = new Set(scopedAtoms.map((candidate) => candidate.workspaceObjectId));
+      const exactObjectId = wildcardMatch(atom.workspaceObjectId, value) || wildcardMatch(atom.workspaceObjectId.replace(/^object:/i, ""), value);
+      if (matchingObjects.size > 1 && !exactObjectId) {
+        if (!context.diagnostics.some((diagnostic) => diagnostic.code === "AMBIGUOUS_NAME")) context.diagnostics.push({ code: "AMBIGUOUS_NAME", message: `Object name \`${value}\` resolves to multiple workspace objects; use a durable ObjectID.` });
+        return false;
+      }
+      matches = exactObjectId || wildcardMatch(atom.workspaceObjectName ?? "", value);
+    } else matches = wildcardMatch(structure.id, value) || wildcardMatch(structure.name, value) || wildcardMatch(structure.source.originalFilename, value);
+  }
+  else if (["b", "q", "occupancy", "formal_charge", "partial_charge", "x", "y", "z", "state"].includes(property)) {
+    const numeric = property === "b" ? atom.bFactor : property === "q" || property === "occupancy" ? atom.occupancy : property === "formal_charge" ? atom.formalCharge : property === "x" ? atom.x : property === "y" ? atom.y : property === "z" ? atom.z : property === "state" ? context.stateOrdinal : undefined;
+    const requested = Number(value);
+    if (!Number.isFinite(requested)) { markInvalid(`${property} requires a finite numeric value.`); return false; }
+    if (numeric === undefined || numeric === null || !Number.isFinite(numeric)) { if (property === "partial_charge" || property === "state" || !context.diagnostics.some((diagnostic) => diagnostic.code === "MISSING_DEPENDENCY")) context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: `Canonical ${property} data is unavailable for this selection context.` }); return false; }
+    matches = operator === "EQ" ? numeric === requested : operator === "NE" ? numeric !== requested : operator === "LT" ? numeric < requested : operator === "LTE" ? numeric <= requested : operator === "GT" ? numeric > requested : numeric >= requested;
+  } else if (property === "ss") {
+    if (!atom.secondaryStructure) { context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical secondary-structure data is unavailable for this molecular revision." }); return false; }
+    matches = wildcardMatch(atom.secondaryStructure, value);
+  } else if (property === "label" || property === "pepseq") {
+    context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: `Canonical ${property} data is unavailable for this molecular revision.` }); return false;
+  }
   else { context.diagnostics.push({ code: "UNKNOWN_PROPERTY", message: `Unknown canonical property: ${property}.` }); return false; }
-  return operator === "NE" ? !matches : matches;
+  if (["EQ", "NE"].includes(operator)) return operator === "NE" ? !matches : matches;
+  if (["name", "resn", "chain", "elem", "alt", "id", "model", "object", "ss"].includes(property)) { context.diagnostics.push({ code: "INVALID_VALUE", message: `${property} only supports equality and inequality matching.` }); return false; }
+  return matches;
 };
 const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, context: EvalContext): Set<string> => {
   const all = () => new Set(context.universe);
   if (ast.kind === "all") return all();
   if (ast.kind === "none") return new Set();
-  if (ast.kind === "category") return new Set(structure.atoms.filter((atom) => atomCategory(atom) === ast.category).map((atom) => atom.stableId).filter((id) => context.universe.has(id)));
+  if (ast.kind === "category") return new Set(structure.atoms.filter((atom) => context.universe.has(atom.stableId) && categoryMatches(atom, ast.category, structure, context)).map((atom) => atom.stableId));
   if (ast.kind === "predicate") return new Set(structure.atoms.filter((atom) => context.universe.has(atom.stableId) && predicateMatches(atom, ast.property, ast.operator, ast.value, structure, context)).map((atom) => atom.stableId));
   if (ast.kind === "named") {
     const named = context.named?.get(ast.name);
@@ -293,9 +342,21 @@ const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, 
   }
   if (ast.kind === "not") { const operand = evaluateAst(ast.operand, structure, context); return new Set([...context.universe].filter((id) => !operand.has(id))); }
   if (ast.kind === "and" || ast.kind === "or") { const left = evaluateAst(ast.left, structure, context); const right = evaluateAst(ast.right, structure, context); return ast.kind === "and" ? new Set([...left].filter((id) => right.has(id))) : new Set([...left, ...right]); }
-  if (ast.kind === "byres" || ast.kind === "bychain") {
-    const operand = evaluateAst(ast.operand, structure, context); const groups = new Set(structure.atoms.filter((atom) => operand.has(atom.stableId)).map((atom) => ast.kind === "byres" ? `${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}` : atom.chain));
-    return new Set(structure.atoms.filter((atom) => groups.has(ast.kind === "byres" ? `${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}` : atom.chain) && context.universe.has(atom.stableId)).map((atom) => atom.stableId));
+  if (ast.kind === "first" || ast.kind === "last") {
+    const operand = evaluateAst(ast.operand, structure, context);
+    const ordered = structure.atoms.map((atom) => atom.stableId).filter((id) => operand.has(id));
+    return new Set(ordered.length ? [ast.kind === "first" ? ordered[0]! : ordered[ordered.length - 1]!] : []);
+  }
+  if (ast.kind === "byobject" || ast.kind === "bymolecule" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha") {
+    const operand = evaluateAst(ast.operand, structure, context); const scope = (atom: CanonicalAtom) => `${atom.workspaceObjectId ?? structure.id}\u0000`; const groups = new Set(structure.atoms.filter((atom) => operand.has(atom.stableId)).map((atom) => ast.kind === "byobject" || ast.kind === "bymolecule" ? scope(atom) : ast.kind === "byres" || ast.kind === "bycalpha" ? `${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}` : `${scope(atom)}${atom.chain}`));
+    if (ast.kind === "byobject" || ast.kind === "bymolecule") return new Set(structure.atoms.filter((atom) => groups.has(scope(atom)) && context.universe.has(atom.stableId)).map((atom) => atom.stableId));
+    if (ast.kind === "bysegi") { context.diagnostics.push({ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: "Segment identity is not present in the current canonical structure." }); return new Set(); }
+    if (ast.kind === "bycalpha") {
+      const residues = new Set(structure.atoms.filter((atom) => operand.has(atom.stableId)).map((atom) => `${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}`));
+      return new Set(structure.atoms.filter((atom) => residues.has(`${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}`) && context.universe.has(atom.stableId)).map((atom) => atom.stableId));
+    }
+    const groupKey = (atom: CanonicalAtom) => ast.kind === "byres" ? `${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}` : `${scope(atom)}${atom.chain}`;
+    return new Set(structure.atoms.filter((atom) => groups.has(groupKey(atom)) && context.universe.has(atom.stableId)).map((atom) => atom.stableId));
   }
   if (ast.kind === "neighbor" || ast.kind === "bound_to") {
     context.needsTopology = true; if (!structure.bonds) { context.diagnostics.push({ code: "TOPOLOGY_CONTEXT_ERROR", message: "Topology is unavailable for neighbor expansion." }); return new Set(); }
@@ -322,10 +383,10 @@ const topologyRevisionFor = (structure: CanonicalMolecularStructure): string => 
 const namespaceRevisionFor = (structure: CanonicalMolecularStructure, named?: NamedSelectionStore): string => hash(`${structure.atoms.map((atom) => `${atom.stableId}:${atom.chain}:${atom.residueNumber}:${atom.insertionCode ?? ""}`).join("\u0000")}\u0000${named?.namespaceRevision ?? "none"}`);
 const baseResult = (query: string, structure: CanonicalMolecularStructure, source: SelectionProvenance, status: SelectionStatus, diagnostics: readonly SelectionDiagnostic[], astText: string, ids: readonly string[], deps: EvalContext, boundPlan: BoundSelectionPlan | null = null): SelectionResult => {
   const stableAtomIds = stableSort(ids, structure); const normalizedAstHash = hash(astText); const membershipHash = hash(stableAtomIds.join("\u0000"));
-  return { schemaVersion: 2, resultId: resultId(query, structure, stableAtomIds), source, query, grammarVersion: GRAMMAR_VERSION, normalizedAst: astText, normalizedAstHash, profile: PROFILE, molecularIdentity: { structureId: structure.id, molecularRevision: structure.scientificHash }, structureId: structure.id, molecularRevision: structure.scientificHash, objectScope: { kind: "structure", objectId: structure.id }, universeFingerprint: hash(structure.atoms.map((atom) => atom.stableId).join("\u0000")), coordinateContext: deps.needsCoordinates ? { structureId: structure.id, revision: structure.scientificHash, stateId: "active" } : null, topologyRevision: deps.needsTopology ? topologyRevisionFor(structure) : null, namespaceRevision: namespaceRevisionFor(structure, deps.named), stableAtomIds, membershipHash, count: stableAtomIds.length, status, diagnostics, dependencyVector: { needsCoordinates: deps.needsCoordinates, needsTopology: deps.needsTopology, needsNamespaces: true }, boundPlan };
+  return { schemaVersion: 2, resultId: resultId(query, structure, stableAtomIds), source, query, grammarVersion: GRAMMAR_VERSION, normalizedAst: astText, normalizedAstHash, profile: PROFILE, molecularIdentity: { structureId: structure.id, molecularRevision: structure.scientificHash }, structureId: structure.id, molecularRevision: structure.scientificHash, objectScope: { kind: "structure", objectId: structure.id }, universeFingerprint: hash(structure.atoms.map((atom) => atom.stableId).join("\u0000")), coordinateContext: deps.needsCoordinates ? { structureId: structure.id, revision: structure.scientificHash, stateId: deps.coordinateStateId ?? "active" } : null, topologyRevision: deps.needsTopology ? topologyRevisionFor(structure) : null, namespaceRevision: namespaceRevisionFor(structure, deps.named), stableAtomIds, membershipHash, count: stableAtomIds.length, status, diagnostics, dependencyVector: { needsCoordinates: deps.needsCoordinates, needsTopology: deps.needsTopology, needsNamespaces: true }, boundPlan };
 };
 
-export type SelectionEvaluationOptions = { named?: NamedSelectionStore; expectedRevision?: string; source?: SelectionProvenance };
+export type SelectionEvaluationOptions = { named?: NamedSelectionStore; expectedRevision?: string; source?: SelectionProvenance; coordinateStateId?: string; stateOrdinal?: number };
 type CachedEvaluation = { normalized: string; ast: SelectionAst; ids: readonly string[]; status: SelectionStatus; diagnostics: readonly SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean };
 const selectionEvaluationCache = new Map<string, CachedEvaluation>();
 const contextFor = (structure: CanonicalMolecularStructure, query: string, named?: NamedSelectionStore, diagnostics: SelectionDiagnostic[] = []): EvalContext => ({
@@ -357,9 +418,9 @@ export const bindSelectionPlan = (query: string, ast: SelectionAst, normalizedAs
 
 export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecularStructure, options: SelectionEvaluationOptions = {}): SelectionResult => {
   const trimmed = query.trim(); const parsed = parseSelection(trimmed); const source = options.source ?? { kind: "query", rawQuery: trimmed };
-  const emptyContext = contextFor(structure, trimmed, options.named, [...parsed.diagnostics]);
+  const emptyContext = { ...contextFor(structure, trimmed, options.named, [...parsed.diagnostics]), coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal };
   if (options.expectedRevision && options.expectedRevision !== structure.scientificHash) return baseResult(trimmed, structure, source, "STALE_REVISION", [{ code: "STALE_REVISION", message: "The selection context revision is stale; the active structure was not changed." }], "", [], emptyContext);
-  const gated = trimmed.match(/\b(gap|pbc|bycell|symmetry|byring|byfragment)\b/i);
+  const gated = trimmed.match(/\b(gap|pbc|bycell|symmetry|byring|byfragment|extend|expand|near_to|beyond|donors|acceptors|arbitrary)\b/i);
   if (gated) return baseResult(trimmed, structure, source, "UNSUPPORTED_OPERATOR_OR_PROFILE", [{ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: `Selection operator \`${gated[1]}\` is gated until its validated scientific profile is available.` }], "", [], emptyContext);
   if (!trimmed || !parsed.ast) {
     const diagnostics = parsed.diagnostics.length ? parsed.diagnostics : [{ code: "SYNTAX_ERROR" as const, message: "A selection expression is required." }];
@@ -367,7 +428,7 @@ export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecu
     return baseResult(trimmed, structure, source, parseStatus, diagnostics, "", [], emptyContext);
   }
   const ast = normalize(parsed.ast); const normalized = serialize(ast); const context: EvalContext = { ...emptyContext, diagnostics: [] };
-  const cacheKey = hash(`${trimmed}\u0000${structure.id}\u0000${structure.scientificHash}\u0000${namespaceRevisionFor(structure, options.named)}\u0000${topologyRevisionFor(structure)}\u0000${PROFILE.fingerprint}`);
+  const cacheKey = hash(`${trimmed}\u0000${structure.id}\u0000${structure.scientificHash}\u0000${options.coordinateStateId ?? "active"}\u0000${namespaceRevisionFor(structure, options.named)}\u0000${topologyRevisionFor(structure)}\u0000${PROFILE.fingerprint}`);
   const cached = selectionEvaluationCache.get(cacheKey);
   if (cached) {
     context.needsCoordinates = cached.needsCoordinates;
@@ -379,7 +440,9 @@ export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecu
   if (context.diagnostics.some((diagnostic) => diagnostic.code === "UNSUPPORTED_OPERATOR_OR_PROFILE")) status = "UNSUPPORTED_OPERATOR_OR_PROFILE";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "UNKNOWN_PROPERTY")) status = "UNKNOWN_PROPERTY";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "UNKNOWN_NAME")) status = "UNKNOWN_NAME";
+  else if (context.diagnostics.some((diagnostic) => diagnostic.code === "AMBIGUOUS_NAME")) status = "AMBIGUOUS_NAME";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "INVALID_VALUE")) status = "INVALID_VALUE";
+  else if (context.diagnostics.some((diagnostic) => diagnostic.code === "MISSING_DEPENDENCY")) status = "MISSING_DEPENDENCY";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "TOPOLOGY_CONTEXT_ERROR")) status = "TOPOLOGY_CONTEXT_ERROR";
   const boundPlan = bindSelectionPlan(trimmed, ast, normalized, structure, { named: options.named, needsCoordinates: context.needsCoordinates, needsTopology: context.needsTopology });
   const cachedValue: CachedEvaluation = { normalized, ast, ids: [...ids], status, diagnostics: [...context.diagnostics], needsCoordinates: context.needsCoordinates, needsTopology: context.needsTopology };

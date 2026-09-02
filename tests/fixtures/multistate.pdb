@@ -1,0 +1,14 @@
+HEADER    MULTI MODEL STATE FIXTURE
+MODEL        1
+ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00 20.00           N
+ATOM      2  CA  ALA A   1       1.450   0.000   0.000  1.00 20.00           C
+ATOM      3  C   ALA A   1       2.000   1.350   0.000  1.00 20.00           C
+ATOM      4  O   ALA A   1       1.400   2.400   0.000  1.00 20.00           O
+ENDMDL
+MODEL        2
+ATOM      1  N   ALA A   1       0.200   0.100   0.000  1.00 20.00           N
+ATOM      2  CA  ALA A   1       1.650   0.100   0.000  1.00 20.00           C
+ATOM      3  C   ALA A   1       2.200   1.450   0.000  1.00 20.00           C
+ATOM      4  O   ALA A   1       1.600   2.500   0.000  1.00 20.00           O
+ENDMDL
+END

@@ -80,4 +80,13 @@ describe("canonical selection engine", () => {
     expect(resolveSelection("name CA and not chain B", structure).stableAtomIds).toEqual(["a1", "a3"]);
     expect(resolveSelection("name != CA", structure).stableAtomIds).toEqual(["a2", "l1", "w1"]);
   });
+
+  it("supports bounded cardinality, chemical, topology, and numeric property families", () => {
+    expect(resolveSelection("first chain A", structure).stableAtomIds).toEqual(["a1"]);
+    expect(resolveSelection("last chain A", structure).stableAtomIds).toEqual(["w1"]);
+    expect(resolveSelection("backbone", structure).stableAtomIds).toEqual(["a1", "a2", "a3", "b1"]);
+    expect(resolveSelection("bonded", structure).stableAtomIds).toEqual(["a1", "a2", "l1"]);
+    expect(resolveSelection("x < 2", structure).stableAtomIds).toEqual(["a1", "a2"]);
+    expect(evaluateSelectionQuery("b > 10", structure).status).toBe("MISSING_DEPENDENCY");
+  });
 });

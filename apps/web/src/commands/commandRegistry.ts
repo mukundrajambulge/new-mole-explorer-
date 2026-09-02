@@ -1,5 +1,5 @@
 export type CommandDomain = "SYSTEM" | "SELECTION" | "PRESENTATION" | "VIEW" | "LABEL" | "MEASURE" | "OBJECT";
-export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "delete" | "update";
+export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "set_name" | "copy" | "create" | "split_states" | "join_states" | "delete" | "update" | "enable" | "disable" | "state" | "frame" | "all_states" | "count_states";
 export type ParsedCommand = { domain: CommandDomain; verb: CommandVerb; raw: string; head: string; argument: string; target: string | null; span: { start: number; end: number } };
 export type CommandParseError = { code: "EMPTY" | "UNKNOWN_COMMAND" | "MISSING_ARGUMENT"; message: string; span?: { start: number; end: number } };
 export type CommandDefinition = { verb: CommandVerb; domain: CommandDomain; synopsis: string; description: string; requiresArgument: boolean };
@@ -18,11 +18,30 @@ export const COMMAND_REGISTRY: readonly CommandDefinition[] = [
   { verb: "unpick", domain: "SELECTION", synopsis: "unpick", description: "Clear transient selection and pick state.", requiresArgument: false },
   { verb: "help", domain: "SYSTEM", synopsis: "help [command]", description: "Show the bounded command registry and capability notes.", requiresArgument: false },
   { verb: "rename", domain: "OBJECT", synopsis: "rename <old>, <new>", description: "Rename a named selection namespace entry.", requiresArgument: true },
+  { verb: "set_name", domain: "OBJECT", synopsis: "set_name <object>, <new>", description: "Rename one workspace object or named selection entry without changing canonical molecular data.", requiresArgument: true },
+  { verb: "copy", domain: "OBJECT", synopsis: "copy <object>, <new>", description: "Create a second workspace object view over the same canonical load result.", requiresArgument: true },
+  { verb: "create", domain: "OBJECT", synopsis: "create <name>", description: "Create a new molecular object only when a canonical source is supplied.", requiresArgument: true },
+  { verb: "split_states", domain: "OBJECT", synopsis: "split_states <object>", description: "Split coordinate states into independent objects when a canonical lineage policy is available.", requiresArgument: true },
+  { verb: "join_states", domain: "OBJECT", synopsis: "join_states <object>, <other>", description: "Join compatible coordinate states under an explicit canonical lineage policy.", requiresArgument: true },
   { verb: "delete", domain: "OBJECT", synopsis: "delete <named-selection>", description: "Delete a named selection snapshot.", requiresArgument: true },
   { verb: "update", domain: "OBJECT", synopsis: "update <name>, <query>", description: "Re-evaluate and replace a named selection snapshot.", requiresArgument: true },
+  { verb: "enable", domain: "OBJECT", synopsis: "enable <object>", description: "Enable one workspace object in the render projection.", requiresArgument: true },
+  { verb: "disable", domain: "OBJECT", synopsis: "disable <object>", description: "Disable one workspace object in the render projection without changing canonical data.", requiresArgument: true },
+  { verb: "state", domain: "OBJECT", synopsis: "state <object>, <state-id|ordinal>", description: "Choose an explicit coordinate state for one workspace object.", requiresArgument: true },
+  { verb: "frame", domain: "OBJECT", synopsis: "frame <ordinal>", description: "Resolve a global frame through each object’s explicit state order; one-state objects remain static.", requiresArgument: true },
+  { verb: "all_states", domain: "OBJECT", synopsis: "all_states <object>", description: "Toggle a bounded overlay of all coordinate states for one object.", requiresArgument: true },
+  { verb: "count_states", domain: "OBJECT", synopsis: "count_states <object>", description: "Report the canonical coordinate-state count for one workspace object.", requiresArgument: true },
 ];
 const definitions = Object.fromEntries(COMMAND_REGISTRY.map((definition) => [definition.verb, definition])) as Record<CommandVerb, CommandDefinition>;
 const verbs = new Set<string>(COMMAND_REGISTRY.map((definition) => definition.verb));
+
+/**
+ * The console has two typed inputs: a registered command or a selection
+ * expression.  Callers must decide which grammar owns the text before they
+ * parse it; falling through to the command parser turns valid bare queries
+ * such as `chain A and protein` into false unknown-command errors.
+ */
+export const isRecognizedCommandVerb = (input: string): input is CommandVerb => verbs.has(input.trim().toLowerCase());
 
 const splitTarget = (value: string): { argument: string; target: string | null } => {
   let braces = 0; let quote = "";

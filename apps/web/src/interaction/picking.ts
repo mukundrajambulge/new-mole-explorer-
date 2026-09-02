@@ -9,6 +9,7 @@ export type CoordinateContext = {
 
 export type StableAtomRef = {
   structureId: string;
+  objectId?: string;
   stableAtomId: string;
   molecularRevision: string;
   coordinateContext: CoordinateContext;
@@ -49,6 +50,8 @@ const pickId = (generation: number, serial: number) => `pick:${generation}:${ser
 export class ReverseIdentityMap {
   private readonly byRendererIndex = new Map<number, StableAtomRef>();
   private readonly byStableId = new Map<string, StableAtomRef>();
+  private readonly byObjectAndStableId = new Map<string, StableAtomRef>();
+  private readonly ambiguousStableIds = new Set<string>();
   private readonly byRendererSerial = new Map<number, StableAtomRef>();
   private readonly ambiguousSerials = new Set<number>();
   private structureId: string | null = null;
@@ -56,28 +59,41 @@ export class ReverseIdentityMap {
   private generation = 0;
 
   build(structure: CanonicalMolecularStructure, generation: number): void {
+    this.buildMany([{ structure, objectId: structure.id }], generation);
+  }
+
+  buildMany(entries: readonly { structure: CanonicalMolecularStructure; objectId: string }[], generation: number): void {
     this.byRendererIndex.clear();
     this.byStableId.clear();
+    this.byObjectAndStableId.clear();
+    this.ambiguousStableIds.clear();
     this.byRendererSerial.clear();
     this.ambiguousSerials.clear();
-    this.structureId = structure.id;
-    this.molecularRevision = structure.scientificHash;
+    this.structureId = entries.length === 1 ? entries[0]!.structure.id : null;
+    this.molecularRevision = entries.length === 1 ? entries[0]!.structure.scientificHash : null;
     this.generation = generation;
-    const coordinateContext = coordinateContextFor(structure);
-    structure.atoms.forEach((atom, index) => {
-      const ref: StableAtomRef = { structureId: structure.id, stableAtomId: atom.stableId, molecularRevision: structure.scientificHash, coordinateContext };
-      this.byRendererIndex.set(index, ref);
-      this.byStableId.set(atom.stableId, ref);
-      if (this.ambiguousSerials.has(atom.serial)) return;
-      if (!this.byRendererSerial.has(atom.serial)) this.byRendererSerial.set(atom.serial, ref);
-      else { this.byRendererSerial.delete(atom.serial); this.ambiguousSerials.add(atom.serial); }
-    });
+    let rendererIndex = 0;
+    for (const entry of entries) {
+      const coordinateContext = coordinateContextFor(entry.structure);
+      entry.structure.atoms.forEach((atom) => {
+        const ref: StableAtomRef = { structureId: entry.structure.id, objectId: entry.objectId, stableAtomId: atom.stableId, molecularRevision: entry.structure.scientificHash, coordinateContext };
+        this.byRendererIndex.set(rendererIndex++, ref);
+        this.byObjectAndStableId.set(`${entry.objectId}\u0000${atom.stableId}`, ref);
+        if (this.ambiguousStableIds.has(atom.stableId)) return;
+        if (!this.byStableId.has(atom.stableId)) this.byStableId.set(atom.stableId, ref);
+        else { this.byStableId.delete(atom.stableId); this.ambiguousStableIds.add(atom.stableId); }
+        if (this.ambiguousSerials.has(atom.serial)) return;
+        if (!this.byRendererSerial.has(atom.serial)) this.byRendererSerial.set(atom.serial, ref);
+        else { this.byRendererSerial.delete(atom.serial); this.ambiguousSerials.add(atom.serial); }
+      });
+    }
   }
 
   resolveAtomHit(hit: { index?: number; serial?: number; properties?: Record<string, unknown> }): AtomPickResult | null {
     const stableId = typeof hit.properties?.canonicalStableId === "string" ? hit.properties.canonicalStableId : null;
-    const ref = (stableId ? this.byStableId.get(stableId) : undefined) ?? (hit.index === undefined ? undefined : this.byRendererIndex.get(hit.index)) ?? (hit.serial === undefined ? undefined : this.byRendererSerial.get(hit.serial));
-    if (!ref || ref.molecularRevision !== this.molecularRevision || ref.structureId !== this.structureId) return null;
+    const objectId = typeof hit.properties?.canonicalObjectId === "string" ? hit.properties.canonicalObjectId : null;
+    const ref = (stableId && objectId ? this.byObjectAndStableId.get(`${objectId}\u0000${stableId}`) : undefined) ?? (stableId ? this.byStableId.get(stableId) : undefined) ?? (hit.index === undefined ? undefined : this.byRendererIndex.get(hit.index)) ?? (hit.serial === undefined ? undefined : this.byRendererSerial.get(hit.serial));
+    if (!ref) return null;
     return { schemaVersion: 1, pickId: pickId(this.generation, hit.index ?? hit.serial ?? 0), pickKind: "ATOM", atomRef: ref, structureId: ref.structureId, molecularRevision: ref.molecularRevision, rendererGeneration: this.generation, coordinateContext: ref.coordinateContext, provenance: "renderer-reverse-identity-map" };
   }
 

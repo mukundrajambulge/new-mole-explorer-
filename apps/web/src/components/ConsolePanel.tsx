@@ -21,8 +21,7 @@ export const ConsolePanel = ({ expanded, onToggle, structure, namedSelections = 
     status: structure ? `3Dmol.js adapter ready · ${structure.structure.source.originalFilename} loaded` : "3Dmol.js adapter ready · no structure loaded",
   } : entry);
 
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
+  const submitQuery = () => {
     const trimmed = query.trim();
     if (!trimmed) return;
     const result = onCommand?.(trimmed) ?? { category: "CAPABILITY" as const, status: "Not executed · authoritative command service is not connected in G1C" };
@@ -30,10 +29,15 @@ export const ConsolePanel = ({ expanded, onToggle, structure, namedSelections = 
     setQuery("");
     setHistoryIndex(-1);
   };
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    submitQuery();
+  };
   const commandHistory = entries.filter((entry) => entry.command !== "renderer status" && entry.command !== "dock run").map((entry) => entry.command);
   const structureSuggestions = structure ? ["all", "none", "polymer", "ligand", "water", "ions", ...[...new Set(structure.structure.atoms.map((atom) => atom.chain).filter(Boolean))].map((chain) => `chain ${chain}`), ...[...new Set(structure.structure.atoms.map((atom) => atom.residueNumber))].slice(0, 3).map((resi) => `resi ${resi}`), ...structure.structure.atoms.slice(0, 3).map((atom) => `name ${atom.atomName}`), ...namedSelections.map((selection) => `%${selection.name}`)] : [];
   const suggestions = /^(select|center|zoom|label)\s+/i.test(query) ? [...new Set([...commandSuggestions(query), ...structureSuggestions])] : commandSuggestions(query);
   const onInputKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") { event.preventDefault(); submitQuery(); return; }
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "l") { event.preventDefault(); setQuery(""); setHistoryIndex(-1); return; }
     if (event.key === "ArrowUp") { event.preventDefault(); if (commandHistory.length === 0) return; const next = historyIndex < 0 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1); setHistoryIndex(next); setQuery(commandHistory[next]); }
     if (event.key === "ArrowDown") { event.preventDefault(); if (historyIndex < 0) return; const next = historyIndex + 1; if (next >= commandHistory.length) { setHistoryIndex(-1); setQuery(""); } else { setHistoryIndex(next); setQuery(commandHistory[next]); } }

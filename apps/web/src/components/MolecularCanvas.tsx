@@ -6,12 +6,15 @@ import { ThreeDMolViewerAdapter } from "../rendering/ThreeDMolViewerAdapter";
 import type { PickResult } from "../interaction/picking";
 import type { MeasurementKind, MeasurementObject } from "../interaction/measurements";
 import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
+import type { WorkspaceObject } from "../workspace/workspaceModel";
 import { Icon } from "./Icon";
 
 type CameraCommand = { actionId: ActionId; sequence: number };
 
 type MolecularCanvasProps = {
   structure: StructureLoadResult | null;
+  workspaceObjects?: readonly WorkspaceObject[];
+  globalFrameIndex?: number;
   projection: RenderProjection;
   activeTool: string;
   cameraCommand?: CameraCommand;
@@ -38,6 +41,8 @@ const toolIcon = (activeTool: string) => {
 
 export const MolecularCanvas = ({
   structure,
+  workspaceObjects = [],
+  globalFrameIndex = 0,
   projection,
   activeTool,
   cameraCommand,
@@ -67,6 +72,7 @@ export const MolecularCanvas = ({
   pickRef.current = onPick;
   hoverRef.current = onHover;
   projectionRef.current = projection;
+  const workspaceKey = workspaceObjects.map((object) => `${object.objectId}:${object.loadResult.structure.id}:${object.enabled}:${object.currentStateId}:${object.allStates}`).join("|");
 
   useEffect(() => {
     const host = hostRef.current;
@@ -132,20 +138,23 @@ export const MolecularCanvas = ({
     if (!structure || !adapterRef.current) return;
     try {
       setViewerError(null);
-      adapterRef.current.load(structure, projectionRef.current);
+      const objects = workspaceObjects.length ? workspaceObjects : [{ objectId: `object:${structure.structure.id}`, displayName: structure.structure.name, loadResult: structure, enabled: true, projection: projectionRef.current, stateOrder: structure.structure.stateOrder ?? [], currentStateId: structure.structure.stateOrder?.[0] ?? `${structure.structure.id}:state:1`, allStates: false }];
+      if (objects.length > 1 || objects.some((object) => object.stateOrder.length > 1 || object.allStates)) adapterRef.current.loadWorkspace(objects);
+      else adapterRef.current.load(structure, projectionRef.current);
     } catch (loadError) {
       setViewerError(loadError instanceof Error ? loadError.message : "The structure could not be rendered.");
     }
-  }, [structure]);
+  }, [structure, workspaceKey, workspaceObjects]);
 
   useEffect(() => {
     if (!adapterRef.current) return;
     try {
-      adapterRef.current.setProjection(projection);
+      if (workspaceObjects.length > 1 || workspaceObjects.some((object) => object.stateOrder.length > 1 || object.allStates)) adapterRef.current.setWorkspaceObjects(workspaceObjects, projection);
+      else adapterRef.current.setProjection(projection);
     } catch (projectionError) {
       setViewerError(projectionError instanceof Error ? projectionError.message : "The display projection could not be applied.");
     }
-  }, [projection, structure]);
+  }, [projection, structure, workspaceObjects]);
 
   useEffect(() => {
     adapterRef.current?.setMeasurements(measurements);
@@ -211,7 +220,7 @@ export const MolecularCanvas = ({
         onPointerUp={endPointerGesture}
         onPointerCancel={endPointerGesture}
       >
-        <div ref={hostRef} className="viewer-host" style={{ bottom: `${viewerBottomInset}px` }} data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} />
+        <div ref={hostRef} className="viewer-host" style={{ bottom: `${viewerBottomInset}px` }} data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} data-global-frame-index={globalFrameIndex} data-renderer-object-count={workspaceObjects.length || (structure ? 1 : 0)} />
         {!structure && !loading && (
           <div className="empty-viewer-state">
             <div className="empty-viewer-card">

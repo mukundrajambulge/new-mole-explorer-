@@ -13,6 +13,7 @@ import { buildDotSurfacePoints, type SurfacePoint } from "./surfaceGenerator";
 import { SurfaceGeometryCache, SurfaceRequestCoordinator, surfaceRequestFor } from "./surfaceProfiles";
 import { puttyProfileFor, puttyRadiusForResidue, puttyResidueRadii } from "./putty";
 import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
+import { stateForObject, structureForWorkspaceObjectState, workspaceScopedStableAtomId, type WorkspaceObject } from "../workspace/workspaceModel";
 
 const diagnosticTypeForStyle = (style: string): RepresentationType => style === "ribbon" ? "RIBBON" : style === "putty" || style === "trace" || style === "cartoon" ? "CARTOON" : style === "nonbonded-crosses" ? "NONBONDED" : style === "nonbonded-spheres" ? "NB_SPHERES" : style === "line" ? "LINES" : style === "stick" || style === "licorice" || style === "ball-and-stick" ? "STICKS" : "SPHERES";
 
@@ -92,6 +93,7 @@ export class ThreeDMolViewerAdapter {
   private container: HTMLElement | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private hasModel = false;
+  private primaryModel: ReturnType<GLViewer["addModel"]> | null = null;
   private structure: CanonicalMolecularStructure | null = null;
   private projection: RenderProjection | null = null;
   private viewport: Viewport = { width: 0, height: 0, visibleTop: 0, visibleBottom: 0, visibleLeft: 0, visibleRight: 0 };
@@ -114,6 +116,9 @@ export class ThreeDMolViewerAdapter {
   private readonly surfaceCache = new SurfaceGeometryCache<readonly SurfacePoint[]>();
   private readonly surfaceCoordinator = new SurfaceRequestCoordinator();
   private measurements: readonly MeasurementObject[] = [];
+  private auxiliaryModels: Array<{ model: ReturnType<GLViewer["addModel"]>; object: WorkspaceObject }> = [];
+  private workspaceObjects: readonly WorkspaceObject[] = [];
+  private primaryObjectEnabled = true;
   private gestureFrame: number | null = null;
   private gesture: { mode: "rotate" | "pan" | "zoom"; x: number; y: number } | null = null;
   private pendingGestureDelta = { x: 0, y: 0 };
@@ -168,7 +173,7 @@ export class ThreeDMolViewerAdapter {
     this.render();
   }
 
-  load(result: StructureLoadResult, projection: RenderProjection): void {
+  load(result: StructureLoadResult, projection: RenderProjection, objectId?: string): void {
     this.ensureMounted();
     this.structure = result.structure;
     this.performance.sceneRebuilds += 1;
@@ -187,40 +192,14 @@ export class ThreeDMolViewerAdapter {
     this.interactionShapes = [];
     this.analysisShapes = [];
     this.analysisOverlays = [];
+    this.auxiliaryModels = [];
+    this.workspaceObjects = [];
+    this.primaryObjectEnabled = true;
     this.hasModel = false;
     this.projection = null;
     const renderModel = this.viewer!.addModel();
-    const indexByStableId = new Map(result.structure.atoms.map((atom, index) => [atom.stableId, index]));
-    const adjacency = new Map<string, Array<{ index: number; order: number }>>();
-    result.structure.bonds.forEach((bond) => {
-      const atom1 = indexByStableId.get(bond.atom1) ?? -1;
-      const atom2 = indexByStableId.get(bond.atom2) ?? -1;
-      if (atom1 < 0 || atom2 < 0) return;
-      adjacency.set(bond.atom1, [...(adjacency.get(bond.atom1) ?? []), { index: atom2, order: orderNumber(bond.order) }]);
-      adjacency.set(bond.atom2, [...(adjacency.get(bond.atom2) ?? []), { index: atom1, order: orderNumber(bond.order) }]);
-    });
-    const atoms: AtomSpec[] = result.structure.atoms.map((atom, index) => ({
-      index,
-      serial: atom.serial,
-      atom: atom.atomName,
-      elem: atom.element,
-      resn: atom.residueName,
-      resi: atom.residueNumber,
-      icode: atom.insertionCode,
-      chain: atom.chain,
-      x: atom.x,
-      y: atom.y,
-      z: atom.z,
-      hetflag: atom.recordType === "HETATM",
-      b: atom.bFactor ?? undefined,
-      q: atom.occupancy ?? undefined,
-      alt: atom.altLoc ?? undefined,
-      ss: secondaryCode(atom.secondaryStructure),
-      bonds: (adjacency.get(atom.stableId) ?? []).map((entry) => entry.index),
-      bondOrder: (adjacency.get(atom.stableId) ?? []).map((entry) => entry.order),
-      properties: { canonicalStableId: atom.stableId, formal_charge: atom.formalCharge, partial_charge: undefined },
-    }));
-    renderModel.addAtoms(atoms);
+    this.primaryModel = renderModel;
+    renderModel.addAtoms(this.atomSpecsFor(result.structure, objectId));
     this.modelLoadCount += 1;
     this.hasModel = true;
     this.bindPicking();
@@ -237,6 +216,43 @@ export class ThreeDMolViewerAdapter {
     } else {
       this.frameToCanonicalBounds(true);
     }
+    this.render();
+  }
+
+  /** Reconcile several canonical objects into the one mounted 3Dmol viewer. */
+  loadWorkspace(objects: readonly WorkspaceObject[]): void {
+    const primary = objects[0];
+    if (!primary) return;
+    this.primaryObjectEnabled = primary.enabled;
+    this.load(this.renderLoadResultForState(primary), primary.projection, primary.objectId);
+    this.workspaceObjects = objects;
+    this.primaryObjectEnabled = primary.enabled;
+    this.reverseIdentityMap.buildMany(objects.map((object) => ({ structure: object.loadResult.structure, objectId: object.objectId })), this.rendererGeneration);
+    const auxiliaryObjects = [
+      ...(primary.allStates ? primary.stateOrder.slice(1).map((stateId) => ({ ...primary, currentStateId: stateId, allStates: false })) : []),
+      ...objects.slice(1).flatMap((object) => object.allStates ? object.stateOrder.slice(1).map((stateId) => ({ ...object, currentStateId: stateId, allStates: false })) : [object]),
+    ];
+    this.auxiliaryModels = auxiliaryObjects.map((object) => {
+      const model = this.viewer!.addModel();
+      model.addAtoms(this.atomSpecsFor(this.renderLoadResultForState(object).structure, object.objectId));
+      return { model, object };
+    });
+    this.renderPrimaryWorkspaceModel();
+    this.renderAuxiliaryModels();
+    this.bindWorkspacePicking();
+    this.container?.setAttribute("data-renderer-model-count", String(auxiliaryObjects.length + 1));
+    this.render();
+  }
+
+  /** Update object-scoped presentation without reloading canonical models. */
+  setWorkspaceObjects(objects: readonly WorkspaceObject[], interactionProjection?: RenderProjection): void {
+    this.workspaceObjects = objects;
+    if (!this.viewer || !this.hasModel) return;
+    if (interactionProjection) this.projection = interactionProjection;
+    this.renderPrimaryWorkspaceModel();
+    this.renderAuxiliaryModels();
+    this.bindWorkspacePicking();
+    if (this.projection) this.projectInteractionHighlights(this.projection);
     this.render();
   }
 
@@ -301,16 +317,51 @@ export class ThreeDMolViewerAdapter {
   }
   endGesture(): void { if (this.gestureFrame !== null) window.cancelAnimationFrame(this.gestureFrame); this.gestureFrame = null; this.pendingGestureDelta = { x: 0, y: 0 }; this.gesture = null; }
 
-  destroy(): void {
+   destroy(): void {
     if (this.container && mountedAdapters.get(this.container) === this) mountedAdapters.delete(this.container);
     this.resizeObserver?.disconnect(); this.resizeObserver = null;
     if (this.viewer) { this.viewer.clear(); this.viewer = null; }
     this.cameraController = null;
-    this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceKinds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
+    this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.auxiliaryModels = []; this.workspaceObjects = []; this.primaryModel = null; this.primaryObjectEnabled = true; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceKinds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
   }
   getDiagnostics(): RenderProjectionDiagnostics { return this.diagnostics; }
 
   private ensureMounted(): void { if (!this.viewer) throw new Error("3Dmol viewer adapter is not mounted."); }
+  private atomSpecsFor(structure: CanonicalMolecularStructure, objectId?: string): AtomSpec[] {
+    const indexByStableId = new Map(structure.atoms.map((atom, index) => [atom.stableId, index]));
+    const adjacency = new Map<string, Array<{ index: number; order: number }>>();
+    structure.bonds.forEach((bond) => {
+      const atom1 = indexByStableId.get(bond.atom1) ?? -1;
+      const atom2 = indexByStableId.get(bond.atom2) ?? -1;
+      if (atom1 < 0 || atom2 < 0) return;
+      adjacency.set(bond.atom1, [...(adjacency.get(bond.atom1) ?? []), { index: atom2, order: orderNumber(bond.order) }]);
+      adjacency.set(bond.atom2, [...(adjacency.get(bond.atom2) ?? []), { index: atom1, order: orderNumber(bond.order) }]);
+    });
+    return structure.atoms.map((atom, index) => ({ index, serial: atom.serial, atom: atom.atomName, elem: atom.element, resn: atom.residueName, resi: atom.residueNumber, icode: atom.insertionCode, chain: atom.chain, x: atom.x, y: atom.y, z: atom.z, hetflag: atom.recordType === "HETATM", b: atom.bFactor ?? undefined, q: atom.occupancy ?? undefined, alt: atom.altLoc ?? undefined, ss: secondaryCode(atom.secondaryStructure), bonds: (adjacency.get(atom.stableId) ?? []).map((entry) => entry.index), bondOrder: (adjacency.get(atom.stableId) ?? []).map((entry) => entry.order), properties: { canonicalStableId: atom.stableId, canonicalObjectId: objectId, formal_charge: atom.formalCharge, partial_charge: undefined } }));
+  }
+
+  private renderLoadResultForState(object: WorkspaceObject): StructureLoadResult {
+    const state = stateForObject(object);
+    if (!state) return object.loadResult;
+    return { ...object.loadResult, structure: { ...object.loadResult.structure, atoms: object.loadResult.structure.atoms.map((atom) => ({ ...atom, ...(state.coordinates[atom.stableId] ?? {}) })) } };
+  }
+
+  private renderWorkspaceModel(model: ReturnType<GLViewer["addModel"]>, object: WorkspaceObject): void {
+    const structure = object.loadResult.structure;
+    if (!object.enabled) { model.setStyle({}, { cartoon: { hidden: true }, stick: { hidden: true }, sphere: { hidden: true }, line: { hidden: true } }); return; }
+    const style = object.projection.representation === "cartoon" || object.projection.representation === "ribbon" ? styleFor("cartoon", object.projection, structure, object.projection.representation === "ribbon" ? "ribbon" : "cartoon") : object.projection.representation === "spheres" || object.projection.representation === "space-filling" ? styleFor("spheres", object.projection, structure, "space") : styleFor(object.projection.representation === "lines" || object.projection.representation === "line" ? "lines" : "sticks", object.projection, structure);
+    model.setStyle({}, style);
+    if (object.projection.representation === "cartoon" || object.projection.representation === "ribbon") model.setStyle({ hetflag: true }, styleFor("sticks", object.projection, structure), true);
+  }
+  private renderPrimaryWorkspaceModel(): void {
+    const object = this.workspaceObjects[0];
+    if (object && this.primaryModel) this.renderWorkspaceModel(this.primaryModel, object);
+  }
+  private renderAuxiliaryModels(): void {
+    for (const { model, object } of this.auxiliaryModels) {
+      this.renderWorkspaceModel(model, object);
+    }
+  }
   private canonicalSelection(predicate: (atom: CanonicalMolecularStructure["atoms"][number]) => boolean): AtomSelectionSpec { const indices = new Set(this.structure!.atoms.map((atom, index) => predicate(atom) ? index : -1).filter((index) => index >= 0)); return { predicate: (atom) => atom.index !== undefined && indices.has(atom.index) }; }
 
   private validView(view: number[] | null | undefined): view is number[] { return Array.isArray(view) && view.length >= 8 && view.slice(0, 8).every((value) => Number.isFinite(value)); }
@@ -379,9 +430,30 @@ export class ThreeDMolViewerAdapter {
     this.viewer.setHoverable(all, true, onHover, onUnhover);
   }
 
+  private bindWorkspacePicking(): void {
+    for (const { model } of this.auxiliaryModels) {
+      model.setClickable({}, true, (atom: AtomSpec) => {
+        const result = this.reverseIdentityMap.resolveAtomHit({ index: atom.index, serial: atom.serial, properties: atom.properties as Record<string, unknown> | undefined });
+        if (result) this.interactionHandlers.onPick?.(result);
+      });
+      model.setHoverable({}, true, (atom: AtomSpec) => {
+        const result = this.reverseIdentityMap.resolveAtomHit({ index: atom.index, serial: atom.serial, properties: atom.properties as Record<string, unknown> | undefined });
+        this.interactionHandlers.onHover?.(result);
+      }, () => this.interactionHandlers.onHover?.(null));
+    }
+  }
+
   private applyProjection(projection: RenderProjection): void {
     this.performance.projectionRebuilds += 1;
     const viewer = this.viewer!; const structure = this.structure!; const diagnostics = buildRenderProjectionDiagnostics(structure, projection); this.diagnostics = diagnostics; this.writeDiagnostics(diagnostics); viewer.setStyle({}, {});
+    if (!this.primaryObjectEnabled) {
+      viewer.setStyle({}, { cartoon: { hidden: true }, stick: { hidden: true }, sphere: { hidden: true }, line: { hidden: true } });
+      this.projectInteractionHighlights(projection);
+      this.projectLabels(projection);
+      this.renderAuxiliaryModels();
+      this.bindWorkspacePicking();
+      return;
+    }
     for (const directive of diagnostics.directives) {
       const target = this.canonicalSelection((atom) => directive.targetStableAtomIds.includes(atom.stableId));
       if (directive.primitive === "line") viewer.addStyle(target, styleFor("lines", projection, structure, directive.styleProfile === "line" ? "default" : "default"));
@@ -401,6 +473,9 @@ export class ThreeDMolViewerAdapter {
     this.projectMeasurementShapes();
     this.applySurfaceDirectives(diagnostics, projection);
     this.setAnalysisOverlays(this.analysisOverlays);
+    this.renderPrimaryWorkspaceModel();
+    this.renderAuxiliaryModels();
+    this.bindWorkspacePicking();
   }
 
   private applyPuttyStyles(target: AtomSelectionSpec, projection: RenderProjection, structure: CanonicalMolecularStructure, targetIds: readonly string[]): void {
@@ -554,18 +629,17 @@ export class ThreeDMolViewerAdapter {
     // Keep selection state complete in the presentation model; cap only per-atom
     // highlight geometry so selecting an entire large structure stays responsive.
     const selectedIds = new Set(projection.interaction.selectedAtomIds.slice(0, 128));
+    const workspaceAtoms = this.workspaceObjects.length ? this.workspaceObjects.flatMap((object) => structureForWorkspaceObjectState(object).atoms.map((atom) => ({ ...atom, stableId: workspaceScopedStableAtomId(object.objectId, atom.stableId) }))) : this.structure.atoms;
     const addMarker = (stableId: string, color: string, radius: number, wireframe: boolean, opacity: number) => {
-      const atom = this.structure!.atoms.find((candidate) => candidate.stableId === stableId);
-      if (!atom) return;
-      this.interactionShapes.push(this.viewer!.addSphere({ center: atom, radius, color, wireframe, opacity }));
+      const atoms = workspaceAtoms.filter((candidate) => candidate.stableId === stableId || candidate.stableId.endsWith(`::${stableId}`));
+      for (const atom of atoms) this.interactionShapes.push(this.viewer!.addSphere({ center: atom, radius, color, wireframe, opacity }));
     };
     if (hoverId) addMarker(hoverId, "#31d8c4", 0.18, true, 0.7);
     if (pickedId) addMarker(pickedId, "#e5ae32", 0.28, true, 0.8);
     if (selectedIds.size) {
       const selectionShape = this.viewer.addShape({ color: "#55d9ff", opacity: 0.28 });
       for (const selectedId of selectedIds) {
-        const atom = this.structure.atoms.find((candidate) => candidate.stableId === selectedId);
-        if (atom) selectionShape.addSphere({ center: atom, radius: 0.22, wireframe: false, opacity: 0.28 });
+        for (const atom of workspaceAtoms.filter((candidate) => candidate.stableId === selectedId || candidate.stableId.endsWith(`::${selectedId}`))) selectionShape.addSphere({ center: atom, radius: 0.22, wireframe: false, opacity: 0.28 });
       }
       this.interactionShapes.push(selectionShape);
     }

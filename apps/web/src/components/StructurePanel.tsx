@@ -3,6 +3,7 @@ import type { ActionId } from "../domain/registry";
 import { formatMeasurement, measurementStatus, type MeasurementKind, type MeasurementObject } from "../interaction/measurements";
 import type { RenderProjection } from "../rendering/renderProjection";
 import type { StructuralAnalysisResult } from "../analysis/structuralAnalysis";
+import type { WorkspaceObject } from "../workspace/workspaceModel";
 import { Icon } from "./Icon";
 
 const analysisTools: Array<{ label: string; icon: "target" | "activity" | "waves" | "shapes" | "box" | "circleHelp"; actionId: ActionId; capability?: string }> = [
@@ -19,6 +20,12 @@ type StructurePanelProps = {
   onToggle: () => void;
   onAction: (actionId: ActionId) => void;
   structure: StructureLoadResult | null;
+  workspaceObjects: readonly WorkspaceObject[];
+  activeObjectId: string | null;
+  onObjectSelect: (objectId: string) => void;
+  onObjectToggle: (objectId: string) => void;
+  onObjectStateCycle: (objectId: string, direction: -1 | 1) => void;
+  onObjectAllStatesToggle: (objectId: string) => void;
   projection: RenderProjection;
   selectedAtom: CanonicalAtom | null;
   onClearSelection: () => void;
@@ -75,7 +82,7 @@ const MeasurementCard = ({ measurementMode, measurementSlots, measurements, stru
   </section>;
 };
 
-export const StructurePanel = ({ collapsed, onToggle, onAction, structure, projection, selectedAtom, onClearSelection, measurementMode, measurementSlots, measurements, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear, analysisResults, loading, error, namedSelections, onNamedSelectionAction }: StructurePanelProps) => {
+export const StructurePanel = ({ collapsed, onToggle, onAction, structure, workspaceObjects, activeObjectId, onObjectSelect, onObjectToggle, onObjectStateCycle, onObjectAllStatesToggle, projection, selectedAtom, onClearSelection, measurementMode, measurementSlots, measurements, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear, analysisResults, loading, error, namedSelections, onNamedSelectionAction }: StructurePanelProps) => {
   const counts = structure?.structure.counts;
   const components = [
     { label: "Protein", count: counts?.polymerAtoms ?? 0, tone: "blue", visible: projection.showProtein },
@@ -96,7 +103,13 @@ export const StructurePanel = ({ collapsed, onToggle, onAction, structure, proje
     </section>
     <section className="panel-card selections-card" data-testid="objects-selections-panel">
       <div className="panel-heading"><div><span className="eyebrow">CANONICAL SCOPE</span><h2>Objects &amp; Selections</h2></div><span className="capability-tag">SNAPSHOTS</span></div>
-      <div className="selection-object-row"><span className="tree-badge tree-badge--blue">O</span><span className="tree-label">{structure?.structure.name ?? "No object"}</span><span className="muted">{structure ? structure.structure.counts.atoms.toLocaleString("en-US") : "—"}</span></div>
+      {workspaceObjects.length === 0 && <div className="selection-empty">No molecular objects loaded.</div>}
+      {workspaceObjects.map((object) => <div className={`selection-object-row ${object.objectId === activeObjectId ? "selection-object-row--active" : ""}`} key={object.objectId} data-object-id={object.objectId}>
+        <button type="button" className="object-select-button" onClick={() => onObjectSelect(object.objectId)} aria-label={`Focus ${object.displayName}`}><span className="tree-badge tree-badge--blue">O</span><span className="tree-label" title={object.objectId}>{object.displayName}</span></button>
+        <span className="muted">{object.loadResult.structure.counts.atoms.toLocaleString("en-US")} · {object.stateOrder.length} state{object.stateOrder.length === 1 ? "" : "s"}{object.stateOrder.length > 1 && <> · {Math.max(1, object.stateOrder.indexOf(object.currentStateId) + 1)}/{object.stateOrder.length}</>}</span>
+        {object.stateOrder.length > 1 && <span className="object-state-actions"><button type="button" onClick={() => onObjectStateCycle(object.objectId, -1)} aria-label={`Previous state for ${object.displayName}`}>‹</button><button type="button" onClick={() => onObjectStateCycle(object.objectId, 1)} aria-label={`Next state for ${object.displayName}`}>›</button><button type="button" onClick={() => onObjectAllStatesToggle(object.objectId)} aria-label={`${object.allStates ? "Hide" : "Show"} all states for ${object.displayName}`}>{object.allStates ? "Σ" : "∑"}</button></span>}
+        <button type="button" className="object-enable-button" onClick={() => onObjectToggle(object.objectId)} aria-label={`${object.enabled ? "Disable" : "Enable"} ${object.displayName}`}>{object.enabled ? "ON" : "OFF"}</button>
+      </div>)}
       {namedSelections.length === 0 ? <div className="selection-empty">No named selections. Use <code>select active_site, …</code>.</div> : <div className="named-selection-list">{namedSelections.map((selection) => <div className="named-selection-row" key={selection.name}><span className="tree-badge tree-badge--purple">S</span><span className="tree-label" title={selection.name}>{selection.name}</span><span className="muted">{selection.count}</span><div className="named-selection-actions">{(["A", "S", "H", "L", "C"] as const).map((action) => <button type="button" key={action} title={`${action} ${selection.name}`} aria-label={`${action} ${selection.name}`} onClick={() => onNamedSelectionAction(selection.name, action)}>{action}</button>)}</div></div>)}</div>}
     </section>
     <section className="panel-card components-card"><div className="panel-heading"><div><span className="eyebrow">STRUCTURE INVENTORY</span><h2>Components</h2></div><span className="capability-tag">Projection only</span></div><div className="component-list">{components.map((component) => <div className="component-row" key={component.label}><span className={`component-dot component-dot--${component.tone} ${component.visible ? "component-dot--visible" : "component-dot--hidden"}`} aria-hidden="true" /><span>{component.label}</span><span className="component-count">{formatCount(component.count)}</span></div>)}</div></section>

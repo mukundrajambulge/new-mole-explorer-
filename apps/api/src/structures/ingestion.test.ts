@@ -97,4 +97,21 @@ describe("VIS-01 structure ingestion", () => {
     expect(result.structure.atoms.map((atom) => atom.secondaryStructure)).toEqual(["HELIX", "HELIX", "SHEET", "SHEET"]);
     expect(result.structure.hierarchy.residues["chain:A:residue:1:"]?.secondaryStructure).toBe("HELIX");
   });
+
+  it("preserves multi-model coordinates as explicit canonical states", async () => {
+    const content = [
+      "MODEL        1",
+      "ATOM      1  CA  ALA A   1       1.000   2.000   3.000  1.00 20.00           C",
+      "ENDMDL",
+      "MODEL        7",
+      "ATOM      1  CA  ALA A   1       4.000   5.000   6.000  1.00 20.00           C",
+      "ENDMDL",
+      "END",
+    ].join("\n");
+    const result = await new StructureIngestionService().ingestLocal("states.pdb", Buffer.from(content));
+    expect(result.structure.coordinateStates).toHaveLength(2);
+    expect(result.structure.stateOrder).toEqual(result.structure.coordinateStates?.map((state) => state.id));
+    expect(result.structure.coordinateStates?.map((state) => state.sourceModelNumber)).toEqual([1, 7]);
+    expect(result.structure.coordinateStates?.[1]?.coordinates[result.structure.atoms[0]!.stableId]).toEqual({ x: 4, y: 5, z: 6 });
+  });
 });

@@ -1,0 +1,105 @@
+# Selection operator conformance matrix
+
+This is the implementation ledger for the current `new-mole-explorer-` worktree. “Verified” means the canonical selection engine has an automated assertion or the live console has exercised the representative. A renderer style or UI visibility is never treated as scientific selection data.
+
+| Operator / aliases | Grammar form | Semantic category | Required canonical data | PresentationState | CoordinateContext | TopologyContext | Research source | Current implementation status | Current live-browser status | Oracle status | Implementation decision | Tests / manual evidence | Notes |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `all` | `all` | generic universe | atoms/object scope | no | no | no | SQ-R01..05; PyMOL | VERIFIED_WORKING | PASS (`select all`) | ORACLE_PENDING | canonical universe | `selectionEngine.test.ts`; `selection-closure.spec.ts` | includes enabled workspace objects only |
+| `*` | `*` | generic universe | atoms/object scope | no | no | no | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | retained alias | engine parser | |
+| `everything` | `everything` | generic universe | atoms/object scope | no | no | no | Mole extension | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | retained explicit alias | parser | |
+| `none` | `none` | generic empty | atoms/object scope | no | no | no | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | canonical empty result | engine parser | |
+| `enabled` | `enabled` | object presentation scope | enabled workspace registry | yes | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | derived universe is enabled-only | engine parser; object E2E | distinct from scientific `all` |
+| `present` | `present` | coordinate presence | atom coordinates/state | no | yes | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | current coordinate universe | engine parser | |
+| `visible` | `visible` | presentation scope | projection visibility binding | yes | no | no | SQ-R05 | MISSING_DEPENDENCY | NOT_RUN | ORACLE_PENDING | fail closed until projection is an explicit dependency | `selectionEngine.ts` | never aliases `all` |
+| `name` | `name CA` | identifier | atom name | no | no | no | SQ-R01..05 | VERIFIED_WORKING | PASS indirectly | ORACLE_PENDING | exact/wildcard tuple match | engine tests | |
+| `%name` | `%active_site` | named snapshot | named-selection store | no | no | namespace | SQ-R01..05 | VERIFIED_WORKING | PASS via named-selection E2E | ORACLE_PENDING | immutable stable-ID snapshot | engine/E2E tests | |
+| `?name` | `?missing` | optional named snapshot | named-selection store | no | no | namespace | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | missing optional name is valid empty | engine tests | |
+| bare named selection | `active_site` | named snapshot | named-selection store | no | no | namespace | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | InputRouter sends non-command heads to selection parser | live failure regression | |
+| object-name resolution | `object mini-protein.pdb` | object reference | workspace ObjectID/name map | yes | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | derived workspace scope metadata | workspace model; object E2E | ObjectID is not display name |
+| group-name resolution | `groupA` | group reference | group registry | no | no | namespace | SQ-R05 | MISSING_DEPENDENCY | NOT_RUN | ORACLE_PENDING | no group registry in this gate | explicit gate | |
+| ambiguity handling | duplicate display names | identity safety | durable ObjectID | no | no | namespace | SQ-R05 | MISSING_IMPLEMENTABLE | NOT_RUN | ORACLE_PENDING | require ObjectID when name is ambiguous | workspace model | no silent first-match policy yet |
+| `not` | `not water` | logical complement | atom universe | no | no | no | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | strongest unary precedence | engine tests | |
+| `!` | `!water` | logical complement | atom universe | no | no | no | PyMOL | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | symbolic alias | parser | |
+| `and` | `chain A and protein` | logical intersection | canonical predicates | no | no | no | SQ-R01..05 | VERIFIED_WORKING | PASS | ORACLE_PENDING | parser-owned bare query path | live regression | |
+| `&` | `chain A & protein` | logical intersection | canonical predicates | no | no | no | PyMOL | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | symbolic alias | parser | |
+| `or` | `ligand or water` | logical union | canonical predicates | no | no | no | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | deterministic stable ordering | engine tests | |
+| `|` | `ligand | water` | logical union | canonical predicates | no | no | no | PyMOL | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | symbolic alias | parser | |
+| parentheses | `(chain A or chain B) and name CA` | logical grouping | canonical predicates | no | no | no | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | Pratt parser precedence | engine tests | |
+| implicit adjacency | `chain A protein` | logical adjacency | accepted grammar profile | no | no | no | PyMOL compatibility | INTENTIONALLY_UNSUPPORTED | NOT_RUN | ORACLE_PENDING | requires profile authorization; not guessed | parser diagnostics | use explicit `and` |
+| `first` | `first chain A` | cardinality | canonical atom order | no | no | no | PyMOL | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | first selected atom only | engine implementation | |
+| `last` | `last chain A` | cardinality | canonical atom order | no | no | no | PyMOL | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | last selected atom only | engine implementation | |
+| `model` | `model 4DJW` | object identifier | structure/workspace identity | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | ID/name matching | engine; object E2E | |
+| `object` | `object mini-protein.pdb` | object identifier | ObjectID/display name | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | object scope annotations | workspace model | |
+| `chain` | `chain A` | hierarchy identifier | chain identity | no | no | no | SQ-R01..05 | VERIFIED_WORKING | PASS indirectly | ORACLE_PENDING | canonical chain field | engine tests; live regression | |
+| `segi` | `segi A` | hierarchy identifier | segment identity | no | no | no | SQ-R01..05 | INTENTIONALLY_UNSUPPORTED | NOT_RUN | ORACLE_PENDING | no segment field is fabricated | engine diagnostics | |
+| `resn` | `resn ALA` | hierarchy identifier | residue name | no | no | no | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | exact/wildcard match | engine | |
+| `resi` | `resi 50-80` | hierarchy identifier | residue number/insertion code | no | no | no | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | insertion-aware range | engine tests | |
+| `alt` | `alt A` | alternate location | altLoc | no | no | no | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | canonical altLoc only | ingestion + engine | |
+| `index` | `index 2` | canonical ordering | atom load order | no | no | no | PyMOL | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | one-based | engine tests | |
+| `id` | `id 2` | source identity | stable ID/source serial | no | no | no | PyMOL | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | stable ID and serial remain distinct | engine tests | |
+| `rank` | `rank 0` | canonical ordering | zero-based rank | no | no | no | PyMOL | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | zero-based | engine tests | |
+| `label` | `label foo` | atom label | label dataset | yes | no | no | SQ-R05 | MISSING_DEPENDENCY | NOT_RUN | ORACLE_PENDING | no arbitrary label namespace | explicit gate | |
+| `pepseq` | `pepseq 10` | polymer sequence | sequence mapping | no | no | no | SQ-R05 | MISSING_DEPENDENCY | NOT_RUN | ORACLE_PENDING | no fabricated sequence index | explicit gate | |
+| `S1 in S2` | `name CA in chain A` | identifier matching | accepted tuple grammar | no | no | no | SQ-R02..05 | RESEARCH_REQUIRED | NOT_RUN | ORACLE_PENDING | not added without exact grammar | matrix gate | |
+| `S1 like S2` | `name like CA` | identifier matching | accepted tuple grammar | no | no | no | SQ-R02..05 | RESEARCH_REQUIRED | NOT_RUN | ORACLE_PENDING | not reduced to string containment | matrix gate | |
+| `byobject` | `byobject chain A` | entity expansion | ObjectID scope | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | object-scoped expansion | engine/workspace model | |
+| `bysegi` | `bysegi chain A` | entity expansion | segment identity | no | no | no | SQ-R01..05 | INTENTIONALLY_UNSUPPORTED | NOT_RUN | ORACLE_PENDING | segment data unavailable | engine diagnostics | |
+| `bychain` | `bychain ligand` | entity expansion | chain/residue hierarchy | no | no | no | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | weak modifier precedence preserved | engine tests | |
+| `byres` | `byres name CA` | entity expansion | residue hierarchy | no | no | no | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | insertion-aware residue groups | engine tests | |
+| `bycalpha` | `bycalpha name CA` | entity expansion | residue hierarchy | no | no | no | PyMOL | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | expands matched residue groups | engine implementation | |
+| `bymolecule` | `bymolecule ligand` | entity expansion | molecule/object identity | no | no | topology | PyMOL | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | object scope only in current profile | engine implementation | |
+| `byfragment` | `byfragment ligand` | entity expansion | fragment topology | no | no | topology | SQ-R05 | INTENTIONALLY_UNSUPPORTED | NOT_RUN | ORACLE_PENDING | fragment perception not present | explicit gate | |
+| `byring` | `byring ligand` | entity expansion | ring perception | no | no | topology | SQ-R05 | INTENTIONALLY_UNSUPPORTED | NOT_RUN | ORACLE_PENDING | ring perception not present | explicit gate | |
+| `bycell` | `bycell chain A` | entity expansion | crystallographic cell | no | no | topology | SQ-R05 | INTENTIONALLY_UNSUPPORTED | NOT_RUN | ORACLE_PENDING | unit-cell data not present | explicit gate | |
+| `neighbor` | `neighbor ligand` | topology expansion | canonical bonds | no | no | yes | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | excludes seed atoms | engine tests | |
+| `bound_to` | `bound_to ligand` | topology expansion | canonical bonds | no | no | yes | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | includes directly bonded atoms | engine tests | |
+| `extend` | `extend 1 ligand` | topology expansion | canonical bonds | no | no | yes | SQ-R05 | INTENTIONALLY_UNSUPPORTED | NOT_RUN | ORACLE_PENDING | no unvalidated breadth semantics | explicit gate | |
+| `within` | `within 4 of ligand` | spatial proximity | canonical coordinates | no | yes | no | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | exact boundary equality | engine tests | |
+| `around` | `around 4 ligand` | spatial proximity | canonical coordinates | no | yes | no | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | excludes reference atoms | engine tests | |
+| `expand` | `expand 4 ligand` | spatial expansion | canonical coordinates | no | yes | no | SQ-R05 | INTENTIONALLY_UNSUPPORTED | NOT_RUN | ORACLE_PENDING | use `within` only until grammar is pinned | explicit gate | |
+| `near_to` | `near_to ligand` | spatial proximity | canonical coordinates | no | yes | no | SQ-R05 | INTENTIONALLY_UNSUPPORTED | NOT_RUN | ORACLE_PENDING | distance semantics not pinned | explicit gate | |
+| `beyond` | `beyond 4 ligand` | spatial complement | canonical coordinates | no | yes | no | SQ-R05 | INTENTIONALLY_UNSUPPORTED | NOT_RUN | ORACLE_PENDING | complement boundary needs profile | explicit gate | |
+| `gap` | `gap 4 ligand` | geometric gap | VDW radii + coordinates | no | yes | no | SQ-R05 | INTENTIONALLY_UNSUPPORTED | NOT_RUN | ORACLE_PENDING | no hidden radius table | explicit gate | |
+| `formal_charge` | `formal_charge = 0` | property comparison | canonical formal charge | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | missing values fail closed | engine implementation | |
+| `partial_charge` | `partial_charge > 0` | property comparison | charge dataset | no | no | no | SQ-R05 | MISSING_DEPENDENCY | NOT_RUN | ORACLE_PENDING | no charge fabrication | engine diagnostics | |
+| `b` | `b > 20` | property comparison | canonical B-factor | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | numeric comparison operators | engine implementation | |
+| `q` / `occupancy` | `q >= 0.5` | property comparison | canonical occupancy | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | numeric occupancy alias | engine implementation | |
+| `ss` | `ss HELIX` | property comparison | secondary-structure dataset | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | canonical assignment only | ingestion/engine | |
+| `elem` | `elem C` | property comparison | element | no | no | no | SQ-R01..05 | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | canonical element | engine | |
+| `x`, `y`, `z` | `x < 10` | coordinate comparison | canonical coordinates | no | yes | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | numeric coordinate comparisons | engine implementation | |
+| `state` | `state 2` | state selector | CoordinateState + StateOrder | no | yes | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | command and selection namespaces remain explicit | state E2E | |
+| arbitrary property | `foo = bar` | property namespace | declared canonical property | no | maybe | maybe | SQ-R05 | INTENTIONALLY_UNSUPPORTED | NOT_RUN | ORACLE_PENDING | unknown fields never become dynamic eval | engine diagnostics | |
+| `=` | `resi = 10` | comparison | selected canonical field | no | field-dependent | field-dependent | PyMOL | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | equality | engine parser | |
+| `!=` | `name != CA` | comparison | selected canonical field | no | field-dependent | field-dependent | PyMOL | VERIFIED_WORKING | NOT_RUN | ORACLE_PENDING | inequality | engine tests | |
+| `<`, `<=`, `>`, `>=` | `x <= 1.0` | numeric comparison | numeric canonical field | no | field-dependent | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | fail closed for text properties | engine implementation | |
+| `hydrogens` / `hydro` | `hydro` | chemical class | element | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | element H only | engine implementation | |
+| `hetatm` | `hetatm` | chemical class | record type | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | source record authority | engine implementation | |
+| `organic` | `organic` | chemical class | ligand classification | no | no | no | SQ-R01..05 | VERIFIED_WORKING | PASS indirectly | ORACLE_PENDING | ligand alias | engine tests | |
+| `inorganic` | `inorganic` | chemical class | ion classification | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | canonical ion classifier | engine implementation | |
+| `solvent` | `solvent` | chemical class | water classification | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | water alias | engine implementation | |
+| `polymer` | `polymer` | structural class | polymer classifier | no | no | no | SQ-R01..05 | VERIFIED_WORKING | PASS indirectly | ORACLE_PENDING | canonical polymer flag | engine tests | |
+| `polymer.protein` / `protein` | `protein` | structural class | polymer classifier | no | no | no | SQ-R01..05 | VERIFIED_WORKING | PASS | ORACLE_PENDING | accepted protein alias | live regression | nucleic distinction still absent |
+| `backbone` | `backbone` | structural class | polymer atom names | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | conservative backbone name set | engine implementation | |
+| `sidechain` | `sidechain` | structural class | polymer atom names | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | complement of conservative backbone set | engine implementation | |
+| `guide` | `guide` | structural class | guide-atom policy | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | CA guide atoms | engine implementation | |
+| `metals` | `metals` | chemical class | canonical ion/element | no | no | no | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | explicit element set | engine implementation | |
+| `bonded` | `bonded` | topology class | canonical bonds | no | no | yes | SQ-R05 | IMPLEMENTED_NOT_YET_VERIFIED | NOT_RUN | ORACLE_PENDING | bond endpoint membership | engine implementation | |
+| `donors` | `donors` | chemical class | validated chemistry dataset | no | no | yes | SQ-R05 | MISSING_DEPENDENCY | NOT_RUN | ORACLE_PENDING | no heuristic donor claim | explicit gate |
+| `acceptors` | `acceptors` | chemical class | validated chemistry dataset | no | no | yes | SQ-R05 | MISSING_DEPENDENCY | NOT_RUN | ORACLE_PENDING | no heuristic acceptor claim | explicit gate |
+| `rep` | `rep cartoon` | presentation selector | atom representation projection | yes | no | no | SQ-R05 | MISSING_DEPENDENCY | NOT_RUN | ORACLE_PENDING | presentation dependency not bound into engine | explicit gate |
+| `color` | `color red` | presentation selector | color projection | yes | no | no | SQ-R05 | MISSING_DEPENDENCY | NOT_RUN | ORACLE_PENDING | command exists; query selector gated | explicit gate |
+| `cartoon_color` | `cartoon_color red` | presentation selector | scoped color projection | yes | no | no | SQ-R05 | MISSING_DEPENDENCY | NOT_RUN | ORACLE_PENDING | no presentation leakage | explicit gate |
+| `ribbon_color` | `ribbon_color red` | presentation selector | scoped color projection | yes | no | no | SQ-R05 | MISSING_DEPENDENCY | NOT_RUN | ORACLE_PENDING | no presentation leakage | explicit gate |
+
+## Status key
+
+- `VERIFIED_WORKING`: automated or live evidence exists for the current implementation.
+- `IMPLEMENTED_NOT_YET_VERIFIED`: code path exists but still needs a representative live-browser case.
+- `BROKEN`: a reproduced failure exists and is not repaired.
+- `MISSING_IMPLEMENTABLE`: canonical implementation is still required.
+- `MISSING_DEPENDENCY`: the required scientific or presentation dependency is absent.
+- `RESEARCH_REQUIRED`: the accepted grammar or semantics are not pinned tightly enough to implement safely.
+- `ORACLE_PENDING`: a pinned PyMOL oracle case is still required.
+- `INTENTIONALLY_UNSUPPORTED`: explicitly gated; no fake behavior is exposed.
+
+The matrix is intentionally honest: a parser branch alone does not promote an operator to verified conformance.
