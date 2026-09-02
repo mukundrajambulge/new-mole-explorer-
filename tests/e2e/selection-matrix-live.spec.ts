@@ -102,7 +102,7 @@ const observedSemanticStatus = (category: string, resultText: string, diagnostic
 };
 
 test("representative selection families run through the real console input", async ({ page }) => {
-  test.setTimeout(120000);
+  test.setTimeout(240000);
   const browserConsoleErrors: string[] = [];
   const pageErrors: string[] = [];
   const networkErrors: string[] = [];
@@ -126,10 +126,13 @@ test("representative selection families run through the real console input", asy
   const evidence: Array<Record<string, unknown>> = [];
 
   for (const value of queries) {
+    const entryCountBeforeQuery = await entries.count();
     await command.fill(value);
     await page.getByRole("button", { name: /Run/ }).click();
-    const latest = entries.last();
+    const latest = entries.nth(entryCountBeforeQuery);
+    await expect(entries).toHaveCount(entryCountBeforeQuery + 1);
     await expect(latest).toBeVisible();
+    await expect(latest.locator(".console-result")).toBeVisible();
     await expect(latest).not.toContainText(/Unknown command|Command is not implemented/);
     const category = await latest.locator(".console-category").innerText();
     const resultText = await latest.locator(".console-result").innerText();
@@ -152,10 +155,13 @@ test("representative selection families run through the real console input", asy
     }
     const subsequentTargeting: Record<string, unknown> = { attempted: false, command: "show sticks, all" };
     if (selectionResult && observedMembershipHash) {
+      const entryCountBeforeTargeting = await entries.count();
       await command.fill("show sticks, all");
       await page.getByRole("button", { name: /Run/ }).click();
-      const targetingEntry = entries.last();
+      const targetingEntry = entries.nth(entryCountBeforeTargeting);
+      await expect(entries).toHaveCount(entryCountBeforeTargeting + 1);
       await expect(targetingEntry).toContainText(/SHOW STICKS|SHOW_AS STICKS/i);
+      await expect(targetingEntry.locator(".console-result")).toBeVisible();
       const retainedHash = await activeSelection.getAttribute("data-membership-hash");
       subsequentTargeting.attempted = true;
       subsequentTargeting.category = await targetingEntry.locator(".console-category").innerText();

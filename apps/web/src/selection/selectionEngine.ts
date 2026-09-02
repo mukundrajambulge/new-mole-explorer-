@@ -352,6 +352,7 @@ const recordCoordinateAtom = (atom: CanonicalAtom, structure: CanonicalMolecular
   context.coordinateObjectIds.add(scope.objectId);
   context.coordinateObjectStates.set(scope.objectId, scope);
 };
+const canonicalPolymerTypingComplete = (structure: CanonicalMolecularStructure): boolean => Boolean(structure.polymerTypingSource) && structure.atoms.filter((atom) => atom.isPolymer).every((atom) => atom.polymerType !== undefined);
 const categoryMatches = (atom: CanonicalAtom, category: SelectionCategory, structure: CanonicalMolecularStructure, context: EvalContext): boolean => {
   if (category === "enabled") return atom.workspaceObjectEnabled ?? true;
   if (category === "present") { context.needsCoordinates = true; recordCoordinateAtom(atom, structure, context); return true; }
@@ -360,8 +361,25 @@ const categoryMatches = (atom: CanonicalAtom, category: SelectionCategory, struc
     if (!context.visibleAtomIds) { context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Presentation visibility is not bound into this selection context." }); return false; }
     return context.visibleAtomIds.has(atom.stableId);
   }
-  if (category === "polymer" || category === "protein") return atom.isPolymer;
-  if (category === "nucleic") { if (!context.diagnostics.some((diagnostic) => diagnostic.code === "MISSING_DEPENDENCY")) context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical nucleic-versus-protein polymer typing is unavailable for this molecular revision." }); return false; }
+  if (category === "polymer") return atom.isPolymer;
+  if (category === "protein") {
+    if (structure.polymerTypingSource) {
+      if (!canonicalPolymerTypingComplete(structure)) {
+        if (!context.diagnostics.some((diagnostic) => diagnostic.code === "MISSING_DEPENDENCY")) context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical protein-versus-nucleic polymer typing is incomplete for this molecular revision." });
+        return false;
+      }
+      return atom.isPolymer && atom.polymerType === "PROTEIN";
+    }
+    return atom.isPolymer;
+  }
+  if (category === "nucleic") {
+    const typingComplete = canonicalPolymerTypingComplete(structure);
+    if (!typingComplete) {
+      if (!context.diagnostics.some((diagnostic) => diagnostic.code === "MISSING_DEPENDENCY")) context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical nucleic-versus-protein polymer typing is unavailable for this molecular revision." });
+      return false;
+    }
+    return atom.isPolymer && atom.polymerType === "NUCLEIC_ACID";
+  }
   if (category === "ligand") return atom.isLigand;
   if (category === "water" || category === "solvent") return atom.isWater;
   if (category === "ion" || category === "inorganic") return atom.isIon;
@@ -584,7 +602,9 @@ const namespaceRevisionFor = (structure: CanonicalMolecularStructure, named?: Na
     workspaceObjectEnabled: atom.workspaceObjectEnabled ?? true,
     workspaceCoordinateStateId: atom.workspaceCoordinateStateId ?? "",
     workspaceStateOrdinal: atom.workspaceStateOrdinal ?? null,
+    polymerType: atom.polymerType ?? null,
   })),
+  polymerTypingSource: structure.polymerTypingSource ?? null,
   partialChargeDataset: structure.partialChargeDataset ? {
     datasetId: structure.partialChargeDataset.datasetId,
     molecularRevision: structure.partialChargeDataset.molecularRevision,

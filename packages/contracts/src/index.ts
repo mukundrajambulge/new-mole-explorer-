@@ -88,6 +88,8 @@ export type CanonicalHierarchy = {
   residues: Record<string, CanonicalResidue>;
 };
 
+export type CanonicalPolymerType = "PROTEIN" | "NUCLEIC_ACID" | "OTHER_POLYMER";
+
 export type CanonicalAtom = {
   stableId: string;
   serial: number;
@@ -104,6 +106,8 @@ export type CanonicalAtom = {
   z: number;
   recordType: "ATOM" | "HETATM";
   isPolymer: boolean;
+  /** Source-backed polymer entity typing; absent means the source did not establish this distinction. */
+  polymerType?: CanonicalPolymerType;
   isLigand: boolean;
   isWater: boolean;
   isIon: boolean;
@@ -179,6 +183,8 @@ export type CanonicalMolecularStructure = {
   coordinateStates?: CanonicalCoordinateState[];
   /** Explicit presentation order; never infer scientific identity from array insertion order. */
   stateOrder?: string[];
+  /** Provenance for source-backed polymer entity typing, when available. */
+  polymerTypingSource?: string;
   partialChargeDataset?: PartialChargeDataset;
   secondaryStructureDataset?: SecondaryStructureDataset;
 };

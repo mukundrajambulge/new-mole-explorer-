@@ -2,12 +2,27 @@ import { expect, test, type Page } from "@playwright/test";
 import { resolve } from "node:path";
 
 const fixture = resolve("tests/fixtures/mini-protein.pdb");
+const typedNucleicFixture = resolve("tests/fixtures/typed-nucleic.mmcif");
 const loadFixture = async (page: Page) => {
   await page.goto("/molstudio");
   await page.locator('input[type="file"]').setInputFiles(fixture);
   await expect(page.getByTitle("mini-protein.pdb")).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
 };
+
+test("source-backed mmCIF polymer typing drives nucleic selection", async ({ page }) => {
+  await page.goto("/molstudio");
+  await page.locator('input[type="file"]').setInputFiles(typedNucleicFixture);
+  await expect(page.getByTitle("typed-nucleic.mmcif")).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  await command.fill("polymer.nucleic");
+  await page.getByRole("button", { name: /Run/ }).click();
+  const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
+  await expect(consoleRegion).toContainText("Selected 2 atoms");
+  await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
+  await page.screenshot({ path: "verification/evidence/selection-polymer-nucleic-mmcif.png", animations: "disabled" });
+});
 
 test("selection commands bind canonical membership and named selection actions", async ({ page }) => {
   await loadFixture(page);

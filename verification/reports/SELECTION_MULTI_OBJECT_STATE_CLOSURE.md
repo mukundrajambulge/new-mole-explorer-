@@ -55,7 +55,7 @@ The current application was exercised with a real 4DJW RCSB load:
 The machine-readable ledger is [selection-operator-matrix.json](../selection/selection-operator-matrix.json), generated from [SELECTION_OPERATOR_MATRIX.md](../selection/SELECTION_OPERATOR_MATRIX.md).
 
 - Rows: **87**
-- Implementation: **70 VERIFIED_WORKING**, **10 MISSING_DEPENDENCY**, **6 INTENTIONALLY_UNSUPPORTED**, **1 UNKNOWN_PROPERTY**
+- Implementation: **71 VERIFIED_WORKING**, **9 MISSING_DEPENDENCY**, **6 INTENTIONALLY_UNSUPPORTED**, **1 UNKNOWN_PROPERTY**
 - Live-browser status: **85 pass/accepted diagnostic outcomes** across the expanded matrix exercise
 - Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **85** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
 - `in`, `bycalpha`, and `bymolecule` now use canonical tuple, residue-CA, and bond-component semantics respectively. `visible` is now bound to an explicit presentation context derived from render directives; it never aliases scientific `all`. `like`, the application implicit-adjacency profile, and the new spatial/topology forms are live-verified; malformed shorthand and missing scientific dependencies remain truthful diagnostics.
@@ -107,6 +107,7 @@ Verification:
 - `tests/e2e/real-structure-workspace.spec.ts`
 - `tests/e2e/selection-closure.spec.ts`
 - `tests/e2e/selection-matrix-live.spec.ts`
+- `tests/fixtures/typed-nucleic.mmcif`
 - `verification/selection/SELECTION_OPERATOR_MATRIX.md`
 - `verification/selection/generate-matrix-summary.mjs`
 - `verification/selection/selection-operator-matrix.json`
@@ -121,6 +122,7 @@ Verification:
 - `verification/evidence/selection-object-create.png`
 - `verification/evidence/selection-state-lineage.png`
 - `verification/evidence/selection-cross-object-spatial.png`
+- `verification/evidence/selection-polymer-nucleic-mmcif.png`
 - `verification/evidence/selection-console-matrix.png`
 - `verification/evidence/visualization-final/space-filling-ligand-only.png`
 - this report
@@ -147,6 +149,7 @@ Verification:
 
 - `CoordinateStateID`, `StateOrder`, typed `StateSelector`, `ObjectDisplayState`, and `FrameStateResolver`: **PASS**
 - Multi-model PDB and mmCIF ingestion coverage: **PASS**
+- Source-backed mmCIF polymer entity typing and `polymer.nucleic` / typed `polymer.protein` selection: **PASS**; untyped sources remain fail-closed
 - Explicit state UI, state commands in both accepted argument orders, and bounded `all_states`: **PASS**
 - In-place state coordinate replacement without duplicate models: **PASS**
 - State-aware derived selection metadata and state-dependent spatial/numeric selection scopes: **PASS**; state 1/state 2 live regressions are `x < 1.5`: 3 atoms → 1 atom and `within 1.5 of name N`: 2 atoms → 1 atom.
@@ -167,14 +170,15 @@ Verification:
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm run test --workspace @molecular/web` — **PASS: 17 files / 76 tests**
-- `npm run test --workspace @molecular/api` — **PASS: 2 files / 11 tests**
+- `npm run test --workspace @molecular/web` — **PASS: 17 files / 78 tests**
+- `npm run test --workspace @molecular/api` — **PASS: 2 files / 12 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 10 / 10**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/real-structure-workspace.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/closure-evidence.spec.ts` — **PASS: 1 / 1**
-- `npm run test:e2e` — **PASS: 71 / 71**
+- `npx playwright test tests/e2e/selection-closure.spec.ts --grep "source-backed mmCIF polymer typing"` — **PASS: 1 / 1**
+- `npm run test:e2e` — **PASS: 72 / 72**
 - `npm run build` — **PASS**
 - `git diff --check` — **PASS**
 
@@ -189,7 +193,8 @@ Verification:
 7. Add `1CRN`, run a cross-object spatial query without a frame and confirm the structured fail-closed diagnostic; choose `LOCAL_SCIENTIFIC` in the panel or run `coordinate_frame local_scientific`, then repeat the query and confirm a non-empty active selection with recorded frame policy.
 8. Import `tests/fixtures/multistate.pdb`, run `x < 1.5` and `within 1.5 of name N` in state 1 and state 2, and confirm the canonical results change from 3 to 1 atoms and 2 to 1 atoms respectively while the active-selection panel reports state scopes 1 and 2.
 9. Create a group, add an object, and enter the bare group name in the console; confirm the member object atoms are selected without changing canonical objects.
-10. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
+10. Import `tests/fixtures/typed-nucleic.mmcif`, run `polymer.nucleic`, and confirm two atoms are selected; run `protein` on the same source to confirm only the two protein atoms are selected.
+11. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
 
 ## Screenshot evidence
 
@@ -208,6 +213,7 @@ Verification:
 - The pinned PyMOL source was executed in a temporary Ubuntu-20.04/Python-3.9.2 compatibility build. The 28 remaining `ORACLE_PENDING` matrix rows are not promoted without matching coverage; this is one reason for the blocked final verdict.
 - `segi`, crystallographic `pbc`/`symmetry`/`bycell`, fragment/ring perception, donor/acceptor chemistry, and `gap` remain explicit unsupported or missing-dependency gates. Unknown properties fail closed.
 - Partial-charge selection is implemented only when a complete, revision-matched canonical charge dataset is present; the admitted PDB/mmCIF ingestion path does not create one, so current loaded structures return a structured missing-dependency diagnostic. Peptide sequence and label-property selection likewise require datasets not present in this gate. `visible` requires the explicit presentation context supplied by the frontend selection router.
+- `polymer.nucleic` and typed `polymer.protein` require complete source-backed `_entity_poly.type` mapping in mmCIF; legacy PDB inputs without that annotation intentionally retain the prior generic polymer behavior and report a truthful dependency diagnostic for nucleic selection.
 - Native `like`, implicit adjacency, topology, corrected spatial forms, and the new object-lineage workflows now have direct coverage; the six native parser errors and the remaining conservative matrix rows are retained as evidence rather than treated as application support.
 - Cross-object spatial queries require an explicit `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD` declaration. `EFFECTIVE_WORLD` is currently an identity-transform policy because object-level scientific transforms are not yet admitted; no hidden presentation transform participates. Cartesian predicates use the named `cartesian-float64-v1` closed-boundary numerical tolerance.
 - The production bundle retains the existing 3Dmol `eval` warning and exceeds the default 500 kB warning threshold; all build and runtime tests pass.

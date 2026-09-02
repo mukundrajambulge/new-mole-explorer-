@@ -213,7 +213,8 @@ const derivedStructure = (
   const partialChargeDataset = parentStructure.partialChargeDataset?.molecularRevision === parentStructure.scientificHash && sourceAtoms.every((atom) => parentStructure.partialChargeDataset?.atomChargeMap[atom.stableId] !== undefined)
     ? { ...parentStructure.partialChargeDataset, molecularRevision: "pending" as string, atomChargeMap: Object.fromEntries(sourceAtoms.map((atom) => [childIdBySourceId.get(atom.stableId)!, parentStructure.partialChargeDataset!.atomChargeMap[atom.stableId]!])) }
     : undefined;
-  const scientificHash = shortHash(JSON.stringify({ atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder: coordinateStates.map((state) => state.id), partialChargeDataset: partialChargeDataset?.atomChargeMap ?? null }));
+  const polymerTypingSource = parentStructure.polymerTypingSource ? `${parentStructure.polymerTypingSource}; derived via ${operation}` : undefined;
+  const scientificHash = shortHash(JSON.stringify({ atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder: coordinateStates.map((state) => state.id), polymerTypingSource: polymerTypingSource ?? null, partialChargeDataset: partialChargeDataset?.atomChargeMap ?? null }));
   const structure: CanonicalMolecularStructure = {
     id: structureId,
     name: displayName,
@@ -227,6 +228,7 @@ const derivedStructure = (
     scientificHash,
     coordinateStates,
     stateOrder: coordinateStates.map((state) => state.id),
+    ...(polymerTypingSource ? { polymerTypingSource } : {}),
     ...(partialChargeDataset ? { partialChargeDataset: { ...partialChargeDataset, molecularRevision: scientificHash } } : {}),
     ...(parentStructure.secondaryStructureDataset ? { secondaryStructureDataset: { ...parentStructure.secondaryStructureDataset, molecularRevision: scientificHash } } : {}),
   };
@@ -347,7 +349,7 @@ export const splitWorkspaceObjectStates = (source: WorkspaceObject, selector: st
   return created.length ? { ok: true, value: created } : { ok: false, message: `No canonical states matched split_states; no object was created.` };
 };
 
-const correspondenceKey = (atom: CanonicalAtom): string => [atom.atomName, atom.element, atom.residueName, atom.residueNumber, atom.insertionCode ?? "", atom.chain, atom.recordType].join("\u0000");
+const correspondenceKey = (atom: CanonicalAtom): string => [atom.atomName, atom.element, atom.residueName, atom.residueNumber, atom.insertionCode ?? "", atom.chain, atom.recordType, atom.polymerType ?? ""].join("\u0000");
 
 export const joinWorkspaceObjectStates = (left: WorkspaceObject, right: WorkspaceObject, existingIds: readonly string[]): WorkspaceOperationResult<WorkspaceObject> => {
   if (left.objectId === right.objectId) return { ok: false, message: "join_states requires two distinct workspace objects; no object was created." };
@@ -438,5 +440,9 @@ export const workspaceSelectionStructure = (objects: readonly WorkspaceObject[])
   };
   const points = atoms;
   const bounds = points.reduce((current, atom) => ({ min: { x: Math.min(current.min.x, atom.x), y: Math.min(current.min.y, atom.y), z: Math.min(current.min.z, atom.z) }, max: { x: Math.max(current.max.x, atom.x), y: Math.max(current.max.y, atom.y), z: Math.max(current.max.z, atom.z) } }), { min: { x: points[0]!.x, y: points[0]!.y, z: points[0]!.z }, max: { x: points[0]!.x, y: points[0]!.y, z: points[0]!.z } });
-  return { ...first, id: namespaceIds ? "workspace" : first.id, name: namespaceIds ? "workspace" : first.name, atoms, bonds, counts, bounds, scientificHash: namespaceIds ? `workspace:${scoped.map((object) => `${object.objectId}:${object.loadResult.structure.scientificHash}:${stateForObject(object)?.id ?? object.currentStateId}:${stateForObject(object)?.coordinateHash ?? ""}`).join("|")}` : first.scientificHash };
+  const typingComplete = scoped.every((object) => Boolean(object.loadResult.structure.polymerTypingSource) && object.loadResult.structure.atoms.filter((atom) => atom.isPolymer).every((atom) => atom.polymerType !== undefined));
+  const polymerTypingSource = typingComplete ? scoped.map((object) => `${object.objectId}: ${object.loadResult.structure.polymerTypingSource}`).join("; ") : undefined;
+  const firstWithoutTyping = { ...first };
+  delete firstWithoutTyping.polymerTypingSource;
+  return { ...firstWithoutTyping, id: namespaceIds ? "workspace" : first.id, name: namespaceIds ? "workspace" : first.name, atoms, bonds, counts, bounds, ...(polymerTypingSource ? { polymerTypingSource } : {}), scientificHash: namespaceIds ? `workspace:${scoped.map((object) => `${object.objectId}:${object.loadResult.structure.scientificHash}:${stateForObject(object)?.id ?? object.currentStateId}:${stateForObject(object)?.coordinateHash ?? ""}`).join("|")}` : first.scientificHash };
 };

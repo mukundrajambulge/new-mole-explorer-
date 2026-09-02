@@ -3,9 +3,9 @@
   "source": "verification/selection/SELECTION_OPERATOR_MATRIX.md",
   "rowCount": 87,
   "implementationStatusCounts": {
-    "VERIFIED_WORKING": 70,
+    "VERIFIED_WORKING": 71,
     "INTENTIONALLY_UNSUPPORTED": 6,
-    "MISSING_DEPENDENCY": 10,
+    "MISSING_DEPENDENCY": 9,
     "UNKNOWN_PROPERTY": 1
   },
   "liveBrowserStatusCounts": {
@@ -14,9 +14,10 @@
     "PASS indirectly": 4,
     "PASS via named-selection E2E": 1,
     "PASS (multi-object-state.spec.ts)": 1,
-    "PASS": 2,
+    "PASS": 1,
     "PASS (selection-matrix-live.spec.ts; multi-object-state.spec.ts)": 1,
-    "PASS (structured diagnostic)": 1
+    "PASS (selection-matrix-live.spec.ts; typed mmCIF E2E)": 1,
+    "PASS (typed mmCIF E2E; untyped PDB structured diagnostic)": 1
   },
   "oracleStatusCounts": {
     "ORACLE_PASS": 39,
@@ -545,16 +546,16 @@
     {
       "operator": "`polymer.protein` / `protein`",
       "implementationStatus": "VERIFIED_WORKING",
-      "liveBrowserStatus": "PASS",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; typed mmCIF E2E)",
       "oracleStatus": "ORACLE_EQUIVALENT",
-      "decision": "accepted protein alias"
+      "decision": "legacy polymer fallback for untyped sources; typed mmCIF restricts the selector to canonical `PROTEIN` atoms"
     },
     {
       "operator": "`polymer.nucleic`",
-      "implementationStatus": "MISSING_DEPENDENCY",
-      "liveBrowserStatus": "PASS (structured diagnostic)",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (typed mmCIF E2E; untyped PDB structured diagnostic)",
       "oracleStatus": "ORACLE_PASS",
-      "decision": "fail closed until canonical polymer typing is ingested; no protein/nucleic heuristic is fabricated"
+      "decision": "use mmCIF `_entity_poly.type` mapped by `_atom_site.label_entity_id`; fail closed when typing is absent or incomplete; no residue-name heuristic"
     },
     {
       "operator": "`backbone`",

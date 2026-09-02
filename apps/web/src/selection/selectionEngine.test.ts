@@ -166,6 +166,19 @@ describe("canonical selection engine", () => {
     expect(evaluateSelectionQuery("b > 10", structure).status).toBe("MISSING_DEPENDENCY");
   });
 
+  it("resolves nucleic polymer selection only from complete canonical typing", () => {
+    const typed = {
+      ...structure,
+      id: "typed-engine-structure",
+      scientificHash: "typed-engine-revision".padEnd(64, "0"),
+      polymerTypingSource: "test canonical entity typing",
+      atoms: structure.atoms.map((atom) => atom.isPolymer ? { ...atom, polymerType: atom.stableId === "a1" || atom.stableId === "a2" ? "NUCLEIC_ACID" as const : "PROTEIN" as const } : atom),
+    } satisfies CanonicalMolecularStructure;
+    expect(resolveSelection("polymer.nucleic", typed).stableAtomIds).toEqual(["a1", "a2"]);
+    expect(resolveSelection("polymer.protein", typed).stableAtomIds).toEqual(["a3", "b1"]);
+    expect(evaluateSelectionQuery("polymer.nucleic", structure).status).toBe("MISSING_DEPENDENCY");
+  });
+
   it("records the consulted coordinate state for state-dependent predicates", () => {
     const state1 = `${structure.id}:state:1`;
     const state2 = `${structure.id}:state:2`;
@@ -197,6 +210,31 @@ describe("canonical selection engine", () => {
     expect(withinSpatialBoundary(4, 4)).toBe(true);
     expect(withinSpatialBoundary(4 + SPATIAL_TOLERANCE_POLICY.squaredDistanceEpsilon / 2, 4)).toBe(true);
     expect(withinSpatialBoundary(4 + SPATIAL_TOLERANCE_POLICY.squaredDistanceEpsilon * 2, 4)).toBe(false);
+  });
+
+  it("covers spatial zero, boundary, empty-reference, and self-overlap semantics", () => {
+    const boundary = {
+      ...structure,
+      id: "spatial-boundary",
+      name: "spatial-boundary",
+      scientificHash: "spatial-boundary-revision".padEnd(64, "0"),
+      counts: { ...structure.counts, atoms: 4, residues: 2, chains: 1, polymerAtoms: 3, ligandAtoms: 1, waterAtoms: 0 },
+      bounds: { min: { x: 0, y: 0, z: 0 }, max: { x: 2.001, y: 0, z: 0 } },
+      atoms: [
+        { ...structure.atoms[0]!, stableId: "ref", atomName: "REF", residueName: "LIG", residueNumber: 1, x: 0, isPolymer: false, isLigand: true },
+        { ...structure.atoms[1]!, stableId: "below", atomName: "BELOW", residueNumber: 2, x: 1.999 },
+        { ...structure.atoms[2]!, stableId: "equal", atomName: "EQUAL", residueNumber: 2, x: 2 },
+        { ...structure.atoms[3]!, stableId: "above", atomName: "ABOVE", residueNumber: 2, x: 2.001 },
+      ],
+      bonds: [],
+    } satisfies CanonicalMolecularStructure;
+    expect(resolveSelection("within 0 of name REF", boundary).stableAtomIds).toEqual(["ref"]);
+    expect(resolveSelection("within 2 of name REF", boundary).stableAtomIds).toEqual(["ref", "below", "equal"]);
+    expect(resolveSelection("within 1.999 of name REF", boundary).stableAtomIds).toEqual(["ref", "below"]);
+    expect(resolveSelection("within 2.001 of name REF", boundary).stableAtomIds).toEqual(["ref", "below", "equal", "above"]);
+    const emptyReference = evaluateSelectionQuery("within 2 of name MISSING", boundary);
+    expect(emptyReference.status).toBe("VALID_EMPTY");
+    expect(emptyReference.count).toBe(0);
   });
 
   it("evaluates partial-charge predicates only against a revision-matched canonical dataset", () => {

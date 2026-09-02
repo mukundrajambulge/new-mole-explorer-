@@ -7,6 +7,7 @@ import type {
   CanonicalChain,
   CanonicalHierarchy,
   CanonicalMolecularStructure,
+  CanonicalPolymerType,
   CanonicalCoordinateState,
   CanonicalResidue,
   CoordinateBounds,
@@ -38,7 +39,7 @@ type AtomSeed = Omit<CanonicalAtom, "stableId">;
 type BondSeed = { atom1Serial: number; atom2Serial: number; order: BondOrder; source: CanonicalBond["source"] };
 type SecondarySpan = { kind: Exclude<SecondaryStructureKind, "LOOP">; chain: string; start: number; end: number };
 type CoordinateSeed = { sourceIndex: number; x: number; y: number; z: number };
-type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[]; coordinateStates?: Array<{ sourceModelNumber: number; coordinates: CoordinateSeed[] }>; secondaryStructureSource?: string };
+type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[]; coordinateStates?: Array<{ sourceModelNumber: number; coordinates: CoordinateSeed[] }>; secondaryStructureSource?: string; polymerTypingSource?: string };
 
 const parseNumber = (value: string, label: string): number => {
   const parsed = Number(value.replace(/\(.+\)$/, ""));
@@ -268,10 +269,29 @@ const parseBondOrder = (value: string | undefined): BondOrder => {
   return "UNKNOWN";
 };
 
+const classifyEntityPolymerType = (value: string | undefined): CanonicalPolymerType | undefined => {
+  const normalized = value?.toLowerCase() ?? "";
+  if (normalized.includes("polypeptide")) return "PROTEIN";
+  if (normalized.includes("ribonucleotide") || normalized.includes("deoxyribonucleotide") || normalized.includes("nucleotide")) return "NUCLEIC_ACID";
+  if (normalized.includes("poly") || normalized.includes("peptide")) return "OTHER_POLYMER";
+  return undefined;
+};
+
 const parseMmcif = (content: string): ParsedSource => {
   const loops = readCifLoops(content);
   const atomLoop = loops.find((loop) => loop.headers.some((header) => header.startsWith("_atom_site.")));
   if (!atomLoop) throw new IngestionError("INVALID_INPUT", "No _atom_site loop was found in the mmCIF input.");
+  const polymerEntityTypes = new Map<string, CanonicalPolymerType>();
+  let hasPolymerEntityLoop = false;
+  for (const loop of loops) {
+    if (!loop.headers.includes("_entity_poly.type")) continue;
+    hasPolymerEntityLoop = true;
+    for (const row of loop.rows) {
+      const entityId = cifValue(row, loop.headers, ["_entity_poly.entity_id"]);
+      const polymerType = classifyEntityPolymerType(cifValue(row, loop.headers, ["_entity_poly.type"]));
+      if (entityId && polymerType) polymerEntityTypes.set(entityId, polymerType);
+    }
+  }
   const modelAtoms = new Map<number, AtomSeed[]>();
   for (const [rowIndex, row] of atomLoop.rows.entries()) {
     const xValue = cifValue(row, atomLoop.headers, ["_atom_site.Cartn_x"]);
@@ -284,6 +304,8 @@ const parseMmcif = (content: string): ParsedSource => {
     const chain = cifValue(row, atomLoop.headers, ["_atom_site.label_asym_id", "_atom_site.auth_asym_id"]) ?? "_";
     const residueNumber = parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.label_seq_id", "_atom_site.auth_seq_id"]), 0);
     const element = normalizeElement(cifValue(row, atomLoop.headers, ["_atom_site.type_symbol"]) ?? "", atomName);
+    const entityId = cifValue(row, atomLoop.headers, ["_atom_site.label_entity_id"]);
+    const polymerType = entityId ? polymerEntityTypes.get(entityId) : undefined;
     const atom = {
       serial: parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.id"]), rowIndex + 1),
       atomName,
@@ -302,6 +324,7 @@ const parseMmcif = (content: string): ParsedSource => {
       altLoc: cifValue(row, atomLoop.headers, ["_atom_site.label_alt_id", "_atom_site.pdbx_PDB_alt_id"]),
       formalCharge: parseOptionalNumber(cifValue(row, atomLoop.headers, ["_atom_site.pdbx_formal_charge"])),
       ...classifyAtom(record, residueName, element),
+      ...(polymerType ? { polymerType } : {}),
     } satisfies AtomSeed;
     const modelNumber = parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.pdbx_PDB_model_num", "_atom_site.pdbx_model_num"]), 1);
     modelAtoms.set(modelNumber, [...(modelAtoms.get(modelNumber) ?? []), atom]);
@@ -375,7 +398,7 @@ const parseMmcif = (content: string): ParsedSource => {
       }
     }
   }
-  return { format: "mmcif", atoms, bonds, coordinateStates: orderedModels.map(([sourceModelNumber, stateAtoms]) => ({ sourceModelNumber, coordinates: stateAtoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) })), ...(secondarySpans.length ? { secondaryStructureSource: "mmCIF struct_conf/struct_sheet_range records" } : {}) };
+  return { format: "mmcif", atoms, bonds, coordinateStates: orderedModels.map(([sourceModelNumber, stateAtoms]) => ({ sourceModelNumber, coordinates: stateAtoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) })), ...(secondarySpans.length ? { secondaryStructureSource: "mmCIF struct_conf/struct_sheet_range records" } : {}), ...(hasPolymerEntityLoop && polymerEntityTypes.size > 0 ? { polymerTypingSource: "mmCIF _entity_poly.type mapped by _atom_site.label_entity_id" } : {}) };
 };
 
 const formatFromFilename = (filename: string): StructureFormat => {
@@ -501,7 +524,7 @@ export class StructureIngestionService {
       return { id: `${hash.slice(0, 16)}:state:${state.sourceModelNumber}`, ordinal: index + 1, sourceModelNumber: state.sourceModelNumber, coordinates, coordinateHash };
     });
     const stateOrder = coordinateStates.map((state) => state.id);
-    const scientificPayload = { atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder };
+    const scientificPayload = { atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder, polymerTypingSource: parsed.polymerTypingSource ?? null };
     const scientificHash = createHash("sha256").update(JSON.stringify(scientificPayload)).digest("hex");
     const structure: CanonicalMolecularStructure = {
       id: `structure_${hash.slice(0, 16)}`,
@@ -514,6 +537,7 @@ export class StructureIngestionService {
       scientificHash,
       coordinateStates,
       stateOrder,
+      ...(parsed.polymerTypingSource ? { polymerTypingSource: parsed.polymerTypingSource } : {}),
       ...(parsed.secondaryStructureSource ? { secondaryStructureDataset: { datasetId: `${hash.slice(0, 16)}:secondary-structure`, molecularRevision: scientificHash, assignmentSource: parsed.secondaryStructureSource, profileVersion: "pdb-mmcif-structural-records-v1" } } : {}),
       ...summary,
     };

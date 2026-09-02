@@ -5,6 +5,8 @@ const pdbFixture = `HEADER    TEST\nATOM      1  CA  ALA A   1       1.000   2.0
 
 const cifFixture = `data_test\nloop_\n_atom_site.group_PDB\n_atom_site.id\n_atom_site.type_symbol\n_atom_site.label_atom_id\n_atom_site.label_comp_id\n_atom_site.label_asym_id\n_atom_site.label_seq_id\n_atom_site.Cartn_x\n_atom_site.Cartn_y\n_atom_site.Cartn_z\nATOM 1 C CA ALA A 1 1.0 2.0 3.0\nHETATM 2 O O HOH A 2 4.0 5.0 6.0\n`;
 
+const typedNucleicCifFixture = `data_typed\nloop_\n_entity_poly.entity_id\n_entity_poly.type\n1 polyribonucleotide\n2 polypeptide(L)\nloop_\n_atom_site.group_PDB\n_atom_site.id\n_atom_site.type_symbol\n_atom_site.label_atom_id\n_atom_site.label_comp_id\n_atom_site.label_asym_id\n_atom_site.label_seq_id\n_atom_site.label_entity_id\n_atom_site.Cartn_x\n_atom_site.Cartn_y\n_atom_site.Cartn_z\nATOM 1 P P A A 1 1 0.0 0.0 0.0\nATOM 2 C C4 A A 1 1 1.0 0.0 0.0\nATOM 3 C CA ALA B 1 2 2.0 0.0 0.0\nATOM 4 N N ALA B 1 2 3.0 0.0 0.0\n`;
+
 const fixedPdbLine = (record: "ATOM" | "HETATM", serial: number, atomName: string, residueName: string, chain: string, residueNumber: number, element: string, bFactor: number | undefined, formalCharge: string | undefined) => {
   const fields = Array.from({ length: 80 }, () => " ");
   const put = (start: number, width: number, value: string) => value.slice(0, width).padStart(width, " ").split("").forEach((character, index) => { fields[start + index] = character; });
@@ -44,6 +46,12 @@ describe("VIS-01 structure ingestion", () => {
     const result = await new StructureIngestionService().ingestLocal("sample.mmcif", Buffer.from(cifFixture));
     expect(result.structure.format).toBe("mmcif");
     expect(result.structure.counts).toMatchObject({ atoms: 2, polymerAtoms: 1, waterAtoms: 1 });
+  });
+
+  it("preserves source-backed polymer entity typing from mmCIF", async () => {
+    const result = await new StructureIngestionService().ingestLocal("typed.mmcif", Buffer.from(typedNucleicCifFixture));
+    expect(result.structure.polymerTypingSource).toBe("mmCIF _entity_poly.type mapped by _atom_site.label_entity_id");
+    expect(result.structure.atoms.map((atom) => atom.polymerType)).toEqual(["NUCLEIC_ACID", "NUCLEIC_ACID", "PROTEIN", "PROTEIN"]);
   });
 
   it("preserves multi-model mmCIF coordinates as explicit canonical states", async () => {
