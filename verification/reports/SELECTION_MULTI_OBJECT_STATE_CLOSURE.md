@@ -16,6 +16,7 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
 - Current implementation commit: `6605630f9256b549e807978e23e30e5af302c26e` (`feat(selection): bind canonical peptide sequence profile`)
 - Ending implementation SHA: `6605630f9256b549e807978e23e30e5af302c26e`
+- Latest pushed implementation/evidence base SHA before this report update: `78262a535b98eb5ff87a9daf85a16a3b396cb3a9`
 - Working tree: clean after the recorded implementation, evidence, and report commits; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
