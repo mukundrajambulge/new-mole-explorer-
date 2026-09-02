@@ -4,6 +4,7 @@ import { resolveSelection } from "../selection/selectionEngine";
 import { copyWorkspaceObject, createWorkspaceObject, createWorkspaceObjectFromSelection, joinWorkspaceObjectStates, setWorkspaceObjectEnabled, splitWorkspaceObjectStates, workspaceSelectionStructure } from "./workspaceModel";
 
 const loadResultFor = (id: string, atomId: string): StructureLoadResult => {
+  const scientificHash = id.padEnd(64, "0");
   const structure = {
     id,
     name: id,
@@ -14,7 +15,8 @@ const loadResultFor = (id: string, atomId: string): StructureLoadResult => {
     atoms: [{ stableId: atomId, serial: 1, atomName: "CA", element: "C", residueName: "ALA", residueNumber: 1, chain: "A", x: 0, y: 0, z: 0, recordType: "ATOM" as const, isPolymer: true, isLigand: false, isWater: false, isIon: false }],
     bonds: [],
     hierarchy: { chainIds: [], chains: {}, residues: {} },
-    scientificHash: id.padEnd(64, "0"),
+    scientificHash,
+    peptideSequenceDataset: { datasetId: `${id}:peptide-sequence`, molecularRevision: scientificHash, assignmentSource: "canonical residue identity fixture", profileVersion: "canonical-peptide-sequence-v1", chains: { "chain:A": { residueIds: ["chain:A:residue:1:"], sequence: "A" } } },
   } satisfies CanonicalMolecularStructure;
   return { structure, renderSource: { format: "pdb", content: "ATOM" } };
 };
@@ -33,6 +35,7 @@ describe("workspace selection scope", () => {
     expect(resolveSelection("all", workspace!).stableAtomIds).toEqual(["object:first::first-atom", "object:second::second-atom"]);
     expect(resolveSelection("enabled", workspace!).stableAtomIds).toEqual(["object:first::first-atom"]);
     expect(workspace!.atoms[1]?.workspaceObjectEnabled).toBe(false);
+    expect(resolveSelection("pepseq A", workspace!).stableAtomIds).toEqual(["object:first::first-atom", "object:second::second-atom"]);
   });
 
   it("materializes a selected canonical subset with new identities and explicit lineage", () => {

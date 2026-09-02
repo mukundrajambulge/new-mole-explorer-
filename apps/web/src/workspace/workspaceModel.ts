@@ -427,6 +427,25 @@ export const cycleWorkspaceObjectState = (object: WorkspaceObject, direction: -1
   return { ...object, currentStateId: object.stateOrder[next]!, allStates: false };
 };
 
+const workspaceScopedResidueId = (objectId: string, residueId: string): string => `${objectId}::${residueId}`;
+
+const workspacePeptideSequenceDatasetFor = (objects: readonly WorkspaceObject[]) => {
+  const sources = objects.map((object) => ({ object, dataset: object.loadResult.structure.peptideSequenceDataset }));
+  const profileVersion = sources[0]?.dataset?.profileVersion;
+  if (!profileVersion || sources.some(({ object, dataset }) => !dataset || dataset.molecularRevision !== object.loadResult.structure.scientificHash || dataset.profileVersion !== profileVersion)) return undefined;
+  const chains = Object.fromEntries(sources.flatMap(({ object, dataset }) => Object.entries(dataset!.chains).map(([chainId, chain]) => [
+    `${object.objectId}::${chainId}`,
+    { ...chain, residueIds: chain.residueIds.map((residueId) => workspaceScopedResidueId(object.objectId, residueId)) },
+  ])));
+  return {
+    datasetId: `workspace:${shortHash(JSON.stringify(chains))}:peptide-sequence`,
+    molecularRevision: "pending",
+    assignmentSource: "object-scoped canonical peptide sequence datasets",
+    profileVersion,
+    chains,
+  };
+};
+
 /** Builds a derived selection universe; source objects remain canonical and untouched. */
 export const workspaceSelectionStructure = (objects: readonly WorkspaceObject[]): CanonicalMolecularStructure | null => {
   const scoped = objects;
@@ -455,7 +474,10 @@ export const workspaceSelectionStructure = (objects: readonly WorkspaceObject[])
   const bounds = points.reduce((current, atom) => ({ min: { x: Math.min(current.min.x, atom.x), y: Math.min(current.min.y, atom.y), z: Math.min(current.min.z, atom.z) }, max: { x: Math.max(current.max.x, atom.x), y: Math.max(current.max.y, atom.y), z: Math.max(current.max.z, atom.z) } }), { min: { x: points[0]!.x, y: points[0]!.y, z: points[0]!.z }, max: { x: points[0]!.x, y: points[0]!.y, z: points[0]!.z } });
   const typingComplete = scoped.every((object) => Boolean(object.loadResult.structure.polymerTypingSource) && object.loadResult.structure.atoms.filter((atom) => atom.isPolymer).every((atom) => atom.polymerType !== undefined));
   const polymerTypingSource = typingComplete ? scoped.map((object) => `${object.objectId}: ${object.loadResult.structure.polymerTypingSource}`).join("; ") : undefined;
+  const peptideSequenceDataset = workspacePeptideSequenceDatasetFor(scoped);
   const firstWithoutTyping = { ...first };
   delete firstWithoutTyping.polymerTypingSource;
-  return { ...firstWithoutTyping, id: namespaceIds ? "workspace" : first.id, name: namespaceIds ? "workspace" : first.name, atoms, bonds, counts, bounds, ...(polymerTypingSource ? { polymerTypingSource } : {}), scientificHash: namespaceIds ? `workspace:${scoped.map((object) => `${object.objectId}:${object.loadResult.structure.scientificHash}:${stateForObject(object)?.id ?? object.currentStateId}:${stateForObject(object)?.coordinateHash ?? ""}`).join("|")}` : first.scientificHash };
+  delete firstWithoutTyping.peptideSequenceDataset;
+  const scientificHash = namespaceIds ? `workspace:${scoped.map((object) => `${object.objectId}:${object.loadResult.structure.scientificHash}:${stateForObject(object)?.id ?? object.currentStateId}:${stateForObject(object)?.coordinateHash ?? ""}`).join("|")}` : first.scientificHash;
+  return { ...firstWithoutTyping, id: namespaceIds ? "workspace" : first.id, name: namespaceIds ? "workspace" : first.name, atoms, bonds, counts, bounds, ...(polymerTypingSource ? { polymerTypingSource } : {}), ...(peptideSequenceDataset ? { peptideSequenceDataset: { ...peptideSequenceDataset, molecularRevision: scientificHash } } : {}), scientificHash };
 };

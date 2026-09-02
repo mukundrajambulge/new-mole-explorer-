@@ -30,6 +30,9 @@ test("multiple canonical objects share one viewer and keep object scope independ
   await command.fill("object mini-protein.pdb or object g1c-small-molecule.pdb");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 15 atoms");
+  await command.fill("pepseq AG");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 8 atoms");
   await command.fill("visible");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 14 atoms");
