@@ -23,6 +23,12 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - API health: `http://localhost:8100/api/health`
 - Port `5173` is intentionally untouched/reserved for the legacy application; it is not the authoritative workstation.
 
+## User-reported failures
+
+- `select all`: **Root cause** — console input did not have a guaranteed typed route into the canonical selection evaluator. **Fix** — the InputRouter now classifies the command verb first and sends `select` arguments to the same canonical engine used by bare selections. **Live result** — on 4DJW, the real console selects the loaded canonical universe of 7,079 atoms, updates the active-selection panel/footer/viewer, and remains reusable by later presentation commands.
+- `chain A and protein`: **Root cause** — a bare selection expression was previously treated as an unsupported command path. **Fix** — non-command input is routed directly to the canonical selection parser. **Live result** — the real console selects 3,060 atoms on 4DJW with visible feedback and no `UNKNOWN_COMMAND` diagnostic.
+- Additional failures discovered and closed: selection feedback was not consistently synchronized with viewer membership; presentation selectors could be confused with scientific `all`; topology expansion could be mistaken for renderer geometry; cross-object spatial queries lacked an explicit coordinate frame; and multi-state selection could lose its state scope. These now have canonical metadata, live regressions, or explicit fail-closed diagnostics.
+
 ## Reproduced failures and live results
 
 The current application was exercised with a real 4DJW RCSB load:
@@ -239,3 +245,10 @@ Verification:
 - Native `like`, implicit adjacency, topology, corrected spatial forms, and the new object-lineage workflows now have direct coverage; the six native parser errors and the remaining conservative matrix rows are retained as evidence rather than treated as application support.
 - Cross-object spatial queries require an explicit `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD` declaration. `EFFECTIVE_WORLD` is currently an identity-transform policy because object-level scientific transforms are not yet admitted; no hidden presentation transform participates. Cartesian predicates use the named `cartesian-float64-v1` closed-boundary numerical tolerance.
 - The production bundle retains the existing 3Dmol `eval` warning and exceeds the default 500 kB warning threshold; all build and runtime tests pass.
+
+## Research-gated items
+
+- `donors` / `acceptors`: the exact compatibility question is whether these selectors should be differential-only or derived from the same Mole chemistry model. The current canonical contract lacks validated component definitions, complete bond order/valence, protonation/tautomer state, and a provenance-stamped perception profile. Required next research fixture set: benzene, pyridine, pyrrole, amide, carboxylate, protonated amine, and unknown-component cases; suggested stage: R03-04 chemistry-perception addendum plus Research-02 chemical-graph/CCD integration.
+- `bycell` / crystallographic symmetry: the exact question is whether the operator means source unit-cell membership, symmetry mates, or periodic-image expansion under the compatibility profile. The current contract lacks validated unit-cell parameters, symmetry operators, and an explicit coordinate-frame policy for mates; suggested stage: SQ-R05 symmetry/PBC addendum with a pinned oracle fixture.
+- `partial_charge`: the missing dependency is a complete atom-to-charge dataset with charge model, units, provenance, and molecular-revision binding. PDB/mmCIF ingestion alone does not supply that dataset; no fallback charge is permitted.
+- Additional `ORACLE_PENDING` rows require direct pinned-PyMOL comparison or a documented native-equivalent mapping. The current host has no PyMOL module installed, so new oracle execution requires the already-used pinned compatibility environment; existing direct-probe artifacts remain preserved.
