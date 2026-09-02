@@ -13,7 +13,7 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Local root: `C:\Users\mukun\Documents\Codex\2026-08-30\files-pasted-by-the-user-new\outputs\molecular-workstation`
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `36182da52e9cdd651d95f25d675f350b114749ad`
-- Ending implementation SHA: `ec5212be295da1eaaa3debf32c0dda5902ee02b8`
+- Ending implementation SHA: `3c31c53` (`feat(selection): support source-backed polymer typing`)
 - Working tree: clean after the recorded implementation, evidence, and report commits; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -39,6 +39,7 @@ The current application was exercised with a real 4DJW RCSB load:
 - Durable `ObjectID`, display name, and renderer model identity are distinct. Duplicate names require an ObjectID and never silently select the first match.
 - Multi-object selection uses a derived workspace universe containing every loaded object, including disabled presentation objects, with object-scoped atom IDs; source canonical IDs are unchanged. `enabled` and `visible` remain separate presentation-scoped selectors.
 - Coordinate states use explicit `CoordinateStateID` and `StateOrder`. One-state structures receive a compatibility singleton state; renderer model order is never treated as scientific state identity.
+- Canonical polymer typing uses mmCIF `_entity_poly.type` joined by `_atom_site.label_entity_id`, is included in the scientific revision/provenance, survives derived object workflows, and fails closed when absent or incomplete; no residue-name whitelist is used.
 - `all_states` is bounded to explicit auxiliary state models. State changes reconcile model coordinates in place when layout is unchanged.
 - Coordinate-dependent selection results carry sorted per-object `stateScopes` with `{ObjectID, CoordinateStateID, StateOrder}`; state-dependent live selection changes are therefore distinguishable even when molecular topology/revision is unchanged.
 - Cartesian spatial comparisons use the centralized `cartesian-float64-v1` closed-boundary policy with an explicit squared-distance numerical epsilon; the epsilon is numerical protection, not a scientific cutoff expansion.
