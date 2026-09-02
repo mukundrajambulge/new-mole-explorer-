@@ -1,0 +1,6 @@
+HEADER    SEGMENT IDENTITY ORACLE FIXTURE
+ATOM      1 N    ALA A  10       1.000   2.000   3.000  1.00 10.00      SEGAN
+ATOM      2 CA  AALA A  10       1.000   2.000   3.000  1.00 25.00      SEGAC
+ATOM      3 CA   GLY B  10       1.000   2.000   3.000  1.00  5.00      SEGBC
+ATOM      4 C1   LIG B  20       1.000   2.000   3.000  1.00 30.00      SEGLC
+END

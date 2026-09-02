@@ -10,12 +10,13 @@
   },
   "liveBrowserStatusCounts": {
     "PASS (`select all`)": 1,
-    "PASS (selection-matrix-live.spec.ts)": 64,
+    "PASS (selection-matrix-live.spec.ts)": 63,
     "PASS indirectly": 4,
     "PASS via named-selection E2E": 1,
     "PASS (multi-object-state.spec.ts)": 1,
     "PASS": 1,
-    "PASS (edge-identity E2E; unannotated mini diagnostic)": 2,
+    "PASS (edge-identity E2E; segment-identity E2E; unannotated mini diagnostic)": 2,
+    "PASS (selection-matrix-live.spec.ts; edge-identity E2E; segment-identity E2E)": 1,
     "PASS (selection-closure E2E; selection-matrix-live.spec.ts)": 5,
     "PASS (ring-topology E2E)": 1,
     "PASS (selection-matrix-live.spec.ts; multi-object-state.spec.ts)": 1,
@@ -25,8 +26,8 @@
     "PASS (`select color red` after `color red, all`; selection-matrix-live.spec.ts)": 1
   },
   "oracleStatusCounts": {
-    "ORACLE_PASS": 42,
-    "ORACLE_PENDING": 23,
+    "ORACLE_PASS": 45,
+    "ORACLE_PENDING": 20,
     "ORACLE_EQUIVALENT": 22
   },
   "entries": [
@@ -222,9 +223,9 @@
     {
       "operator": "`segi`",
       "implementationStatus": "VERIFIED_WORKING",
-      "liveBrowserStatus": "PASS (edge-identity E2E; unannotated mini diagnostic)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "canonical source segment identity; fail closed when the source omits it"
+      "liveBrowserStatus": "PASS (edge-identity E2E; segment-identity E2E; unannotated mini diagnostic)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact PDB segment identity; mmCIF segment fields remain canonical application data when PyMOL does not expose them"
     },
     {
       "operator": "`resn`",
@@ -243,9 +244,9 @@
     {
       "operator": "`alt`",
       "implementationStatus": "VERIFIED_WORKING",
-      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "canonical altLoc only"
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; edge-identity E2E; segment-identity E2E)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact source alternate-location comparison on segment-identity fixture"
     },
     {
       "operator": "`index`",
@@ -306,9 +307,9 @@
     {
       "operator": "`bysegi`",
       "implementationStatus": "VERIFIED_WORKING",
-      "liveBrowserStatus": "PASS (edge-identity E2E; unannotated mini diagnostic)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "object-scoped expansion over canonical segment identity; fail closed when absent"
+      "liveBrowserStatus": "PASS (edge-identity E2E; segment-identity E2E; unannotated mini diagnostic)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact object-scoped expansion over PDB segment identity; fail closed when absent"
     },
     {
       "operator": "`bychain`",

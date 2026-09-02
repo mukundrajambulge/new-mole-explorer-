@@ -6,6 +6,7 @@ const typedNucleicFixture = resolve("tests/fixtures/typed-nucleic.mmcif");
 const edgeIdentityFixture = resolve("tests/fixtures/edge-identity.mmcif");
 const ringFixture = resolve("tests/fixtures/ring-ligand.pdb");
 const typedPropertiesFixture = resolve("tests/fixtures/typed-properties.pdb");
+const segmentIdentityFixture = resolve("tests/fixtures/segment-identity.pdb");
 const loadFixture = async (page: Page) => {
   await page.goto("/molstudio");
   await page.locator('input[type="file"]').setInputFiles(fixture);
@@ -43,6 +44,23 @@ test("canonical mmCIF segment identity drives segi and bysegi selection", async 
   await run("alt A", 1);
   await run("b > 20", 2);
   await run("q >= 0.5", 4);
+});
+
+test("canonical PDB segment identity and alternate location match the pinned identity fixture", async ({ page }) => {
+  await page.goto("/molstudio");
+  await page.locator('input[type="file"]').setInputFiles(segmentIdentityFixture);
+  await expect(page.getByTitle("segment-identity.pdb")).toBeVisible({ timeout: 15000 });
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
+  const run = async (value: string, count: number) => {
+    await command.fill(value);
+    await page.getByRole("button", { name: /Run/ }).click();
+    await expect(consoleRegion.locator(".console-entry").last()).toContainText(`Selected ${count} atoms`);
+    await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
+  };
+  await run("segi SEGA", 2);
+  await run("bysegi segi SEGA", 2);
+  await run("alt A", 1);
 });
 
 test("canonical ring topology expands byring from a seed atom", async ({ page }) => {
