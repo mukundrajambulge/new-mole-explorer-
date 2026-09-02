@@ -3,9 +3,9 @@
   "source": "verification/selection/SELECTION_OPERATOR_MATRIX.md",
   "rowCount": 87,
   "implementationStatusCounts": {
-    "VERIFIED_WORKING": 81,
-    "MISSING_DEPENDENCY": 4,
+    "VERIFIED_WORKING": 82,
     "INTENTIONALLY_UNSUPPORTED": 1,
+    "MISSING_DEPENDENCY": 3,
     "UNKNOWN_PROPERTY": 1
   },
   "liveBrowserStatusCounts": {
@@ -24,8 +24,8 @@
     "PASS (`select color red` after `color red, all`; selection-matrix-live.spec.ts)": 1
   },
   "oracleStatusCounts": {
-    "ORACLE_PASS": 39,
-    "ORACLE_PENDING": 27,
+    "ORACLE_PASS": 40,
+    "ORACLE_PENDING": 26,
     "ORACLE_EQUIVALENT": 21
   },
   "entries": [
@@ -276,10 +276,10 @@
     },
     {
       "operator": "`pepseq`",
-      "implementationStatus": "MISSING_DEPENDENCY",
+      "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "no fabricated sequence index"
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "contiguous one-letter motif returns complete canonical residue atoms; invalid/noncanonical motifs fail with `INVALID_VALUE`"
     },
     {
       "operator": "`S1 in S2`",
