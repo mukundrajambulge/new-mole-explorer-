@@ -1,5 +1,5 @@
 export type CommandDomain = "SYSTEM" | "SELECTION" | "PRESENTATION" | "VIEW" | "LABEL" | "MEASURE" | "OBJECT";
-export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "set_name" | "copy" | "create" | "split_states" | "join_states" | "delete" | "update" | "enable" | "disable" | "state" | "frame" | "all_states" | "count_states";
+export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "set_name" | "copy" | "create" | "split_states" | "join_states" | "group" | "delete" | "update" | "enable" | "disable" | "state" | "frame" | "all_states" | "count_states";
 export type ParsedCommand = { domain: CommandDomain; verb: CommandVerb; raw: string; head: string; argument: string; target: string | null; span: { start: number; end: number } };
 export type CommandParseError = { code: "EMPTY" | "UNKNOWN_COMMAND" | "MISSING_ARGUMENT"; message: string; span?: { start: number; end: number } };
 export type CommandDefinition = { verb: CommandVerb; domain: CommandDomain; synopsis: string; description: string; requiresArgument: boolean };
@@ -23,6 +23,7 @@ export const COMMAND_REGISTRY: readonly CommandDefinition[] = [
   { verb: "create", domain: "OBJECT", synopsis: "create <target>, <selection>", description: "Create a new molecular object from a validated canonical selection when backend lineage support is available.", requiresArgument: true },
   { verb: "split_states", domain: "OBJECT", synopsis: "split_states <object>", description: "Split coordinate states into independent objects when a canonical lineage policy is available.", requiresArgument: true },
   { verb: "join_states", domain: "OBJECT", synopsis: "join_states <object>, <other>", description: "Join compatible coordinate states under an explicit canonical lineage policy.", requiresArgument: true },
+  { verb: "group", domain: "OBJECT", synopsis: "group <create|add|remove|open|close|toggle|empty> …", description: "Organize workspace objects without changing canonical molecular data.", requiresArgument: true },
   { verb: "delete", domain: "OBJECT", synopsis: "delete <named-selection>", description: "Delete a named selection snapshot.", requiresArgument: true },
   { verb: "update", domain: "OBJECT", synopsis: "update <name>, <query>", description: "Re-evaluate and replace a named selection snapshot.", requiresArgument: true },
   { verb: "enable", domain: "OBJECT", synopsis: "enable <object>", description: "Enable one workspace object in the render projection.", requiresArgument: true },
@@ -74,6 +75,7 @@ export const commandSuggestions = (prefix: string): readonly string[] => {
   if (/\s/.test(raw)) {
     if (["show", "show_as", "hide"].includes(head)) return ["lines", "sticks", "spheres", "ball-and-stick", "cartoon", "surface", "mesh", "dots"];
     if (head === "measure") return ["distance", "angle", "dihedral", "clear"];
+    if (head === "group") return ["create", "add", "remove", "open", "close", "toggle", "empty"];
     if (head === "color") return ["red", "green", "blue", "cyan", "yellow", "inherit"];
     if (head === "select" || head === "center" || head === "zoom" || head === "label") return ["all", "none", "polymer", "ligand", "water", "ion", "chain", "resi", "name"];
   }

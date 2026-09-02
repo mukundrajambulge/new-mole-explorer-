@@ -144,7 +144,7 @@ export const MolecularCanvas = ({
     if (!structure || !adapterRef.current) return;
     try {
       setViewerError(null);
-      const objects = workspaceObjectsForLoadRef.current.length ? workspaceObjectsForLoadRef.current : [{ objectId: `object:${structure.structure.id}`, displayName: structure.structure.name, loadResult: structure, enabled: true, projection: projectionRef.current, stateOrder: structure.structure.stateOrder ?? [], currentStateId: structure.structure.stateOrder?.[0] ?? `${structure.structure.id}:state:1`, allStates: false }];
+      const objects = workspaceObjectsForLoadRef.current.length ? workspaceObjectsForLoadRef.current : [{ objectId: `object:${structure.structure.id}`, displayName: structure.structure.name, loadResult: structure, enabled: true, projection: projectionRef.current, stateOrder: structure.structure.stateOrder ?? [], currentStateId: structure.structure.stateOrder?.[0] ?? `${structure.structure.id}:state:1`, allStates: false, lineage: { operation: "LOAD" as const, parentObjectIds: [], parentStructureIds: [structure.structure.id] } }];
       if (objects.length > 1 || objects.some((object) => object.stateOrder.length > 1 || object.allStates)) adapterRef.current.loadWorkspace(objects);
       else adapterRef.current.load(structure, projectionRef.current);
     } catch (loadError) {

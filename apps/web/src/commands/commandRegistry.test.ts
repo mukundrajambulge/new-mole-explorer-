@@ -12,9 +12,11 @@ describe("typed command registry boundary", () => {
     expect(parseCommand("color").error?.code).toBe("MISSING_ARGUMENT");
     expect(commandSuggestions("sh")).toEqual(["show", "show_as"]);
     expect(commandSuggestions("select ")).toContain("chain");
+    expect(commandSuggestions("group ")).toContain("create");
     expect(commandHelp("select")[0]?.domain).toBe("SELECTION");
     expect(parseCommand("rename active_site, binding_site").command).toMatchObject({ domain: "OBJECT", argument: "active_site", target: "binding_site" });
     expect(parseCommand("copy copied_object, source_object").command).toMatchObject({ domain: "OBJECT", verb: "copy", argument: "copied_object", target: "source_object" });
     expect(parseCommand("state 2, objectA").command).toMatchObject({ domain: "OBJECT", verb: "state", argument: "2", target: "objectA" });
+    expect(parseCommand("group add protein-set, objectA").command).toMatchObject({ domain: "OBJECT", verb: "group", argument: "add protein-set", target: "objectA" });
   });
 });

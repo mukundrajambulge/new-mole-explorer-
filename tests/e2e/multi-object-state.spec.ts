@@ -47,7 +47,7 @@ test("multiple canonical objects share one viewer and keep object scope independ
   await ligandRow.getByRole("button", { name: "Focus g1c-small-molecule.pdb" }).click();
   await expect(page.getByRole("combobox", { name: "Color mode" })).toHaveValue("monochrome");
 
-  await command.fill("copy mini-protein.pdb, copied-mini");
+  await command.fill("copy copied-mini, mini-protein.pdb");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(panel.locator("[data-object-id]")).toHaveCount(3);
   await expect(panel).toContainText("copied-mini");
@@ -59,7 +59,7 @@ test("multiple canonical objects share one viewer and keep object scope independ
 
   await command.fill("create unsupported-object");
   await page.getByRole("button", { name: /Run/ }).click();
-  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("create is unavailable");
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("create requires `create target, selection`");
 
   await ligandRow.getByRole("button", { name: "Disable g1c-small-molecule.pdb" }).click();
   await expect(ligandRow.getByRole("button", { name: "Enable g1c-small-molecule.pdb" })).toBeVisible();
@@ -217,4 +217,64 @@ test("a single object remains render-synchronized across disable and re-enable",
   await row.getByRole("button", { name: "Enable mini-protein.pdb" }).click();
   await expect(renderer).toHaveAttribute("data-renderer-object-projection", /"enabled":true/);
   await expect(renderer).toHaveAttribute("data-viewer-state", "loaded");
+});
+
+test("create from a canonical selection produces a new lineage object without changing the source", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(mini);
+  const panel = page.getByTestId("objects-selections-panel");
+  await expect(panel.locator("[data-object-id]")).toHaveCount(1);
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  await command.fill("create ligand-object, ligand");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(panel.locator("[data-object-id]")).toHaveCount(2);
+  await expect(panel).toContainText("ligand-object");
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-renderer-model-count", "2");
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Created ligand-object from 2 canonical atoms");
+  await command.fill("object ligand-object");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 2 atoms");
+  await command.fill("select all");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 14 atoms");
+  await page.screenshot({ path: resolve("verification/evidence/selection-object-create.png") });
+});
+
+test("split_states and strict join_states preserve explicit state lineage", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(multiState);
+  const panel = page.getByTestId("objects-selections-panel");
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  await command.fill("split_states multistate.pdb");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(panel.locator("[data-object-id]")).toHaveCount(3);
+  await expect(panel).toContainText("multistate_state_1");
+  await expect(panel).toContainText("multistate_state_2");
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Split multistate.pdb into 2 new one-state objects");
+  await command.fill("join_states multistate_state_1, multistate_state_2");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(panel.locator("[data-object-id]")).toHaveCount(4);
+  await expect(panel).toContainText("multistate_state_1_joined");
+  await expect(panel.locator("[data-object-id]").filter({ hasText: "multistate_state_1_joined" })).toContainText("2 states");
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("strict atom/topology correspondence");
+  await page.screenshot({ path: resolve("verification/evidence/selection-state-lineage.png") });
+});
+
+test("workspace groups organize objects without changing their canonical scope", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(mini);
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
+  await command.fill("group create ensemble");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await command.fill("group add ensemble, mini-protein.pdb");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await command.fill("group close ensemble");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(page.getByTestId("workspace-groups")).toContainText("ensemble");
+  await expect(page.getByTestId("workspace-groups")).toContainText("closed · 1 object");
+  await expect(consoleRegion).toContainText("Added mini-protein.pdb to group ensemble");
+  await command.fill("select all");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(consoleRegion).toContainText("Selected 12 atoms");
 });

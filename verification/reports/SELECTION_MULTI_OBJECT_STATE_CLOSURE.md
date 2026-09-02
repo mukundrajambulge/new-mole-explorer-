@@ -12,8 +12,8 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Remote: `new-origin https://github.com/mukundrajambulge/new-mole-explorer-.git`
 - Local root: `C:\Users\mukun\Documents\Codex\2026-08-30\files-pasted-by-the-user-new\outputs\molecular-workstation`
 - Branch: `fix/visualization-final-closure`
-- Starting SHA for this closure pass: `900552e18e5eccabaaaedbae0853ef9956585084`
-- Ending evidence SHA: `3cf6b6c` (scientific workspace scope, revision-matched partial-charge selection, and regenerated live evidence)
+- Starting SHA for this closure pass: `c439364207858158ad8de06ed8acd1e60763ab7a`
+- Ending evidence SHA: pending commit for this pass (lineage-aware object workflows, organizational groups, and regenerated live evidence)
 - Working tree before commit: modified by this closure pass; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -40,7 +40,8 @@ The current application was exercised with a real 4DJW RCSB load:
 - Multi-object selection uses a derived workspace universe containing every loaded object, including disabled presentation objects, with object-scoped atom IDs; source canonical IDs are unchanged. `enabled` and `visible` remain separate presentation-scoped selectors.
 - Coordinate states use explicit `CoordinateStateID` and `StateOrder`. One-state structures receive a compatibility singleton state; renderer model order is never treated as scientific state identity.
 - `all_states` is bounded to explicit auxiliary state models. State changes reconcile model coordinates in place when layout is unchanged.
-- Object `copy` preserves canonical source, state order, current state, enablement, and projection while receiving a new durable ObjectID. `create`, `split_states`, and `join_states` remain explicitly gated where lineage semantics are not defined.
+- Object `copy` deep-clones presentation/load containers, preserves canonical source, state order, current state, enablement, and projection, and receives a new durable ObjectID with explicit lineage. `create` materializes selected atoms with new stable identities and source correspondence; `split_states` creates bounded one-state objects; `join_states` accepts only strict ordered atom/topology correspondence. Failed or incompatible operations are non-destructive.
+- Workspace groups provide stable organizational membership with create/add/remove/open/close/toggle/empty operations. Group actions do not mutate canonical molecular data; destructive purge/excise/delete remain unavailable.
 - Workspace presentation commands are applied per canonical object scope. The viewer adapter projects each object’s representation directives onto its own model, and single-object disable/enable transitions stay in the same workspace projection path.
 - Selection cache identity includes canonical selector fields and workspace namespace metadata, including durable object ID, mutable display name, segment identity, and coordinate-state annotations; renaming cannot reuse a stale object-name result.
 - Failed loads are non-destructive: the current workspace and viewer remain intact.
@@ -57,6 +58,14 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - Oracle comparison ledger: **18 ORACLE_PASS**, **13 ORACLE_EQUIVALENT**, **0 ORACLE_PENDING** across the intentionally conservative 31-row comparison ledger; the full direct probe is [pymol-matrix-probe.json](../selection/pymol-matrix-probe.json) (**85 forms: 79 successful, 6 native errors**).
 - Pinned oracle evidence: [pymol-oracle-results.json](../selection/pymol-oracle-results.json); runner: [run-pymol-oracle.py](../selection/run-pymol-oracle.py)
 - Missing dependency and research rows are explicit gates. No unsupported operator is silently aliased to a different scientific meaning.
+
+## Commands
+
+- Bare selection input, `select`, named selections, `show`, `hide`, `color`, `label`, view, and measurements: **PASS** through the typed console boundary.
+- `rename` / `set_name`, `copy`, `create`, `split_states`, and strict `join_states`: **PASS** with durable identity and lineage; invalid or incompatible operations are non-destructive.
+- `enable` / `disable`, `state`, `frame`, `all_states`, and `count_states`: **PASS** with explicit per-object state order.
+- `group create|add|remove|open|close|toggle|empty`: **PASS** as organizational state; destructive `purge`, `excise`, and `delete` remain unavailable.
+- Cross-object spatial selection: **BLOCKED / fail-closed** until an explicit coordinate frame is declared.
 
 ## Files changed in this closure
 
@@ -100,6 +109,8 @@ Verification:
 - `verification/evidence/closure-uploaded-cartoon-ligand-sticks.png`
 - `verification/evidence/closure-rcsb-1crn-cartoon.png`
 - `verification/evidence/closure-4djw-two-objects.png`
+- `verification/evidence/selection-object-create.png`
+- `verification/evidence/selection-state-lineage.png`
 - `verification/evidence/selection-console-matrix.png`
 - `verification/evidence/visualization-final/space-filling-ligand-only.png`
 - this report
@@ -115,6 +126,10 @@ Verification:
 - Reverse picking identity map with object and coordinate-state context: **PASS**
 - Object/state-scoped surfaces and unrelated-state cache isolation: **PASS**
 - Object-scoped measurement picks reject mixed-object ambiguity and resolve against the canonical target object: **PASS**
+- Create-from-selection with new atom identities and lineage: **PASS**
+- Bounded split_states first/last/prefix semantics: **PASS**
+- Strict join_states correspondence and topology validation: **PASS**
+- Non-destructive organizational group lifecycle: **PASS**
 - Cross-object spatial selection without an explicit coordinate frame: **BLOCKED / fail-closed with a structured dependency diagnostic**
 
 ## Multi-state closure
@@ -125,6 +140,7 @@ Verification:
 - In-place state coordinate replacement without duplicate models: **PASS**
 - State-aware derived selection metadata: **PASS**
 - Heterogeneous object/state layout reconciliation: **PASS**
+- split_states and join_states preserve source-state lineage: **PASS**
 
 ## Visualization regression closure
 
@@ -140,14 +156,15 @@ Verification:
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm run test --workspace @molecular/web` — **PASS: 17 files / 71 tests**
+- `npm run test --workspace @molecular/web` — **PASS: 17 files / 74 tests**
 - `npm run test --workspace @molecular/api` — **PASS: 2 files / 11 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 6 / 6**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/real-structure-workspace.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/closure-evidence.spec.ts` — **PASS: 1 / 1**
-- `npm run test:e2e` — **PASS: 67 / 67**
+- `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 9 / 9**
+- `npm run test:e2e` — **PASS: 70 / 70**
 - `npm run build` — **PASS**
 - `git diff --check` — **PASS**
 
@@ -167,6 +184,8 @@ Verification:
 - [Uploaded Cartoon + ligand sticks](../evidence/closure-uploaded-cartoon-ligand-sticks.png)
 - [RCSB 1CRN Cartoon](../evidence/closure-rcsb-1crn-cartoon.png)
 - [4DJW + 1CRN in one workspace](../evidence/closure-4djw-two-objects.png)
+- [Create-from-selection object](../evidence/selection-object-create.png)
+- [Split/join state lineage](../evidence/selection-state-lineage.png)
 - [Selection console matrix](../evidence/selection-console-matrix.png)
 - [Space-filling ligand presentation](../evidence/visualization-final/space-filling-ligand-only.png)
 
@@ -175,6 +194,6 @@ Verification:
 - The pinned PyMOL source was executed in a temporary Ubuntu-20.04/Python-3.9.2 compatibility build. The 28 remaining `ORACLE_PENDING` matrix rows are not promoted without matching coverage; this is one reason for the blocked final verdict.
 - `segi`, crystallographic `pbc`/`symmetry`/`bycell`, fragment/ring perception, donor/acceptor chemistry, and `gap` remain explicit unsupported or missing-dependency gates. Unknown properties fail closed.
 - Partial-charge selection is implemented only when a complete, revision-matched canonical charge dataset is present; the admitted PDB/mmCIF ingestion path does not create one, so current loaded structures return a structured missing-dependency diagnostic. Peptide sequence and label-property selection likewise require datasets not present in this gate. `visible` requires the explicit presentation context supplied by the frontend selection router.
-- Native `like`, implicit adjacency, topology, and corrected spatial forms now have direct probe coverage; the six native parser errors and the remaining conservative matrix rows are retained as evidence rather than treated as application support.
+- Native `like`, implicit adjacency, topology, corrected spatial forms, and the new object-lineage workflows now have direct coverage; the six native parser errors and the remaining conservative matrix rows are retained as evidence rather than treated as application support.
 - Cross-object spatial queries are intentionally not evaluated until the workspace declares whether coordinates are `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD`; same-object spatial queries remain supported.
 - The production bundle retains the existing 3Dmol `eval` warning and exceeds the default 500 kB warning threshold; all build and runtime tests pass.

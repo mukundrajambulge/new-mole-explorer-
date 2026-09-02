@@ -22,7 +22,7 @@ import type { PickResult } from "./interaction/picking";
 import { colorRegistry } from "./rendering/colorRegistry";
 import { analyzeStructure, overlaysForAnalysis, type StructuralAnalysisKind, type StructuralAnalysisResult } from "./analysis/structuralAnalysis";
 import { commandHelp, isRecognizedCommandVerb, parseCommand } from "./commands/commandRegistry";
-import { createWorkspaceObject, cycleWorkspaceObjectState, renameWorkspaceObject, resolveGlobalFrameState, setWorkspaceObjectAllStates, setWorkspaceObjectEnabled, setWorkspaceObjectState, structureForWorkspaceObjectState, workspaceScopedStableAtomId, workspaceSelectionStructure, type WorkspaceObject } from "./workspace/workspaceModel";
+import { copyWorkspaceObject, createWorkspaceGroup, createWorkspaceObject, createWorkspaceObjectFromSelection, cycleWorkspaceObjectState, joinWorkspaceObjectStates, renameWorkspaceObject, resolveGlobalFrameState, setWorkspaceObjectAllStates, setWorkspaceObjectEnabled, setWorkspaceObjectState, splitWorkspaceObjectStates, structureForWorkspaceObjectState, updateWorkspaceGroup, workspaceScopedStableAtomId, workspaceSelectionStructure, type WorkspaceGroup, type WorkspaceObject } from "./workspace/workspaceModel";
 
 const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_SELECT]: "Select",
@@ -51,6 +51,7 @@ export const App = () => {
   const [project, setProject] = useState<ProjectRecord | null>(null);
   const [structure, setStructure] = useState<StructureLoadResult | null>(null);
   const [workspaceObjects, setWorkspaceObjects] = useState<WorkspaceObject[]>([]);
+  const [workspaceGroups, setWorkspaceGroups] = useState<WorkspaceGroup[]>([]);
   const [activeObjectId, setActiveObjectId] = useState<string | null>(null);
   const [globalFrameIndex, setGlobalFrameIndex] = useState(0);
   const [projection, setProjection] = useState<RenderProjection>(createDefaultRenderProjection());
@@ -72,6 +73,7 @@ export const App = () => {
   const namedSelectionsRef = useRef<NamedSelectionStore | null>(null);
   const activeSelectionResultRef = useRef<SelectionResult | null>(null);
   const workspaceObjectsRef = useRef<WorkspaceObject[]>([]);
+  const workspaceGroupsRef = useRef<WorkspaceGroup[]>([]);
   const pendingImportModeRef = useRef<"replace" | "add">("replace");
   const analysisOverlays = useMemo(() => overlaysForAnalysis(analysisResults), [analysisResults]);
   const viewerWorkspaceObjects = useMemo(() => workspaceObjects.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object), [activeObjectId, projection, workspaceObjects]);
@@ -144,6 +146,7 @@ export const App = () => {
       const nextWorkspace = mode === "add" ? [...workspaceObjectsRef.current, workspaceObject] : [workspaceObject];
       workspaceObjectsRef.current = nextWorkspace;
       setWorkspaceObjects(nextWorkspace);
+      if (mode === "replace") { workspaceGroupsRef.current = []; setWorkspaceGroups([]); }
       setActiveObjectId(workspaceObject.objectId);
       setStructure(result);
       namedSelectionsRef.current = new NamedSelectionStore(result.structure);
@@ -230,6 +233,8 @@ export const App = () => {
       setProject(created);
       workspaceObjectsRef.current = [];
       setWorkspaceObjects([]);
+      workspaceGroupsRef.current = [];
+      setWorkspaceGroups([]);
       setActiveObjectId(null);
       setStructure(null);
       setProjection(createDefaultRenderProjection());
@@ -256,6 +261,8 @@ export const App = () => {
       const openedWorkspace = opened.structure ? [createWorkspaceObject(opened.structure)] : [];
       workspaceObjectsRef.current = openedWorkspace;
       setWorkspaceObjects(openedWorkspace);
+      workspaceGroupsRef.current = [];
+      setWorkspaceGroups([]);
       setActiveObjectId(openedWorkspace[0]?.objectId ?? null);
       setStructure(opened.structure);
       namedSelectionsRef.current = opened.structure ? new NamedSelectionStore(opened.structure.structure) : null;
@@ -448,6 +455,17 @@ export const App = () => {
     return next;
   };
 
+  const resolveWorkspaceGroup = (name: string) => {
+    const normalized = name.trim().replace(/^['"]|['"]$/g, "").toLowerCase();
+    const candidates = workspaceGroupsRef.current.filter((group) => group.groupId.toLowerCase() === normalized || group.name.toLowerCase() === normalized);
+    return { group: candidates.length === 1 ? candidates[0] : undefined, ambiguous: candidates.length > 1 };
+  };
+
+  const setWorkspaceGroupsSafe = (groups: WorkspaceGroup[]) => {
+    workspaceGroupsRef.current = groups;
+    setWorkspaceGroups(groups);
+  };
+
   const runConsoleCommand = (input: string): ConsoleCommandResult => {
     const trimmed = input.trim();
     const head = trimmed.match(/^([^\s]+)/)?.[1] ?? "";
@@ -568,20 +586,109 @@ export const App = () => {
       const target = resolved.object;
       return target ? { category: "OBJECT", status: `${target.displayName} has ${target.stateOrder.length} canonical coordinate state${target.stateOrder.length === 1 ? "" : "s"}.`, count: target.stateOrder.length } : { category: "OBJECT", status: `Object ${parsed.argument} does not exist.` };
     }
+    if (parsed.verb === "group") {
+      const groupInput = parsed.argument.trim();
+      const subcommand = groupInput.match(/^(\S+)(?:\s+(.+))?$/s);
+      const action = subcommand?.[1]?.toLowerCase() ?? "";
+      const name = subcommand?.[2]?.trim() ?? "";
+      if (!subcommand) return { category: "OBJECT", status: "group requires create, add, remove, open, close, toggle, or empty." };
+      if (action === "create") {
+        if (parsed.target) return { category: "OBJECT", status: "group create accepts only a name; no group was created." };
+        const created = createWorkspaceGroup(name, workspaceGroupsRef.current.map((group) => group.groupId));
+        if (!created.ok) return { category: "OBJECT", status: created.message };
+        setWorkspaceGroupsSafe([...workspaceGroupsRef.current, created.value]);
+        return { category: "OBJECT", status: `Created workspace group ${created.value.name}.` };
+      }
+      if (["purge", "excise", "delete"].includes(action)) return { category: "OBJECT", status: `group ${action} is unavailable because destructive group lifecycle is not enabled; no group or object changed.` };
+      const targetGroup = resolveWorkspaceGroup(name);
+      if (targetGroup.ambiguous) return { category: "OBJECT", status: `Group reference ${name} is ambiguous; use a durable GroupID and no group state changed.` };
+      if (!targetGroup.group) return { category: "OBJECT", status: `Group ${name} does not exist; no group state changed.` };
+      if (action === "add" || action === "remove") {
+        if (!parsed.target) return { category: "OBJECT", status: `group ${action} requires a group and object target; no group state changed.` };
+        const resolvedObject = resolveWorkspaceObject(parsed.target);
+        if (resolvedObject.ambiguous) return { category: "OBJECT", status: ambiguousObjectStatus(parsed.target) };
+        if (!resolvedObject.object) return { category: "OBJECT", status: `Object ${parsed.target} does not exist; no group state changed.` };
+        const memberIds = new Set(targetGroup.group.objectIds);
+        if (action === "add") memberIds.add(resolvedObject.object.objectId); else memberIds.delete(resolvedObject.object.objectId);
+        setWorkspaceGroupsSafe(workspaceGroupsRef.current.map((group) => group.groupId === targetGroup.group!.groupId ? updateWorkspaceGroup(group, { objectIds: [...memberIds] }) : group));
+        return { category: "OBJECT", status: `${action === "add" ? "Added" : "Removed"} ${resolvedObject.object.displayName} ${action === "add" ? "to" : "from"} group ${targetGroup.group.name}.` };
+      }
+      if (["open", "close", "toggle", "empty"].includes(action)) {
+        const nextOpen = action === "open" ? true : action === "close" ? false : action === "toggle" ? !targetGroup.group.open : targetGroup.group.open;
+        const nextMembers = action === "empty" ? [] : targetGroup.group.objectIds;
+        setWorkspaceGroupsSafe(workspaceGroupsRef.current.map((group) => group.groupId === targetGroup.group!.groupId ? updateWorkspaceGroup(group, { open: nextOpen, objectIds: nextMembers }) : group));
+        return { category: "OBJECT", status: action === "empty" ? `Emptied group ${targetGroup.group.name}; objects remain loaded.` : `${nextOpen ? "Opened" : "Closed"} group ${targetGroup.group.name}.` };
+      }
+      return { category: "OBJECT", status: `Unknown group action ${action}; no group state changed.` };
+    }
     if (parsed.verb === "copy" || parsed.verb === "create" || parsed.verb === "split_states" || parsed.verb === "join_states") {
-      if (parsed.verb === "create") return { category: "OBJECT", status: "create is unavailable without a canonical structure source; no object was created." };
-      if (parsed.verb === "split_states") return { category: "OBJECT", status: "split_states is unavailable until canonical state-to-object lineage is defined; no object was created." };
-      if (parsed.verb === "join_states") return { category: "OBJECT", status: "join_states is unavailable until compatible canonical state lineage is validated; no object was changed." };
-      const left = resolveWorkspaceObject(parsed.argument);
-      const right = parsed.target ? resolveWorkspaceObject(parsed.target) : { object: undefined, ambiguous: false };
-      if (left.ambiguous || right.ambiguous) return { category: "OBJECT", status: ambiguousObjectStatus(left.ambiguous ? parsed.argument : parsed.target ?? "") };
-      const source = left.object ?? right.object;
-      const displayName = left.object ? parsed.target?.trim() : parsed.argument.trim();
-      if (!source || !displayName) return { category: "OBJECT", status: "copy requires `copy target, source` and an existing unambiguous source object." };
-      const copiedBase = createWorkspaceObject(source.loadResult, workspaceObjectsRef.current.map((object) => object.objectId));
-      const copied = renameWorkspaceObject({ ...copiedBase, enabled: source.enabled, projection: source.projection, stateOrder: [...source.stateOrder], currentStateId: source.currentStateId, allStates: source.allStates }, displayName);
+      if (parsed.verb === "create") {
+        if (!parsed.target) return { category: "OBJECT", status: "create requires `create target, selection`; no object was created." };
+        const context = commandSelectionContext();
+        if (!context.structure) return { category: "OBJECT", status: "No structure loaded; no object was created." };
+        try {
+          const result = requireValidSelection(evaluateSelectionQuery(parsed.target, context.structure, { named: context.named, coordinateStateId: context.coordinateStateId, stateOrdinal: context.stateOrdinal, presentation: context.presentation }));
+          const scopedObjectIds = new Set(result.stableAtomIds.map((stableId) => stableId.includes("::") ? stableId.split("::", 1)[0] : activeObjectId).filter((value): value is string => Boolean(value)));
+          if (scopedObjectIds.size > 1) return { category: "OBJECT", status: "create requires a selection from one workspace object; cross-object creation is not supported and no object was created." };
+          const source = [...scopedObjectIds][0] ? workspaceObjectsRef.current.find((object) => object.objectId === [...scopedObjectIds][0]) : workspaceObjectsRef.current.find((object) => object.objectId === activeObjectId);
+          if (!source) return { category: "OBJECT", status: "create could not resolve one source workspace object; no object was created." };
+          const canonicalIds = result.stableAtomIds.map((stableId) => stableId.startsWith(`${source.objectId}::`) ? stableId.slice(source.objectId.length + 2) : stableId);
+          const created = createWorkspaceObjectFromSelection(source, canonicalIds, parsed.argument, workspaceObjectsRef.current.map((object) => object.objectId));
+          if (!created.ok) return { category: "OBJECT", status: created.message };
+          appendWorkspaceObject(created.value);
+          setActiveObjectId(created.value.objectId);
+          setStructure(created.value.loadResult);
+          setProjection(created.value.projection);
+          namedSelectionsRef.current = new NamedSelectionStore(created.value.loadResult.structure);
+          setNamedSelections([]);
+          setActiveSelection(null);
+          return { category: "OBJECT", status: `Created ${created.value.displayName} from ${result.count} canonical atoms with new identities; source object preserved.`, count: result.count };
+        } catch (error) { return commandError(error, "OBJECT"); }
+      }
+      if (parsed.verb === "split_states") {
+        const resolved = resolveWorkspaceObject(parsed.argument);
+        if (resolved.ambiguous) return { category: "OBJECT", status: ambiguousObjectStatus(parsed.argument) };
+        if (!resolved.object) return { category: "OBJECT", status: `Object ${parsed.argument} does not exist; split_states made no changes.` };
+        const split = splitWorkspaceObjectStates(resolved.object, parsed.target, workspaceObjectsRef.current.map((object) => object.objectId));
+        if (!split.ok) return { category: "OBJECT", status: split.message };
+        const next = [...workspaceObjectsRef.current, ...split.value];
+        workspaceObjectsRef.current = next;
+        setWorkspaceObjects(next);
+        const first = split.value[0]!;
+        setActiveObjectId(first.objectId);
+        setStructure(first.loadResult);
+        setProjection(first.projection);
+        namedSelectionsRef.current = new NamedSelectionStore(first.loadResult.structure);
+        setNamedSelections([]);
+        setActiveSelection(null);
+        return { category: "OBJECT", status: `Split ${resolved.object.displayName} into ${split.value.length} new one-state object${split.value.length === 1 ? "" : "s"}; source object preserved.`, count: split.value.length };
+      }
+      if (parsed.verb === "join_states") {
+        if (!parsed.target) return { category: "OBJECT", status: "join_states requires `join_states object, other`; no object was created." };
+        const left = resolveWorkspaceObject(parsed.argument);
+        const right = resolveWorkspaceObject(parsed.target);
+        if (left.ambiguous || right.ambiguous) return { category: "OBJECT", status: ambiguousObjectStatus(left.ambiguous ? parsed.argument : parsed.target) };
+        if (!left.object || !right.object) return { category: "OBJECT", status: "join_states requires two existing unambiguous workspace objects; no object was created." };
+        const joined = joinWorkspaceObjectStates(left.object, right.object, workspaceObjectsRef.current.map((object) => object.objectId));
+        if (!joined.ok) return { category: "OBJECT", status: joined.message };
+        appendWorkspaceObject(joined.value);
+        setActiveObjectId(joined.value.objectId);
+        setStructure(joined.value.loadResult);
+        setProjection(joined.value.projection);
+        namedSelectionsRef.current = new NamedSelectionStore(joined.value.loadResult.structure);
+        setNamedSelections([]);
+        setActiveSelection(null);
+        return { category: "OBJECT", status: `Joined ${left.object.displayName} and ${right.object.displayName} into ${joined.value.displayName} with strict atom/topology correspondence; sources preserved.`, count: joined.value.stateOrder.length };
+      }
+      if (!parsed.target) return { category: "OBJECT", status: "copy requires `copy target, source` and an existing unambiguous source object." };
+      const sourceResolution = resolveWorkspaceObject(parsed.target);
+      if (sourceResolution.ambiguous) return { category: "OBJECT", status: ambiguousObjectStatus(parsed.target) };
+      if (!sourceResolution.object) return { category: "OBJECT", status: `Source object ${parsed.target} does not exist; copy made no changes.` };
+      const targetResolution = resolveWorkspaceObject(parsed.argument);
+      if (targetResolution.object || targetResolution.ambiguous) return { category: "OBJECT", status: `Target object name ${parsed.argument} is already in use; copy made no changes.` };
+      const copied = copyWorkspaceObject(sourceResolution.object, parsed.argument, workspaceObjectsRef.current.map((object) => object.objectId));
       appendWorkspaceObject(copied);
-      return { category: "OBJECT", status: `Copied ${source.displayName} to ${copied.displayName}; canonical source and state order preserved.` };
+      return { category: "OBJECT", status: `Copied ${sourceResolution.object.displayName} to ${copied.displayName}; canonical source and state order preserved.` };
     }
     if (parsed.verb === "rename" || parsed.verb === "set_name") {
       const resolved = resolveWorkspaceObject(parsed.argument);
@@ -803,7 +910,7 @@ export const App = () => {
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
         <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
-          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} activeObjectId={activeObjectId} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} />
+          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} />
           <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFileDrop={importFile} consoleExpanded={consoleExpanded} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} />
           <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
         </div>
