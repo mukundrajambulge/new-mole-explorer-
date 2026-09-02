@@ -4,7 +4,7 @@
 
 **SELECTION + MULTI-OBJECT/MULTI-STATE CLOSURE INCOMPLETE — BLOCKED**
 
-The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. The pinned PyMOL source has now executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The gate remains blocked because 28 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
+The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. Cross-object spatial queries now require and record an explicit coordinate-frame policy; bare object and group references resolve through the workspace namespace. The pinned PyMOL source has executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The gate remains blocked because 28 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
 
 ## Repository and run evidence
 
@@ -12,9 +12,9 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Remote: `new-origin https://github.com/mukundrajambulge/new-mole-explorer-.git`
 - Local root: `C:\Users\mukun\Documents\Codex\2026-08-30\files-pasted-by-the-user-new\outputs\molecular-workstation`
 - Branch: `fix/visualization-final-closure`
-- Starting SHA for this closure pass: `c439364207858158ad8de06ed8acd1e60763ab7a`
-- Ending evidence SHA: `6d67b83` (lineage-aware object workflows, organizational groups, and regenerated live evidence)
-- Working tree before commit: modified by this closure pass; no unrelated files were changed
+- Starting SHA for this closure pass: `36182da52e9cdd651d95f25d675f350b114749ad`
+- Ending evidence SHA: `1227b2b703c859f3d8eec31292910d300af15ece`
+- Working tree: clean after the recorded implementation and evidence commits; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
 - API health: `http://localhost:8100/api/health`
@@ -42,6 +42,8 @@ The current application was exercised with a real 4DJW RCSB load:
 - `all_states` is bounded to explicit auxiliary state models. State changes reconcile model coordinates in place when layout is unchanged.
 - Object `copy` deep-clones presentation/load containers, preserves canonical source, state order, current state, enablement, and projection, and receives a new durable ObjectID with explicit lineage. `create` materializes selected atoms with new stable identities and source correspondence; `split_states` creates bounded one-state objects; `join_states` accepts only strict ordered atom/topology correspondence. Failed or incompatible operations are non-destructive.
 - Workspace groups provide stable organizational membership with create/add/remove/open/close/toggle/empty operations. Group actions do not mutate canonical molecular data; destructive purge/excise/delete remain unavailable.
+- Cross-object spatial evaluation has an explicit `CoordinateFramePolicy`: `LOCAL_SCIENTIFIC` compares raw canonical Å coordinates, while `EFFECTIVE_WORLD` currently uses the declared identity object transforms. The policy is recorded in `SelectionResult` and `BoundSelectionPlan`; an undeclared cross-object query fails closed.
+- Bare workspace object names and group names resolve through the same canonical selection engine as explicit `object` predicates. Named snapshots retain precedence, and ambiguous object/group names produce a structured diagnostic.
 - Workspace presentation commands are applied per canonical object scope. The viewer adapter projects each object’s representation directives onto its own model, and single-object disable/enable transitions stay in the same workspace projection path.
 - Selection cache identity includes canonical selector fields and workspace namespace metadata, including durable object ID, mutable display name, segment identity, and coordinate-state annotations; renaming cannot reuse a stale object-name result.
 - Failed loads are non-destructive: the current workspace and viewer remain intact.
@@ -51,7 +53,7 @@ The current application was exercised with a real 4DJW RCSB load:
 The machine-readable ledger is [selection-operator-matrix.json](../selection/selection-operator-matrix.json), generated from [SELECTION_OPERATOR_MATRIX.md](../selection/SELECTION_OPERATOR_MATRIX.md).
 
 - Rows: **87**
-- Implementation: **69 VERIFIED_WORKING**, **11 MISSING_DEPENDENCY**, **6 INTENTIONALLY_UNSUPPORTED**, **1 UNKNOWN_PROPERTY**
+- Implementation: **70 VERIFIED_WORKING**, **10 MISSING_DEPENDENCY**, **6 INTENTIONALLY_UNSUPPORTED**, **1 UNKNOWN_PROPERTY**
 - Live-browser status: **85 pass/accepted diagnostic outcomes** across the expanded matrix exercise
 - Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **85** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
 - `in`, `bycalpha`, and `bymolecule` now use canonical tuple, residue-CA, and bond-component semantics respectively. `visible` is now bound to an explicit presentation context derived from render directives; it never aliases scientific `all`. `like`, the application implicit-adjacency profile, and the new spatial/topology forms are live-verified; malformed shorthand and missing scientific dependencies remain truthful diagnostics.
@@ -65,7 +67,8 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - `rename` / `set_name`, `copy`, `create`, `split_states`, and strict `join_states`: **PASS** with durable identity and lineage; invalid or incompatible operations are non-destructive.
 - `enable` / `disable`, `state`, `frame`, `all_states`, and `count_states`: **PASS** with explicit per-object state order.
 - `group create|add|remove|open|close|toggle|empty`: **PASS** as organizational state; destructive `purge`, `excise`, and `delete` remain unavailable.
-- Cross-object spatial selection: **BLOCKED / fail-closed** until an explicit coordinate frame is declared.
+- `coordinate_frame local_scientific|effective_world`: **PASS**; the policy is visible in the workspace and included in spatial selection metadata.
+- Cross-object spatial selection: **PASS when explicitly declared; fail-closed without a declared coordinate frame**.
 
 ## Files changed in this closure
 
@@ -85,6 +88,7 @@ Application/contracts:
 - `apps/web/src/rendering/surfaceProfiles.ts`
 - `apps/web/src/selection/selectionEngine.ts`
 - `apps/web/src/selection/selectionEngine.test.ts`
+- `apps/web/src/interaction/selectionResolver.ts`
 - `apps/web/src/styles/global.css`
 - `apps/web/src/workspace/workspaceModel.ts`
 - `apps/web/src/workspace/workspaceModel.test.ts`
@@ -111,6 +115,7 @@ Verification:
 - `verification/evidence/closure-4djw-two-objects.png`
 - `verification/evidence/selection-object-create.png`
 - `verification/evidence/selection-state-lineage.png`
+- `verification/evidence/selection-cross-object-spatial.png`
 - `verification/evidence/selection-console-matrix.png`
 - `verification/evidence/visualization-final/space-filling-ligand-only.png`
 - this report
@@ -130,7 +135,8 @@ Verification:
 - Bounded split_states first/last/prefix semantics: **PASS**
 - Strict join_states correspondence and topology validation: **PASS**
 - Non-destructive organizational group lifecycle: **PASS**
-- Cross-object spatial selection without an explicit coordinate frame: **BLOCKED / fail-closed with a structured dependency diagnostic**
+- Bare object and group-name resolution: **PASS** through the canonical workspace selection context
+- Cross-object spatial selection with `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD`: **PASS**; undeclared policy remains **fail-closed with a structured dependency diagnostic**
 
 ## Multi-state closure
 
@@ -159,12 +165,11 @@ Verification:
 - `npm run test --workspace @molecular/web` — **PASS: 17 files / 74 tests**
 - `npm run test --workspace @molecular/api` — **PASS: 2 files / 11 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
-- `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 6 / 6**
+- `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 10 / 10**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/real-structure-workspace.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/closure-evidence.spec.ts` — **PASS: 1 / 1**
-- `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 9 / 9**
-- `npm run test:e2e` — **PASS: 70 / 70**
+- `npm run test:e2e` — **PASS: 71 / 71**
 - `npm run build` — **PASS**
 - `git diff --check` — **PASS**
 
@@ -176,7 +181,9 @@ Verification:
 4. Load 4DJW, run `select all`, then run bare `chain A and protein`; confirm 7,079 and 3,060 selections respectively.
 5. Use RCSB Add for `1CRN`; confirm two object rows, one viewer, independent focus/style/enable controls, and object-qualified selection.
 6. Import `tests/fixtures/multistate.pdb`; confirm `2 states`, switch state, toggle bounded all-state overlay, and run `count_states multistate.pdb`.
-7. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
+7. Add `1CRN`, run a cross-object spatial query without a frame and confirm the structured fail-closed diagnostic; choose `LOCAL_SCIENTIFIC` in the panel or run `coordinate_frame local_scientific`, then repeat the query and confirm a non-empty active selection with recorded frame policy.
+8. Create a group, add an object, and enter the bare group name in the console; confirm the member object atoms are selected without changing canonical objects.
+9. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
 
 ## Screenshot evidence
 
@@ -186,6 +193,7 @@ Verification:
 - [4DJW + 1CRN in one workspace](../evidence/closure-4djw-two-objects.png)
 - [Create-from-selection object](../evidence/selection-object-create.png)
 - [Split/join state lineage](../evidence/selection-state-lineage.png)
+- [Cross-object spatial frame declaration](../evidence/selection-cross-object-spatial.png)
 - [Selection console matrix](../evidence/selection-console-matrix.png)
 - [Space-filling ligand presentation](../evidence/visualization-final/space-filling-ligand-only.png)
 
@@ -195,5 +203,5 @@ Verification:
 - `segi`, crystallographic `pbc`/`symmetry`/`bycell`, fragment/ring perception, donor/acceptor chemistry, and `gap` remain explicit unsupported or missing-dependency gates. Unknown properties fail closed.
 - Partial-charge selection is implemented only when a complete, revision-matched canonical charge dataset is present; the admitted PDB/mmCIF ingestion path does not create one, so current loaded structures return a structured missing-dependency diagnostic. Peptide sequence and label-property selection likewise require datasets not present in this gate. `visible` requires the explicit presentation context supplied by the frontend selection router.
 - Native `like`, implicit adjacency, topology, corrected spatial forms, and the new object-lineage workflows now have direct coverage; the six native parser errors and the remaining conservative matrix rows are retained as evidence rather than treated as application support.
-- Cross-object spatial queries are intentionally not evaluated until the workspace declares whether coordinates are `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD`; same-object spatial queries remain supported.
+- Cross-object spatial queries require an explicit `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD` declaration. `EFFECTIVE_WORLD` is currently an identity-transform policy because object-level scientific transforms are not yet admitted; no hidden presentation transform participates.
 - The production bundle retains the existing 3Dmol `eval` warning and exceeds the default 500 kB warning threshold; all build and runtime tests pass.
