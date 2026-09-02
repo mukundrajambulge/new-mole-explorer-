@@ -4,7 +4,7 @@
 
 **SELECTION + MULTI-OBJECT/MULTI-STATE CLOSURE INCOMPLETE — BLOCKED**
 
-The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. Cross-object spatial queries now require and record an explicit coordinate-frame policy; bare object and group references resolve through the workspace namespace. The pinned PyMOL source has executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The gate remains blocked because 28 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
+The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. Cross-object spatial queries now require and record an explicit coordinate-frame policy; every coordinate-dependent selection also records the exact per-object coordinate state scope consulted, including cached and bound plans. The pinned PyMOL source has executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The gate remains blocked because 28 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
 
 ## Repository and run evidence
 
@@ -13,8 +13,8 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Local root: `C:\Users\mukun\Documents\Codex\2026-08-30\files-pasted-by-the-user-new\outputs\molecular-workstation`
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `36182da52e9cdd651d95f25d675f350b114749ad`
-- Ending evidence SHA: `1227b2b703c859f3d8eec31292910d300af15ece`
-- Working tree: clean after the recorded implementation and evidence commits; no unrelated files were changed
+- Ending implementation SHA: `d20da6a612f369f7ebe2c1200d9fcf7e1b18a997`
+- Working tree: clean after the recorded implementation, evidence, and report commits; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
 - API health: `http://localhost:8100/api/health`
@@ -40,6 +40,8 @@ The current application was exercised with a real 4DJW RCSB load:
 - Multi-object selection uses a derived workspace universe containing every loaded object, including disabled presentation objects, with object-scoped atom IDs; source canonical IDs are unchanged. `enabled` and `visible` remain separate presentation-scoped selectors.
 - Coordinate states use explicit `CoordinateStateID` and `StateOrder`. One-state structures receive a compatibility singleton state; renderer model order is never treated as scientific state identity.
 - `all_states` is bounded to explicit auxiliary state models. State changes reconcile model coordinates in place when layout is unchanged.
+- Coordinate-dependent selection results carry sorted per-object `stateScopes` with `{ObjectID, CoordinateStateID, StateOrder}`; state-dependent live selection changes are therefore distinguishable even when molecular topology/revision is unchanged.
+- Cartesian spatial comparisons use the centralized `cartesian-float64-v1` closed-boundary policy with an explicit squared-distance numerical epsilon; the epsilon is numerical protection, not a scientific cutoff expansion.
 - Object `copy` deep-clones presentation/load containers, preserves canonical source, state order, current state, enablement, and projection, and receives a new durable ObjectID with explicit lineage. `create` materializes selected atoms with new stable identities and source correspondence; `split_states` creates bounded one-state objects; `join_states` accepts only strict ordered atom/topology correspondence. Failed or incompatible operations are non-destructive.
 - Workspace groups provide stable organizational membership with create/add/remove/open/close/toggle/empty operations. Group actions do not mutate canonical molecular data; destructive purge/excise/delete remain unavailable.
 - Cross-object spatial evaluation has an explicit `CoordinateFramePolicy`: `LOCAL_SCIENTIFIC` compares raw canonical Å coordinates, while `EFFECTIVE_WORLD` currently uses the declared identity object transforms. The policy is recorded in `SelectionResult` and `BoundSelectionPlan`; an undeclared cross-object query fails closed.
@@ -69,6 +71,7 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - `group create|add|remove|open|close|toggle|empty`: **PASS** as organizational state; destructive `purge`, `excise`, and `delete` remain unavailable.
 - `coordinate_frame local_scientific|effective_world`: **PASS**; the policy is visible in the workspace and included in spatial selection metadata.
 - Cross-object spatial selection: **PASS when explicitly declared; fail-closed without a declared coordinate frame**.
+- State-dependent coordinate predicates: **PASS**; live `x < 1.5` changes from 3 atoms in state 1 to 1 atom in state 2 and exposes the consulted state scope in the active-selection panel.
 
 ## Files changed in this closure
 
@@ -88,6 +91,7 @@ Application/contracts:
 - `apps/web/src/rendering/surfaceProfiles.ts`
 - `apps/web/src/selection/selectionEngine.ts`
 - `apps/web/src/selection/selectionEngine.test.ts`
+- `apps/web/src/selection/spatialPolicy.ts`
 - `apps/web/src/interaction/selectionResolver.ts`
 - `apps/web/src/styles/global.css`
 - `apps/web/src/workspace/workspaceModel.ts`
@@ -144,7 +148,7 @@ Verification:
 - Multi-model PDB and mmCIF ingestion coverage: **PASS**
 - Explicit state UI, state commands in both accepted argument orders, and bounded `all_states`: **PASS**
 - In-place state coordinate replacement without duplicate models: **PASS**
-- State-aware derived selection metadata: **PASS**
+- State-aware derived selection metadata and state-dependent spatial/numeric selection scopes: **PASS**; state 1/state 2 live boundary regression is 3 atoms → 1 atom.
 - Heterogeneous object/state layout reconciliation: **PASS**
 - split_states and join_states preserve source-state lineage: **PASS**
 
@@ -162,7 +166,7 @@ Verification:
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm run test --workspace @molecular/web` — **PASS: 17 files / 74 tests**
+- `npm run test --workspace @molecular/web` — **PASS: 17 files / 76 tests**
 - `npm run test --workspace @molecular/api` — **PASS: 2 files / 11 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 10 / 10**
@@ -182,8 +186,9 @@ Verification:
 5. Use RCSB Add for `1CRN`; confirm two object rows, one viewer, independent focus/style/enable controls, and object-qualified selection.
 6. Import `tests/fixtures/multistate.pdb`; confirm `2 states`, switch state, toggle bounded all-state overlay, and run `count_states multistate.pdb`.
 7. Add `1CRN`, run a cross-object spatial query without a frame and confirm the structured fail-closed diagnostic; choose `LOCAL_SCIENTIFIC` in the panel or run `coordinate_frame local_scientific`, then repeat the query and confirm a non-empty active selection with recorded frame policy.
-8. Create a group, add an object, and enter the bare group name in the console; confirm the member object atoms are selected without changing canonical objects.
-9. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
+8. Import `tests/fixtures/multistate.pdb`, run `x < 1.5` in state 1 and state 2, and confirm the canonical result changes from 3 atoms to 1 atom while the active-selection panel reports state scopes 1 and 2.
+9. Create a group, add an object, and enter the bare group name in the console; confirm the member object atoms are selected without changing canonical objects.
+10. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
 
 ## Screenshot evidence
 
@@ -203,5 +208,5 @@ Verification:
 - `segi`, crystallographic `pbc`/`symmetry`/`bycell`, fragment/ring perception, donor/acceptor chemistry, and `gap` remain explicit unsupported or missing-dependency gates. Unknown properties fail closed.
 - Partial-charge selection is implemented only when a complete, revision-matched canonical charge dataset is present; the admitted PDB/mmCIF ingestion path does not create one, so current loaded structures return a structured missing-dependency diagnostic. Peptide sequence and label-property selection likewise require datasets not present in this gate. `visible` requires the explicit presentation context supplied by the frontend selection router.
 - Native `like`, implicit adjacency, topology, corrected spatial forms, and the new object-lineage workflows now have direct coverage; the six native parser errors and the remaining conservative matrix rows are retained as evidence rather than treated as application support.
-- Cross-object spatial queries require an explicit `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD` declaration. `EFFECTIVE_WORLD` is currently an identity-transform policy because object-level scientific transforms are not yet admitted; no hidden presentation transform participates.
+- Cross-object spatial queries require an explicit `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD` declaration. `EFFECTIVE_WORLD` is currently an identity-transform policy because object-level scientific transforms are not yet admitted; no hidden presentation transform participates. Cartesian predicates use the named `cartesian-float64-v1` closed-boundary numerical tolerance.
 - The production bundle retains the existing 3Dmol `eval` warning and exceeds the default 500 kB warning threshold; all build and runtime tests pass.
