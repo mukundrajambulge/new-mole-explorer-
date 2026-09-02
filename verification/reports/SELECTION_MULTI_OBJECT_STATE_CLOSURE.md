@@ -14,9 +14,9 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `b87a0388b57859ecf4d038997352a9d0178abe5a`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
-- Current implementation commit: `2a44540c9dfd24dd7241f569c00e8c0c22e9de83` (`fix(selection): preserve peptide sequence scope across workspace objects`)
-- Ending implementation SHA: `2a44540c9dfd24dd7241f569c00e8c0c22e9de83`
-- Latest implementation/evidence base SHA before this report update: `2a44540c9dfd24dd7241f569c00e8c0c22e9de83`
+- Current implementation commit: `5e1501fed20b72390f94e52cf1b1b6f13e71d724` (`test(selection): verify canonical property predicates live`)
+- Ending implementation SHA: `5e1501fed20b72390f94e52cf1b1b6f13e71d724`
+- Latest implementation/evidence base SHA before this report update: `5e1501fed20b72390f94e52cf1b1b6f13e71d724`
 - Working tree: modified only by the evidence screenshots and this report update; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -87,10 +87,12 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - Cross-object spatial selection: **PASS when explicitly declared; fail-closed without a declared coordinate frame**.
 - State-dependent coordinate predicates: **PASS**; live `x < 1.5` changes from 3 atoms in state 1 to 1 atom in state 2, and live `within 1.5 of name N` changes from 2 atoms in state 1 to 1 atom in state 2 while exposing the consulted state scope in the active-selection panel.
 - Canonical segment, alternate-location, occupancy, and B-factor identity: **PASS**; `segi SEG_A` and `bysegi segi SEG_A` select the source-backed segment, while `alt A`, `b > 20`, and `q >= 0.5` use the preserved canonical fields.
+- Canonical formal charge and secondary structure: **PASS**; source charge predicates and PDB HELIX/SHEET predicates select positive live subsets without renderer-derived values.
 - Presentation-dependent selection: **PASS** for effective `rep`, `color`, `label`, `cartoon_color`, and `ribbon_color` selectors; the selection result records the projection revision and remains stable under subsequent targeting.
 - Canonical fragment/ring topology: **PASS** for the declared application profiles; `byfragment` uses canonical-bond connected components and `byring` uses bounded simple cycles of size 3–7.
 - VDW surface-gap selection: **PASS** for the declared `canonical-element-vdw-radius@1` profile; non-empty and valid-empty live cases are covered, and unknown radius data fails closed without changing the workspace.
 - Peptide sequence selection: **PASS** for the declared `canonical-peptide-sequence-v1` profile; `pepseq AG` selects the complete canonical residue atoms in the uploaded two-residue fixture, while invalid values fail with `INVALID_VALUE`.
+- Canonical PDB property selection: **PASS** for source formal charge, B-factor, and HELIX/SHEET secondary-structure assignments in the live `typed-properties.pdb` fixture; missing-property behavior remains fail-closed on the minimal fixture.
 
 ## Files changed in this closure
 
@@ -133,6 +135,7 @@ Verification:
 - `tests/fixtures/ring-ligand.pdb`
 - `tests/fixtures/typed-nucleic.mmcif`
 - `tests/fixtures/edge-identity.mmcif`
+- `tests/fixtures/typed-properties.pdb`
 - `verification/selection/SELECTION_OPERATOR_MATRIX.md`
 - `verification/selection/generate-matrix-summary.mjs`
 - `verification/selection/selection-operator-matrix.json`
@@ -205,8 +208,9 @@ Verification:
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "source-backed mmCIF polymer typing"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "canonical mmCIF segment identity"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "ring topology"` — **PASS: 1 / 1**
+- `npx playwright test tests/e2e/selection-closure.spec.ts --grep "formal charge"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "presentation-dependent"` — **PASS: 1 / 1**
-- `npm run test:e2e` — **PASS: 75 / 75**
+- `npm run test:e2e` — **PASS: 76 / 76**
 - `npm run build` — **PASS**
 - `git diff --check` — **PASS**
 - Pinned PyMOL oracle reproduction — **PASS: PyMOL 3.2.0a; 85 forms; 79 successful / 6 native errors; committed probe row payload identical**
@@ -226,7 +230,8 @@ Verification:
 11. Import `tests/fixtures/edge-identity.mmcif`, run `segi SEG_A`, `bysegi segi SEG_A`, `alt A`, `b > 20`, and `q >= 0.5`, and confirm the source-backed identity fields drive the expected non-empty selections.
 12. Import `tests/fixtures/mini-protein.pdb`, run `gap 0 ligand` and `gap 4 ligand`, and confirm the active-selection counts are 6 and 0; the selection result should expose the `canonical-element-vdw-radius@1` scientific profile.
 13. Import `tests/fixtures/mini-protein.pdb`, run `pepseq AG`, and confirm 8 canonical atoms are selected; run `pepseq 10` and confirm the invalid-value diagnostic leaves the previous workspace and active selection unchanged.
-14. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
+14. Import `tests/fixtures/typed-properties.pdb`, run `formal_charge = 0` (2 atoms), `formal_charge > 0` (1), `ss HELIX` (2), `ss SHEET` (2), and `b > 20` (1), and confirm `VALID NONEMPTY` status.
+15. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
 
 ## Screenshot evidence
 
