@@ -13,7 +13,7 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Local root: `C:\Users\mukun\Documents\Codex\2026-08-30\files-pasted-by-the-user-new\outputs\molecular-workstation`
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `900552e18e5eccabaaaedbae0853ef9956585084`
-- Ending evidence SHA: `9f1bc5e86feaf4117e123fa24b93e13a476878ce` (selection semantics, segment identity metadata, workspace presentation synchronization, selection namespace cache safety, explicit presentation-bound visibility selection, and pinned-oracle verification evidence)
+- Ending evidence SHA: `4d50a48` (scientific workspace scope, revision-matched partial-charge selection, and regenerated live evidence)
 - Working tree before commit: modified by this closure pass; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -37,7 +37,7 @@ The current application was exercised with a real 4DJW RCSB load:
 - `RenderProjection` is the renderer-neutral presentation boundary consumed by `ThreeDMolViewerAdapter`; UI components do not own 3Dmol scientific state.
 - One mounted molecular canvas owns one authoritative adapter/viewer instance. Multiple workspace objects become separate 3Dmol models within that viewer.
 - Durable `ObjectID`, display name, and renderer model identity are distinct. Duplicate names require an ObjectID and never silently select the first match.
-- Multi-object selection uses a derived workspace universe with object-scoped atom IDs; source canonical IDs are unchanged.
+- Multi-object selection uses a derived workspace universe containing every loaded object, including disabled presentation objects, with object-scoped atom IDs; source canonical IDs are unchanged. `enabled` and `visible` remain separate presentation-scoped selectors.
 - Coordinate states use explicit `CoordinateStateID` and `StateOrder`. One-state structures receive a compatibility singleton state; renderer model order is never treated as scientific state identity.
 - `all_states` is bounded to explicit auxiliary state models. State changes reconcile model coordinates in place when layout is unchanged.
 - Object `copy` preserves canonical source, state order, current state, enablement, and projection while receiving a new durable ObjectID. `create`, `split_states`, and `join_states` remain explicitly gated where lineage semantics are not defined.
@@ -78,6 +78,7 @@ Application/contracts:
 - `apps/web/src/selection/selectionEngine.test.ts`
 - `apps/web/src/styles/global.css`
 - `apps/web/src/workspace/workspaceModel.ts`
+- `apps/web/src/workspace/workspaceModel.test.ts`
 - `apps/api/src/structures/ingestion.ts`
 - `packages/contracts/src/index.ts`
 - `package.json`
@@ -110,6 +111,7 @@ Verification:
 - Independent object enable/disable and projection/style/color state: **PASS**
 - Object-qualified console representation/color targeting and single-object disable/enable synchronization: **PASS**
 - Cross-object selection and object-qualified queries: **PASS**
+- Scientific `all` versus presentation `enabled` scope after disabling one object: **PASS**
 - Reverse picking identity map with object and coordinate-state context: **PASS**
 - Object/state-scoped surfaces and unrelated-state cache isolation: **PASS**
 - Object-scoped measurement picks reject mixed-object ambiguity and resolve against the canonical target object: **PASS**
@@ -138,7 +140,7 @@ Verification:
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm run test --workspace @molecular/web` — **PASS: 16 files / 69 tests**
+- `npm run test --workspace @molecular/web` — **PASS: 17 files / 71 tests**
 - `npm run test --workspace @molecular/api` — **PASS: 2 files / 11 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 6 / 6**
@@ -172,7 +174,7 @@ Verification:
 
 - The pinned PyMOL source was executed in a temporary Ubuntu-20.04/Python-3.9.2 compatibility build. The 28 remaining `ORACLE_PENDING` matrix rows are not promoted without matching coverage; this is one reason for the blocked final verdict.
 - `segi`, crystallographic `pbc`/`symmetry`/`bycell`, fragment/ring perception, donor/acceptor chemistry, and `gap` remain explicit unsupported or missing-dependency gates. Unknown properties fail closed.
-- Partial charge, peptide sequence, and label-property selection require datasets not present in this gate and return structured missing-dependency diagnostics. `visible` requires the explicit presentation context supplied by the frontend selection router.
+- Partial-charge selection is implemented only when a complete, revision-matched canonical charge dataset is present; the admitted PDB/mmCIF ingestion path does not create one, so current loaded structures return a structured missing-dependency diagnostic. Peptide sequence and label-property selection likewise require datasets not present in this gate. `visible` requires the explicit presentation context supplied by the frontend selection router.
 - Native `like`, implicit adjacency, topology, and corrected spatial forms now have direct probe coverage; the six native parser errors and the remaining conservative matrix rows are retained as evidence rather than treated as application support.
 - Cross-object spatial queries are intentionally not evaluated until the workspace declares whether coordinates are `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD`; same-object spatial queries remain supported.
 - The production bundle retains the existing 3Dmol `eval` warning and exceeds the default 500 kB warning threshold; all build and runtime tests pass.

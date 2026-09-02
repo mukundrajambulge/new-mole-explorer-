@@ -308,7 +308,8 @@ const atomCategory = (atom: CanonicalAtom): "polymer" | "ligand" | "water" | "io
 const backboneNames = new Set(["N", "CA", "C", "O", "OXT"]);
 const metalElements = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA", "ZN", "FE", "MN", "CU", "CO", "NI"]);
 const categoryMatches = (atom: CanonicalAtom, category: SelectionCategory, structure: CanonicalMolecularStructure, context: EvalContext): boolean => {
-  if (category === "enabled" || category === "present") return true;
+  if (category === "enabled") return atom.workspaceObjectEnabled ?? true;
+  if (category === "present") return true;
   if (category === "visible") {
     context.needsPresentation = true;
     if (!context.visibleAtomIds) { context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Presentation visibility is not bound into this selection context." }); return false; }
@@ -365,7 +366,24 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
     } else matches = wildcardMatch(structure.id, value) || wildcardMatch(structure.name, value) || wildcardMatch(structure.source.originalFilename, value);
   }
   else if (["b", "q", "occupancy", "formal_charge", "partial_charge", "x", "y", "z", "state"].includes(property)) {
-    const numeric = property === "b" ? atom.bFactor : property === "q" || property === "occupancy" ? atom.occupancy : property === "formal_charge" ? atom.formalCharge : property === "x" ? atom.x : property === "y" ? atom.y : property === "z" ? atom.z : property === "state" ? atom.workspaceStateOrdinal ?? context.stateOrdinal : undefined;
+    const chargeDataset = structure.partialChargeDataset;
+    const numeric = property === "b"
+      ? atom.bFactor
+      : property === "q" || property === "occupancy"
+        ? atom.occupancy
+        : property === "formal_charge"
+          ? atom.formalCharge
+          : property === "partial_charge"
+            ? chargeDataset?.molecularRevision === structure.scientificHash ? chargeDataset.atomChargeMap[atom.stableId] : undefined
+            : property === "x"
+              ? atom.x
+              : property === "y"
+                ? atom.y
+                : property === "z"
+                  ? atom.z
+                  : property === "state"
+                    ? atom.workspaceStateOrdinal ?? context.stateOrdinal
+                    : undefined;
     const requested = Number(value);
     if (!Number.isFinite(requested)) { markInvalid(`${property} requires a finite numeric value.`); return false; }
     if (numeric === undefined || numeric === null || !Number.isFinite(numeric)) { if (property === "partial_charge" || property === "state" || !context.diagnostics.some((diagnostic) => diagnostic.code === "MISSING_DEPENDENCY")) context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: `Canonical ${property} data is unavailable for this selection context.` }); return false; }
@@ -500,9 +518,17 @@ const namespaceRevisionFor = (structure: CanonicalMolecularStructure, named?: Na
     segmentId: atom.segmentId ?? "",
     workspaceObjectId: atom.workspaceObjectId ?? "",
     workspaceObjectName: atom.workspaceObjectName ?? "",
+    workspaceObjectEnabled: atom.workspaceObjectEnabled ?? true,
     workspaceCoordinateStateId: atom.workspaceCoordinateStateId ?? "",
     workspaceStateOrdinal: atom.workspaceStateOrdinal ?? null,
   })),
+  partialChargeDataset: structure.partialChargeDataset ? {
+    datasetId: structure.partialChargeDataset.datasetId,
+    molecularRevision: structure.partialChargeDataset.molecularRevision,
+    chargeModel: structure.partialChargeDataset.chargeModel,
+    profileVersion: structure.partialChargeDataset.profileVersion,
+    atomChargeMap: structure.partialChargeDataset.atomChargeMap,
+  } : null,
   namedNamespaceRevision: named?.namespaceRevision ?? "none",
 }));
 const baseResult = (query: string, structure: CanonicalMolecularStructure, source: SelectionProvenance, status: SelectionStatus, diagnostics: readonly SelectionDiagnostic[], astText: string, ids: readonly string[], deps: EvalContext, boundPlan: BoundSelectionPlan | null = null): SelectionResult => {

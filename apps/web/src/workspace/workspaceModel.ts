@@ -108,15 +108,15 @@ export const cycleWorkspaceObjectState = (object: WorkspaceObject, direction: -1
 
 /** Builds a derived selection universe; source objects remain canonical and untouched. */
 export const workspaceSelectionStructure = (objects: readonly WorkspaceObject[]): CanonicalMolecularStructure | null => {
-  const enabled = objects.filter((object) => object.enabled);
-  const first = enabled[0]?.loadResult.structure;
+  const scoped = objects;
+  const first = scoped[0]?.loadResult.structure;
   if (!first) return null;
-  const atoms = enabled.flatMap((object) => {
+  const atoms = scoped.flatMap((object) => {
     const state = stateForObject(object);
     const ordinal = state?.ordinal ?? Math.max(1, object.stateOrder.indexOf(object.currentStateId) + 1);
-    return structureForWorkspaceObjectState(object).atoms.map((atom) => ({ ...atom, stableId: workspaceScopedStableAtomId(object.objectId, atom.stableId), workspaceObjectId: object.objectId, workspaceObjectName: object.displayName, workspaceCoordinateStateId: state?.id, workspaceStateOrdinal: ordinal }));
+    return structureForWorkspaceObjectState(object).atoms.map((atom) => ({ ...atom, stableId: workspaceScopedStableAtomId(object.objectId, atom.stableId), workspaceObjectId: object.objectId, workspaceObjectName: object.displayName, workspaceObjectEnabled: object.enabled, workspaceCoordinateStateId: state?.id, workspaceStateOrdinal: ordinal }));
   });
-  const bonds = enabled.flatMap((object) => object.loadResult.structure.bonds.map((bond) => ({ ...bond, atom1: workspaceScopedStableAtomId(object.objectId, bond.atom1), atom2: workspaceScopedStableAtomId(object.objectId, bond.atom2) })));
+  const bonds = scoped.flatMap((object) => object.loadResult.structure.bonds.map((bond) => ({ ...bond, atom1: workspaceScopedStableAtomId(object.objectId, bond.atom1), atom2: workspaceScopedStableAtomId(object.objectId, bond.atom2) })));
   const chains = new Set(atoms.map((atom) => `${atom.workspaceObjectId}\u0000${atom.chain}`));
   const residues = new Set(atoms.map((atom) => `${atom.workspaceObjectId}\u0000${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}`));
   const counts = {
@@ -131,5 +131,5 @@ export const workspaceSelectionStructure = (objects: readonly WorkspaceObject[])
   };
   const points = atoms;
   const bounds = points.reduce((current, atom) => ({ min: { x: Math.min(current.min.x, atom.x), y: Math.min(current.min.y, atom.y), z: Math.min(current.min.z, atom.z) }, max: { x: Math.max(current.max.x, atom.x), y: Math.max(current.max.y, atom.y), z: Math.max(current.max.z, atom.z) } }), { min: { x: points[0]!.x, y: points[0]!.y, z: points[0]!.z }, max: { x: points[0]!.x, y: points[0]!.y, z: points[0]!.z } });
-  return { ...first, id: "workspace", name: "workspace", atoms, bonds, counts, bounds, scientificHash: `workspace:${enabled.map((object) => `${object.objectId}:${object.loadResult.structure.scientificHash}:${stateForObject(object)?.id ?? object.currentStateId}:${stateForObject(object)?.coordinateHash ?? ""}`).join("|")}` };
+  return { ...first, id: "workspace", name: "workspace", atoms, bonds, counts, bounds, scientificHash: `workspace:${scoped.map((object) => `${object.objectId}:${object.loadResult.structure.scientificHash}:${stateForObject(object)?.id ?? object.currentStateId}:${stateForObject(object)?.coordinateHash ?? ""}`).join("|")}` };
 };

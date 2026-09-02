@@ -20,7 +20,7 @@ export const COMMAND_REGISTRY: readonly CommandDefinition[] = [
   { verb: "rename", domain: "OBJECT", synopsis: "rename <old>, <new>", description: "Rename a named selection namespace entry.", requiresArgument: true },
   { verb: "set_name", domain: "OBJECT", synopsis: "set_name <object>, <new>", description: "Rename one workspace object or named selection entry without changing canonical molecular data.", requiresArgument: true },
   { verb: "copy", domain: "OBJECT", synopsis: "copy <target>, <source>", description: "Create a second workspace object view over the same canonical load result.", requiresArgument: true },
-  { verb: "create", domain: "OBJECT", synopsis: "create <target>, <selection>", description: "Create a new molecular object from a validated canonical selection when lineage support is available.", requiresArgument: true },
+  { verb: "create", domain: "OBJECT", synopsis: "create <target>, <selection>", description: "Create a new molecular object from a validated canonical selection when backend lineage support is available.", requiresArgument: true },
   { verb: "split_states", domain: "OBJECT", synopsis: "split_states <object>", description: "Split coordinate states into independent objects when a canonical lineage policy is available.", requiresArgument: true },
   { verb: "join_states", domain: "OBJECT", synopsis: "join_states <object>, <other>", description: "Join compatible coordinate states under an explicit canonical lineage policy.", requiresArgument: true },
   { verb: "delete", domain: "OBJECT", synopsis: "delete <named-selection>", description: "Delete a named selection snapshot.", requiresArgument: true },

@@ -119,6 +119,8 @@ export type CanonicalAtom = {
   /** Workspace-only scope metadata used by derived multi-object selection views. */
   workspaceObjectId?: string;
   workspaceObjectName?: string;
+  /** Workspace-only presentation scope; scientific `all` still includes disabled objects. */
+  workspaceObjectEnabled?: boolean;
   /** Workspace-only coordinate-state metadata used by state-aware selection. */
   workspaceCoordinateStateId?: string;
   workspaceStateOrdinal?: number;

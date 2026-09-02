@@ -65,6 +65,9 @@ test("multiple canonical objects share one viewer and keep object scope independ
   await expect(ligandRow.getByRole("button", { name: "Enable g1c-small-molecule.pdb" })).toBeVisible();
   await command.fill("select all");
   await page.getByRole("button", { name: /Run/ }).click();
+  await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 27 atoms");
+  await command.fill("enabled");
+  await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 24 atoms");
   await command.fill("visible");
   await page.getByRole("button", { name: /Run/ }).click();

@@ -151,4 +151,27 @@ describe("canonical selection engine", () => {
     expect(resolveSelection("x < 2", structure).stableAtomIds).toEqual(["a1", "a2"]);
     expect(evaluateSelectionQuery("b > 10", structure).status).toBe("MISSING_DEPENDENCY");
   });
+
+  it("evaluates partial-charge predicates only against a revision-matched canonical dataset", () => {
+    const charged = {
+      ...structure,
+      scientificHash: "charged-revision".padEnd(64, "0"),
+      partialChargeDataset: {
+        datasetId: "fixture:charges:1",
+        molecularRevision: "charged-revision".padEnd(64, "0"),
+        chargeModel: "AM1-BCC",
+        profileVersion: "partial-charge-diverging-v1",
+        atomChargeMap: { a1: -0.42, a2: 0.42, a3: -0.1, b1: 0, l1: 0.1, w1: -0.05 },
+        units: "e",
+        provenance: "deterministic canonical fixture",
+      },
+    } satisfies CanonicalMolecularStructure;
+    expect(resolveSelection("partial_charge > 0", charged).stableAtomIds).toEqual(["a2", "l1"]);
+
+    const stale = { ...charged, partialChargeDataset: { ...charged.partialChargeDataset, molecularRevision: "stale" } } satisfies CanonicalMolecularStructure;
+    const staleResult = evaluateSelectionQuery("partial_charge > 0", stale);
+    expect(staleResult.status).toBe("MISSING_DEPENDENCY");
+    expect(staleResult.count).toBe(0);
+    expect(staleResult.diagnostics[0]?.message).toContain("partial_charge");
+  });
 });

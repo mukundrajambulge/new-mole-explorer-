@@ -408,7 +408,7 @@ export const App = () => {
 
   const commandSelectionContext = () => {
     const activeObject = workspaceObjectsRef.current.find((object) => object.objectId === activeObjectId);
-    const current = workspaceObjectsRef.current.length > 1 ? workspaceSelectionStructure(workspaceObjectsRef.current) : activeObject && activeObject.enabled ? structureForWorkspaceObjectState(activeObject) : activeObject ? null : structure?.structure ?? null;
+    const current = workspaceObjectsRef.current.length > 1 ? workspaceSelectionStructure(workspaceObjectsRef.current) : activeObject ? structureForWorkspaceObjectState(activeObject) : structure?.structure ?? null;
     return { structure: current, named: current?.id === structure?.structure.id || current?.id === `${structure?.structure.id}:state:${activeObject?.currentStateId}` ? namedSelectionsRef.current ?? undefined : undefined, coordinateStateId: activeObject?.currentStateId, stateOrdinal: activeObject ? Math.max(1, activeObject.stateOrder.indexOf(activeObject.currentStateId) + 1) : undefined, presentation: presentationSelectionContext() };
   };
 
