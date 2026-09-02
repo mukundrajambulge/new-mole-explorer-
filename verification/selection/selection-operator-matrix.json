@@ -10,7 +10,7 @@
   },
   "liveBrowserStatusCounts": {
     "PASS (`select all`)": 1,
-    "PASS (selection-matrix-live.spec.ts)": 60,
+    "PASS (selection-matrix-live.spec.ts)": 59,
     "PASS indirectly": 4,
     "PASS via named-selection E2E": 1,
     "PASS (multi-object-state.spec.ts)": 1,
@@ -21,7 +21,7 @@
     "PASS (ring-topology E2E)": 1,
     "PASS (selection-matrix-live.spec.ts; multi-object-state.spec.ts)": 1,
     "PASS (typed-properties E2E; selection-matrix-live.spec.ts)": 3,
-    "PASS (selection-matrix-live.spec.ts; typed-properties E2E)": 2,
+    "PASS (selection-matrix-live.spec.ts; typed-properties E2E)": 3,
     "PASS (selection-matrix-live.spec.ts; typed mmCIF E2E)": 1,
     "PASS (typed mmCIF E2E; untyped PDB structured diagnostic)": 1,
     "PASS (selection-matrix-live.spec.ts; sidechain-identity E2E)": 1,
@@ -29,8 +29,8 @@
   },
   "oracleStatusCounts": {
     "ORACLE_PASS": 47,
-    "ORACLE_PENDING": 16,
-    "ORACLE_EQUIVALENT": 24
+    "ORACLE_EQUIVALENT": 26,
+    "ORACLE_PENDING": 14
   },
   "entries": [
     {
@@ -51,8 +51,8 @@
       "operator": "`everything`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "retained explicit alias"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "intentional Mole alias for the canonical universe; pinned PyMOL equivalent is `all` because native `everything` is rejected"
     },
     {
       "operator": "`none`",
@@ -498,9 +498,9 @@
     {
       "operator": "`!=`",
       "implementationStatus": "VERIFIED_WORKING",
-      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "inequality"
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; typed-properties E2E)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application inequality is compared as the complement of pinned native equality because the pinned PyMOL parser rejects the direct `!=` spelling"
     },
     {
       "operator": "`<`, `<=`, `>`, `>=`",

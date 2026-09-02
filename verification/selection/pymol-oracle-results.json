@@ -8,7 +8,7 @@
     "Native-equivalent rows preserve the application's explicit protein, water, and ligand aliases without claiming those aliases are PyMOL spellings.",
     "The source commit is pinned; the temporary Python compatibility layer only adds future annotations and legacy runtime shims needed by this environment.",
     "The complete direct probe is recorded in `pymol-matrix-probe.json`: 85 native forms, 79 successful and 6 native errors. The comparison ledger below promotes only exact forms or documented application aliases.",
-    "The direct probe now includes corrected native topology and spatial forms; this comparison ledger remains intentionally conservative and contains 46 selected exact/equivalent rows across the shared mini fixture and the fixture-scoped canonical-property, identity, ring-topology, backbone-partition, and numeric-comparison cases below.",
+    "The direct probe now includes corrected native topology and spatial forms; this comparison ledger remains intentionally conservative and contains 48 selected exact/equivalent rows across the shared mini fixture and the fixture-scoped canonical-property, identity, ring-topology, backbone-partition, numeric-comparison, alias, and inequality cases below.",
     "The typed-properties rows use the same pinned source and identify their fixture explicitly; application ss HELIX/SHEET maps to PyMOL ss h/s without treating the long-form tokens as native spellings."
   ],
   "rows": [
@@ -57,6 +57,8 @@
     { "applicationQuery": "x < 2", "oracleQuery": "x < 2", "oracleStatus": "ORACLE_PASS", "count": 4, "membershipHash": "cd62a6d47e5c76b2c229f573f93f8db90e55b6e842f38bb982b22988c2b6a17b", "fixture": "tests/fixtures/mini-protein.pdb" },
     { "applicationQuery": "x <= 2", "oracleQuery": "x <= 2", "oracleStatus": "ORACLE_PASS", "count": 5, "membershipHash": "adb916c92311da2a7899b3a1a8871be270477b0c449c2383e03a5e8bd7aa8ec3", "fixture": "tests/fixtures/mini-protein.pdb" },
     { "applicationQuery": "y >= 0", "oracleQuery": "y >= 0", "oracleStatus": "ORACLE_PASS", "count": 10, "membershipHash": "6da58662cb63463b15ef21c2fd47409fda4954a41b1cca5ce016cc52d22c4270", "fixture": "tests/fixtures/mini-protein.pdb" },
-    { "applicationQuery": "z <= 100", "oracleQuery": "z <= 100", "oracleStatus": "ORACLE_PASS", "count": 12, "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a", "fixture": "tests/fixtures/mini-protein.pdb" }
+    { "applicationQuery": "z <= 100", "oracleQuery": "z <= 100", "oracleStatus": "ORACLE_PASS", "count": 12, "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a", "fixture": "tests/fixtures/mini-protein.pdb" },
+    { "applicationQuery": "everything", "oracleQuery": "all", "oracleStatus": "ORACLE_EQUIVALENT", "count": 12, "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a", "mapping": "intentional Mole universe alias -> pinned PyMOL all; native PyMOL everything is rejected", "fixture": "tests/fixtures/mini-protein.pdb" },
+    { "applicationQuery": "formal_charge != 0", "oracleQuery": "not (formal_charge = 0)", "oracleStatus": "ORACLE_EQUIVALENT", "count": 2, "membershipHash": "1fd9ce7cfa40d1a31f19eed2fc622562a7ccf67929ac735c6456bceaad14a657", "mapping": "application inequality -> complement of pinned native equality; direct PyMOL != spelling is rejected", "fixture": "tests/fixtures/typed-properties.pdb" }
   ]
 }
