@@ -4,7 +4,7 @@
 
 **SELECTION + MULTI-OBJECT/MULTI-STATE CLOSURE INCOMPLETE — BLOCKED**
 
-The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. Cross-object spatial queries now require and record an explicit coordinate-frame policy; every coordinate-dependent selection also records the exact per-object coordinate state scope consulted, including cached and bound plans. The pinned PyMOL source has executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The application now also binds RenderProjection representation, color, label, and representation-specific color selectors, and evaluates fragment/ring expansion from the canonical bond graph. The gate remains blocked because 28 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
+The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. Cross-object spatial queries now require and record an explicit coordinate-frame policy; every coordinate-dependent selection also records the exact per-object coordinate state scope consulted, including cached and bound plans. The pinned PyMOL source has executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The application now also binds RenderProjection representation, color, label, and representation-specific color selectors, evaluates fragment/ring expansion from the canonical bond graph, and implements a versioned VDW surface-gap profile with strict missing-radius handling. The gate remains blocked because 27 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
 
 ## Repository and run evidence
 
@@ -44,6 +44,7 @@ The current application was exercised with a real 4DJW RCSB load:
 - `all_states` is bounded to explicit auxiliary state models. State changes reconcile model coordinates in place when layout is unchanged.
 - Coordinate-dependent selection results carry sorted per-object `stateScopes` with `{ObjectID, CoordinateStateID, StateOrder}`; state-dependent live selection changes are therefore distinguishable even when molecular topology/revision is unchanged.
 - Cartesian spatial comparisons use the centralized `cartesian-float64-v1` closed-boundary policy with an explicit squared-distance numerical epsilon; the epsilon is numerical protection, not a scientific cutoff expansion.
+- VDW gap selection uses the versioned `canonical-element-vdw-radius@1` property source and a separate strict surface-gap tolerance policy. The renderer’s convenience fallback is never used by scientific selection; unknown element radii return `MISSING_DEPENDENCY`.
 - Object `copy` deep-clones presentation/load containers, preserves canonical source, state order, current state, enablement, and projection, and receives a new durable ObjectID with explicit lineage. `create` materializes selected atoms with new stable identities and source correspondence; `split_states` creates bounded one-state objects; `join_states` accepts only strict ordered atom/topology correspondence. Failed or incompatible operations are non-destructive.
 - Workspace groups provide stable organizational membership with create/add/remove/open/close/toggle/empty operations. Group actions do not mutate canonical molecular data; destructive purge/excise/delete remain unavailable.
 - Cross-object spatial evaluation has an explicit `CoordinateFramePolicy`: `LOCAL_SCIENTIFIC` compares raw canonical Å coordinates, while `EFFECTIVE_WORLD` currently uses the declared identity object transforms. The policy is recorded in `SelectionResult` and `BoundSelectionPlan`; an undeclared cross-object query fails closed.
@@ -57,11 +58,11 @@ The current application was exercised with a real 4DJW RCSB load:
 The machine-readable ledger is [selection-operator-matrix.json](../selection/selection-operator-matrix.json), generated from [SELECTION_OPERATOR_MATRIX.md](../selection/SELECTION_OPERATOR_MATRIX.md).
 
 - Rows: **87**
-- Implementation: **80 VERIFIED_WORKING**, **4 MISSING_DEPENDENCY**, **2 INTENTIONALLY_UNSUPPORTED**, **1 UNKNOWN_PROPERTY**
-- Live-browser status: **87 pass/accepted diagnostic outcomes** across the expanded matrix exercise
-- Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **87** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
+- Implementation: **81 VERIFIED_WORKING**, **4 MISSING_DEPENDENCY**, **1 INTENTIONALLY_UNSUPPORTED**, **1 UNKNOWN_PROPERTY**
+- Live-browser status: **88 pass/accepted diagnostic outcomes** across the expanded matrix exercise
+- Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **88** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
 - `in`, `bycalpha`, `bymolecule`, `byfragment`, and `byring` now use canonical tuple, residue-CA, connected-component, and bounded-cycle semantics respectively. `visible` is now bound to an explicit presentation context derived from render directives; `rep`, `color`, `label`, `cartoon_color`, and `ribbon_color` are likewise evaluated from the current RenderProjection and never from 3Dmol internals. These selectors never alias scientific `all`. `like`, the application implicit-adjacency profile, and the new spatial/topology forms are live-verified; malformed shorthand and missing scientific dependencies remain truthful diagnostics.
-- Oracle comparison ledger: **39 ORACLE_PASS**, **20 ORACLE_EQUIVALENT**, **28 ORACLE_PENDING** across the 87-row comparison ledger; the full direct probe is [pymol-matrix-probe.json](../selection/pymol-matrix-probe.json) (**85 forms: 79 successful, 6 native errors**).
+- Oracle comparison ledger: **39 ORACLE_PASS**, **21 ORACLE_EQUIVALENT**, **27 ORACLE_PENDING** across the 87-row comparison ledger; the full direct probe is [pymol-matrix-probe.json](../selection/pymol-matrix-probe.json) (**85 forms: 79 successful, 6 native errors**).
 - Pinned oracle evidence: [pymol-oracle-results.json](../selection/pymol-oracle-results.json); runner: [run-pymol-oracle.py](../selection/run-pymol-oracle.py)
 - Missing dependency and research rows are explicit gates. No unsupported operator is silently aliased to a different scientific meaning.
 
@@ -77,6 +78,7 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - Canonical segment, alternate-location, occupancy, and B-factor identity: **PASS**; `segi SEG_A` and `bysegi segi SEG_A` select the source-backed segment, while `alt A`, `b > 20`, and `q >= 0.5` use the preserved canonical fields.
 - Presentation-dependent selection: **PASS** for effective `rep`, `color`, `label`, `cartoon_color`, and `ribbon_color` selectors; the selection result records the projection revision and remains stable under subsequent targeting.
 - Canonical fragment/ring topology: **PASS** for the declared application profiles; `byfragment` uses canonical-bond connected components and `byring` uses bounded simple cycles of size 3–7.
+- VDW surface-gap selection: **PASS** for the declared `canonical-element-vdw-radius@1` profile; non-empty and valid-empty live cases are covered, and unknown radius data fails closed without changing the workspace.
 
 ## Files changed in this closure
 
@@ -93,7 +95,9 @@ Application/contracts:
 - `apps/web/src/interaction/measurements.ts`
 - `apps/web/src/interaction/picking.ts`
 - `apps/web/src/rendering/ThreeDMolViewerAdapter.ts`
+- `apps/web/src/rendering/surfaceGenerator.ts`
 - `apps/web/src/rendering/surfaceProfiles.ts`
+- `apps/web/src/science/vdwRadii.ts`
 - `apps/web/src/selection/selectionEngine.ts`
 - `apps/web/src/selection/selectionEngine.test.ts`
 - `apps/web/src/selection/spatialPolicy.ts`
@@ -178,9 +182,10 @@ Verification:
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm run test --workspace @molecular/web` — **PASS: 17 files / 80 tests**
+- `npm run test --workspace @molecular/web` — **PASS: 17 files / 81 tests**
 - `npm run test --workspace @molecular/api` — **PASS: 2 files / 13 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
+- `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1; 88 live queries**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 10 / 10**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/real-structure-workspace.spec.ts` — **PASS: 1 / 1**
@@ -206,7 +211,8 @@ Verification:
 9. Create a group, add an object, and enter the bare group name in the console; confirm the member object atoms are selected without changing canonical objects.
 10. Import `tests/fixtures/typed-nucleic.mmcif`, run `polymer.nucleic`, and confirm two atoms are selected; run `protein` on the same source to confirm only the two protein atoms are selected.
 11. Import `tests/fixtures/edge-identity.mmcif`, run `segi SEG_A`, `bysegi segi SEG_A`, `alt A`, `b > 20`, and `q >= 0.5`, and confirm the source-backed identity fields drive the expected non-empty selections.
-12. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
+12. Import `tests/fixtures/mini-protein.pdb`, run `gap 0 ligand` and `gap 4 ligand`, and confirm the active-selection counts are 6 and 0; the selection result should expose the `canonical-element-vdw-radius@1` scientific profile.
+13. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
 
 ## Screenshot evidence
 
@@ -222,8 +228,8 @@ Verification:
 
 ## Known limitations and blockers
 
-- The pinned PyMOL source was executed in a temporary Ubuntu-20.04/Python-3.9.2 compatibility build. The 28 remaining `ORACLE_PENDING` matrix rows are not promoted without matching coverage; this is one reason for the blocked final verdict.
-- Crystallographic `pbc`/`symmetry`/`bycell`, donor/acceptor chemistry, and `gap` remain explicit unsupported or missing-dependency gates. Unknown properties fail closed. `byfragment` and `byring` are implemented only for the declared canonical-bond component and bounded-cycle profiles; they are not claimed as full PyMOL chemistry perception.
+- The pinned PyMOL source was executed in a temporary Ubuntu-20.04/Python-3.9.2 compatibility build. The 27 remaining `ORACLE_PENDING` matrix rows are not promoted without matching coverage; this is one reason for the blocked final verdict.
+- Crystallographic `pbc`/`symmetry`/`bycell` and donor/acceptor chemistry remain explicit unsupported or missing-dependency gates. Unknown properties and unknown VDW radii fail closed. `gap` is implemented only for the declared versioned element-radius profile; `byfragment` and `byring` are implemented only for the declared canonical-bond component and bounded-cycle profiles; they are not claimed as full PyMOL chemistry perception.
 - Partial-charge selection is implemented only when a complete, revision-matched canonical charge dataset is present; the admitted PDB/mmCIF ingestion path does not create one, so current loaded structures return a structured missing-dependency diagnostic. Peptide sequence selection likewise requires a dataset not present in this gate. `visible` and presentation selectors require the explicit RenderProjection context supplied by the frontend selection router; bare `label …` remains a label command, while `select label …` matches rendered safe-label text.
 - `polymer.nucleic` and typed `polymer.protein` require complete source-backed `_entity_poly.type` mapping in mmCIF; legacy PDB inputs without that annotation intentionally retain the prior generic polymer behavior and report a truthful dependency diagnostic for nucleic selection.
 - Native `like`, implicit adjacency, topology, corrected spatial forms, and the new object-lineage workflows now have direct coverage; the six native parser errors and the remaining conservative matrix rows are retained as evidence rather than treated as application support.

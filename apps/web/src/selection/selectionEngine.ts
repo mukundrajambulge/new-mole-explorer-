@@ -1,5 +1,6 @@
 import type { CanonicalAtom, CanonicalMolecularStructure } from "@molecular/contracts";
-import { withinSpatialBoundary } from "./spatialPolicy";
+import { vdwRadiusForElementStrict, VDW_RADIUS_PROFILE } from "../science/vdwRadii";
+import { beyondSurfaceGapBoundary, withinSpatialBoundary } from "./spatialPolicy";
 
 export type SelectionStatus =
   | "VALID_NONEMPTY"
@@ -59,12 +60,18 @@ export type SelectionAst =
   | { kind: "neighbor" | "bound_to"; operand: SelectionAst }
   | { kind: "extend"; distance: number; operand: SelectionAst }
   | { kind: "identifier_match"; mode: "in" | "like"; left: SelectionAst; right: SelectionAst }
-  | { kind: "within" | "around" | "expand" | "near_to" | "beyond"; distance: number; reference: SelectionAst; candidate?: SelectionAst };
+  | { kind: "within" | "around" | "expand" | "near_to" | "beyond" | "gap"; distance: number; reference: SelectionAst; candidate?: SelectionAst };
 
 export type SelectionProvenance = {
   kind: "query" | "pick" | "named-snapshot" | "command";
   rawQuery?: string;
   parentResultIds?: readonly string[];
+};
+
+export type ScientificSelectionProfile = {
+  id: string;
+  version: string;
+  fingerprint: string;
 };
 
 export type BoundSelectionPlan = {
@@ -79,6 +86,7 @@ export type BoundSelectionPlan = {
   coordinateContext: SelectionCoordinateContext | null;
   topologyRevision: string | null;
   namespaceRevision: string;
+  scientificProfiles: readonly ScientificSelectionProfile[];
   presentationContext: { revision: string } | null;
   dependencyVector: { needsCoordinates: boolean; needsTopology: boolean; needsNamespaces: boolean; needsPresentation: boolean };
 };
@@ -100,6 +108,7 @@ export type SelectionResult = {
   coordinateContext: SelectionCoordinateContext | null;
   topologyRevision: string | null;
   namespaceRevision: string;
+  scientificProfiles: readonly ScientificSelectionProfile[];
   presentationContext: { revision: string } | null;
   stableAtomIds: readonly string[];
   membershipHash: string;
@@ -208,9 +217,9 @@ class SelectionParser {
     while (true) {
       const token = this.current();
       const word = token.lexeme.toLowerCase();
-      const implicitOr = !["in", "like", "or", "and", "within", "around", "expand", "near_to", "beyond", "extend", "of"].includes(word)
+      const implicitOr = !["in", "like", "or", "and", "within", "around", "expand", "near_to", "beyond", "gap", "extend", "of"].includes(word)
         && (token.kind === "LPAREN" || (token.kind === "OPERATOR" && token.lexeme === "!") || ((token.kind === "WORD" || token.kind === "STRING") && !/^-?(?:\d+(?:\.\d*)?|\.\d+)$/.test(token.lexeme)));
-      const bindingPower = word === "or" || token.lexeme === "|" || implicitOr ? 10 : word === "and" || token.lexeme === "&" ? 20 : ["in", "like", "within", "around", "expand", "near_to", "beyond", "extend"].includes(word) ? 25 : -1;
+      const bindingPower = word === "or" || token.lexeme === "|" || implicitOr ? 10 : word === "and" || token.lexeme === "&" ? 20 : ["in", "like", "within", "around", "expand", "near_to", "beyond", "gap", "extend"].includes(word) ? 25 : -1;
       if (bindingPower < minBindingPower) break;
       if (word === "in" || word === "like") {
         this.take();
@@ -221,6 +230,10 @@ class SelectionParser {
         const distance = this.distance();
         if (this.current().lexeme.toLowerCase() === "of") this.take();
         left = { kind: word, distance, candidate: left, reference: this.expression(bindingPower + 1) }; continue;
+      }
+      if (word === "gap") {
+        this.take();
+        left = { kind: "gap", distance: this.distance(), reference: left }; continue;
       }
       if (word === "expand") {
         this.take();
@@ -261,6 +274,11 @@ class SelectionParser {
       if (this.current().lexeme.toLowerCase() === "of") this.take();
       return { kind: word, distance, reference: this.expression(35) };
     }
+    if (word === "gap") {
+      const distance = this.distance();
+      if (this.current().lexeme.toLowerCase() === "of") this.take();
+      return { kind: "gap", distance, reference: this.expression(35) };
+    }
     if (word === "all" || word === "*" || word === "everything") return { kind: "all" };
     if (word === "none") return { kind: "none" };
     const category = categoryNames.get(word as "polymer" | "protein" | "ligand" | "organic" | "water" | "ion" | "ions" | "other");
@@ -276,7 +294,7 @@ class SelectionParser {
     if (token.kind === "STRING" || token.kind === "WORD") {
       if (token.lexeme.startsWith("%")) return { kind: "named", name: token.lexeme.slice(1), required: true, span: token.span };
       if (token.lexeme.startsWith("?") && token.lexeme.length > 1) return { kind: "named", name: token.lexeme.slice(1), required: false, span: token.span };
-      const infixOperator = ["in", "like", "or", "and", "within", "around", "expand", "near_to", "beyond", "extend", "of"].includes(this.current().lexeme.toLowerCase());
+      const infixOperator = ["in", "like", "or", "and", "within", "around", "expand", "near_to", "beyond", "gap", "extend", "of"].includes(this.current().lexeme.toLowerCase());
       if (this.current().kind === "WORD" && !infixOperator && !/^-?\d+(?:\.\d+)?$/.test(this.current().lexeme)) this.failWith("UNKNOWN_PROPERTY", `Unknown property or malformed selector \`${token.lexeme}\`.`, token);
       return { kind: "named", name: token.lexeme, required: true, span: token.span };
     }
@@ -312,7 +330,7 @@ const normalize = (ast: SelectionAst): SelectionAst => {
   if (ast.kind === "and" || ast.kind === "or") return { ...ast, left: normalize(ast.left), right: normalize(ast.right) };
   if (ast.kind === "not" || ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "byfragment" || ast.kind === "byring" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to" || ast.kind === "extend") return { ...ast, operand: normalize(ast.operand) };
   if (ast.kind === "identifier_match") return { ...ast, left: normalize(ast.left), right: normalize(ast.right) };
-  if (ast.kind === "within" || ast.kind === "around" || ast.kind === "expand" || ast.kind === "near_to" || ast.kind === "beyond") return { ...ast, reference: normalize(ast.reference), ...(ast.candidate ? { candidate: normalize(ast.candidate) } : {}) };
+  if (ast.kind === "within" || ast.kind === "around" || ast.kind === "expand" || ast.kind === "near_to" || ast.kind === "beyond" || ast.kind === "gap") return { ...ast, reference: normalize(ast.reference), ...(ast.candidate ? { candidate: normalize(ast.candidate) } : {}) };
   if (ast.kind === "predicate") return { ...ast, property: ast.property.toLowerCase() as SelectionProperty, value: ast.value.trim() };
   if (ast.kind === "named") return { ...ast, name: ast.name.trim() };
   return ast;
@@ -327,11 +345,14 @@ const serialize = (ast: SelectionAst): string => {
   if (ast.kind === "extend") return `extend(${ast.distance},${serialize(ast.operand)})`;
   if (ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "byfragment" || ast.kind === "byring" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to") return `${ast.kind}(${serialize(ast.operand)})`;
   if (ast.kind === "identifier_match") return `${ast.kind}:${ast.mode}(${serialize(ast.left)},${serialize(ast.right)})`;
-  if (ast.kind === "within" || ast.kind === "around" || ast.kind === "expand" || ast.kind === "near_to" || ast.kind === "beyond") return `${ast.kind}(${ast.distance},${serialize(ast.reference)}${ast.candidate ? `,${serialize(ast.candidate)}` : ""})`;
+  if (ast.kind === "within" || ast.kind === "around" || ast.kind === "expand" || ast.kind === "near_to" || ast.kind === "beyond" || ast.kind === "gap") return `${ast.kind}(${ast.distance},${serialize(ast.reference)}${ast.candidate ? `,${serialize(ast.candidate)}` : ""})`;
   return "invalid";
 };
 
-type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; presentationRevision: string | null; visibleAtomIds?: ReadonlySet<string>; representationTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; colorTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; representationColorTokensByStableAtomId?: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>>; labelTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; query: string; indexByStableId: Map<string, number>; rankByStableId: Map<string, number>; coordinateStateId?: string; stateOrdinal?: number; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds: Set<string>; coordinateObjectStates: Map<string, SelectionCoordinateStateScope>; objectMatches: Map<string, Set<string>> };
+type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; presentationRevision: string | null; scientificProfiles: ScientificSelectionProfile[]; visibleAtomIds?: ReadonlySet<string>; representationTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; colorTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; representationColorTokensByStableAtomId?: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>>; labelTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; query: string; indexByStableId: Map<string, number>; rankByStableId: Map<string, number>; coordinateStateId?: string; stateOrdinal?: number; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds: Set<string>; coordinateObjectStates: Map<string, SelectionCoordinateStateScope>; objectMatches: Map<string, Set<string>> };
+const recordScientificProfile = (context: EvalContext, profile: ScientificSelectionProfile): void => {
+  if (!context.scientificProfiles.some((candidate) => candidate.fingerprint === profile.fingerprint)) context.scientificProfiles.push(profile);
+};
 const wildcardMatch = (value: string, pattern: string): boolean => {
   const escaped = [...pattern].map((char) => char === "*" ? ".*" : char === "?" ? "." : char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("");
   return new RegExp(`^${escaped}$`, "i").test(value);
@@ -675,6 +696,45 @@ const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, 
     if (ast.kind === "neighbor") for (const id of target) result.delete(id);
     return result;
   }
+  if (ast.kind === "gap") {
+    context.needsCoordinates = true;
+    recordScientificProfile(context, VDW_RADIUS_PROFILE);
+    if (ast.distance < 0 || !Number.isFinite(ast.distance)) { context.diagnostics.push({ code: "INVALID_VALUE", message: "VDW surface gap distance must be finite and non-negative." }); return new Set(); }
+    const reference = evaluateAst(ast.reference, structure, context);
+    const candidate = ast.candidate ? evaluateAst(ast.candidate, structure, context) : new Set(context.universe);
+    const refAtoms = structure.atoms.filter((atom) => reference.has(atom.stableId));
+    const candidateAtoms = structure.atoms.filter((atom) => candidate.has(atom.stableId));
+    const referenceObjectIds = new Set(refAtoms.map((atom) => atom.workspaceObjectId ?? structure.id));
+    const candidateObjectIds = new Set(candidateAtoms.map((atom) => atom.workspaceObjectId ?? structure.id));
+    const coordinateObjectIds = new Set([...referenceObjectIds, ...candidateObjectIds]);
+    for (const objectId of coordinateObjectIds) context.coordinateObjectIds.add(objectId);
+    const crossesObjectBoundary = [...referenceObjectIds].some((referenceObjectId) => [...candidateObjectIds].some((candidateObjectId) => candidateObjectId !== referenceObjectId));
+    if (crossesObjectBoundary && !context.coordinateFramePolicy) {
+      context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Cross-object spatial selection requires an explicit LOCAL_SCIENTIFIC or EFFECTIVE_WORLD coordinate context." });
+      return new Set();
+    }
+    for (const atom of [...refAtoms, ...candidateAtoms]) recordCoordinateAtom(atom, structure, context);
+    const radiusByStableId = new Map<string, number>();
+    for (const atom of [...refAtoms, ...candidateAtoms]) {
+      const radius = vdwRadiusForElementStrict(atom.element);
+      if (radius === null) {
+        context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: `VDW radius for element \`${atom.element}\` is unavailable under profile ${VDW_RADIUS_PROFILE.id}@${VDW_RADIUS_PROFILE.version}; the gap result was not returned.` });
+        return new Set();
+      }
+      radiusByStableId.set(atom.stableId, radius);
+    }
+    const result = new Set<string>();
+    for (const atom of candidateAtoms) {
+      if (reference.has(atom.stableId)) continue;
+      const atomRadius = radiusByStableId.get(atom.stableId)!;
+      const minimumGap = refAtoms.length === 0 ? Number.POSITIVE_INFINITY : Math.min(...refAtoms.map((ref) => {
+        const dx = atom.x - ref.x; const dy = atom.y - ref.y; const dz = atom.z - ref.z;
+        return Math.sqrt(dx * dx + dy * dy + dz * dz) - atomRadius - radiusByStableId.get(ref.stableId)!;
+      }));
+      if (beyondSurfaceGapBoundary(minimumGap, ast.distance)) result.add(atom.stableId);
+    }
+    return result;
+  }
   if (ast.kind !== "within" && ast.kind !== "around" && ast.kind !== "expand" && ast.kind !== "near_to" && ast.kind !== "beyond") return new Set();
   context.needsCoordinates = true;
   if (ast.distance < 0 || !Number.isFinite(ast.distance)) { context.diagnostics.push({ code: "INVALID_VALUE", message: "Spatial distance must be finite and non-negative." }); return new Set(); }
@@ -747,11 +807,11 @@ const coordinateContextFor = (structure: CanonicalMolecularStructure, needsCoord
 const baseResult = (query: string, structure: CanonicalMolecularStructure, source: SelectionProvenance, status: SelectionStatus, diagnostics: readonly SelectionDiagnostic[], astText: string, ids: readonly string[], deps: EvalContext, boundPlan: BoundSelectionPlan | null = null): SelectionResult => {
   const stableAtomIds = stableSort(ids, structure); const normalizedAstHash = hash(astText); const membershipHash = hash(stableAtomIds.join("\u0000"));
   const coordinateContext = coordinateContextFor(structure, deps.needsCoordinates, deps.coordinateFramePolicy, deps.coordinateObjectIds, deps.coordinateObjectStates, deps.coordinateStateId, deps.stateOrdinal);
-  return { schemaVersion: 2, resultId: resultId(query, structure, stableAtomIds), source, query, grammarVersion: GRAMMAR_VERSION, normalizedAst: astText, normalizedAstHash, profile: PROFILE, molecularIdentity: { structureId: structure.id, molecularRevision: structure.scientificHash }, structureId: structure.id, molecularRevision: structure.scientificHash, objectScope: { kind: "structure", objectId: structure.id }, universeFingerprint: hash(structure.atoms.map((atom) => atom.stableId).join("\u0000")), coordinateContext, topologyRevision: deps.needsTopology ? topologyRevisionFor(structure) : null, namespaceRevision: namespaceRevisionFor(structure, deps.named, deps.groups), presentationContext: deps.needsPresentation && deps.presentationRevision ? { revision: deps.presentationRevision } : null, stableAtomIds, membershipHash, count: stableAtomIds.length, status, diagnostics, dependencyVector: { needsCoordinates: deps.needsCoordinates, needsTopology: deps.needsTopology, needsNamespaces: true, needsPresentation: deps.needsPresentation }, boundPlan };
+  return { schemaVersion: 2, resultId: resultId(query, structure, stableAtomIds), source, query, grammarVersion: GRAMMAR_VERSION, normalizedAst: astText, normalizedAstHash, profile: PROFILE, molecularIdentity: { structureId: structure.id, molecularRevision: structure.scientificHash }, structureId: structure.id, molecularRevision: structure.scientificHash, objectScope: { kind: "structure", objectId: structure.id }, universeFingerprint: hash(structure.atoms.map((atom) => atom.stableId).join("\u0000")), coordinateContext, topologyRevision: deps.needsTopology ? topologyRevisionFor(structure) : null, namespaceRevision: namespaceRevisionFor(structure, deps.named, deps.groups), scientificProfiles: deps.scientificProfiles, presentationContext: deps.needsPresentation && deps.presentationRevision ? { revision: deps.presentationRevision } : null, stableAtomIds, membershipHash, count: stableAtomIds.length, status, diagnostics, dependencyVector: { needsCoordinates: deps.needsCoordinates, needsTopology: deps.needsTopology, needsNamespaces: true, needsPresentation: deps.needsPresentation }, boundPlan };
 };
 
 export type SelectionEvaluationOptions = { named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; expectedRevision?: string; source?: SelectionProvenance; coordinateStateId?: string; stateOrdinal?: number; coordinateFrame?: CoordinateFramePolicy; presentation?: SelectionPresentationContext };
-type CachedEvaluation = { normalized: string; ast: SelectionAst; ids: readonly string[]; status: SelectionStatus; diagnostics: readonly SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds: readonly string[]; coordinateObjectStates: readonly SelectionCoordinateStateScope[] };
+type CachedEvaluation = { normalized: string; ast: SelectionAst; ids: readonly string[]; status: SelectionStatus; diagnostics: readonly SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; scientificProfiles: readonly ScientificSelectionProfile[]; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds: readonly string[]; coordinateObjectStates: readonly SelectionCoordinateStateScope[] };
 const selectionEvaluationCache = new Map<string, CachedEvaluation>();
 const contextFor = (structure: CanonicalMolecularStructure, query: string, named?: NamedSelectionStore, diagnostics: SelectionDiagnostic[] = [], presentation?: SelectionPresentationContext, coordinateFramePolicy?: CoordinateFramePolicy, groups?: readonly SelectionWorkspaceGroup[]): EvalContext => ({
   universe: new Set(structure.atoms.map((atom) => atom.stableId)),
@@ -760,6 +820,7 @@ const contextFor = (structure: CanonicalMolecularStructure, query: string, named
   needsTopology: false,
   needsPresentation: false,
   presentationRevision: presentation?.revision ?? null,
+  scientificProfiles: [],
   visibleAtomIds: presentation ? new Set(presentation.visibleStableAtomIds) : undefined,
   representationTokensByStableAtomId: presentation?.representationTokensByStableAtomId,
   colorTokensByStableAtomId: presentation?.colorTokensByStableAtomId,
@@ -776,7 +837,7 @@ const contextFor = (structure: CanonicalMolecularStructure, query: string, named
   objectMatches: new Map(),
 });
 
-export type SelectionBindingDependencies = { needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; presentationRevision?: string | null; named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds?: readonly string[]; coordinateObjectStates?: readonly SelectionCoordinateStateScope[]; coordinateStateId?: string; stateOrdinal?: number };
+export type SelectionBindingDependencies = { needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; presentationRevision?: string | null; scientificProfiles?: readonly ScientificSelectionProfile[]; named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds?: readonly string[]; coordinateObjectStates?: readonly SelectionCoordinateStateScope[]; coordinateStateId?: string; stateOrdinal?: number };
 export const bindSelectionPlan = (query: string, ast: SelectionAst, normalizedAst: string, structure: CanonicalMolecularStructure, dependencies: SelectionBindingDependencies): BoundSelectionPlan => ({
   schemaVersion: 1,
   query,
@@ -789,6 +850,7 @@ export const bindSelectionPlan = (query: string, ast: SelectionAst, normalizedAs
   coordinateContext: coordinateContextFor(structure, dependencies.needsCoordinates, dependencies.coordinateFramePolicy, new Set(dependencies.coordinateObjectIds ?? []), new Map((dependencies.coordinateObjectStates ?? []).map((scope) => [scope.objectId, scope])), dependencies.coordinateStateId, dependencies.stateOrdinal),
   topologyRevision: dependencies.needsTopology ? topologyRevisionFor(structure) : null,
   namespaceRevision: namespaceRevisionFor(structure, dependencies.named, dependencies.groups),
+  scientificProfiles: dependencies.scientificProfiles ?? [],
   presentationContext: dependencies.needsPresentation && dependencies.presentationRevision ? { revision: dependencies.presentationRevision } : null,
   dependencyVector: { needsCoordinates: dependencies.needsCoordinates, needsTopology: dependencies.needsTopology, needsNamespaces: true, needsPresentation: dependencies.needsPresentation },
 });
@@ -797,7 +859,7 @@ export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecu
   const trimmed = query.trim(); const parsed = parseSelection(trimmed); const source = options.source ?? { kind: "query", rawQuery: trimmed };
   const emptyContext = { ...contextFor(structure, trimmed, options.named, [...parsed.diagnostics], options.presentation, options.coordinateFrame, options.groups), coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal };
   if (options.expectedRevision && options.expectedRevision !== structure.scientificHash) return baseResult(trimmed, structure, source, "STALE_REVISION", [{ code: "STALE_REVISION", message: "The selection context revision is stale; the active structure was not changed." }], "", [], emptyContext);
-  const gated = trimmed.match(/\b(gap|pbc|bycell|symmetry|donors|acceptors|arbitrary)\b/i);
+  const gated = trimmed.match(/\b(pbc|bycell|symmetry|donors|acceptors|arbitrary)\b/i);
   if (gated) return baseResult(trimmed, structure, source, "UNSUPPORTED_OPERATOR_OR_PROFILE", [{ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: `Selection operator \`${gated[1]}\` is gated until its validated scientific profile is available.` }], "", [], emptyContext);
   if (!trimmed || !parsed.ast) {
     const diagnostics = parsed.diagnostics.length ? parsed.diagnostics : [{ code: "SYNTAX_ERROR" as const, message: "A selection expression is required." }];
@@ -812,10 +874,11 @@ export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecu
     context.needsCoordinates = cached.needsCoordinates;
     context.needsTopology = cached.needsTopology;
     context.needsPresentation = cached.needsPresentation;
+    context.scientificProfiles = [...cached.scientificProfiles];
     context.coordinateFramePolicy = cached.coordinateFramePolicy;
     context.coordinateObjectIds = new Set(cached.coordinateObjectIds);
     context.coordinateObjectStates = new Map(cached.coordinateObjectStates.map((scope) => [scope.objectId, scope]));
-    return baseResult(trimmed, structure, source, cached.status, cached.diagnostics, cached.normalized, cached.ids, context, bindSelectionPlan(trimmed, cached.ast, cached.normalized, structure, { named: options.named, groups: options.groups, needsCoordinates: cached.needsCoordinates, needsTopology: cached.needsTopology, needsPresentation: cached.needsPresentation, presentationRevision: options.presentation?.revision ?? null, coordinateFramePolicy: cached.coordinateFramePolicy, coordinateObjectIds: cached.coordinateObjectIds, coordinateObjectStates: cached.coordinateObjectStates, coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal }));
+    return baseResult(trimmed, structure, source, cached.status, cached.diagnostics, cached.normalized, cached.ids, context, bindSelectionPlan(trimmed, cached.ast, cached.normalized, structure, { named: options.named, groups: options.groups, needsCoordinates: cached.needsCoordinates, needsTopology: cached.needsTopology, needsPresentation: cached.needsPresentation, scientificProfiles: cached.scientificProfiles, presentationRevision: options.presentation?.revision ?? null, coordinateFramePolicy: cached.coordinateFramePolicy, coordinateObjectIds: cached.coordinateObjectIds, coordinateObjectStates: cached.coordinateObjectStates, coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal }));
   }
   const ids = evaluateAst(ast, structure, context);
   let status: SelectionStatus = ids.size > 0 ? "VALID_NONEMPTY" : "VALID_EMPTY";
@@ -826,8 +889,8 @@ export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecu
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "INVALID_VALUE")) status = "INVALID_VALUE";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "MISSING_DEPENDENCY")) status = "MISSING_DEPENDENCY";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "TOPOLOGY_CONTEXT_ERROR")) status = "TOPOLOGY_CONTEXT_ERROR";
-  const boundPlan = bindSelectionPlan(trimmed, ast, normalized, structure, { named: options.named, groups: options.groups, needsCoordinates: context.needsCoordinates, needsTopology: context.needsTopology, needsPresentation: context.needsPresentation, presentationRevision: context.presentationRevision, coordinateFramePolicy: context.coordinateFramePolicy, coordinateObjectIds: [...context.coordinateObjectIds], coordinateObjectStates: [...context.coordinateObjectStates.values()], coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal });
-  const cachedValue: CachedEvaluation = { normalized, ast, ids: [...ids], status, diagnostics: [...context.diagnostics], needsCoordinates: context.needsCoordinates, needsTopology: context.needsTopology, needsPresentation: context.needsPresentation, coordinateFramePolicy: context.coordinateFramePolicy, coordinateObjectIds: [...context.coordinateObjectIds], coordinateObjectStates: [...context.coordinateObjectStates.values()] };
+  const boundPlan = bindSelectionPlan(trimmed, ast, normalized, structure, { named: options.named, groups: options.groups, needsCoordinates: context.needsCoordinates, needsTopology: context.needsTopology, needsPresentation: context.needsPresentation, scientificProfiles: context.scientificProfiles, presentationRevision: context.presentationRevision, coordinateFramePolicy: context.coordinateFramePolicy, coordinateObjectIds: [...context.coordinateObjectIds], coordinateObjectStates: [...context.coordinateObjectStates.values()], coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal });
+  const cachedValue: CachedEvaluation = { normalized, ast, ids: [...ids], status, diagnostics: [...context.diagnostics], needsCoordinates: context.needsCoordinates, needsTopology: context.needsTopology, needsPresentation: context.needsPresentation, scientificProfiles: [...context.scientificProfiles], coordinateFramePolicy: context.coordinateFramePolicy, coordinateObjectIds: [...context.coordinateObjectIds], coordinateObjectStates: [...context.coordinateObjectStates.values()] };
   selectionEvaluationCache.set(cacheKey, cachedValue);
   return baseResult(trimmed, structure, source, status, context.diagnostics, normalized, [...ids], context, boundPlan);
 };

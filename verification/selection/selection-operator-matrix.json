@@ -3,9 +3,9 @@
   "source": "verification/selection/SELECTION_OPERATOR_MATRIX.md",
   "rowCount": 87,
   "implementationStatusCounts": {
-    "VERIFIED_WORKING": 80,
+    "VERIFIED_WORKING": 81,
     "MISSING_DEPENDENCY": 4,
-    "INTENTIONALLY_UNSUPPORTED": 2,
+    "INTENTIONALLY_UNSUPPORTED": 1,
     "UNKNOWN_PROPERTY": 1
   },
   "liveBrowserStatusCounts": {
@@ -25,8 +25,8 @@
   },
   "oracleStatusCounts": {
     "ORACLE_PASS": 39,
-    "ORACLE_PENDING": 28,
-    "ORACLE_EQUIVALENT": 20
+    "ORACLE_PENDING": 27,
+    "ORACLE_EQUIVALENT": 21
   },
   "entries": [
     {
@@ -416,10 +416,10 @@
     },
     {
       "operator": "`gap`",
-      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "no hidden radius table"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application prefix maps to `all and (organic gap X)`; strict radius lookup and explicit missing-radius failure"
     },
     {
       "operator": "`formal_charge`",

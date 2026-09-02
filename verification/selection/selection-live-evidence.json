@@ -3,7 +3,7 @@
   "fixture": "tests/fixtures/mini-protein.pdb",
   "generatedBy": "tests/e2e/selection-matrix-live.spec.ts",
   "expectedMembershipHashPolicy": "null when no independent application-fixture hash is pinned; observed hashes are recorded from the active canonical selection result",
-  "attemptedQueryCount": 87,
+  "attemptedQueryCount": 88,
   "browserConsoleErrors": [],
   "pageErrors": [],
   "networkErrors": [],
@@ -1736,30 +1736,60 @@
       "failureDiagnostics": []
     },
     {
+      "query": "gap 0 ligand",
+      "expected": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "atomCount": 6,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "VALID_NONEMPTY",
+        "category": "SELECTION",
+        "result": "●\nSelected 6 atoms · replace · revision 3342815df0…\n· 6 atoms",
+        "atomCount": 6,
+        "membershipHash": "1edbc587",
+        "viewerMembershipHash": "1edbc587",
+        "selectionIndicator": "visible",
+        "selectionVisible": true,
+        "selectionIndicationConsistent": true
+      },
+      "subsequentTargeting": {
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "1edbc587",
+        "unchanged": true
+      },
+      "failureDiagnostics": []
+    },
+    {
       "query": "gap 4 ligand",
       "expected": {
-        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "semanticStatus": "VALID_EMPTY",
         "atomCount": 0,
         "membershipHash": null
       },
       "observed": {
-        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "semanticStatus": "VALID_EMPTY",
         "category": "SELECTION",
-        "result": "●\nSelection operator `gap` is gated until its validated scientific profile is available.\n· 0 atoms",
+        "result": "●\nSelected 0 atoms · replace · revision 3342815df0…\n· 0 atoms",
         "atomCount": 0,
-        "membershipHash": null,
-        "viewerMembershipHash": null,
-        "selectionIndicator": null,
+        "membershipHash": "811c9dc5",
+        "viewerMembershipHash": "811c9dc5",
+        "selectionIndicator": "none",
         "selectionVisible": false,
-        "selectionIndicationConsistent": null
+        "selectionIndicationConsistent": true
       },
       "subsequentTargeting": {
-        "attempted": false,
-        "command": "show sticks, all"
+        "attempted": true,
+        "command": "show sticks, all",
+        "category": "PRESENTATION",
+        "result": "●\nSHOW STICKS on 12 atoms.",
+        "retainedMembershipHash": "811c9dc5",
+        "unchanged": true
       },
-      "failureDiagnostics": [
-        "Selection operator `gap` is gated until its validated scientific profile is available."
-      ]
+      "failureDiagnostics": []
     },
     {
       "query": "formal_charge = 0",

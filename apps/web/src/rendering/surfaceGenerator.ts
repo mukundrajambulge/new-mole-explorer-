@@ -1,8 +1,8 @@
 import type { CanonicalAtom, CanonicalMolecularStructure } from "@molecular/contracts";
 import type { SurfaceProfileKind } from "./surfaceProfiles";
+import { vdwRadiusForElement } from "../science/vdwRadii";
 
-const VDW_RADII: Record<string, number> = { H: 1.20, C: 1.70, N: 1.55, O: 1.52, F: 1.47, P: 1.80, S: 1.80, CL: 1.75, BR: 1.85, I: 1.98, FE: 1.80, MG: 1.73, ZN: 1.39, NA: 2.27, K: 2.75 };
-export const vdwRadiusForElement = (element: string): number => VDW_RADII[element.toUpperCase()] ?? 1.70;
+export { vdwRadiusForElement } from "../science/vdwRadii";
 
 export type SurfacePoint = { x: number; y: number; z: number; stableAtomId: string; colorElement: string };
 

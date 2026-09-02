@@ -13,5 +13,15 @@ export const SPATIAL_TOLERANCE_POLICY = {
   units: "angstrom",
 } as const;
 
+export const GAP_TOLERANCE_POLICY = {
+  id: "vdw-surface-gap-float64-strict-boundary-v1",
+  distanceEpsilon: 1e-12,
+  boundary: "STRICT_GREATER_THAN",
+  units: "angstrom",
+} as const;
+
 export const withinSpatialBoundary = (distanceSquared: number, cutoffSquared: number): boolean =>
   distanceSquared <= cutoffSquared + SPATIAL_TOLERANCE_POLICY.squaredDistanceEpsilon;
+
+export const beyondSurfaceGapBoundary = (surfaceGap: number, cutoff: number): boolean =>
+  surfaceGap > cutoff + GAP_TOLERANCE_POLICY.distanceEpsilon;

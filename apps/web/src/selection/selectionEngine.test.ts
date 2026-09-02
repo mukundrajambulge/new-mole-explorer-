@@ -10,7 +10,7 @@ const structure = {
   atoms: [
     { stableId: "a1", serial: 1, atomName: "CA", element: "C", residueName: "ALA", residueNumber: 10, chain: "A", x: 0, y: 0, z: 0, recordType: "ATOM" as const, isPolymer: true, isLigand: false, isWater: false, isIon: false },
     { stableId: "a2", serial: 2, atomName: "N", element: "N", residueName: "ALA", residueNumber: 10, chain: "A", x: 1.2, y: 0, z: 0, recordType: "ATOM" as const, isPolymer: true, isLigand: false, isWater: false, isIon: false },
-    { stableId: "a3", serial: 3, atomName: "CA", element: "GLY", residueName: "GLY", residueNumber: 11, chain: "A", x: 4, y: 0, z: 0, recordType: "ATOM" as const, isPolymer: true, isLigand: false, isWater: false, isIon: false },
+    { stableId: "a3", serial: 3, atomName: "CA", element: "C", residueName: "GLY", residueNumber: 11, chain: "A", x: 4, y: 0, z: 0, recordType: "ATOM" as const, isPolymer: true, isLigand: false, isWater: false, isIon: false },
     { stableId: "b1", serial: 4, atomName: "CA", element: "C", residueName: "SER", residueNumber: 10, chain: "B", x: 8, y: 0, z: 0, recordType: "ATOM" as const, isPolymer: true, isLigand: false, isWater: false, isIon: false },
     { stableId: "l1", serial: 5, atomName: "C1", element: "C", residueName: "LIG", residueNumber: 20, chain: "A", x: 2, y: 0, z: 0, recordType: "HETATM" as const, isPolymer: false, isLigand: true, isWater: false, isIon: false },
     { stableId: "w1", serial: 6, atomName: "O", element: "O", residueName: "HOH", residueNumber: 30, chain: "A", x: 10, y: 0, z: 0, recordType: "HETATM" as const, isPolymer: false, isLigand: false, isWater: true, isIon: false },
@@ -73,7 +73,20 @@ describe("canonical selection engine", () => {
     expect(resolveSelection("all near_to 2 of ligand", structure).stableAtomIds).toEqual(["a1", "a2", "a3"]);
     expect(resolveSelection("all beyond 2 of ligand", structure).stableAtomIds).toEqual(["b1", "w1"]);
     expect(evaluateSelectionQuery("within -1 of ligand", structure).status).toBe("SYNTAX_ERROR");
-    expect(evaluateSelectionQuery("gap 4 of ligand", structure).status).toBe("UNSUPPORTED_OPERATOR_OR_PROFILE");
+    const gap = resolveSelection("gap 0 of ligand", structure);
+    expect(gap.stableAtomIds).toEqual(["b1", "w1"]);
+    expect(gap.scientificProfiles).toEqual([{ id: "canonical-element-vdw-radius", version: "1", fingerprint: "canonical-element-vdw-radius-v1" }]);
+    expect(gap.boundPlan?.scientificProfiles).toEqual(gap.scientificProfiles);
+    expect(resolveSelection("all and (ligand gap 0)", structure).stableAtomIds).toEqual(["b1", "w1"]);
+    expect(resolveSelection("gap 4 of ligand", structure).stableAtomIds).toEqual(["w1"]);
+  });
+
+  it("fails VDW gap selection closed when a canonical radius is unavailable", () => {
+    const unknownElement = { ...structure, atoms: structure.atoms.map((atom) => atom.stableId === "b1" ? { ...atom, element: "XX" } : atom), scientificHash: "unknown-vdw-revision".padEnd(64, "0") } satisfies CanonicalMolecularStructure;
+    const result = evaluateSelectionQuery("gap 0 ligand", unknownElement);
+    expect(result.status).toBe("MISSING_DEPENDENCY");
+    expect(result.count).toBe(0);
+    expect(result.diagnostics[0]?.message).toContain("canonical-element-vdw-radius@1");
   });
 
   it("fails closed for cross-object spatial queries without an explicit coordinate frame", () => {
