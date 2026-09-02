@@ -13,7 +13,7 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Local root: `C:\Users\mukun\Documents\Codex\2026-08-30\files-pasted-by-the-user-new\outputs\molecular-workstation`
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `900552e18e5eccabaaaedbae0853ef9956585084`
-- Ending implementation SHA: pending final evidence commit (selection semantics, segment identity metadata, workspace presentation synchronization, selection namespace cache safety, explicit presentation-bound visibility selection, and pinned-oracle verification evidence)
+- Ending evidence SHA: `9f1bc5e86feaf4117e123fa24b93e13a476878ce` (selection semantics, segment identity metadata, workspace presentation synchronization, selection namespace cache safety, explicit presentation-bound visibility selection, and pinned-oracle verification evidence)
 - Working tree before commit: modified by this closure pass; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
