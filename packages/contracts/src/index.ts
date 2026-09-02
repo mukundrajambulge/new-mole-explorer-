@@ -76,6 +76,19 @@ export type SecondaryStructureDataset = {
   profileVersion: string;
 };
 
+export type PeptideSequenceChain = {
+  residueIds: string[];
+  sequence: string;
+};
+
+export type PeptideSequenceDataset = {
+  datasetId: string;
+  molecularRevision: string;
+  assignmentSource: string;
+  profileVersion: string;
+  chains: Record<string, PeptideSequenceChain>;
+};
+
 export type CanonicalChain = {
   id: string;
   name: string;
@@ -187,6 +200,7 @@ export type CanonicalMolecularStructure = {
   polymerTypingSource?: string;
   partialChargeDataset?: PartialChargeDataset;
   secondaryStructureDataset?: SecondaryStructureDataset;
+  peptideSequenceDataset?: PeptideSequenceDataset;
 };
 
 export type StructureLoadResult = {

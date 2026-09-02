@@ -7,6 +7,7 @@ import type {
   CanonicalChain,
   CanonicalHierarchy,
   CanonicalMolecularStructure,
+  PeptideSequenceChain,
   CanonicalPolymerType,
   CanonicalCoordinateState,
   CanonicalResidue,
@@ -456,6 +457,23 @@ const summarize = (atoms: CanonicalAtom[]): { counts: CanonicalMolecularStructur
 
 const canonicalBondKey = (atom1: string, atom2: string) => [atom1, atom2].sort().join("|");
 
+const AMINO_ACID_ONE_LETTER: Readonly<Record<string, string>> = {
+  ALA: "A", ARG: "R", ASN: "N", ASP: "D", CYS: "C", GLN: "Q", GLU: "E", GLY: "G",
+  HIS: "H", ILE: "I", LEU: "L", LYS: "K", MET: "M", PHE: "F", PRO: "P", SER: "S",
+  THR: "T", TRP: "W", TYR: "Y", VAL: "V",
+};
+
+const peptideSequenceChainsFor = (hierarchy: CanonicalHierarchy): Record<string, PeptideSequenceChain> =>
+  Object.fromEntries(hierarchy.chainIds.map((chainId) => {
+    const polymerResidues = hierarchy.chains[chainId]!.residueIds
+      .map((residueId) => hierarchy.residues[residueId]!)
+      .filter((residue) => residue.isPolymer);
+    return [chainId, {
+      residueIds: polymerResidues.map((residue) => residue.id),
+      sequence: polymerResidues.map((residue) => AMINO_ACID_ONE_LETTER[residue.name.toUpperCase()] ?? "X").join(""),
+    } satisfies PeptideSequenceChain];
+  }));
+
 export class StructureIngestionService {
   private readonly structures = new Map<string, CanonicalMolecularStructure>();
 
@@ -515,6 +533,7 @@ export class StructureIngestionService {
     } as const;
     const hierarchy = makeHierarchy(atoms);
     const bonds = [...bondsByKey.values()];
+    const peptideSequenceChains = peptideSequenceChainsFor(hierarchy);
     const coordinateStates: CanonicalCoordinateState[] = (parsed.coordinateStates ?? [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }]).map((state, index) => {
       const coordinates = Object.fromEntries(state.coordinates.map((coordinate) => {
         const atom = atoms[coordinate.sourceIndex];
@@ -524,7 +543,7 @@ export class StructureIngestionService {
       return { id: `${hash.slice(0, 16)}:state:${state.sourceModelNumber}`, ordinal: index + 1, sourceModelNumber: state.sourceModelNumber, coordinates, coordinateHash };
     });
     const stateOrder = coordinateStates.map((state) => state.id);
-    const scientificPayload = { atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder, polymerTypingSource: parsed.polymerTypingSource ?? null };
+    const scientificPayload = { atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder, polymerTypingSource: parsed.polymerTypingSource ?? null, peptideSequenceChains };
     const scientificHash = createHash("sha256").update(JSON.stringify(scientificPayload)).digest("hex");
     const structure: CanonicalMolecularStructure = {
       id: `structure_${hash.slice(0, 16)}`,
@@ -539,6 +558,7 @@ export class StructureIngestionService {
       stateOrder,
       ...(parsed.polymerTypingSource ? { polymerTypingSource: parsed.polymerTypingSource } : {}),
       ...(parsed.secondaryStructureSource ? { secondaryStructureDataset: { datasetId: `${hash.slice(0, 16)}:secondary-structure`, molecularRevision: scientificHash, assignmentSource: parsed.secondaryStructureSource, profileVersion: "pdb-mmcif-structural-records-v1" } } : {}),
+      peptideSequenceDataset: { datasetId: `${hash.slice(0, 16)}:peptide-sequence`, molecularRevision: scientificHash, assignmentSource: "canonical polymer residue names mapped to one-letter amino-acid codes", profileVersion: "canonical-peptide-sequence-v1", chains: peptideSequenceChains },
       ...summary,
     };
     this.structures.set(structure.id, structure);

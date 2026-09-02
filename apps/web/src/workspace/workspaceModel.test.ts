@@ -48,6 +48,34 @@ describe("workspace selection scope", () => {
     expect(created.value.loadResult.structure.atoms[0]!.stableId).not.toBe("source-atom");
   });
 
+  it("rebuilds the canonical peptide sequence when a derived object drops residues", () => {
+    const base = loadResultFor("sequence-source", "sequence-a").structure;
+    const sourceHash = "sequence-source-revision".padEnd(64, "0");
+    const source = createWorkspaceObject({ ...loadResultFor("sequence-source", "sequence-a"), structure: {
+      ...base,
+      counts: { ...base.counts, atoms: 2, residues: 2 },
+      scientificHash: sourceHash,
+      atoms: [
+        { ...base.atoms[0]!, stableId: "sequence-a", residueNumber: 1, residueName: "ALA" },
+        { ...base.atoms[0]!, stableId: "sequence-g", serial: 2, atomName: "CA", residueNumber: 2, residueName: "GLY", x: 1 },
+      ],
+      peptideSequenceDataset: {
+        datasetId: "sequence-source:peptide-sequence",
+        molecularRevision: sourceHash,
+        assignmentSource: "canonical residue identity fixture",
+        profileVersion: "canonical-peptide-sequence-v1",
+        chains: { "chain:A": { residueIds: ["chain:A:residue:1:", "chain:A:residue:2:"], sequence: "AG" } },
+      },
+    } satisfies CanonicalMolecularStructure });
+    const created = createWorkspaceObjectFromSelection(source, ["sequence-g"], "glycine-only", [source.objectId]);
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+    expect(created.value.loadResult.structure.peptideSequenceDataset?.chains["chain:A"]).toMatchObject({
+      residueIds: ["chain:A:residue:2:"],
+      sequence: "G",
+    });
+  });
+
   it("splits explicit states and joins only strictly corresponding one-state objects", () => {
     const base = loadResultFor("states", "state-a");
     const atoms = [base.structure.atoms[0]!, { ...base.structure.atoms[0]!, stableId: "state-b", serial: 2, atomName: "N", x: 1 }];

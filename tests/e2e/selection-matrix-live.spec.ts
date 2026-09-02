@@ -56,6 +56,7 @@ const expectedCounts = new Map<string, number>([
   ["beyond 4 ligand", 6],
   ["gap 0 ligand", 6],
   ["gap 4 ligand", 0],
+  ["pepseq AG", 8],
   ["formal_charge = 0", 0],
   ["partial_charge > 0", 0],
   ["b > 20", 0],
@@ -88,7 +89,9 @@ const expectedSemanticStatus = (value: string): string => {
   if (/^byring\b/.test(query)) return "VALID_EMPTY";
   if (/^(segi|bysegi|bycell|donors|acceptors)\b/.test(query)) return "UNSUPPORTED_OPERATOR_OR_PROFILE";
   if (query === "gap 0 ligand" || query === "gap 4 ligand") return query === "gap 4 ligand" ? "VALID_EMPTY" : "VALID_NONEMPTY";
-  if (/^(partial_charge|pepseq|polymer\.nucleic)\b/.test(query) || query === "label foo") return "MISSING_DEPENDENCY";
+  if (/^(partial_charge|polymer\.nucleic)\b/.test(query) || query === "label foo") return "MISSING_DEPENDENCY";
+  if (query === "pepseq ag") return "VALID_NONEMPTY";
+  if (query === "pepseq 10") return "INVALID_VALUE";
   if (query === "foo = bar") return "SYNTAX_ERROR";
   if (query === "groupa") return "UNKNOWN_NAME";
   if (query === "name like ca" || query === "near_to ligand") return "SYNTAX_ERROR";
@@ -105,6 +108,7 @@ const observedSemanticStatus = (category: string, resultText: string, diagnostic
   if (/Presentation selector|data is unavailable|visibility is not bound|unavailable/i.test(text)) return "MISSING_DEPENDENCY";
   if (/gated|unsupported|Segment identity/i.test(text)) return "UNSUPPORTED_OPERATOR_OR_PROFILE";
   if (/Unknown canonical property|Unknown property/i.test(text)) return "UNKNOWN_PROPERTY";
+  if (/pepseq requires/i.test(text)) return "INVALID_VALUE";
   if (/does not exist/i.test(text)) return "UNKNOWN_NAME";
   if (/ambiguous/i.test(text)) return "AMBIGUOUS_NAME";
   if (/require|Unexpected token|Expected|malformed/i.test(text)) return "SYNTAX_ERROR";
@@ -131,7 +135,7 @@ test("representative selection families run through the real console input", asy
   const queries = [
     "select active_site, chain A",
     "all within 4 of ligand", "all around 4 of ligand", "all near_to 4 of ligand", "all beyond 4 of ligand",
-     "all", "*", "everything", "none", "enabled", "present", "visible", "polymer.nucleic", "name CA", "%active_site", "?missing", "active_site", "groupA", "not water", "!water", "chain A and protein", "chain A & protein", "ligand or water", "ligand | water", "(chain A or chain B) and name CA", "chain A protein", "first all", "last all", "model mini-protein.pdb", "object mini-protein.pdb", "chain A", "segi A", "resn ALA", "resi 1", "alt A", "index 2", "id 2", "rank 0", "name != CA", "label all, {name}", "select label CA", "pepseq 10", "name CA in chain A", "name like CA", "(chain A and name CA) like (chain A and name CA)", "byobject chain A", "bysegi chain A", "bychain ligand", "byres name CA", "bycalpha name CA", "bymolecule ligand", "byfragment ligand", "byring ligand", "bycell chain A", "neighbor ligand", "bound_to ligand", "extend 1 ligand", "within 4 of ligand", "around 4 of ligand", "expand 4 ligand", "near_to ligand", "beyond 4 ligand", "gap 0 ligand", "gap 4 ligand", "formal_charge = 0", "partial_charge > 0", "b > 20", "q >= 0.5", "ss HELIX", "elem C", "x < 2", "x <= 2", "y >= 0", "z <= 100", "state 2", "foo = bar", "rep cartoon", "color red", "select color red", "show sticks, all", "hide sticks, all", "center all", "zoom all", "measure distance", "measure clear", "get_view", "cartoon_color red", "ribbon_color red",
+     "all", "*", "everything", "none", "enabled", "present", "visible", "polymer.nucleic", "name CA", "%active_site", "?missing", "active_site", "groupA", "not water", "!water", "chain A and protein", "chain A & protein", "ligand or water", "ligand | water", "(chain A or chain B) and name CA", "chain A protein", "first all", "last all", "model mini-protein.pdb", "object mini-protein.pdb", "chain A", "segi A", "resn ALA", "resi 1", "alt A", "index 2", "id 2", "rank 0", "name != CA", "label all, {name}", "select label CA", "pepseq AG", "pepseq 10", "name CA in chain A", "name like CA", "(chain A and name CA) like (chain A and name CA)", "byobject chain A", "bysegi chain A", "bychain ligand", "byres name CA", "bycalpha name CA", "bymolecule ligand", "byfragment ligand", "byring ligand", "bycell chain A", "neighbor ligand", "bound_to ligand", "extend 1 ligand", "within 4 of ligand", "around 4 of ligand", "expand 4 ligand", "near_to ligand", "beyond 4 ligand", "gap 0 ligand", "gap 4 ligand", "formal_charge = 0", "partial_charge > 0", "b > 20", "q >= 0.5", "ss HELIX", "elem C", "x < 2", "x <= 2", "y >= 0", "z <= 100", "state 2", "foo = bar", "rep cartoon", "color red", "select color red", "show sticks, all", "hide sticks, all", "center all", "zoom all", "measure distance", "measure clear", "get_view", "cartoon_color red", "ribbon_color red",
   ];
   const evidence: Array<Record<string, unknown>> = [];
 

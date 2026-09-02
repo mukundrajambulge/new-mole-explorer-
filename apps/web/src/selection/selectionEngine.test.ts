@@ -89,6 +89,24 @@ describe("canonical selection engine", () => {
     expect(result.diagnostics[0]?.message).toContain("canonical-element-vdw-radius@1");
   });
 
+  it("resolves pepseq from an explicit canonical sequence dataset", () => {
+    const sequenced = {
+      ...structure,
+      peptideSequenceDataset: {
+        datasetId: "sequence:v1",
+        molecularRevision: structure.scientificHash,
+        assignmentSource: "canonical residue identity fixture",
+        profileVersion: "canonical-peptide-sequence-v1",
+        chains: { "chain:A": { residueIds: ["chain:A:residue:10:", "chain:A:residue:11:"], sequence: "AG" } },
+      },
+      scientificHash: structure.scientificHash,
+    } satisfies CanonicalMolecularStructure;
+    const result = resolveSelection("pepseq AG", sequenced);
+    expect(result.stableAtomIds).toEqual(["a1", "a2", "a3"]);
+    expect(result.dependencyVector.needsCoordinates).toBe(false);
+    expect(evaluateSelectionQuery("pepseq 10", sequenced).status).toBe("INVALID_VALUE");
+  });
+
   it("fails closed for cross-object spatial queries without an explicit coordinate frame", () => {
     const workspace = {
       ...structure,

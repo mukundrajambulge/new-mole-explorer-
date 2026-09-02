@@ -210,11 +210,23 @@ const derivedStructure = (
   });
   const summary = summaryFor(atoms);
   const hierarchy = hierarchyFor(atoms);
+  const peptideSequenceDataset = parentStructure.peptideSequenceDataset?.molecularRevision === parentStructure.scientificHash
+    ? {
+      ...parentStructure.peptideSequenceDataset,
+      molecularRevision: "pending" as string,
+      chains: Object.fromEntries(Object.entries(parentStructure.peptideSequenceDataset.chains)
+        .map(([chainId, chain]) => {
+          const codeByResidueId = new Map(chain.residueIds.map((residueId, index) => [residueId, chain.sequence[index] ?? "X"]));
+          const residueIds = chain.residueIds.filter((residueId) => Boolean(hierarchy.residues[residueId]));
+          return [chainId, { ...chain, residueIds, sequence: residueIds.map((residueId) => codeByResidueId.get(residueId) ?? "X").join("") }];
+        })) ,
+    }
+    : undefined;
   const partialChargeDataset = parentStructure.partialChargeDataset?.molecularRevision === parentStructure.scientificHash && sourceAtoms.every((atom) => parentStructure.partialChargeDataset?.atomChargeMap[atom.stableId] !== undefined)
     ? { ...parentStructure.partialChargeDataset, molecularRevision: "pending" as string, atomChargeMap: Object.fromEntries(sourceAtoms.map((atom) => [childIdBySourceId.get(atom.stableId)!, parentStructure.partialChargeDataset!.atomChargeMap[atom.stableId]!])) }
     : undefined;
   const polymerTypingSource = parentStructure.polymerTypingSource ? `${parentStructure.polymerTypingSource}; derived via ${operation}` : undefined;
-  const scientificHash = shortHash(JSON.stringify({ atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder: coordinateStates.map((state) => state.id), polymerTypingSource: polymerTypingSource ?? null, partialChargeDataset: partialChargeDataset?.atomChargeMap ?? null }));
+  const scientificHash = shortHash(JSON.stringify({ atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder: coordinateStates.map((state) => state.id), polymerTypingSource: polymerTypingSource ?? null, partialChargeDataset: partialChargeDataset?.atomChargeMap ?? null, peptideSequenceChains: peptideSequenceDataset?.chains ?? null }));
   const structure: CanonicalMolecularStructure = {
     id: structureId,
     name: displayName,
@@ -231,6 +243,7 @@ const derivedStructure = (
     ...(polymerTypingSource ? { polymerTypingSource } : {}),
     ...(partialChargeDataset ? { partialChargeDataset: { ...partialChargeDataset, molecularRevision: scientificHash } } : {}),
     ...(parentStructure.secondaryStructureDataset ? { secondaryStructureDataset: { ...parentStructure.secondaryStructureDataset, molecularRevision: scientificHash } } : {}),
+    ...(peptideSequenceDataset ? { peptideSequenceDataset: { ...peptideSequenceDataset, molecularRevision: scientificHash } } : {}),
   };
   return { loadResult: { structure, renderSource: { format: "pdb", content: pdbContentFor(structure, coordinateStates) } }, sourceAtomMap, sourceStateIds: stateInputs.map(({ sourceState }) => sourceState.id) };
 };

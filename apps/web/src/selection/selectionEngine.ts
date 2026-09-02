@@ -349,7 +349,7 @@ const serialize = (ast: SelectionAst): string => {
   return "invalid";
 };
 
-type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; presentationRevision: string | null; scientificProfiles: ScientificSelectionProfile[]; visibleAtomIds?: ReadonlySet<string>; representationTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; colorTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; representationColorTokensByStableAtomId?: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>>; labelTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; query: string; indexByStableId: Map<string, number>; rankByStableId: Map<string, number>; coordinateStateId?: string; stateOrdinal?: number; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds: Set<string>; coordinateObjectStates: Map<string, SelectionCoordinateStateScope>; objectMatches: Map<string, Set<string>> };
+type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; presentationRevision: string | null; scientificProfiles: ScientificSelectionProfile[]; peptideSelectionMatches: Map<string, Set<string>>; visibleAtomIds?: ReadonlySet<string>; representationTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; colorTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; representationColorTokensByStableAtomId?: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>>; labelTokensByStableAtomId?: Readonly<Record<string, readonly string[]>>; named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; query: string; indexByStableId: Map<string, number>; rankByStableId: Map<string, number>; coordinateStateId?: string; stateOrdinal?: number; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds: Set<string>; coordinateObjectStates: Map<string, SelectionCoordinateStateScope>; objectMatches: Map<string, Set<string>> };
 const recordScientificProfile = (context: EvalContext, profile: ScientificSelectionProfile): void => {
   if (!context.scientificProfiles.some((candidate) => candidate.fingerprint === profile.fingerprint)) context.scientificProfiles.push(profile);
 };
@@ -358,6 +358,34 @@ const wildcardMatch = (value: string, pattern: string): boolean => {
   return new RegExp(`^${escaped}$`, "i").test(value);
 };
 const residueParts = (value: string): { number: number; insertion: string } | null => { const match = value.match(/^(-?\d+)([A-Za-z]?)$/); return match ? { number: Number(match[1]), insertion: match[2].toUpperCase() } : null; };
+const residueIdFor = (atom: CanonicalAtom): string => `chain:${atom.chain}:residue:${atom.residueNumber}:${atom.insertionCode ?? ""}`;
+const peptideSelectionAtomIdsFor = (value: string, structure: CanonicalMolecularStructure, context: EvalContext): Set<string> => {
+  const cached = context.peptideSelectionMatches.get(value);
+  if (cached) return cached;
+  const matches = new Set<string>();
+  const normalized = value.trim().toUpperCase();
+  if (!/^[ACDEFGHIKLMNPQRSTVWY]+$/.test(normalized)) {
+    context.diagnostics.push({ code: "INVALID_VALUE", message: "pepseq requires a non-empty one-letter amino-acid sequence." });
+    context.peptideSelectionMatches.set(value, matches);
+    return matches;
+  }
+  const dataset = structure.peptideSequenceDataset;
+  if (!dataset || dataset.molecularRevision !== structure.scientificHash) {
+    context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical pepseq data is unavailable for this molecular revision." });
+    context.peptideSelectionMatches.set(value, matches);
+    return matches;
+  }
+  const matchedResidues = new Set<string>();
+  for (const chain of Object.values(dataset.chains)) {
+    for (let start = 0; start <= chain.sequence.length - normalized.length; start += 1) {
+      if (chain.sequence.slice(start, start + normalized.length) !== normalized) continue;
+      for (const residueId of chain.residueIds.slice(start, start + normalized.length)) matchedResidues.add(residueId);
+    }
+  }
+  for (const atom of structure.atoms) if (matchedResidues.has(residueIdFor(atom))) matches.add(atom.stableId);
+  context.peptideSelectionMatches.set(value, matches);
+  return matches;
+};
 const residueMatch = (atom: CanonicalAtom, value: string): boolean => {
   const range = value.match(/^(-?\d+[A-Za-z]?)(?:-|:)(-?\d+[A-Za-z]?)$/);
   const current = { number: atom.residueNumber, insertion: (atom.insertionCode ?? "").toUpperCase() };
@@ -602,7 +630,7 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
     if (!atom.secondaryStructure) { context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical secondary-structure data is unavailable for this molecular revision." }); return false; }
     matches = wildcardMatch(atom.secondaryStructure, value);
   } else if (property === "pepseq") {
-    context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: `Canonical ${property} data is unavailable for this molecular revision.` }); return false;
+    matches = peptideSelectionAtomIdsFor(value, structure, context).has(atom.stableId);
   }
   else { context.diagnostics.push({ code: "UNKNOWN_PROPERTY", message: `Unknown canonical property: ${property}.` }); return false; }
   if (["EQ", "NE"].includes(operator)) return operator === "NE" ? !matches : matches;
@@ -787,6 +815,12 @@ const namespaceRevisionFor = (structure: CanonicalMolecularStructure, named?: Na
     profileVersion: structure.partialChargeDataset.profileVersion,
     atomChargeMap: structure.partialChargeDataset.atomChargeMap,
   } : null,
+  peptideSequenceDataset: structure.peptideSequenceDataset ? {
+    datasetId: structure.peptideSequenceDataset.datasetId,
+    molecularRevision: structure.peptideSequenceDataset.molecularRevision,
+    profileVersion: structure.peptideSequenceDataset.profileVersion,
+    chains: structure.peptideSequenceDataset.chains,
+  } : null,
   namedNamespaceRevision: named?.namespaceRevision ?? "none",
   workspaceGroups: groups?.map((group) => ({ groupId: group.groupId, name: group.name, objectIds: [...group.objectIds].sort() })).sort((left, right) => left.groupId.localeCompare(right.groupId)) ?? [],
 }));
@@ -821,6 +855,7 @@ const contextFor = (structure: CanonicalMolecularStructure, query: string, named
   needsPresentation: false,
   presentationRevision: presentation?.revision ?? null,
   scientificProfiles: [],
+  peptideSelectionMatches: new Map(),
   visibleAtomIds: presentation ? new Set(presentation.visibleStableAtomIds) : undefined,
   representationTokensByStableAtomId: presentation?.representationTokensByStableAtomId,
   colorTokensByStableAtomId: presentation?.colorTokensByStableAtomId,

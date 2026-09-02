@@ -40,6 +40,7 @@ describe("VIS-01 structure ingestion", () => {
     expect(result.structure.atoms[0]).toMatchObject({ element: "C", residueName: "ALA", x: 1, y: 2, z: 3, isPolymer: true });
     expect(result.structure.atoms[0].stableId).toContain(":atom:1");
     expect(result.structure.hierarchy.chainIds).toEqual(["chain:A"]);
+    expect(result.structure.peptideSequenceDataset).toMatchObject({ profileVersion: "canonical-peptide-sequence-v1", chains: { "chain:A": { sequence: "A" } } });
     expect(result.structure.scientificHash).toHaveLength(64);
     expect(result.renderSource.content).toBe(pdbFixture);
   });
@@ -54,6 +55,17 @@ describe("VIS-01 structure ingestion", () => {
     const result = await new StructureIngestionService().ingestLocal("typed.mmcif", Buffer.from(typedNucleicCifFixture));
     expect(result.structure.polymerTypingSource).toBe("mmCIF _entity_poly.type mapped by _atom_site.label_entity_id");
     expect(result.structure.atoms.map((atom) => atom.polymerType)).toEqual(["NUCLEIC_ACID", "NUCLEIC_ACID", "PROTEIN", "PROTEIN"]);
+  });
+
+  it("records canonical one-letter peptide sequences from polymer residue identity", async () => {
+    const content = [
+      fixedPdbLine("ATOM", 1, "CA", "ALA", "A", 1, "C", 1, undefined),
+      fixedPdbLine("ATOM", 2, "CA", "GLY", "A", 2, "C", 2, undefined),
+      "END",
+    ].join("\n");
+    const result = await new StructureIngestionService().ingestLocal("sequence.pdb", Buffer.from(content));
+    expect(result.structure.peptideSequenceDataset).toMatchObject({ profileVersion: "canonical-peptide-sequence-v1", chains: { "chain:A": { sequence: "AG" } } });
+    expect(result.structure.peptideSequenceDataset?.molecularRevision).toBe(result.structure.scientificHash);
   });
 
   it("preserves mmCIF segment, alternate-location, occupancy, and B-factor identity fields", async () => {
