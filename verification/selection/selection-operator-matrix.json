@@ -25,9 +25,9 @@
     "PASS (`select color red` after `color red, all`; selection-matrix-live.spec.ts)": 1
   },
   "oracleStatusCounts": {
-    "ORACLE_PASS": 40,
-    "ORACLE_PENDING": 26,
-    "ORACLE_EQUIVALENT": 21
+    "ORACLE_PASS": 42,
+    "ORACLE_PENDING": 23,
+    "ORACLE_EQUIVALENT": 22
   },
   "entries": [
     {
@@ -426,8 +426,8 @@
       "operator": "`formal_charge`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (typed-properties E2E; selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "missing values fail closed"
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact source formal-charge comparison on typed-properties fixture; missing values fail closed"
     },
     {
       "operator": "`partial_charge`",
@@ -440,8 +440,8 @@
       "operator": "`b`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (typed-properties E2E; selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "numeric comparison operators"
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact source B-factor comparison on typed-properties fixture"
     },
     {
       "operator": "`q` / `occupancy`",
@@ -454,8 +454,8 @@
       "operator": "`ss`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (typed-properties E2E; selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "canonical assignment only"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application long-form `HELIX`/`SHEET` tokens map to PyMOL `h`/`s`; canonical assignment only"
     },
     {
       "operator": "`elem`",

@@ -8,7 +8,8 @@
     "Native-equivalent rows preserve the application's explicit protein, water, and ligand aliases without claiming those aliases are PyMOL spellings.",
     "The source commit is pinned; the temporary Python compatibility layer only adds future annotations and legacy runtime shims needed by this environment.",
     "The complete direct probe is recorded in `pymol-matrix-probe.json`: 85 native forms, 79 successful and 6 native errors. The comparison ledger below promotes only exact forms or documented application aliases.",
-    "The direct probe now includes corrected native topology and spatial forms; this comparison ledger remains intentionally conservative and contains 32 selected exact/equivalent rows."
+    "The direct probe now includes corrected native topology and spatial forms; this comparison ledger remains intentionally conservative and contains 37 selected exact/equivalent rows across the shared mini fixture and the fixture-scoped canonical-property cases below.",
+    "The typed-properties rows use the same pinned source and identify their fixture explicitly; application ss HELIX/SHEET maps to PyMOL ss h/s without treating the long-form tokens as native spellings."
   ],
   "rows": [
     { "applicationQuery": "all", "oracleQuery": "all", "oracleStatus": "ORACLE_PASS", "count": 12, "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a" },
@@ -42,6 +43,11 @@
     { "applicationQuery": "extend 1 ligand", "oracleQuery": "organic extend 1", "oracleStatus": "ORACLE_EQUIVALENT", "count": 2, "membershipHash": "f1a7a9815562e93a9cc9321e9842cdda93caf16003517d83b5f7344643f588ab", "mapping": "application ligand alias -> PyMOL organic; application prefix form -> PyMOL infix form" },
     { "applicationQuery": "expand 4 ligand", "oracleQuery": "organic expand 4", "oracleStatus": "ORACLE_EQUIVALENT", "count": 6, "membershipHash": "09afc26b25d9ee1b66db33cd0f42878b51651e480a73f02334ea8b2a6554c778", "mapping": "application ligand alias -> PyMOL organic" },
     { "applicationQuery": "all near_to 4 of ligand", "oracleQuery": "all near_to 4 of organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 4, "membershipHash": "3b6fe510caacbdbd06dd04531291201b2a1f69fe48bef46b806df59f496d1f99", "mapping": "application ligand alias -> PyMOL organic" },
-    { "applicationQuery": "beyond 4 ligand", "oracleQuery": "all beyond 4 of organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 6, "membershipHash": "9ff1c4cc6da97079493e4060fceac7dc79eb5615582f738cdd13c108adaf1900", "mapping": "application ligand alias -> PyMOL organic; application candidate universe -> PyMOL all" }
+    { "applicationQuery": "beyond 4 ligand", "oracleQuery": "all beyond 4 of organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 6, "membershipHash": "9ff1c4cc6da97079493e4060fceac7dc79eb5615582f738cdd13c108adaf1900", "mapping": "application ligand alias -> PyMOL organic; application candidate universe -> PyMOL all" },
+    { "applicationQuery": "formal_charge = 0", "oracleQuery": "formal_charge = 0", "oracleStatus": "ORACLE_PASS", "count": 2, "membershipHash": "bcd0f8611f2d8a294ae30292eea5437a0dfb140b7eaccfe7a2a792e26121e289", "fixture": "tests/fixtures/typed-properties.pdb" },
+    { "applicationQuery": "formal_charge > 0", "oracleQuery": "formal_charge > 0", "oracleStatus": "ORACLE_PASS", "count": 1, "membershipHash": "0d06a40b0259525f564ccb08144f8e7d3c1d56e8c7d4fd75545917e3488efb8c", "fixture": "tests/fixtures/typed-properties.pdb" },
+    { "applicationQuery": "b > 20", "oracleQuery": "b > 20", "oracleStatus": "ORACLE_PASS", "count": 1, "membershipHash": "00fdf0451c5ae1f02861ced3021fcef3f04a6d3b5f07fa3525f40ddf8dd1c3d5", "fixture": "tests/fixtures/typed-properties.pdb" },
+    { "applicationQuery": "ss HELIX", "oracleQuery": "ss h", "oracleStatus": "ORACLE_EQUIVALENT", "count": 2, "membershipHash": "bad3464d6ae712c279d4941bbf873139c3df3b9869afaff7d28595443b38e512", "mapping": "application long-form secondary-structure token -> PyMOL one-letter token", "fixture": "tests/fixtures/typed-properties.pdb" },
+    { "applicationQuery": "ss SHEET", "oracleQuery": "ss s", "oracleStatus": "ORACLE_EQUIVALENT", "count": 2, "membershipHash": "966385cd2836bc749ca1748ed49511ffeecf1db00ac7b470e1ab9a15f861358c", "mapping": "application long-form secondary-structure token -> PyMOL one-letter token", "fixture": "tests/fixtures/typed-properties.pdb" }
   ]
 }
