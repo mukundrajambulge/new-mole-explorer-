@@ -74,6 +74,34 @@ test("multiple canonical objects share one viewer and keep object scope independ
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 22 atoms");
 });
 
+test("cross-object spatial selection requires and records an explicit coordinate frame", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(mini);
+  await expect(page.getByTitle("mini-protein.pdb").first()).toBeVisible();
+  const chooserPromise = page.waitForEvent("filechooser");
+  await page.getByRole("button", { name: "File", exact: true }).click();
+  await page.getByRole("button", { name: "Add Structure", exact: true }).click();
+  await (await chooserPromise).setFiles(ligand);
+
+  const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  const run = async (value: string) => { await command.fill(value); await page.getByRole("button", { name: /Run/ }).click(); };
+
+  await run("object mini-protein.pdb within 2 of object g1c-small-molecule.pdb");
+  await expect(consoleRegion).toContainText("Cross-object spatial selection requires an explicit LOCAL_SCIENTIFIC or EFFECTIVE_WORLD coordinate context");
+  await expect(page.getByTestId("coordinate-frame").locator("select")).toHaveValue("");
+
+  await run("coordinate_frame local_scientific");
+  await expect(page.getByTestId("coordinate-frame").locator("select")).toHaveValue("LOCAL_SCIENTIFIC");
+  await run("object mini-protein.pdb within 2 of object g1c-small-molecule.pdb");
+  await expect(consoleRegion.locator(".console-entry").last()).toContainText(/Selected \d+ atoms/);
+  await run("mini-protein.pdb within 2 of g1c-small-molecule.pdb");
+  await expect(consoleRegion.locator(".console-entry").last()).toContainText(/Selected [1-9]\d* atoms/);
+  await expect(page.getByTestId("active-selection")).toBeVisible();
+  await consoleRegion.locator(".console-history").evaluate((element) => { element.scrollTop = element.scrollHeight; });
+  await page.screenshot({ path: "verification/evidence/selection-cross-object-spatial.png", fullPage: true });
+});
+
 test("multi-model ingestion exposes explicit state order and state switching", async ({ page }) => {
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(multiState);
@@ -274,6 +302,9 @@ test("workspace groups organize objects without changing their canonical scope",
   await expect(page.getByTestId("workspace-groups")).toContainText("ensemble");
   await expect(page.getByTestId("workspace-groups")).toContainText("closed · 1 object");
   await expect(consoleRegion).toContainText("Added mini-protein.pdb to group ensemble");
+  await command.fill("ensemble");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(consoleRegion).toContainText("Selected 12 atoms");
   await command.fill("select all");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(consoleRegion).toContainText("Selected 12 atoms");

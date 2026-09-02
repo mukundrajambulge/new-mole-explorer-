@@ -74,6 +74,18 @@ describe("canonical selection engine", () => {
     expect(result.status).toBe("MISSING_DEPENDENCY");
     expect(result.count).toBe(0);
     expect(result.diagnostics[0]?.message).toContain("explicit LOCAL_SCIENTIFIC or EFFECTIVE_WORLD coordinate context");
+
+    const local = resolveSelection("object A within 4 of object B", workspace, { coordinateFrame: "LOCAL_SCIENTIFIC" });
+    expect(local.stableAtomIds).toEqual(["object:a::a1"]);
+    expect(local.coordinateContext).toEqual({ structureId: "workspace", revision: workspace.scientificHash, stateId: "active", framePolicy: "LOCAL_SCIENTIFIC", objectIds: ["object:a", "object:b"] });
+
+    const world = resolveSelection("object A within 4 of object B", workspace, { coordinateFrame: "EFFECTIVE_WORLD" });
+    expect(world.stableAtomIds).toEqual(local.stableAtomIds);
+    expect(world.coordinateContext?.framePolicy).toBe("EFFECTIVE_WORLD");
+
+    expect(resolveSelection("A", workspace).stableAtomIds).toEqual(["object:a::a1"]);
+    expect(resolveSelection("ensemble", workspace, { groups: [{ groupId: "group:ensemble", name: "ensemble", objectIds: ["object:a"] }] }).stableAtomIds).toEqual(["object:a::a1"]);
+    expect(parseSelection("A-obj.pdb within 4 of B-obj.pdb").ast?.kind).toBe("within");
   });
 
   it("binds visible selection to an explicit presentation context and invalidates its cache", () => {

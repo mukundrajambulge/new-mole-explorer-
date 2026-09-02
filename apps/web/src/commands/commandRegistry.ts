@@ -1,5 +1,5 @@
 export type CommandDomain = "SYSTEM" | "SELECTION" | "PRESENTATION" | "VIEW" | "LABEL" | "MEASURE" | "OBJECT";
-export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "set_name" | "copy" | "create" | "split_states" | "join_states" | "group" | "delete" | "update" | "enable" | "disable" | "state" | "frame" | "all_states" | "count_states";
+export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "set_name" | "copy" | "create" | "split_states" | "join_states" | "group" | "delete" | "update" | "enable" | "disable" | "state" | "frame" | "all_states" | "count_states" | "coordinate_frame";
 export type ParsedCommand = { domain: CommandDomain; verb: CommandVerb; raw: string; head: string; argument: string; target: string | null; span: { start: number; end: number } };
 export type CommandParseError = { code: "EMPTY" | "UNKNOWN_COMMAND" | "MISSING_ARGUMENT"; message: string; span?: { start: number; end: number } };
 export type CommandDefinition = { verb: CommandVerb; domain: CommandDomain; synopsis: string; description: string; requiresArgument: boolean };
@@ -32,6 +32,7 @@ export const COMMAND_REGISTRY: readonly CommandDefinition[] = [
   { verb: "frame", domain: "OBJECT", synopsis: "frame <ordinal>", description: "Resolve a global frame through each object’s explicit state order; one-state objects remain static.", requiresArgument: true },
   { verb: "all_states", domain: "OBJECT", synopsis: "all_states <object>", description: "Toggle a bounded overlay of all coordinate states for one object.", requiresArgument: true },
   { verb: "count_states", domain: "OBJECT", synopsis: "count_states <object>", description: "Report the canonical coordinate-state count for one workspace object.", requiresArgument: true },
+  { verb: "coordinate_frame", domain: "SELECTION", synopsis: "coordinate_frame <local_scientific|effective_world>", description: "Declare the coordinate frame policy for cross-object spatial selections.", requiresArgument: true },
 ];
 const definitions = Object.fromEntries(COMMAND_REGISTRY.map((definition) => [definition.verb, definition])) as Record<CommandVerb, CommandDefinition>;
 const verbs = new Set<string>(COMMAND_REGISTRY.map((definition) => definition.verb));
@@ -76,6 +77,7 @@ export const commandSuggestions = (prefix: string): readonly string[] => {
     if (["show", "show_as", "hide"].includes(head)) return ["lines", "sticks", "spheres", "ball-and-stick", "cartoon", "surface", "mesh", "dots"];
     if (head === "measure") return ["distance", "angle", "dihedral", "clear"];
     if (head === "group") return ["create", "add", "remove", "open", "close", "toggle", "empty"];
+    if (head === "coordinate_frame") return ["local_scientific", "effective_world"];
     if (head === "color") return ["red", "green", "blue", "cyan", "yellow", "inherit"];
     if (head === "select" || head === "center" || head === "zoom" || head === "label") return ["all", "none", "polymer", "ligand", "water", "ion", "chain", "resi", "name"];
   }

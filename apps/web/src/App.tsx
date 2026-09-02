@@ -15,7 +15,7 @@ import { applyRepresentationToSelection, clearColorForSelection, createDefaultRe
 import { applyPresentationAction, type PresentationComponent } from "./rendering/presentationActions";
 import { buildRenderProjectionDiagnostics } from "./rendering/renderDirectives";
 import { STYLE_DEFINITIONS, representationCapabilityFor, representationStyleForCommand } from "./rendering/styleProfiles";
-import { combineSelections, evaluateSelectionQuery, NamedSelectionStore, resolveSelection, parseRepresentationCommand, requireValidSelection, SelectionResolutionError, selectionForStableIds, type SelectionPresentationContext, type SelectionResult } from "./interaction/selectionResolver";
+import { combineSelections, evaluateSelectionQuery, NamedSelectionStore, resolveSelection, parseRepresentationCommand, requireValidSelection, SelectionResolutionError, selectionForStableIds, type CoordinateFramePolicy, type SelectionPresentationContext, type SelectionResult } from "./interaction/selectionResolver";
 import { LabelExpressionError, labelExpressionForMode, parseSafeLabelExpression, type LabelMode } from "./interaction/labels";
 import { MeasurementAccumulator, createMeasurementObject, measurementCardinality, type MeasurementKind, type MeasurementObject } from "./interaction/measurements";
 import type { PickResult } from "./interaction/picking";
@@ -54,6 +54,7 @@ export const App = () => {
   const [workspaceGroups, setWorkspaceGroups] = useState<WorkspaceGroup[]>([]);
   const [activeObjectId, setActiveObjectId] = useState<string | null>(null);
   const [globalFrameIndex, setGlobalFrameIndex] = useState(0);
+  const [coordinateFramePolicy, setCoordinateFramePolicy] = useState<CoordinateFramePolicy | null>(null);
   const [projection, setProjection] = useState<RenderProjection>(createDefaultRenderProjection());
   const [loadState, setLoadState] = useState<"idle" | "loading" | "error">("idle");
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -146,7 +147,7 @@ export const App = () => {
       const nextWorkspace = mode === "add" ? [...workspaceObjectsRef.current, workspaceObject] : [workspaceObject];
       workspaceObjectsRef.current = nextWorkspace;
       setWorkspaceObjects(nextWorkspace);
-      if (mode === "replace") { workspaceGroupsRef.current = []; setWorkspaceGroups([]); }
+       if (mode === "replace") { workspaceGroupsRef.current = []; setWorkspaceGroups([]); setCoordinateFramePolicy(null); }
       setActiveObjectId(workspaceObject.objectId);
       setStructure(result);
       namedSelectionsRef.current = new NamedSelectionStore(result.structure);
@@ -236,6 +237,7 @@ export const App = () => {
       workspaceGroupsRef.current = [];
       setWorkspaceGroups([]);
       setActiveObjectId(null);
+      setCoordinateFramePolicy(null);
       setStructure(null);
       setProjection(createDefaultRenderProjection());
       measurementAccumulatorRef.current.clear();
@@ -264,6 +266,7 @@ export const App = () => {
       workspaceGroupsRef.current = [];
       setWorkspaceGroups([]);
       setActiveObjectId(openedWorkspace[0]?.objectId ?? null);
+      setCoordinateFramePolicy(null);
       setStructure(opened.structure);
       namedSelectionsRef.current = opened.structure ? new NamedSelectionStore(opened.structure.structure) : null;
       setProjection(opened.structure ? fromProjectPresentation(opened.presentation, opened.structure.structure) : createDefaultRenderProjection());
@@ -415,9 +418,11 @@ export const App = () => {
 
   const commandSelectionContext = () => {
     const activeObject = workspaceObjectsRef.current.find((object) => object.objectId === activeObjectId);
-    const current = workspaceObjectsRef.current.length > 1 ? workspaceSelectionStructure(workspaceObjectsRef.current) : activeObject ? structureForWorkspaceObjectState(activeObject) : structure?.structure ?? null;
-    return { structure: current, named: current?.id === structure?.structure.id || current?.id === `${structure?.structure.id}:state:${activeObject?.currentStateId}` ? namedSelectionsRef.current ?? undefined : undefined, coordinateStateId: activeObject?.currentStateId, stateOrdinal: activeObject ? Math.max(1, activeObject.stateOrder.indexOf(activeObject.currentStateId) + 1) : undefined, presentation: presentationSelectionContext() };
+    const current = workspaceObjectsRef.current.length > 0 ? workspaceSelectionStructure(workspaceObjectsRef.current) : structure?.structure ?? null;
+    return { structure: current, named: workspaceObjectsRef.current.length === 1 ? namedSelectionsRef.current ?? undefined : undefined, groups: workspaceGroupsRef.current, coordinateStateId: activeObject?.currentStateId, stateOrdinal: activeObject ? Math.max(1, activeObject.stateOrder.indexOf(activeObject.currentStateId) + 1) : undefined, coordinateFrame: workspaceObjectsRef.current.length > 1 ? coordinateFramePolicy ?? undefined : "LOCAL_SCIENTIFIC" as CoordinateFramePolicy, presentation: presentationSelectionContext() };
   };
+
+  const selectionOptionsFor = (context: ReturnType<typeof commandSelectionContext>) => ({ named: context.named, groups: context.groups, coordinateStateId: context.coordinateStateId, stateOrdinal: context.stateOrdinal, coordinateFrame: context.coordinateFrame, presentation: context.presentation });
 
   const workspaceObjectCandidates = (name: string) => {
     const normalized = name.trim().replace(/^['"]|['"]$/g, "").toLowerCase();
@@ -478,7 +483,7 @@ export const App = () => {
       const context = commandSelectionContext();
       if (!context.structure) return { category: "SELECTION", status: "No structure loaded; selection was not changed." };
       try {
-        const result = requireValidSelection(evaluateSelectionQuery(trimmed, context.structure, { named: context.named, coordinateStateId: context.coordinateStateId, stateOrdinal: context.stateOrdinal, presentation: context.presentation }));
+        const result = requireValidSelection(evaluateSelectionQuery(trimmed, context.structure, selectionOptionsFor(context)));
         setActiveSelection(result);
         setProjection((current) => setInteractionState(current, { selectedAtomIds: result.stableAtomIds, pickedAtomId: result.stableAtomIds[0] ?? null, measurementPickAtomIds: [] }));
         return { category: "SELECTION", status: `Selected ${result.count} atoms · replace · revision ${result.molecularRevision.slice(0, 10)}…`, count: result.count };
@@ -491,6 +496,13 @@ export const App = () => {
     const parsed = parsedResult.command;
     if (!parsed) return { category: "CAPABILITY", status: "Command was not parsed and no state was changed." };
     if (parsed.verb === "help") return { category: "SYSTEM", status: commandHelp(parsed.argument).map((definition) => `${definition.synopsis} — ${definition.description}`).join(" · ") || "No command matches that help topic." };
+    if (parsed.verb === "coordinate_frame") {
+      const value = parsed.argument.trim().toLowerCase();
+      const policy = value === "local_scientific" ? "LOCAL_SCIENTIFIC" : value === "effective_world" ? "EFFECTIVE_WORLD" : null;
+      if (!policy) return { category: "SELECTION", status: "coordinate_frame accepts only local_scientific or effective_world; the current frame declaration was preserved." };
+      setCoordinateFramePolicy(policy);
+      return { category: "SELECTION", status: `Declared ${policy} coordinate context for cross-object spatial selection. ${policy === "EFFECTIVE_WORLD" ? "Current workspace object transforms are identity, so canonical coordinates are used." : "Raw canonical coordinates are compared in their declared local scientific frame."}` };
+    }
     if (parsed.verb === "select") {
       const context = commandSelectionContext();
       if (!context.structure) return { category: "SELECTION", status: "No structure loaded; selection was not changed." };
@@ -498,7 +510,7 @@ export const App = () => {
         const namedMatch = trimmed.match(/^select\s+([A-Za-z_][A-Za-z0-9_]*)\s*,\s*(.+)$/i);
         const operationMatch = trimmed.match(/^select(?:\s+(replace|add|subtract|intersect))?\s+(.+)$/i);
         if (namedMatch) {
-          const result = requireValidSelection(evaluateSelectionQuery(namedMatch[2], context.structure, { named: context.named, coordinateStateId: context.coordinateStateId, stateOrdinal: context.stateOrdinal, presentation: context.presentation }));
+          const result = requireValidSelection(evaluateSelectionQuery(namedMatch[2], context.structure, selectionOptionsFor(context)));
           const snapshot = namedSelectionsRef.current?.createSnapshot(namedMatch[1], result);
           if (snapshot) setNamedSelections(namedSelectionsRef.current?.list().map((selection) => ({ name: selection.name, count: selection.stableAtomIds.length })) ?? []);
           setActiveSelection(result);
@@ -507,7 +519,7 @@ export const App = () => {
         }
         const query = operationMatch?.[2]?.trim() || "all";
         const operation = (operationMatch?.[1]?.toLowerCase() ?? "replace") as "replace" | "add" | "subtract" | "intersect";
-        const target = requireValidSelection(evaluateSelectionQuery(query, context.structure, { named: context.named, coordinateStateId: context.coordinateStateId, stateOrdinal: context.stateOrdinal, presentation: context.presentation }));
+        const target = requireValidSelection(evaluateSelectionQuery(query, context.structure, selectionOptionsFor(context)));
         const currentSelection = activeSelectionResultRef.current;
         const result = operation === "replace" || !currentSelection ? target : combineSelections(currentSelection, target, operation);
         setActiveSelection(result);
@@ -534,7 +546,7 @@ export const App = () => {
         const context = commandSelectionContext();
         if (!context.structure) return { category: "SELECTION", status: "No structure loaded; state selection was not changed." };
         try {
-          const result = requireValidSelection(evaluateSelectionQuery(`state ${parsed.argument.trim()}`, context.structure, { named: context.named, coordinateStateId: context.coordinateStateId, stateOrdinal: context.stateOrdinal, presentation: context.presentation }));
+          const result = requireValidSelection(evaluateSelectionQuery(`state ${parsed.argument.trim()}`, context.structure, selectionOptionsFor(context)));
           setActiveSelection(result);
           setProjection((current) => setInteractionState(current, { selectedAtomIds: result.stableAtomIds, pickedAtomId: result.stableAtomIds[0] ?? null, measurementPickAtomIds: [] }));
           return { category: "SELECTION", status: `State ${parsed.argument.trim()} selected ${result.count} atoms.`, count: result.count };
@@ -627,7 +639,7 @@ export const App = () => {
         const context = commandSelectionContext();
         if (!context.structure) return { category: "OBJECT", status: "No structure loaded; no object was created." };
         try {
-          const result = requireValidSelection(evaluateSelectionQuery(parsed.target, context.structure, { named: context.named, coordinateStateId: context.coordinateStateId, stateOrdinal: context.stateOrdinal, presentation: context.presentation }));
+          const result = requireValidSelection(evaluateSelectionQuery(parsed.target, context.structure, selectionOptionsFor(context)));
           const scopedObjectIds = new Set(result.stableAtomIds.map((stableId) => stableId.includes("::") ? stableId.split("::", 1)[0] : activeObjectId).filter((value): value is string => Boolean(value)));
           if (scopedObjectIds.size > 1) return { category: "OBJECT", status: "create requires a selection from one workspace object; cross-object creation is not supported and no object was created." };
           const source = [...scopedObjectIds][0] ? workspaceObjectsRef.current.find((object) => object.objectId === [...scopedObjectIds][0]) : workspaceObjectsRef.current.find((object) => object.objectId === activeObjectId);
@@ -728,7 +740,7 @@ export const App = () => {
       if (representationCommand) {
         const context = commandSelectionContext();
         if (!context.structure) return { category: "PRESENTATION", status: "No structure loaded; presentation was not changed." };
-        const target = resolveSelection(representationCommand.query, context.structure, { named: context.named, coordinateStateId: context.coordinateStateId, stateOrdinal: context.stateOrdinal, presentation: context.presentation });
+        const target = resolveSelection(representationCommand.query, context.structure, selectionOptionsFor(context));
         const style = representationStyleForCommand(representationCommand.representation) ?? undefined;
         const capability = representationCapabilityFor(style ?? "cartoon", context.structure);
         if (!capability.maySelect) return { category: "PRESENTATION", status: `${capability.label} unavailable: ${capability.diagnostic ?? capability.unsupportedReason ?? "canonical capability is not implemented"}` };
@@ -742,7 +754,7 @@ export const App = () => {
         if (/^(inherit|default|reset)$/i.test(colorMatch[1].trim())) {
           const context = commandSelectionContext();
           if (!context.structure) return { category: "PRESENTATION", status: "No structure loaded; color was not changed." };
-          const target = resolveSelection(colorMatch[2]?.trim() || "all", context.structure, { named: context.named, coordinateStateId: context.coordinateStateId, stateOrdinal: context.stateOrdinal, presentation: context.presentation });
+          const target = resolveSelection(colorMatch[2]?.trim() || "all", context.structure, selectionOptionsFor(context));
           updateWorkspaceProjections(target.stableAtomIds, (current, objectStableIds) => clearColorForSelection(current, objectStableIds));
           return { category: "PRESENTATION", status: `Cleared explicit colors for ${target.stableAtomIds.length} atoms; inherited scheme restored.` };
         }
@@ -750,7 +762,7 @@ export const App = () => {
         if (!color.definition) return { category: "PRESENTATION", status: "COLOR_NOT_FOUND" };
         const context = commandSelectionContext();
         if (!context.structure) return { category: "PRESENTATION", status: "No structure loaded; color was not changed." };
-        const target = resolveSelection(colorMatch[2]?.trim() || "all", context.structure, { named: context.named, coordinateStateId: context.coordinateStateId, stateOrdinal: context.stateOrdinal, presentation: context.presentation });
+        const target = resolveSelection(colorMatch[2]?.trim() || "all", context.structure, selectionOptionsFor(context));
         const colorHex = `#${color.definition.rgbSrgb.map((value) => Math.round(value * 255).toString(16).padStart(2, "0")).join("")}`;
         updateWorkspaceProjections(target.stableAtomIds, (current, objectStableIds) => setColorForSelection(current, objectStableIds, colorHex));
         return { category: "PRESENTATION", status: `Applied ${color.definition.canonicalName} to ${target.stableAtomIds.length} atoms.` };
@@ -910,7 +922,7 @@ export const App = () => {
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
         <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
-          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} />
+          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} />
           <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFileDrop={importFile} consoleExpanded={consoleExpanded} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} />
           <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
         </div>

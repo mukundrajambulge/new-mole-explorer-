@@ -3,17 +3,19 @@
   "source": "verification/selection/SELECTION_OPERATOR_MATRIX.md",
   "rowCount": 87,
   "implementationStatusCounts": {
-    "VERIFIED_WORKING": 69,
-    "MISSING_DEPENDENCY": 11,
+    "VERIFIED_WORKING": 70,
     "INTENTIONALLY_UNSUPPORTED": 6,
+    "MISSING_DEPENDENCY": 10,
     "UNKNOWN_PROPERTY": 1
   },
   "liveBrowserStatusCounts": {
     "PASS (`select all`)": 1,
-    "PASS (selection-matrix-live.spec.ts)": 78,
+    "PASS (selection-matrix-live.spec.ts)": 76,
     "PASS indirectly": 4,
     "PASS via named-selection E2E": 1,
+    "PASS (multi-object-state.spec.ts)": 1,
     "PASS": 2,
+    "PASS (selection-matrix-live.spec.ts; multi-object-state.spec.ts)": 1,
     "PASS (structured diagnostic)": 1
   },
   "oracleStatusCounts": {
@@ -108,10 +110,10 @@
     },
     {
       "operator": "group-name resolution",
-      "implementationStatus": "MISSING_DEPENDENCY",
-      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (multi-object-state.spec.ts)",
       "oracleStatus": "ORACLE_PENDING",
-      "decision": "no group registry in this gate"
+      "decision": "workspace group registry is bound into the canonical selection context; group actions remain organizational"
     },
     {
       "operator": "ambiguity handling",
@@ -375,9 +377,9 @@
     {
       "operator": "`within`",
       "implementationStatus": "VERIFIED_WORKING",
-      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; multi-object-state.spec.ts)",
       "oracleStatus": "ORACLE_EQUIVALENT",
-      "decision": "exact boundary equality"
+      "decision": "exact boundary equality; cross-object evaluation requires explicit `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD` policy"
     },
     {
       "operator": "`around`",

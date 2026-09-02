@@ -18,5 +18,7 @@ describe("typed command registry boundary", () => {
     expect(parseCommand("copy copied_object, source_object").command).toMatchObject({ domain: "OBJECT", verb: "copy", argument: "copied_object", target: "source_object" });
     expect(parseCommand("state 2, objectA").command).toMatchObject({ domain: "OBJECT", verb: "state", argument: "2", target: "objectA" });
     expect(parseCommand("group add protein-set, objectA").command).toMatchObject({ domain: "OBJECT", verb: "group", argument: "add protein-set", target: "objectA" });
+    expect(parseCommand("coordinate_frame local_scientific").command).toMatchObject({ domain: "SELECTION", verb: "coordinate_frame", argument: "local_scientific", target: null });
+    expect(commandSuggestions("coordinate_frame ")).toEqual(["local_scientific", "effective_world"]);
   });
 });
