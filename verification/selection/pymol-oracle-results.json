@@ -7,7 +7,8 @@
   "notes": [
     "Native-equivalent rows preserve the application's explicit protein, water, and ligand aliases without claiming those aliases are PyMOL spellings.",
     "The source commit is pinned; the temporary Python compatibility layer only adds future annotations and legacy runtime shims needed by this environment.",
-    "Spatial forms remain pending because the application's `within 4 of ...` and `around 4 ...` grammar was not silently translated to an unverified PyMOL form."
+    "The complete direct probe is recorded in `pymol-matrix-probe.json`: 92 native forms, 72 successful and 20 native errors. The comparison ledger below promotes only exact forms or documented application aliases.",
+    "Spatial forms remain pending in this comparison ledger because the application's accepted forms were not silently translated to an unverified PyMOL form."
   ],
   "rows": [
     { "applicationQuery": "all", "oracleQuery": "all", "oracleStatus": "ORACLE_PASS", "count": 12, "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a" },
@@ -28,9 +29,13 @@
     { "applicationQuery": "first all", "oracleQuery": "first all", "oracleStatus": "ORACLE_PASS", "count": 1, "membershipHash": "eb7674fed3646839030b00957c80e0e663a875ba732ce82ef46d8f7aee1c7e7e" },
     { "applicationQuery": "last all", "oracleQuery": "last all", "oracleStatus": "ORACLE_PASS", "count": 1, "membershipHash": "fd35d6fe72936e087801f9ec4812f8a4316605b1e82396341d78c0b6a27384e9" },
     { "applicationQuery": "byres name CA", "oracleQuery": "byres name CA", "oracleStatus": "ORACLE_PASS", "count": 8, "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3" },
+    { "applicationQuery": "name CA in chain A", "oracleQuery": "name CA in chain A", "oracleStatus": "ORACLE_PASS", "count": 2, "membershipHash": "f249bc605c5b2026858b16111b3affdc513a9e68a53d6687cb58e395bbd5d591" },
+    { "applicationQuery": "bycalpha name CA", "oracleQuery": "bycalpha name CA", "oracleStatus": "ORACLE_PASS", "count": 2, "membershipHash": "f249bc605c5b2026858b16111b3affdc513a9e68a53d6687cb58e395bbd5d591" },
+    { "applicationQuery": "bymolecule ligand", "oracleQuery": "bymolecule organic", "oracleStatus": "ORACLE_PASS", "count": 2, "membershipHash": "f1a7a9815562e93a9cc9321e9842cdda93caf16003517d83b5f7344643f588ab", "mapping": "application ligand alias -> PyMOL organic" },
     { "applicationQuery": "bychain ligand", "oracleQuery": "bychain organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 11, "membershipHash": "1dcb79441de393fa447723e626d083633130aadb7bf27f9ed87596b7881db096", "mapping": "application ligand alias -> PyMOL organic" },
     { "applicationQuery": "neighbor ligand", "oracleQuery": "neighbor organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 0, "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "mapping": "application ligand alias -> PyMOL organic" },
     { "applicationQuery": "bound_to ligand", "oracleQuery": "bound_to organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 2, "membershipHash": "f1a7a9815562e93a9cc9321e9842cdda93caf16003517d83b5f7344643f588ab", "mapping": "application ligand alias -> PyMOL organic" },
+    { "applicationQuery": "polymer.nucleic", "oracleQuery": "polymer.nucleic", "oracleStatus": "ORACLE_PASS", "count": 0, "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" },
     { "applicationQuery": "within 4 of ligand", "oracleQuery": null, "oracleStatus": "ORACLE_PENDING", "reason": "native PyMOL grammar equivalent not pinned" },
     { "applicationQuery": "around 4 ligand", "oracleQuery": null, "oracleStatus": "ORACLE_PENDING", "reason": "native PyMOL grammar equivalent not pinned" }
   ]

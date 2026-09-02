@@ -1,23 +1,24 @@
 {
   "schemaVersion": 1,
   "source": "verification/selection/SELECTION_OPERATOR_MATRIX.md",
-  "rowCount": 79,
+  "rowCount": 87,
   "implementationStatusCounts": {
-    "VERIFIED_WORKING": 57,
-    "MISSING_DEPENDENCY": 10,
-    "INTENTIONALLY_UNSUPPORTED": 10,
-    "RESEARCH_REQUIRED": 2
+    "VERIFIED_WORKING": 68,
+    "MISSING_DEPENDENCY": 12,
+    "INTENTIONALLY_UNSUPPORTED": 6,
+    "UNKNOWN_PROPERTY": 1
   },
   "liveBrowserStatusCounts": {
     "PASS (`select all`)": 1,
-    "PASS (selection-matrix-live.spec.ts)": 71,
+    "PASS (selection-matrix-live.spec.ts)": 78,
     "PASS indirectly": 4,
     "PASS via named-selection E2E": 1,
-    "PASS": 2
+    "PASS": 2,
+    "PASS (structured diagnostic)": 1
   },
   "oracleStatusCounts": {
-    "ORACLE_PASS": 13,
-    "ORACLE_PENDING": 60,
+    "ORACLE_PASS": 17,
+    "ORACLE_PENDING": 64,
     "ORACLE_EQUIVALENT": 6
   },
   "entries": [
@@ -92,6 +93,34 @@
       "decision": "missing optional name is valid empty"
     },
     {
+      "operator": "bare named selection",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "InputRouter sends non-command heads to selection parser"
+    },
+    {
+      "operator": "object-name resolution",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "derived workspace scope metadata"
+    },
+    {
+      "operator": "group-name resolution",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "no group registry in this gate"
+    },
+    {
+      "operator": "ambiguity handling",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "require ObjectID when name is ambiguous"
+    },
+    {
       "operator": "`not`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
@@ -132,6 +161,20 @@
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PENDING",
       "decision": "symbolic alias"
+    },
+    {
+      "operator": "parentheses",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "Pratt parser precedence"
+    },
+    {
+      "operator": "implicit adjacency",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "implicit adjacency is an explicit application-profile OR; native alias spelling still requires a pinned direct case"
     },
     {
       "operator": "`first`",
@@ -233,17 +276,17 @@
     },
     {
       "operator": "`S1 in S2`",
-      "implementationStatus": "RESEARCH_REQUIRED",
+      "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "not added without exact grammar"
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "matches the complete identifier tuple documented by PyMOL; segment identity is optional canonical source data"
     },
     {
       "operator": "`S1 like S2`",
-      "implementationStatus": "RESEARCH_REQUIRED",
+      "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PENDING",
-      "decision": "not reduced to string containment"
+      "decision": "matches name and residue identity; invalid `name like CA` remains a syntax error"
     },
     {
       "operator": "`byobject`",
@@ -277,15 +320,15 @@
       "operator": "`bycalpha`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "expands matched residue groups"
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "returns only CA atoms from residues containing a matched atom"
     },
     {
       "operator": "`bymolecule`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "object scope only in current profile"
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "returns complete connected components from canonical bonds; never aliases object scope"
     },
     {
       "operator": "`byfragment`",
@@ -324,10 +367,10 @@
     },
     {
       "operator": "`extend`",
-      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PENDING",
-      "decision": "no unvalidated breadth semantics"
+      "decision": "bounded inclusive breadth-first expansion over canonical bonds; pinned native infix case remains pending"
     },
     {
       "operator": "`within`",
@@ -345,24 +388,24 @@
     },
     {
       "operator": "`expand`",
-      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PENDING",
-      "decision": "use `within` only until grammar is pinned"
+      "decision": "inclusive Cartesian expansion over the active coordinate state; native grammar remains pending"
     },
     {
       "operator": "`near_to`",
-      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PENDING",
-      "decision": "distance semantics not pinned"
+      "decision": "candidate atoms within the boundary excluding reference atoms; missing-distance shorthand fails syntax"
     },
     {
       "operator": "`beyond`",
-      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PENDING",
-      "decision": "complement boundary needs profile"
+      "decision": "candidate atoms outside the inclusive Cartesian boundary"
     },
     {
       "operator": "`gap`",
@@ -426,6 +469,13 @@
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PENDING",
       "decision": "command and selection namespaces remain explicit"
+    },
+    {
+      "operator": "arbitrary property",
+      "implementationStatus": "UNKNOWN_PROPERTY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "unknown fields fail closed; no dynamic evaluation"
     },
     {
       "operator": "`=`",
@@ -496,6 +546,13 @@
       "liveBrowserStatus": "PASS",
       "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "accepted protein alias"
+    },
+    {
+      "operator": "`polymer.nucleic`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (structured diagnostic)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "fail closed until canonical polymer typing is ingested; no protein/nucleic heuristic is fabricated"
     },
     {
       "operator": "`backbone`",

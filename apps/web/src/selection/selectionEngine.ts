@@ -22,7 +22,7 @@ export type SelectionTokenKind = "WORD" | "STRING" | "LPAREN" | "RPAREN" | "COMM
 export type SelectionToken = { kind: SelectionTokenKind; lexeme: string; span: SourceSpan };
 
 export type SelectionProperty = "name" | "resn" | "resi" | "chain" | "segi" | "elem" | "id" | "index" | "rank" | "model" | "object" | "alt" | "formal_charge" | "partial_charge" | "b" | "q" | "occupancy" | "ss" | "x" | "y" | "z" | "state" | "label" | "pepseq";
-export type SelectionCategory = "polymer" | "ligand" | "water" | "ion" | "other" | "hydrogen" | "hetatm" | "inorganic" | "solvent" | "protein" | "backbone" | "sidechain" | "guide" | "metals" | "bonded" | "enabled" | "present" | "visible";
+export type SelectionCategory = "polymer" | "ligand" | "water" | "ion" | "other" | "hydrogen" | "hetatm" | "inorganic" | "solvent" | "protein" | "nucleic" | "backbone" | "sidechain" | "guide" | "metals" | "bonded" | "enabled" | "present" | "visible";
 export type SelectionAst =
   | { kind: "all" }
   | { kind: "none" }
@@ -33,7 +33,9 @@ export type SelectionAst =
   | { kind: "and" | "or"; left: SelectionAst; right: SelectionAst }
   | { kind: "byobject" | "bysegi" | "bychain" | "byres" | "bycalpha" | "bymolecule" | "first" | "last"; operand: SelectionAst }
   | { kind: "neighbor" | "bound_to"; operand: SelectionAst }
-  | { kind: "within" | "around"; distance: number; reference: SelectionAst; candidate?: SelectionAst };
+  | { kind: "extend"; distance: number; operand: SelectionAst }
+  | { kind: "identifier_match"; mode: "in" | "like"; left: SelectionAst; right: SelectionAst }
+  | { kind: "within" | "around" | "expand" | "near_to" | "beyond"; distance: number; reference: SelectionAst; candidate?: SelectionAst };
 
 export type SelectionProvenance = {
   kind: "query" | "pick" | "named-snapshot" | "command";
@@ -137,7 +139,7 @@ export const lexSelection = (query: string): { tokens: readonly SelectionToken[]
 const isWord = (token: SelectionToken | undefined, value?: string): boolean => token?.kind === "WORD" && (value === undefined || token.lexeme.toLowerCase() === value);
 const propertyNames = new Set<SelectionProperty>(["name", "resn", "resi", "chain", "segi", "elem", "id", "index", "rank", "model", "object", "alt", "formal_charge", "partial_charge", "b", "q", "occupancy", "ss", "x", "y", "z", "state", "label", "pepseq"]);
 const categoryNames = new Map<string, SelectionCategory>([
-  ["polymer", "polymer"], ["protein", "protein"], ["polymer.protein", "protein"], ["ligand", "ligand"], ["organic", "ligand"], ["water", "water"], ["solvent", "solvent"], ["ion", "ion"], ["ions", "ion"], ["inorganic", "inorganic"], ["hetatm", "hetatm"], ["hydrogens", "hydrogen"], ["hydrogen", "hydrogen"], ["hydro", "hydrogen"], ["backbone", "backbone"], ["sidechain", "sidechain"], ["guide", "guide"], ["metals", "metals"], ["bonded", "bonded"], ["enabled", "enabled"], ["present", "present"], ["visible", "visible"], ["other", "other"],
+  ["polymer", "polymer"], ["protein", "protein"], ["polymer.protein", "protein"], ["nucleic", "nucleic"], ["polymer.nucleic", "nucleic"], ["ligand", "ligand"], ["organic", "ligand"], ["water", "water"], ["solvent", "solvent"], ["ion", "ion"], ["ions", "ion"], ["inorganic", "inorganic"], ["hetatm", "hetatm"], ["hydrogens", "hydrogen"], ["hydrogen", "hydrogen"], ["hydro", "hydrogen"], ["backbone", "backbone"], ["sidechain", "sidechain"], ["guide", "guide"], ["metals", "metals"], ["bonded", "bonded"], ["enabled", "enabled"], ["present", "present"], ["visible", "visible"], ["other", "other"],
 ] as const);
 
 class SelectionParser {
@@ -159,12 +161,31 @@ class SelectionParser {
     while (true) {
       const token = this.current();
       const word = token.lexeme.toLowerCase();
-      const bindingPower = word === "or" || token.lexeme === "|" ? 10 : word === "and" || token.lexeme === "&" ? 20 : word === "within" ? 25 : -1;
+      const implicitOr = !["in", "like", "or", "and", "within", "around", "expand", "near_to", "beyond", "extend", "of"].includes(word)
+        && (token.kind === "LPAREN" || (token.kind === "OPERATOR" && token.lexeme === "!") || ((token.kind === "WORD" || token.kind === "STRING") && !/^-?(?:\d+(?:\.\d*)?|\.\d+)$/.test(token.lexeme)));
+      const bindingPower = word === "or" || token.lexeme === "|" || implicitOr ? 10 : word === "and" || token.lexeme === "&" ? 20 : ["in", "like", "within", "around", "expand", "near_to", "beyond", "extend"].includes(word) ? 25 : -1;
       if (bindingPower < minBindingPower) break;
-      this.take();
-      if (word === "within") {
-        const distance = this.distance(); this.expectWord("of");
-        left = { kind: "within", distance, candidate: left, reference: this.expression(bindingPower + 1) }; continue;
+      if (word === "in" || word === "like") {
+        this.take();
+        left = { kind: "identifier_match", mode: word, left, right: this.expression(bindingPower + 1) }; continue;
+      }
+      if (word === "within" || word === "around" || word === "near_to" || word === "beyond") {
+        this.take();
+        const distance = this.distance();
+        if (this.current().lexeme.toLowerCase() === "of") this.take();
+        left = { kind: word, distance, candidate: left, reference: this.expression(bindingPower + 1) }; continue;
+      }
+      if (word === "expand") {
+        this.take();
+        left = { kind: "expand", distance: this.distance(), reference: left }; continue;
+      }
+      if (word === "extend") {
+        this.take();
+        left = { kind: "extend", distance: this.distance(), operand: left }; continue;
+      }
+      if (!implicitOr) this.take();
+      if (implicitOr) {
+        left = { kind: "or", left, right: this.expression(bindingPower + 1) }; continue;
       }
       const right = this.expression(bindingPower + 1);
       left = { kind: word === "or" || token.lexeme === "|" ? "or" : "and", left, right };
@@ -178,20 +199,27 @@ class SelectionParser {
     if (token.kind === "LPAREN") { const nested = this.expression(0); if (this.current().kind !== "RPAREN") this.fail("Expected `)`."); this.take(); return nested; }
     if (token.kind === "OPERATOR" && token.lexeme === "!") return { kind: "not", operand: this.expression(60) };
     if (word === "not") return { kind: "not", operand: this.expression(60) };
-    if (["byobject", "bysegi", "byres", "bychain", "bycalpha", "bymolecule"].includes(word)) return { kind: word as "byobject" | "bysegi" | "byres" | "bychain" | "bycalpha" | "bymolecule", operand: this.expression(15) };
+    if (["byobject", "bysegi", "byres", "bychain", "bycalpha", "bymolecule"].includes(word)) return { kind: word as "byobject" | "bysegi" | "byres" | "bychain" | "bycalpha" | "bymolecule", operand: this.expression(0) };
     if (word === "first" || word === "last") return { kind: word, operand: this.expression(60) };
     if (word === "neighbor" || word === "bound_to" || word === "bound-to") return { kind: word === "bound-to" ? "bound_to" : word, operand: this.expression(35) };
+    if (word === "extend") return { kind: "extend", distance: this.distance(), operand: this.expression(35) };
     if (word === "within" || word === "around") {
       const distance = this.distance();
-      if (word === "within") this.expectWord("of");
+      if (word === "within") this.expectWord("of"); else if (this.current().lexeme.toLowerCase() === "of") this.take();
       const reference = this.expression(35);
       return { kind: word, distance, reference };
+    }
+    if (word === "expand" || word === "near_to" || word === "beyond") {
+      const distance = this.distance();
+      if (this.current().lexeme.toLowerCase() === "of") this.take();
+      return { kind: word, distance, reference: this.expression(35) };
     }
     if (word === "all" || word === "*" || word === "everything") return { kind: "all" };
     if (word === "none") return { kind: "none" };
     const category = categoryNames.get(word as "polymer" | "protein" | "ligand" | "organic" | "water" | "ion" | "ions" | "other");
     if (category) return { kind: "category", category, span: token.span };
     if (propertyNames.has(word as SelectionProperty)) {
+      if (isWord(this.current(), "in") || isWord(this.current(), "like")) this.fail(`Identifier matching requires two selection expressions; \`${word} ${this.current().lexeme}\` is not a property value.`);
       let operator: "EQ" | "NE" | "LT" | "LTE" | "GT" | "GTE" = "EQ";
       if (this.current().kind === "OPERATOR" && ["=", "!=", "<", "<=", ">", ">="].includes(this.current().lexeme)) { const operatorToken = this.take().lexeme; operator = operatorToken === "!=" ? "NE" : operatorToken === "<" ? "LT" : operatorToken === "<=" ? "LTE" : operatorToken === ">" ? "GT" : operatorToken === ">=" ? "GTE" : "EQ"; }
       const value = this.take();
@@ -234,8 +262,9 @@ const selectionParseCache = new Map<string, { ast: SelectionAst | null; tokens: 
 
 const normalize = (ast: SelectionAst): SelectionAst => {
   if (ast.kind === "and" || ast.kind === "or") return { ...ast, left: normalize(ast.left), right: normalize(ast.right) };
-  if (ast.kind === "not" || ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to") return { ...ast, operand: normalize(ast.operand) };
-  if (ast.kind === "within" || ast.kind === "around") return { ...ast, reference: normalize(ast.reference), ...(ast.candidate ? { candidate: normalize(ast.candidate) } : {}) };
+  if (ast.kind === "not" || ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to" || ast.kind === "extend") return { ...ast, operand: normalize(ast.operand) };
+  if (ast.kind === "identifier_match") return { ...ast, left: normalize(ast.left), right: normalize(ast.right) };
+  if (ast.kind === "within" || ast.kind === "around" || ast.kind === "expand" || ast.kind === "near_to" || ast.kind === "beyond") return { ...ast, reference: normalize(ast.reference), ...(ast.candidate ? { candidate: normalize(ast.candidate) } : {}) };
   if (ast.kind === "predicate") return { ...ast, property: ast.property.toLowerCase() as SelectionProperty, value: ast.value.trim() };
   if (ast.kind === "named") return { ...ast, name: ast.name.trim() };
   return ast;
@@ -247,8 +276,10 @@ const serialize = (ast: SelectionAst): string => {
   if (ast.kind === "predicate") return `${ast.property}${ast.operator === "EQ" ? "=" : ast.operator === "NE" ? "!=" : ast.operator === "LT" ? "<" : ast.operator === "LTE" ? "<=" : ast.operator === "GT" ? ">" : ">="}${JSON.stringify(ast.value)}`;
   if (ast.kind === "not") return `not(${serialize(ast.operand)})`;
   if (ast.kind === "and" || ast.kind === "or") return `(${serialize(ast.left)} ${ast.kind} ${serialize(ast.right)})`;
+  if (ast.kind === "extend") return `extend(${ast.distance},${serialize(ast.operand)})`;
   if (ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to") return `${ast.kind}(${serialize(ast.operand)})`;
-  if (ast.kind === "within" || ast.kind === "around") return `${ast.kind}(${ast.distance},${serialize(ast.reference)}${ast.candidate ? `,${serialize(ast.candidate)}` : ""})`;
+  if (ast.kind === "identifier_match") return `${ast.kind}:${ast.mode}(${serialize(ast.left)},${serialize(ast.right)})`;
+  if (ast.kind === "within" || ast.kind === "around" || ast.kind === "expand" || ast.kind === "near_to" || ast.kind === "beyond") return `${ast.kind}(${ast.distance},${serialize(ast.reference)}${ast.candidate ? `,${serialize(ast.candidate)}` : ""})`;
   return "invalid";
 };
 
@@ -271,6 +302,7 @@ const categoryMatches = (atom: CanonicalAtom, category: SelectionCategory, struc
   if (category === "enabled" || category === "present") return true;
   if (category === "visible") { context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Presentation visibility is not bound into this selection context." }); return false; }
   if (category === "polymer" || category === "protein") return atom.isPolymer;
+  if (category === "nucleic") { if (!context.diagnostics.some((diagnostic) => diagnostic.code === "MISSING_DEPENDENCY")) context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical nucleic-versus-protein polymer typing is unavailable for this molecular revision." }); return false; }
   if (category === "ligand") return atom.isLigand;
   if (category === "water" || category === "solvent") return atom.isWater;
   if (category === "ion" || category === "inorganic") return atom.isIon;
@@ -286,7 +318,10 @@ const categoryMatches = (atom: CanonicalAtom, category: SelectionCategory, struc
 };
 type SelectionOperator = "EQ" | "NE" | "LT" | "LTE" | "GT" | "GTE";
 const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, operator: SelectionOperator, value: string, structure: CanonicalMolecularStructure, context: EvalContext): boolean => {
-  if (property === "segi") { if (!context.diagnostics.some((diagnostic) => diagnostic.code === "UNSUPPORTED_OPERATOR_OR_PROFILE")) context.diagnostics.push({ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: "Segment identity is not present in the current canonical structure; the query was not mapped to chain identity." }); return false; }
+  if (property === "segi" && !structure.atoms.some((atom) => atom.segmentId)) {
+    if (!context.diagnostics.some((diagnostic) => diagnostic.code === "UNSUPPORTED_OPERATOR_OR_PROFILE")) context.diagnostics.push({ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: "Segment identity is not present in the current canonical structure." });
+    return false;
+  }
   const markInvalid = (message: string) => { if (!context.diagnostics.some((diagnostic) => diagnostic.code === "INVALID_VALUE" && diagnostic.message === message)) context.diagnostics.push({ code: "INVALID_VALUE", message }); };
   if ((property === "index" && (!/^\d+$/.test(value) || Number(value) < 1)) || (property === "rank" && (!/^\d+$/.test(value) || Number(value) < 0))) { markInvalid(`${property} requires a non-negative integer with ${property === "index" ? "one-based" : "zero-based"} semantics.`); return false; }
   if (property === "resi" && !/^-?\d+[A-Za-z]?(?:[-:]-?\d+[A-Za-z]?)?$/.test(value)) { markInvalid(`Residue selector \`${value}\` is not an integer, insertion-aware value, or range.`); return false; }
@@ -295,6 +330,7 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
   else if (property === "resn") matches = wildcardMatch(atom.residueName, value);
   else if (property === "resi") matches = residueMatch(atom, value);
   else if (property === "chain") matches = wildcardMatch(atom.chain, value);
+  else if (property === "segi") matches = wildcardMatch(atom.segmentId ?? "", value);
   else if (property === "elem") matches = wildcardMatch(atom.element, value);
   else if (property === "alt") matches = wildcardMatch(atom.altLoc ?? "", value);
   else if (property === "id") matches = atom.stableId === value || String(atom.serial) === value;
@@ -329,7 +365,7 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
   }
   else { context.diagnostics.push({ code: "UNKNOWN_PROPERTY", message: `Unknown canonical property: ${property}.` }); return false; }
   if (["EQ", "NE"].includes(operator)) return operator === "NE" ? !matches : matches;
-  if (["name", "resn", "chain", "elem", "alt", "id", "model", "object", "ss"].includes(property)) { context.diagnostics.push({ code: "INVALID_VALUE", message: `${property} only supports equality and inequality matching.` }); return false; }
+  if (["name", "resn", "chain", "segi", "elem", "alt", "id", "model", "object", "ss"].includes(property)) { context.diagnostics.push({ code: "INVALID_VALUE", message: `${property} only supports equality and inequality matching.` }); return false; }
   return matches;
 };
 const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, context: EvalContext): Set<string> => {
@@ -350,25 +386,72 @@ const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, 
     const ordered = structure.atoms.map((atom) => atom.stableId).filter((id) => operand.has(id));
     return new Set(ordered.length ? [ast.kind === "first" ? ordered[0]! : ordered[ordered.length - 1]!] : []);
   }
+  if (ast.kind === "identifier_match") {
+    const left = evaluateAst(ast.left, structure, context);
+    const right = evaluateAst(ast.right, structure, context);
+    const key = (atom: CanonicalAtom) => ast.mode === "in"
+      ? [atom.atomName, atom.residueNumber, atom.insertionCode ?? "", atom.residueName, atom.chain, atom.segmentId ?? ""].join("\u0000")
+      : [atom.atomName, atom.residueNumber, atom.insertionCode ?? ""].join("\u0000");
+    const rightKeys = new Set(structure.atoms.filter((atom) => right.has(atom.stableId)).map(key));
+    return new Set(structure.atoms.filter((atom) => left.has(atom.stableId) && rightKeys.has(key(atom))).map((atom) => atom.stableId));
+  }
   if (ast.kind === "byobject" || ast.kind === "bymolecule" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha") {
-    const operand = evaluateAst(ast.operand, structure, context); const scope = (atom: CanonicalAtom) => `${atom.workspaceObjectId ?? structure.id}\u0000`; const groups = new Set(structure.atoms.filter((atom) => operand.has(atom.stableId)).map((atom) => ast.kind === "byobject" || ast.kind === "bymolecule" ? scope(atom) : ast.kind === "byres" || ast.kind === "bycalpha" ? `${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}` : `${scope(atom)}${atom.chain}`));
-    if (ast.kind === "byobject" || ast.kind === "bymolecule") return new Set(structure.atoms.filter((atom) => groups.has(scope(atom)) && context.universe.has(atom.stableId)).map((atom) => atom.stableId));
-    if (ast.kind === "bysegi") { context.diagnostics.push({ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: "Segment identity is not present in the current canonical structure." }); return new Set(); }
+    const operand = evaluateAst(ast.operand, structure, context); const scope = (atom: CanonicalAtom) => `${atom.workspaceObjectId ?? structure.id}\u0000`; const groups = new Set(structure.atoms.filter((atom) => operand.has(atom.stableId)).map((atom) => ast.kind === "byobject" ? scope(atom) : ast.kind === "byres" || ast.kind === "bycalpha" ? `${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}` : ast.kind === "bysegi" ? `${scope(atom)}${atom.segmentId ?? ""}` : `${scope(atom)}${atom.chain}`));
+    if (ast.kind === "byobject") return new Set(structure.atoms.filter((atom) => groups.has(scope(atom)) && context.universe.has(atom.stableId)).map((atom) => atom.stableId));
+    if (ast.kind === "bymolecule") {
+      context.needsTopology = true;
+      const adjacency = new Map<string, Set<string>>();
+      for (const bond of structure.bonds) {
+        adjacency.set(bond.atom1, new Set([...(adjacency.get(bond.atom1) ?? []), bond.atom2]));
+        adjacency.set(bond.atom2, new Set([...(adjacency.get(bond.atom2) ?? []), bond.atom1]));
+      }
+      const componentByAtom = new Map<string, string>();
+      for (const atom of structure.atoms) {
+        if (componentByAtom.has(atom.stableId)) continue;
+        const componentId = atom.stableId;
+        const stack = [atom.stableId];
+        componentByAtom.set(atom.stableId, componentId);
+        while (stack.length) {
+          const current = stack.pop()!;
+          for (const next of adjacency.get(current) ?? []) {
+            if (!componentByAtom.has(next)) { componentByAtom.set(next, componentId); stack.push(next); }
+          }
+        }
+      }
+      const selectedComponents = new Set([...operand].map((id) => componentByAtom.get(id)).filter((id): id is string => Boolean(id)));
+      return new Set(structure.atoms.filter((atom) => context.universe.has(atom.stableId) && selectedComponents.has(componentByAtom.get(atom.stableId)!)).map((atom) => atom.stableId));
+    }
+    if (ast.kind === "bysegi" && !structure.atoms.some((atom) => atom.segmentId)) { context.diagnostics.push({ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: "Segment identity is not present in the current canonical structure." }); return new Set(); }
     if (ast.kind === "bycalpha") {
       const residues = new Set(structure.atoms.filter((atom) => operand.has(atom.stableId)).map((atom) => `${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}`));
-      return new Set(structure.atoms.filter((atom) => residues.has(`${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}`) && context.universe.has(atom.stableId)).map((atom) => atom.stableId));
+      return new Set(structure.atoms.filter((atom) => atom.atomName.toUpperCase() === "CA" && residues.has(`${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}`) && context.universe.has(atom.stableId)).map((atom) => atom.stableId));
     }
-    const groupKey = (atom: CanonicalAtom) => ast.kind === "byres" ? `${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}` : `${scope(atom)}${atom.chain}`;
+    const groupKey = (atom: CanonicalAtom) => ast.kind === "byres" ? `${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}` : ast.kind === "bysegi" ? `${scope(atom)}${atom.segmentId ?? ""}` : `${scope(atom)}${atom.chain}`;
     return new Set(structure.atoms.filter((atom) => groups.has(groupKey(atom)) && context.universe.has(atom.stableId)).map((atom) => atom.stableId));
   }
-  if (ast.kind === "neighbor" || ast.kind === "bound_to") {
+  if (ast.kind === "neighbor" || ast.kind === "bound_to" || ast.kind === "extend") {
     context.needsTopology = true; if (!structure.bonds) { context.diagnostics.push({ code: "TOPOLOGY_CONTEXT_ERROR", message: "Topology is unavailable for neighbor expansion." }); return new Set(); }
     const target = evaluateAst(ast.operand, structure, context); const result = new Set<string>();
+    if (ast.kind === "extend") {
+      if (!Number.isInteger(ast.distance) || ast.distance < 0) { context.diagnostics.push({ code: "INVALID_VALUE", message: "Topology extension distance must be a non-negative integer." }); return new Set(); }
+      let frontier = new Set(target);
+      for (let step = 0; step < ast.distance; step += 1) {
+        const next = new Set<string>();
+        for (const bond of structure.bonds) {
+          if (frontier.has(bond.atom1) && context.universe.has(bond.atom2)) next.add(bond.atom2);
+          if (frontier.has(bond.atom2) && context.universe.has(bond.atom1)) next.add(bond.atom1);
+        }
+        for (const id of next) result.add(id);
+        frontier = next;
+      }
+      for (const id of target) result.add(id);
+      return result;
+    }
     for (const bond of structure.bonds) { const first = target.has(bond.atom1); const second = target.has(bond.atom2); if (first && context.universe.has(bond.atom2)) result.add(bond.atom2); if (second && context.universe.has(bond.atom1)) result.add(bond.atom1); }
     if (ast.kind === "neighbor") for (const id of target) result.delete(id);
     return result;
   }
-  if (ast.kind !== "within" && ast.kind !== "around") return new Set();
+  if (ast.kind !== "within" && ast.kind !== "around" && ast.kind !== "expand" && ast.kind !== "near_to" && ast.kind !== "beyond") return new Set();
   context.needsCoordinates = true;
   if (ast.distance < 0 || !Number.isFinite(ast.distance)) { context.diagnostics.push({ code: "INVALID_VALUE", message: "Spatial distance must be finite and non-negative." }); return new Set(); }
   const reference = evaluateAst(ast.reference, structure, context); const candidate = ast.candidate ? evaluateAst(ast.candidate, structure, context) : new Set(context.universe); const refAtoms = structure.atoms.filter((atom) => reference.has(atom.stableId));
@@ -376,7 +459,9 @@ const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, 
   for (const atom of structure.atoms) {
     if (!candidate.has(atom.stableId)) continue;
     const inside = refAtoms.some((ref) => { const dx = atom.x - ref.x; const dy = atom.y - ref.y; const dz = atom.z - ref.z; return dx * dx + dy * dy + dz * dz <= radiusSquared; });
-    if (inside && (ast.kind !== "around" || !reference.has(atom.stableId))) result.add(atom.stableId);
+    if ((ast.kind === "within" || ast.kind === "expand") && inside) result.add(atom.stableId);
+    if ((ast.kind === "around" || ast.kind === "near_to") && inside && !reference.has(atom.stableId)) result.add(atom.stableId);
+    if (ast.kind === "beyond" && !inside) result.add(atom.stableId);
   }
   return result;
 };
@@ -426,7 +511,7 @@ export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecu
   const presentationSelector = trimmed.match(/^(rep|cartoon_color|ribbon_color)\b/i);
   if (presentationSelector) return baseResult(trimmed, structure, source, "MISSING_DEPENDENCY", [{ code: "MISSING_DEPENDENCY", message: `Presentation selector \`${presentationSelector[1]}\` is not evaluated in the scientific selection context; use a registered presentation command.` }], "", [], emptyContext);
   if (options.expectedRevision && options.expectedRevision !== structure.scientificHash) return baseResult(trimmed, structure, source, "STALE_REVISION", [{ code: "STALE_REVISION", message: "The selection context revision is stale; the active structure was not changed." }], "", [], emptyContext);
-  const gated = trimmed.match(/\b(gap|pbc|bycell|symmetry|byring|byfragment|extend|expand|near_to|beyond|donors|acceptors|arbitrary)\b/i);
+  const gated = trimmed.match(/\b(gap|pbc|bycell|symmetry|byring|byfragment|donors|acceptors|arbitrary)\b/i);
   if (gated) return baseResult(trimmed, structure, source, "UNSUPPORTED_OPERATOR_OR_PROFILE", [{ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: `Selection operator \`${gated[1]}\` is gated until its validated scientific profile is available.` }], "", [], emptyContext);
   if (!trimmed || !parsed.ast) {
     const diagnostics = parsed.diagnostics.length ? parsed.diagnostics : [{ code: "SYNTAX_ERROR" as const, message: "A selection expression is required." }];

@@ -20,7 +20,7 @@ const splitRow = (line) => {
   return cells;
 };
 
-const rows = source.split(/\r?\n/).filter((line) => line.startsWith("| `") && !line.includes("---"));
+const rows = source.split(/\r?\n/).filter((line) => line.trimStart().startsWith("|") && !line.includes("---") && !line.startsWith("| Operator / aliases"));
 const entries = rows.map((line) => {
   const cells = splitRow(line);
   return { operator: cells[0], implementationStatus: cells[8], liveBrowserStatus: cells[9], oracleStatus: cells[10], decision: cells[11] };

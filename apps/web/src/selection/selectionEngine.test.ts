@@ -33,6 +33,15 @@ describe("canonical selection engine", () => {
     expect(resolveSelection("byres name CA and chain A", structure).stableAtomIds).toEqual(["a1", "a2", "a3"]);
     expect(resolveSelection("byres (name CA or ligand)", structure).stableAtomIds).toEqual(["a1", "a2", "a3", "b1", "l1"]);
     expect(resolveSelection("bychain chain A and ligand", structure).stableAtomIds).toEqual(["a1", "a2", "a3", "l1", "w1"]);
+    expect(resolveSelection("chain A protein", structure).stableAtomIds).toEqual(["a1", "a2", "a3", "b1", "l1", "w1"]);
+    expect(resolveSelection("bycalpha name CA", structure).stableAtomIds).toEqual(["a1", "a3", "b1"]);
+    expect(resolveSelection("bymolecule ligand", structure).stableAtomIds).toEqual(["a1", "a2", "l1"]);
+    expect(resolveSelection("name CA in chain A", structure).stableAtomIds).toEqual(["a1", "a3"]);
+    expect(resolveSelection("(chain A and name CA) like (chain A and name CA)", structure).stableAtomIds).toEqual(["a1", "a3"]);
+    const segmented = { ...structure, atoms: structure.atoms.map((atom) => ({ ...atom, segmentId: atom.chain === "A" ? "SEG_A" : "SEG_B" })), scientificHash: "c".repeat(64) } satisfies CanonicalMolecularStructure;
+    expect(resolveSelection("segi SEG_A", segmented).stableAtomIds).toEqual(["a1", "a2", "a3", "l1", "w1"]);
+    expect(resolveSelection("bysegi (name CA and segi SEG_A)", segmented).stableAtomIds).toEqual(["a1", "a2", "a3", "l1", "w1"]);
+    expect(resolveSelection("name CA in segi SEG_A", segmented).stableAtomIds).toEqual(["a1", "a3"]);
   });
 
   it("evaluates topology and exact spatial boundaries through canonical data", () => {
@@ -41,6 +50,10 @@ describe("canonical selection engine", () => {
     expect(resolveSelection("within 2 of ligand", structure).stableAtomIds).toEqual(["a1", "a2", "a3", "l1"]);
     expect(resolveSelection("around 2 ligand", structure).stableAtomIds).toEqual(["a1", "a2", "a3"]);
     expect(resolveSelection("chain A within 4 of ligand or water", structure).stableAtomIds).toEqual(["a1", "a2", "a3", "l1", "w1"]);
+    expect(resolveSelection("ligand extend 1", structure).stableAtomIds).toEqual(["a2", "l1"]);
+    expect(resolveSelection("ligand expand 2", structure).stableAtomIds).toEqual(["a1", "a2", "a3", "l1"]);
+    expect(resolveSelection("all near_to 2 of ligand", structure).stableAtomIds).toEqual(["a1", "a2", "a3"]);
+    expect(resolveSelection("all beyond 2 of ligand", structure).stableAtomIds).toEqual(["b1", "w1"]);
     expect(evaluateSelectionQuery("within -1 of ligand", structure).status).toBe("SYNTAX_ERROR");
     expect(evaluateSelectionQuery("gap 4 of ligand", structure).status).toBe("UNSUPPORTED_OPERATOR_OR_PROFILE");
   });

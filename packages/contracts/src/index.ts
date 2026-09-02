@@ -97,6 +97,8 @@ export type CanonicalAtom = {
   residueNumber: number;
   insertionCode?: string;
   chain: string;
+  /** Authoritative segment identifier when supplied by the source. */
+  segmentId?: string;
   x: number;
   y: number;
   z: number;

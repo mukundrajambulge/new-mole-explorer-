@@ -4,7 +4,7 @@
 
 **SELECTION + MULTI-OBJECT/MULTI-STATE CLOSURE INCOMPLETE — BLOCKED**
 
-The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. The pinned PyMOL source has now executed against the shared fixture for 23 representative forms: 13 exact forms pass and 6 application aliases match documented native equivalents. The gate remains blocked because 60 of the 79 matrix rows still require a pinned oracle result or a deliberately unresolved native grammar decision. Unsupported and research-dependent operators remain fail-closed and are not presented as scientifically implemented.
+The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. The pinned PyMOL source has now executed against the shared fixture for 92 direct forms: 72 pass and 20 return native errors; the comparison ledger promotes only exact forms or documented aliases. The gate remains blocked because 64 of the 87 matrix rows still require a pinned oracle result or a deliberately unresolved native grammar decision. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
 
 ## Repository and run evidence
 
@@ -12,8 +12,8 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Remote: `new-origin https://github.com/mukundrajambulge/new-mole-explorer-.git`
 - Local root: `C:\Users\mukun\Documents\Codex\2026-08-30\files-pasted-by-the-user-new\outputs\molecular-workstation`
 - Branch: `fix/visualization-final-closure`
-- Starting SHA for this closure pass: `278379a9eda32b36d0e82654594082190cfd3e37`
-- Ending implementation SHA: `ec242a9776ac4dc083fc945c9745c99bb51fd1e5` (includes durable active-selection feedback and workspace projection synchronization)
+- Starting SHA for this closure pass: `900552e18e5eccabaaaedbae0853ef9956585084`
+- Ending implementation SHA: pending commit for this continuation (selection semantics, segment identity metadata, and verification evidence)
 - Working tree before commit: modified by this closure pass; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -46,12 +46,12 @@ The current application was exercised with a real 4DJW RCSB load:
 
 The machine-readable ledger is [selection-operator-matrix.json](../selection/selection-operator-matrix.json), generated from [SELECTION_OPERATOR_MATRIX.md](../selection/SELECTION_OPERATOR_MATRIX.md).
 
-- Rows: **79**
-- Implementation: **57 VERIFIED_WORKING**, **10 MISSING_DEPENDENCY**, **10 INTENTIONALLY_UNSUPPORTED**, **2 RESEARCH_REQUIRED**
-- Live-browser status: **79 pass/accepted diagnostic outcomes** across the expanded matrix exercise
-- Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **79** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
-- The two `in`/`like` forms remain research-gated and fail closed with syntax diagnostics; `foo = bar` is rejected without dynamic property evaluation. These are recorded as policy-gated outcomes rather than scientific successes.
-- Oracle status: **13 ORACLE_PASS**, **6 ORACLE_EQUIVALENT**, **60 ORACLE_PENDING**
+- Rows: **87**
+- Implementation: **68 VERIFIED_WORKING**, **12 MISSING_DEPENDENCY**, **6 INTENTIONALLY_UNSUPPORTED**, **1 UNKNOWN_PROPERTY**
+- Live-browser status: **85 pass/accepted diagnostic outcomes** across the expanded matrix exercise
+- Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **85** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
+- `in`, `bycalpha`, and `bymolecule` now use canonical tuple, residue-CA, and bond-component semantics respectively. `like`, the application implicit-adjacency profile, and the new spatial/topology forms are live-verified; malformed shorthand and missing scientific dependencies remain truthful diagnostics.
+- Oracle comparison ledger: **18 ORACLE_PASS**, **7 ORACLE_EQUIVALENT**, **2 ORACLE_PENDING**; the full direct probe is [pymol-matrix-probe.json](../selection/pymol-matrix-probe.json).
 - Pinned oracle evidence: [pymol-oracle-results.json](../selection/pymol-oracle-results.json); runner: [run-pymol-oracle.py](../selection/run-pymol-oracle.py)
 - Missing dependency and research rows are explicit gates. No unsupported operator is silently aliased to a different scientific meaning.
 
@@ -72,8 +72,10 @@ Application/contracts:
 - `apps/web/src/rendering/ThreeDMolViewerAdapter.ts`
 - `apps/web/src/rendering/surfaceProfiles.ts`
 - `apps/web/src/selection/selectionEngine.ts`
+- `apps/web/src/selection/selectionEngine.test.ts`
 - `apps/web/src/styles/global.css`
 - `apps/web/src/workspace/workspaceModel.ts`
+- `apps/api/src/structures/ingestion.ts`
 - `packages/contracts/src/index.ts`
 - `package.json`
 
@@ -86,6 +88,7 @@ Verification:
 - `verification/selection/generate-matrix-summary.mjs`
 - `verification/selection/selection-operator-matrix.json`
 - `verification/selection/pymol-oracle-results.json`
+- `verification/selection/pymol-matrix-probe.json`
 - `verification/selection/run-pymol-oracle.py`
 - `verification/selection/selection-live-evidence.json`
 - `verification/evidence/closure-empty-state.png`
@@ -130,7 +133,7 @@ Verification:
 - `npm run lint` — **PASS**
 - `npm run test --workspace @molecular/web` — **PASS: 16 files / 66 tests**
 - `npm run test --workspace @molecular/api` — **PASS: 2 files / 11 tests**
-- `npm run verify:selection-matrix` — **PASS: 79 rows; JSON regenerated**
+- `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 4 / 4**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/real-structure-workspace.spec.ts` — **PASS: 1 / 1**
@@ -147,7 +150,7 @@ Verification:
 4. Load 4DJW, run `select all`, then run bare `chain A and protein`; confirm 7,079 and 3,060 selections respectively.
 5. Use RCSB Add for `1CRN`; confirm two object rows, one viewer, independent focus/style/enable controls, and object-qualified selection.
 6. Import `tests/fixtures/multistate.pdb`; confirm `2 states`, switch state, toggle bounded all-state overlay, and run `count_states multistate.pdb`.
-7. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json`.
+7. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
 
 ## Screenshot evidence
 
@@ -159,8 +162,8 @@ Verification:
 
 ## Known limitations and blockers
 
-- The pinned PyMOL source was executed in a temporary Ubuntu-20.04/Python-3.9.2 compatibility build. The 60 remaining `ORACLE_PENDING` rows are not promoted without matching coverage; this is the reason for the blocked final verdict.
-- `segi`, crystallographic `pbc`/`symmetry`/`bycell`, fragment/ring perception, arbitrary properties, donor/acceptor chemistry, and several spatial expansion operators remain explicit unsupported gates.
+- The pinned PyMOL source was executed in a temporary Ubuntu-20.04/Python-3.9.2 compatibility build. The 64 remaining `ORACLE_PENDING` matrix rows are not promoted without matching coverage; this is the reason for the blocked final verdict.
+- `segi`, crystallographic `pbc`/`symmetry`/`bycell`, fragment/ring perception, donor/acceptor chemistry, and `gap` remain explicit unsupported or missing-dependency gates. Unknown properties fail closed.
 - Partial charge, peptide sequence, label-property, and presentation-visibility selection require datasets not present in this gate and return structured missing-dependency diagnostics.
-- `in`/`like` tuple grammar and exact PyMOL semantics require a pinned research decision.
+- `like` and implicit-adjacency still need a direct native oracle case even though their canonical application-profile behavior is live-verified.
 - The production bundle retains the existing 3Dmol `eval` warning and exceeds the default 500 kB warning threshold; all build and runtime tests pass.
