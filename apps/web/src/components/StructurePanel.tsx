@@ -32,7 +32,7 @@ type StructurePanelProps = {
   onObjectAllStatesToggle: (objectId: string) => void;
   projection: RenderProjection;
   selectedAtom: CanonicalAtom | null;
-  activeSelection: Pick<SelectionResult, "count" | "status" | "membershipHash" | "query"> | null;
+  activeSelection: Pick<SelectionResult, "count" | "status" | "membershipHash" | "query" | "coordinateContext"> | null;
   onClearSelection: () => void;
   measurementMode: MeasurementKind | null;
   measurementSlots: readonly string[];
@@ -52,6 +52,11 @@ const formatCount = (value: number) => value.toLocaleString("en-US");
 const formatCoordinate = (value: number) => Number.isFinite(value) ? value.toFixed(3) : "—";
 const formatOptional = (value: number | null | undefined, digits = 2) => value === null || value === undefined || !Number.isFinite(value) ? "—" : value.toFixed(digits);
 const measurementLabel = (kind: MeasurementKind) => kind === "DISTANCE" ? "Distance" : kind === "ANGLE" ? "Angle" : "Dihedral";
+const coordinateScopeLabel = (selection: Pick<SelectionResult, "coordinateContext">) => {
+  const scopes = selection.coordinateContext?.stateScopes ?? [];
+  if (!scopes.length) return null;
+  return `${scopes.length === 1 ? "state" : "states"} ${scopes.map((scope) => scope.ordinal).join(", ")}`;
+};
 
 const ContextCard = ({ selectedAtom, onAction, onClearSelection }: { selectedAtom: CanonicalAtom | null; onAction: (actionId: ActionId) => void; onClearSelection: () => void }) => (
   <section className="panel-card context-card" data-testid="context-panel">
@@ -117,7 +122,7 @@ export const StructurePanel = ({ collapsed, onToggle, onAction, structure, works
       </div>)}
       {workspaceGroups.length > 0 && <div className="workspace-group-list" data-testid="workspace-groups"><div className="analysis-subheading"><span>Groups</span><span className="capability-tag">ORGANIZATIONAL</span></div>{workspaceGroups.map((group) => <div className="workspace-group-row" key={group.groupId} data-group-id={group.groupId}><span className="tree-badge tree-badge--purple">G</span><span className="tree-label" title={group.groupId}>{group.name}</span><span className="muted">{group.open ? "open" : "closed"} · {group.objectIds.length} object{group.objectIds.length === 1 ? "" : "s"}</span></div>)}</div>}
       <div className="coordinate-frame-control" data-testid="coordinate-frame"><div className="analysis-subheading"><span>Spatial coordinate frame</span><span className="capability-tag">EXPLICIT</span></div><select aria-label="Spatial coordinate frame" value={coordinateFramePolicy ?? ""} onChange={(event) => onCoordinateFrameChange((event.target.value || null) as CoordinateFramePolicy | null)}><option value="">Undeclared (cross-object spatial blocked)</option><option value="LOCAL_SCIENTIFIC">LOCAL_SCIENTIFIC · raw canonical Å</option><option value="EFFECTIVE_WORLD">EFFECTIVE_WORLD · identity transforms</option></select><small>{coordinateFramePolicy === "LOCAL_SCIENTIFIC" ? "Compare raw canonical coordinates." : coordinateFramePolicy === "EFFECTIVE_WORLD" ? "Compare effective world coordinates; current object transforms are identity." : "Declare a policy before comparing coordinates across objects."}</small></div>
-      {activeSelection ? <div className="active-selection-summary" data-testid="active-selection" data-membership-hash={activeSelection.membershipHash}><span className="tree-badge tree-badge--cyan">A</span><span className="tree-label">Active selection</span><span className="muted">{formatCount(activeSelection.count)} atoms · {activeSelection.status.replaceAll("_", " ")}</span></div> : <div className="selection-empty">No active selection.</div>}
+      {activeSelection ? <div className="active-selection-summary" data-testid="active-selection" data-membership-hash={activeSelection.membershipHash} data-coordinate-state-scopes={activeSelection.coordinateContext ? JSON.stringify(activeSelection.coordinateContext.stateScopes) : undefined}><span className="tree-badge tree-badge--cyan">A</span><span className="tree-label">Active selection</span><span className="muted">{formatCount(activeSelection.count)} atoms · {activeSelection.status.replaceAll("_", " ")}</span>{coordinateScopeLabel(activeSelection) && <span className="muted" title={JSON.stringify(activeSelection.coordinateContext?.stateScopes)}>· {coordinateScopeLabel(activeSelection)}</span>}</div> : <div className="selection-empty">No active selection.</div>}
       {namedSelections.length === 0 ? <div className="selection-empty">No named selections. Use <code>select active_site, …</code>.</div> : <div className="named-selection-list">{namedSelections.map((selection) => <div className="named-selection-row" key={selection.name}><span className="tree-badge tree-badge--purple">S</span><span className="tree-label" title={selection.name}>{selection.name}</span><span className="muted">{selection.count}</span><div className="named-selection-actions">{(["A", "S", "H", "L", "C"] as const).map((action) => <button type="button" key={action} title={`${action} ${selection.name}`} aria-label={`${action} ${selection.name}`} onClick={() => onNamedSelectionAction(selection.name, action)}>{action}</button>)}</div></div>)}</div>}
     </section>
     <section className="panel-card components-card"><div className="panel-heading"><div><span className="eyebrow">STRUCTURE INVENTORY</span><h2>Components</h2></div><span className="capability-tag">Projection only</span></div><div className="component-list">{components.map((component) => <div className="component-row" key={component.label}><span className={`component-dot component-dot--${component.tone} ${component.visible ? "component-dot--visible" : "component-dot--hidden"}`} aria-hidden="true" /><span>{component.label}</span><span className="component-count">{formatCount(component.count)}</span></div>)}</div></section>

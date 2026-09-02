@@ -1,4 +1,5 @@
 import type { CanonicalAtom, CanonicalMolecularStructure } from "@molecular/contracts";
+import { withinSpatialBoundary } from "./spatialPolicy";
 
 export type SelectionStatus =
   | "VALID_NONEMPTY"
@@ -23,12 +24,19 @@ export type SelectionStatus =
  * inferred from the renderer.
  */
 export type CoordinateFramePolicy = "LOCAL_SCIENTIFIC" | "EFFECTIVE_WORLD";
+export type SelectionCoordinateStateScope = {
+  objectId: string;
+  stateId: string;
+  ordinal: number;
+};
 export type SelectionCoordinateContext = {
   structureId: string;
   revision: string;
   stateId: string;
   framePolicy: CoordinateFramePolicy;
   objectIds: readonly string[];
+  /** The exact coordinate realization consulted for each workspace object. */
+  stateScopes: readonly SelectionCoordinateStateScope[];
 };
 
 export type SourceSpan = { start: number; end: number; line: number; column: number };
@@ -315,7 +323,7 @@ const serialize = (ast: SelectionAst): string => {
   return "invalid";
 };
 
-type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; presentationRevision: string | null; visibleAtomIds?: ReadonlySet<string>; named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; query: string; indexByStableId: Map<string, number>; rankByStableId: Map<string, number>; coordinateStateId?: string; stateOrdinal?: number; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds: Set<string>; objectMatches: Map<string, Set<string>> };
+type EvalContext = { universe: Set<string>; diagnostics: SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; presentationRevision: string | null; visibleAtomIds?: ReadonlySet<string>; named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; query: string; indexByStableId: Map<string, number>; rankByStableId: Map<string, number>; coordinateStateId?: string; stateOrdinal?: number; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds: Set<string>; coordinateObjectStates: Map<string, SelectionCoordinateStateScope>; objectMatches: Map<string, Set<string>> };
 const wildcardMatch = (value: string, pattern: string): boolean => {
   const escaped = [...pattern].map((char) => char === "*" ? ".*" : char === "?" ? "." : char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("");
   return new RegExp(`^${escaped}$`, "i").test(value);
@@ -330,9 +338,23 @@ const residueMatch = (atom: CanonicalAtom, value: string): boolean => {
 const atomCategory = (atom: CanonicalAtom): "polymer" | "ligand" | "water" | "ion" | "other" => atom.isPolymer ? "polymer" : atom.isLigand ? "ligand" : atom.isWater ? "water" : atom.isIon ? "ion" : "other";
 const backboneNames = new Set(["N", "CA", "C", "O", "OXT"]);
 const metalElements = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA", "ZN", "FE", "MN", "CU", "CO", "NI"]);
+const coordinateStateScopeFor = (atom: CanonicalAtom, structure: CanonicalMolecularStructure, context: EvalContext): SelectionCoordinateStateScope => {
+  const objectId = atom.workspaceObjectId ?? structure.id;
+  const stateId = atom.workspaceCoordinateStateId ?? context.coordinateStateId ?? structure.stateOrder?.[0] ?? structure.coordinateStates?.[0]?.id ?? `${structure.id}:state:1`;
+  const ordinal = atom.workspaceStateOrdinal
+    ?? context.stateOrdinal
+    ?? structure.coordinateStates?.find((state) => state.id === stateId)?.ordinal
+    ?? Math.max(1, structure.stateOrder?.indexOf(stateId) === undefined ? 1 : (structure.stateOrder.indexOf(stateId) + 1));
+  return { objectId, stateId, ordinal };
+};
+const recordCoordinateAtom = (atom: CanonicalAtom, structure: CanonicalMolecularStructure, context: EvalContext): void => {
+  const scope = coordinateStateScopeFor(atom, structure, context);
+  context.coordinateObjectIds.add(scope.objectId);
+  context.coordinateObjectStates.set(scope.objectId, scope);
+};
 const categoryMatches = (atom: CanonicalAtom, category: SelectionCategory, structure: CanonicalMolecularStructure, context: EvalContext): boolean => {
   if (category === "enabled") return atom.workspaceObjectEnabled ?? true;
-  if (category === "present") return true;
+  if (category === "present") { context.needsCoordinates = true; recordCoordinateAtom(atom, structure, context); return true; }
   if (category === "visible") {
     context.needsPresentation = true;
     if (!context.visibleAtomIds) { context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Presentation visibility is not bound into this selection context." }); return false; }
@@ -389,6 +411,8 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
     } else matches = wildcardMatch(structure.id, value) || wildcardMatch(structure.name, value) || wildcardMatch(structure.source.originalFilename, value);
   }
   else if (["b", "q", "occupancy", "formal_charge", "partial_charge", "x", "y", "z", "state"].includes(property)) {
+    context.needsCoordinates = true;
+    recordCoordinateAtom(atom, structure, context);
     const chargeDataset = structure.partialChargeDataset;
     const numeric = property === "b"
       ? atom.bFactor
@@ -532,10 +556,11 @@ const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, 
     context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Cross-object spatial selection requires an explicit LOCAL_SCIENTIFIC or EFFECTIVE_WORLD coordinate context." });
     return new Set();
   }
+  for (const atom of [...refAtoms, ...candidateAtoms]) recordCoordinateAtom(atom, structure, context);
   const result = new Set<string>(); const radiusSquared = ast.distance * ast.distance;
   for (const atom of structure.atoms) {
     if (!candidate.has(atom.stableId)) continue;
-    const inside = refAtoms.some((ref) => { const dx = atom.x - ref.x; const dy = atom.y - ref.y; const dz = atom.z - ref.z; return dx * dx + dy * dy + dz * dz <= radiusSquared; });
+    const inside = refAtoms.some((ref) => { const dx = atom.x - ref.x; const dy = atom.y - ref.y; const dz = atom.z - ref.z; return withinSpatialBoundary(dx * dx + dy * dy + dz * dz, radiusSquared); });
     if ((ast.kind === "within" || ast.kind === "expand") && inside) result.add(atom.stableId);
     if ((ast.kind === "around" || ast.kind === "near_to") && inside && !reference.has(atom.stableId)) result.add(atom.stableId);
     if (ast.kind === "beyond" && !inside) result.add(atom.stableId);
@@ -570,16 +595,28 @@ const namespaceRevisionFor = (structure: CanonicalMolecularStructure, named?: Na
   namedNamespaceRevision: named?.namespaceRevision ?? "none",
   workspaceGroups: groups?.map((group) => ({ groupId: group.groupId, name: group.name, objectIds: [...group.objectIds].sort() })).sort((left, right) => left.groupId.localeCompare(right.groupId)) ?? [],
 }));
+const coordinateContextFor = (structure: CanonicalMolecularStructure, needsCoordinates: boolean, framePolicy: CoordinateFramePolicy | undefined, objectIds: ReadonlySet<string>, stateScopes: ReadonlyMap<string, SelectionCoordinateStateScope>, coordinateStateId?: string, stateOrdinal?: number): SelectionCoordinateContext | null => {
+  if (!needsCoordinates || (!framePolicy && objectIds.size > 1)) return null;
+  const scopes = [...stateScopes.values()].sort((left, right) => left.objectId.localeCompare(right.objectId));
+  const fallbackObjectIds = [...objectIds].sort();
+  const resolvedScopes = scopes.length > 0 ? scopes : fallbackObjectIds.map((objectId) => ({ objectId, stateId: coordinateStateId ?? "active", ordinal: stateOrdinal ?? 1 }));
+  return {
+    structureId: structure.id,
+    revision: structure.scientificHash,
+    stateId: resolvedScopes.length === 1 ? resolvedScopes[0]!.stateId : "workspace-active",
+    framePolicy: framePolicy ?? "LOCAL_SCIENTIFIC",
+    objectIds: fallbackObjectIds,
+    stateScopes: resolvedScopes,
+  };
+};
 const baseResult = (query: string, structure: CanonicalMolecularStructure, source: SelectionProvenance, status: SelectionStatus, diagnostics: readonly SelectionDiagnostic[], astText: string, ids: readonly string[], deps: EvalContext, boundPlan: BoundSelectionPlan | null = null): SelectionResult => {
   const stableAtomIds = stableSort(ids, structure); const normalizedAstHash = hash(astText); const membershipHash = hash(stableAtomIds.join("\u0000"));
-  const coordinateContext = deps.needsCoordinates && (deps.coordinateFramePolicy || deps.coordinateObjectIds.size <= 1)
-    ? { structureId: structure.id, revision: structure.scientificHash, stateId: deps.coordinateStateId ?? "active", framePolicy: deps.coordinateFramePolicy ?? "LOCAL_SCIENTIFIC" as CoordinateFramePolicy, objectIds: [...deps.coordinateObjectIds].sort() }
-    : null;
+  const coordinateContext = coordinateContextFor(structure, deps.needsCoordinates, deps.coordinateFramePolicy, deps.coordinateObjectIds, deps.coordinateObjectStates, deps.coordinateStateId, deps.stateOrdinal);
   return { schemaVersion: 2, resultId: resultId(query, structure, stableAtomIds), source, query, grammarVersion: GRAMMAR_VERSION, normalizedAst: astText, normalizedAstHash, profile: PROFILE, molecularIdentity: { structureId: structure.id, molecularRevision: structure.scientificHash }, structureId: structure.id, molecularRevision: structure.scientificHash, objectScope: { kind: "structure", objectId: structure.id }, universeFingerprint: hash(structure.atoms.map((atom) => atom.stableId).join("\u0000")), coordinateContext, topologyRevision: deps.needsTopology ? topologyRevisionFor(structure) : null, namespaceRevision: namespaceRevisionFor(structure, deps.named, deps.groups), presentationContext: deps.needsPresentation && deps.presentationRevision ? { revision: deps.presentationRevision } : null, stableAtomIds, membershipHash, count: stableAtomIds.length, status, diagnostics, dependencyVector: { needsCoordinates: deps.needsCoordinates, needsTopology: deps.needsTopology, needsNamespaces: true, needsPresentation: deps.needsPresentation }, boundPlan };
 };
 
 export type SelectionEvaluationOptions = { named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; expectedRevision?: string; source?: SelectionProvenance; coordinateStateId?: string; stateOrdinal?: number; coordinateFrame?: CoordinateFramePolicy; presentation?: SelectionPresentationContext };
-type CachedEvaluation = { normalized: string; ast: SelectionAst; ids: readonly string[]; status: SelectionStatus; diagnostics: readonly SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds: readonly string[] };
+type CachedEvaluation = { normalized: string; ast: SelectionAst; ids: readonly string[]; status: SelectionStatus; diagnostics: readonly SelectionDiagnostic[]; needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds: readonly string[]; coordinateObjectStates: readonly SelectionCoordinateStateScope[] };
 const selectionEvaluationCache = new Map<string, CachedEvaluation>();
 const contextFor = (structure: CanonicalMolecularStructure, query: string, named?: NamedSelectionStore, diagnostics: SelectionDiagnostic[] = [], presentation?: SelectionPresentationContext, coordinateFramePolicy?: CoordinateFramePolicy, groups?: readonly SelectionWorkspaceGroup[]): EvalContext => ({
   universe: new Set(structure.atoms.map((atom) => atom.stableId)),
@@ -596,10 +633,11 @@ const contextFor = (structure: CanonicalMolecularStructure, query: string, named
   rankByStableId: new Map(structure.atoms.map((atom, index) => [atom.stableId, index])),
   coordinateFramePolicy,
   coordinateObjectIds: new Set(),
+  coordinateObjectStates: new Map(),
   objectMatches: new Map(),
 });
 
-export type SelectionBindingDependencies = { needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; presentationRevision?: string | null; named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds?: readonly string[] };
+export type SelectionBindingDependencies = { needsCoordinates: boolean; needsTopology: boolean; needsPresentation: boolean; presentationRevision?: string | null; named?: NamedSelectionStore; groups?: readonly SelectionWorkspaceGroup[]; coordinateFramePolicy?: CoordinateFramePolicy; coordinateObjectIds?: readonly string[]; coordinateObjectStates?: readonly SelectionCoordinateStateScope[]; coordinateStateId?: string; stateOrdinal?: number };
 export const bindSelectionPlan = (query: string, ast: SelectionAst, normalizedAst: string, structure: CanonicalMolecularStructure, dependencies: SelectionBindingDependencies): BoundSelectionPlan => ({
   schemaVersion: 1,
   query,
@@ -609,7 +647,7 @@ export const bindSelectionPlan = (query: string, ast: SelectionAst, normalizedAs
   molecularRevision: structure.scientificHash,
   objectScope: { kind: "structure", objectId: structure.id },
   universeFingerprint: hash(structure.atoms.map((atom) => atom.stableId).join("\u0000")),
-  coordinateContext: dependencies.needsCoordinates && (dependencies.coordinateFramePolicy || (dependencies.coordinateObjectIds?.length ?? 0) <= 1) ? { structureId: structure.id, revision: structure.scientificHash, stateId: "active", framePolicy: dependencies.coordinateFramePolicy ?? "LOCAL_SCIENTIFIC", objectIds: [...(dependencies.coordinateObjectIds ?? [])].sort() } : null,
+  coordinateContext: coordinateContextFor(structure, dependencies.needsCoordinates, dependencies.coordinateFramePolicy, new Set(dependencies.coordinateObjectIds ?? []), new Map((dependencies.coordinateObjectStates ?? []).map((scope) => [scope.objectId, scope])), dependencies.coordinateStateId, dependencies.stateOrdinal),
   topologyRevision: dependencies.needsTopology ? topologyRevisionFor(structure) : null,
   namespaceRevision: namespaceRevisionFor(structure, dependencies.named, dependencies.groups),
   presentationContext: dependencies.needsPresentation && dependencies.presentationRevision ? { revision: dependencies.presentationRevision } : null,
@@ -639,7 +677,8 @@ export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecu
     context.needsPresentation = cached.needsPresentation;
     context.coordinateFramePolicy = cached.coordinateFramePolicy;
     context.coordinateObjectIds = new Set(cached.coordinateObjectIds);
-    return baseResult(trimmed, structure, source, cached.status, cached.diagnostics, cached.normalized, cached.ids, context, bindSelectionPlan(trimmed, cached.ast, cached.normalized, structure, { named: options.named, groups: options.groups, needsCoordinates: cached.needsCoordinates, needsTopology: cached.needsTopology, needsPresentation: cached.needsPresentation, presentationRevision: options.presentation?.revision ?? null, coordinateFramePolicy: cached.coordinateFramePolicy, coordinateObjectIds: cached.coordinateObjectIds }));
+    context.coordinateObjectStates = new Map(cached.coordinateObjectStates.map((scope) => [scope.objectId, scope]));
+    return baseResult(trimmed, structure, source, cached.status, cached.diagnostics, cached.normalized, cached.ids, context, bindSelectionPlan(trimmed, cached.ast, cached.normalized, structure, { named: options.named, groups: options.groups, needsCoordinates: cached.needsCoordinates, needsTopology: cached.needsTopology, needsPresentation: cached.needsPresentation, presentationRevision: options.presentation?.revision ?? null, coordinateFramePolicy: cached.coordinateFramePolicy, coordinateObjectIds: cached.coordinateObjectIds, coordinateObjectStates: cached.coordinateObjectStates, coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal }));
   }
   const ids = evaluateAst(ast, structure, context);
   let status: SelectionStatus = ids.size > 0 ? "VALID_NONEMPTY" : "VALID_EMPTY";
@@ -650,8 +689,8 @@ export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecu
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "INVALID_VALUE")) status = "INVALID_VALUE";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "MISSING_DEPENDENCY")) status = "MISSING_DEPENDENCY";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "TOPOLOGY_CONTEXT_ERROR")) status = "TOPOLOGY_CONTEXT_ERROR";
-  const boundPlan = bindSelectionPlan(trimmed, ast, normalized, structure, { named: options.named, groups: options.groups, needsCoordinates: context.needsCoordinates, needsTopology: context.needsTopology, needsPresentation: context.needsPresentation, presentationRevision: context.presentationRevision, coordinateFramePolicy: context.coordinateFramePolicy, coordinateObjectIds: [...context.coordinateObjectIds] });
-  const cachedValue: CachedEvaluation = { normalized, ast, ids: [...ids], status, diagnostics: [...context.diagnostics], needsCoordinates: context.needsCoordinates, needsTopology: context.needsTopology, needsPresentation: context.needsPresentation, coordinateFramePolicy: context.coordinateFramePolicy, coordinateObjectIds: [...context.coordinateObjectIds] };
+  const boundPlan = bindSelectionPlan(trimmed, ast, normalized, structure, { named: options.named, groups: options.groups, needsCoordinates: context.needsCoordinates, needsTopology: context.needsTopology, needsPresentation: context.needsPresentation, presentationRevision: context.presentationRevision, coordinateFramePolicy: context.coordinateFramePolicy, coordinateObjectIds: [...context.coordinateObjectIds], coordinateObjectStates: [...context.coordinateObjectStates.values()], coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal });
+  const cachedValue: CachedEvaluation = { normalized, ast, ids: [...ids], status, diagnostics: [...context.diagnostics], needsCoordinates: context.needsCoordinates, needsTopology: context.needsTopology, needsPresentation: context.needsPresentation, coordinateFramePolicy: context.coordinateFramePolicy, coordinateObjectIds: [...context.coordinateObjectIds], coordinateObjectStates: [...context.coordinateObjectStates.values()] };
   selectionEvaluationCache.set(cacheKey, cachedValue);
   return baseResult(trimmed, structure, source, status, context.diagnostics, normalized, [...ids], context, boundPlan);
 };

@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { CanonicalMolecularStructure } from "@molecular/contracts";
 import { NamedSelectionStore, combineSelections, evaluateSelectionQuery, parseSelection, resolveSelection, selectionForStableIds } from "./selectionEngine";
+import { SPATIAL_TOLERANCE_POLICY, withinSpatialBoundary } from "./spatialPolicy";
+import { createWorkspaceObject, setWorkspaceObjectState, workspaceSelectionStructure } from "../workspace/workspaceModel";
 
 const structure = {
   id: "engine-structure", name: "engine", format: "pdb", source: { kind: "LOCAL_FILE" as const, originalFilename: "engine.pdb", format: "pdb" as const, sha256: "a".repeat(64), byteLength: 1, ingestedAt: "2026-01-01T00:00:00.000Z", parserProfile: "test" },
@@ -77,7 +79,7 @@ describe("canonical selection engine", () => {
 
     const local = resolveSelection("object A within 4 of object B", workspace, { coordinateFrame: "LOCAL_SCIENTIFIC" });
     expect(local.stableAtomIds).toEqual(["object:a::a1"]);
-    expect(local.coordinateContext).toEqual({ structureId: "workspace", revision: workspace.scientificHash, stateId: "active", framePolicy: "LOCAL_SCIENTIFIC", objectIds: ["object:a", "object:b"] });
+    expect(local.coordinateContext).toEqual({ structureId: "workspace", revision: workspace.scientificHash, stateId: "workspace-active", framePolicy: "LOCAL_SCIENTIFIC", objectIds: ["object:a", "object:b"], stateScopes: [{ objectId: "object:a", stateId: "workspace:state:1", ordinal: 1 }, { objectId: "object:b", stateId: "workspace:state:1", ordinal: 1 }] });
 
     const world = resolveSelection("object A within 4 of object B", workspace, { coordinateFrame: "EFFECTIVE_WORLD" });
     expect(world.stableAtomIds).toEqual(local.stableAtomIds);
@@ -162,6 +164,39 @@ describe("canonical selection engine", () => {
     expect(resolveSelection("bonded", structure).stableAtomIds).toEqual(["a1", "a2", "l1"]);
     expect(resolveSelection("x < 2", structure).stableAtomIds).toEqual(["a1", "a2"]);
     expect(evaluateSelectionQuery("b > 10", structure).status).toBe("MISSING_DEPENDENCY");
+  });
+
+  it("records the consulted coordinate state for state-dependent predicates", () => {
+    const state1 = `${structure.id}:state:1`;
+    const state2 = `${structure.id}:state:2`;
+    const multistate = {
+      ...structure,
+      coordinateStates: [
+        { id: state1, ordinal: 1, sourceModelNumber: 1, coordinateHash: "state-1", coordinates: Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, { x: atom.x, y: atom.y, z: atom.z }])) },
+        { id: state2, ordinal: 2, sourceModelNumber: 2, coordinateHash: "state-2", coordinates: Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, { x: atom.stableId === "a1" ? 0.2 : atom.stableId === "a2" ? 1.65 : atom.x, y: atom.y, z: atom.z }])) },
+      ],
+      stateOrder: [state1, state2],
+    } satisfies CanonicalMolecularStructure;
+    const loaded = { structure: multistate, renderSource: { format: "pdb" as const, content: "MODEL\nEND" } };
+    const object = createWorkspaceObject(loaded);
+    const firstStructure = workspaceSelectionStructure([object])!;
+    const first = resolveSelection("x < 1.5", firstStructure, { coordinateStateId: state1, stateOrdinal: 1 });
+    expect(first.count).toBe(2);
+    expect(first.coordinateContext?.stateScopes).toEqual([{ objectId: object.objectId, stateId: state1, ordinal: 1 }]);
+
+    const secondObject = setWorkspaceObjectState(object, state2);
+    const secondStructure = workspaceSelectionStructure([secondObject])!;
+    const second = resolveSelection("x < 1.5", secondStructure, { coordinateStateId: state2, stateOrdinal: 2 });
+    expect(second.count).toBe(1);
+    expect(second.coordinateContext?.stateScopes).toEqual([{ objectId: object.objectId, stateId: state2, ordinal: 2 }]);
+    expect(second.coordinateContext?.stateScopes).not.toEqual(first.coordinateContext?.stateScopes);
+  });
+
+  it("uses the centralized closed spatial boundary tolerance", () => {
+    expect(SPATIAL_TOLERANCE_POLICY.metric).toBe("EUCLIDEAN_SQUARED_ANGSTROM");
+    expect(withinSpatialBoundary(4, 4)).toBe(true);
+    expect(withinSpatialBoundary(4 + SPATIAL_TOLERANCE_POLICY.squaredDistanceEpsilon / 2, 4)).toBe(true);
+    expect(withinSpatialBoundary(4 + SPATIAL_TOLERANCE_POLICY.squaredDistanceEpsilon * 2, 4)).toBe(false);
   });
 
   it("evaluates partial-charge predicates only against a revision-matched canonical dataset", () => {
