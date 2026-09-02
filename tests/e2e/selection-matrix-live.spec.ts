@@ -45,7 +45,7 @@ const expectedCounts = new Map<string, number>([
   ["byres name CA", 8],
   ["bycalpha name CA", 2],
   ["bymolecule ligand", 2],
-  ["byfragment ligand", 2],
+  ["byfragment ligand", 0],
   ["byring ligand", 0],
   ["bycell chain A", 0],
   ["neighbor ligand", 0],
@@ -85,7 +85,7 @@ const expectedSemanticStatus = (value: string): string => {
   if (query.startsWith("select ")) return query === "select active_site, chain a" ? "VALID_NONEMPTY" : "SELECTION_RESULT";
   if (query === "rep cartoon" || query === "cartoon_color red") return "VALID_NONEMPTY";
   if (/^ribbon_color\b/.test(query)) return "VALID_EMPTY";
-  if (query === "byfragment ligand") return "VALID_NONEMPTY";
+  if (query === "byfragment ligand") return "MISSING_DEPENDENCY";
   if (/^byring\b/.test(query)) return "VALID_EMPTY";
   if (/^(segi|bysegi|bycell|donors|acceptors)\b/.test(query)) return "UNSUPPORTED_OPERATOR_OR_PROFILE";
   if (query === "gap 0 ligand" || query === "gap 4 ligand") return query === "gap 4 ligand" ? "VALID_EMPTY" : "VALID_NONEMPTY";

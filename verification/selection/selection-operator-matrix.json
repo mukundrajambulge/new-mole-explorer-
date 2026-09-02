@@ -3,21 +3,21 @@
   "source": "verification/selection/SELECTION_OPERATOR_MATRIX.md",
   "rowCount": 87,
   "implementationStatusCounts": {
-    "VERIFIED_WORKING": 82,
+    "VERIFIED_WORKING": 81,
+    "MISSING_DEPENDENCY": 4,
     "INTENTIONALLY_UNSUPPORTED": 1,
-    "MISSING_DEPENDENCY": 3,
     "UNKNOWN_PROPERTY": 1
   },
   "liveBrowserStatusCounts": {
     "PASS (`select all`)": 1,
-    "PASS (selection-matrix-live.spec.ts)": 59,
+    "PASS (selection-matrix-live.spec.ts)": 60,
     "PASS indirectly": 4,
     "PASS via named-selection E2E": 1,
     "PASS (multi-object-state.spec.ts)": 1,
     "PASS": 1,
     "PASS (edge-identity E2E; segment-identity E2E; unannotated mini diagnostic)": 2,
     "PASS (selection-matrix-live.spec.ts; edge-identity E2E; segment-identity E2E)": 1,
-    "PASS (selection-closure E2E; selection-matrix-live.spec.ts)": 5,
+    "PASS (selection-closure E2E; selection-matrix-live.spec.ts)": 4,
     "PASS (ring-topology E2E)": 1,
     "PASS (selection-matrix-live.spec.ts; multi-object-state.spec.ts)": 1,
     "PASS (typed-properties E2E; selection-matrix-live.spec.ts)": 3,
@@ -343,10 +343,10 @@
     },
     {
       "operator": "`byfragment`",
-      "implementationStatus": "VERIFIED_WORKING",
-      "liveBrowserStatus": "PASS (selection-closure E2E; selection-matrix-live.spec.ts)",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PENDING",
-      "decision": "application profile expands the seed across connected components of the authoritative canonical bond graph; no coordinate-inferred edges"
+      "decision": "requires complete canonical fragment membership; no connected-component or coordinate-inferred fallback"
     },
     {
       "operator": "`byring`",

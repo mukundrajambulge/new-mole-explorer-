@@ -38,7 +38,15 @@ describe("canonical selection engine", () => {
     expect(resolveSelection("chain A protein", structure).stableAtomIds).toEqual(["a1", "a2", "a3", "b1", "l1", "w1"]);
     expect(resolveSelection("bycalpha name CA", structure).stableAtomIds).toEqual(["a1", "a3", "b1"]);
     expect(resolveSelection("bymolecule ligand", structure).stableAtomIds).toEqual(["a1", "a2", "l1"]);
-    expect(resolveSelection("byfragment ligand", structure).stableAtomIds).toEqual(["a1", "a2", "l1"]);
+    const missingFragments = evaluateSelectionQuery("byfragment ligand", structure);
+    expect(missingFragments.status).toBe("MISSING_DEPENDENCY");
+    expect(missingFragments.count).toBe(0);
+    const fragmented = {
+      ...structure,
+      atoms: structure.atoms.map((atom) => ({ ...atom, fragmentId: atom.stableId === "a1" || atom.stableId === "a2" || atom.stableId === "l1" ? "fragment:ligand-bound" : `fragment:${atom.stableId}` })),
+      scientificHash: "fragmented-engine-revision".padEnd(64, "0"),
+    } satisfies CanonicalMolecularStructure;
+    expect(resolveSelection("byfragment ligand", fragmented).stableAtomIds).toEqual(["a1", "a2", "l1"]);
     expect(resolveSelection("name CA in chain A", structure).stableAtomIds).toEqual(["a1", "a3"]);
     expect(resolveSelection("(chain A and name CA) like (chain A and name CA)", structure).stableAtomIds).toEqual(["a1", "a3"]);
     const segmented = { ...structure, atoms: structure.atoms.map((atom) => ({ ...atom, segmentId: atom.chain === "A" ? "SEG_A" : "SEG_B" })), scientificHash: "c".repeat(64) } satisfies CanonicalMolecularStructure;

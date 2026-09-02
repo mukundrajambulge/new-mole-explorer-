@@ -1451,30 +1451,28 @@
     {
       "query": "byfragment ligand",
       "expected": {
-        "semanticStatus": "VALID_NONEMPTY",
-        "atomCount": 2,
+        "semanticStatus": "MISSING_DEPENDENCY",
+        "atomCount": 0,
         "membershipHash": null
       },
       "observed": {
-        "semanticStatus": "VALID_NONEMPTY",
+        "semanticStatus": "MISSING_DEPENDENCY",
         "category": "SELECTION",
-        "result": "●\nSelected 2 atoms · replace · revision c6439bbd3c…\n· 2 atoms",
-        "atomCount": 2,
-        "membershipHash": "d993317d",
-        "viewerMembershipHash": "d993317d",
-        "selectionIndicator": "visible",
-        "selectionVisible": true,
-        "selectionIndicationConsistent": true
+        "result": "●\nCanonical fragment assignment data is unavailable or incomplete; byfragment was not evaluated.\n· 0 atoms",
+        "atomCount": 0,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
       },
       "subsequentTargeting": {
-        "attempted": true,
-        "command": "show sticks, all",
-        "category": "PRESENTATION",
-        "result": "●\nSHOW STICKS on 12 atoms.",
-        "retainedMembershipHash": "d993317d",
-        "unchanged": true
+        "attempted": false,
+        "command": "show sticks, all"
       },
-      "failureDiagnostics": []
+      "failureDiagnostics": [
+        "Canonical fragment assignment data is unavailable or incomplete; byfragment was not evaluated."
+      ]
     },
     {
       "query": "byring ligand",

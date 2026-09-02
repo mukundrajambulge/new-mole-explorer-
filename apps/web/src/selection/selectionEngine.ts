@@ -680,12 +680,21 @@ const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, 
   if (ast.kind === "byobject" || ast.kind === "bymolecule" || ast.kind === "byfragment" || ast.kind === "byring" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha") {
     const operand = evaluateAst(ast.operand, structure, context); const scope = (atom: CanonicalAtom) => `${atom.workspaceObjectId ?? structure.id}\u0000`; const groups = new Set(structure.atoms.filter((atom) => operand.has(atom.stableId)).map((atom) => ast.kind === "byobject" ? scope(atom) : ast.kind === "byres" || ast.kind === "bycalpha" ? `${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}` : ast.kind === "bysegi" ? `${scope(atom)}${atom.segmentId ?? ""}` : `${scope(atom)}${atom.chain}`));
     if (ast.kind === "byobject") return new Set(structure.atoms.filter((atom) => groups.has(scope(atom)) && context.universe.has(atom.stableId)).map((atom) => atom.stableId));
-    if (ast.kind === "bymolecule" || ast.kind === "byfragment") {
+    if (ast.kind === "bymolecule") {
       context.needsTopology = true;
-      if (ast.kind === "byfragment" && structure.bonds.length === 0) { context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical bond topology is unavailable; fragment membership cannot be established." }); return new Set(); }
       const { componentByAtom } = canonicalTopologyGraphFor(structure);
       const selectedComponents = new Set([...operand].map((id) => componentByAtom.get(id)).filter((id): id is string => Boolean(id)));
       return new Set(structure.atoms.filter((atom) => context.universe.has(atom.stableId) && selectedComponents.has(componentByAtom.get(atom.stableId)!)).map((atom) => atom.stableId));
+    }
+    if (ast.kind === "byfragment") {
+      context.needsTopology = true;
+      const fragmentIdsByAtom = new Map(structure.atoms.map((atom) => [atom.stableId, atom.fragmentId?.trim() ?? ""]));
+      if ([...fragmentIdsByAtom.values()].some((fragmentId) => !fragmentId)) {
+        context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical fragment assignment data is unavailable or incomplete; byfragment was not evaluated." });
+        return new Set();
+      }
+      const selectedFragments = new Set(structure.atoms.filter((atom) => operand.has(atom.stableId)).map((atom) => `${scope(atom)}${fragmentIdsByAtom.get(atom.stableId)!}`));
+      return new Set(structure.atoms.filter((atom) => context.universe.has(atom.stableId) && selectedFragments.has(`${scope(atom)}${fragmentIdsByAtom.get(atom.stableId)!}`)).map((atom) => atom.stableId));
     }
     if (ast.kind === "byring") {
       const rings = canonicalRingsFor(structure, context);

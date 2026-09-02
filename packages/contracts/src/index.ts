@@ -114,6 +114,8 @@ export type CanonicalAtom = {
   chain: string;
   /** Authoritative segment identifier when supplied by the source. */
   segmentId?: string;
+  /** Authoritative fragment membership when supplied by an admitted chemistry profile. */
+  fragmentId?: string;
   x: number;
   y: number;
   z: number;
