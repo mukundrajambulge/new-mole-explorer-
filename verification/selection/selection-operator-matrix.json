@@ -16,14 +16,16 @@
     "PASS": 2
   },
   "oracleStatusCounts": {
-    "ORACLE_PENDING": 79
+    "ORACLE_PASS": 13,
+    "ORACLE_PENDING": 60,
+    "ORACLE_EQUIVALENT": 6
   },
   "entries": [
     {
       "operator": "`all`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (`select all`)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "canonical universe"
     },
     {
@@ -44,7 +46,7 @@
       "operator": "`none`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "canonical empty result"
     },
     {
@@ -93,7 +95,7 @@
       "operator": "`not`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "strongest unary precedence"
     },
     {
@@ -107,7 +109,7 @@
       "operator": "`and`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "parser-owned bare query path"
     },
     {
@@ -135,14 +137,14 @@
       "operator": "`first`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "first selected atom only"
     },
     {
       "operator": "`last`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "last selected atom only"
     },
     {
@@ -163,7 +165,7 @@
       "operator": "`chain`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS indirectly",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "canonical chain field"
     },
     {
@@ -177,7 +179,7 @@
       "operator": "`resn`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "exact/wildcard match"
     },
     {
@@ -261,14 +263,14 @@
       "operator": "`bychain`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "weak modifier precedence preserved"
     },
     {
       "operator": "`byres`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "insertion-aware residue groups"
     },
     {
@@ -310,14 +312,14 @@
       "operator": "`neighbor`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "excludes seed atoms"
     },
     {
       "operator": "`bound_to`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "includes directly bonded atoms"
     },
     {
@@ -408,7 +410,7 @@
       "operator": "`elem`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "canonical element"
     },
     {
@@ -450,35 +452,35 @@
       "operator": "`hydrogens` / `hydro`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "element H only"
     },
     {
       "operator": "`hetatm`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "source record authority"
     },
     {
       "operator": "`organic`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS indirectly",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "ligand alias"
     },
     {
       "operator": "`inorganic`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "canonical ion classifier"
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "ion classification"
     },
     {
       "operator": "`solvent`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "water alias"
     },
     {
@@ -492,7 +494,7 @@
       "operator": "`polymer.protein` / `protein`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_EQUIVALENT",
       "decision": "accepted protein alias"
     },
     {

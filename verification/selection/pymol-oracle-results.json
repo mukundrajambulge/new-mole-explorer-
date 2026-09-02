@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "oracleSource": "schrodinger/pymol-open-source@5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+  "runtime": "Ubuntu-20.04 Python 3.9.2 temporary compatibility build",
+  "fixture": "tests/fixtures/mini-protein.pdb",
+  "membershipHash": "sha256 of newline-joined PyMOL atom index|chain|resn|resi|name|symbol tuples",
+  "notes": [
+    "Native-equivalent rows preserve the application's explicit protein, water, and ligand aliases without claiming those aliases are PyMOL spellings.",
+    "The source commit is pinned; the temporary Python compatibility layer only adds future annotations and legacy runtime shims needed by this environment.",
+    "Spatial forms remain pending because the application's `within 4 of ...` and `around 4 ...` grammar was not silently translated to an unverified PyMOL form."
+  ],
+  "rows": [
+    { "applicationQuery": "all", "oracleQuery": "all", "oracleStatus": "ORACLE_PASS", "count": 12, "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a" },
+    { "applicationQuery": "none", "oracleQuery": "none", "oracleStatus": "ORACLE_PASS", "count": 0, "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" },
+    { "applicationQuery": "chain A", "oracleQuery": "chain A", "oracleStatus": "ORACLE_PASS", "count": 11, "membershipHash": "1dcb79441de393fa447723e626d083633130aadb7bf27f9ed87596b7881db096" },
+    { "applicationQuery": "chain A and protein", "oracleQuery": "chain A and polymer.protein", "oracleStatus": "ORACLE_EQUIVALENT", "count": 8, "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3", "mapping": "application protein alias -> PyMOL polymer.protein" },
+    { "applicationQuery": "protein", "oracleQuery": "polymer.protein", "oracleStatus": "ORACLE_EQUIVALENT", "count": 8, "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3", "mapping": "application protein alias -> PyMOL polymer.protein" },
+    { "applicationQuery": "organic", "oracleQuery": "organic", "oracleStatus": "ORACLE_PASS", "count": 2, "membershipHash": "f1a7a9815562e93a9cc9321e9842cdda93caf16003517d83b5f7344643f588ab" },
+    { "applicationQuery": "water", "oracleQuery": "solvent", "oracleStatus": "ORACLE_EQUIVALENT", "count": 1, "membershipHash": "e8d745048e2ab948d7f24ddbb4c405c80e731da553909c5dee9199cb0098601a", "mapping": "application water alias -> PyMOL solvent" },
+    { "applicationQuery": "inorganic", "oracleQuery": "inorganic", "oracleStatus": "ORACLE_PASS", "count": 1, "membershipHash": "fd35d6fe72936e087801f9ec4812f8a4316605b1e82396341d78c0b6a27384e9" },
+    { "applicationQuery": "name CA", "oracleQuery": "name CA", "oracleStatus": "ORACLE_PASS", "count": 2, "membershipHash": "f249bc605c5b2026858b16111b3affdc513a9e68a53d6687cb58e395bbd5d591" },
+    { "applicationQuery": "resn ALA", "oracleQuery": "resn ALA", "oracleStatus": "ORACLE_PASS", "count": 4, "membershipHash": "37f84737cae8462dad78696fd75f3ed69c7f0beab20500eef9a77eb82ad7dc8a" },
+    { "applicationQuery": "resi 1", "oracleQuery": "resi 1", "oracleStatus": "ORACLE_PASS", "count": 4, "membershipHash": "37f84737cae8462dad78696fd75f3ed69c7f0beab20500eef9a77eb82ad7dc8a" },
+    { "applicationQuery": "elem C", "oracleQuery": "elem C", "oracleStatus": "ORACLE_PASS", "count": 5, "membershipHash": "faeaeeb8183d745ca498cb14cad23f658f8739810d49466ae93a88263e3db027" },
+    { "applicationQuery": "hetatm", "oracleQuery": "hetatm", "oracleStatus": "ORACLE_PASS", "count": 4, "membershipHash": "dd5e06b4c99dfe1c7671e215dfd1e6cd69b462b517753447c427f6c929fb42fb" },
+    { "applicationQuery": "hydro", "oracleQuery": "hydro", "oracleStatus": "ORACLE_PASS", "count": 0, "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" },
+    { "applicationQuery": "not water", "oracleQuery": "not solvent", "oracleStatus": "ORACLE_EQUIVALENT", "count": 11, "membershipHash": "a026ddea65f6845646345536441d3f8808c6687abe353b1e881499c01896ea58", "mapping": "application water alias -> PyMOL solvent" },
+    { "applicationQuery": "first all", "oracleQuery": "first all", "oracleStatus": "ORACLE_PASS", "count": 1, "membershipHash": "eb7674fed3646839030b00957c80e0e663a875ba732ce82ef46d8f7aee1c7e7e" },
+    { "applicationQuery": "last all", "oracleQuery": "last all", "oracleStatus": "ORACLE_PASS", "count": 1, "membershipHash": "fd35d6fe72936e087801f9ec4812f8a4316605b1e82396341d78c0b6a27384e9" },
+    { "applicationQuery": "byres name CA", "oracleQuery": "byres name CA", "oracleStatus": "ORACLE_PASS", "count": 8, "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3" },
+    { "applicationQuery": "bychain ligand", "oracleQuery": "bychain organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 11, "membershipHash": "1dcb79441de393fa447723e626d083633130aadb7bf27f9ed87596b7881db096", "mapping": "application ligand alias -> PyMOL organic" },
+    { "applicationQuery": "neighbor ligand", "oracleQuery": "neighbor organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 0, "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "mapping": "application ligand alias -> PyMOL organic" },
+    { "applicationQuery": "bound_to ligand", "oracleQuery": "bound_to organic", "oracleStatus": "ORACLE_EQUIVALENT", "count": 2, "membershipHash": "f1a7a9815562e93a9cc9321e9842cdda93caf16003517d83b5f7344643f588ab", "mapping": "application ligand alias -> PyMOL organic" },
+    { "applicationQuery": "within 4 of ligand", "oracleQuery": null, "oracleStatus": "ORACLE_PENDING", "reason": "native PyMOL grammar equivalent not pinned" },
+    { "applicationQuery": "around 4 ligand", "oracleQuery": null, "oracleStatus": "ORACLE_PENDING", "reason": "native PyMOL grammar equivalent not pinned" }
+  ]
+}

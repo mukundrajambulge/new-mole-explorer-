@@ -4,7 +4,7 @@
 
 **SELECTION + MULTI-OBJECT/MULTI-STATE CLOSURE INCOMPLETE — BLOCKED**
 
-The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. The gate remains blocked only because the required pinned PyMOL oracle has not been executed in this environment, and the matrix therefore retains explicit `ORACLE_PENDING` rows. Unsupported and research-dependent operators remain fail-closed and are not presented as scientifically implemented.
+The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. The pinned PyMOL source has now executed against the shared fixture for 23 representative forms: 13 exact forms pass and 6 application aliases match documented native equivalents. The gate remains blocked because 60 of the 79 matrix rows still require a pinned oracle result or a deliberately unresolved native grammar decision. Unsupported and research-dependent operators remain fail-closed and are not presented as scientifically implemented.
 
 ## Repository and run evidence
 
@@ -47,7 +47,8 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - Rows: **79**
 - Implementation: **57 VERIFIED_WORKING**, **10 MISSING_DEPENDENCY**, **10 INTENTIONALLY_UNSUPPORTED**, **2 RESEARCH_REQUIRED**
 - Live-browser status: **79 pass/accepted diagnostic outcomes** across the expanded matrix exercise
-- Oracle status: **79 ORACLE_PENDING**
+- Oracle status: **13 ORACLE_PASS**, **6 ORACLE_EQUIVALENT**, **60 ORACLE_PENDING**
+- Pinned oracle evidence: [pymol-oracle-results.json](../selection/pymol-oracle-results.json); runner: [run-pymol-oracle.py](../selection/run-pymol-oracle.py)
 - Missing dependency and research rows are explicit gates. No unsupported operator is silently aliased to a different scientific meaning.
 
 ## Files changed in this closure
@@ -56,6 +57,7 @@ Application/contracts:
 
 - `apps/api/src/structures/ingestion.test.ts`
 - `apps/web/src/App.tsx`
+- `apps/web/src/components/StatusBar.tsx`
 - `apps/web/src/commands/commandRegistry.test.ts`
 - `apps/web/src/commands/commandRegistry.ts`
 - `apps/web/src/components/ContextToolbar.tsx`
@@ -77,6 +79,8 @@ Verification:
 - `verification/selection/SELECTION_OPERATOR_MATRIX.md`
 - `verification/selection/generate-matrix-summary.mjs`
 - `verification/selection/selection-operator-matrix.json`
+- `verification/selection/pymol-oracle-results.json`
+- `verification/selection/run-pymol-oracle.py`
 - `verification/evidence/closure-empty-state.png`
 - `verification/evidence/closure-uploaded-cartoon-ligand-sticks.png`
 - `verification/evidence/closure-rcsb-1crn-cartoon.png`
@@ -136,6 +140,7 @@ Verification:
 4. Load 4DJW, run `select all`, then run bare `chain A and protein`; confirm 7,079 and 3,060 selections respectively.
 5. Use RCSB Add for `1CRN`; confirm two object rows, one viewer, independent focus/style/enable controls, and object-qualified selection.
 6. Import `tests/fixtures/multistate.pdb`; confirm `2 states`, switch state, toggle bounded all-state overlay, and run `count_states multistate.pdb`.
+7. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json`.
 
 ## Screenshot evidence
 
@@ -147,7 +152,7 @@ Verification:
 
 ## Known limitations and blockers
 
-- PyMOL is not installed or importable in this environment, so the pinned PyMOL oracle cases were not executed; this is the reason for the blocked final verdict.
+- The pinned PyMOL source was executed in a temporary Ubuntu-20.04/Python-3.9.2 compatibility build. The 60 remaining `ORACLE_PENDING` rows are not promoted without matching coverage; this is the reason for the blocked final verdict.
 - `segi`, crystallographic `pbc`/`symmetry`/`bycell`, fragment/ring perception, arbitrary properties, donor/acceptor chemistry, and several spatial expansion operators remain explicit unsupported gates.
 - Partial charge, peptide sequence, label-property, and presentation-visibility selection require datasets not present in this gate and return structured missing-dependency diagnostics.
 - `in`/`like` tuple grammar and exact PyMOL semantics require a pinned research decision.

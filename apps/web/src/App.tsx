@@ -76,6 +76,7 @@ export const App = () => {
 
   const setActiveSelection = (result: SelectionResult | null) => {
     activeSelectionResultRef.current = result;
+    setProjection((current) => setInteractionState(current, { selectedAtomIds: result?.stableAtomIds ?? [], pickedAtomId: null, measurementPickAtomIds: [] }));
   };
 
   useEffect(() => {

@@ -13,9 +13,11 @@ test("4DJW live selection and a second RCSB object share one workspace", async (
   await command.fill("select all");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 7079 atoms", { timeout: 15000 });
+  await expect(page.locator(".status-metrics")).toContainText("Selection 7,079");
   await command.fill("chain A and protein");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 3060 atoms", { timeout: 15000 });
+  await expect(page.locator(".status-metrics")).toContainText("Selection 3,060");
 
   await page.getByRole("textbox", { name: "RCSB PDB ID" }).fill("1CRN");
   await page.getByRole("button", { name: "RCSB add" }).click();
