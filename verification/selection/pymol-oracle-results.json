@@ -8,7 +8,7 @@
     "Native-equivalent rows preserve the application's explicit protein, water, and ligand aliases without claiming those aliases are PyMOL spellings.",
     "The source commit is pinned; the temporary Python compatibility layer only adds future annotations and legacy runtime shims needed by this environment.",
     "The complete direct probe is recorded in `pymol-matrix-probe.json`: 85 native forms, 79 successful and 6 native errors. The comparison ledger below promotes only exact forms or documented application aliases.",
-    "The direct probe now includes corrected native topology and spatial forms; this comparison ledger remains intentionally conservative and contains 54 selected exact/equivalent rows across the shared mini fixture and the fixture-scoped canonical-property, identity, ring-topology, backbone-partition, numeric-comparison, alias, inequality, label, representation, visibility, color, and workspace-group cases below.",
+    "The direct probe now includes corrected native topology and spatial forms; this comparison ledger remains intentionally conservative and contains 56 selected exact/equivalent rows across the shared mini fixture and the fixture-scoped canonical-property, identity, ring-topology, backbone-partition, numeric-comparison, alias, inequality, label, representation, visibility, color, and workspace-group cases below.",
     "The typed-properties rows use the same pinned source and identify their fixture explicitly; application ss HELIX/SHEET maps to PyMOL ss h/s without treating the long-form tokens as native spellings.",
     "The positive partial_charge comparison is recorded separately in pymol-partial-charge-oracle.json because the shared baseline fixture has no charge-bearing source field."
   ],
