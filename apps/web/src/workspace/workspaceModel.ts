@@ -1,4 +1,5 @@
 import type { CanonicalAtom, CanonicalBond, CanonicalCoordinateState, CanonicalHierarchy, CanonicalMolecularStructure, StructureLoadResult } from "@molecular/contracts";
+import { canonicalChemistryRolesDatasetComplete, canonicalFragmentDatasetComplete } from "../science/datasetValidity";
 import { createDefaultRenderProjection, type RenderProjection } from "../rendering/renderProjection";
 
 export type WorkspaceLineageOperation = "LOAD" | "COPY" | "CREATE_FROM_SELECTION" | "SPLIT_STATE" | "JOIN_STATES";
@@ -459,7 +460,7 @@ const workspacePeptideSequenceDatasetFor = (objects: readonly WorkspaceObject[])
 const workspaceChemistryDatasetFor = (objects: readonly WorkspaceObject[]) => {
   const sources = objects.map((object) => ({ object, dataset: object.loadResult.structure.chemistryDataset }));
   const profileVersion = sources[0]?.dataset?.profileVersion;
-  if (!profileVersion || sources.some(({ object, dataset }) => !dataset || dataset.molecularRevision !== object.loadResult.structure.scientificHash || dataset.profileVersion !== profileVersion)) return undefined;
+  if (!profileVersion || sources.some(({ object }) => !canonicalChemistryRolesDatasetComplete(object.loadResult.structure))) return undefined;
   const signature = sources.map(({ object, dataset }) => ({ objectId: object.objectId, donorAtomIds: dataset!.donorAtomIds, acceptorAtomIds: dataset!.acceptorAtomIds }));
   return {
     datasetId: `workspace:${shortHash(JSON.stringify(signature))}:chemistry-roles`,
@@ -473,11 +474,7 @@ const workspaceChemistryDatasetFor = (objects: readonly WorkspaceObject[]) => {
 
 const workspaceFragmentDatasetFor = (objects: readonly WorkspaceObject[]) => {
   const sources = objects.map((object) => ({ object, dataset: object.loadResult.structure.fragmentDataset }));
-  if (sources.some(({ object, dataset }) => {
-    if (!dataset || dataset.molecularRevision !== object.loadResult.structure.scientificHash || dataset.profileVersion !== "canonical-fragment-assignment-v1") return true;
-    const atomIds = new Set(object.loadResult.structure.atoms.map((atom) => atom.stableId));
-    return object.loadResult.structure.atoms.some((atom) => !dataset.atomFragmentMap[atom.stableId]?.trim()) || Object.keys(dataset.atomFragmentMap).some((atomId) => !atomIds.has(atomId));
-  })) return undefined;
+  if (sources.some(({ object }) => !canonicalFragmentDatasetComplete(object.loadResult.structure))) return undefined;
   const entries = sources.flatMap(({ object, dataset }) => Object.entries(dataset!.atomFragmentMap).map(([atomId, fragmentId]) => [workspaceScopedStableAtomId(object.objectId, atomId), fragmentId.trim()] as const));
   if (entries.length !== objects.reduce((count, object) => count + object.loadResult.structure.atoms.length, 0) || entries.some(([, fragmentId]) => !fragmentId)) return undefined;
   return {

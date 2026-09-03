@@ -1,6 +1,6 @@
 import type { CanonicalAtom, CanonicalMolecularStructure, CanonicalUnitCell } from "@molecular/contracts";
 import { vdwRadiusForElementStrict, VDW_RADIUS_PROFILE } from "../science/vdwRadii";
-import { canonicalPartialChargeDatasetComplete } from "../science/datasetValidity";
+import { canonicalChemistryRolesDatasetComplete, canonicalFragmentDatasetComplete, canonicalPartialChargeDatasetComplete } from "../science/datasetValidity";
 import { beyondSurfaceGapBoundary, withinSpatialBoundary } from "./spatialPolicy";
 
 export type SelectionStatus =
@@ -532,20 +532,6 @@ const recordCoordinateAtom = (atom: CanonicalAtom, structure: CanonicalMolecular
   context.coordinateObjectStates.set(scope.objectId, scope);
 };
 const canonicalPolymerTypingComplete = (structure: CanonicalMolecularStructure): boolean => Boolean(structure.polymerTypingSource) && structure.atoms.filter((atom) => atom.isPolymer).every((atom) => atom.polymerType !== undefined);
-const canonicalChemistryRolesComplete = (structure: CanonicalMolecularStructure): boolean => {
-  const dataset = structure.chemistryDataset;
-  if (!dataset || dataset.molecularRevision !== structure.scientificHash || dataset.profileVersion !== "canonical-chemistry-roles-v1") return false;
-  const atomIds = new Set(structure.atoms.map((atom) => atom.stableId));
-  return [...dataset.donorAtomIds, ...dataset.acceptorAtomIds].every((atomId) => atomIds.has(atomId));
-};
-const canonicalFragmentDatasetComplete = (structure: CanonicalMolecularStructure): boolean => {
-  const dataset = structure.fragmentDataset;
-  if (!dataset || dataset.molecularRevision !== structure.scientificHash || dataset.profileVersion !== "canonical-fragment-assignment-v1") return false;
-  const atomIds = structure.atoms.map((atom) => atom.stableId);
-  return atomIds.length > 0
-    && atomIds.every((atomId) => typeof dataset.atomFragmentMap[atomId] === "string" && dataset.atomFragmentMap[atomId]!.trim().length > 0)
-    && Object.keys(dataset.atomFragmentMap).every((atomId) => atomIds.includes(atomId));
-};
 const categoryMatches = (atom: CanonicalAtom, category: SelectionCategory, structure: CanonicalMolecularStructure, context: EvalContext): boolean => {
   if (category === "enabled") return atom.workspaceObjectEnabled ?? true;
   if (category === "present") { context.needsCoordinates = true; recordCoordinateAtom(atom, structure, context); return true; }
@@ -587,7 +573,7 @@ const categoryMatches = (atom: CanonicalAtom, category: SelectionCategory, struc
   if (category === "donors" || category === "acceptors") {
     context.needsTopology = true;
     recordScientificProfile(context, CHEMISTRY_ROLES_PROFILE);
-    if (!canonicalChemistryRolesComplete(structure)) {
+    if (!canonicalChemistryRolesDatasetComplete(structure)) {
       if (!context.diagnostics.some((diagnostic) => diagnostic.code === "MISSING_DEPENDENCY")) context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Complete revision-matched canonical chemistry-role data is unavailable for donor/acceptor selection." });
       return false;
     }

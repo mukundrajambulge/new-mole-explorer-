@@ -64,6 +64,8 @@ describe("canonical selection engine", () => {
     expect(evaluateSelectionQuery("byfragment ligand", staleFragments).status).toBe("MISSING_DEPENDENCY");
     const incompleteFragments = { ...fragmented, fragmentDataset: { ...fragmented.fragmentDataset, atomFragmentMap: { a1: "fragment:one" } } } satisfies CanonicalMolecularStructure;
     expect(evaluateSelectionQuery("byfragment ligand", incompleteFragments).status).toBe("MISSING_DEPENDENCY");
+    const incompleteFragmentMetadata = { ...fragmented, fragmentDataset: { ...fragmented.fragmentDataset, assignmentSource: "" } } satisfies CanonicalMolecularStructure;
+    expect(evaluateSelectionQuery("byfragment ligand", incompleteFragmentMetadata).status).toBe("MISSING_DEPENDENCY");
     expect(resolveSelection("name CA in chain A", structure).stableAtomIds).toEqual(["a1", "a3"]);
     expect(resolveSelection("(chain A and name CA) like (chain A and name CA)", structure).stableAtomIds).toEqual(["a1", "a3"]);
     const segmented = { ...structure, atoms: structure.atoms.map((atom) => ({ ...atom, segmentId: atom.chain === "A" ? "SEG_A" : "SEG_B" })), scientificHash: "c".repeat(64) } satisfies CanonicalMolecularStructure;
@@ -423,5 +425,7 @@ describe("canonical selection engine", () => {
     expect(missing.status).toBe("MISSING_DEPENDENCY");
     const stale = evaluateSelectionQuery("acceptors", { ...typedChemistry, chemistryDataset: { ...typedChemistry.chemistryDataset, molecularRevision: "stale" } });
     expect(stale.status).toBe("MISSING_DEPENDENCY");
+    const incompleteMetadata = evaluateSelectionQuery("donors", { ...typedChemistry, chemistryDataset: { ...typedChemistry.chemistryDataset, provenance: "" } });
+    expect(incompleteMetadata.status).toBe("MISSING_DEPENDENCY");
   });
 });
