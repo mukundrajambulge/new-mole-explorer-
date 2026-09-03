@@ -173,6 +173,16 @@ describe("canonical selection engine", () => {
     expect(resolveSelection("color red", structure, { presentation }).stableAtomIds).toEqual(["a1", "a2"]);
     expect(resolveSelection("cartoon_color red", structure, { presentation }).stableAtomIds).toEqual(["a1", "a2"]);
     expect(resolveSelection("ribbon_color red", structure, { presentation }).stableAtomIds).toEqual([]);
+    const ribbonPresentation = {
+      ...presentation,
+      representationColorTokensByStableAtomId: {
+        ...presentation.representationColorTokensByStableAtomId,
+        a1: { RIBBON: ["#ff0000", "red"] },
+        a2: { RIBBON: ["#ff0000", "red"] },
+      },
+      revision: "projection-ribbon-selectors-1",
+    };
+    expect(resolveSelection("ribbon_color red", structure, { presentation: ribbonPresentation }).stableAtomIds).toEqual(["a1", "a2"]);
     expect(resolveSelection("label ALA10:CA", structure, { presentation }).stableAtomIds).toEqual(["a1"]);
     expect(evaluateSelectionQuery("rep cartoon !=", structure, { presentation }).status).toBe("SYNTAX_ERROR");
     const result = resolveSelection("rep sticks", structure, { presentation });

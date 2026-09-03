@@ -162,6 +162,7 @@ Verification:
 - `verification/evidence/selection-cross-object-spatial.png`
 - `verification/evidence/selection-polymer-nucleic-mmcif.png`
 - `verification/evidence/selection-console-matrix.png`
+- `verification/evidence/selection-ribbon-color.png`
 - `verification/evidence/visualization-final/space-filling-ligand-only.png`
 - this report
 
@@ -210,7 +211,7 @@ Verification:
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm test` — **PASS: web 17 files / 83 tests; API 2 files / 15 tests**
+- `npm test` — **PASS: web 17 files / 83 tests; API 2 files / 16 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1; 89 live queries**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 10 / 10**
@@ -223,6 +224,7 @@ Verification:
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "PDB segment identity"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "sidechain"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "presentation-dependent"` — **PASS: 1 / 1**
+- The presentation-dependent regression now verifies both the truthful empty Ribbon-color case under Cartoon and the positive `ribbon_color red` path after activating Ribbon and applying a canonical color override.
 - `npx playwright test tests/e2e/g1c-visualization.spec.ts --grep "measurable when side panels"` — **PASS: 1 / 1; non-zero CSS and backing canvas dimensions**
 - `npx playwright test tests/e2e/g1c-visualization.spec.ts --grep "official RCSB"` — **PASS: 1 / 1; official fallback path exercised**
 - `npm run test:e2e` — **PASS: 79 / 79**
@@ -250,6 +252,7 @@ Verification:
 16. Import `tests/fixtures/sidechain-identity.pdb`, run `backbone` (4 atoms) and `sidechain` (1 atom), and confirm the canonical partition is visible and non-empty.
 17. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
 18. Resize the browser to a narrow viewport (for example 720×800), import `tests/fixtures/mini-protein.pdb`, and confirm the 3Dmol canvas remains non-zero and visibly renders the structure while side panels collapse.
+19. With `mini-protein.pdb` loaded, switch Style to Ribbon, apply `color red, all` in the console, and run `select ribbon_color red`; confirm 8 polymer atoms are selected and the viewer remains loaded.
 
 ## Screenshot evidence
 
@@ -261,6 +264,7 @@ Verification:
 - [Split/join state lineage](../evidence/selection-state-lineage.png)
 - [Cross-object spatial frame declaration](../evidence/selection-cross-object-spatial.png)
 - [Selection console matrix](../evidence/selection-console-matrix.png)
+- [Active Ribbon color selection](../evidence/selection-ribbon-color.png)
 - [Space-filling ligand presentation](../evidence/visualization-final/space-filling-ligand-only.png)
 
 ## Known limitations and blockers

@@ -193,7 +193,15 @@ test("presentation-dependent selectors use the current RenderProjection", async 
   await runSelection("select color red", 11, "VALID NONEMPTY");
   await runSelection("select cartoon_color red", 8, "VALID NONEMPTY");
   await runSelection("select ribbon_color red", 0, "VALID EMPTY");
-  expect((await atomMetrics.innerText()).replace(/\s+/g, "")).toBe(before.replace(/\s+/g, ""));
+  await page.getByRole("combobox", { name: "Style" }).selectOption("ribbon");
+  await expect(viewer).toHaveAttribute("data-renderer-ribbon-contributors", "8");
+  await command.fill("color red, all");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(consoleRegion.locator(".console-entry").last()).toContainText(/Applied red to 12 atoms/i);
+  await runSelection("select ribbon_color red", 8, "VALID NONEMPTY");
+  await page.screenshot({ path: resolve("verification/evidence/selection-ribbon-color.png"), animations: "disabled" });
+  const canonicalMetrics = (value: string) => value.replace(/Selection\s+\d+/i, "").replace(/\s+/g, "");
+  expect(canonicalMetrics(await atomMetrics.innerText())).toBe(canonicalMetrics(before));
   await expect(viewer).toHaveAttribute("data-viewer-state", "loaded");
 });
 
