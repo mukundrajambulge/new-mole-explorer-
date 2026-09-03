@@ -15,8 +15,8 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Starting SHA for this closure pass: `27610d35980b2d233e4f97f240ccdbd6439e5d39`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
 - Current implementation commit: `296bd64` (`fix(selection): validate chemistry dataset provenance`)
-- Ending implementation/evidence SHA: `296bd64`
-- Latest implementation/evidence base SHA before this report update: `296bd64`
+- Ending implementation/evidence SHA: `e342e8f9e3e5096022f581a1adbb529caf0b6b6e`
+- Latest implementation/evidence base SHA before this report update: `e342e8f9e3e5096022f581a1adbb529caf0b6b6e`
 - Working tree: clean after the implementation/evidence commit; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -232,6 +232,7 @@ Verification:
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e` — **PASS: 81 / 81**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1; 90 live queries**
+- Fresh live rerun after the shared dataset-validator changes — **PASS: 1 / 1; 90 live queries; 1.3 minutes; exit 0**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 11 / 11**
 - `npx playwright test tests/e2e/real-structure-workspace.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/closure-evidence.spec.ts` — **PASS: 1 / 1**
