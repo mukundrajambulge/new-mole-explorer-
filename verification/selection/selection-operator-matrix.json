@@ -29,8 +29,8 @@
   },
   "oracleStatusCounts": {
     "ORACLE_PASS": 47,
-    "ORACLE_EQUIVALENT": 26,
-    "ORACLE_PENDING": 14
+    "ORACLE_EQUIVALENT": 28,
+    "ORACLE_PENDING": 12
   },
   "entries": [
     {
@@ -275,8 +275,8 @@
       "operator": "`label`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-closure E2E; selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "matches the text emitted by the active safe label projection; bare `label …` remains the explicit label command"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application safe-label text match is equivalent to pinned PyMOL `label \"CA\"` on the mini fixture; bare `label …` remains the explicit label command"
     },
     {
       "operator": "`pepseq`",
@@ -618,8 +618,8 @@
       "operator": "`rep`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-closure E2E; selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "effective representation tokens are bound from RenderProjection; absent context fails closed"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "effective RenderProjection cartoon contributors match pinned PyMOL `rep cartoon` on the mini fixture; absent context fails closed"
     },
     {
       "operator": "`color`",
