@@ -214,6 +214,50 @@ test("object-scoped surfaces survive an unrelated coordinate-state change", asyn
   expect(Object.entries(afterCounts).find(([key]) => key.startsWith(`${miniId}:`))?.[1]).toBe(1);
 });
 
+test("multi-object workspace projects every bounded surface family", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(multiState);
+  await expect(page.getByTitle("multistate.pdb").first()).toBeVisible();
+  const chooserPromise = page.waitForEvent("filechooser");
+  await page.getByRole("button", { name: "File", exact: true }).click();
+  await page.getByRole("button", { name: "Add Structure", exact: true }).click();
+  await (await chooserPromise).setFiles(mini);
+  await expect(page.getByTitle("mini-protein.pdb").first()).toBeVisible();
+
+  const panel = page.getByTestId("objects-selections-panel");
+  const stateRow = panel.locator("[data-object-id]").filter({ hasText: "multistate.pdb" });
+  const miniRow = panel.locator("[data-object-id]").filter({ hasText: "mini-protein.pdb" });
+  const renderer = page.getByTestId("molecular-viewer");
+  const style = page.getByRole("combobox", { name: "Style" });
+  const surfaceStyles = [
+    "van-der-waals-surface",
+    "solvent-accessible-surface",
+    "solvent-excluded-surface",
+    "mesh",
+    "dots",
+    "dot-surface",
+  ];
+
+  for (const surfaceStyle of surfaceStyles) {
+    await stateRow.getByRole("button", { name: "Focus multistate.pdb" }).click();
+    await style.selectOption("cartoon");
+    await miniRow.getByRole("button", { name: "Focus mini-protein.pdb" }).click();
+    await style.selectOption("cartoon");
+    await expect(renderer).toHaveAttribute("data-renderer-surface-object-count", "0", { timeout: 15000 });
+    await stateRow.getByRole("button", { name: "Focus multistate.pdb" }).click();
+    await style.selectOption(surfaceStyle);
+    await expect(renderer).toHaveAttribute("data-renderer-surface-object-count", "1", { timeout: 15000 });
+    await miniRow.getByRole("button", { name: "Focus mini-protein.pdb" }).click();
+    await style.selectOption(surfaceStyle);
+    await expect(renderer).toHaveAttribute("data-renderer-surface-object-count", "2", { timeout: 15000 });
+  }
+
+  await expect(renderer).toHaveAttribute("data-renderer-model-count", "2");
+  await expect(renderer).toHaveAttribute("data-viewer-state", "loaded");
+  await page.screenshot({ path: resolve("verification/evidence/selection-multi-object-surfaces.png"), animations: "disabled" });
+});
+
 test("console presentation commands target canonical workspace objects and keep enable state in sync", async ({ page }) => {
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(mini);

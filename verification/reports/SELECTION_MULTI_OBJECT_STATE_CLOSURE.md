@@ -161,6 +161,7 @@ Verification:
 - `verification/evidence/closure-responsive-canvas.png`
 - `verification/evidence/selection-object-create.png`
 - `verification/evidence/selection-state-lineage.png`
+- `verification/evidence/selection-multi-object-surfaces.png`
 - `verification/evidence/selection-cross-object-spatial.png`
 - `verification/evidence/selection-polymer-nucleic-mmcif.png`
 - `verification/evidence/selection-console-matrix.png`
@@ -177,7 +178,7 @@ Verification:
 - Cross-object selection and object-qualified queries: **PASS**
 - Scientific `all` versus presentation `enabled` scope after disabling one object: **PASS**
 - Reverse picking identity map with object and coordinate-state context: **PASS**
-- Object/state-scoped surfaces and unrelated-state cache isolation: **PASS**
+- Object/state-scoped surfaces and unrelated-state cache isolation: **PASS**; VDW, SAS, SES, Mesh, Dots, and Dot Surface are each projected independently to two objects.
 - Object-scoped measurement picks reject mixed-object ambiguity and resolve against the canonical target object: **PASS**
 - Create-from-selection with new atom identities and lineage: **PASS**
 - Bounded split_states first/last/prefix semantics: **PASS**
@@ -215,8 +216,9 @@ Verification:
 - `npm run lint` — **PASS**
 - `npm test` — **PASS: web 17 files / 83 tests; API 2 files / 16 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
+- `npx playwright test tests/e2e` — **PASS: 80 / 80**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1; 90 live queries**
-- `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 10 / 10**
+- `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 11 / 11**
 - `npx playwright test tests/e2e/real-structure-workspace.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/closure-evidence.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "source-backed mmCIF polymer typing"` — **PASS: 1 / 1**
