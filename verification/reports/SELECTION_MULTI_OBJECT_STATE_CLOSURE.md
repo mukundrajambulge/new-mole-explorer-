@@ -91,7 +91,7 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - `coordinate_frame local_scientific|effective_world`: **PASS**; the policy is visible in the workspace and included in spatial selection metadata.
 - Cross-object spatial selection: **PASS when explicitly declared; fail-closed without a declared coordinate frame**.
 - State-dependent coordinate predicates: **PASS**; live `x < 1.5` changes from 3 atoms in state 1 to 1 atom in state 2, and live `within 1.5 of name N` changes from 2 atoms in state 1 to 1 atom in state 2 while exposing the consulted state scope in the active-selection panel.
-- Source-backed `bycell` selection: **PASS** for the bounded fractional-cell-membership profile; PDB `CRYST1` and mmCIF `_cell` parameters are preserved canonically, the live fixture selects the same two atoms as pinned PyMOL, and symmetry-mate/PBC expansion is intentionally not claimed.
+- Source-backed `bycell` selection: **PASS** for the bounded fractional-cell-membership profile; PDB `CRYST1` and mmCIF `_cell` parameters are preserved canonically, the live fixture selects the same two atoms as pinned PyMOL, and a multi-object regression proves each object uses its own cell scope. Symmetry-mate/PBC expansion is intentionally not claimed.
 - Canonical segment, alternate-location, occupancy, and B-factor identity: **PASS**; `segi SEG_A` and `bysegi segi SEG_A` select source-backed segments, while `alt A`, `b > 20`, and `q >= 0.5` use the preserved canonical fields. PDB segment and alternate-location membership match the pinned identity fixture exactly.
 - Canonical formal charge and secondary structure: **PASS**; source charge predicates and PDB HELIX/SHEET predicates select positive live subsets without renderer-derived values. Strict/inclusive numeric comparisons are covered on formal charge, B-factor, and coordinates; direct `!=` spelling remains an explicit PyMOL parser difference documented as an equivalent complement.
 - Presentation-dependent selection: **PASS** for effective `rep`, `color`, and `label`, plus explicit representation-scoped `cartoon_color` and `ribbon_color` selectors; generic atom color no longer leaks into representation-specific selectors. The selection result records the projection revision and remains stable under subsequent targeting.
@@ -218,7 +218,7 @@ Verification:
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm test` — **PASS: web 17 files / 85 tests; API 2 files / 18 tests**
+- `npm test` — **PASS: web 17 files / 86 tests; API 2 files / 18 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e` — **PASS: 81 / 81**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1; 90 live queries**

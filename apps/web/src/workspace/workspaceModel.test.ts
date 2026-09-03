@@ -47,6 +47,30 @@ describe("workspace selection scope", () => {
     expect(workspace?.atoms.map((atom) => atom.workspaceUnitCell?.a)).toEqual([10, 20]);
   });
 
+  it("evaluates multi-object bycell against each object's own unit cell", () => {
+    const cell = (a: number) => ({ a, b: 10, c: 10, alpha: 90, beta: 90, gamma: 90, source: "PDB_CRYST1" as const, profileVersion: "fractional-unit-cell-membership-v1" as const });
+    const twoAtomObject = (id: string, firstX: number, secondX: number, unitCell: ReturnType<typeof cell>) => {
+      const base = loadResultFor(id, `${id}-ca`);
+      return createWorkspaceObject({ ...base, structure: {
+        ...base.structure,
+        counts: { ...base.structure.counts, atoms: 2 },
+        bounds: { min: { x: firstX, y: 0, z: 0 }, max: { x: secondX, y: 0, z: 0 } },
+        atoms: [
+          { ...base.structure.atoms[0]!, stableId: `${id}-ca`, x: firstX, atomName: "CA" },
+          { ...base.structure.atoms[0]!, stableId: `${id}-n`, serial: 2, x: secondX, atomName: "N" },
+        ],
+        unitCell,
+      } });
+    };
+    const first = twoAtomObject("cell-first-two", 1, 2, cell(10));
+    const second = twoAtomObject("cell-second-two", 15, 25, cell(100));
+    const workspace = workspaceSelectionStructure([first, { ...second, objectId: "object:cell-second-two" }]);
+    expect(workspace).not.toBeNull();
+    const result = resolveSelection("bycell (object cell-second-two.pdb and name CA)", workspace!);
+    expect(result.stableAtomIds).toEqual(["object:cell-second-two::cell-second-two-ca", "object:cell-second-two::cell-second-two-n"]);
+    expect(result.status).toBe("VALID_NONEMPTY");
+  });
+
   it("materializes a selected canonical subset with new identities and explicit lineage", () => {
     const source = createWorkspaceObject({ ...loadResultFor("source", "source-atom"), structure: { ...loadResultFor("source", "source-atom").structure, bonds: [] } });
     const created = createWorkspaceObjectFromSelection(source, ["source-atom"], "selected-object", [source.objectId]);
