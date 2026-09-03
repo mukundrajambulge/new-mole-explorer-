@@ -4,7 +4,7 @@
 
 **SELECTION + MULTI-OBJECT/MULTI-STATE CLOSURE INCOMPLETE — BLOCKED**
 
-The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. Cross-object spatial queries now require and record an explicit coordinate-frame policy; every coordinate-dependent selection also records the exact per-object coordinate state scope consulted, including cached and bound plans. The pinned PyMOL source has executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The application now also binds RenderProjection representation, color, label, and representation-specific color selectors, evaluates canonical fragment assignments and bounded ring topology without renderer-derived shortcuts, implements a versioned VDW surface-gap profile with strict missing-radius handling, binds `pepseq` to a revision-stamped canonical one-letter peptide sequence dataset, preserves source-backed crystallographic unit-cell parameters for bounded `bycell` membership, retains the actual official remote retrieval provider and URI when RCSB falls back to the wwPDB partner endpoint, and exposes a strict revision-bound canonical chemistry-role dataset boundary for `donors`/`acceptors` without fabricating roles for ordinary PDB/mmCIF ingestion. The gate remains blocked because 6 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
+The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. Cross-object spatial queries now require and record an explicit coordinate-frame policy; every coordinate-dependent selection also records the exact per-object coordinate state scope consulted, including cached and bound plans. The pinned PyMOL source has executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The application now also binds RenderProjection representation, color, label, and representation-specific color selectors, evaluates canonical fragment assignments and bounded ring topology without renderer-derived shortcuts, implements a versioned VDW surface-gap profile with strict missing-radius handling, binds `pepseq` to a revision-stamped canonical one-letter peptide sequence dataset, preserves source-backed crystallographic unit-cell parameters for bounded `bycell` membership, retains the actual official remote retrieval provider and URI when RCSB falls back to the wwPDB partner endpoint, exposes strict revision-bound canonical chemistry-role and fragment-assignment dataset boundaries for `donors`/`acceptors` and `byfragment`, and never fabricates those datasets for ordinary PDB/mmCIF ingestion. The gate remains blocked because 6 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
 
 ## Repository and run evidence
 
@@ -14,9 +14,9 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `27610d35980b2d233e4f97f240ccdbd6439e5d39`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
-- Current implementation commit: `0d09d17` (`fix(selection): fail closed on incomplete charge data`)
-- Ending implementation/evidence SHA: `0d09d17`
-- Latest implementation/evidence base SHA before this report update: `0d09d17`
+- Current implementation commit: `f460e87` (`fix(selection): bind fragment expansion to canonical dataset`)
+- Ending implementation/evidence SHA: `f460e87`
+- Latest implementation/evidence base SHA before this report update: `f460e87`
 - Working tree: clean after the implementation/evidence commit; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -48,6 +48,7 @@ The current application was exercised with a real 4DJW RCSB load:
 - `RenderProjection` is the renderer-neutral presentation boundary consumed by `ThreeDMolViewerAdapter`; UI components do not own 3Dmol scientific state.
 - Partial-charge selection, color, and labels require complete finite atom coverage from a revision-matched canonical dataset; stale or incomplete datasets fail closed and cannot yield partial scientific results.
 - `donors` and `acceptors` consume only a complete `canonical-chemistry-roles-v1` dataset whose molecular revision matches the canonical structure; the evaluator records the scientific profile and fails closed when admitted PDB/mmCIF sources do not provide it. No bond-order, protonation, tautomer, or renderer-derived heuristic is promoted to scientific state.
+- `byfragment` consumes only a complete `canonical-fragment-assignment-v1` dataset whose molecular revision matches the canonical structure; derived and multi-object selection views remap those assignments by stable ID and keep fragments object-scoped. Per-atom hints, connected components, and coordinates are not used as fallbacks.
 - `pepseq` consumes only the revision-matched `canonical-peptide-sequence-v1` dataset produced by ingestion and propagated through derived-object workflows; the evaluator does not infer sequence from renderer state or a residue-name heuristic at query time.
 - Workspace peptide-sequence datasets namespace each object and residue ID, so identical chain/residue labels in separate objects cannot collide; the multi-object regression selects the expected 8 atoms from the protein object only.
 - One mounted molecular canvas owns one authoritative adapter/viewer instance. Multiple workspace objects become separate 3Dmol models within that viewer.
@@ -106,6 +107,7 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 
 Application/contracts:
 
+- Latest fragment-authority hardening: `packages/contracts/src/index.ts`, `apps/web/src/selection/selectionEngine.ts`, `apps/web/src/selection/selectionEngine.test.ts`, `apps/web/src/workspace/workspaceModel.ts`, and `apps/web/src/workspace/workspaceModel.test.ts`
 - `apps/api/src/structures/ingestion.test.ts`
 - `apps/web/src/App.tsx`
 - `apps/web/src/rendering/colorSchemes.ts`
@@ -220,7 +222,7 @@ Verification:
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm test` — **PASS: web 17 files / 89 tests; API 2 files / 18 tests**
+- `npm test` — **PASS: web 17 files / 90 tests; API 2 files / 18 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e` — **PASS: 81 / 81**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1; 90 live queries**
@@ -235,6 +237,7 @@ Verification:
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "sidechain"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "presentation-dependent"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "source-backed unit-cell"` — **PASS: 1 / 1; PDB CRYST1 fixture and `bycell name CA` select 2 atoms**
+- `npx playwright test tests/e2e/selection-closure.spec.ts tests/e2e/g1c-visualization.spec.ts tests/e2e/v-final.spec.ts --grep "presentation-dependent|component colors|custom labels|G1C-COLOR|labels remain canonical"` — **PASS: 5 / 5; revision-bound partial-charge presentation remains unavailable when its dataset is absent**
 - The presentation-dependent regression now verifies that generic `color red` remains distinct from representation-specific selectors, then covers positive `set cartoon_color, red, polymer` and `set ribbon_color, red, polymer` paths.
 - `npx playwright test tests/e2e/g1c-visualization.spec.ts --grep "measurable when side panels"` — **PASS: 1 / 1; non-zero CSS and backing canvas dimensions**
 - `npx playwright test tests/e2e/g1c-visualization.spec.ts --grep "official RCSB"` — **PASS: 1 / 1; official fallback path exercised**

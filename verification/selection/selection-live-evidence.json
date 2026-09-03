@@ -1842,7 +1842,7 @@
       "observed": {
         "semanticStatus": "MISSING_DEPENDENCY",
         "category": "SELECTION",
-        "result": "●\nCanonical partial_charge data is unavailable for this selection context.\n· 0 atoms",
+        "result": "●\nComplete revision-matched canonical partial_charge data is unavailable for this selection context.\n· 0 atoms",
         "atomCount": 0,
         "membershipHash": null,
         "viewerMembershipHash": null,
@@ -1855,18 +1855,7 @@
         "command": "show sticks, all"
       },
       "failureDiagnostics": [
-        "Canonical partial_charge data is unavailable for this selection context.",
-        "Canonical partial_charge data is unavailable for this selection context.",
-        "Canonical partial_charge data is unavailable for this selection context.",
-        "Canonical partial_charge data is unavailable for this selection context.",
-        "Canonical partial_charge data is unavailable for this selection context.",
-        "Canonical partial_charge data is unavailable for this selection context.",
-        "Canonical partial_charge data is unavailable for this selection context.",
-        "Canonical partial_charge data is unavailable for this selection context.",
-        "Canonical partial_charge data is unavailable for this selection context.",
-        "Canonical partial_charge data is unavailable for this selection context.",
-        "Canonical partial_charge data is unavailable for this selection context.",
-        "Canonical partial_charge data is unavailable for this selection context."
+        "Complete revision-matched canonical partial_charge data is unavailable for this selection context."
       ]
     },
     {
