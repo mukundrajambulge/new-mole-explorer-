@@ -80,6 +80,16 @@ export type CanonicalChemistryDataset = {
   provenance: string;
 };
 
+/** Complete, revision-bound fragment memberships supplied by an admitted profile. */
+export type CanonicalFragmentDataset = {
+  datasetId: string;
+  molecularRevision: string;
+  profileVersion: "canonical-fragment-assignment-v1";
+  atomFragmentMap: Record<string, string>;
+  assignmentSource: string;
+  provenance: string;
+};
+
 export type SecondaryStructureDataset = {
   datasetId: string;
   molecularRevision: string;
@@ -232,6 +242,8 @@ export type CanonicalMolecularStructure = {
   polymerTypingSource?: string;
   /** Optional complete chemistry-role assignments; absent data must fail closed for donor/acceptor selection. */
   chemistryDataset?: CanonicalChemistryDataset;
+  /** Optional complete source-backed fragment memberships; absent data must fail closed for byfragment. */
+  fragmentDataset?: CanonicalFragmentDataset;
   partialChargeDataset?: PartialChargeDataset;
   secondaryStructureDataset?: SecondaryStructureDataset;
   peptideSequenceDataset?: PeptideSequenceDataset;

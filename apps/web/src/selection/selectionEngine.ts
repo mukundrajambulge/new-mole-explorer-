@@ -544,6 +544,14 @@ const canonicalChemistryRolesComplete = (structure: CanonicalMolecularStructure)
   const atomIds = new Set(structure.atoms.map((atom) => atom.stableId));
   return [...dataset.donorAtomIds, ...dataset.acceptorAtomIds].every((atomId) => atomIds.has(atomId));
 };
+const canonicalFragmentDatasetComplete = (structure: CanonicalMolecularStructure): boolean => {
+  const dataset = structure.fragmentDataset;
+  if (!dataset || dataset.molecularRevision !== structure.scientificHash || dataset.profileVersion !== "canonical-fragment-assignment-v1") return false;
+  const atomIds = structure.atoms.map((atom) => atom.stableId);
+  return atomIds.length > 0
+    && atomIds.every((atomId) => typeof dataset.atomFragmentMap[atomId] === "string" && dataset.atomFragmentMap[atomId]!.trim().length > 0)
+    && Object.keys(dataset.atomFragmentMap).every((atomId) => atomIds.includes(atomId));
+};
 const categoryMatches = (atom: CanonicalAtom, category: SelectionCategory, structure: CanonicalMolecularStructure, context: EvalContext): boolean => {
   if (category === "enabled") return atom.workspaceObjectEnabled ?? true;
   if (category === "present") { context.needsCoordinates = true; recordCoordinateAtom(atom, structure, context); return true; }
@@ -774,11 +782,12 @@ const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, 
     }
     if (ast.kind === "byfragment") {
       context.needsTopology = true;
-      const fragmentIdsByAtom = new Map(structure.atoms.map((atom) => [atom.stableId, atom.fragmentId?.trim() ?? ""]));
-      if ([...fragmentIdsByAtom.values()].some((fragmentId) => !fragmentId)) {
+      const fragmentDataset = structure.fragmentDataset;
+      if (!canonicalFragmentDatasetComplete(structure)) {
         context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical fragment assignment data is unavailable or incomplete; byfragment was not evaluated." });
         return new Set();
       }
+      const fragmentIdsByAtom = new Map(structure.atoms.map((atom) => [atom.stableId, fragmentDataset!.atomFragmentMap[atom.stableId]!.trim()]));
       const selectedFragments = new Set(structure.atoms.filter((atom) => operand.has(atom.stableId)).map((atom) => `${scope(atom)}${fragmentIdsByAtom.get(atom.stableId)!}`));
       return new Set(structure.atoms.filter((atom) => context.universe.has(atom.stableId) && selectedFragments.has(`${scope(atom)}${fragmentIdsByAtom.get(atom.stableId)!}`)).map((atom) => atom.stableId));
     }
@@ -922,6 +931,13 @@ const namespaceRevisionFor = (structure: CanonicalMolecularStructure, named?: Na
     profileVersion: structure.chemistryDataset.profileVersion,
     donorAtomIds: structure.chemistryDataset.donorAtomIds,
     acceptorAtomIds: structure.chemistryDataset.acceptorAtomIds,
+  } : null,
+  fragmentDataset: structure.fragmentDataset ? {
+    datasetId: structure.fragmentDataset.datasetId,
+    molecularRevision: structure.fragmentDataset.molecularRevision,
+    profileVersion: structure.fragmentDataset.profileVersion,
+    atomFragmentMap: structure.fragmentDataset.atomFragmentMap,
+    assignmentSource: structure.fragmentDataset.assignmentSource,
   } : null,
   namedNamespaceRevision: named?.namespaceRevision ?? "none",
   workspaceGroups: groups?.map((group) => ({ groupId: group.groupId, name: group.name, objectIds: [...group.objectIds].sort() })).sort((left, right) => left.groupId.localeCompare(right.groupId)) ?? [],

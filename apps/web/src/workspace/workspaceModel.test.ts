@@ -96,6 +96,30 @@ describe("workspace selection scope", () => {
     expect(resolveSelection("acceptors", workspace!).stableAtomIds).toEqual(["object:chem-second::second-atom"]);
   });
 
+  it("preserves complete fragment assignments across a multi-object selection universe", () => {
+    const fragmentObject = (id: string, atomId: string, fragmentId: string) => {
+      const base = loadResultFor(id, atomId);
+      const scientificHash = `${id}-fragment-revision`.padEnd(64, "0");
+      return createWorkspaceObject({ ...base, structure: {
+        ...base.structure,
+        scientificHash,
+        fragmentDataset: {
+          datasetId: `${id}:fragments`,
+          molecularRevision: scientificHash,
+          profileVersion: "canonical-fragment-assignment-v1" as const,
+          atomFragmentMap: { [atomId]: fragmentId },
+          assignmentSource: "validated canonical fragment fixture",
+          provenance: "validated canonical fragment fixture",
+        },
+      }} satisfies StructureLoadResult);
+    };
+    const first = fragmentObject("fragment-first", "first-atom", "fragment:shared");
+    const second = createWorkspaceObject(fragmentObject("fragment-second", "second-atom", "fragment:shared").loadResult, [first.objectId]);
+    const workspace = workspaceSelectionStructure([first, second]);
+    expect(workspace?.fragmentDataset?.molecularRevision).toBe(workspace?.scientificHash);
+    expect(resolveSelection("byfragment name CA", workspace!).stableAtomIds).toEqual(["object:fragment-first::first-atom", "object:fragment-second::second-atom"]);
+  });
+
   it("materializes a selected canonical subset with new identities and explicit lineage", () => {
     const source = createWorkspaceObject({ ...loadResultFor("source", "source-atom"), structure: { ...loadResultFor("source", "source-atom").structure, bonds: [] } });
     const created = createWorkspaceObjectFromSelection(source, ["source-atom"], "selected-object", [source.objectId]);

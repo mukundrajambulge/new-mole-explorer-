@@ -43,8 +43,15 @@ describe("canonical selection engine", () => {
     expect(missingFragments.count).toBe(0);
     const fragmented = {
       ...structure,
-      atoms: structure.atoms.map((atom) => ({ ...atom, fragmentId: atom.stableId === "a1" || atom.stableId === "a2" || atom.stableId === "l1" ? "fragment:ligand-bound" : `fragment:${atom.stableId}` })),
       scientificHash: "fragmented-engine-revision".padEnd(64, "0"),
+      fragmentDataset: {
+        datasetId: "fragment-fixture",
+        molecularRevision: "fragmented-engine-revision".padEnd(64, "0"),
+        profileVersion: "canonical-fragment-assignment-v1" as const,
+        atomFragmentMap: Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, atom.stableId === "a1" || atom.stableId === "a2" || atom.stableId === "l1" ? "fragment:ligand-bound" : `fragment:${atom.stableId}`])),
+        assignmentSource: "test fixture",
+        provenance: "test fixture",
+      },
     } satisfies CanonicalMolecularStructure;
     expect(resolveSelection("byfragment ligand", fragmented).stableAtomIds).toEqual(["a1", "a2", "l1"]);
     expect(resolveSelection("name CA in chain A", structure).stableAtomIds).toEqual(["a1", "a3"]);
