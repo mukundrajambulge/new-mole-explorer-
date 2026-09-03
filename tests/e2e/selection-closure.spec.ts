@@ -191,6 +191,10 @@ test("presentation-dependent selectors use the current RenderProjection", async 
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(consoleRegion.locator(".console-entry").last()).toContainText(/Applied red to 12 atoms/i);
   await runSelection("select color red", 11, "VALID NONEMPTY");
+  await runSelection("select cartoon_color red", 0, "VALID EMPTY");
+  await command.fill("set cartoon_color, red, polymer");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(consoleRegion.locator(".console-entry").last()).toContainText(/Applied red to 8 CARTOON atoms/i);
   await runSelection("select cartoon_color red", 8, "VALID NONEMPTY");
   await runSelection("select ribbon_color red", 0, "VALID EMPTY");
   await page.getByRole("combobox", { name: "Style" }).selectOption("ribbon");
@@ -198,6 +202,10 @@ test("presentation-dependent selectors use the current RenderProjection", async 
   await command.fill("color red, all");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(consoleRegion.locator(".console-entry").last()).toContainText(/Applied red to 12 atoms/i);
+  await runSelection("select ribbon_color red", 0, "VALID EMPTY");
+  await command.fill("set ribbon_color, red, polymer");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(consoleRegion.locator(".console-entry").last()).toContainText(/Applied red to 8 RIBBON atoms/i);
   await runSelection("select ribbon_color red", 8, "VALID NONEMPTY");
   await page.screenshot({ path: resolve("verification/evidence/selection-ribbon-color.png"), animations: "disabled" });
   const canonicalMetrics = (value: string) => value.replace(/Selection\s+\d+/i, "").replace(/\s+/g, "");

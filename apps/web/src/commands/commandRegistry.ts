@@ -1,5 +1,5 @@
 export type CommandDomain = "SYSTEM" | "SELECTION" | "PRESENTATION" | "VIEW" | "LABEL" | "MEASURE" | "OBJECT";
-export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "set_name" | "copy" | "create" | "split_states" | "join_states" | "group" | "delete" | "update" | "enable" | "disable" | "state" | "frame" | "all_states" | "count_states" | "coordinate_frame";
+export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "set" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "set_name" | "copy" | "create" | "split_states" | "join_states" | "group" | "delete" | "update" | "enable" | "disable" | "state" | "frame" | "all_states" | "count_states" | "coordinate_frame";
 export type ParsedCommand = { domain: CommandDomain; verb: CommandVerb; raw: string; head: string; argument: string; target: string | null; span: { start: number; end: number } };
 export type CommandParseError = { code: "EMPTY" | "UNKNOWN_COMMAND" | "MISSING_ARGUMENT"; message: string; span?: { start: number; end: number } };
 export type CommandDefinition = { verb: CommandVerb; domain: CommandDomain; synopsis: string; description: string; requiresArgument: boolean };
@@ -10,6 +10,7 @@ export const COMMAND_REGISTRY: readonly CommandDefinition[] = [
   { verb: "show_as", domain: "PRESENTATION", synopsis: "show_as <representation>, <query>", description: "Show one representation and make it the target representation.", requiresArgument: true },
   { verb: "hide", domain: "PRESENTATION", synopsis: "hide <representation>, <query>", description: "Hide one representation for the selected canonical scope.", requiresArgument: true },
   { verb: "color", domain: "PRESENTATION", synopsis: "color <named-color|inherit>, <query>", description: "Apply or clear a presentation color without changing canonical data.", requiresArgument: true },
+  { verb: "set", domain: "PRESENTATION", synopsis: "set <cartoon_color|ribbon_color>, <named-color>, <query>", description: "Apply an explicit representation-scoped color without changing canonical data.", requiresArgument: true },
   { verb: "label", domain: "LABEL", synopsis: "label <query>, <safe-expression>", description: "Apply a non-evaluating canonical label expression.", requiresArgument: true },
   { verb: "center", domain: "VIEW", synopsis: "center <query>", description: "Center the camera on a canonical target.", requiresArgument: true },
   { verb: "zoom", domain: "VIEW", synopsis: "zoom <query>", description: "Fit the camera to a canonical target.", requiresArgument: true },
@@ -79,6 +80,7 @@ export const commandSuggestions = (prefix: string): readonly string[] => {
     if (head === "group") return ["create", "add", "remove", "open", "close", "toggle", "empty"];
     if (head === "coordinate_frame") return ["local_scientific", "effective_world"];
     if (head === "color") return ["red", "green", "blue", "cyan", "yellow", "inherit"];
+    if (head === "set") return ["cartoon_color", "ribbon_color"];
     if (head === "select" || head === "center" || head === "zoom" || head === "label") return ["all", "none", "polymer", "ligand", "water", "ion", "chain", "resi", "name"];
   }
   return [...verbs].filter((verb) => !normalized || verb.startsWith(normalized)).sort();

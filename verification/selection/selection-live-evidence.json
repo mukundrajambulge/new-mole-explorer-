@@ -3,7 +3,7 @@
   "fixture": "tests/fixtures/mini-protein.pdb",
   "generatedBy": "tests/e2e/selection-matrix-live.spec.ts",
   "expectedMembershipHashPolicy": "null when no independent application-fixture hash is pinned; observed hashes are recorded from the active canonical selection result",
-  "attemptedQueryCount": 89,
+  "attemptedQueryCount": 90,
   "browserConsoleErrors": [],
   "pageErrors": [],
   "networkErrors": [],
@@ -2391,6 +2391,30 @@
         "semanticStatus": "COMMAND_HANDLED",
         "category": "VIEW",
         "result": "●\n{\"projection\":\"perspective\"}",
+        "atomCount": null,
+        "membershipHash": null,
+        "viewerMembershipHash": null,
+        "selectionIndicator": null,
+        "selectionVisible": false,
+        "selectionIndicationConsistent": null
+      },
+      "subsequentTargeting": {
+        "attempted": false,
+        "command": "show sticks, all"
+      },
+      "failureDiagnostics": []
+    },
+    {
+      "query": "set cartoon_color, red, polymer",
+      "expected": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "atomCount": null,
+        "membershipHash": null
+      },
+      "observed": {
+        "semanticStatus": "COMMAND_HANDLED",
+        "category": "PRESENTATION",
+        "result": "●\nApplied red to 8 CARTOON atoms.",
         "atomCount": null,
         "membershipHash": null,
         "viewerMembershipHash": null,

@@ -19,6 +19,8 @@ describe("typed command registry boundary", () => {
     expect(parseCommand("state 2, objectA").command).toMatchObject({ domain: "OBJECT", verb: "state", argument: "2", target: "objectA" });
     expect(parseCommand("group add protein-set, objectA").command).toMatchObject({ domain: "OBJECT", verb: "group", argument: "add protein-set", target: "objectA" });
     expect(parseCommand("coordinate_frame local_scientific").command).toMatchObject({ domain: "SELECTION", verb: "coordinate_frame", argument: "local_scientific", target: null });
+    expect(parseCommand("set ribbon_color, red, polymer").command).toMatchObject({ domain: "PRESENTATION", verb: "set", argument: "ribbon_color", target: "red, polymer" });
+    expect(commandSuggestions("set ")).toEqual(["cartoon_color", "ribbon_color"]);
     expect(commandSuggestions("coordinate_frame ")).toEqual(["local_scientific", "effective_world"]);
   });
 });

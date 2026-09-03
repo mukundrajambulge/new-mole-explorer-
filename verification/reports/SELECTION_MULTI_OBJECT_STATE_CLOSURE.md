@@ -72,9 +72,9 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 
 - Rows: **87**
 - Implementation: **81 VERIFIED_WORKING**, **4 MISSING_DEPENDENCY**, **1 INTENTIONALLY_UNSUPPORTED**, **1 UNKNOWN_PROPERTY**
-- Live-browser status: **89 pass/accepted diagnostic outcomes** across the expanded matrix exercise
-- Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **89** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
-- `in`, `bycalpha`, `bymolecule`, `byfragment`, and `byring` now use canonical tuple, residue-CA, connected-component, canonical-fragment-assignment, and bounded-cycle semantics respectively. `visible` is now bound to an explicit presentation context derived from render directives; `rep`, `color`, `label`, `cartoon_color`, and `ribbon_color` are likewise evaluated from the current RenderProjection and never from 3Dmol internals. These selectors never alias scientific `all`. `like`, the application implicit-adjacency profile, and the new spatial/topology forms are live-verified; malformed shorthand and missing scientific dependencies remain truthful diagnostics.
+- Live-browser status: **90 pass/accepted diagnostic outcomes** across the expanded matrix exercise
+- Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **90** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
+- `in`, `bycalpha`, `bymolecule`, `byfragment`, and `byring` now use canonical tuple, residue-CA, connected-component, canonical-fragment-assignment, and bounded-cycle semantics respectively. `visible` is now bound to an explicit presentation context derived from render directives; `rep`, `color`, `label`, `cartoon_color`, and `ribbon_color` are likewise evaluated from the current RenderProjection and never from 3Dmol internals. Generic atom color and representation-scoped color are separate namespaces; `set cartoon_color|ribbon_color, <color>, <query>` is the explicit representation-scoped mutation path. These selectors never alias scientific `all`. `like`, the application implicit-adjacency profile, and the new spatial/topology forms are live-verified; malformed shorthand and missing scientific dependencies remain truthful diagnostics.
 - Oracle comparison ledger: **47 ORACLE_PASS**, **32 ORACLE_EQUIVALENT**, **8 ORACLE_PENDING** across the 87-row comparison ledger; the full direct probe is [pymol-matrix-probe.json](../selection/pymol-matrix-probe.json) (**85 forms: 79 successful, 6 native errors**).
 - Exact-oracle reproduction: **PASS** in the local Ubuntu-20.04 compatibility environment using the pinned source commit; PyMOL **3.2.0a**, 85 forms, 79 successful and 6 native errors, with row payloads byte-identical to the committed direct probe. The comparison ledger now contains 54 selected exact/equivalent rows, including fixture-scoped formal-charge, B-factor, secondary-structure, segment-identity, alternate-location, ring-topology, backbone-partition, numeric-comparison, alias, inequality, label, representation, visibility, color, and workspace-group cases.
 - Pinned oracle evidence: [pymol-oracle-results.json](../selection/pymol-oracle-results.json); runner: [run-pymol-oracle.py](../selection/run-pymol-oracle.py)
@@ -92,7 +92,7 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - State-dependent coordinate predicates: **PASS**; live `x < 1.5` changes from 3 atoms in state 1 to 1 atom in state 2, and live `within 1.5 of name N` changes from 2 atoms in state 1 to 1 atom in state 2 while exposing the consulted state scope in the active-selection panel.
 - Canonical segment, alternate-location, occupancy, and B-factor identity: **PASS**; `segi SEG_A` and `bysegi segi SEG_A` select source-backed segments, while `alt A`, `b > 20`, and `q >= 0.5` use the preserved canonical fields. PDB segment and alternate-location membership match the pinned identity fixture exactly.
 - Canonical formal charge and secondary structure: **PASS**; source charge predicates and PDB HELIX/SHEET predicates select positive live subsets without renderer-derived values. Strict/inclusive numeric comparisons are covered on formal charge, B-factor, and coordinates; direct `!=` spelling remains an explicit PyMOL parser difference documented as an equivalent complement.
-- Presentation-dependent selection: **PASS** for effective `rep`, `color`, `label`, `cartoon_color`, and `ribbon_color` selectors; the selection result records the projection revision and remains stable under subsequent targeting.
+- Presentation-dependent selection: **PASS** for effective `rep`, `color`, and `label`, plus explicit representation-scoped `cartoon_color` and `ribbon_color` selectors; generic atom color no longer leaks into representation-specific selectors. The selection result records the projection revision and remains stable under subsequent targeting.
 - Canonical fragment/ring topology: `byring` **PASS** for the declared bounded-cycle profile; `byfragment` is **MISSING_DEPENDENCY** until an admitted source supplies complete canonical fragment assignments. The ring fixture’s six-atom expansion is oracle-equivalent to pinned PyMOL `byring organic`; no connected-component fallback is exposed as `byfragment`.
 - VDW surface-gap selection: **PASS** for the declared `canonical-element-vdw-radius@1` profile; non-empty and valid-empty live cases are covered, and unknown radius data fails closed without changing the workspace.
 - Peptide sequence selection: **PASS** for the declared `canonical-peptide-sequence-v1` profile; `pepseq AG` selects the complete canonical residue atoms in the uploaded two-residue fixture, while invalid values fail with `INVALID_VALUE`.
@@ -104,6 +104,8 @@ Application/contracts:
 
 - `apps/api/src/structures/ingestion.test.ts`
 - `apps/web/src/App.tsx`
+- `apps/web/src/rendering/colorSchemes.ts`
+- `apps/web/src/rendering/colorSchemes.test.ts`
 - `apps/web/src/components/StatusBar.tsx`
 - `apps/web/src/commands/commandRegistry.test.ts`
 - `apps/web/src/commands/commandRegistry.ts`
@@ -213,7 +215,7 @@ Verification:
 - `npm run lint` — **PASS**
 - `npm test` — **PASS: web 17 files / 83 tests; API 2 files / 16 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
-- `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1; 89 live queries**
+- `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1; 90 live queries**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 10 / 10**
 - `npx playwright test tests/e2e/real-structure-workspace.spec.ts` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/closure-evidence.spec.ts` — **PASS: 1 / 1**
@@ -224,7 +226,7 @@ Verification:
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "PDB segment identity"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "sidechain"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "presentation-dependent"` — **PASS: 1 / 1**
-- The presentation-dependent regression now verifies both the truthful empty Ribbon-color case under Cartoon and the positive `ribbon_color red` path after activating Ribbon and applying a canonical color override.
+- The presentation-dependent regression now verifies that generic `color red` remains distinct from representation-specific selectors, then covers positive `set cartoon_color, red, polymer` and `set ribbon_color, red, polymer` paths.
 - `npx playwright test tests/e2e/g1c-visualization.spec.ts --grep "measurable when side panels"` — **PASS: 1 / 1; non-zero CSS and backing canvas dimensions**
 - `npx playwright test tests/e2e/g1c-visualization.spec.ts --grep "official RCSB"` — **PASS: 1 / 1; official fallback path exercised**
 - `npm run test:e2e` — **PASS: 79 / 79**
@@ -252,7 +254,7 @@ Verification:
 16. Import `tests/fixtures/sidechain-identity.pdb`, run `backbone` (4 atoms) and `sidechain` (1 atom), and confirm the canonical partition is visible and non-empty.
 17. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
 18. Resize the browser to a narrow viewport (for example 720×800), import `tests/fixtures/mini-protein.pdb`, and confirm the 3Dmol canvas remains non-zero and visibly renders the structure while side panels collapse.
-19. With `mini-protein.pdb` loaded, switch Style to Ribbon, apply `color red, all` in the console, and run `select ribbon_color red`; confirm 8 polymer atoms are selected and the viewer remains loaded.
+19. With `mini-protein.pdb` loaded, apply `color red, all` and confirm `select cartoon_color red` / `select ribbon_color red` remain empty until an explicit representation setting is applied; then run `set cartoon_color, red, polymer` or `set ribbon_color, red, polymer` and confirm the matching selector returns 8 polymer atoms without changing canonical metrics.
 
 ## Screenshot evidence
 
@@ -264,7 +266,7 @@ Verification:
 - [Split/join state lineage](../evidence/selection-state-lineage.png)
 - [Cross-object spatial frame declaration](../evidence/selection-cross-object-spatial.png)
 - [Selection console matrix](../evidence/selection-console-matrix.png)
-- [Active Ribbon color selection](../evidence/selection-ribbon-color.png)
+- [Representation-scoped Ribbon color selection](../evidence/selection-ribbon-color.png)
 - [Space-filling ligand presentation](../evidence/visualization-final/space-filling-ligand-only.png)
 
 ## Known limitations and blockers

@@ -72,6 +72,8 @@ describe("G1C renderer-neutral color schemes", () => {
     expect(structure.atoms[3].stableId).toBe("lig");
     expect(selected.color.componentColors.ligand?.mode).toBe("custom");
     const representationSpecific = setRepresentationColorForSelection(selected, [ligand.stableId], "STICKS", "#112233");
+    expect(resolveProjectedAtomColor(representationSpecific.color, "STICKS", ligand, structure).color).toBe("#112233");
+    expect(resolveProjectedAtomColor(representationSpecific.color, "SPHERES", ligand, structure).color).toBe("#ff00ff");
     const inherited = clearColorForSelection(representationSpecific, [ligand.stableId]);
     expect(inherited.color.componentColors.ligand?.mode).toBe("custom");
     expect(inherited.color.representationOverrides[ligand.stableId]).toBeUndefined();

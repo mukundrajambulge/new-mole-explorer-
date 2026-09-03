@@ -66,7 +66,7 @@ const residueFor = (structure: CanonicalMolecularStructure, atom: CanonicalAtom)
 
 export type ColorResolution = { status: "READY" | "UNAVAILABLE" | "EXPERIMENTAL"; color: string; diagnostic?: string };
 
-const representationTypeFor = (representation: "lines" | "sticks" | "spheres" | "cartoon" | "licorice" | "cross" | RepresentationType): RepresentationType => {
+export const representationTypeFor = (representation: "lines" | "sticks" | "spheres" | "cartoon" | "licorice" | "cross" | RepresentationType): RepresentationType => {
   if (representation === "lines") return "LINES";
   if (representation === "sticks" || representation === "licorice") return "STICKS";
   if (representation === "spheres" || representation === "cross") return "SPHERES";
@@ -83,10 +83,10 @@ export const resolveProjectedAtomColor = (
   explicitGlobalColor?: string,
 ): ColorResolution => {
   const stableId = atom?.stableId;
-  const atomOverride = stableId ? color.atomColors[stableId] : undefined;
-  if (atomOverride) return { status: "READY", color: atomOverride };
   const representationOverride = stableId ? color.representationOverrides[stableId]?.[representationTypeFor(representation)] : undefined;
   if (representationOverride) return { status: "READY", color: representationOverride };
+  const atomOverride = stableId ? color.atomColors[stableId] : undefined;
+  if (atomOverride) return { status: "READY", color: atomOverride };
   if (!atom) return { status: "READY", color: explicitGlobalColor ?? "#7f8791" };
   const category = atom.isPolymer ? "protein" : atom.isLigand ? "ligand" : atom.isWater ? "water" : atom.isIon ? "ions" : "other";
   const componentOverride = color.componentColors?.[category];

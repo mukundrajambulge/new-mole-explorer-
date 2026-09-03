@@ -11,10 +11,10 @@ import { StatusBar } from "./components/StatusBar";
 import { StructurePanel } from "./components/StructurePanel";
 import { ACTION_IDS, ACTION_REGISTRY, type ActionId, type ActionDefinition } from "./domain/registry";
 import { ApiClientError, apiClient } from "./lib/apiClient";
-import { applyRepresentationToSelection, clearColorForSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setComponentColor, setInteractionState, setLabelState, setProjectionStyle, setRepresentationParameters, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
+import { applyRepresentationToSelection, clearColorForSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setComponentColor, setInteractionState, setLabelState, setProjectionStyle, setRepresentationColorForSelection, setRepresentationParameters, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
 import { applyPresentationAction, type PresentationComponent } from "./rendering/presentationActions";
 import { buildRenderProjectionDiagnostics } from "./rendering/renderDirectives";
-import { resolveProjectedAtomColor } from "./rendering/colorSchemes";
+import { representationTypeFor, resolveProjectedAtomColor } from "./rendering/colorSchemes";
 import { STYLE_DEFINITIONS, representationCapabilityFor, representationStyleForCommand } from "./rendering/styleProfiles";
 import { combineSelections, evaluateSelectionQuery, NamedSelectionStore, resolveSelection, parseRepresentationCommand, requireValidSelection, SelectionResolutionError, selectionForStableIds, type CoordinateFramePolicy, type SelectionPresentationContext, type SelectionResult } from "./interaction/selectionResolver";
 import { LabelExpressionError, labelExpressionForMode, labelPlanForState, parseSafeLabelExpression, resolveSafeLabel, type LabelMode } from "./interaction/labels";
@@ -131,9 +131,12 @@ export const App = () => {
           if (!atom) continue;
           const resolvedColor = resolveProjectedAtomColor(object.projection.color, directive.representation, atom, canonical, explicitGlobalColor).color;
           for (const token of colorTokens(resolvedColor)) addToken(colorTokensByStableAtomId, scopedStableId, token);
-          const byRepresentation = representationColorTokensByStableAtomId[scopedStableId] ?? (representationColorTokensByStableAtomId[scopedStableId] = {});
-          const representationTokens = byRepresentation[directive.representation] ?? (byRepresentation[directive.representation] = []);
-          for (const token of colorTokens(resolvedColor)) if (!representationTokens.includes(token)) representationTokens.push(token);
+          const explicitRepresentationColor = object.projection.color.representationOverrides[stableId]?.[representationTypeFor(directive.representation)];
+          if (explicitRepresentationColor) {
+            const byRepresentation = representationColorTokensByStableAtomId[scopedStableId] ?? (representationColorTokensByStableAtomId[scopedStableId] = {});
+            const representationTokens = byRepresentation[directive.representation] ?? (byRepresentation[directive.representation] = []);
+            for (const token of colorTokens(explicitRepresentationColor)) if (!representationTokens.includes(token)) representationTokens.push(token);
+          }
         }
       }
     }
@@ -553,6 +556,21 @@ export const App = () => {
       if (!policy) return { category: "SELECTION", status: "coordinate_frame accepts only local_scientific or effective_world; the current frame declaration was preserved." };
       setCoordinateFramePolicy(policy);
       return { category: "SELECTION", status: `Declared ${policy} coordinate context for cross-object spatial selection. ${policy === "EFFECTIVE_WORLD" ? "Current workspace object transforms are identity, so canonical coordinates are used." : "Raw canonical coordinates are compared in their declared local scientific frame."}` };
+    }
+    if (parsed.verb === "set") {
+      const representation = parsed.argument.trim().toLowerCase();
+      if (representation !== "cartoon_color" && representation !== "ribbon_color") return { category: "PRESENTATION", status: `Setting ${parsed.argument} is not implemented in the current bounded presentation gate; no state changed.` };
+      const setting = parsed.target?.match(/^([^,]+?)(?:\s*,\s*(.+))?$/);
+      if (!setting) return { category: "PRESENTATION", status: `set ${representation} requires set ${representation}, <color>, <query>; no state changed.` };
+      const color = colorRegistry.resolveInputWithDiagnostic(setting[1].trim());
+      if (!color.definition) return { category: "PRESENTATION", status: "COLOR_NOT_FOUND" };
+      const context = commandSelectionContext();
+      if (!context.structure) return { category: "PRESENTATION", status: "No structure loaded; representation color was not changed." };
+      const target = requireValidSelection(resolveSelection(setting[2]?.trim() || "all", context.structure, selectionOptionsFor(context)));
+      const colorHex = `#${color.definition.rgbSrgb.map((value) => Math.round(value * 255).toString(16).padStart(2, "0")).join("")}`;
+      const representationType = representation === "cartoon_color" ? "CARTOON" : "RIBBON";
+      updateWorkspaceProjections(target.stableAtomIds, (current, objectStableIds) => setRepresentationColorForSelection(current, objectStableIds, representationType, colorHex));
+      return { category: "PRESENTATION", status: `Applied ${color.definition.canonicalName} to ${target.stableAtomIds.length} ${representationType} atoms.` };
     }
     if (parsed.verb === "select") {
       const context = commandSelectionContext();
