@@ -15,7 +15,7 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Starting SHA for this closure pass: `27610d35980b2d233e4f97f240ccdbd6439e5d39`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
 - Current implementation commit: `6396c17` (`Add source-backed partial charge ingestion`)
-- Ending implementation/evidence SHA: `7b72e5a1d49f162150dbc5db2c979d0c41685bde`
+- Ending implementation/evidence SHA: `6a665e3a2d5da8b1fafed10aa55ca6a9525e39bc`
 - Working tree: clean after the implementation/evidence commit; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
