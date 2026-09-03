@@ -24,6 +24,8 @@ describe("safe labels and reverse identity picking", () => {
     expect(resolveSafeLabel(expression, withDataset.atoms[0], withDataset)).toBe("-0.420");
     const stale = { ...withDataset, partialChargeDataset: { ...withDataset.partialChargeDataset, molecularRevision: "stale" } };
     expect(resolveSafeLabel(expression, stale.atoms[0], stale)).toBe("?");
+    const incompleteMetadata = { ...withDataset, partialChargeDataset: { ...withDataset.partialChargeDataset, units: "" } };
+    expect(resolveSafeLabel(expression, incompleteMetadata.atoms[0], incompleteMetadata)).toBe("?");
   });
 
   it("resolves renderer hits through O(1) reverse maps and validates revision", () => {

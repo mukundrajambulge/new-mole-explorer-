@@ -396,6 +396,8 @@ describe("canonical selection engine", () => {
     const incomplete = { ...charged, partialChargeDataset: { ...charged.partialChargeDataset, atomChargeMap: { a2: 0.42 } } } satisfies CanonicalMolecularStructure;
     expect(evaluateSelectionQuery("partial_charge > 0", incomplete).status).toBe("MISSING_DEPENDENCY");
     expect(evaluateSelectionQuery("partial_charge > 0", incomplete).count).toBe(0);
+    const incompleteMetadata = { ...charged, partialChargeDataset: { ...charged.partialChargeDataset, provenance: "" } } satisfies CanonicalMolecularStructure;
+    expect(evaluateSelectionQuery("partial_charge > 0", incompleteMetadata).status).toBe("MISSING_DEPENDENCY");
   });
 
   it("evaluates donor and acceptor selectors only from a complete canonical chemistry dataset", () => {

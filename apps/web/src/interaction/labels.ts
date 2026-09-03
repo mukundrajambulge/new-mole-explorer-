@@ -1,4 +1,5 @@
 import type { CanonicalAtom, CanonicalMolecularStructure } from "@molecular/contracts";
+import { canonicalPartialChargeDatasetComplete } from "../science/datasetValidity";
 
 export const LABEL_FIELDS = ["name", "resn", "resi", "chain", "segi", "model", "elem", "alt", "b", "q", "formal_charge", "partial_charge", "ss"] as const;
 export type LabelField = (typeof LABEL_FIELDS)[number];
@@ -82,8 +83,7 @@ const fieldValue = (field: LabelField, atom: CanonicalAtom, structure: Canonical
   if (field === "q") return atom.occupancy === undefined || atom.occupancy === null ? "?" : atom.occupancy.toFixed(2);
   if (field === "formal_charge") return atom.formalCharge === undefined || atom.formalCharge === null ? "?" : String(atom.formalCharge);
   if (field === "partial_charge") {
-    const dataset = structure.partialChargeDataset;
-    const value = dataset?.molecularRevision === structure.scientificHash ? dataset.atomChargeMap[atom.stableId] : undefined;
+    const value = canonicalPartialChargeDatasetComplete(structure) ? structure.partialChargeDataset!.atomChargeMap[atom.stableId] : undefined;
     return value !== undefined && Number.isFinite(value) ? value.toFixed(3) : "?";
   }
   return atom.secondaryStructure ?? "?";

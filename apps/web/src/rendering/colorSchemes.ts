@@ -1,5 +1,6 @@
 import type { CanonicalAtom, CanonicalMolecularStructure } from "@molecular/contracts";
 import type { ColorMode, ColorState, RepresentationType } from "./presentationState";
+import { canonicalPartialChargeDatasetComplete } from "../science/datasetValidity";
 
 export type ColorSchemeId =
   | "classic-cpk"
@@ -119,8 +120,8 @@ export const resolveAtomColor = (mode: ColorMode, atom: CanonicalAtom, structure
     if (atom.formalCharge === undefined || atom.formalCharge === null) return { status: "UNAVAILABLE", color: "#7f8791", diagnostic: "FORMAL_CHARGE_UNKNOWN" }; return { status: "READY", color: diverging(atom.formalCharge / 3) };
   }
   if (mode === "by-partial-charge") {
-    const dataset = structure.partialChargeDataset;
-    if (!dataset || dataset.molecularRevision !== structure.scientificHash) return { status: "UNAVAILABLE", color: "#7f8791", diagnostic: "Partial-charge data unavailable for this molecular revision." };
+    if (!canonicalPartialChargeDatasetComplete(structure)) return { status: "UNAVAILABLE", color: "#7f8791", diagnostic: "Partial-charge data unavailable for this molecular revision." };
+    const dataset = structure.partialChargeDataset!;
     const value = dataset.atomChargeMap[atom.stableId];
     const values = Object.values(dataset.atomChargeMap);
     const complete = structure.atoms.every((candidate) => {

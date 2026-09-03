@@ -47,6 +47,8 @@ describe("G1C renderer-neutral color schemes", () => {
     expect(resolveAtomColor("by-partial-charge", stale.atoms[0], stale).status).toBe("UNAVAILABLE");
     const incomplete = { ...withDataset, partialChargeDataset: { ...withDataset.partialChargeDataset, atomChargeMap: { c: -0.5 } } };
     expect(resolveAtomColor("by-partial-charge", incomplete.atoms[0], incomplete).status).toBe("UNAVAILABLE");
+    const incompleteMetadata = { ...withDataset, partialChargeDataset: { ...withDataset.partialChargeDataset, provenance: "" } };
+    expect(resolveAtomColor("by-partial-charge", incompleteMetadata.atoms[0], incompleteMetadata).status).toBe("UNAVAILABLE");
   });
   it("uses explicit ligand color before representation changes, visibility, or global scheme changes", () => {
     const ligand = structure.atoms[3];

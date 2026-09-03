@@ -2,6 +2,7 @@ import type { CanonicalMolecularStructure, ProjectPresentationState } from "@mol
 import { COLOR_SCHEME_DEFINITIONS, type ColorSchemeId } from "./colorSchemes";
 import type { StyleProfileId } from "./styleProfiles";
 import { DEFAULT_LABEL_STATE, type LabelState } from "../interaction/labels";
+import { canonicalPartialChargeDatasetComplete } from "../science/datasetValidity";
 
 export const REPRESENTATION_TYPES = ["LINES", "STICKS", "SPHERES", "CARTOON", "RIBBON", "SURFACE", "MESH", "DOTS", "NONBONDED", "NB_SPHERES"] as const;
 export type RepresentationType = (typeof REPRESENTATION_TYPES)[number];
@@ -210,7 +211,7 @@ export const setLayerVisibility = (projection: RenderProjection, layer: "showPro
 export const setColorScheme = (projection: RenderProjection, mode: ColorMode, structure: CanonicalMolecularStructure | null = null): RenderProjection => ({
   ...projection,
   color: { ...projection.color, mode, colorId: mode === "named" ? projection.color.colorId ?? "pymol:marine" : mode === "uniform" ? "pymol:grey" : projection.color.colorId },
-  colorDiagnostic: mode === "by-partial-charge" && !structure?.partialChargeDataset ? "Partial-charge data unavailable for this molecular revision." : mode === "esp" ? "ESP field unavailable: no electrostatic potential computation is registered for this molecular revision." : (mode === "secondary-structure-standard" || mode === "secondary-structure-jmol" || mode === "secondary-structure") && !structure?.secondaryStructureDataset ? "Secondary-structure assignment unavailable for this molecular revision." : null,
+  colorDiagnostic: mode === "by-partial-charge" && (!structure || !canonicalPartialChargeDatasetComplete(structure)) ? "Partial-charge data unavailable for this molecular revision." : mode === "esp" ? "ESP field unavailable: no electrostatic potential computation is registered for this molecular revision." : (mode === "secondary-structure-standard" || mode === "secondary-structure-jmol" || mode === "secondary-structure") && !structure?.secondaryStructureDataset ? "Secondary-structure assignment unavailable for this molecular revision." : null,
 });
 
 export const applyRepresentationOperation = (state: RepresentationState, operation: RepresentationDirective["operation"], mask: RepresentationMask, targetStableAtomIds: string[], style?: RepresentationStyle): RepresentationState => {
