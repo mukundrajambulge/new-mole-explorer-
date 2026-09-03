@@ -14,9 +14,9 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `27610d35980b2d233e4f97f240ccdbd6439e5d39`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
-- Current implementation commit: `f460e87` (`fix(selection): bind fragment expansion to canonical dataset`)
-- Ending implementation/evidence SHA: `e3eeb81`
-- Latest implementation/evidence base SHA before this report update: `e3eeb81`
+- Current implementation commit: `db4da25` (`fix(selection): unify partial-charge dataset validation`)
+- Ending implementation/evidence SHA: `db4da25`
+- Latest implementation/evidence base SHA before this report update: `db4da25`
 - Working tree: clean after the implementation/evidence commit; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -47,6 +47,7 @@ The current application was exercised with a real 4DJW RCSB load:
 - Source-backed unit-cell parameters remain attached to their canonical object; multi-object selection views carry an object-qualified cell scope and never reuse the first object’s cell for unrelated atoms.
 - `RenderProjection` is the renderer-neutral presentation boundary consumed by `ThreeDMolViewerAdapter`; UI components do not own 3Dmol scientific state.
 - Partial-charge selection, color, and labels require complete finite atom coverage from a revision-matched canonical dataset; stale or incomplete datasets fail closed and cannot yield partial scientific results.
+- Partial-charge selection, color, labels, UI diagnostics, and cache identity share one validation boundary requiring non-empty dataset metadata, exact atom coverage, finite values, and revision binding.
 - `donors` and `acceptors` consume only a complete `canonical-chemistry-roles-v1` dataset whose molecular revision matches the canonical structure; the evaluator records the scientific profile and fails closed when admitted PDB/mmCIF sources do not provide it. No bond-order, protonation, tautomer, or renderer-derived heuristic is promoted to scientific state.
 - `byfragment` consumes only a complete `canonical-fragment-assignment-v1` dataset whose molecular revision matches the canonical structure; derived and multi-object selection views remap those assignments by stable ID and keep fragments object-scoped. Per-atom hints, connected components, and coordinates are not used as fallbacks.
 - `pepseq` consumes only the revision-matched `canonical-peptide-sequence-v1` dataset produced by ingestion and propagated through derived-object workflows; the evaluator does not infer sequence from renderer state or a residue-name heuristic at query time.
@@ -108,6 +109,7 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 Application/contracts:
 
 - Latest fragment-authority hardening: `packages/contracts/src/index.ts`, `apps/web/src/selection/selectionEngine.ts`, `apps/web/src/selection/selectionEngine.test.ts`, `apps/web/src/workspace/workspaceModel.ts`, and `apps/web/src/workspace/workspaceModel.test.ts`
+- Latest partial-charge authority hardening: `apps/web/src/science/datasetValidity.ts`, `apps/web/src/rendering/colorSchemes.ts`, `apps/web/src/interaction/labels.ts`, and `apps/web/src/rendering/presentationState.ts` with corresponding regression tests
 - `apps/api/src/structures/ingestion.test.ts`
 - `apps/web/src/App.tsx`
 - `apps/web/src/rendering/colorSchemes.ts`
@@ -222,8 +224,9 @@ Verification:
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm test` — **PASS: web 17 files / 90 tests; API 2 files / 18 tests**
+- `npm test` — **PASS: web 17 files / 91 tests; API 2 files / 18 tests**
 - `npm run test --workspace @molecular/web -- src/selection/selectionEngine.test.ts src/workspace/workspaceModel.test.ts` — **PASS: 2 files / 30 tests; missing, stale, incomplete, and multi-object fragment datasets are covered**
+- `npm run test --workspace @molecular/web -- src/selection/selectionEngine.test.ts src/rendering/colorSchemes.test.ts src/interaction/labels-picking.test.ts src/rendering/presentationState.test.ts` — **PASS: 4 files / 43 tests; shared partial-charge validation and cache/UI diagnostic paths are covered**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e` — **PASS: 81 / 81**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1; 90 live queries**
