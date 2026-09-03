@@ -14,9 +14,9 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `27610d35980b2d233e4f97f240ccdbd6439e5d39`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
-- Current implementation commit: `296bd64` (`fix(selection): validate chemistry dataset provenance`)
-- Ending implementation/evidence SHA: `e342e8f9e3e5096022f581a1adbb529caf0b6b6e`
-- Latest implementation/evidence base SHA before this report update: `e342e8f9e3e5096022f581a1adbb529caf0b6b6e`
+- Current implementation commit: `57bdfaa` (`fix(selection): fail closed on malformed datasets`)
+- Ending implementation/evidence SHA: `57bdfaa411159aa5b193559883831dc0b2aa6033`
+- Latest implementation/evidence base SHA before this report update: `57bdfaa411159aa5b193559883831dc0b2aa6033`
 - Working tree: clean after the implementation/evidence commit; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -111,6 +111,7 @@ Application/contracts:
 
 - Latest fragment-authority hardening: `packages/contracts/src/index.ts`, `apps/web/src/selection/selectionEngine.ts`, `apps/web/src/selection/selectionEngine.test.ts`, `apps/web/src/workspace/workspaceModel.ts`, and `apps/web/src/workspace/workspaceModel.test.ts`
 - Latest partial-charge authority hardening: `apps/web/src/science/datasetValidity.ts`, `apps/web/src/rendering/colorSchemes.ts`, `apps/web/src/interaction/labels.ts`, and `apps/web/src/rendering/presentationState.ts` with corresponding regression tests
+- Latest malformed-dataset guard: `apps/web/src/science/datasetValidity.ts` and `apps/web/src/science/datasetValidity.test.ts`; malformed optional charge, fragment, and chemistry-role payloads now fail closed without throwing
 - `apps/api/src/structures/ingestion.test.ts`
 - `apps/web/src/App.tsx`
 - `apps/web/src/rendering/colorSchemes.ts`
@@ -226,6 +227,7 @@ Verification:
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
 - `npm test` — **PASS: web 17 files / 91 tests; API 2 files / 18 tests**
+- Latest full suite after malformed-dataset guards — **PASS: web 18 files / 93 tests; API 2 files / 18 tests**
 - `npm run test --workspace @molecular/web -- src/selection/selectionEngine.test.ts src/workspace/workspaceModel.test.ts` — **PASS: 2 files / 30 tests; missing, stale, incomplete, and multi-object fragment datasets are covered**
 - `npm run test --workspace @molecular/web -- src/selection/selectionEngine.test.ts src/rendering/colorSchemes.test.ts src/interaction/labels-picking.test.ts src/rendering/presentationState.test.ts` — **PASS: 4 files / 43 tests; shared partial-charge validation and cache/UI diagnostic paths are covered**
 - `npm run test --workspace @molecular/web -- src/selection/selectionEngine.test.ts src/workspace/workspaceModel.test.ts` — **PASS: 2 files / 30 tests; chemistry-role and fragment provenance/coverage gates are covered**
