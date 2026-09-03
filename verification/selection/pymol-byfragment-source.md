@@ -15,6 +15,8 @@ The pinned implementation:
 
 Therefore the native operation depends on editor fragment assignments. It is not a synonym for canonical bond connected components or a coordinate-derived connected-component calculation. The application reserves canonical bond components for `bymolecule` and requires a complete, revision-matched `canonical-fragment-assignment-v1` dataset for `byfragment`.
 
+The admitted parser was audited alongside the pinned source: the PDB path records atom identity, coordinates, bonds, unit-cell data, and structural records but no fragment assignment; the mmCIF path promotes `_chem_comp_bond` as canonical bond topology and `_chem_comp_atom.partial_charge` as source charge data, but has no admitted fragment-assignment category. The optional fragment dataset in `packages/contracts/src/index.ts` therefore has no producer for ordinary PDB/mmCIF loads.
+
 The direct pinned probe records `byfragment organic` as a valid empty result on the shared mini fixture. That result does not prove a positive fragment assignment, because the fixture has no editor fragment assignment payload. The comparison ledger consequently keeps `byfragment` as `ORACLE_PENDING` until an accepted source-backed fragment-assignment fixture and policy are available.
 
 No PyMOL fragment-library files, per-atom hints, inferred connected components, or coordinates are promoted as a universal canonical fragment authority.
