@@ -14,10 +14,10 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `27610d35980b2d233e4f97f240ccdbd6439e5d39`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
-- Current implementation commit: `27610d3` (`fix(selection): separate representation color selectors`)
-- Ending implementation/evidence SHA: `6ed2d2e79672b4842b0d4dec9ce8bec715055be7`
-- Latest implementation/evidence base SHA before this report update: `6ed2d2e79672b4842b0d4dec9ce8bec715055be7`
-- Working tree: clean after the implementation/evidence and report synchronization commits; no unrelated files were changed
+- Current implementation commit: `6597552` (`feat(selection): close source-backed unit-cell membership`)
+- Ending implementation/evidence SHA: `6597552`
+- Latest implementation/evidence base SHA before this report update: `6597552`
+- Working tree: clean after the implementation/evidence commit; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
 - API health: `http://localhost:8100/api/health`
