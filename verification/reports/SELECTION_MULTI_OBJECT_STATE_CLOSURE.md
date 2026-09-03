@@ -234,7 +234,7 @@ Verification:
 - `npm run test --workspace @molecular/web -- src/selection/selectionEngine.test.ts src/rendering/colorSchemes.test.ts src/interaction/labels-picking.test.ts src/rendering/presentationState.test.ts` — **PASS: 4 files / 43 tests; shared partial-charge validation and cache/UI diagnostic paths are covered**
 - `npm run test --workspace @molecular/web -- src/selection/selectionEngine.test.ts src/workspace/workspaceModel.test.ts` — **PASS: 2 files / 30 tests; chemistry-role and fragment provenance/coverage gates are covered**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
-- `npx playwright test tests/e2e` — **PASS: 81 / 81**
+- `npx playwright test tests/e2e` — **PASS: 82 / 82**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1; 90 live queries**
 - Fresh live rerun after the shared dataset-validator changes — **PASS: 1 / 1; 90 live queries; 1.3 minutes; exit 0**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 11 / 11**
@@ -253,7 +253,7 @@ Verification:
 - The presentation-dependent regression now verifies that generic `color red` remains distinct from representation-specific selectors, then covers positive `set cartoon_color, red, polymer` and `set ribbon_color, red, polymer` paths.
 - `npx playwright test tests/e2e/g1c-visualization.spec.ts --grep "measurable when side panels"` — **PASS: 1 / 1; non-zero CSS and backing canvas dimensions**
 - `npx playwright test tests/e2e/g1c-visualization.spec.ts --grep "official RCSB"` — **PASS: 1 / 1; official fallback path exercised**
-- `npm run test:e2e` — **PASS: 81 / 81**
+- `npm run test:e2e` — **PASS: 82 / 82**
 - `npm run build` — **PASS**
 - `git diff --check` — **PASS**
 - Pinned PyMOL oracle reproduction — **PASS: PyMOL 3.2.0a; 85 forms; 79 successful / 6 native errors; committed probe row payload identical**
