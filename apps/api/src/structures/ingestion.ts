@@ -43,7 +43,7 @@ type AtomSeed = Omit<CanonicalAtom, "stableId">;
 type BondSeed = { atom1Serial: number; atom2Serial: number; order: BondOrder; source: CanonicalBond["source"] };
 type SecondarySpan = { kind: Exclude<SecondaryStructureKind, "LOOP">; chain: string; start: number; end: number };
 type CoordinateSeed = { sourceIndex: number; x: number; y: number; z: number };
-type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[]; coordinateStates?: Array<{ sourceModelNumber: number; coordinates: CoordinateSeed[] }>; secondaryStructureSource?: string; polymerTypingSource?: string; unitCell?: CanonicalUnitCell };
+type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[]; coordinateStates?: Array<{ sourceModelNumber: number; coordinates: CoordinateSeed[] }>; secondaryStructureSource?: string; polymerTypingSource?: string; unitCell?: CanonicalUnitCell; partialChargeValues?: Record<string, number> };
 
 const parseNumber = (value: string, label: string): number => {
   const parsed = Number(value.replace(/\(.+\)$/, ""));
@@ -101,6 +101,7 @@ const classifyAtom = (recordType: "ATOM" | "HETATM", residueName: string, elemen
 };
 
 const atomCorrespondenceKey = (atom: AtomSeed): string => [atom.serial, atom.atomName, atom.residueName, atom.residueNumber, atom.insertionCode ?? "", atom.chain, atom.altLoc ?? ""].join("\u0000");
+const componentAtomKey = (component: string, atomName: string): string => `${component.trim().toUpperCase()}\u0000${atomName.trim()}`;
 
 const parsePdb = (content: string): ParsedSource => {
   const atoms: AtomSeed[] = [];
@@ -202,6 +203,7 @@ const parsePdb = (content: string): ParsedSource => {
     const span = secondarySpans.find((candidate) => candidate.chain === atom.chain && atom.residueNumber >= candidate.start && atom.residueNumber <= candidate.end);
     if (span) atom.secondaryStructure = span.kind;
   }
+
   return { format: "pdb", atoms, bonds, coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }], ...(secondarySpans.length ? { secondaryStructureSource: "PDB HELIX/SHEET records" } : {}), ...(unitCell ? { unitCell } : {}) };
 };
 
@@ -432,7 +434,22 @@ const parseMmcif = (content: string): ParsedSource => {
       }
     }
   }
-  return { format: "mmcif", atoms, bonds, coordinateStates: orderedModels.map(([sourceModelNumber, stateAtoms]) => ({ sourceModelNumber, coordinates: stateAtoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) })), ...(secondarySpans.length ? { secondaryStructureSource: "mmCIF struct_conf/struct_sheet_range records" } : {}), ...(hasPolymerEntityLoop && polymerEntityTypes.size > 0 ? { polymerTypingSource: "mmCIF _entity_poly.type mapped by _atom_site.label_entity_id" } : {}), ...(unitCell ? { unitCell } : {}) };
+  const partialChargeValues: Record<string, number> = {};
+  const partialChargeLoop = loops.find((loop) => loop.headers.includes("_chem_comp_atom.partial_charge"));
+  if (partialChargeLoop) {
+    for (const row of partialChargeLoop.rows) {
+      const component = cifValue(row, partialChargeLoop.headers, ["_chem_comp_atom.comp_id"]);
+      const atomName = cifValue(row, partialChargeLoop.headers, ["_chem_comp_atom.atom_id"]);
+      const value = cifValue(row, partialChargeLoop.headers, ["_chem_comp_atom.partial_charge"]);
+      if (!component || !atomName || !value) continue;
+      const parsedValue = parseOptionalNumber(value);
+      if (typeof parsedValue !== "number" || !Number.isFinite(parsedValue)) continue;
+      const key = componentAtomKey(component, atomName);
+      if (partialChargeValues[key] === undefined || partialChargeValues[key] === parsedValue) partialChargeValues[key] = parsedValue;
+      else delete partialChargeValues[key];
+    }
+  }
+  return { format: "mmcif", atoms, bonds, coordinateStates: orderedModels.map(([sourceModelNumber, stateAtoms]) => ({ sourceModelNumber, coordinates: stateAtoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) })), ...(secondarySpans.length ? { secondaryStructureSource: "mmCIF struct_conf/struct_sheet_range records" } : {}), ...(hasPolymerEntityLoop && polymerEntityTypes.size > 0 ? { polymerTypingSource: "mmCIF _entity_poly.type mapped by _atom_site.label_entity_id" } : {}), ...(Object.keys(partialChargeValues).length ? { partialChargeValues } : {}), ...(unitCell ? { unitCell } : {}) };
 };
 
 const formatFromFilename = (filename: string): StructureFormat => {
@@ -596,7 +613,23 @@ export class StructureIngestionService {
       return { id: `${hash.slice(0, 16)}:state:${state.sourceModelNumber}`, ordinal: index + 1, sourceModelNumber: state.sourceModelNumber, coordinates, coordinateHash };
     });
     const stateOrder = coordinateStates.map((state) => state.id);
-    const scientificPayload = { atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder, unitCell: parsed.unitCell ?? null, polymerTypingSource: parsed.polymerTypingSource ?? null, peptideSequenceChains };
+    const sourceChargeMap = parsed.partialChargeValues
+      ? Object.fromEntries(atoms.flatMap((atom) => {
+        const value = parsed.partialChargeValues![componentAtomKey(atom.residueName, atom.atomName)];
+        return typeof value === "number" && Number.isFinite(value) ? [[atom.stableId, value] as const] : [];
+      }))
+      : {};
+    const hasCompleteSourceCharges = parsed.format === "mmcif" && atoms.length > 0 && Object.keys(sourceChargeMap).length === atoms.length;
+    const partialChargeDataset = hasCompleteSourceCharges ? {
+      datasetId: `${hash.slice(0, 16)}:partial-charge`,
+      molecularRevision: "pending",
+      chargeModel: "source-declared mmCIF _chem_comp_atom.partial_charge",
+      profileVersion: "mmcif-chem-comp-partial-charge-v1",
+      atomChargeMap: sourceChargeMap,
+      units: "e",
+      provenance: "Copied from source _chem_comp_atom.partial_charge; no charge inference performed",
+    } : undefined;
+    const scientificPayload = { atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder, unitCell: parsed.unitCell ?? null, polymerTypingSource: parsed.polymerTypingSource ?? null, partialChargeValues: hasCompleteSourceCharges ? sourceChargeMap : null, peptideSequenceChains };
     const scientificHash = createHash("sha256").update(JSON.stringify(scientificPayload)).digest("hex");
     const structure: CanonicalMolecularStructure = {
       id: `structure_${hash.slice(0, 16)}`,
@@ -612,6 +645,7 @@ export class StructureIngestionService {
       ...(parsed.unitCell ? { unitCell: parsed.unitCell } : {}),
       ...(parsed.polymerTypingSource ? { polymerTypingSource: parsed.polymerTypingSource } : {}),
       ...(parsed.secondaryStructureSource ? { secondaryStructureDataset: { datasetId: `${hash.slice(0, 16)}:secondary-structure`, molecularRevision: scientificHash, assignmentSource: parsed.secondaryStructureSource, profileVersion: "pdb-mmcif-structural-records-v1" } } : {}),
+      ...(partialChargeDataset ? { partialChargeDataset: { ...partialChargeDataset, molecularRevision: scientificHash } } : {}),
       peptideSequenceDataset: { datasetId: `${hash.slice(0, 16)}:peptide-sequence`, molecularRevision: scientificHash, assignmentSource: "canonical polymer residue names mapped to one-letter amino-acid codes", profileVersion: "canonical-peptide-sequence-v1", chains: peptideSequenceChains },
       ...summary,
     };

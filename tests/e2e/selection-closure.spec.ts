@@ -6,6 +6,7 @@ const typedNucleicFixture = resolve("tests/fixtures/typed-nucleic.mmcif");
 const edgeIdentityFixture = resolve("tests/fixtures/edge-identity.mmcif");
 const ringFixture = resolve("tests/fixtures/ring-ligand.pdb");
 const typedPropertiesFixture = resolve("tests/fixtures/typed-properties.pdb");
+const sourcePartialChargeFixture = resolve("tests/fixtures/source-partial-charge.mmcif");
 const segmentIdentityFixture = resolve("tests/fixtures/segment-identity.pdb");
 const sidechainIdentityFixture = resolve("tests/fixtures/sidechain-identity.pdb");
 const unitCellFixture = resolve("tests/fixtures/unit-cell.pdb");
@@ -140,6 +141,19 @@ test("canonical PDB formal charge and secondary structure predicates run live", 
   await run("ss SHEET", 2);
   await run("b > 20", 1);
   await run("b <= 20", 3);
+});
+
+test("source-declared mmCIF partial charges run through the real console", async ({ page }) => {
+  await page.goto("/molstudio");
+  await page.locator('input[type="file"]').setInputFiles(sourcePartialChargeFixture);
+  await expect(page.getByTitle("source-partial-charge.mmcif")).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
+  await command.fill("partial_charge > 0");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(consoleRegion.locator(".console-entry").last()).toContainText("Selected 1 atoms");
+  await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
 });
 
 test("selection commands bind canonical membership and named selection actions", async ({ page }) => {

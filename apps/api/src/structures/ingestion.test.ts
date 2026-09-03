@@ -5,6 +5,28 @@ const pdbFixture = `HEADER    TEST\nATOM      1  CA  ALA A   1       1.000   2.0
 
 const cifFixture = `data_test\nloop_\n_atom_site.group_PDB\n_atom_site.id\n_atom_site.type_symbol\n_atom_site.label_atom_id\n_atom_site.label_comp_id\n_atom_site.label_asym_id\n_atom_site.label_seq_id\n_atom_site.Cartn_x\n_atom_site.Cartn_y\n_atom_site.Cartn_z\nATOM 1 C CA ALA A 1 1.0 2.0 3.0\nHETATM 2 O O HOH A 2 4.0 5.0 6.0\n`;
 
+const partialChargeCifFixture = `data_charges
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.partial_charge
+ALA CA 0.25
+LIG C1 -0.50
+loop_
+_atom_site.group_PDB
+_atom_site.id
+_atom_site.type_symbol
+_atom_site.label_atom_id
+_atom_site.label_comp_id
+_atom_site.label_asym_id
+_atom_site.label_seq_id
+_atom_site.Cartn_x
+_atom_site.Cartn_y
+_atom_site.Cartn_z
+ATOM 1 C CA ALA A 1 1.0 2.0 3.0
+HETATM 2 C C1 LIG A 101 4.0 5.0 6.0
+`;
+
 const typedNucleicCifFixture = `data_typed\nloop_\n_entity_poly.entity_id\n_entity_poly.type\n1 polyribonucleotide\n2 polypeptide(L)\nloop_\n_atom_site.group_PDB\n_atom_site.id\n_atom_site.type_symbol\n_atom_site.label_atom_id\n_atom_site.label_comp_id\n_atom_site.label_asym_id\n_atom_site.label_seq_id\n_atom_site.label_entity_id\n_atom_site.Cartn_x\n_atom_site.Cartn_y\n_atom_site.Cartn_z\nATOM 1 P P A A 1 1 0.0 0.0 0.0\nATOM 2 C C4 A A 1 1 1.0 0.0 0.0\nATOM 3 C CA ALA B 1 2 2.0 0.0 0.0\nATOM 4 N N ALA B 1 2 3.0 0.0 0.0\n`;
 
 const edgeIdentityCifFixture = `data_edge\nloop_\n_atom_site.group_PDB\n_atom_site.id\n_atom_site.type_symbol\n_atom_site.label_atom_id\n_atom_site.label_comp_id\n_atom_site.label_asym_id\n_atom_site.label_seq_id\n_atom_site.label_alt_id\n_atom_site.pdbx_PDB_segment_id\n_atom_site.Cartn_x\n_atom_site.Cartn_y\n_atom_site.Cartn_z\n_atom_site.occupancy\n_atom_site.B_iso_or_equiv\nATOM 1 C CA ALA A 10 A SEG_A 0.0 0.0 0.0 1.00 25.00\nATOM 2 N N ALA A 10 . SEG_A 1.0 0.0 0.0 1.00 10.00\nATOM 3 C CA GLY B 10 . SEG_B 2.0 0.0 0.0 1.00 5.00\nHETATM 4 C C1 LIG B 20 . SEG_L 3.0 0.0 0.0 0.50 30.00\n`;
@@ -49,6 +71,26 @@ describe("VIS-01 structure ingestion", () => {
     const result = await new StructureIngestionService().ingestLocal("sample.mmcif", Buffer.from(cifFixture));
     expect(result.structure.format).toBe("mmcif");
     expect(result.structure.counts).toMatchObject({ atoms: 2, polymerAtoms: 1, waterAtoms: 1 });
+  });
+
+  it("promotes complete source-declared mmCIF partial charges without inference", async () => {
+    const result = await new StructureIngestionService().ingestLocal("charges.mmcif", Buffer.from(partialChargeCifFixture));
+    const dataset = result.structure.partialChargeDataset;
+    expect(dataset).toMatchObject({
+      chargeModel: "source-declared mmCIF _chem_comp_atom.partial_charge",
+      profileVersion: "mmcif-chem-comp-partial-charge-v1",
+      units: "e",
+      provenance: "Copied from source _chem_comp_atom.partial_charge; no charge inference performed",
+    });
+    expect(dataset?.molecularRevision).toBe(result.structure.scientificHash);
+    expect(dataset?.atomChargeMap[result.structure.atoms[0]!.stableId]).toBe(0.25);
+    expect(dataset?.atomChargeMap[result.structure.atoms[1]!.stableId]).toBe(-0.5);
+  });
+
+  it("does not promote an incomplete source-declared charge map", async () => {
+    const incomplete = partialChargeCifFixture.replace("LIG C1 -0.50\n", "");
+    const result = await new StructureIngestionService().ingestLocal("incomplete-charges.mmcif", Buffer.from(incomplete));
+    expect(result.structure.partialChargeDataset).toBeUndefined();
   });
 
   it("preserves source-backed polymer entity typing from mmCIF", async () => {

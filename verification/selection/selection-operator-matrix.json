@@ -3,13 +3,13 @@
   "source": "verification/selection/SELECTION_OPERATOR_MATRIX.md",
   "rowCount": 87,
   "implementationStatusCounts": {
-    "VERIFIED_WORKING": 82,
-    "MISSING_DEPENDENCY": 4,
+    "VERIFIED_WORKING": 83,
+    "MISSING_DEPENDENCY": 3,
     "INTENTIONALLY_UNSUPPORTED": 1
   },
   "liveBrowserStatusCounts": {
     "PASS (`select all`)": 1,
-    "PASS (selection-matrix-live.spec.ts)": 59,
+    "PASS (selection-matrix-live.spec.ts)": 58,
     "PASS indirectly": 4,
     "PASS via named-selection E2E": 1,
     "PASS (multi-object-state.spec.ts)": 1,
@@ -21,6 +21,7 @@
     "PASS (selection-matrix-live.spec.ts diagnostic; bycell E2E)": 1,
     "PASS (selection-matrix-live.spec.ts; multi-object-state.spec.ts)": 1,
     "PASS (typed-properties E2E; selection-matrix-live.spec.ts)": 3,
+    "PASS (selection-matrix-live.spec.ts; source-partial-charge E2E)": 1,
     "PASS (selection-matrix-live.spec.ts; typed-properties E2E)": 3,
     "PASS (selection-matrix-live.spec.ts; typed mmCIF E2E)": 1,
     "PASS (typed mmCIF E2E; untyped PDB structured diagnostic)": 1,
@@ -434,10 +435,10 @@
     },
     {
       "operator": "`partial_charge`",
-      "implementationStatus": "MISSING_DEPENDENCY",
-      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; source-partial-charge E2E)",
       "oracleStatus": "ORACLE_PENDING",
-      "decision": "no charge fabrication"
+      "decision": "promote only complete atom-covered source values with model, units, provenance, and revision binding; absent/incomplete input fails closed"
     },
     {
       "operator": "`b`",
