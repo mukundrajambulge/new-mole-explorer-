@@ -346,7 +346,7 @@
       "implementationStatus": "MISSING_DEPENDENCY",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PENDING",
-      "decision": "requires complete canonical fragment membership; no connected-component or coordinate-inferred fallback"
+      "decision": "requires complete `canonical-fragment-assignment-v1` membership; no per-atom-hint, connected-component, or coordinate-inferred fallback"
     },
     {
       "operator": "`byring`",
@@ -605,14 +605,14 @@
       "implementationStatus": "MISSING_DEPENDENCY",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PENDING",
-      "decision": "no heuristic donor claim"
+      "decision": "requires complete canonical donor assignments; no heuristic donor claim"
     },
     {
       "operator": "`acceptors`",
       "implementationStatus": "MISSING_DEPENDENCY",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PENDING",
-      "decision": "no heuristic acceptor claim"
+      "decision": "requires complete canonical acceptor assignments; no heuristic acceptor claim"
     },
     {
       "operator": "`rep`",

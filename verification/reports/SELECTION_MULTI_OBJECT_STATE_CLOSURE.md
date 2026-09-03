@@ -15,8 +15,8 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Starting SHA for this closure pass: `27610d35980b2d233e4f97f240ccdbd6439e5d39`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
 - Current implementation commit: `f460e87` (`fix(selection): bind fragment expansion to canonical dataset`)
-- Ending implementation/evidence SHA: `f460e87`
-- Latest implementation/evidence base SHA before this report update: `f460e87`
+- Ending implementation/evidence SHA: `e3eeb81`
+- Latest implementation/evidence base SHA before this report update: `e3eeb81`
 - Working tree: clean after the implementation/evidence commit; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -54,7 +54,7 @@ The current application was exercised with a real 4DJW RCSB load:
 - One mounted molecular canvas owns one authoritative adapter/viewer instance. Multiple workspace objects become separate 3Dmol models within that viewer.
 - Durable `ObjectID`, display name, and renderer model identity are distinct. Duplicate names require an ObjectID and never silently select the first match.
 - Multi-object selection uses a derived workspace universe containing every loaded object, including disabled presentation objects, with object-scoped atom IDs; source canonical IDs are unchanged. `enabled` and `visible` remain separate presentation-scoped selectors.
-- `bymolecule` expands canonical bond connected components. `byfragment` is a separate canonical fragment-assignment operation: it requires complete source-backed `CanonicalAtom.fragmentId` membership and never falls back to connected components or coordinates.
+- `bymolecule` expands canonical bond connected components. `byfragment` is a separate canonical fragment-assignment operation: it requires a complete revision-matched `CanonicalFragmentDataset` and never falls back to per-atom hints, connected components, or coordinates.
 - Coordinate states use explicit `CoordinateStateID` and `StateOrder`. One-state structures receive a compatibility singleton state; renderer model order is never treated as scientific state identity.
 - Canonical polymer typing uses mmCIF `_entity_poly.type` joined by `_atom_site.label_entity_id`, is included in the scientific revision/provenance, survives derived object workflows, and fails closed when absent or incomplete; no residue-name whitelist is used.
 - Remote structure ingestion prefers the official RCSB mmCIF endpoint and falls back only to the official wwPDB partner PDBe mmCIF endpoint when the primary retrieval is unavailable; the canonical source records the provider and exact URI used.
@@ -223,6 +223,7 @@ Verification:
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
 - `npm test` — **PASS: web 17 files / 90 tests; API 2 files / 18 tests**
+- `npm run test --workspace @molecular/web -- src/selection/selectionEngine.test.ts src/workspace/workspaceModel.test.ts` — **PASS: 2 files / 30 tests; missing, stale, incomplete, and multi-object fragment datasets are covered**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e` — **PASS: 81 / 81**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1; 90 live queries**
