@@ -41,6 +41,12 @@ describe("canonical selection engine", () => {
     const missingFragments = evaluateSelectionQuery("byfragment ligand", structure);
     expect(missingFragments.status).toBe("MISSING_DEPENDENCY");
     expect(missingFragments.count).toBe(0);
+    const atomOnlyHints = {
+      ...structure,
+      atoms: structure.atoms.map((atom) => ({ ...atom, fragmentId: `fragment:${atom.stableId}` })),
+      scientificHash: "atom-hint-fragment-revision".padEnd(64, "0"),
+    } satisfies CanonicalMolecularStructure;
+    expect(evaluateSelectionQuery("byfragment ligand", atomOnlyHints).status).toBe("MISSING_DEPENDENCY");
     const fragmented = {
       ...structure,
       scientificHash: "fragmented-engine-revision".padEnd(64, "0"),
@@ -54,6 +60,10 @@ describe("canonical selection engine", () => {
       },
     } satisfies CanonicalMolecularStructure;
     expect(resolveSelection("byfragment ligand", fragmented).stableAtomIds).toEqual(["a1", "a2", "l1"]);
+    const staleFragments = { ...fragmented, fragmentDataset: { ...fragmented.fragmentDataset, molecularRevision: "stale" } } satisfies CanonicalMolecularStructure;
+    expect(evaluateSelectionQuery("byfragment ligand", staleFragments).status).toBe("MISSING_DEPENDENCY");
+    const incompleteFragments = { ...fragmented, fragmentDataset: { ...fragmented.fragmentDataset, atomFragmentMap: { a1: "fragment:one" } } } satisfies CanonicalMolecularStructure;
+    expect(evaluateSelectionQuery("byfragment ligand", incompleteFragments).status).toBe("MISSING_DEPENDENCY");
     expect(resolveSelection("name CA in chain A", structure).stableAtomIds).toEqual(["a1", "a3"]);
     expect(resolveSelection("(chain A and name CA) like (chain A and name CA)", structure).stableAtomIds).toEqual(["a1", "a3"]);
     const segmented = { ...structure, atoms: structure.atoms.map((atom) => ({ ...atom, segmentId: atom.chain === "A" ? "SEG_A" : "SEG_B" })), scientificHash: "c".repeat(64) } satisfies CanonicalMolecularStructure;
