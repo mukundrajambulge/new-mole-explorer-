@@ -23,4 +23,10 @@ describe("typed command registry boundary", () => {
     expect(commandSuggestions("set ")).toEqual(["cartoon_color", "ribbon_color"]);
     expect(commandSuggestions("coordinate_frame ")).toEqual(["local_scientific", "effective_world"]);
   });
+  it("routes bounded history/edit commands through the typed registry", () => {
+    expect(parseCommand("history").command).toMatchObject({ domain: "HISTORY", verb: "history", argument: "" });
+    expect(parseCommand("undo").command).toMatchObject({ domain: "HISTORY", verb: "undo", argument: "" });
+    expect(parseCommand("redo").command).toMatchObject({ domain: "HISTORY", verb: "redo", argument: "" });
+    expect(parseCommand("edit_test").command).toMatchObject({ domain: "EDIT", verb: "edit_test", argument: "" });
+  });
 });
