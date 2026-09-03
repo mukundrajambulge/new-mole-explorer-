@@ -314,3 +314,62 @@ export type ProjectSaveRequest = {
   presentation: ProjectPresentationState;
   expectedRevision?: number;
 };
+
+/**
+ * R07 canonical edit vocabulary.  These are domain operations, not renderer
+ * or UI commands.  Unsupported operations are still represented here so later
+ * editing stages extend one mutation pathway instead of creating another one.
+ */
+export const EDIT_OPERATION_KINDS = [
+  "DELETE_ATOMS",
+  "CREATE_BOND",
+  "DELETE_BOND",
+  "SET_BOND_ORDER",
+  "ADD_HYDROGENS",
+  "REMOVE_HYDROGENS",
+  "REPLACE_ATOM",
+  "ATTACH_FRAGMENT",
+  "APPLY_COORDINATE_EDIT",
+  "APPLY_RIGID_TRANSFORM",
+] as const;
+
+export type EditOperationKind = (typeof EDIT_OPERATION_KINDS)[number];
+
+/** Canonical state selectors; raw compatibility sentinels are resolved before execution. */
+export type EditStateSelector =
+  | { kind: "CURRENT" }
+  | { kind: "ALL" }
+  | { kind: "EXPLICIT_ORDINAL"; ordinal: number }
+  | { kind: "COORDINATE_STATE_ID"; stateId: string }
+  | { kind: "APPEND" }
+  | { kind: "COMMAND_DEFAULT" };
+
+export type CanonicalEditTarget = {
+  objectId?: string;
+  atomIds?: readonly string[];
+  bondIds?: readonly string[];
+  selectionResultId?: string;
+};
+
+export type CanonicalEditCommand = {
+  schemaVersion: 1;
+  commandId: string;
+  operation: EditOperationKind;
+  objectId: string;
+  baseRevisionId: string;
+  stateScope: EditStateSelector;
+  target: CanonicalEditTarget;
+  parameters: Readonly<Record<string, unknown>>;
+  origin: {
+    channel: "CONSOLE" | "UI" | "API" | "TEST";
+    actionId?: string;
+    rawCommand?: string;
+  };
+  provenance: {
+    producerId: string;
+    producerVersion: string;
+    requestedAt: string;
+    actor?: string;
+    metadata?: Readonly<Record<string, string>>;
+  };
+};
