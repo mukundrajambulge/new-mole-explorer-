@@ -29,9 +29,9 @@
     "PASS (`select color red` after `color red, all`; selection-matrix-live.spec.ts)": 1
   },
   "oracleStatusCounts": {
-    "ORACLE_PASS": 48,
+    "ORACLE_PASS": 50,
     "ORACLE_EQUIVALENT": 34,
-    "ORACLE_PENDING": 5
+    "ORACLE_PENDING": 3
   },
   "entries": [
     {
@@ -605,15 +605,15 @@
       "operator": "`donors`",
       "implementationStatus": "MISSING_DEPENDENCY",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "requires complete canonical donor assignments; no heuristic donor claim"
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "pinned PyMOL `donors` executes on the mini fixture (7 atoms); application still requires complete canonical donor assignments and makes no heuristic donor claim"
     },
     {
       "operator": "`acceptors`",
       "implementationStatus": "MISSING_DEPENDENCY",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "requires complete canonical acceptor assignments; no heuristic acceptor claim"
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "pinned PyMOL `acceptors` executes on the mini fixture (4 atoms); application still requires complete canonical acceptor assignments and makes no heuristic acceptor claim"
     },
     {
       "operator": "`rep`",
