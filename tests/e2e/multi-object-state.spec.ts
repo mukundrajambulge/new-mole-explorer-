@@ -364,6 +364,7 @@ test("split_states and strict join_states preserve explicit state lineage", asyn
 test("workspace groups organize objects without changing their canonical scope", async ({ page }) => {
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(mini);
+  await expect(page.getByTitle("mini-protein.pdb").first()).toBeVisible();
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   await command.fill("group create ensemble");
