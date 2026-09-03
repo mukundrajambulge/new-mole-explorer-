@@ -164,6 +164,7 @@ Verification:
 - `verification/selection/selection-operator-matrix.json`
 - `verification/selection/pymol-oracle-results.json`
 - `verification/selection/pymol-partial-charge-oracle.json`
+- `verification/selection/pymol-byfragment-source.md`
 - `verification/selection/pymol-presentation-oracle.json`
 - `verification/selection/pymol-matrix-probe.json`
 - `verification/selection/run-pymol-oracle.py`
