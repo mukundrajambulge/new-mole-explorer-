@@ -29,8 +29,8 @@
   },
   "oracleStatusCounts": {
     "ORACLE_PASS": 47,
-    "ORACLE_EQUIVALENT": 31,
-    "ORACLE_PENDING": 9
+    "ORACLE_EQUIVALENT": 32,
+    "ORACLE_PENDING": 8
   },
   "entries": [
     {
@@ -121,8 +121,8 @@
       "operator": "group-name resolution",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (multi-object-state.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "workspace group registry is bound into the canonical selection context; group actions remain organizational"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "workspace group registry is bound into the canonical selection context; the live group member scope is equivalent to pinned PyMOL `groupA` on the fixture; group actions remain organizational"
     },
     {
       "operator": "ambiguity handling",
