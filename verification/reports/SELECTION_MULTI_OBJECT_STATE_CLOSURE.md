@@ -4,7 +4,7 @@
 
 **SELECTION + MULTI-OBJECT/MULTI-STATE CLOSURE INCOMPLETE — BLOCKED**
 
-The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. Cross-object spatial queries now require and record an explicit coordinate-frame policy; every coordinate-dependent selection also records the exact per-object coordinate state scope consulted, including cached and bound plans. The pinned PyMOL source has executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The application now also binds RenderProjection representation, color, label, and representation-specific color selectors, evaluates canonical fragment assignments and bounded ring topology without renderer-derived shortcuts, implements a versioned VDW surface-gap profile with strict missing-radius handling, binds `pepseq` to a revision-stamped canonical one-letter peptide sequence dataset, preserves source-backed crystallographic unit-cell parameters for bounded `bycell` membership, retains the actual official remote retrieval provider and URI when RCSB falls back to the wwPDB partner endpoint, exposes strict revision-bound canonical chemistry-role and fragment-assignment dataset boundaries for `donors`/`acceptors` and `byfragment`, and never fabricates those datasets for ordinary PDB/mmCIF ingestion. Dynamic arbitrary-property evaluation is explicitly unavailable and is covered by the pinned native rejection of `foo = bar`. The gate remains blocked because 5 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
+The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. Cross-object spatial queries now require and record an explicit coordinate-frame policy; every coordinate-dependent selection also records the exact per-object coordinate state scope consulted, including cached and bound plans. The pinned PyMOL source has executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The application now also binds RenderProjection representation, color, label, and representation-specific color selectors, evaluates canonical fragment assignments and bounded ring topology without renderer-derived shortcuts, implements a versioned VDW surface-gap profile with strict missing-radius handling, binds `pepseq` to a revision-stamped canonical one-letter peptide sequence dataset, preserves source-backed crystallographic unit-cell parameters for bounded `bycell` membership, retains the actual official remote retrieval provider and URI when RCSB falls back to the wwPDB partner endpoint, promotes complete source-declared mmCIF partial charges without inference, exposes strict revision-bound canonical chemistry-role and fragment-assignment dataset boundaries for `donors`/`acceptors` and `byfragment`, and never fabricates scientific datasets when those fields are absent. Dynamic arbitrary-property evaluation is explicitly unavailable and is covered by the pinned native rejection of `foo = bar`. The gate remains blocked because 5 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
 
 ## Repository and run evidence
 
@@ -14,9 +14,9 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `27610d35980b2d233e4f97f240ccdbd6439e5d39`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
-- Current implementation commit: `57bdfaa` (`fix(selection): fail closed on malformed datasets`)
-- Ending implementation/evidence SHA: `57bdfaa411159aa5b193559883831dc0b2aa6033`
-- Latest implementation/evidence base SHA before this report update: `57bdfaa411159aa5b193559883831dc0b2aa6033`
+- Current implementation commit: `6396c17` (`Add source-backed partial charge ingestion`)
+- Ending implementation/evidence SHA: `6396c175cb7744b3f766bbb5be7e909468a271b6`
+- Latest implementation/evidence base SHA before this report update: `6396c175cb7744b3f766bbb5be7e909468a271b6`
 - Working tree: clean after the implementation/evidence commit; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -77,7 +77,7 @@ The current application was exercised with a real 4DJW RCSB load:
 The machine-readable ledger is [selection-operator-matrix.json](../selection/selection-operator-matrix.json), generated from [SELECTION_OPERATOR_MATRIX.md](../selection/SELECTION_OPERATOR_MATRIX.md).
 
 - Rows: **87**
-- Implementation: **82 VERIFIED_WORKING**, **4 MISSING_DEPENDENCY**, **1 INTENTIONALLY_UNSUPPORTED**
+- Implementation: **83 VERIFIED_WORKING**, **3 MISSING_DEPENDENCY**, **1 INTENTIONALLY_UNSUPPORTED**
 - Live-browser status: **90 pass/accepted diagnostic outcomes** across the expanded matrix exercise
 - Live evidence: [selection-live-evidence.json](../selection/selection-live-evidence.json) records all **90** attempts, with **0 browser-console errors, 0 page errors, 0 network failures, 0 atom-count mismatches, 0 viewer/panel membership mismatches**, and subsequent targeting checks retaining the active selection hash.
 - `in`, `bycalpha`, `bymolecule`, `byfragment`, `byring`, and `bycell` now use canonical tuple, residue-CA, connected-component, canonical-fragment-assignment, bounded-cycle, and source-backed fractional-cell-membership semantics respectively. `visible` is now bound to an explicit presentation context derived from render directives; `rep`, `color`, `label`, `cartoon_color`, and `ribbon_color` are likewise evaluated from the current RenderProjection and never from 3Dmol internals. Generic atom color and representation-scoped color are separate namespaces; `set cartoon_color|ribbon_color, <color>, <query>` is the explicit representation-scoped mutation path. These selectors never alias scientific `all`. `like`, the application implicit-adjacency profile, and the new spatial/topology forms are live-verified; malformed shorthand and missing scientific dependencies remain truthful diagnostics.
@@ -101,6 +101,7 @@ The machine-readable ledger is [selection-operator-matrix.json](../selection/sel
 - Canonical formal charge and secondary structure: **PASS**; source charge predicates and PDB HELIX/SHEET predicates select positive live subsets without renderer-derived values. Strict/inclusive numeric comparisons are covered on formal charge, B-factor, and coordinates; direct `!=` spelling remains an explicit PyMOL parser difference documented as an equivalent complement.
 - Presentation-dependent selection: **PASS** for effective `rep`, `color`, and `label`, plus explicit representation-scoped `cartoon_color` and `ribbon_color` selectors; generic atom color no longer leaks into representation-specific selectors. The selection result records the projection revision and remains stable under subsequent targeting.
 - Canonical fragment/ring topology: `byring` **PASS** for the declared bounded-cycle profile; `byfragment` is **MISSING_DEPENDENCY** until an admitted source supplies complete canonical fragment assignments. The ring fixture’s six-atom expansion is oracle-equivalent to pinned PyMOL `byring organic`; no connected-component fallback is exposed as `byfragment`.
+- Partial-charge selection: **PASS** when the input mmCIF supplies complete `_chem_comp_atom.partial_charge` values for every loaded atom; the API copies those source values into a revision-bound dataset with explicit model/units/provenance and does not infer charges. Inputs without a complete source loop remain fail-closed.
 - VDW surface-gap selection: **PASS** for the declared `canonical-element-vdw-radius@1` profile; non-empty and valid-empty live cases are covered, and unknown radius data fails closed without changing the workspace.
 - Peptide sequence selection: **PASS** for the declared `canonical-peptide-sequence-v1` profile; `pepseq AG` selects the complete canonical residue atoms in the uploaded two-residue fixture, while invalid values fail with `INVALID_VALUE`.
 - Canonical PDB property selection: **PASS** for source formal charge, B-factor, and HELIX/SHEET secondary-structure assignments in the live `typed-properties.pdb` fixture; missing-property behavior remains fail-closed on the minimal fixture.
@@ -111,6 +112,7 @@ Application/contracts:
 
 - Latest fragment-authority hardening: `packages/contracts/src/index.ts`, `apps/web/src/selection/selectionEngine.ts`, `apps/web/src/selection/selectionEngine.test.ts`, `apps/web/src/workspace/workspaceModel.ts`, and `apps/web/src/workspace/workspaceModel.test.ts`
 - Latest partial-charge authority hardening: `apps/web/src/science/datasetValidity.ts`, `apps/web/src/rendering/colorSchemes.ts`, `apps/web/src/interaction/labels.ts`, and `apps/web/src/rendering/presentationState.ts` with corresponding regression tests
+- Latest source-declared partial-charge ingestion: `apps/api/src/structures/ingestion.ts`, `apps/api/src/structures/ingestion.test.ts`, `tests/fixtures/source-partial-charge.mmcif`, and the live console coverage in `tests/e2e/selection-closure.spec.ts`
 - Latest malformed-dataset guard: `apps/web/src/science/datasetValidity.ts` and `apps/web/src/science/datasetValidity.test.ts`; malformed optional charge, fragment, and chemistry-role payloads now fail closed without throwing
 - `apps/api/src/structures/ingestion.test.ts`
 - `apps/web/src/App.tsx`
@@ -154,6 +156,7 @@ Verification:
 - `tests/fixtures/typed-nucleic.mmcif`
 - `tests/fixtures/edge-identity.mmcif`
 - `tests/fixtures/typed-properties.pdb`
+- `tests/fixtures/source-partial-charge.mmcif`
 - `tests/fixtures/segment-identity.pdb`
 - `tests/fixtures/sidechain-identity.pdb`
 - `verification/selection/SELECTION_OPERATOR_MATRIX.md`
@@ -226,8 +229,7 @@ Verification:
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm test` — **PASS: web 17 files / 91 tests; API 2 files / 18 tests**
-- Latest full suite after malformed-dataset guards — **PASS: web 18 files / 93 tests; API 2 files / 18 tests**
+- `npm test` — **PASS: web 18 files / 93 tests; API 2 files / 20 tests**
 - `npm run test --workspace @molecular/web -- src/selection/selectionEngine.test.ts src/workspace/workspaceModel.test.ts` — **PASS: 2 files / 30 tests; missing, stale, incomplete, and multi-object fragment datasets are covered**
 - `npm run test --workspace @molecular/web -- src/selection/selectionEngine.test.ts src/rendering/colorSchemes.test.ts src/interaction/labels-picking.test.ts src/rendering/presentationState.test.ts` — **PASS: 4 files / 43 tests; shared partial-charge validation and cache/UI diagnostic paths are covered**
 - `npm run test --workspace @molecular/web -- src/selection/selectionEngine.test.ts src/workspace/workspaceModel.test.ts` — **PASS: 2 files / 30 tests; chemistry-role and fragment provenance/coverage gates are covered**
@@ -242,6 +244,7 @@ Verification:
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "canonical mmCIF segment identity"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "ring topology"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "formal charge"` — **PASS: 1 / 1**
+- `npx playwright test tests/e2e/selection-closure.spec.ts --grep "source-declared mmCIF partial charges"` — **PASS: 1 / 1; complete source values selected through the real console**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "PDB segment identity"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "sidechain"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "presentation-dependent"` — **PASS: 1 / 1**
@@ -308,5 +311,5 @@ Verification:
 - `donors` / `acceptors`: the canonical contract now admits only a complete, revision-matched `canonical-chemistry-roles-v1` dataset and records its profile in selection plans/results; the remaining gap is a validated producer with complete bond order/valence, protonation/tautomer state, and provenance. Required next research fixture set: benzene, pyridine, pyrrole, amide, carboxylate, protonated amine, and unknown-component cases; suggested stage: R03-04 chemistry-perception addendum plus Research-02 chemical-graph/CCD integration.
 - `pbc` / crystallographic symmetry: the remaining research question is whether future compatibility should expose symmetry mates or periodic-image expansion beyond the now-implemented source-backed unit-cell membership profile; suggested stage: SQ-R05 symmetry/PBC addendum with symmetry-operator fixtures and an explicit coordinate-frame policy for mates.
 - `byfragment`: the exact question is whether the accepted profile should expose PyMOL editor fragment assignments directly or admit a different chemistry-defined fragment dataset. The pinned source uses editor fragment assignments, while current PDB/mmCIF ingestion supplies neither those assignments nor an equivalent canonical dataset; connected components are reserved for `bymolecule`. Required next research fixture: disconnected editor fragments and a source-backed fragment-assignment payload; suggested stage: R-PYMOL chemistry/fragment addendum.
-- `partial_charge`: the missing dependency is a complete atom-to-charge dataset with charge model, units, provenance, and molecular-revision binding. PDB/mmCIF ingestion alone does not supply that dataset; no fallback charge is permitted.
+- `partial_charge`: complete source-declared `_chem_comp_atom.partial_charge` values are now promoted when they cover every loaded atom, with charge model, units, provenance, and molecular-revision binding. The real 4DJW/1CRN mmCIF payloads contain no complete charge loop, so those ordinary loads still fail closed; no fallback charge is permitted.
 - Additional `ORACLE_PENDING` rows require a matching direct pinned-PyMOL comparison or a documented native-equivalent mapping. The exact pinned probe is reproducible locally; the remaining five pending rows are retained because they require application presentation/workspace context, a missing canonical data producer, lack discriminative fixture data, or need an explicit native-equivalent decision. Existing direct-probe artifacts remain preserved.
