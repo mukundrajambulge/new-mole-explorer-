@@ -14,9 +14,9 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `27610d35980b2d233e4f97f240ccdbd6439e5d39`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
-- Current implementation commit: `50f9f3f` (`feat(selection): add canonical chemistry role boundary`)
-- Ending implementation/evidence SHA: `50f9f3f`
-- Latest implementation/evidence base SHA before this report update: `50f9f3f`
+- Current implementation commit: `0d09d17` (`fix(selection): fail closed on incomplete charge data`)
+- Ending implementation/evidence SHA: `0d09d17`
+- Latest implementation/evidence base SHA before this report update: `0d09d17`
 - Working tree: clean after the implementation/evidence commit; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
@@ -46,6 +46,7 @@ The current application was exercised with a real 4DJW RCSB load:
 - Backend canonical structure, topology, coordinates, provenance, source hash, and coordinate-state metadata remain the scientific authority.
 - Source-backed unit-cell parameters remain attached to their canonical object; multi-object selection views carry an object-qualified cell scope and never reuse the first object’s cell for unrelated atoms.
 - `RenderProjection` is the renderer-neutral presentation boundary consumed by `ThreeDMolViewerAdapter`; UI components do not own 3Dmol scientific state.
+- Partial-charge selection, color, and labels require complete finite atom coverage from a revision-matched canonical dataset; stale or incomplete datasets fail closed and cannot yield partial scientific results.
 - `donors` and `acceptors` consume only a complete `canonical-chemistry-roles-v1` dataset whose molecular revision matches the canonical structure; the evaluator records the scientific profile and fails closed when admitted PDB/mmCIF sources do not provide it. No bond-order, protonation, tautomer, or renderer-derived heuristic is promoted to scientific state.
 - `pepseq` consumes only the revision-matched `canonical-peptide-sequence-v1` dataset produced by ingestion and propagated through derived-object workflows; the evaluator does not infer sequence from renderer state or a residue-name heuristic at query time.
 - Workspace peptide-sequence datasets namespace each object and residue ID, so identical chain/residue labels in separate objects cannot collide; the multi-object regression selects the expected 8 atoms from the protein object only.
@@ -219,7 +220,7 @@ Verification:
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm test` — **PASS: web 17 files / 88 tests; API 2 files / 18 tests**
+- `npm test` — **PASS: web 17 files / 89 tests; API 2 files / 18 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e` — **PASS: 81 / 81**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1; 90 live queries**
@@ -283,7 +284,7 @@ Verification:
 
 - The pinned PyMOL source was executed in an isolated Ubuntu-20.04/Python-3.9 compatibility build. The 6 remaining `ORACLE_PENDING` matrix rows are not promoted without matching coverage; this is one reason for the blocked final verdict.
 - Crystallographic `pbc`/`symmetry` and donor/acceptor chemistry remain explicit unsupported or missing-dependency gates. `bycell` now has a bounded source-backed fractional-cell-membership profile, but it does not expand symmetry mates or periodic images. Donor/acceptor selection now has an explicit revision-bound canonical chemistry-role contract, but admitted PDB/mmCIF ingestion does not produce that dataset, so these queries fail closed without heuristic roles. Unknown properties and unknown VDW radii fail closed. `gap` is implemented only for the declared versioned element-radius profile; `byring` is implemented only for the declared bounded-cycle profile, while `byfragment` requires canonical source-backed fragment assignments. These profiles are not claimed as full PyMOL chemistry perception.
-- Partial-charge selection is implemented only when a complete, revision-matched canonical charge dataset is present; the admitted PDB/mmCIF ingestion path does not create one, so current loaded structures return a structured missing-dependency diagnostic. `visible` and presentation selectors require the explicit RenderProjection context supplied by the frontend selection router; bare `label …` remains a label command, while `select label …` matches rendered safe-label text. `pepseq` currently supports canonical one-letter motifs and the standard amino-acid mapping profile only; modified residues are represented as `X` and cannot satisfy an exact motif.
+- Partial-charge selection, color, and labels are implemented only when a complete, finite, revision-matched canonical charge dataset is present; stale or incomplete datasets fail closed, and the admitted PDB/mmCIF ingestion path does not create one, so current loaded structures return a structured missing-dependency diagnostic. `visible` and presentation selectors require the explicit RenderProjection context supplied by the frontend selection router; bare `label …` remains a label command, while `select label …` matches rendered safe-label text. `pepseq` currently supports canonical one-letter motifs and the standard amino-acid mapping profile only; modified residues are represented as `X` and cannot satisfy an exact motif.
 - `polymer.nucleic` and typed `polymer.protein` require complete source-backed `_entity_poly.type` mapping in mmCIF; legacy PDB inputs without that annotation intentionally retain the prior generic polymer behavior and report a truthful dependency diagnostic for nucleic selection.
 - Native `like`, implicit adjacency, topology, corrected spatial forms, and the new object-lineage workflows now have direct coverage; the six native parser errors and the remaining conservative matrix rows are retained as evidence rather than treated as application support.
 - PDB `segi` and `alt` now have exact pinned-oracle coverage. mmCIF segment fields remain canonical application data when the pinned PyMOL build does not expose an equivalent native selector, so that source-format difference is documented rather than hidden.
