@@ -5,7 +5,7 @@
   "implementationStatusCounts": {
     "VERIFIED_WORKING": 82,
     "MISSING_DEPENDENCY": 4,
-    "UNKNOWN_PROPERTY": 1
+    "INTENTIONALLY_UNSUPPORTED": 1
   },
   "liveBrowserStatusCounts": {
     "PASS (`select all`)": 1,
@@ -29,8 +29,8 @@
   },
   "oracleStatusCounts": {
     "ORACLE_PASS": 48,
-    "ORACLE_EQUIVALENT": 33,
-    "ORACLE_PENDING": 6
+    "ORACLE_EQUIVALENT": 34,
+    "ORACLE_PENDING": 5
   },
   "entries": [
     {
@@ -483,10 +483,10 @@
     },
     {
       "operator": "arbitrary property",
-      "implementationStatus": "UNKNOWN_PROPERTY",
+      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "unknown fields fail closed; no dynamic evaluation"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "dynamic property evaluation is explicitly unavailable; unknown fields fail closed"
     },
     {
       "operator": "`=`",
