@@ -1,5 +1,5 @@
-export type CommandDomain = "SYSTEM" | "SELECTION" | "PRESENTATION" | "VIEW" | "LABEL" | "MEASURE" | "OBJECT";
-export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "set" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "set_name" | "copy" | "create" | "split_states" | "join_states" | "group" | "delete" | "update" | "enable" | "disable" | "state" | "frame" | "all_states" | "count_states" | "coordinate_frame";
+export type CommandDomain = "SYSTEM" | "SELECTION" | "PRESENTATION" | "VIEW" | "LABEL" | "MEASURE" | "OBJECT" | "HISTORY" | "EDIT";
+export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "set" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "set_name" | "copy" | "create" | "split_states" | "join_states" | "group" | "delete" | "update" | "enable" | "disable" | "state" | "frame" | "all_states" | "count_states" | "coordinate_frame" | "history" | "undo" | "redo" | "edit_test";
 export type ParsedCommand = { domain: CommandDomain; verb: CommandVerb; raw: string; head: string; argument: string; target: string | null; span: { start: number; end: number } };
 export type CommandParseError = { code: "EMPTY" | "UNKNOWN_COMMAND" | "MISSING_ARGUMENT"; message: string; span?: { start: number; end: number } };
 export type CommandDefinition = { verb: CommandVerb; domain: CommandDomain; synopsis: string; description: string; requiresArgument: boolean };
@@ -34,6 +34,10 @@ export const COMMAND_REGISTRY: readonly CommandDefinition[] = [
   { verb: "all_states", domain: "OBJECT", synopsis: "all_states <object>", description: "Toggle a bounded overlay of all coordinate states for one object.", requiresArgument: true },
   { verb: "count_states", domain: "OBJECT", synopsis: "count_states <object>", description: "Report the canonical coordinate-state count for one workspace object.", requiresArgument: true },
   { verb: "coordinate_frame", domain: "SELECTION", synopsis: "coordinate_frame <local_scientific|effective_world>", description: "Declare the coordinate frame policy for cross-object spatial selections.", requiresArgument: true },
+  { verb: "history", domain: "HISTORY", synopsis: "history", description: "Report the authoritative scientific revision cursor and retained branch state.", requiresArgument: false },
+  { verb: "undo", domain: "HISTORY", synopsis: "undo", description: "Navigate to the exact retained scientific parent revision.", requiresArgument: false },
+  { verb: "redo", domain: "HISTORY", synopsis: "redo", description: "Navigate to the exact retained scientific child revision when unambiguous.", requiresArgument: false },
+  { verb: "edit_test", domain: "EDIT", synopsis: "edit_test", description: "Apply one deterministic coordinate edit through the R07-B1 transaction boundary for integration verification.", requiresArgument: false },
 ];
 const definitions = Object.fromEntries(COMMAND_REGISTRY.map((definition) => [definition.verb, definition])) as Record<CommandVerb, CommandDefinition>;
 const verbs = new Set<string>(COMMAND_REGISTRY.map((definition) => definition.verb));

@@ -263,15 +263,26 @@ export class ThreeDMolViewerAdapter {
       this.loadWorkspace(objects);
       return;
     }
+    const scientificRevisionChanged = previousObjects.length === objects.length && previousObjects.some((previous, index) => previous.loadResult.structure.scientificHash !== objects[index]?.loadResult.structure.scientificHash);
     if (this.viewer && this.hasModel && objects[0]) {
-      const primaryChanged = previousObjects[0]?.currentStateId !== objects[0].currentStateId;
+      const primaryChanged = scientificRevisionChanged || previousObjects[0]?.currentStateId !== objects[0].currentStateId;
       if (primaryChanged && this.primaryModel) this.replaceModelAtoms(this.primaryModel, objects[0]);
       const nextAuxiliaryObjects = this.auxiliaryObjectsFor(objects);
       for (const [index, nextObject] of nextAuxiliaryObjects.entries()) {
         const current = this.auxiliaryModels[index];
         if (!current) continue;
-        if (current.object.currentStateId !== nextObject.currentStateId) this.replaceModelAtoms(current.model, nextObject);
+        if (scientificRevisionChanged || current.object.currentStateId !== nextObject.currentStateId) this.replaceModelAtoms(current.model, nextObject);
         this.auxiliaryModels[index] = { model: current.model, object: nextObject };
+      }
+      if (scientificRevisionChanged) {
+        // A scientific revision replaces canonical atom specs and reverse
+        // identity bindings in-place.  Keep the viewer instance/models, but
+        // advance generation so old picks cannot commit against the child.
+        this.rendererGeneration += 1;
+        this.container?.setAttribute("data-renderer-generation", String(this.rendererGeneration));
+        this.structure = this.renderLoadResultForState(objects[0]).structure;
+        this.reverseIdentityMap.buildMany(objects.map((object) => ({ structure: this.renderLoadResultForState(object).structure, objectId: object.objectId, stateId: stateForObject(object)?.id })), this.rendererGeneration);
+        this.surfaceCoordinator.invalidate();
       }
     }
     this.workspaceObjects = objects;

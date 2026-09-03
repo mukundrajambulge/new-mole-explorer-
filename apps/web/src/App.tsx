@@ -24,6 +24,7 @@ import { colorRegistry } from "./rendering/colorRegistry";
 import { analyzeStructure, overlaysForAnalysis, type StructuralAnalysisKind, type StructuralAnalysisResult } from "./analysis/structuralAnalysis";
 import { commandHelp, isRecognizedCommandVerb, parseCommand } from "./commands/commandRegistry";
 import { copyWorkspaceObject, createWorkspaceGroup, createWorkspaceObject, createWorkspaceObjectFromSelection, cycleWorkspaceObjectState, joinWorkspaceObjectStates, renameWorkspaceObject, resolveGlobalFrameState, setWorkspaceObjectAllStates, setWorkspaceObjectEnabled, setWorkspaceObjectState, splitWorkspaceObjectStates, structureForWorkspaceObjectState, updateWorkspaceGroup, workspaceScopedStableAtomId, workspaceSelectionStructure, type WorkspaceGroup, type WorkspaceObject } from "./workspace/workspaceModel";
+import { createCoordinateEditCommand, ScientificHistoryService, type ScientificRevision } from "./editing/editFoundation";
 
 const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_SELECT]: "Select",
@@ -77,8 +78,10 @@ export const App = () => {
   const workspaceObjectsRef = useRef<WorkspaceObject[]>([]);
   const workspaceGroupsRef = useRef<WorkspaceGroup[]>([]);
   const pendingImportModeRef = useRef<"replace" | "add">("replace");
+  const historyServiceRef = useRef(new ScientificHistoryService());
   const analysisOverlays = useMemo(() => overlaysForAnalysis(analysisResults), [analysisResults]);
   const viewerWorkspaceObjects = useMemo(() => workspaceObjects.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object), [activeObjectId, projection, workspaceObjects]);
+  const activeHistoryState = activeObjectId ? historyServiceRef.current.historyState(activeObjectId) : null;
 
   const presentationSelectionContext = (): SelectionPresentationContext | undefined => {
     if (!viewerWorkspaceObjects.length) return undefined;
@@ -159,6 +162,14 @@ export const App = () => {
     setProjection((current) => setInteractionState(current, { selectedAtomIds: result?.stableAtomIds ?? [], pickedAtomId: null, measurementPickAtomIds: [] }));
   };
 
+  const resetScientificHistory = useCallback(() => {
+    historyServiceRef.current = new ScientificHistoryService();
+  }, []);
+
+  const registerScientificRoot = useCallback((object: WorkspaceObject) => {
+    historyServiceRef.current.registerRoot(object.objectId, object.loadResult, object.currentStateId);
+  }, []);
+
   useEffect(() => {
     let mounted = true;
     apiClient.health().then(() => mounted && setApiStatus("connected")).catch(() => mounted && setApiStatus("offline"));
@@ -199,6 +210,8 @@ export const App = () => {
       const result = await loader();
       const workspaceObject = createWorkspaceObject(result, mode === "add" ? workspaceObjectsRef.current.map((object) => object.objectId) : []);
       const nextWorkspace = mode === "add" ? [...workspaceObjectsRef.current, workspaceObject] : [workspaceObject];
+      if (mode === "replace") resetScientificHistory();
+      registerScientificRoot(workspaceObject);
       workspaceObjectsRef.current = nextWorkspace;
       setWorkspaceObjects(nextWorkspace);
        if (mode === "replace") { workspaceGroupsRef.current = []; setWorkspaceGroups([]); setCoordinateFramePolicy(null); }
@@ -220,7 +233,7 @@ export const App = () => {
       setLoadState("error");
       setLoadError(error instanceof ApiClientError ? error.message : "The structure could not be loaded. The current structure was kept.");
     }
-  }, []);
+  }, [registerScientificRoot, resetScientificHistory]);
 
   const importFile = (file: File, mode: "replace" | "add" = pendingImportModeRef.current) => {
     pendingImportModeRef.current = "replace";
@@ -286,6 +299,7 @@ export const App = () => {
     try {
       const created = await apiClient.createProject();
       setProject(created);
+      resetScientificHistory();
       workspaceObjectsRef.current = [];
       setWorkspaceObjects([]);
       workspaceGroupsRef.current = [];
@@ -315,6 +329,8 @@ export const App = () => {
       const opened = await apiClient.openProject(id.trim());
       setProject(opened);
       const openedWorkspace = opened.structure ? [createWorkspaceObject(opened.structure)] : [];
+      resetScientificHistory();
+      if (openedWorkspace[0]) registerScientificRoot(openedWorkspace[0]);
       workspaceObjectsRef.current = openedWorkspace;
       setWorkspaceObjects(openedWorkspace);
       workspaceGroupsRef.current = [];
@@ -508,10 +524,87 @@ export const App = () => {
   const ambiguousObjectStatus = (name: string) => `Object reference ${name} is ambiguous; use a durable ObjectID (object:<structure-id>[:suffix]) and no object state changed.`;
 
   const appendWorkspaceObject = (object: WorkspaceObject) => {
+    registerScientificRoot(object);
     const next = [...workspaceObjectsRef.current, object];
     workspaceObjectsRef.current = next;
     setWorkspaceObjects(next);
     return next;
+  };
+
+  const applyScientificRevisionToWorkspace = (revision: ScientificRevision): void => {
+    const currentObjects = workspaceObjectsRef.current;
+    const target = currentObjects.find((object) => object.objectId === revision.objectId);
+    if (!target) return;
+    const nextStateOrder = [...revision.stateOrder];
+    const nextStateId = nextStateOrder.includes(target.currentStateId) ? target.currentStateId : revision.currentStateId;
+    const nextTarget = { ...target, loadResult: revision.loadResult, stateOrder: nextStateOrder, currentStateId: nextStateId };
+    const nextObjects = currentObjects.map((object) => object.objectId === revision.objectId ? nextTarget : object);
+    workspaceObjectsRef.current = nextObjects;
+    setWorkspaceObjects(nextObjects);
+    if (revision.objectId !== activeObjectId) {
+      return;
+    }
+
+    const survivingIds = activeSelectionResultRef.current?.structureId === revision.loadResult.structure.id
+      ? activeSelectionResultRef.current.stableAtomIds.filter((stableId) => revision.loadResult.structure.atoms.some((atom) => atom.stableId === stableId))
+      : [];
+    const reboundSelection = survivingIds.length ? selectionForStableIds(survivingIds, revision.loadResult.structure) : null;
+    activeSelectionResultRef.current = reboundSelection;
+    setActiveSelectionState(reboundSelection);
+    const projectedSelectionIds = nextObjects.length > 1 ? survivingIds.map((stableId) => workspaceScopedStableAtomId(revision.objectId, stableId)) : survivingIds;
+    const baseProjection = revision.objectId === activeObjectId ? projection : nextTarget.projection;
+    const nextProjection = setInteractionState(baseProjection, { selectedAtomIds: projectedSelectionIds, pickedAtomId: survivingIds[0] ?? null, hoveredAtomId: null, measurementPickAtomIds: [] });
+    const oldNamedSnapshots = namedSelectionsRef.current?.list() ?? [];
+    const reboundNamedSelections = new NamedSelectionStore(revision.loadResult.structure);
+    for (const snapshot of oldNamedSnapshots) {
+      const ids = snapshot.stableAtomIds.filter((stableId) => revision.loadResult.structure.atoms.some((atom) => atom.stableId === stableId));
+      try { reboundNamedSelections.createSnapshot(snapshot.name, selectionForStableIds(ids, revision.loadResult.structure)); } catch { /* stale names remain safely unavailable in the new revision */ }
+    }
+    namedSelectionsRef.current = reboundNamedSelections;
+    setNamedSelections(reboundNamedSelections.list().map((selection) => ({ name: selection.name, count: selection.stableAtomIds.length })));
+    setStructure(nextTarget.loadResult);
+    setProjection(nextProjection);
+    setMeasurements((current) => current.map((measurement) => measurement.objectId === revision.objectId ? { ...measurement, status: "STALE" } : measurement));
+    setAnalysisResults((current) => current.map((result) => result.status === "STALE" ? result : { ...result, status: "STALE", diagnostic: `STALE after scientific revision ${revision.revisionId}. Re-run this analysis on the restored revision.` }));
+  };
+
+  const runHistoryAction = (actionId: typeof ACTION_IDS.HISTORY_UNDO | typeof ACTION_IDS.HISTORY_REDO): ConsoleCommandResult => {
+    if (!activeObjectId) return { category: "HISTORY", status: "HISTORY_UNAVAILABLE: no active workspace object is loaded." };
+    const result = actionId === ACTION_IDS.HISTORY_UNDO ? historyServiceRef.current.undo(activeObjectId) : historyServiceRef.current.redo(activeObjectId);
+    if (!result.ok) return { category: "HISTORY", status: `${result.code}: ${result.message}` };
+    applyScientificRevisionToWorkspace(result.revision);
+    return { category: "HISTORY", status: `${result.operation} restored exact scientific revision ${result.toRevisionId} · parent ${result.revision.parentRevisionId ?? "none"}.` };
+  };
+
+  const runDeterministicCoordinateEdit = (): ConsoleCommandResult => {
+    if (!activeObjectId) return { category: "EDIT", status: "INVALID_EDIT_INPUT: load a structure before running the B1 integration edit." };
+    const object = workspaceObjectsRef.current.find((candidate) => candidate.objectId === activeObjectId);
+    const current = historyServiceRef.current.currentRevision(activeObjectId);
+    const selection = activeSelectionResultRef.current;
+    if (!object || !current) return { category: "EDIT", status: "HISTORY_UNAVAILABLE: the active object has no scientific revision history." };
+    const workspaceStructure = workspaceSelectionStructure(workspaceObjectsRef.current);
+    if (!selection || !workspaceStructure || selection.structureId !== workspaceStructure.id || selection.molecularRevision !== workspaceStructure.scientificHash) return { category: "EDIT", status: "INVALID_SELECTION: select one canonical atom in the active object before running edit_test." };
+    const workspaceScoped = workspaceStructure.id === "workspace";
+    const scopedPrefix = `${activeObjectId}::`;
+    const selectedObjectIds = workspaceScoped ? selection.stableAtomIds.filter((stableId) => stableId.startsWith(scopedPrefix)) : selection.stableAtomIds;
+    if (selection.stableAtomIds.length !== 1 || selectedObjectIds.length !== 1) return { category: "EDIT", status: "AMBIGUOUS_TARGET: edit_test requires exactly one selected canonical atom in the active object." };
+    const canonicalStableId = workspaceScoped ? selectedObjectIds[0].slice(scopedPrefix.length) : selectedObjectIds[0];
+    const canonicalSelection = selectionForStableIds([canonicalStableId], object.loadResult.structure);
+    const atom = object.loadResult.structure.atoms.find((candidate) => candidate.stableId === canonicalStableId);
+    if (!atom) return { category: "EDIT", status: "TARGET_NOT_FOUND: the selected stable AtomUID is not present in the active revision." };
+    const command = createCoordinateEditCommand({
+      objectId: activeObjectId,
+      baseRevisionId: current.revisionId,
+      selectionResult: canonicalSelection,
+      stateScope: { kind: "COORDINATE_STATE_ID", stateId: object.currentStateId },
+      coordinates: { [atom.stableId]: { x: atom.x + 0.25, y: atom.y - 0.125, z: atom.z + 0.5 } },
+      origin: { channel: "CONSOLE", actionId: "EDIT.TEST_COORDINATE", rawCommand: "edit_test" },
+      provenance: { producerId: "molecular-workstation.r07.integration", producerVersion: "1" },
+    });
+    const result = historyServiceRef.current.execute(command);
+    if (!result.ok) return { category: "EDIT", status: `${result.code}: ${result.message}` };
+    applyScientificRevisionToWorkspace(result.revision);
+    return { category: "EDIT", status: `COMMITTED coordinate test edit · ${result.baseRevisionId} → ${result.resultRevisionId}`, count: 1 };
   };
 
   const resolveWorkspaceGroup = (name: string) => {
@@ -550,6 +643,14 @@ export const App = () => {
     const parsed = parsedResult.command;
     if (!parsed) return { category: "CAPABILITY", status: "Command was not parsed and no state was changed." };
     if (parsed.verb === "help") return { category: "SYSTEM", status: commandHelp(parsed.argument).map((definition) => `${definition.synopsis} — ${definition.description}`).join(" · ") || "No command matches that help topic." };
+    if (parsed.verb === "history") {
+      if (!activeObjectId) return { category: "HISTORY", status: "HISTORY_UNAVAILABLE: no active workspace object is loaded." };
+      const history = historyServiceRef.current.historyState(activeObjectId);
+      return { category: "HISTORY", status: history ? JSON.stringify(history) : "HISTORY_UNAVAILABLE: no retained history is available for the active object." };
+    }
+    if (parsed.verb === "undo") return runHistoryAction(ACTION_IDS.HISTORY_UNDO);
+    if (parsed.verb === "redo") return runHistoryAction(ACTION_IDS.HISTORY_REDO);
+    if (parsed.verb === "edit_test") return runDeterministicCoordinateEdit();
     if (parsed.verb === "coordinate_frame") {
       const value = parsed.argument.trim().toLowerCase();
       const policy = value === "local_scientific" ? "LOCAL_SCIENTIFIC" : value === "effective_world" ? "EFFECTIVE_WORLD" : null;
@@ -732,6 +833,7 @@ export const App = () => {
         if (!resolved.object) return { category: "OBJECT", status: `Object ${parsed.argument} does not exist; split_states made no changes.` };
         const split = splitWorkspaceObjectStates(resolved.object, parsed.target, workspaceObjectsRef.current.map((object) => object.objectId));
         if (!split.ok) return { category: "OBJECT", status: split.message };
+        split.value.forEach((object) => registerScientificRoot(object));
         const next = [...workspaceObjectsRef.current, ...split.value];
         workspaceObjectsRef.current = next;
         setWorkspaceObjects(next);
@@ -892,6 +994,11 @@ export const App = () => {
 
   const handleAction = (actionId: ActionId) => {
     const capability = ACTION_REGISTRY[actionId];
+    if (actionId === ACTION_IDS.HISTORY_UNDO || actionId === ACTION_IDS.HISTORY_REDO) {
+      const result = runHistoryAction(actionId);
+      setNotice({ ...capability, state: result.status.startsWith("UNDO") || result.status.startsWith("REDO") || result.status.startsWith("HISTORY") ? "SUPPORTED_WITH_LIMITATIONS" : capability.state, description: result.status });
+      return;
+    }
     if (actionId.startsWith("WORKSPACE.")) {
       const workspaceName = actionId.replace("WORKSPACE.", "").toLowerCase();
       const labels: Record<string, string> = { home: "Home", projects: "Projects", analysis: "Analysis", laboratory: "Laboratory", molecular: "Molecular", console: "Console" };
@@ -995,7 +1102,7 @@ export const App = () => {
           <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFileDrop={importFile} consoleExpanded={consoleExpanded} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} />
           <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
         </div>
-        <StatusBar apiStatus={apiStatus} structure={structure} project={project} selectedAtomCount={projection.interaction.selectedAtomIds.length} />
+        <StatusBar apiStatus={apiStatus} structure={structure} project={project} selectedAtomCount={projection.interaction.selectedAtomIds.length} scientificRevision={activeHistoryState?.currentRevisionId ?? null} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} />
         {notice && <CapabilityNotice capability={notice} onClose={() => setNotice(null)} />}
         <div className="console-layer"><ConsolePanel expanded={consoleExpanded} onToggle={() => setConsoleExpanded((value) => !value)} structure={structure} namedSelections={namedSelections} onCommand={runConsoleCommand} /></div>
       </main>
