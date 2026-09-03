@@ -81,7 +81,11 @@ const fieldValue = (field: LabelField, atom: CanonicalAtom, structure: Canonical
   if (field === "b") return atom.bFactor === undefined || atom.bFactor === null ? "?" : atom.bFactor.toFixed(2);
   if (field === "q") return atom.occupancy === undefined || atom.occupancy === null ? "?" : atom.occupancy.toFixed(2);
   if (field === "formal_charge") return atom.formalCharge === undefined || atom.formalCharge === null ? "?" : String(atom.formalCharge);
-  if (field === "partial_charge") return structure.partialChargeDataset?.atomChargeMap[atom.stableId]?.toFixed(3) ?? "?";
+  if (field === "partial_charge") {
+    const dataset = structure.partialChargeDataset;
+    const value = dataset?.molecularRevision === structure.scientificHash ? dataset.atomChargeMap[atom.stableId] : undefined;
+    return value !== undefined && Number.isFinite(value) ? value.toFixed(3) : "?";
+  }
   return atom.secondaryStructure ?? "?";
 };
 

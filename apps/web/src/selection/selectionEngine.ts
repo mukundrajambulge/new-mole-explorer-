@@ -531,6 +531,13 @@ const recordCoordinateAtom = (atom: CanonicalAtom, structure: CanonicalMolecular
   context.coordinateObjectStates.set(scope.objectId, scope);
 };
 const canonicalPolymerTypingComplete = (structure: CanonicalMolecularStructure): boolean => Boolean(structure.polymerTypingSource) && structure.atoms.filter((atom) => atom.isPolymer).every((atom) => atom.polymerType !== undefined);
+const canonicalPartialChargeDatasetComplete = (structure: CanonicalMolecularStructure): boolean => {
+  const dataset = structure.partialChargeDataset;
+  return Boolean(dataset && dataset.molecularRevision === structure.scientificHash && structure.atoms.every((atom) => {
+    const value = dataset.atomChargeMap[atom.stableId];
+    return value !== undefined && Number.isFinite(value);
+  }));
+};
 const canonicalChemistryRolesComplete = (structure: CanonicalMolecularStructure): boolean => {
   const dataset = structure.chemistryDataset;
   if (!dataset || dataset.molecularRevision !== structure.scientificHash || dataset.profileVersion !== "canonical-chemistry-roles-v1") return false;
@@ -650,6 +657,10 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
     context.needsCoordinates = true;
     recordCoordinateAtom(atom, structure, context);
     const chargeDataset = structure.partialChargeDataset;
+    if (property === "partial_charge" && !canonicalPartialChargeDatasetComplete(structure)) {
+      if (!context.diagnostics.some((diagnostic) => diagnostic.code === "MISSING_DEPENDENCY")) context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Complete revision-matched canonical partial_charge data is unavailable for this selection context." });
+      return false;
+    }
     const numeric = property === "b"
       ? atom.bFactor
       : property === "q" || property === "occupancy"
@@ -657,7 +668,7 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
         : property === "formal_charge"
           ? atom.formalCharge
           : property === "partial_charge"
-            ? chargeDataset?.molecularRevision === structure.scientificHash ? chargeDataset.atomChargeMap[atom.stableId] : undefined
+            ? chargeDataset!.atomChargeMap[atom.stableId]
             : property === "x"
               ? atom.x
               : property === "y"

@@ -119,7 +119,17 @@ export const resolveAtomColor = (mode: ColorMode, atom: CanonicalAtom, structure
     if (atom.formalCharge === undefined || atom.formalCharge === null) return { status: "UNAVAILABLE", color: "#7f8791", diagnostic: "FORMAL_CHARGE_UNKNOWN" }; return { status: "READY", color: diverging(atom.formalCharge / 3) };
   }
   if (mode === "by-partial-charge") {
-    const dataset = structure.partialChargeDataset; if (!dataset) return { status: "UNAVAILABLE", color: "#7f8791", diagnostic: "Partial-charge data unavailable for this molecular revision." }; const value = dataset.atomChargeMap[atom.stableId]; if (value === undefined) return { status: "UNAVAILABLE", color: "#7f8791", diagnostic: "Partial-charge data unavailable for this molecular revision." }; const values = Object.values(dataset.atomChargeMap); const max = Math.max(...values.map((entry) => Math.abs(entry)), 1e-9); return { status: "READY", color: diverging(value / max) };
+    const dataset = structure.partialChargeDataset;
+    if (!dataset || dataset.molecularRevision !== structure.scientificHash) return { status: "UNAVAILABLE", color: "#7f8791", diagnostic: "Partial-charge data unavailable for this molecular revision." };
+    const value = dataset.atomChargeMap[atom.stableId];
+    const values = Object.values(dataset.atomChargeMap);
+    const complete = structure.atoms.every((candidate) => {
+      const candidateValue = dataset.atomChargeMap[candidate.stableId];
+      return candidateValue !== undefined && Number.isFinite(candidateValue);
+    });
+    if (!complete || value === undefined || !Number.isFinite(value) || values.some((entry) => !Number.isFinite(entry))) return { status: "UNAVAILABLE", color: "#7f8791", diagnostic: "Partial-charge data unavailable for this molecular revision." };
+    const max = Math.max(...values.map((entry) => Math.abs(entry)), 1e-9);
+    return { status: "READY", color: diverging(value / max) };
   }
   if (mode === "esp") return { status: "EXPERIMENTAL", color: "#7f8791", diagnostic: "ESP field unavailable: no electrostatic potential computation is registered for this molecular revision." };
   if (mode === "secondary-structure-standard" || mode === "secondary-structure-jmol" || mode === "secondary-structure") {

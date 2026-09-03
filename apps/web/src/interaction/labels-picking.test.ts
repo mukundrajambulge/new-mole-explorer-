@@ -18,6 +18,14 @@ describe("safe labels and reverse identity picking", () => {
     expect(() => parseSafeLabelExpression("{name" )).toThrow(/Unbalanced braces/i);
   });
 
+  it("does not expose stale partial-charge labels", () => {
+    const withDataset = { ...structure, partialChargeDataset: { datasetId: "charges:v1", molecularRevision: structure.scientificHash, chargeModel: "fixture", profileVersion: "v1", atomChargeMap: { "stable-ca": -0.42 }, units: "e", provenance: "deterministic fixture" } };
+    const expression = parseSafeLabelExpression("{partial_charge}");
+    expect(resolveSafeLabel(expression, withDataset.atoms[0], withDataset)).toBe("-0.420");
+    const stale = { ...withDataset, partialChargeDataset: { ...withDataset.partialChargeDataset, molecularRevision: "stale" } };
+    expect(resolveSafeLabel(expression, stale.atoms[0], stale)).toBe("?");
+  });
+
   it("resolves renderer hits through O(1) reverse maps and validates revision", () => {
     const map = new ReverseIdentityMap();
     map.build(structure, 7);

@@ -40,7 +40,14 @@ describe("G1C renderer-neutral color schemes", () => {
     expect(jmol.status).toBe("READY");
     expect(standard.color).not.toBe(jmol.color);
   });
-  it("renders a supplied partial-charge dataset", () => { const withDataset = { ...structure, partialChargeDataset: { datasetId: "charges:v1", molecularRevision: structure.scientificHash, chargeModel: "fixture", profileVersion: "v1", atomChargeMap: { c: -0.5, n: 0.5 }, units: "e", provenance: "deterministic fixture" } }; expect(resolveAtomColor("by-partial-charge", withDataset.atoms[0], withDataset).status).toBe("READY"); });
+  it("renders only a revision-matched finite partial-charge dataset", () => {
+    const withDataset = { ...structure, partialChargeDataset: { datasetId: "charges:v1", molecularRevision: structure.scientificHash, chargeModel: "fixture", profileVersion: "v1", atomChargeMap: { c: -0.5, n: 0.5, o: 0, lig: 0.1 }, units: "e", provenance: "deterministic fixture" } };
+    expect(resolveAtomColor("by-partial-charge", withDataset.atoms[0], withDataset).status).toBe("READY");
+    const stale = { ...withDataset, partialChargeDataset: { ...withDataset.partialChargeDataset, molecularRevision: "stale" } };
+    expect(resolveAtomColor("by-partial-charge", stale.atoms[0], stale).status).toBe("UNAVAILABLE");
+    const incomplete = { ...withDataset, partialChargeDataset: { ...withDataset.partialChargeDataset, atomChargeMap: { c: -0.5 } } };
+    expect(resolveAtomColor("by-partial-charge", incomplete.atoms[0], incomplete).status).toBe("UNAVAILABLE");
+  });
   it("uses explicit ligand color before representation changes, visibility, or global scheme changes", () => {
     const ligand = structure.atoms[3];
     const base = createDefaultRenderProjection(structure);
