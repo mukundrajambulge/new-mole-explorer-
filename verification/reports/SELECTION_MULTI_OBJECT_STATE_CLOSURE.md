@@ -14,9 +14,9 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `b87a0388b57859ecf4d038997352a9d0178abe5a`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
-- Current implementation commit: `089db30` (`docs(verification): promote workspace group oracle`)
-- Ending implementation SHA: `089db30`
-- Latest implementation/evidence base SHA before this report update: `089db30`
+- Current implementation commit: `d459291` (`fix(ingestion): add official wwPDB fallback and responsive viewer`)
+- Ending implementation SHA: `d459291`
+- Latest implementation/evidence base SHA before this report update: `d459291`
 - Working tree: clean after the implementation/evidence and report synchronization commits; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
