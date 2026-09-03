@@ -30,8 +30,8 @@
   },
   "oracleStatusCounts": {
     "ORACLE_PASS": 51,
-    "ORACLE_EQUIVALENT": 34,
-    "ORACLE_PENDING": 2
+    "ORACLE_EQUIVALENT": 35,
+    "ORACLE_PENDING": 1
   },
   "entries": [
     {
@@ -129,8 +129,8 @@
       "operator": "ambiguity handling",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "require ObjectID when name is ambiguous"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application identity-safety extension: pinned PyMOL keeps object names unique and replaces same-name objects; Mole Explorer rejects an ambiguous display name and requires ObjectID"
     },
     {
       "operator": "`not`",
