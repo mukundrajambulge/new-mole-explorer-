@@ -38,6 +38,15 @@ describe("workspace selection scope", () => {
     expect(resolveSelection("pepseq A", workspace!).stableAtomIds).toEqual(["object:first::first-atom", "object:second::second-atom"]);
   });
 
+  it("keeps crystallographic cell scope object-qualified in a multi-object selection view", () => {
+    const cell = (a: number) => ({ a, b: 10, c: 10, alpha: 90, beta: 90, gamma: 90, source: "PDB_CRYST1" as const, profileVersion: "fractional-unit-cell-membership-v1" as const });
+    const first = createWorkspaceObject({ ...loadResultFor("cell-first", "first-atom"), structure: { ...loadResultFor("cell-first", "first-atom").structure, unitCell: cell(10) } });
+    const second = createWorkspaceObject({ ...loadResultFor("cell-second", "second-atom"), structure: { ...loadResultFor("cell-second", "second-atom").structure, unitCell: cell(20) } }, [first.objectId]);
+    const workspace = workspaceSelectionStructure([first, second]);
+    expect(workspace?.unitCell).toBeUndefined();
+    expect(workspace?.atoms.map((atom) => atom.workspaceUnitCell?.a)).toEqual([10, 20]);
+  });
+
   it("materializes a selected canonical subset with new identities and explicit lineage", () => {
     const source = createWorkspaceObject({ ...loadResultFor("source", "source-atom"), structure: { ...loadResultFor("source", "source-atom").structure, bonds: [] } });
     const created = createWorkspaceObjectFromSelection(source, ["source-atom"], "selected-object", [source.objectId]);

@@ -46,7 +46,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 6 atoms · replace · revision c6439bbd3c…\n· 6 atoms",
+        "result": "●\nSelected 6 atoms · replace · revision 5f476cbbc1…\n· 6 atoms",
         "atomCount": 6,
         "membershipHash": "79d0c150",
         "viewerMembershipHash": "79d0c150",
@@ -74,7 +74,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 4 atoms · replace · revision c6439bbd3c…\n· 4 atoms",
+        "result": "●\nSelected 4 atoms · replace · revision 5f476cbbc1…\n· 4 atoms",
         "atomCount": 4,
         "membershipHash": "5cf44a98",
         "viewerMembershipHash": "5cf44a98",
@@ -102,7 +102,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 4 atoms · replace · revision c6439bbd3c…\n· 4 atoms",
+        "result": "●\nSelected 4 atoms · replace · revision 5f476cbbc1…\n· 4 atoms",
         "atomCount": 4,
         "membershipHash": "5cf44a98",
         "viewerMembershipHash": "5cf44a98",
@@ -130,7 +130,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 6 atoms · replace · revision c6439bbd3c…\n· 6 atoms",
+        "result": "●\nSelected 6 atoms · replace · revision 5f476cbbc1…\n· 6 atoms",
         "atomCount": 6,
         "membershipHash": "1edbc587",
         "viewerMembershipHash": "1edbc587",
@@ -158,7 +158,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 12 atoms · replace · revision c6439bbd3c…\n· 12 atoms",
+        "result": "●\nSelected 12 atoms · replace · revision 5f476cbbc1…\n· 12 atoms",
         "atomCount": 12,
         "membershipHash": "c29d701e",
         "viewerMembershipHash": "c29d701e",
@@ -186,7 +186,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 12 atoms · replace · revision c6439bbd3c…\n· 12 atoms",
+        "result": "●\nSelected 12 atoms · replace · revision 5f476cbbc1…\n· 12 atoms",
         "atomCount": 12,
         "membershipHash": "c29d701e",
         "viewerMembershipHash": "c29d701e",
@@ -214,7 +214,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 12 atoms · replace · revision c6439bbd3c…\n· 12 atoms",
+        "result": "●\nSelected 12 atoms · replace · revision 5f476cbbc1…\n· 12 atoms",
         "atomCount": 12,
         "membershipHash": "c29d701e",
         "viewerMembershipHash": "c29d701e",
@@ -242,7 +242,7 @@
       "observed": {
         "semanticStatus": "VALID_EMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 0 atoms · replace · revision c6439bbd3c…\n· 0 atoms",
+        "result": "●\nSelected 0 atoms · replace · revision 5f476cbbc1…\n· 0 atoms",
         "atomCount": 0,
         "membershipHash": "811c9dc5",
         "viewerMembershipHash": "811c9dc5",
@@ -270,7 +270,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 12 atoms · replace · revision c6439bbd3c…\n· 12 atoms",
+        "result": "●\nSelected 12 atoms · replace · revision 5f476cbbc1…\n· 12 atoms",
         "atomCount": 12,
         "membershipHash": "c29d701e",
         "viewerMembershipHash": "c29d701e",
@@ -298,7 +298,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 12 atoms · replace · revision c6439bbd3c…\n· 12 atoms",
+        "result": "●\nSelected 12 atoms · replace · revision 5f476cbbc1…\n· 12 atoms",
         "atomCount": 12,
         "membershipHash": "c29d701e",
         "viewerMembershipHash": "c29d701e",
@@ -326,7 +326,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 11 atoms · replace · revision c6439bbd3c…\n· 11 atoms",
+        "result": "●\nSelected 11 atoms · replace · revision 5f476cbbc1…\n· 11 atoms",
         "atomCount": 11,
         "membershipHash": "c9c5e093",
         "viewerMembershipHash": "c9c5e093",
@@ -380,7 +380,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 2 atoms · replace · revision c6439bbd3c…\n· 2 atoms",
+        "result": "●\nSelected 2 atoms · replace · revision 5f476cbbc1…\n· 2 atoms",
         "atomCount": 2,
         "membershipHash": "c49cc517",
         "viewerMembershipHash": "c49cc517",
@@ -408,7 +408,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 11 atoms · replace · revision c6439bbd3c…\n· 11 atoms",
+        "result": "●\nSelected 11 atoms · replace · revision 5f476cbbc1…\n· 11 atoms",
         "atomCount": 11,
         "membershipHash": "cac5e226",
         "viewerMembershipHash": "cac5e226",
@@ -436,7 +436,7 @@
       "observed": {
         "semanticStatus": "VALID_EMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 0 atoms · replace · revision c6439bbd3c…\n· 0 atoms",
+        "result": "●\nSelected 0 atoms · replace · revision 5f476cbbc1…\n· 0 atoms",
         "atomCount": 0,
         "membershipHash": "811c9dc5",
         "viewerMembershipHash": "811c9dc5",
@@ -464,7 +464,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 11 atoms · replace · revision c6439bbd3c…\n· 11 atoms",
+        "result": "●\nSelected 11 atoms · replace · revision 5f476cbbc1…\n· 11 atoms",
         "atomCount": 11,
         "membershipHash": "cac5e226",
         "viewerMembershipHash": "cac5e226",
@@ -518,7 +518,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 11 atoms · replace · revision c6439bbd3c…\n· 11 atoms",
+        "result": "●\nSelected 11 atoms · replace · revision 5f476cbbc1…\n· 11 atoms",
         "atomCount": 11,
         "membershipHash": "c9c5e093",
         "viewerMembershipHash": "c9c5e093",
@@ -546,7 +546,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 11 atoms · replace · revision c6439bbd3c…\n· 11 atoms",
+        "result": "●\nSelected 11 atoms · replace · revision 5f476cbbc1…\n· 11 atoms",
         "atomCount": 11,
         "membershipHash": "c9c5e093",
         "viewerMembershipHash": "c9c5e093",
@@ -574,7 +574,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 8 atoms · replace · revision c6439bbd3c…\n· 8 atoms",
+        "result": "●\nSelected 8 atoms · replace · revision 5f476cbbc1…\n· 8 atoms",
         "atomCount": 8,
         "membershipHash": "646bf637",
         "viewerMembershipHash": "646bf637",
@@ -602,7 +602,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 8 atoms · replace · revision c6439bbd3c…\n· 8 atoms",
+        "result": "●\nSelected 8 atoms · replace · revision 5f476cbbc1…\n· 8 atoms",
         "atomCount": 8,
         "membershipHash": "646bf637",
         "viewerMembershipHash": "646bf637",
@@ -630,7 +630,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 3 atoms · replace · revision c6439bbd3c…\n· 3 atoms",
+        "result": "●\nSelected 3 atoms · replace · revision 5f476cbbc1…\n· 3 atoms",
         "atomCount": 3,
         "membershipHash": "33bd2b36",
         "viewerMembershipHash": "33bd2b36",
@@ -658,7 +658,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 3 atoms · replace · revision c6439bbd3c…\n· 3 atoms",
+        "result": "●\nSelected 3 atoms · replace · revision 5f476cbbc1…\n· 3 atoms",
         "atomCount": 3,
         "membershipHash": "33bd2b36",
         "viewerMembershipHash": "33bd2b36",
@@ -686,7 +686,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 2 atoms · replace · revision c6439bbd3c…\n· 2 atoms",
+        "result": "●\nSelected 2 atoms · replace · revision 5f476cbbc1…\n· 2 atoms",
         "atomCount": 2,
         "membershipHash": "c49cc517",
         "viewerMembershipHash": "c49cc517",
@@ -714,7 +714,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 11 atoms · replace · revision c6439bbd3c…\n· 11 atoms",
+        "result": "●\nSelected 11 atoms · replace · revision 5f476cbbc1…\n· 11 atoms",
         "atomCount": 11,
         "membershipHash": "cac5e226",
         "viewerMembershipHash": "cac5e226",
@@ -742,7 +742,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 1 atoms · replace · revision c6439bbd3c…\n· 1 atoms",
+        "result": "●\nSelected 1 atoms · replace · revision 5f476cbbc1…\n· 1 atoms",
         "atomCount": 1,
         "membershipHash": "ee701b59",
         "viewerMembershipHash": "ee701b59",
@@ -770,7 +770,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 1 atoms · replace · revision c6439bbd3c…\n· 1 atoms",
+        "result": "●\nSelected 1 atoms · replace · revision 5f476cbbc1…\n· 1 atoms",
         "atomCount": 1,
         "membershipHash": "c57b2971",
         "viewerMembershipHash": "c57b2971",
@@ -798,7 +798,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 12 atoms · replace · revision c6439bbd3c…\n· 12 atoms",
+        "result": "●\nSelected 12 atoms · replace · revision 5f476cbbc1…\n· 12 atoms",
         "atomCount": 12,
         "membershipHash": "c29d701e",
         "viewerMembershipHash": "c29d701e",
@@ -826,7 +826,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 12 atoms · replace · revision c6439bbd3c…\n· 12 atoms",
+        "result": "●\nSelected 12 atoms · replace · revision 5f476cbbc1…\n· 12 atoms",
         "atomCount": 12,
         "membershipHash": "c29d701e",
         "viewerMembershipHash": "c29d701e",
@@ -854,7 +854,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 11 atoms · replace · revision c6439bbd3c…\n· 11 atoms",
+        "result": "●\nSelected 11 atoms · replace · revision 5f476cbbc1…\n· 11 atoms",
         "atomCount": 11,
         "membershipHash": "cac5e226",
         "viewerMembershipHash": "cac5e226",
@@ -908,7 +908,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 4 atoms · replace · revision c6439bbd3c…\n· 4 atoms",
+        "result": "●\nSelected 4 atoms · replace · revision 5f476cbbc1…\n· 4 atoms",
         "atomCount": 4,
         "membershipHash": "5df44c2b",
         "viewerMembershipHash": "5df44c2b",
@@ -936,7 +936,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 4 atoms · replace · revision c6439bbd3c…\n· 4 atoms",
+        "result": "●\nSelected 4 atoms · replace · revision 5f476cbbc1…\n· 4 atoms",
         "atomCount": 4,
         "membershipHash": "5df44c2b",
         "viewerMembershipHash": "5df44c2b",
@@ -964,7 +964,7 @@
       "observed": {
         "semanticStatus": "VALID_EMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 0 atoms · replace · revision c6439bbd3c…\n· 0 atoms",
+        "result": "●\nSelected 0 atoms · replace · revision 5f476cbbc1…\n· 0 atoms",
         "atomCount": 0,
         "membershipHash": "811c9dc5",
         "viewerMembershipHash": "811c9dc5",
@@ -992,7 +992,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 1 atoms · replace · revision c6439bbd3c…\n· 1 atoms",
+        "result": "●\nSelected 1 atoms · replace · revision 5f476cbbc1…\n· 1 atoms",
         "atomCount": 1,
         "membershipHash": "eb7016a0",
         "viewerMembershipHash": "eb7016a0",
@@ -1020,7 +1020,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 1 atoms · replace · revision c6439bbd3c…\n· 1 atoms",
+        "result": "●\nSelected 1 atoms · replace · revision 5f476cbbc1…\n· 1 atoms",
         "atomCount": 1,
         "membershipHash": "eb7016a0",
         "viewerMembershipHash": "eb7016a0",
@@ -1048,7 +1048,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 1 atoms · replace · revision c6439bbd3c…\n· 1 atoms",
+        "result": "●\nSelected 1 atoms · replace · revision 5f476cbbc1…\n· 1 atoms",
         "atomCount": 1,
         "membershipHash": "ee701b59",
         "viewerMembershipHash": "ee701b59",
@@ -1076,7 +1076,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 10 atoms · replace · revision c6439bbd3c…\n· 10 atoms",
+        "result": "●\nSelected 10 atoms · replace · revision 5f476cbbc1…\n· 10 atoms",
         "atomCount": 10,
         "membershipHash": "c08dd2b6",
         "viewerMembershipHash": "c08dd2b6",
@@ -1128,7 +1128,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 2 atoms · replace · revision c6439bbd3c…",
+        "result": "●\nSelected 2 atoms · replace · revision 5f476cbbc1…",
         "atomCount": 2,
         "membershipHash": "c49cc517",
         "viewerMembershipHash": "c49cc517",
@@ -1156,7 +1156,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 8 atoms · replace · revision c6439bbd3c…\n· 8 atoms",
+        "result": "●\nSelected 8 atoms · replace · revision 5f476cbbc1…\n· 8 atoms",
         "atomCount": 8,
         "membershipHash": "646bf637",
         "viewerMembershipHash": "646bf637",
@@ -1210,7 +1210,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 2 atoms · replace · revision c6439bbd3c…\n· 2 atoms",
+        "result": "●\nSelected 2 atoms · replace · revision 5f476cbbc1…\n· 2 atoms",
         "atomCount": 2,
         "membershipHash": "c49cc517",
         "viewerMembershipHash": "c49cc517",
@@ -1264,7 +1264,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 2 atoms · replace · revision c6439bbd3c…\n· 2 atoms",
+        "result": "●\nSelected 2 atoms · replace · revision 5f476cbbc1…\n· 2 atoms",
         "atomCount": 2,
         "membershipHash": "c49cc517",
         "viewerMembershipHash": "c49cc517",
@@ -1292,7 +1292,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 12 atoms · replace · revision c6439bbd3c…\n· 12 atoms",
+        "result": "●\nSelected 12 atoms · replace · revision 5f476cbbc1…\n· 12 atoms",
         "atomCount": 12,
         "membershipHash": "c29d701e",
         "viewerMembershipHash": "c29d701e",
@@ -1346,7 +1346,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 11 atoms · replace · revision c6439bbd3c…\n· 11 atoms",
+        "result": "●\nSelected 11 atoms · replace · revision 5f476cbbc1…\n· 11 atoms",
         "atomCount": 11,
         "membershipHash": "cac5e226",
         "viewerMembershipHash": "cac5e226",
@@ -1374,7 +1374,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 8 atoms · replace · revision c6439bbd3c…\n· 8 atoms",
+        "result": "●\nSelected 8 atoms · replace · revision 5f476cbbc1…\n· 8 atoms",
         "atomCount": 8,
         "membershipHash": "646bf637",
         "viewerMembershipHash": "646bf637",
@@ -1402,7 +1402,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 2 atoms · replace · revision c6439bbd3c…\n· 2 atoms",
+        "result": "●\nSelected 2 atoms · replace · revision 5f476cbbc1…\n· 2 atoms",
         "atomCount": 2,
         "membershipHash": "c49cc517",
         "viewerMembershipHash": "c49cc517",
@@ -1430,7 +1430,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 2 atoms · replace · revision c6439bbd3c…\n· 2 atoms",
+        "result": "●\nSelected 2 atoms · replace · revision 5f476cbbc1…\n· 2 atoms",
         "atomCount": 2,
         "membershipHash": "d993317d",
         "viewerMembershipHash": "d993317d",
@@ -1484,7 +1484,7 @@
       "observed": {
         "semanticStatus": "VALID_EMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 0 atoms · replace · revision c6439bbd3c…\n· 0 atoms",
+        "result": "●\nSelected 0 atoms · replace · revision 5f476cbbc1…\n· 0 atoms",
         "atomCount": 0,
         "membershipHash": "811c9dc5",
         "viewerMembershipHash": "811c9dc5",
@@ -1510,9 +1510,9 @@
         "membershipHash": null
       },
       "observed": {
-        "semanticStatus": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+        "semanticStatus": "MISSING_DEPENDENCY",
         "category": "SELECTION",
-        "result": "●\nSelection operator `bycell` is gated until its validated scientific profile is available.\n· 0 atoms",
+        "result": "●\nCanonical unit-cell parameters are unavailable; bycell was not evaluated.\n· 0 atoms",
         "atomCount": 0,
         "membershipHash": null,
         "viewerMembershipHash": null,
@@ -1525,7 +1525,7 @@
         "command": "show sticks, all"
       },
       "failureDiagnostics": [
-        "Selection operator `bycell` is gated until its validated scientific profile is available."
+        "Canonical unit-cell parameters are unavailable; bycell was not evaluated."
       ]
     },
     {
@@ -1538,7 +1538,7 @@
       "observed": {
         "semanticStatus": "VALID_EMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 0 atoms · replace · revision c6439bbd3c…\n· 0 atoms",
+        "result": "●\nSelected 0 atoms · replace · revision 5f476cbbc1…\n· 0 atoms",
         "atomCount": 0,
         "membershipHash": "811c9dc5",
         "viewerMembershipHash": "811c9dc5",
@@ -1566,7 +1566,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 2 atoms · replace · revision c6439bbd3c…\n· 2 atoms",
+        "result": "●\nSelected 2 atoms · replace · revision 5f476cbbc1…\n· 2 atoms",
         "atomCount": 2,
         "membershipHash": "d993317d",
         "viewerMembershipHash": "d993317d",
@@ -1594,7 +1594,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 2 atoms · replace · revision c6439bbd3c…\n· 2 atoms",
+        "result": "●\nSelected 2 atoms · replace · revision 5f476cbbc1…\n· 2 atoms",
         "atomCount": 2,
         "membershipHash": "d993317d",
         "viewerMembershipHash": "d993317d",
@@ -1622,7 +1622,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 6 atoms · replace · revision c6439bbd3c…\n· 6 atoms",
+        "result": "●\nSelected 6 atoms · replace · revision 5f476cbbc1…\n· 6 atoms",
         "atomCount": 6,
         "membershipHash": "79d0c150",
         "viewerMembershipHash": "79d0c150",
@@ -1650,7 +1650,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 4 atoms · replace · revision c6439bbd3c…\n· 4 atoms",
+        "result": "●\nSelected 4 atoms · replace · revision 5f476cbbc1…\n· 4 atoms",
         "atomCount": 4,
         "membershipHash": "5cf44a98",
         "viewerMembershipHash": "5cf44a98",
@@ -1678,7 +1678,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 6 atoms · replace · revision c6439bbd3c…\n· 6 atoms",
+        "result": "●\nSelected 6 atoms · replace · revision 5f476cbbc1…\n· 6 atoms",
         "atomCount": 6,
         "membershipHash": "79d0c150",
         "viewerMembershipHash": "79d0c150",
@@ -1732,7 +1732,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 6 atoms · replace · revision c6439bbd3c…\n· 6 atoms",
+        "result": "●\nSelected 6 atoms · replace · revision 5f476cbbc1…\n· 6 atoms",
         "atomCount": 6,
         "membershipHash": "1edbc587",
         "viewerMembershipHash": "1edbc587",
@@ -1760,7 +1760,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 6 atoms · replace · revision c6439bbd3c…\n· 6 atoms",
+        "result": "●\nSelected 6 atoms · replace · revision 5f476cbbc1…\n· 6 atoms",
         "atomCount": 6,
         "membershipHash": "1edbc587",
         "viewerMembershipHash": "1edbc587",
@@ -1788,7 +1788,7 @@
       "observed": {
         "semanticStatus": "VALID_EMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 0 atoms · replace · revision c6439bbd3c…\n· 0 atoms",
+        "result": "●\nSelected 0 atoms · replace · revision 5f476cbbc1…\n· 0 atoms",
         "atomCount": 0,
         "membershipHash": "811c9dc5",
         "viewerMembershipHash": "811c9dc5",
@@ -1879,7 +1879,7 @@
       "observed": {
         "semanticStatus": "VALID_EMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 0 atoms · replace · revision c6439bbd3c…\n· 0 atoms",
+        "result": "●\nSelected 0 atoms · replace · revision 5f476cbbc1…\n· 0 atoms",
         "atomCount": 0,
         "membershipHash": "811c9dc5",
         "viewerMembershipHash": "811c9dc5",
@@ -1907,7 +1907,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 12 atoms · replace · revision c6439bbd3c…\n· 12 atoms",
+        "result": "●\nSelected 12 atoms · replace · revision 5f476cbbc1…\n· 12 atoms",
         "atomCount": 12,
         "membershipHash": "c29d701e",
         "viewerMembershipHash": "c29d701e",
@@ -1972,7 +1972,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 5 atoms · replace · revision c6439bbd3c…\n· 5 atoms",
+        "result": "●\nSelected 5 atoms · replace · revision 5f476cbbc1…\n· 5 atoms",
         "atomCount": 5,
         "membershipHash": "a3933ff1",
         "viewerMembershipHash": "a3933ff1",
@@ -2000,7 +2000,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 4 atoms · replace · revision c6439bbd3c…\n· 4 atoms",
+        "result": "●\nSelected 4 atoms · replace · revision 5f476cbbc1…\n· 4 atoms",
         "atomCount": 4,
         "membershipHash": "a31e0eec",
         "viewerMembershipHash": "a31e0eec",
@@ -2028,7 +2028,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 5 atoms · replace · revision c6439bbd3c…\n· 5 atoms",
+        "result": "●\nSelected 5 atoms · replace · revision 5f476cbbc1…\n· 5 atoms",
         "atomCount": 5,
         "membershipHash": "f827a93c",
         "viewerMembershipHash": "f827a93c",
@@ -2056,7 +2056,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 10 atoms · replace · revision c6439bbd3c…\n· 10 atoms",
+        "result": "●\nSelected 10 atoms · replace · revision 5f476cbbc1…\n· 10 atoms",
         "atomCount": 10,
         "membershipHash": "7739eb0c",
         "viewerMembershipHash": "7739eb0c",
@@ -2084,7 +2084,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 12 atoms · replace · revision c6439bbd3c…\n· 12 atoms",
+        "result": "●\nSelected 12 atoms · replace · revision 5f476cbbc1…\n· 12 atoms",
         "atomCount": 12,
         "membershipHash": "c29d701e",
         "viewerMembershipHash": "c29d701e",
@@ -2166,7 +2166,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 8 atoms · replace · revision c6439bbd3c…\n· 8 atoms",
+        "result": "●\nSelected 8 atoms · replace · revision 5f476cbbc1…\n· 8 atoms",
         "atomCount": 8,
         "membershipHash": "646bf637",
         "viewerMembershipHash": "646bf637",
@@ -2218,7 +2218,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 11 atoms · replace · revision c6439bbd3c…",
+        "result": "●\nSelected 11 atoms · replace · revision 5f476cbbc1…",
         "atomCount": 11,
         "membershipHash": "c9c5e093",
         "viewerMembershipHash": "c9c5e093",
@@ -2438,7 +2438,7 @@
       "observed": {
         "semanticStatus": "VALID_NONEMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 8 atoms · replace · revision c6439bbd3c…\n· 8 atoms",
+        "result": "●\nSelected 8 atoms · replace · revision 5f476cbbc1…\n· 8 atoms",
         "atomCount": 8,
         "membershipHash": "646bf637",
         "viewerMembershipHash": "646bf637",
@@ -2466,7 +2466,7 @@
       "observed": {
         "semanticStatus": "VALID_EMPTY",
         "category": "SELECTION",
-        "result": "●\nSelected 0 atoms · replace · revision c6439bbd3c…\n· 0 atoms",
+        "result": "●\nSelected 0 atoms · replace · revision 5f476cbbc1…\n· 0 atoms",
         "atomCount": 0,
         "membershipHash": "811c9dc5",
         "viewerMembershipHash": "811c9dc5",

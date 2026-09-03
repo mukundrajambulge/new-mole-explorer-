@@ -55,6 +55,33 @@ describe("canonical selection engine", () => {
     expect(resolveSelection("name CA in segi SEG_A", segmented).stableAtomIds).toEqual(["a1", "a3"]);
   });
 
+  it("expands bycell from source-backed fractional unit-cell membership", () => {
+    const unitCellStructure = {
+      ...structure,
+      id: "unit-cell-structure",
+      scientificHash: "unit-cell-revision".padEnd(64, "0"),
+      unitCell: {
+        a: 10,
+        b: 10,
+        c: 10,
+        alpha: 90,
+        beta: 90,
+        gamma: 90,
+        source: "PDB_CRYST1" as const,
+        profileVersion: "fractional-unit-cell-membership-v1" as const,
+      },
+      atoms: structure.atoms.map((atom) => ({
+        ...atom,
+        x: atom.stableId === "a1" ? 1 : atom.stableId === "a2" ? 2 : atom.stableId === "a3" ? 11 : atom.stableId === "b1" ? 12 : 11,
+      })),
+    } satisfies CanonicalMolecularStructure;
+    const result = resolveSelection("bycell name N", unitCellStructure);
+    expect(result.stableAtomIds).toEqual(["a1", "a2"]);
+    expect(result.dependencyVector.needsCoordinates).toBe(true);
+    expect(result.scientificProfiles).toEqual([{ id: "canonical-unit-cell-membership", version: "1", fingerprint: "canonical-unit-cell-membership-v1" }]);
+    expect(result.coordinateContext?.stateScopes).toEqual([{ objectId: unitCellStructure.id, stateId: `${unitCellStructure.id}:state:1`, ordinal: 1 }]);
+  });
+
   it("expands byring from bounded cycles in the canonical bond graph", () => {
     const ring = { ...structure, bonds: [
       { id: "r1", atom1: "a1", atom2: "a2", order: "AROMATIC" as const, source: "PDB_CONECT" as const },

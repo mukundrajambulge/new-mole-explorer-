@@ -189,6 +189,7 @@ const derivedStructure = (
   const sourceAtomMap: Record<string, string> = {};
   const childIdBySourceId = new Map<string, string>();
   const initialState = stateInputs[0]?.sourceState;
+  const unitCell = stateInputs.every(({ sourceObject }) => JSON.stringify(sourceObject.loadResult.structure.unitCell) === JSON.stringify(parentStructure.unitCell)) ? parentStructure.unitCell : undefined;
   const atoms = sourceAtoms.map((sourceAtom, index) => {
     const childStableId = `${structureId}:object:${shortHash(objectId)}:atom:${index + 1}`;
     sourceAtomMap[childStableId] = sourceAtom.stableId;
@@ -226,7 +227,7 @@ const derivedStructure = (
     ? { ...parentStructure.partialChargeDataset, molecularRevision: "pending" as string, atomChargeMap: Object.fromEntries(sourceAtoms.map((atom) => [childIdBySourceId.get(atom.stableId)!, parentStructure.partialChargeDataset!.atomChargeMap[atom.stableId]!])) }
     : undefined;
   const polymerTypingSource = parentStructure.polymerTypingSource ? `${parentStructure.polymerTypingSource}; derived via ${operation}` : undefined;
-  const scientificHash = shortHash(JSON.stringify({ atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder: coordinateStates.map((state) => state.id), polymerTypingSource: polymerTypingSource ?? null, partialChargeDataset: partialChargeDataset?.atomChargeMap ?? null, peptideSequenceChains: peptideSequenceDataset?.chains ?? null }));
+  const scientificHash = shortHash(JSON.stringify({ atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder: coordinateStates.map((state) => state.id), unitCell: unitCell ?? null, polymerTypingSource: polymerTypingSource ?? null, partialChargeDataset: partialChargeDataset?.atomChargeMap ?? null, peptideSequenceChains: peptideSequenceDataset?.chains ?? null }));
   const structure: CanonicalMolecularStructure = {
     id: structureId,
     name: displayName,
@@ -240,6 +241,7 @@ const derivedStructure = (
     scientificHash,
     coordinateStates,
     stateOrder: coordinateStates.map((state) => state.id),
+    ...(unitCell ? { unitCell } : {}),
     ...(polymerTypingSource ? { polymerTypingSource } : {}),
     ...(partialChargeDataset ? { partialChargeDataset: { ...partialChargeDataset, molecularRevision: scientificHash } } : {}),
     ...(parentStructure.secondaryStructureDataset ? { secondaryStructureDataset: { ...parentStructure.secondaryStructureDataset, molecularRevision: scientificHash } } : {}),
@@ -455,7 +457,7 @@ export const workspaceSelectionStructure = (objects: readonly WorkspaceObject[])
   const atoms = scoped.flatMap((object) => {
     const state = stateForObject(object);
     const ordinal = state?.ordinal ?? Math.max(1, object.stateOrder.indexOf(object.currentStateId) + 1);
-    return structureForWorkspaceObjectState(object).atoms.map((atom) => ({ ...atom, stableId: namespaceIds ? workspaceScopedStableAtomId(object.objectId, atom.stableId) : atom.stableId, workspaceObjectId: object.objectId, workspaceObjectName: object.displayName, workspaceObjectEnabled: object.enabled, workspaceCoordinateStateId: state?.id, workspaceStateOrdinal: ordinal }));
+    return structureForWorkspaceObjectState(object).atoms.map((atom) => ({ ...atom, stableId: namespaceIds ? workspaceScopedStableAtomId(object.objectId, atom.stableId) : atom.stableId, workspaceObjectId: object.objectId, workspaceObjectName: object.displayName, workspaceObjectEnabled: object.enabled, workspaceCoordinateStateId: state?.id, workspaceStateOrdinal: ordinal, ...(namespaceIds && object.loadResult.structure.unitCell ? { workspaceUnitCell: object.loadResult.structure.unitCell } : {}) }));
   });
   const bonds = scoped.flatMap((object) => object.loadResult.structure.bonds.map((bond) => ({ ...bond, atom1: namespaceIds ? workspaceScopedStableAtomId(object.objectId, bond.atom1) : bond.atom1, atom2: namespaceIds ? workspaceScopedStableAtomId(object.objectId, bond.atom2) : bond.atom2 })));
   const chains = new Set(atoms.map((atom) => `${atom.workspaceObjectId}\u0000${atom.chain}`));
@@ -478,6 +480,7 @@ export const workspaceSelectionStructure = (objects: readonly WorkspaceObject[])
   const firstWithoutTyping = { ...first };
   delete firstWithoutTyping.polymerTypingSource;
   delete firstWithoutTyping.peptideSequenceDataset;
+  if (namespaceIds) delete firstWithoutTyping.unitCell;
   const scientificHash = namespaceIds ? `workspace:${scoped.map((object) => `${object.objectId}:${object.loadResult.structure.scientificHash}:${stateForObject(object)?.id ?? object.currentStateId}:${stateForObject(object)?.coordinateHash ?? ""}`).join("|")}` : first.scientificHash;
   return { ...firstWithoutTyping, id: namespaceIds ? "workspace" : first.id, name: namespaceIds ? "workspace" : first.name, atoms, bonds, counts, bounds, ...(polymerTypingSource ? { polymerTypingSource } : {}), ...(peptideSequenceDataset ? { peptideSequenceDataset: { ...peptideSequenceDataset, molecularRevision: scientificHash } } : {}), scientificHash };
 };

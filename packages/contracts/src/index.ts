@@ -144,6 +144,8 @@ export type CanonicalAtom = {
   /** Workspace-only coordinate-state metadata used by state-aware selection. */
   workspaceCoordinateStateId?: string;
   workspaceStateOrdinal?: number;
+  /** Workspace-only source-backed cell scope used by multi-object bycell evaluation. */
+  workspaceUnitCell?: CanonicalUnitCell;
 };
 
 export type StructureCounts = {
@@ -173,6 +175,20 @@ export type CanonicalCoordinateState = {
   coordinateHash: string;
 };
 
+/** Source-backed crystallographic unit-cell parameters for bounded bycell selection. */
+export type CanonicalUnitCell = {
+  a: number;
+  b: number;
+  c: number;
+  alpha: number;
+  beta: number;
+  gamma: number;
+  spaceGroup?: string;
+  zValue?: number;
+  source: "PDB_CRYST1" | "MMCIF_CELL";
+  profileVersion: "fractional-unit-cell-membership-v1";
+};
+
 export type StructureSourceMetadata = {
   kind: StructureSourceKind;
   originalFilename: string;
@@ -200,6 +216,8 @@ export type CanonicalMolecularStructure = {
   coordinateStates?: CanonicalCoordinateState[];
   /** Explicit presentation order; never infer scientific identity from array insertion order. */
   stateOrder?: string[];
+  /** Optional source-backed crystallographic cell; does not imply symmetry expansion or PBC. */
+  unitCell?: CanonicalUnitCell;
   /** Provenance for source-backed polymer entity typing, when available. */
   polymerTypingSource?: string;
   partialChargeDataset?: PartialChargeDataset;

@@ -156,6 +156,64 @@ ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
     expect(result.structure.atoms[1].formalCharge).toBeUndefined();
   });
 
+  it("preserves source-backed PDB unit-cell parameters", async () => {
+    const content = [
+      "CRYST1   10.000   10.000   10.000  90.00  90.00  90.00 P 1           1",
+      fixedPdbLine("ATOM", 1, "CA", "ALA", "A", 1, "C", 1, undefined),
+      "END",
+    ].join("\n");
+    const result = await new StructureIngestionService().ingestLocal("unit-cell.pdb", Buffer.from(content));
+    expect(result.structure.unitCell).toMatchObject({
+      a: 10,
+      b: 10,
+      c: 10,
+      alpha: 90,
+      beta: 90,
+      gamma: 90,
+      source: "PDB_CRYST1",
+      profileVersion: "fractional-unit-cell-membership-v1",
+    });
+  });
+
+  it("preserves source-backed mmCIF unit-cell parameters", async () => {
+    const content = [
+      "data_cell",
+      "_cell.length_a 20.0",
+      "_cell.length_b 21.0",
+      "_cell.length_c 22.0",
+      "_cell.angle_alpha 90.0",
+      "_cell.angle_beta 91.0",
+      "_cell.angle_gamma 89.0",
+      "_symmetry.space_group_name_H-M 'P 1'",
+      "_cell.Z_PDB 2",
+      "loop_",
+      "_atom_site.group_PDB",
+      "_atom_site.id",
+      "_atom_site.type_symbol",
+      "_atom_site.label_atom_id",
+      "_atom_site.label_comp_id",
+      "_atom_site.label_asym_id",
+      "_atom_site.label_seq_id",
+      "_atom_site.Cartn_x",
+      "_atom_site.Cartn_y",
+      "_atom_site.Cartn_z",
+      "ATOM 1 C CA ALA A 1 1.0 2.0 3.0",
+    ].join("\n");
+    const result = await new StructureIngestionService().ingestLocal("unit-cell.mmcif", Buffer.from(content));
+    expect(result.structure.unitCell).toMatchObject({
+      a: 20,
+      b: 21,
+      c: 22,
+      alpha: 90,
+      beta: 91,
+      gamma: 89,
+      spaceGroup: "P 1",
+      zValue: 2,
+      source: "MMCIF_CELL",
+      profileVersion: "fractional-unit-cell-membership-v1",
+    });
+  });
+
   it("records admitted PDB HELIX/SHEET assignments as canonical secondary structure", async () => {
     const content = [
       "HELIX    1   1 ALA A   1  GLY A   2  1                                  ",

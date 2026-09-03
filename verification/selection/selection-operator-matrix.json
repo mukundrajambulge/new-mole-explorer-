@@ -3,14 +3,13 @@
   "source": "verification/selection/SELECTION_OPERATOR_MATRIX.md",
   "rowCount": 87,
   "implementationStatusCounts": {
-    "VERIFIED_WORKING": 81,
+    "VERIFIED_WORKING": 82,
     "MISSING_DEPENDENCY": 4,
-    "INTENTIONALLY_UNSUPPORTED": 1,
     "UNKNOWN_PROPERTY": 1
   },
   "liveBrowserStatusCounts": {
     "PASS (`select all`)": 1,
-    "PASS (selection-matrix-live.spec.ts)": 60,
+    "PASS (selection-matrix-live.spec.ts)": 59,
     "PASS indirectly": 4,
     "PASS via named-selection E2E": 1,
     "PASS (multi-object-state.spec.ts)": 1,
@@ -19,6 +18,7 @@
     "PASS (selection-matrix-live.spec.ts; edge-identity E2E; segment-identity E2E)": 1,
     "PASS (selection-closure E2E; selection-matrix-live.spec.ts)": 4,
     "PASS (ring-topology E2E)": 1,
+    "PASS (selection-matrix-live.spec.ts diagnostic; bycell E2E)": 1,
     "PASS (selection-matrix-live.spec.ts; multi-object-state.spec.ts)": 1,
     "PASS (typed-properties E2E; selection-matrix-live.spec.ts)": 3,
     "PASS (selection-matrix-live.spec.ts; typed-properties E2E)": 3,
@@ -28,9 +28,9 @@
     "PASS (`select color red` after `color red, all`; selection-matrix-live.spec.ts)": 1
   },
   "oracleStatusCounts": {
-    "ORACLE_PASS": 47,
+    "ORACLE_PASS": 48,
     "ORACLE_EQUIVALENT": 33,
-    "ORACLE_PENDING": 7
+    "ORACLE_PENDING": 6
   },
   "entries": [
     {
@@ -357,10 +357,10 @@
     },
     {
       "operator": "`bycell`",
-      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
-      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "unit-cell data not present"
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts diagnostic; bycell E2E)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "bounded current-coordinate fractional-cell membership; no symmetry-mate or PBC expansion"
     },
     {
       "operator": "`neighbor`",

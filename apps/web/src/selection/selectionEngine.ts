@@ -1,4 +1,4 @@
-import type { CanonicalAtom, CanonicalMolecularStructure } from "@molecular/contracts";
+import type { CanonicalAtom, CanonicalMolecularStructure, CanonicalUnitCell } from "@molecular/contracts";
 import { vdwRadiusForElementStrict, VDW_RADIUS_PROFILE } from "../science/vdwRadii";
 import { beyondSurfaceGapBoundary, withinSpatialBoundary } from "./spatialPolicy";
 
@@ -56,7 +56,7 @@ export type SelectionAst =
   | { kind: "named"; name: string; required: boolean; span?: SourceSpan }
   | { kind: "not"; operand: SelectionAst }
   | { kind: "and" | "or"; left: SelectionAst; right: SelectionAst }
-  | { kind: "byobject" | "bysegi" | "bychain" | "byres" | "bycalpha" | "bymolecule" | "byfragment" | "byring" | "first" | "last"; operand: SelectionAst }
+  | { kind: "byobject" | "bysegi" | "bychain" | "byres" | "bycalpha" | "bymolecule" | "byfragment" | "byring" | "bycell" | "first" | "last"; operand: SelectionAst }
   | { kind: "neighbor" | "bound_to"; operand: SelectionAst }
   | { kind: "extend"; distance: number; operand: SelectionAst }
   | { kind: "identifier_match"; mode: "in" | "like"; left: SelectionAst; right: SelectionAst }
@@ -150,6 +150,7 @@ export type SelectionWorkspaceGroup = {
 };
 
 const PROFILE = { id: "pymol-oss-mvp", version: "1", fingerprint: "pymol-oss-mvp-selection-v1" } as const;
+const UNIT_CELL_PROFILE = { id: "canonical-unit-cell-membership", version: "1", fingerprint: "canonical-unit-cell-membership-v1" } as const;
 const GRAMMAR_VERSION = "selection-lexer-pratt-v1";
 const hash = (value: string): string => {
   let result = 2166136261;
@@ -259,7 +260,7 @@ class SelectionParser {
     if (token.kind === "LPAREN") { const nested = this.expression(0); if (this.current().kind !== "RPAREN") this.fail("Expected `)`."); this.take(); return nested; }
     if (token.kind === "OPERATOR" && token.lexeme === "!") return { kind: "not", operand: this.expression(60) };
     if (word === "not") return { kind: "not", operand: this.expression(60) };
-    if (["byobject", "bysegi", "byres", "bychain", "bycalpha", "bymolecule", "byfragment", "byring"].includes(word)) return { kind: word as "byobject" | "bysegi" | "byres" | "bychain" | "bycalpha" | "bymolecule" | "byfragment" | "byring", operand: this.expression(0) };
+    if (["byobject", "bysegi", "byres", "bychain", "bycalpha", "bymolecule", "byfragment", "byring", "bycell"].includes(word)) return { kind: word as "byobject" | "bysegi" | "byres" | "bychain" | "bycalpha" | "bymolecule" | "byfragment" | "byring" | "bycell", operand: this.expression(0) };
     if (word === "first" || word === "last") return { kind: word, operand: this.expression(60) };
     if (word === "neighbor" || word === "bound_to" || word === "bound-to") return { kind: word === "bound-to" ? "bound_to" : word, operand: this.expression(35) };
     if (word === "extend") return { kind: "extend", distance: this.distance(), operand: this.expression(35) };
@@ -328,7 +329,7 @@ const selectionParseCache = new Map<string, { ast: SelectionAst | null; tokens: 
 
 const normalize = (ast: SelectionAst): SelectionAst => {
   if (ast.kind === "and" || ast.kind === "or") return { ...ast, left: normalize(ast.left), right: normalize(ast.right) };
-  if (ast.kind === "not" || ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "byfragment" || ast.kind === "byring" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to" || ast.kind === "extend") return { ...ast, operand: normalize(ast.operand) };
+  if (ast.kind === "not" || ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "byfragment" || ast.kind === "byring" || ast.kind === "bycell" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to" || ast.kind === "extend") return { ...ast, operand: normalize(ast.operand) };
   if (ast.kind === "identifier_match") return { ...ast, left: normalize(ast.left), right: normalize(ast.right) };
   if (ast.kind === "within" || ast.kind === "around" || ast.kind === "expand" || ast.kind === "near_to" || ast.kind === "beyond" || ast.kind === "gap") return { ...ast, reference: normalize(ast.reference), ...(ast.candidate ? { candidate: normalize(ast.candidate) } : {}) };
   if (ast.kind === "predicate") return { ...ast, property: ast.property.toLowerCase() as SelectionProperty, value: ast.value.trim() };
@@ -343,7 +344,7 @@ const serialize = (ast: SelectionAst): string => {
   if (ast.kind === "not") return `not(${serialize(ast.operand)})`;
   if (ast.kind === "and" || ast.kind === "or") return `(${serialize(ast.left)} ${ast.kind} ${serialize(ast.right)})`;
   if (ast.kind === "extend") return `extend(${ast.distance},${serialize(ast.operand)})`;
-  if (ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "byfragment" || ast.kind === "byring" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to") return `${ast.kind}(${serialize(ast.operand)})`;
+  if (ast.kind === "byobject" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha" || ast.kind === "bymolecule" || ast.kind === "byfragment" || ast.kind === "byring" || ast.kind === "bycell" || ast.kind === "first" || ast.kind === "last" || ast.kind === "neighbor" || ast.kind === "bound_to") return `${ast.kind}(${serialize(ast.operand)})`;
   if (ast.kind === "identifier_match") return `${ast.kind}:${ast.mode}(${serialize(ast.left)},${serialize(ast.right)})`;
   if (ast.kind === "within" || ast.kind === "around" || ast.kind === "expand" || ast.kind === "near_to" || ast.kind === "beyond" || ast.kind === "gap") return `${ast.kind}(${ast.distance},${serialize(ast.reference)}${ast.candidate ? `,${serialize(ast.candidate)}` : ""})`;
   return "invalid";
@@ -486,6 +487,33 @@ const canonicalRingsFor = (structure: CanonicalMolecularStructure, context: Eval
     return null;
   }
   return rings;
+};
+const fractionalCellCoordinatesFor = (atom: CanonicalAtom, cell: CanonicalUnitCell): [number, number, number] | null => {
+  const toRadians = (degrees: number) => degrees * Math.PI / 180;
+  const alpha = toRadians(cell.alpha);
+  const beta = toRadians(cell.beta);
+  const gamma = toRadians(cell.gamma);
+  const sinGamma = Math.sin(gamma);
+  if (Math.abs(sinGamma) < 1e-10) return null;
+  const cosAlpha = Math.cos(alpha);
+  const cosBeta = Math.cos(beta);
+  const cosGamma = Math.cos(gamma);
+  const by = cell.b * sinGamma;
+  const czSquared = cell.c * cell.c - Math.pow(cell.c * (cosBeta), 2) - Math.pow(cell.c * (cosAlpha - cosBeta * cosGamma) / sinGamma, 2);
+  if (by <= 0 || czSquared <= 1e-10) return null;
+  const zFraction = (atom.z - 0) / Math.sqrt(czSquared);
+  const yFraction = (atom.y - cell.c * (cosAlpha - cosBeta * cosGamma) / sinGamma * zFraction) / by;
+  const xFraction = (atom.x - cell.b * cosGamma * yFraction - cell.c * cosBeta * zFraction) / cell.a;
+  return [xFraction, yFraction, zFraction];
+};
+const fractionalCellKeyFor = (atom: CanonicalAtom, cell: CanonicalUnitCell): string | null => {
+  const fractional = fractionalCellCoordinatesFor(atom, cell);
+  return fractional ? fractional.map((value) => Math.floor(value)).join(",") : null;
+};
+const scopedFractionalCellKeyFor = (atom: CanonicalAtom, structure: CanonicalMolecularStructure): string | null => {
+  const cell = structure.unitCell ?? atom.workspaceUnitCell;
+  const key = cell ? fractionalCellKeyFor(atom, cell) : null;
+  return key ? `${atom.workspaceObjectId ?? structure.id}\u0000${key}` : null;
 };
 const coordinateStateScopeFor = (atom: CanonicalAtom, structure: CanonicalMolecularStructure, context: EvalContext): SelectionCoordinateStateScope => {
   const objectId = atom.workspaceObjectId ?? structure.id;
@@ -677,9 +705,39 @@ const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, 
     const rightKeys = new Set(structure.atoms.filter((atom) => right.has(atom.stableId)).map(key));
     return new Set(structure.atoms.filter((atom) => left.has(atom.stableId) && rightKeys.has(key(atom))).map((atom) => atom.stableId));
   }
-  if (ast.kind === "byobject" || ast.kind === "bymolecule" || ast.kind === "byfragment" || ast.kind === "byring" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha") {
+  if (ast.kind === "byobject" || ast.kind === "bymolecule" || ast.kind === "byfragment" || ast.kind === "byring" || ast.kind === "bycell" || ast.kind === "bysegi" || ast.kind === "byres" || ast.kind === "bychain" || ast.kind === "bycalpha") {
     const operand = evaluateAst(ast.operand, structure, context); const scope = (atom: CanonicalAtom) => `${atom.workspaceObjectId ?? structure.id}\u0000`; const groups = new Set(structure.atoms.filter((atom) => operand.has(atom.stableId)).map((atom) => ast.kind === "byobject" ? scope(atom) : ast.kind === "byres" || ast.kind === "bycalpha" ? `${scope(atom)}${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}` : ast.kind === "bysegi" ? `${scope(atom)}${atom.segmentId ?? ""}` : `${scope(atom)}${atom.chain}`));
     if (ast.kind === "byobject") return new Set(structure.atoms.filter((atom) => groups.has(scope(atom)) && context.universe.has(atom.stableId)).map((atom) => atom.stableId));
+    if (ast.kind === "bycell") {
+      context.needsCoordinates = true;
+      recordScientificProfile(context, UNIT_CELL_PROFILE);
+      if (!structure.unitCell && structure.atoms.some((atom) => !atom.workspaceUnitCell)) {
+        context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical unit-cell parameters are unavailable; bycell was not evaluated." });
+        return new Set();
+      }
+      const selectedCells = new Set<string>();
+      for (const atom of structure.atoms) {
+        recordCoordinateAtom(atom, structure, context);
+        if (!operand.has(atom.stableId)) continue;
+        const key = scopedFractionalCellKeyFor(atom, structure);
+        if (!key) {
+          context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical unit-cell parameters could not produce a valid fractional coordinate transform; bycell was not evaluated." });
+          return new Set();
+        }
+        selectedCells.add(key);
+      }
+      const result = new Set<string>();
+      for (const atom of structure.atoms) {
+        if (!context.universe.has(atom.stableId)) continue;
+        const key = scopedFractionalCellKeyFor(atom, structure);
+        if (!key) {
+          context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Canonical unit-cell parameters could not produce a valid fractional coordinate transform; bycell was not evaluated." });
+          return new Set();
+        }
+        if (selectedCells.has(key)) result.add(atom.stableId);
+      }
+      return result;
+    }
     if (ast.kind === "bymolecule") {
       context.needsTopology = true;
       const { componentByAtom } = canonicalTopologyGraphFor(structure);
@@ -903,7 +961,7 @@ export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecu
   const trimmed = query.trim(); const parsed = parseSelection(trimmed); const source = options.source ?? { kind: "query", rawQuery: trimmed };
   const emptyContext = { ...contextFor(structure, trimmed, options.named, [...parsed.diagnostics], options.presentation, options.coordinateFrame, options.groups), coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal };
   if (options.expectedRevision && options.expectedRevision !== structure.scientificHash) return baseResult(trimmed, structure, source, "STALE_REVISION", [{ code: "STALE_REVISION", message: "The selection context revision is stale; the active structure was not changed." }], "", [], emptyContext);
-  const gated = trimmed.match(/\b(pbc|bycell|symmetry|donors|acceptors|arbitrary)\b/i);
+  const gated = trimmed.match(/\b(pbc|symmetry|donors|acceptors|arbitrary)\b/i);
   if (gated) return baseResult(trimmed, structure, source, "UNSUPPORTED_OPERATOR_OR_PROFILE", [{ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: `Selection operator \`${gated[1]}\` is gated until its validated scientific profile is available.` }], "", [], emptyContext);
   if (!trimmed || !parsed.ast) {
     const diagnostics = parsed.diagnostics.length ? parsed.diagnostics : [{ code: "SYNTAX_ERROR" as const, message: "A selection expression is required." }];

@@ -8,6 +8,7 @@ const ringFixture = resolve("tests/fixtures/ring-ligand.pdb");
 const typedPropertiesFixture = resolve("tests/fixtures/typed-properties.pdb");
 const segmentIdentityFixture = resolve("tests/fixtures/segment-identity.pdb");
 const sidechainIdentityFixture = resolve("tests/fixtures/sidechain-identity.pdb");
+const unitCellFixture = resolve("tests/fixtures/unit-cell.pdb");
 const loadFixture = async (page: Page) => {
   await page.goto("/molstudio");
   await page.locator('input[type="file"]').setInputFiles(fixture);
@@ -80,6 +81,23 @@ test("canonical ring topology expands byring from a seed atom", async ({ page })
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(consoleRegion.locator(".console-entry").last()).toContainText("Selected 6 atoms");
   await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
+});
+
+test("source-backed unit-cell parameters drive bounded bycell selection", async ({ page }) => {
+  await page.goto("/molstudio");
+  await page.locator('input[type="file"]').setInputFiles(unitCellFixture);
+  await expect(page.getByTitle("unit-cell.pdb")).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
+  const entries = consoleRegion.locator(".console-entry");
+  const before = await entries.count();
+  await command.fill("bycell name CA");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(entries.nth(before)).toContainText("Selected 2 atoms");
+  await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-indicator", "visible");
+  await page.screenshot({ path: resolve("verification/evidence/selection-bycell.png"), animations: "disabled" });
 });
 
 test("canonical sidechain selection matches the pinned backbone partition fixture", async ({ page }) => {
