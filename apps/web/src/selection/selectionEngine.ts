@@ -47,7 +47,7 @@ export type SelectionTokenKind = "WORD" | "STRING" | "LPAREN" | "RPAREN" | "COMM
 export type SelectionToken = { kind: SelectionTokenKind; lexeme: string; span: SourceSpan };
 
 export type SelectionProperty = "name" | "resn" | "resi" | "chain" | "segi" | "elem" | "id" | "index" | "rank" | "model" | "object" | "alt" | "formal_charge" | "partial_charge" | "b" | "q" | "occupancy" | "ss" | "x" | "y" | "z" | "state" | "label" | "pepseq" | "rep" | "color" | "cartoon_color" | "ribbon_color";
-export type SelectionCategory = "polymer" | "ligand" | "water" | "ion" | "other" | "hydrogen" | "hetatm" | "inorganic" | "solvent" | "protein" | "nucleic" | "backbone" | "sidechain" | "guide" | "metals" | "bonded" | "enabled" | "present" | "visible";
+export type SelectionCategory = "polymer" | "ligand" | "water" | "ion" | "other" | "hydrogen" | "hetatm" | "inorganic" | "solvent" | "protein" | "nucleic" | "backbone" | "sidechain" | "guide" | "metals" | "bonded" | "donors" | "acceptors" | "enabled" | "present" | "visible";
 export type SelectionAst =
   | { kind: "all" }
   | { kind: "none" }
@@ -151,6 +151,7 @@ export type SelectionWorkspaceGroup = {
 
 const PROFILE = { id: "pymol-oss-mvp", version: "1", fingerprint: "pymol-oss-mvp-selection-v1" } as const;
 const UNIT_CELL_PROFILE = { id: "canonical-unit-cell-membership", version: "1", fingerprint: "canonical-unit-cell-membership-v1" } as const;
+const CHEMISTRY_ROLES_PROFILE = { id: "canonical-chemistry-roles", version: "1", fingerprint: "canonical-chemistry-roles-v1" } as const;
 const GRAMMAR_VERSION = "selection-lexer-pratt-v1";
 const hash = (value: string): string => {
   let result = 2166136261;
@@ -196,7 +197,7 @@ export const lexSelection = (query: string): { tokens: readonly SelectionToken[]
 const isWord = (token: SelectionToken | undefined, value?: string): boolean => token?.kind === "WORD" && (value === undefined || token.lexeme.toLowerCase() === value);
 const propertyNames = new Set<SelectionProperty>(["name", "resn", "resi", "chain", "segi", "elem", "id", "index", "rank", "model", "object", "alt", "formal_charge", "partial_charge", "b", "q", "occupancy", "ss", "x", "y", "z", "state", "label", "pepseq", "rep", "color", "cartoon_color", "ribbon_color"]);
 const categoryNames = new Map<string, SelectionCategory>([
-  ["polymer", "polymer"], ["protein", "protein"], ["polymer.protein", "protein"], ["nucleic", "nucleic"], ["polymer.nucleic", "nucleic"], ["ligand", "ligand"], ["organic", "ligand"], ["water", "water"], ["solvent", "solvent"], ["ion", "ion"], ["ions", "ion"], ["inorganic", "inorganic"], ["hetatm", "hetatm"], ["hydrogens", "hydrogen"], ["hydrogen", "hydrogen"], ["hydro", "hydrogen"], ["backbone", "backbone"], ["sidechain", "sidechain"], ["guide", "guide"], ["metals", "metals"], ["bonded", "bonded"], ["enabled", "enabled"], ["present", "present"], ["visible", "visible"], ["other", "other"],
+  ["polymer", "polymer"], ["protein", "protein"], ["polymer.protein", "protein"], ["nucleic", "nucleic"], ["polymer.nucleic", "nucleic"], ["ligand", "ligand"], ["organic", "ligand"], ["water", "water"], ["solvent", "solvent"], ["ion", "ion"], ["ions", "ion"], ["inorganic", "inorganic"], ["hetatm", "hetatm"], ["hydrogens", "hydrogen"], ["hydrogen", "hydrogen"], ["hydro", "hydrogen"], ["backbone", "backbone"], ["sidechain", "sidechain"], ["guide", "guide"], ["metals", "metals"], ["bonded", "bonded"], ["donors", "donors"], ["acceptors", "acceptors"], ["enabled", "enabled"], ["present", "present"], ["visible", "visible"], ["other", "other"],
 ] as const);
 
 class SelectionParser {
@@ -530,6 +531,12 @@ const recordCoordinateAtom = (atom: CanonicalAtom, structure: CanonicalMolecular
   context.coordinateObjectStates.set(scope.objectId, scope);
 };
 const canonicalPolymerTypingComplete = (structure: CanonicalMolecularStructure): boolean => Boolean(structure.polymerTypingSource) && structure.atoms.filter((atom) => atom.isPolymer).every((atom) => atom.polymerType !== undefined);
+const canonicalChemistryRolesComplete = (structure: CanonicalMolecularStructure): boolean => {
+  const dataset = structure.chemistryDataset;
+  if (!dataset || dataset.molecularRevision !== structure.scientificHash || dataset.profileVersion !== "canonical-chemistry-roles-v1") return false;
+  const atomIds = new Set(structure.atoms.map((atom) => atom.stableId));
+  return [...dataset.donorAtomIds, ...dataset.acceptorAtomIds].every((atomId) => atomIds.has(atomId));
+};
 const categoryMatches = (atom: CanonicalAtom, category: SelectionCategory, structure: CanonicalMolecularStructure, context: EvalContext): boolean => {
   if (category === "enabled") return atom.workspaceObjectEnabled ?? true;
   if (category === "present") { context.needsCoordinates = true; recordCoordinateAtom(atom, structure, context); return true; }
@@ -568,6 +575,16 @@ const categoryMatches = (atom: CanonicalAtom, category: SelectionCategory, struc
   if (category === "guide") return atom.isPolymer && atom.atomName.toUpperCase() === "CA";
   if (category === "metals") return atom.isIon && metalElements.has(atom.element.toUpperCase());
   if (category === "bonded") { context.needsTopology = true; return structure.bonds.some((bond) => bond.atom1 === atom.stableId || bond.atom2 === atom.stableId); }
+  if (category === "donors" || category === "acceptors") {
+    context.needsTopology = true;
+    recordScientificProfile(context, CHEMISTRY_ROLES_PROFILE);
+    if (!canonicalChemistryRolesComplete(structure)) {
+      if (!context.diagnostics.some((diagnostic) => diagnostic.code === "MISSING_DEPENDENCY")) context.diagnostics.push({ code: "MISSING_DEPENDENCY", message: "Complete revision-matched canonical chemistry-role data is unavailable for donor/acceptor selection." });
+      return false;
+    }
+    const atomIds = category === "donors" ? structure.chemistryDataset!.donorAtomIds : structure.chemistryDataset!.acceptorAtomIds;
+    return atomIds.includes(atom.stableId);
+  }
   return false;
 };
 type SelectionOperator = "EQ" | "NE" | "LT" | "LTE" | "GT" | "GTE";
@@ -888,6 +905,13 @@ const namespaceRevisionFor = (structure: CanonicalMolecularStructure, named?: Na
     profileVersion: structure.peptideSequenceDataset.profileVersion,
     chains: structure.peptideSequenceDataset.chains,
   } : null,
+  chemistryDataset: structure.chemistryDataset ? {
+    datasetId: structure.chemistryDataset.datasetId,
+    molecularRevision: structure.chemistryDataset.molecularRevision,
+    profileVersion: structure.chemistryDataset.profileVersion,
+    donorAtomIds: structure.chemistryDataset.donorAtomIds,
+    acceptorAtomIds: structure.chemistryDataset.acceptorAtomIds,
+  } : null,
   namedNamespaceRevision: named?.namespaceRevision ?? "none",
   workspaceGroups: groups?.map((group) => ({ groupId: group.groupId, name: group.name, objectIds: [...group.objectIds].sort() })).sort((left, right) => left.groupId.localeCompare(right.groupId)) ?? [],
 }));
@@ -961,7 +985,7 @@ export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecu
   const trimmed = query.trim(); const parsed = parseSelection(trimmed); const source = options.source ?? { kind: "query", rawQuery: trimmed };
   const emptyContext = { ...contextFor(structure, trimmed, options.named, [...parsed.diagnostics], options.presentation, options.coordinateFrame, options.groups), coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal };
   if (options.expectedRevision && options.expectedRevision !== structure.scientificHash) return baseResult(trimmed, structure, source, "STALE_REVISION", [{ code: "STALE_REVISION", message: "The selection context revision is stale; the active structure was not changed." }], "", [], emptyContext);
-  const gated = trimmed.match(/\b(pbc|symmetry|donors|acceptors|arbitrary)\b/i);
+  const gated = trimmed.match(/\b(pbc|symmetry|arbitrary)\b/i);
   if (gated) return baseResult(trimmed, structure, source, "UNSUPPORTED_OPERATOR_OR_PROFILE", [{ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: `Selection operator \`${gated[1]}\` is gated until its validated scientific profile is available.` }], "", [], emptyContext);
   if (!trimmed || !parsed.ast) {
     const diagnostics = parsed.diagnostics.length ? parsed.diagnostics : [{ code: "SYNTAX_ERROR" as const, message: "A selection expression is required." }];

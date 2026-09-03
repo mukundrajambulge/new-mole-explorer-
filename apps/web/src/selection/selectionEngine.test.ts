@@ -377,4 +377,29 @@ describe("canonical selection engine", () => {
     expect(staleResult.count).toBe(0);
     expect(staleResult.diagnostics[0]?.message).toContain("partial_charge");
   });
+
+  it("evaluates donor and acceptor selectors only from a complete canonical chemistry dataset", () => {
+    const chemistryRevision = "chemistry-revision".padEnd(64, "0");
+    const typedChemistry = {
+      ...structure,
+      scientificHash: chemistryRevision,
+      chemistryDataset: {
+        datasetId: "fixture:chemistry-roles:1",
+        molecularRevision: chemistryRevision,
+        profileVersion: "canonical-chemistry-roles-v1" as const,
+        donorAtomIds: ["a2", "l1"],
+        acceptorAtomIds: ["a3"],
+        provenance: "validated canonical chemistry fixture",
+      },
+    } satisfies CanonicalMolecularStructure;
+    const donors = resolveSelection("donors", typedChemistry);
+    expect(donors.stableAtomIds).toEqual(["a2", "l1"]);
+    expect(resolveSelection("acceptors", typedChemistry).stableAtomIds).toEqual(["a3"]);
+    expect(donors.dependencyVector.needsTopology).toBe(true);
+    expect(donors.scientificProfiles).toEqual([{ id: "canonical-chemistry-roles", version: "1", fingerprint: "canonical-chemistry-roles-v1" }]);
+    const missing = evaluateSelectionQuery("donors", structure);
+    expect(missing.status).toBe("MISSING_DEPENDENCY");
+    const stale = evaluateSelectionQuery("acceptors", { ...typedChemistry, chemistryDataset: { ...typedChemistry.chemistryDataset, molecularRevision: "stale" } });
+    expect(stale.status).toBe("MISSING_DEPENDENCY");
+  });
 });

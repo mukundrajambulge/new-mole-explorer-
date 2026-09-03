@@ -87,7 +87,8 @@ const expectedSemanticStatus = (value: string): string => {
   if (/^ribbon_color\b/.test(query)) return "VALID_EMPTY";
   if (query === "byfragment ligand") return "MISSING_DEPENDENCY";
   if (/^byring\b/.test(query)) return "VALID_EMPTY";
-  if (/^(segi|bysegi|bycell|donors|acceptors)\b/.test(query)) return "UNSUPPORTED_OPERATOR_OR_PROFILE";
+  if (/^(segi|bysegi|bycell)\b/.test(query)) return "UNSUPPORTED_OPERATOR_OR_PROFILE";
+  if (/^(donors|acceptors)\b/.test(query)) return "MISSING_DEPENDENCY";
   if (query === "gap 0 ligand" || query === "gap 4 ligand") return query === "gap 4 ligand" ? "VALID_EMPTY" : "VALID_NONEMPTY";
   if (/^(partial_charge|polymer\.nucleic)\b/.test(query) || query === "label foo") return "MISSING_DEPENDENCY";
   if (query === "pepseq ag") return "VALID_NONEMPTY";

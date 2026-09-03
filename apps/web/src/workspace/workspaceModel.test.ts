@@ -71,6 +71,31 @@ describe("workspace selection scope", () => {
     expect(result.status).toBe("VALID_NONEMPTY");
   });
 
+  it("preserves complete chemistry-role datasets across a multi-object selection universe", () => {
+    const chemistryObject = (id: string, atomId: string, role: "donor" | "acceptor") => {
+      const base = loadResultFor(id, atomId);
+      const scientificHash = `${id}-chemistry-revision`.padEnd(64, "0");
+      return createWorkspaceObject({ ...base, structure: {
+        ...base.structure,
+        scientificHash,
+        chemistryDataset: {
+          datasetId: `${id}:chemistry-roles`,
+          molecularRevision: scientificHash,
+          profileVersion: "canonical-chemistry-roles-v1" as const,
+          donorAtomIds: role === "donor" ? [atomId] : [],
+          acceptorAtomIds: role === "acceptor" ? [atomId] : [],
+          provenance: "validated canonical chemistry fixture",
+        },
+      }} satisfies StructureLoadResult);
+    };
+    const first = chemistryObject("chem-first", "first-atom", "donor");
+    const second = createWorkspaceObject(chemistryObject("chem-second", "second-atom", "acceptor").loadResult, [first.objectId]);
+    const workspace = workspaceSelectionStructure([first, second]);
+    expect(workspace?.chemistryDataset?.molecularRevision).toBe(workspace?.scientificHash);
+    expect(resolveSelection("donors", workspace!).stableAtomIds).toEqual(["object:chem-first::first-atom"]);
+    expect(resolveSelection("acceptors", workspace!).stableAtomIds).toEqual(["object:chem-second::second-atom"]);
+  });
+
   it("materializes a selected canonical subset with new identities and explicit lineage", () => {
     const source = createWorkspaceObject({ ...loadResultFor("source", "source-atom"), structure: { ...loadResultFor("source", "source-atom").structure, bonds: [] } });
     const created = createWorkspaceObjectFromSelection(source, ["source-atom"], "selected-object", [source.objectId]);

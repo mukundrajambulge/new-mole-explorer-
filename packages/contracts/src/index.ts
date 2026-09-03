@@ -70,6 +70,16 @@ export type PartialChargeDataset = {
   provenance: string;
 };
 
+/** Complete, revision-bound chemistry roles supplied by an admitted perception profile. */
+export type CanonicalChemistryDataset = {
+  datasetId: string;
+  molecularRevision: string;
+  profileVersion: "canonical-chemistry-roles-v1";
+  donorAtomIds: string[];
+  acceptorAtomIds: string[];
+  provenance: string;
+};
+
 export type SecondaryStructureDataset = {
   datasetId: string;
   molecularRevision: string;
@@ -220,6 +230,8 @@ export type CanonicalMolecularStructure = {
   unitCell?: CanonicalUnitCell;
   /** Provenance for source-backed polymer entity typing, when available. */
   polymerTypingSource?: string;
+  /** Optional complete chemistry-role assignments; absent data must fail closed for donor/acceptor selection. */
+  chemistryDataset?: CanonicalChemistryDataset;
   partialChargeDataset?: PartialChargeDataset;
   secondaryStructureDataset?: SecondaryStructureDataset;
   peptideSequenceDataset?: PeptideSequenceDataset;
