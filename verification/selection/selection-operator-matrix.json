@@ -29,9 +29,9 @@
     "PASS (`select color red` after `color red, all`; selection-matrix-live.spec.ts)": 1
   },
   "oracleStatusCounts": {
-    "ORACLE_PASS": 50,
+    "ORACLE_PASS": 51,
     "ORACLE_EQUIVALENT": 34,
-    "ORACLE_PENDING": 3
+    "ORACLE_PENDING": 2
   },
   "entries": [
     {
@@ -437,7 +437,7 @@
       "operator": "`partial_charge`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; source-partial-charge E2E)",
-      "oracleStatus": "ORACLE_PENDING",
+      "oracleStatus": "ORACLE_PASS",
       "decision": "promote only complete atom-covered source values with model, units, provenance, and revision binding; absent/incomplete input fails closed"
     },
     {

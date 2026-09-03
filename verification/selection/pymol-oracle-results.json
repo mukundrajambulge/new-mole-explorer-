@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "oracleSource": "schrodinger/pymol-open-source@5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
-  "runtime": "Ubuntu-20.04 Python 3.9.2 temporary compatibility build",
+  "runtime": "Ubuntu-20.04 Python 3.8.10 source-built extension with temporary compatibility layer",
   "fixture": "tests/fixtures/mini-protein.pdb",
   "membershipHash": "sha256 of newline-joined PyMOL atom index|chain|resn|resi|name|symbol tuples",
   "notes": [
@@ -9,7 +9,8 @@
     "The source commit is pinned; the temporary Python compatibility layer only adds future annotations and legacy runtime shims needed by this environment.",
     "The complete direct probe is recorded in `pymol-matrix-probe.json`: 85 native forms, 79 successful and 6 native errors. The comparison ledger below promotes only exact forms or documented application aliases.",
     "The direct probe now includes corrected native topology and spatial forms; this comparison ledger remains intentionally conservative and contains 54 selected exact/equivalent rows across the shared mini fixture and the fixture-scoped canonical-property, identity, ring-topology, backbone-partition, numeric-comparison, alias, inequality, label, representation, visibility, color, and workspace-group cases below.",
-    "The typed-properties rows use the same pinned source and identify their fixture explicitly; application ss HELIX/SHEET maps to PyMOL ss h/s without treating the long-form tokens as native spellings."
+    "The typed-properties rows use the same pinned source and identify their fixture explicitly; application ss HELIX/SHEET maps to PyMOL ss h/s without treating the long-form tokens as native spellings.",
+    "The positive partial_charge comparison is recorded separately in pymol-partial-charge-oracle.json because the shared baseline fixture has no charge-bearing source field."
   ],
   "rows": [
     { "applicationQuery": "all", "oracleQuery": "all", "oracleStatus": "ORACLE_PASS", "count": 12, "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a" },
@@ -47,6 +48,7 @@
     { "applicationQuery": "formal_charge = 0", "oracleQuery": "formal_charge = 0", "oracleStatus": "ORACLE_PASS", "count": 2, "membershipHash": "bcd0f8611f2d8a294ae30292eea5437a0dfb140b7eaccfe7a2a792e26121e289", "fixture": "tests/fixtures/typed-properties.pdb" },
     { "applicationQuery": "formal_charge > 0", "oracleQuery": "formal_charge > 0", "oracleStatus": "ORACLE_PASS", "count": 1, "membershipHash": "0d06a40b0259525f564ccb08144f8e7d3c1d56e8c7d4fd75545917e3488efb8c", "fixture": "tests/fixtures/typed-properties.pdb" },
     { "applicationQuery": "b > 20", "oracleQuery": "b > 20", "oracleStatus": "ORACLE_PASS", "count": 1, "membershipHash": "00fdf0451c5ae1f02861ced3021fcef3f04a6d3b5f07fa3525f40ddf8dd1c3d5", "fixture": "tests/fixtures/typed-properties.pdb" },
+    { "applicationQuery": "partial_charge > 0", "oracleQuery": "partial_charge > 0", "oracleStatus": "ORACLE_PASS", "count": 1, "membershipHash": "eb7674fed3646839030b00957c80e0e663a875ba732ce82ef46d8f7aee1c7e7e", "fixture": "tests/fixtures/mini-protein.pdb", "evidence": "verification/selection/pymol-partial-charge-oracle.json", "mapping": "pinned PyMOL 3.2.0a positive probe with explicit partial-charge setup; application source-declared mmCIF values remain independently validated" },
     { "applicationQuery": "ss HELIX", "oracleQuery": "ss h", "oracleStatus": "ORACLE_EQUIVALENT", "count": 2, "membershipHash": "bad3464d6ae712c279d4941bbf873139c3df3b9869afaff7d28595443b38e512", "mapping": "application long-form secondary-structure token -> PyMOL one-letter token", "fixture": "tests/fixtures/typed-properties.pdb" },
     { "applicationQuery": "ss SHEET", "oracleQuery": "ss s", "oracleStatus": "ORACLE_EQUIVALENT", "count": 2, "membershipHash": "966385cd2836bc749ca1748ed49511ffeecf1db00ac7b470e1ab9a15f861358c", "mapping": "application long-form secondary-structure token -> PyMOL one-letter token", "fixture": "tests/fixtures/typed-properties.pdb" },
     { "applicationQuery": "segi SEGA", "oracleQuery": "segi SEGA", "oracleStatus": "ORACLE_PASS", "count": 2, "membershipHash": "be3aed9430e99793e8bcb371ffa180ef8946b4d3d88a833a06ad9c226924f73a", "fixture": "tests/fixtures/segment-identity.pdb" },
