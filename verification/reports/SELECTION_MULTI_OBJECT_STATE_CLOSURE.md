@@ -14,10 +14,10 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `b87a0388b57859ecf4d038997352a9d0178abe5a`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
-- Current implementation commit: `c194f0d` (`docs(verification): promote label and representation oracle cases`)
-- Ending implementation SHA: `c194f0d`
-- Latest implementation/evidence base SHA before this report update: `c194f0d`
-- Working tree: clean after the implementation/evidence commit; no unrelated files were changed
+- Current implementation commit: `47f00c6` (`docs(verification): close presentation oracle cases`)
+- Ending implementation SHA: `47f00c6`
+- Latest implementation/evidence base SHA before this report update: `47f00c6`
+- Working tree: clean after the implementation/evidence and report synchronization commits; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
 - API health: `http://localhost:8100/api/health`
