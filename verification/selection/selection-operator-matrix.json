@@ -29,8 +29,8 @@
   },
   "oracleStatusCounts": {
     "ORACLE_PASS": 47,
-    "ORACLE_EQUIVALENT": 28,
-    "ORACLE_PENDING": 12
+    "ORACLE_EQUIVALENT": 31,
+    "ORACLE_PENDING": 9
   },
   "entries": [
     {
@@ -79,8 +79,8 @@
       "operator": "`visible`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "requires explicit presentation visibility context; never aliases `all`"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application default projection is equivalent to pinned PyMOL with solvent hidden and explicit protein/ligand/ion representations; never aliases `all`"
     },
     {
       "operator": "`name`",
@@ -625,15 +625,15 @@
       "operator": "`color`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (`select color red` after `color red, all`; selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "explicit `select color …` evaluates effective projection colors; bare `color …` remains the presentation command"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application `select color red` after `color red, all` matches pinned PyMOL `color red` after the presentation-matched non-solvent setup; bare `color …` remains the presentation command"
     },
     {
       "operator": "`cartoon_color`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-closure E2E; selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "effective CARTOON color tokens are scoped to cartoon directives"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "effective CARTOON color tokens match pinned PyMOL `cartoon_color red` on the explicitly shown protein cartoon scope"
     },
     {
       "operator": "`ribbon_color`",

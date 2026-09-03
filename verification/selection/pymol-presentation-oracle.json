@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "source": "schrodinger/pymol-open-source@5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+  "oracleSource": "schrodinger/pymol-open-source@5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+  "runtime": "PyMOL 2.3.0",
+  "fixture": "tests/fixtures/mini-protein.pdb",
+  "queryCount": 3,
+  "generatedBy": "verification/selection/run-pymol-presentation-oracle.py",
+  "presentationBaseline": {
+    "hidden": "solvent",
+    "representations": {
+      "polymer.protein": "cartoon",
+      "organic": "sticks",
+      "inorganic": "spheres"
+    },
+    "colorSelectorSetup": "color red on all and not solvent",
+    "cartoonColorSelectorSetup": "cartoon_color red on polymer.protein"
+  },
+  "rows": [
+    {
+      "query": "visible",
+      "returnCode": 11,
+      "count": 11,
+      "membershipHash": "a026ddea65f6845646345536441d3f8808c6687abe353b1e881499c01896ea58",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "5|A|GLY|2|N|N",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O",
+        "9|A|LIG|101|C1|C",
+        "10|A|LIG|101|O1|O",
+        "12|B|NA|301|NA|NA"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "color red",
+      "returnCode": 11,
+      "count": 11,
+      "membershipHash": "a026ddea65f6845646345536441d3f8808c6687abe353b1e881499c01896ea58",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "5|A|GLY|2|N|N",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O",
+        "9|A|LIG|101|C1|C",
+        "10|A|LIG|101|O1|O",
+        "12|B|NA|301|NA|NA"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "cartoon_color red",
+      "returnCode": 8,
+      "count": 8,
+      "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "5|A|GLY|2|N|N",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O"
+      ],
+      "status": "PASS"
+    }
+  ]
+}
