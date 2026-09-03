@@ -110,8 +110,29 @@ ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
     });
     vi.stubGlobal("fetch", fetchMock);
     const result = await new StructureIngestionService().ingestRcsb("1abc");
-    expect(result.structure.source).toMatchObject({ kind: "RCSB", uri: "https://files.rcsb.org/download/1ABC.cif", originalFilename: "1ABC.cif" });
+    expect(result.structure.source).toMatchObject({ kind: "RCSB", provider: "RCSB", uri: "https://files.rcsb.org/download/1ABC.cif", originalFilename: "1ABC.cif" });
     expect(fetchMock).toHaveBeenCalledOnce();
+    vi.unstubAllGlobals();
+  });
+
+  it("falls back to the official wwPDB partner mmCIF endpoint when RCSB is unreachable", async () => {
+    const fetchMock = vi.fn(async (input: string | URL | Request) => {
+      if (String(input) === "https://files.rcsb.org/download/1ABC.cif") throw new Error("RCSB edge timeout");
+      expect(String(input)).toBe("https://www.ebi.ac.uk/pdbe/entry-files/download/1abc.cif");
+      return new Response(cifFixture, { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await new StructureIngestionService().ingestRcsb("1abc");
+    expect(result.structure.source).toMatchObject({ kind: "RCSB", provider: "PDBE", uri: "https://www.ebi.ac.uk/pdbe/entry-files/download/1abc.cif", originalFilename: "1ABC.cif" });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    vi.unstubAllGlobals();
+  });
+
+  it("reports not found only when every official remote endpoint returns 404", async () => {
+    const fetchMock = vi.fn(async () => new Response("", { status: 404 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(new StructureIngestionService().ingestRcsb("1abc")).rejects.toMatchObject({ code: "REMOTE_NOT_FOUND" });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
     vi.unstubAllGlobals();
   });
 

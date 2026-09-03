@@ -35,6 +35,7 @@ export const STRUCTURE_FORMATS = ["pdb", "mmcif"] as const;
 export type StructureFormat = (typeof STRUCTURE_FORMATS)[number];
 
 export type StructureSourceKind = "LOCAL_FILE" | "RCSB";
+export type RemoteStructureProvider = "RCSB" | "PDBE";
 
 export type BondOrder = "SINGLE" | "DOUBLE" | "TRIPLE" | "AROMATIC" | "UNKNOWN";
 
@@ -179,6 +180,7 @@ export type StructureSourceMetadata = {
   sha256: string;
   byteLength: number;
   uri?: string;
+  provider?: RemoteStructureProvider;
   ingestedAt: string;
   parserProfile: string;
 };

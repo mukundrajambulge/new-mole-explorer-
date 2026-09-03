@@ -16,10 +16,12 @@ import type {
   StructureFormat,
   StructureLoadResult,
   StructureSourceKind,
+  RemoteStructureProvider,
 } from "@molecular/contracts";
 
 export const MAX_STRUCTURE_BYTES = 25 * 1024 * 1024;
 export const INGESTION_PARSER_PROFILE = "molecular-workstation-g1b-canonical-v1";
+const REMOTE_FETCH_TIMEOUT_MS = 10_000;
 
 const WATER_RESIDUES = new Set(["HOH", "WAT", "H2O", "DOD"]);
 const ION_ELEMENTS = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA", "ZN", "FE", "MN", "CU", "CO", "NI", "CL", "BR", "IOD"]);
@@ -484,20 +486,39 @@ export class StructureIngestionService {
   async ingestRcsb(pdbId: string): Promise<StructureLoadResult> {
     const normalizedId = pdbId.trim().toUpperCase();
     if (!/^[A-Z0-9]{4}$/.test(normalizedId)) throw new IngestionError("INVALID_INPUT", "Enter a valid four-character PDB ID.");
-    const uri = `https://files.rcsb.org/download/${normalizedId}.cif`;
-    let response: Response;
-    try {
-      response = await fetch(uri, { signal: AbortSignal.timeout(20_000), headers: { accept: "text/plain" } });
-    } catch {
-      throw new IngestionError("REMOTE_FETCH_FAILED", "RCSB could not be reached. Check the network and try again.", 502);
+    const sources: Array<{ provider: RemoteStructureProvider; uri: string }> = [
+      { provider: "RCSB", uri: `https://files.rcsb.org/download/${normalizedId}.cif` },
+      { provider: "PDBE", uri: `https://www.ebi.ac.uk/pdbe/entry-files/download/${normalizedId.toLowerCase()}.cif` },
+    ];
+    let sawNotFound = false;
+    let allResponsesNotFound = true;
+    for (const source of sources) {
+      let response: Response;
+      try {
+        response = await fetch(source.uri, { signal: AbortSignal.timeout(REMOTE_FETCH_TIMEOUT_MS), headers: { accept: "text/plain" } });
+      } catch {
+        allResponsesNotFound = false;
+        continue;
+      }
+      if (response.status === 404) {
+        sawNotFound = true;
+        continue;
+      }
+      allResponsesNotFound = false;
+      if (!response.ok) continue;
+      try {
+        const content = await response.text();
+        return await this.ingest("RCSB", `${normalizedId}.cif`, Buffer.from(content, "utf8"), source.uri, source.provider);
+      } catch (error) {
+        if (error instanceof IngestionError) throw error;
+        continue;
+      }
     }
-    if (response.status === 404) throw new IngestionError("REMOTE_NOT_FOUND", `RCSB could not find structure ${normalizedId}.`, 404);
-    if (!response.ok) throw new IngestionError("REMOTE_FETCH_FAILED", `RCSB returned HTTP ${response.status}.`, 502);
-    const content = await response.text();
-    return this.ingest("RCSB", `${normalizedId}.cif`, Buffer.from(content, "utf8"), uri);
+    if (sawNotFound && allResponsesNotFound) throw new IngestionError("REMOTE_NOT_FOUND", `RCSB/wwPDB could not find structure ${normalizedId}.`, 404);
+    throw new IngestionError("REMOTE_FETCH_FAILED", "RCSB/wwPDB could not be reached. Check the network and try again.", 502);
   }
 
-  private async ingest(kind: StructureSourceKind, filename: string, buffer: Buffer, uri?: string): Promise<StructureLoadResult> {
+  private async ingest(kind: StructureSourceKind, filename: string, buffer: Buffer, uri?: string, provider?: RemoteStructureProvider): Promise<StructureLoadResult> {
     if (buffer.length > MAX_STRUCTURE_BYTES) throw new IngestionError("PAYLOAD_TOO_LARGE", "Structure files must be 25 MB or smaller.");
     const safeFilename = basename(filename).replace(/[^A-Za-z0-9._-]/g, "_");
     const content = buffer.toString("utf8");
@@ -528,6 +549,7 @@ export class StructureIngestionService {
       sha256: hash,
       byteLength: buffer.length,
       ...(uri ? { uri } : {}),
+      ...(provider ? { provider } : {}),
       ingestedAt: new Date().toISOString(),
       parserProfile: INGESTION_PARSER_PROFILE,
     } as const;

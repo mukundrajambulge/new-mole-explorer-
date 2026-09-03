@@ -4,7 +4,7 @@
 
 **SELECTION + MULTI-OBJECT/MULTI-STATE CLOSURE INCOMPLETE — BLOCKED**
 
-The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. Cross-object spatial queries now require and record an explicit coordinate-frame policy; every coordinate-dependent selection also records the exact per-object coordinate state scope consulted, including cached and bound plans. The pinned PyMOL source has executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The application now also binds RenderProjection representation, color, label, and representation-specific color selectors, evaluates canonical fragment assignments and bounded ring topology without renderer-derived shortcuts, implements a versioned VDW surface-gap profile with strict missing-radius handling, and binds `pepseq` to a revision-stamped canonical one-letter peptide sequence dataset. The gate remains blocked because 9 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
+The implementation paths, live regressions, multi-object workspace, multi-state rendering, and visualization regression suite pass in the authoritative repository. Cross-object spatial queries now require and record an explicit coordinate-frame policy; every coordinate-dependent selection also records the exact per-object coordinate state scope consulted, including cached and bound plans. The pinned PyMOL source has executed against the shared fixture for 85 direct forms: 79 pass and 6 return native errors; the comparison ledger promotes only exact forms or documented aliases. The application now also binds RenderProjection representation, color, label, and representation-specific color selectors, evaluates canonical fragment assignments and bounded ring topology without renderer-derived shortcuts, implements a versioned VDW surface-gap profile with strict missing-radius handling, binds `pepseq` to a revision-stamped canonical one-letter peptide sequence dataset, and retains the actual official remote retrieval provider and URI when RCSB falls back to the wwPDB partner endpoint. The gate remains blocked because 8 of the 87 matrix rows remain oracle-pending, alongside explicitly unsupported or dependency-gated operators. Unsupported and dependency-gated operators remain fail-closed and are not presented as scientifically implemented.
 
 ## Repository and run evidence
 
@@ -28,6 +28,7 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - `select all`: **Root cause** — console input did not have a guaranteed typed route into the canonical selection evaluator. **Fix** — the InputRouter now classifies the command verb first and sends `select` arguments to the same canonical engine used by bare selections. **Live result** — on 4DJW, the real console selects the loaded canonical universe of 7,079 atoms, updates the active-selection panel/footer/viewer, and remains reusable by later presentation commands.
 - `chain A and protein`: **Root cause** — a bare selection expression was previously treated as an unsupported command path. **Fix** — non-command input is routed directly to the canonical selection parser. **Live result** — the real console selects 3,060 atoms on 4DJW with visible feedback and no `UNKNOWN_COMMAND` diagnostic.
 - Additional failures discovered and closed: selection feedback was not consistently synchronized with viewer membership; presentation selectors could be confused with scientific `all`; topology expansion could be mistaken for renderer geometry; cross-object spatial queries lacked an explicit coordinate frame; and multi-state selection could lose its state scope. These now have canonical metadata, live regressions, or explicit fail-closed diagnostics.
+- `RCSB` fetch: **Root cause** — the primary `files.rcsb.org` edge can time out in the local runtime. **Fix** — the backend now tries the official RCSB mmCIF endpoint first, then the official wwPDB partner PDBe endpoint with a bounded timeout, recording `provider`, URI, byte length, and SHA-256. **Live result** — `1CRN` and `4DJW` load successfully through the fallback path without replacing the current workspace on failure.
 
 ## Reproduced failures and live results
 
@@ -52,6 +53,7 @@ The current application was exercised with a real 4DJW RCSB load:
 - `bymolecule` expands canonical bond connected components. `byfragment` is a separate canonical fragment-assignment operation: it requires complete source-backed `CanonicalAtom.fragmentId` membership and never falls back to connected components or coordinates.
 - Coordinate states use explicit `CoordinateStateID` and `StateOrder`. One-state structures receive a compatibility singleton state; renderer model order is never treated as scientific state identity.
 - Canonical polymer typing uses mmCIF `_entity_poly.type` joined by `_atom_site.label_entity_id`, is included in the scientific revision/provenance, survives derived object workflows, and fails closed when absent or incomplete; no residue-name whitelist is used.
+- Remote structure ingestion prefers the official RCSB mmCIF endpoint and falls back only to the official wwPDB partner PDBe mmCIF endpoint when the primary retrieval is unavailable; the canonical source records the provider and exact URI used.
 - `all_states` is bounded to explicit auxiliary state models. State changes reconcile model coordinates in place when layout is unchanged.
 - Coordinate-dependent selection results carry sorted per-object `stateScopes` with `{ObjectID, CoordinateStateID, StateOrder}`; state-dependent live selection changes are therefore distinguishable even when molecular topology/revision is unchanged.
 - Cartesian spatial comparisons use the centralized `cartesian-float64-v1` closed-boundary policy with an explicit squared-distance numerical epsilon; the epsilon is numerical protection, not a scientific cutoff expansion.
@@ -129,6 +131,7 @@ Application/contracts:
 Verification:
 
 - `tests/e2e/multi-object-state.spec.ts`
+- `tests/e2e/g1c-visualization.spec.ts`
 - `tests/fixtures/multistate.pdb`
 - `tests/e2e/real-structure-workspace.spec.ts`
 - `tests/e2e/selection-closure.spec.ts`
@@ -153,6 +156,7 @@ Verification:
 - `verification/evidence/closure-uploaded-cartoon-ligand-sticks.png`
 - `verification/evidence/closure-rcsb-1crn-cartoon.png`
 - `verification/evidence/closure-4djw-two-objects.png`
+- `verification/evidence/closure-responsive-canvas.png`
 - `verification/evidence/selection-object-create.png`
 - `verification/evidence/selection-state-lineage.png`
 - `verification/evidence/selection-cross-object-spatial.png`
@@ -199,13 +203,14 @@ Verification:
 - Independent representation, color, visibility, view, background, and labels: **PASS**
 - VDW/SAS/SES/Mesh/Dots/analysis overlays and surface cache behavior: **PASS / bounded profiles**
 - Resize, rotate, pan, zoom, focus, center, orient, origin, and reset: **PASS**
+- Responsive narrow layout keeps the real 3Dmol canvas measurable and visible after side-panel collapse: **PASS**
 - Unavailable toolbar/menu features: **explicit Coming Soon/Unavailable**
 
 ## Tests and results
 
 - `npm run typecheck` — **PASS**
 - `npm run lint` — **PASS**
-- `npm test` — **PASS: web 17 files / 83 tests; API 2 files / 14 tests**
+- `npm test` — **PASS: web 17 files / 83 tests; API 2 files / 15 tests**
 - `npm run verify:selection-matrix` — **PASS: 87 rows; JSON regenerated**
 - `npx playwright test tests/e2e/selection-matrix-live.spec.ts` — **PASS: 1 / 1; 89 live queries**
 - `npx playwright test tests/e2e/multi-object-state.spec.ts` — **PASS: 10 / 10**
@@ -218,7 +223,9 @@ Verification:
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "PDB segment identity"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "sidechain"` — **PASS: 1 / 1**
 - `npx playwright test tests/e2e/selection-closure.spec.ts --grep "presentation-dependent"` — **PASS: 1 / 1**
-- `npm run test:e2e` — **PASS: 78 / 78**
+- `npx playwright test tests/e2e/g1c-visualization.spec.ts --grep "measurable when side panels"` — **PASS: 1 / 1; non-zero CSS and backing canvas dimensions**
+- `npx playwright test tests/e2e/g1c-visualization.spec.ts --grep "official RCSB"` — **PASS: 1 / 1; official fallback path exercised**
+- `npm run test:e2e` — **PASS: 79 / 79**
 - `npm run build` — **PASS**
 - `git diff --check` — **PASS**
 - Pinned PyMOL oracle reproduction — **PASS: PyMOL 3.2.0a; 85 forms; 79 successful / 6 native errors; committed probe row payload identical**
@@ -242,6 +249,7 @@ Verification:
 15. Import `tests/fixtures/segment-identity.pdb`, run `segi SEGA`, `bysegi segi SEGA`, and `alt A`, and confirm counts 2, 2, and 1 with `VALID NONEMPTY` status.
 16. Import `tests/fixtures/sidechain-identity.pdb`, run `backbone` (4 atoms) and `sidechain` (1 atom), and confirm the canonical partition is visible and non-empty.
 17. In a pinned PyMOL environment, run `python verification/selection/run-pymol-oracle.py tests/fixtures/mini-protein.pdb` and compare the emitted hashes with `pymol-oracle-results.json` and the direct probe evidence.
+18. Resize the browser to a narrow viewport (for example 720×800), import `tests/fixtures/mini-protein.pdb`, and confirm the 3Dmol canvas remains non-zero and visibly renders the structure while side panels collapse.
 
 ## Screenshot evidence
 

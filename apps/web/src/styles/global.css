@@ -372,7 +372,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
   body { min-width: 0; }
   .app-shell { grid-template-columns: 56px minmax(0, 1fr); }
   .side-column { display: none; }
-  .workspace-grid { grid-template-columns: 0 minmax(0, 1fr) 0; padding-left: 6px; padding-right: 6px; }
+  /* Hidden side columns must not leave the canvas auto-placed in the zero-width first track. */
+  .workspace-grid { grid-template-columns: minmax(0, 1fr); padding-left: 6px; padding-right: 6px; }
   .console-layer { right: 18px; left: 18px; }
   .menu-links { gap: 9px; }
   .menu-links button { font-size: 11px; }
