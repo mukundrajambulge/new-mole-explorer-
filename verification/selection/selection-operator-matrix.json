@@ -29,8 +29,8 @@
   },
   "oracleStatusCounts": {
     "ORACLE_PASS": 47,
-    "ORACLE_EQUIVALENT": 32,
-    "ORACLE_PENDING": 8
+    "ORACLE_EQUIVALENT": 33,
+    "ORACLE_PENDING": 7
   },
   "entries": [
     {
@@ -639,8 +639,8 @@
       "operator": "`ribbon_color`",
       "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-closure E2E; selection-matrix-live.spec.ts)",
-      "oracleStatus": "ORACLE_PENDING",
-      "decision": "explicit RIBBON color tokens are scoped to active ribbon directives; generic atom color is not treated as a RIBBON setting"
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "explicit RIBBON color tokens are scoped to active ribbon directives and match pinned PyMOL `ribbon_color red` on the explicitly shown protein ribbon; generic atom color is not treated as a RIBBON setting"
     }
   ]
 }

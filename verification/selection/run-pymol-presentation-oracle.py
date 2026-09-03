@@ -3,7 +3,8 @@
 The application baseline is explicit: solvent is hidden by presentation, the
 protein contributes Cartoon, the organic component contributes Sticks, and the
 ion contributes Spheres. Color selectors are evaluated only after their
-corresponding presentation setup is applied.
+corresponding presentation setup is applied. Generic atom color and
+representation-specific color are intentionally probed as separate settings.
 """
 
 from __future__ import annotations
@@ -76,6 +77,12 @@ def main() -> None:
     cmd.set("cartoon_color", "red", "polymer.protein")
     rows.append(row_for("cartoon_color red"))
 
+    reset_fixture(args.fixture)
+    cmd.hide("cartoon", "polymer.protein")
+    cmd.show("ribbon", "polymer.protein")
+    cmd.set("ribbon_color", "red", "polymer.protein")
+    rows.append(row_for("ribbon_color red"))
+
     result = {
         "schemaVersion": 1,
         "source": ORACLE_SOURCE,
@@ -89,6 +96,8 @@ def main() -> None:
             "representations": {"polymer.protein": "cartoon", "organic": "sticks", "inorganic": "spheres"},
             "colorSelectorSetup": "color red on all and not solvent",
             "cartoonColorSelectorSetup": "cartoon_color red on polymer.protein",
+            "ribbonRepresentation": "ribbon on polymer.protein",
+            "ribbonColorSelectorSetup": "ribbon_color red on polymer.protein",
         },
         "rows": rows,
     }

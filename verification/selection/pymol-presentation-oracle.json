@@ -3,8 +3,8 @@
   "source": "schrodinger/pymol-open-source@5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
   "oracleSource": "schrodinger/pymol-open-source@5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
   "runtime": "PyMOL 2.3.0",
-  "fixture": "tests/fixtures/mini-protein.pdb",
-  "queryCount": 3,
+  "fixture": "/mnt/c/Users/mukun/Documents/Codex/2026-08-30/files-pasted-by-the-user-new/outputs/molecular-workstation/tests/fixtures/mini-protein.pdb",
+  "queryCount": 4,
   "generatedBy": "verification/selection/run-pymol-presentation-oracle.py",
   "presentationBaseline": {
     "hidden": "solvent",
@@ -14,7 +14,9 @@
       "inorganic": "spheres"
     },
     "colorSelectorSetup": "color red on all and not solvent",
-    "cartoonColorSelectorSetup": "cartoon_color red on polymer.protein"
+    "cartoonColorSelectorSetup": "cartoon_color red on polymer.protein",
+    "ribbonRepresentation": "ribbon on polymer.protein",
+    "ribbonColorSelectorSetup": "ribbon_color red on polymer.protein"
   },
   "rows": [
     {
@@ -59,6 +61,23 @@
     },
     {
       "query": "cartoon_color red",
+      "returnCode": 8,
+      "count": 8,
+      "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
+      "tuples": [
+        "1|A|ALA|1|N|N",
+        "2|A|ALA|1|CA|C",
+        "3|A|ALA|1|C|C",
+        "4|A|ALA|1|O|O",
+        "5|A|GLY|2|N|N",
+        "6|A|GLY|2|CA|C",
+        "7|A|GLY|2|C|C",
+        "8|A|GLY|2|O|O"
+      ],
+      "status": "PASS"
+    },
+    {
+      "query": "ribbon_color red",
       "returnCode": 8,
       "count": 8,
       "membershipHash": "b81d2bafa24c4af20dd64edec8c1c31d6a801450485bce11c65db1d24cdae7c3",
