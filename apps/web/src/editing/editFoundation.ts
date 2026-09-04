@@ -1,10 +1,12 @@
 import type {
   CanonicalAtom,
+  CanonicalBond,
   CanonicalCoordinateState,
   CanonicalEditCommand,
   CanonicalHierarchy,
   CanonicalMolecularStructure,
   Coordinate3D,
+  BondOrder,
   EditOperationKind,
   EditStateSelector,
   StructureLoadResult,
@@ -27,7 +29,9 @@ export type InvalidationCategory =
   | "ALIGNMENT_RESULT"
   | "SPATIAL_CACHE"
   | "GEOMETRY_CACHE"
-  | "CHEMISTRY_ANALYSIS";
+  | "CHEMISTRY_ANALYSIS"
+  | "STRUCTURAL_ANALYSIS"
+  | "DOCKING_PREPARATION";
 
 export type EntityKind = "ATOM" | "BOND" | "RESIDUE" | "COORDINATE_STATE";
 export type EntityLineageOutcome = "PRESERVED" | "NEW" | "RETIRED" | "REPLACED" | "UNRESOLVED";
@@ -136,7 +140,15 @@ export type EditFailureCode =
   | "TRANSACTION_VALIDATION_FAILED"
   | "REVISION_CONFLICT"
   | "HISTORY_UNAVAILABLE"
-  | "INVALID_SELECTION";
+  | "INVALID_SELECTION"
+  | "EMPTY_SELECTION"
+  | "CROSS_OBJECT_TOPOLOGY_UNSUPPORTED"
+  | "SELF_BOND"
+  | "DUPLICATE_BOND"
+  | "BOND_NOT_FOUND"
+  | "UNSUPPORTED_BOND_ORDER"
+  | "CHEMISTRY_AMBIGUOUS"
+  | "CHEMISTRY_UNSUPPORTED";
 
 export type EditFailure = {
   ok: false;
@@ -250,6 +262,17 @@ const boundsFor = (atoms: readonly CanonicalAtom[]) => {
   }), { min: { x: first.x, y: first.y, z: first.z }, max: { x: first.x, y: first.y, z: first.z } });
 };
 
+const countsFor = (atoms: readonly CanonicalAtom[], hierarchy: CanonicalHierarchy) => ({
+  atoms: atoms.length,
+  residues: Object.keys(hierarchy.residues).length,
+  chains: hierarchy.chainIds.length,
+  polymerAtoms: atoms.filter((atom) => atom.isPolymer).length,
+  ligandAtoms: atoms.filter((atom) => atom.isLigand).length,
+  waterAtoms: atoms.filter((atom) => atom.isWater).length,
+  ionAtoms: atoms.filter((atom) => atom.isIon).length,
+  otherAtoms: atoms.filter((atom) => !atom.isPolymer && !atom.isLigand && !atom.isWater && !atom.isIon).length,
+});
+
 const scientificAtomPayload = (atom: CanonicalAtom) => ({
   stableId: atom.stableId,
   atomName: atom.atomName,
@@ -335,14 +358,42 @@ const renderSourceFor = (structure: CanonicalMolecularStructure, states: readonl
   return `${lines.join("\n")}\n`;
 };
 
-const rebindDatasets = (structure: CanonicalMolecularStructure, revisionId: string): CanonicalMolecularStructure => ({
-  ...structure,
-  ...(structure.chemistryDataset ? { chemistryDataset: { ...structure.chemistryDataset, molecularRevision: revisionId } } : {}),
-  ...(structure.fragmentDataset ? { fragmentDataset: { ...structure.fragmentDataset, molecularRevision: revisionId } } : {}),
-  ...(structure.partialChargeDataset ? { partialChargeDataset: { ...structure.partialChargeDataset, molecularRevision: revisionId } } : {}),
-  ...(structure.secondaryStructureDataset ? { secondaryStructureDataset: { ...structure.secondaryStructureDataset, molecularRevision: revisionId } } : {}),
-  ...(structure.peptideSequenceDataset ? { peptideSequenceDataset: { ...structure.peptideSequenceDataset, molecularRevision: revisionId } } : {}),
-});
+const rebindDatasets = (structure: CanonicalMolecularStructure, revisionId: string): CanonicalMolecularStructure => {
+  const atomIds = new Set(structure.atoms.map((atom) => atom.stableId));
+  const residueIds = new Set(Object.keys(structure.hierarchy.residues));
+  const chemistryDataset = structure.chemistryDataset ? {
+    ...structure.chemistryDataset,
+    molecularRevision: revisionId,
+    donorAtomIds: structure.chemistryDataset.donorAtomIds.filter((id) => atomIds.has(id)),
+    acceptorAtomIds: structure.chemistryDataset.acceptorAtomIds.filter((id) => atomIds.has(id)),
+  } : undefined;
+  const fragmentDataset = structure.fragmentDataset ? {
+    ...structure.fragmentDataset,
+    molecularRevision: revisionId,
+    atomFragmentMap: Object.fromEntries(Object.entries(structure.fragmentDataset.atomFragmentMap).filter(([atomId]) => atomIds.has(atomId))),
+  } : undefined;
+  const partialChargeDataset = structure.partialChargeDataset ? {
+    ...structure.partialChargeDataset,
+    molecularRevision: revisionId,
+    atomChargeMap: Object.fromEntries(Object.entries(structure.partialChargeDataset.atomChargeMap).filter(([atomId]) => atomIds.has(atomId))),
+  } : undefined;
+  const peptideSequenceDataset = structure.peptideSequenceDataset ? {
+    ...structure.peptideSequenceDataset,
+    molecularRevision: revisionId,
+    chains: Object.fromEntries(Object.entries(structure.peptideSequenceDataset.chains).map(([chainId, chain]) => {
+      const kept = chain.residueIds.flatMap((residueId, index) => residueIds.has(residueId) ? [{ residueId, index }] : []);
+      return [chainId, { residueIds: kept.map((entry) => entry.residueId), sequence: kept.map((entry) => chain.sequence[entry.index] ?? "").join("") }];
+    }).filter(([, chain]) => (chain as { residueIds: string[] }).residueIds.length > 0)),
+  } : undefined;
+  return {
+    ...structure,
+    ...(chemistryDataset ? { chemistryDataset } : {}),
+    ...(fragmentDataset ? { fragmentDataset } : {}),
+    ...(partialChargeDataset ? { partialChargeDataset } : {}),
+    ...(structure.secondaryStructureDataset ? { secondaryStructureDataset: { ...structure.secondaryStructureDataset, molecularRevision: revisionId } } : {}),
+    ...(peptideSequenceDataset ? { peptideSequenceDataset } : {}),
+  };
+};
 
 const coordinateEditParameters = (command: ScientificEditCommand): { coordinates?: Record<string, unknown>; coordinatesByState?: Record<string, Record<string, unknown>> } | null => {
   const value = command.parameters;
@@ -372,7 +423,7 @@ const resolveStateIds = (revision: ScientificRevision, selector: EditStateSelect
 export const invalidationManifestFor = (changedDomains: readonly ScientificDomain[], staleArtifactIds: readonly string[] = []): InvalidationManifest => {
   const categories = new Set<InvalidationCategory>();
   if (changedDomains.includes("TOPOLOGY") || changedDomains.includes("IDENTITY")) {
-    ["TOPOLOGY_SELECTION", "NEIGHBOR_ANALYSIS", "RING_ANALYSIS", "FRAGMENT_ANALYSIS", "CONTACT_ANALYSIS", "CLASH_ANALYSIS", "HYDROGEN_BOND_ANALYSIS", "SURFACE_CACHE", "GEOMETRY_CACHE"].forEach((category) => categories.add(category as InvalidationCategory));
+    ["TOPOLOGY_SELECTION", "NEIGHBOR_ANALYSIS", "RING_ANALYSIS", "FRAGMENT_ANALYSIS", "CONTACT_ANALYSIS", "CLASH_ANALYSIS", "HYDROGEN_BOND_ANALYSIS", "SURFACE_CACHE", "GEOMETRY_CACHE", "CHEMISTRY_ANALYSIS", "STRUCTURAL_ANALYSIS", "DOCKING_PREPARATION"].forEach((category) => categories.add(category as InvalidationCategory));
   }
   if (changedDomains.includes("COORDINATES")) {
     ["SPATIAL_SELECTION", "MEASUREMENT", "CONTACT_ANALYSIS", "CLASH_ANALYSIS", "HYDROGEN_BOND_ANALYSIS", "ALIGNMENT_RESULT", "SPATIAL_CACHE", "GEOMETRY_CACHE", "SURFACE_CACHE"].forEach((category) => categories.add(category as InvalidationCategory));
@@ -397,6 +448,20 @@ const lineageFor = (parent: CanonicalMolecularStructure, child: CanonicalMolecul
   ...parent.bonds.map((bond) => ({ entityKind: "BOND" as const, sourceId: bond.id, resultId: child.bonds.some((candidate) => candidate.id === bond.id) ? bond.id : undefined, outcome: child.bonds.some((candidate) => candidate.id === bond.id) ? "PRESERVED" as const : "RETIRED" as const })),
   ...parent.hierarchy.chainIds.flatMap((chainId) => parent.hierarchy.chains[chainId]?.residueIds ?? []).map((residueId) => ({ entityKind: "RESIDUE" as const, sourceId: residueId, resultId: child.hierarchy.residues[residueId] ? residueId : undefined, outcome: child.hierarchy.residues[residueId] ? "PRESERVED" as const : "RETIRED" as const })),
 ];
+
+const topologyLineageFor = (parent: CanonicalMolecularStructure, child: CanonicalMolecularStructure, operation: EditOperationKind, replacedBond?: { sourceId: string; resultId: string }): EntityLineageRecord[] => {
+  const records = lineageFor(parent, child);
+  if (operation === "EDIT_ADD_BOND") {
+    const added = child.bonds.find((bond) => !parent.bonds.some((candidate) => candidate.id === bond.id));
+    if (added) records.push({ entityKind: "BOND", resultId: added.id, outcome: "NEW" });
+  }
+  if (replacedBond) {
+    const source = records.find((record) => record.entityKind === "BOND" && record.sourceId === replacedBond.sourceId);
+    if (source) { source.outcome = "REPLACED"; source.resultId = replacedBond.resultId; }
+    records.push({ entityKind: "BOND", resultId: replacedBond.resultId, outcome: "NEW" });
+  }
+  return records;
+};
 
 export const createCoordinateEditCommand = (input: {
   objectId: string;
@@ -431,10 +496,77 @@ export const createCoordinateEditCommand = (input: {
   };
 };
 
+type TopologyCommandInput = {
+  objectId: string;
+  baseRevisionId: string;
+  selectionResult: SelectionResult;
+  atomIds: readonly string[];
+  origin: CanonicalEditCommand["origin"];
+  provenance?: Partial<CanonicalEditCommand["provenance"]>;
+  commandId?: string;
+  objectIds?: readonly string[];
+  parameters?: Readonly<Record<string, unknown>>;
+};
+
+const createTopologyCommand = (input: TopologyCommandInput, operation: Extract<EditOperationKind, "EDIT_DELETE_ATOMS" | "EDIT_ADD_BOND" | "EDIT_DELETE_BOND" | "EDIT_REPLACE_BOND_SEMANTICS">): ScientificEditCommand => {
+  const target = { objectId: input.objectId, atomIds: [...input.atomIds], ...(input.objectIds ? { objectIds: [...input.objectIds] } : {}), selectionResultId: input.selectionResult.resultId };
+  const parameters = { ...(input.parameters ?? {}) };
+  const fingerprint = { operation, objectId: input.objectId, baseRevisionId: input.baseRevisionId, stateScope: { kind: "ALL" as const }, target, parameters };
+  return {
+    schemaVersion: 1,
+    commandId: input.commandId ?? `command:${stableHash(fingerprint)}`,
+    operation,
+    objectId: input.objectId,
+    baseRevisionId: input.baseRevisionId,
+    stateScope: { kind: "ALL" },
+    target,
+    parameters,
+    origin: input.origin,
+    provenance: { producerId: "molecular-workstation.r07", producerVersion: "2", requestedAt: new Date().toISOString(), ...input.provenance },
+    selectionResult: input.selectionResult,
+  };
+};
+
+export const createDeleteAtomsCommand = (input: Omit<TopologyCommandInput, "parameters" | "objectIds">): ScientificEditCommand => createTopologyCommand(input, "EDIT_DELETE_ATOMS");
+
+export const createAddBondCommand = (input: Omit<TopologyCommandInput, "parameters"> & { order: Exclude<BondOrder, "UNKNOWN">; objectIds?: readonly string[] }): ScientificEditCommand => createTopologyCommand({ ...input, parameters: { order: input.order } }, "EDIT_ADD_BOND");
+
+export const createDeleteBondCommand = (input: Omit<TopologyCommandInput, "parameters" | "objectIds"> & { bondId?: string; objectIds?: readonly string[] }): ScientificEditCommand => createTopologyCommand({ ...input, parameters: input.bondId ? { bondId: input.bondId } : {} }, "EDIT_DELETE_BOND");
+
+export const createReplaceBondSemanticsCommand = (input: Omit<TopologyCommandInput, "parameters"> & { order: Exclude<BondOrder, "UNKNOWN">; bondId?: string; objectIds?: readonly string[] }): ScientificEditCommand => createTopologyCommand({ ...input, parameters: { order: input.order, ...(input.bondId ? { bondId: input.bondId } : {}) } }, "EDIT_REPLACE_BOND_SEMANTICS");
+
+const topologyOperations = new Set<EditOperationKind>(["EDIT_DELETE_ATOMS", "EDIT_ADD_BOND", "EDIT_DELETE_BOND", "EDIT_REPLACE_BOND_SEMANTICS"]);
+const supportedBondOrders = new Set<Exclude<BondOrder, "UNKNOWN">>(["SINGLE", "DOUBLE", "TRIPLE", "AROMATIC"]);
+const bondWeight = (order: BondOrder): number => order === "DOUBLE" ? 2 : order === "TRIPLE" ? 3 : order === "AROMATIC" ? 1.5 : 1;
+const valenceCeiling = (element: string): number => {
+  const normalized = element.trim().toUpperCase();
+  if (normalized === "H") return 1;
+  if (normalized === "B") return 3;
+  if (normalized === "C") return 4;
+  if (normalized === "N") return 4;
+  if (normalized === "O") return 2;
+  if (["F", "CL", "BR", "I"].includes(normalized)) return 1;
+  if (["P", "S"].includes(normalized)) return 6;
+  return 8;
+};
+const endpointKey = (left: string, right: string): string => [left, right].sort().join("\u0000");
+const endpointsFor = (bond: CanonicalBond): string => endpointKey(bond.atom1, bond.atom2);
+const sameIds = (left: readonly string[], right: readonly string[]): boolean => left.length === right.length && new Set(left).size === left.length && left.every((id) => right.includes(id));
+const commandOrder = (command: ScientificEditCommand): BondOrder | null => {
+  const order = command.parameters.order;
+  return typeof order === "string" && supportedBondOrders.has(order as Exclude<BondOrder, "UNKNOWN">) ? order as Exclude<BondOrder, "UNKNOWN"> : null;
+};
+const objectIdsForCommand = (command: ScientificEditCommand): readonly string[] => command.target.objectIds ?? [command.objectId];
+
 export class EditTransaction {
   constructor(private readonly history: ObjectRevisionHistory, private readonly command: ScientificEditCommand) {}
 
   commit(): EditResult {
+    if (topologyOperations.has(this.command.operation)) return this.commitTopologyEdit();
+    return this.commitCoordinateEdit();
+  }
+
+  private commitCoordinateEdit(): EditResult {
     const transactionId = makeTransactionId(this.command);
     const current = this.history.nodes.get(this.history.currentRevisionId);
     if (!current) return fail("HISTORY_UNAVAILABLE", `No current revision is retained for object ${this.command.objectId}.`, this.command, transactionId);
@@ -504,7 +636,7 @@ export class EditTransaction {
     const revisionId = `r07-revision-${stableHash({ parentRevisionId: current.revisionId, operation: this.command.operation, target: this.command.target, stateScope: this.command.stateScope, parameters: this.command.parameters, contentHash })}`;
     const nextStructure = rebindDatasets({ ...nextStructureBase, scientificHash: revisionId }, revisionId);
     const nextLoadResult: StructureLoadResult = freezeLoadResult(nextLoadResultFrom(nextStructure, nextStates));
-    const invalidationManifest = invalidationManifestFor(["COORDINATES"]);
+    const invalidationManifest = invalidationManifestFor(["COORDINATES"], [...requestedAtomIds, ...(selection ? [selection.resultId] : [])]);
     const entityLineage = lineageFor(baseStructure, nextStructure);
     const provenance: ScientificProvenanceRecord = {
       provenanceRecordId: `provenance:${transactionId}`,
@@ -548,6 +680,155 @@ export class EditTransaction {
     this.history.children.set(current.revisionId, parentChildren);
     this.history.currentRevisionId = revisionId;
     return { ok: true, outcome: "COMMITTED", transactionId, objectId: this.command.objectId, baseRevisionId: current.revisionId, resultRevisionId: revisionId, revision, invalidationManifest, identityTransition: revision.identityTransition, entityLineage, provenanceRecordId: provenance.provenanceRecordId, diagnostics: [`CoordinateState scope: ${stateResolution.ids.join(", ")}`, "Scientific candidate validated before publication."] };
+  }
+
+  private commitTopologyEdit(): EditResult {
+    const transactionId = makeTransactionId(this.command);
+    const current = this.history.nodes.get(this.history.currentRevisionId);
+    if (!current) return fail("HISTORY_UNAVAILABLE", `No current revision is retained for object ${this.command.objectId}.`, this.command, transactionId);
+    if (this.command.schemaVersion !== 1 || !this.command.commandId || !this.command.objectId || !this.command.baseRevisionId) return fail("INVALID_EDIT_INPUT", "A canonical topology command requires schema, command ID, object ID and base revision.", this.command, transactionId);
+    if (this.command.objectId !== this.history.objectId || (this.command.target.objectId && this.command.target.objectId !== this.history.objectId)) return fail("REVISION_CONFLICT", `Command target object ${this.command.target.objectId ?? this.command.objectId} does not match transaction object ${this.history.objectId}.`, this.command, transactionId);
+    if (this.command.baseRevisionId !== current.revisionId) return fail("STALE_BASE_REVISION", `Expected base revision ${this.command.baseRevisionId}, but object ${this.command.objectId} is at ${current.revisionId}.`, this.command, transactionId);
+
+    const baseStructure = current.loadResult.structure;
+    const selection = this.command.selectionResult;
+    if (!selection || (selection.status !== "VALID_NONEMPTY" && selection.status !== "VALID_EMPTY")) return fail("INVALID_SELECTION", "Every topology edit requires a valid immutable SelectionResult.", this.command, transactionId);
+    if (selection.status === "VALID_EMPTY") return fail("EMPTY_SELECTION", "The selection is empty; no topology revision was created.", this.command, transactionId);
+    if (selection.structureId !== baseStructure.id || selection.molecularRevision !== baseStructure.scientificHash) return fail("STALE_BASE_REVISION", `Selection ${selection.resultId} is bound to a different molecular revision.`, this.command, transactionId);
+    if (this.command.target.selectionResultId !== selection.resultId) return fail("INVALID_EDIT_INPUT", "The compact selection reference does not match the supplied SelectionResult.", this.command, transactionId);
+    const requestedAtomIds = this.command.target.atomIds ?? selection.stableAtomIds;
+    if (!requestedAtomIds.length) return fail("EMPTY_SELECTION", "The topology edit requires at least one stable AtomUID target.", this.command, transactionId);
+    if (this.command.operation !== "EDIT_DELETE_ATOMS" && requestedAtomIds.length === 2 && requestedAtomIds[0] === requestedAtomIds[1]) return fail("SELF_BOND", "A bond cannot connect an atom to itself.", this.command, transactionId);
+    if (new Set(requestedAtomIds).size !== requestedAtomIds.length || !sameIds(requestedAtomIds, selection.stableAtomIds)) return fail("AMBIGUOUS_TARGET", "Topology targets must exactly match the unique SelectionResult AtomUID membership.", this.command, transactionId);
+    const scopedObjectIds = objectIdsForCommand(this.command);
+    if (scopedObjectIds.length !== 1 || scopedObjectIds[0] !== this.history.objectId || requestedAtomIds.some((atomId) => atomId.includes("::"))) return fail("CROSS_OBJECT_TOPOLOGY_UNSUPPORTED", "Topology edits are object-scoped in B2; cross-object targets are rejected atomically.", this.command, transactionId);
+    if (this.command.stateScope.kind !== "ALL") return fail("INVALID_STATE_SCOPE", "Topology edits apply to every explicit coordinate state; use stateScope ALL.", this.command, transactionId);
+    const stateResolution = resolveStateIds(current, this.command.stateScope);
+    if ("code" in stateResolution) return fail(stateResolution.code, stateResolution.message, this.command, transactionId);
+    if (stateResolution.ids.length !== current.stateOrder.length) return fail("INVALID_STATE_SCOPE", "Topology edits require all coordinate states to be present in the canonical state order.", this.command, transactionId);
+
+    const atomById = new Map(baseStructure.atoms.map((atom) => [atom.stableId, atom]));
+    const missingAtomId = requestedAtomIds.find((atomId) => !atomById.has(atomId));
+    if (missingAtomId) return fail("TARGET_NOT_FOUND", `Stable AtomUID ${missingAtomId} is not present in revision ${current.revisionId}.`, this.command, transactionId);
+    let nextAtoms = baseStructure.atoms.map((atom) => ({ ...atom }));
+    let nextBonds = baseStructure.bonds.map((bond) => ({ ...bond }));
+    const endpointPair = requestedAtomIds.length === 2 ? endpointKey(requestedAtomIds[0]!, requestedAtomIds[1]!) : null;
+    const matchingBonds = endpointPair ? baseStructure.bonds.filter((bond) => endpointsFor(bond) === endpointPair) : [];
+    let replacedBond: { sourceId: string; resultId: string } | undefined;
+    const parameters = this.command.parameters;
+
+    if (this.command.operation === "EDIT_DELETE_ATOMS") {
+      const deleted = new Set(requestedAtomIds);
+      nextAtoms = nextAtoms.filter((atom) => !deleted.has(atom.stableId));
+      nextBonds = nextBonds.filter((bond) => !deleted.has(bond.atom1) && !deleted.has(bond.atom2));
+    } else {
+      if (requestedAtomIds.length !== 2) return fail("AMBIGUOUS_TARGET", `${this.command.operation} requires exactly two endpoint AtomUIDs.`, this.command, transactionId);
+      if (requestedAtomIds[0] === requestedAtomIds[1]) return fail("SELF_BOND", "A bond cannot connect an atom to itself.", this.command, transactionId);
+      const left = atomById.get(requestedAtomIds[0]!);
+      const right = atomById.get(requestedAtomIds[1]!);
+      if (!left || !right) return fail("TARGET_NOT_FOUND", "Both bond endpoints must resolve to canonical AtomUIDs in the same object.", this.command, transactionId);
+      if (this.command.operation === "EDIT_ADD_BOND") {
+        const order = commandOrder(this.command);
+        if (!order) return fail("UNSUPPORTED_BOND_ORDER", "Bond creation supports only SINGLE, DOUBLE, TRIPLE, or AROMATIC order.", this.command, transactionId);
+        if (matchingBonds.length) return fail("DUPLICATE_BOND", "The selected endpoint pair already has a canonical bond.", this.command, transactionId);
+        const usedValence = (atomId: string) => baseStructure.bonds.filter((bond) => bond.atom1 === atomId || bond.atom2 === atomId).reduce((sum, bond) => sum + bondWeight(bond.order), 0);
+        if (usedValence(left.stableId) + bondWeight(order) > valenceCeiling(left.element) || usedValence(right.stableId) + bondWeight(order) > valenceCeiling(right.element)) return fail("CHEMISTRY_AMBIGUOUS", "The requested bond exceeds the bounded valence profile; no implicit hydrogen or aromaticity inference was attempted.", this.command, transactionId);
+        const canonicalEndpoints = [left.stableId, right.stableId].sort();
+        nextBonds.push({ id: `bond:${this.command.objectId}:${stableHash({ parentRevisionId: current.revisionId, endpoints: endpointPair, order })}`, atom1: canonicalEndpoints[0]!, atom2: canonicalEndpoints[1]!, order, source: "UNKNOWN" });
+      } else if (this.command.operation === "EDIT_DELETE_BOND") {
+        const requestedBondId = typeof parameters.bondId === "string" ? parameters.bondId : undefined;
+        const removable = requestedBondId ? matchingBonds.filter((bond) => bond.id === requestedBondId) : matchingBonds;
+        if (!removable.length) return fail("BOND_NOT_FOUND", "No canonical bond exists for the exact endpoint pair and requested BondUID.", this.command, transactionId);
+        const removableIds = new Set(removable.map((bond) => bond.id));
+        nextBonds = nextBonds.filter((bond) => !removableIds.has(bond.id));
+      } else {
+        const oldBondId = typeof parameters.bondId === "string" ? parameters.bondId : undefined;
+        const candidates = oldBondId ? matchingBonds.filter((bond) => bond.id === oldBondId) : matchingBonds;
+        if (!candidates.length) return fail("BOND_NOT_FOUND", "No canonical bond exists for the exact endpoint pair and requested BondUID.", this.command, transactionId);
+        if (candidates.length !== 1) return fail("AMBIGUOUS_TARGET", "Bond order replacement requires one authoritative BondUID.", this.command, transactionId);
+        const order = commandOrder(this.command);
+        if (!order) return fail("UNSUPPORTED_BOND_ORDER", "Bond replacement supports only SINGLE, DOUBLE, TRIPLE, or AROMATIC order.", this.command, transactionId);
+        const oldBond = candidates[0]!;
+        if (oldBond.order === order) return fail("TRANSACTION_VALIDATION_FAILED", "The requested bond order is already canonical; no child revision was published.", this.command, transactionId);
+        if (matchingBonds.some((bond) => bond.id !== oldBond.id && bond.order === order)) return fail("DUPLICATE_BOND", "Another canonical bond with the requested endpoint semantics already exists.", this.command, transactionId);
+        const usedValence = (atomId: string) => baseStructure.bonds.filter((bond) => bond.id !== oldBond.id && (bond.atom1 === atomId || bond.atom2 === atomId)).reduce((sum, bond) => sum + bondWeight(bond.order), 0);
+        if (usedValence(left.stableId) + bondWeight(order) > valenceCeiling(left.element) || usedValence(right.stableId) + bondWeight(order) > valenceCeiling(right.element)) return fail("CHEMISTRY_AMBIGUOUS", "The requested bond order exceeds the bounded valence profile; no implicit hydrogen or aromaticity inference was attempted.", this.command, transactionId);
+        const resultBondId = `bond:${this.command.objectId}:${stableHash({ parentRevisionId: current.revisionId, sourceBondId: oldBond.id, order })}`;
+        nextBonds = nextBonds.filter((bond) => bond.id !== oldBond.id);
+        nextBonds.push({ ...oldBond, id: resultBondId, order, source: "UNKNOWN" });
+        replacedBond = { sourceId: oldBond.id, resultId: resultBondId };
+      }
+    }
+
+    const states = stateForStructure(baseStructure);
+    const deletedIds = this.command.operation === "EDIT_DELETE_ATOMS" ? new Set(requestedAtomIds) : new Set<string>();
+    const nextStates = states.map((state) => {
+      const coordinates = deletedIds.size ? Object.fromEntries(Object.entries(state.coordinates).filter(([atomId]) => !deletedIds.has(atomId))) : { ...state.coordinates };
+      return { ...state, coordinates, coordinateHash: `r07-state-${stableHash({ stateId: state.id, coordinates })}` };
+    });
+    const currentState = nextStates.find((state) => state.id === current.currentStateId) ?? nextStates[0]!;
+    const realizedAtoms = atomsForState(nextAtoms, currentState);
+    const hierarchy = hierarchyFor(realizedAtoms, baseStructure.hierarchy);
+    const nextStructureBase: CanonicalMolecularStructure = {
+      ...clone(baseStructure),
+      atoms: realizedAtoms,
+      bonds: nextBonds,
+      counts: countsFor(realizedAtoms, hierarchy),
+      bounds: boundsFor(realizedAtoms),
+      hierarchy,
+      coordinateStates: nextStates,
+      stateOrder: [...current.stateOrder],
+    };
+    const contentHash = deterministicScientificContentHash(nextStructureBase);
+    const revisionId = `r07-revision-${stableHash({ parentRevisionId: current.revisionId, operation: this.command.operation, target: this.command.target, stateScope: this.command.stateScope, parameters: this.command.parameters, contentHash })}`;
+    const resultIdentityId = identityIdFor(nextStructureBase);
+    const nextStructure = rebindDatasets({ ...nextStructureBase, scientificHash: revisionId }, revisionId);
+    const nextLoadResult: StructureLoadResult = freezeLoadResult(nextLoadResultFrom(nextStructure, nextStates));
+    const affectedBondIds = this.command.operation === "EDIT_DELETE_ATOMS" ? baseStructure.bonds.filter((bond) => requestedAtomIds.includes(bond.atom1) || requestedAtomIds.includes(bond.atom2)).map((bond) => bond.id) : matchingBonds.map((bond) => bond.id);
+    const staleIds = [...new Set([...requestedAtomIds, ...affectedBondIds, ...(replacedBond ? [replacedBond.resultId] : []), selection.resultId])];
+    const invalidationManifest = invalidationManifestFor(["TOPOLOGY", "IDENTITY"], staleIds);
+    const entityLineage = topologyLineageFor(baseStructure, nextStructure, this.command.operation, replacedBond);
+    const provenance: ScientificProvenanceRecord = {
+      provenanceRecordId: `provenance:${transactionId}`,
+      transactionId,
+      commandId: this.command.commandId,
+      operation: this.command.operation,
+      objectId: this.command.objectId,
+      baseRevisionId: current.revisionId,
+      resultRevisionId: revisionId,
+      producerId: this.command.provenance.producerId,
+      producerVersion: this.command.provenance.producerVersion,
+      requestedAt: this.command.provenance.requestedAt,
+      ...(this.command.provenance.actor ? { actor: this.command.provenance.actor } : {}),
+      ...(this.command.provenance.metadata ? { metadata: this.command.provenance.metadata } : {}),
+    };
+    const revision: ScientificRevision = deepFreeze({
+      schemaVersion: 1,
+      revisionId,
+      objectId: this.command.objectId,
+      molecularIdentityId: resultIdentityId,
+      scientificContentHash: contentHash,
+      loadResult: nextLoadResult,
+      parentRevisionId: current.revisionId,
+      parentRevisionIds: [current.revisionId],
+      transactionId,
+      operation: this.command.operation,
+      changedDomains: ["TOPOLOGY", "IDENTITY"],
+      invalidationManifest,
+      identityTransition: { sourceIdentityId: current.molecularIdentityId, resultIdentityId, outcome: "DERIVED", reason: "Topology editing derives a new MolecularIdentity; atom and surviving-bond identities are preserved by lineage." },
+      entityLineage,
+      provenance,
+      stateOrder: [...current.stateOrder],
+      currentStateId: current.currentStateId,
+      sequence: current.sequence + 1,
+    });
+    this.history.nodes.set(revisionId, revision);
+    this.history.children.set(revisionId, new Set());
+    const parentChildren = this.history.children.get(current.revisionId) ?? new Set<string>();
+    parentChildren.add(revisionId);
+    this.history.children.set(current.revisionId, parentChildren);
+    this.history.currentRevisionId = revisionId;
+    return { ok: true, outcome: "COMMITTED", transactionId, objectId: this.command.objectId, baseRevisionId: current.revisionId, resultRevisionId: revisionId, revision, invalidationManifest, identityTransition: revision.identityTransition, entityLineage, provenanceRecordId: provenance.provenanceRecordId, diagnostics: [`Topology operation: ${this.command.operation}`, "All coordinate states were reconciled without cloning or fallback coordinates.", "Scientific candidate validated before publication."] };
   }
 }
 

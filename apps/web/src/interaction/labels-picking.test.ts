@@ -38,6 +38,16 @@ describe("safe labels and reverse identity picking", () => {
     expect(map.background().pickKind).toBe("BACKGROUND");
   });
 
+  it("resolves a bond pick to the stable BondUID and endpoint AtomUIDs", () => {
+    const bonded = { ...structure, atoms: [structure.atoms[0], { ...structure.atoms[0], stableId: "stable-o", serial: 43, atomName: "O", element: "O", x: 2 }], bonds: [{ id: "bond-stable", atom1: "stable-ca", atom2: "stable-o", order: "SINGLE" as const, source: "PDB_CONECT" as const }] };
+    const map = new ReverseIdentityMap();
+    map.build(bonded, 12);
+    const hit = map.resolveBond(bonded.bonds[0], bonded);
+    expect(hit?.pickKind).toBe("BOND");
+    expect(hit?.bondRef).toMatchObject({ bondId: "bond-stable", endpoints: ["stable-ca", "stable-o"], molecularRevision: bonded.scientificHash });
+    expect(map.resolveBond(bonded.bonds[0], { ...bonded, scientificHash: "stale" })).toBeNull();
+  });
+
   it("plans one stable label per canonical chain or residue", () => {
     const atoms = [
       structure.atoms[0],

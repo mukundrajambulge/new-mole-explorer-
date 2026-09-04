@@ -321,14 +321,14 @@ export type ProjectSaveRequest = {
  * editing stages extend one mutation pathway instead of creating another one.
  */
 export const EDIT_OPERATION_KINDS = [
-  "DELETE_ATOMS",
-  "CREATE_BOND",
-  "DELETE_BOND",
-  "SET_BOND_ORDER",
-  "ADD_HYDROGENS",
-  "REMOVE_HYDROGENS",
-  "REPLACE_ATOM",
-  "ATTACH_FRAGMENT",
+  "EDIT_DELETE_ATOMS",
+  "EDIT_ADD_BOND",
+  "EDIT_DELETE_BOND",
+  "EDIT_REPLACE_BOND_SEMANTICS",
+  "EDIT_ADD_HYDROGENS",
+  "EDIT_REMOVE_HYDROGENS",
+  "EDIT_REPLACE_ATOM",
+  "EDIT_ATTACH_FRAGMENT",
   "APPLY_COORDINATE_EDIT",
   "APPLY_RIGID_TRANSFORM",
 ] as const;
@@ -346,6 +346,8 @@ export type EditStateSelector =
 
 export type CanonicalEditTarget = {
   objectId?: string;
+  /** Object scope for endpoint validation; more than one object is rejected in B2. */
+  objectIds?: readonly string[];
   atomIds?: readonly string[];
   bondIds?: readonly string[];
   selectionResultId?: string;
