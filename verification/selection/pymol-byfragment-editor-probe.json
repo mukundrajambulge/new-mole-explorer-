@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "source": "schrodinger/pymol-open-source@5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+  "runtime": "PyMOL 2.3.0 system compatibility probe",
+  "acceptanceStatus": "SUPPORTING_EVIDENCE_ONLY",
+  "generatedBy": "manual editor-fragment probe; not the pinned acceptance oracle",
+  "setup": [
+    "cmd.fragment('ala', 'base')",
+    "cmd.edit('base and name CB')",
+    "editor.attach_fragment('pk1', 'benzene', 11, 0)"
+  ],
+  "observations": [
+    {
+      "phase": "ordinary fragment-library object",
+      "query": "byfragment base",
+      "count": 0
+    },
+    {
+      "phase": "after editor fragment attachment",
+      "query": "byfragment base",
+      "count": 17
+    },
+    {
+      "phase": "after editor fragment attachment",
+      "query": "byfragment name C*",
+      "count": 17
+    }
+  ],
+  "interpretation": "The positive result follows an editor operation that creates internal fragment selections. This does not establish a serializable atom-to-fragment field in ordinary PDB/mmCIF input and must not be used as a connected-component fallback."
+}
