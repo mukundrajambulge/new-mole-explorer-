@@ -4,7 +4,7 @@ This note records the source-level reason that `byfragment` remains a research/d
 
 - Source: `schrodinger/pymol-open-source@5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69`
 - Runtime used for the direct probe: PyMOL `3.2.0a` in the isolated Ubuntu-20.04/Python-3.8 compatibility build.
-- Source location: `layer3/Selector.cpp`, `SELE_BYF1`, lines 8462–8511 in the pinned checkout.
+- Source location: [`layer3/Selector.cpp`, `SELE_BYF1`, lines 8462–8511](https://raw.githubusercontent.com/schrodinger/pymol-open-source/5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69/layer3/Selector.cpp#L8462-L8511) in the pinned checkout.
 
 The pinned implementation:
 
