@@ -35,6 +35,7 @@ export const STRUCTURE_FORMATS = ["pdb", "mmcif"] as const;
 export type StructureFormat = (typeof STRUCTURE_FORMATS)[number];
 
 export type StructureSourceKind = "LOCAL_FILE" | "RCSB";
+export type RemoteStructureProvider = "RCSB" | "PDBE";
 
 export type BondOrder = "SINGLE" | "DOUBLE" | "TRIPLE" | "AROMATIC" | "UNKNOWN";
 
@@ -69,11 +70,44 @@ export type PartialChargeDataset = {
   provenance: string;
 };
 
+/** Complete, revision-bound chemistry roles supplied by an admitted perception profile. */
+export type CanonicalChemistryDataset = {
+  datasetId: string;
+  molecularRevision: string;
+  profileVersion: "canonical-chemistry-roles-v1";
+  donorAtomIds: string[];
+  acceptorAtomIds: string[];
+  provenance: string;
+};
+
+/** Complete, revision-bound fragment memberships supplied by an admitted profile. */
+export type CanonicalFragmentDataset = {
+  datasetId: string;
+  molecularRevision: string;
+  profileVersion: "canonical-fragment-assignment-v1";
+  atomFragmentMap: Record<string, string>;
+  assignmentSource: string;
+  provenance: string;
+};
+
 export type SecondaryStructureDataset = {
   datasetId: string;
   molecularRevision: string;
   assignmentSource: string;
   profileVersion: string;
+};
+
+export type PeptideSequenceChain = {
+  residueIds: string[];
+  sequence: string;
+};
+
+export type PeptideSequenceDataset = {
+  datasetId: string;
+  molecularRevision: string;
+  assignmentSource: string;
+  profileVersion: string;
+  chains: Record<string, PeptideSequenceChain>;
 };
 
 export type CanonicalChain = {
@@ -88,6 +122,8 @@ export type CanonicalHierarchy = {
   residues: Record<string, CanonicalResidue>;
 };
 
+export type CanonicalPolymerType = "PROTEIN" | "NUCLEIC_ACID" | "OTHER_POLYMER";
+
 export type CanonicalAtom = {
   stableId: string;
   serial: number;
@@ -97,11 +133,17 @@ export type CanonicalAtom = {
   residueNumber: number;
   insertionCode?: string;
   chain: string;
+  /** Authoritative segment identifier when supplied by the source. */
+  segmentId?: string;
+  /** Authoritative fragment membership when supplied by an admitted chemistry profile. */
+  fragmentId?: string;
   x: number;
   y: number;
   z: number;
   recordType: "ATOM" | "HETATM";
   isPolymer: boolean;
+  /** Source-backed polymer entity typing; absent means the source did not establish this distinction. */
+  polymerType?: CanonicalPolymerType;
   isLigand: boolean;
   isWater: boolean;
   isIon: boolean;
@@ -114,6 +156,16 @@ export type CanonicalAtom = {
   /** Authoritative alternate-location identifier when supplied by the source. */
   altLoc?: string | null;
   secondaryStructure?: SecondaryStructureKind | null;
+  /** Workspace-only scope metadata used by derived multi-object selection views. */
+  workspaceObjectId?: string;
+  workspaceObjectName?: string;
+  /** Workspace-only presentation scope; scientific `all` still includes disabled objects. */
+  workspaceObjectEnabled?: boolean;
+  /** Workspace-only coordinate-state metadata used by state-aware selection. */
+  workspaceCoordinateStateId?: string;
+  workspaceStateOrdinal?: number;
+  /** Workspace-only source-backed cell scope used by multi-object bycell evaluation. */
+  workspaceUnitCell?: CanonicalUnitCell;
 };
 
 export type StructureCounts = {
@@ -132,6 +184,31 @@ export type CoordinateBounds = {
   max: { x: number; y: number; z: number };
 };
 
+export type Coordinate3D = { x: number; y: number; z: number };
+
+/** A coordinate realization of one molecular object. Identity/topology live on the object. */
+export type CanonicalCoordinateState = {
+  id: string;
+  ordinal: number;
+  sourceModelNumber?: number;
+  coordinates: Record<string, Coordinate3D>;
+  coordinateHash: string;
+};
+
+/** Source-backed crystallographic unit-cell parameters for bounded bycell selection. */
+export type CanonicalUnitCell = {
+  a: number;
+  b: number;
+  c: number;
+  alpha: number;
+  beta: number;
+  gamma: number;
+  spaceGroup?: string;
+  zValue?: number;
+  source: "PDB_CRYST1" | "MMCIF_CELL";
+  profileVersion: "fractional-unit-cell-membership-v1";
+};
+
 export type StructureSourceMetadata = {
   kind: StructureSourceKind;
   originalFilename: string;
@@ -139,6 +216,7 @@ export type StructureSourceMetadata = {
   sha256: string;
   byteLength: number;
   uri?: string;
+  provider?: RemoteStructureProvider;
   ingestedAt: string;
   parserProfile: string;
 };
@@ -154,8 +232,21 @@ export type CanonicalMolecularStructure = {
   bonds: CanonicalBond[];
   hierarchy: CanonicalHierarchy;
   scientificHash: string;
+  /** Optional multi-model foundation; omitted by older persisted G1C records. */
+  coordinateStates?: CanonicalCoordinateState[];
+  /** Explicit presentation order; never infer scientific identity from array insertion order. */
+  stateOrder?: string[];
+  /** Optional source-backed crystallographic cell; does not imply symmetry expansion or PBC. */
+  unitCell?: CanonicalUnitCell;
+  /** Provenance for source-backed polymer entity typing, when available. */
+  polymerTypingSource?: string;
+  /** Optional complete chemistry-role assignments; absent data must fail closed for donor/acceptor selection. */
+  chemistryDataset?: CanonicalChemistryDataset;
+  /** Optional complete source-backed fragment memberships; absent data must fail closed for byfragment. */
+  fragmentDataset?: CanonicalFragmentDataset;
   partialChargeDataset?: PartialChargeDataset;
   secondaryStructureDataset?: SecondaryStructureDataset;
+  peptideSequenceDataset?: PeptideSequenceDataset;
 };
 
 export type StructureLoadResult = {
@@ -185,6 +276,7 @@ export type ProjectPresentationState = {
     mode: string;
     colorId?: string;
     customHex?: string;
+    componentColors?: Partial<Record<"protein" | "ligand" | "water" | "ions" | "other", { mode: "inherit" | "element" | "chain" | "custom"; customHex?: string | null }>>;
   };
   background: {
     preset: string;

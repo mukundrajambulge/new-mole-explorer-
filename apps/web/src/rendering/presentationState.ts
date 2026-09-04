@@ -2,6 +2,7 @@ import type { CanonicalMolecularStructure, ProjectPresentationState } from "@mol
 import { COLOR_SCHEME_DEFINITIONS, type ColorSchemeId } from "./colorSchemes";
 import type { StyleProfileId } from "./styleProfiles";
 import { DEFAULT_LABEL_STATE, type LabelState } from "../interaction/labels";
+import { canonicalPartialChargeDatasetComplete } from "../science/datasetValidity";
 
 export const REPRESENTATION_TYPES = ["LINES", "STICKS", "SPHERES", "CARTOON", "RIBBON", "SURFACE", "MESH", "DOTS", "NONBONDED", "NB_SPHERES"] as const;
 export type RepresentationType = (typeof REPRESENTATION_TYPES)[number];
@@ -44,6 +45,7 @@ export type ColorState = {
   atomColors: Record<string, string>;
   objectColors: Record<string, string>;
   representationOverrides: Record<string, Partial<Record<RepresentationType, string>>>;
+  componentColors: Partial<Record<"protein" | "ligand" | "water" | "ions" | "other", { mode: "inherit" | "element" | "chain" | "custom"; customHex: string | null }>>;
 };
 
 export const BACKGROUND_PRESETS = ["Dark", "Black", "White", "Neutral", "Dark Gray", "Light Gray", "Navy", "Deep Blue", "Custom"] as const;
@@ -93,11 +95,11 @@ export type RenderProjection = {
   interaction: InteractionState;
 };
 
-export const DEFAULT_COLOR: ColorState = { mode: "element", colorId: null, customHex: null, profileRef: "PYMOL_OSS_5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69", atomColors: {}, objectColors: {}, representationOverrides: {} };
+export const DEFAULT_COLOR: ColorState = { mode: "rainbow", colorId: null, customHex: null, profileRef: "PYMOL_OSS_5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69", atomColors: {}, objectColors: {}, representationOverrides: {}, componentColors: {} };
 export const DEFAULT_BACKGROUND: BackgroundColorState = { preset: "Black", color: "#05070a" };
 export const DEFAULT_CAMERA: CameraState = { view: null, defaultView: null, projectionMode: "perspective", fov: 20, nearClip: 0.1, farClip: 1000, clippingMode: "auto", viewport: null };
 export const DEFAULT_INTERACTION: InteractionState = { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] };
-export const DEFAULT_REPRESENTATION_PARAMETERS: RepresentationParameters = { stickRadius: 0.16, sphereScale: 1, lineWidth: 1, cartoonThickness: 0.92, quality: 8, lineOpacity: 1, stickOpacity: 1, sphereOpacity: 1, cartoonOpacity: 1, ribbonOpacity: 1, surfaceOpacity: 0.55, meshOpacity: 0.7, dotOpacity: 0.85, nonbondedOpacity: 1, surfaceProbeRadius: 1.4, surfaceQuality: 0.5, dotDensity: 12, meshWidth: 1, puttyMinRadius: 0.18, puttyMaxRadius: 0.72 };
+export const DEFAULT_REPRESENTATION_PARAMETERS: RepresentationParameters = { stickRadius: 0.16, sphereScale: 1, lineWidth: 1, cartoonThickness: 0.92, quality: 8, lineOpacity: 1, stickOpacity: 1, sphereOpacity: 1, cartoonOpacity: 1, ribbonOpacity: 1, surfaceOpacity: 1, meshOpacity: 1, dotOpacity: 1, nonbondedOpacity: 1, surfaceProbeRadius: 1.4, surfaceQuality: 0.5, dotDensity: 12, meshWidth: 1, puttyMinRadius: 0.18, puttyMaxRadius: 0.72 };
 
 export const maskForStyle = (style: RepresentationStyle): RepresentationMask => {
   if (style === "lines" || style === "line") return REPRESENTATION_MASKS.LINES;
@@ -182,10 +184,22 @@ export const setInteractionState = (projection: RenderProjection, interaction: P
 
 export const setLabelState = (projection: RenderProjection, labels: Partial<LabelState>): RenderProjection => ({ ...projection, labels: { ...projection.labels, ...labels } });
 
+export const setComponentColor = (projection: RenderProjection, category: "protein" | "ligand" | "water" | "ions" | "other", mode: "inherit" | "element" | "chain" | "custom", customHex: string | null = null): RenderProjection => ({
+  ...projection,
+  color: { ...projection.color, componentColors: { ...projection.color.componentColors, [category]: { mode, customHex: mode === "custom" ? customHex : null } } },
+});
+
 export const setColorForSelection = (projection: RenderProjection, targetStableAtomIds: readonly string[], color: string): RenderProjection => ({
   ...projection,
   color: { ...projection.color, atomColors: { ...projection.color.atomColors, ...Object.fromEntries(targetStableAtomIds.map((stableId) => [stableId, color])) } },
 });
+
+export const clearColorForSelection = (projection: RenderProjection, targetStableAtomIds: readonly string[]): RenderProjection => {
+  const target = new Set(targetStableAtomIds);
+  const atomColors = Object.fromEntries(Object.entries(projection.color.atomColors).filter(([stableId]) => !target.has(stableId)));
+  const representationOverrides = Object.fromEntries(Object.entries(projection.color.representationOverrides).filter(([stableId]) => !target.has(stableId)));
+  return { ...projection, color: { ...projection.color, atomColors, representationOverrides } };
+};
 
 export const setRepresentationColorForSelection = (projection: RenderProjection, targetStableAtomIds: readonly string[], representation: RepresentationType, color: string): RenderProjection => ({
   ...projection,
@@ -197,7 +211,7 @@ export const setLayerVisibility = (projection: RenderProjection, layer: "showPro
 export const setColorScheme = (projection: RenderProjection, mode: ColorMode, structure: CanonicalMolecularStructure | null = null): RenderProjection => ({
   ...projection,
   color: { ...projection.color, mode, colorId: mode === "named" ? projection.color.colorId ?? "pymol:marine" : mode === "uniform" ? "pymol:grey" : projection.color.colorId },
-  colorDiagnostic: mode === "by-partial-charge" && !structure?.partialChargeDataset ? "Partial-charge data unavailable for this molecular revision." : mode === "esp" ? "ESP field unavailable: no electrostatic potential computation is registered for this molecular revision." : (mode === "secondary-structure-standard" || mode === "secondary-structure-jmol" || mode === "secondary-structure") && !structure?.secondaryStructureDataset ? "Secondary-structure assignment unavailable for this molecular revision." : null,
+  colorDiagnostic: mode === "by-partial-charge" && (!structure || !canonicalPartialChargeDatasetComplete(structure)) ? "Partial-charge data unavailable for this molecular revision." : mode === "esp" ? "ESP field unavailable: no electrostatic potential computation is registered for this molecular revision." : (mode === "secondary-structure-standard" || mode === "secondary-structure-jmol" || mode === "secondary-structure") && !structure?.secondaryStructureDataset ? "Secondary-structure assignment unavailable for this molecular revision." : null,
 });
 
 export const applyRepresentationOperation = (state: RepresentationState, operation: RepresentationDirective["operation"], mask: RepresentationMask, targetStableAtomIds: string[], style?: RepresentationStyle): RepresentationState => {
@@ -216,7 +230,7 @@ export const toProjectPresentation = (projection: RenderProjection): ProjectPres
   schemaVersion: 1,
   representation: projection.representation,
   layerVisibility: { protein: projection.showProtein, ligand: projection.showLigand, water: projection.showWater, ions: projection.showIons, other: projection.showOther },
-  color: { mode: projection.color.mode, ...(projection.color.colorId ? { colorId: projection.color.colorId } : {}), ...(projection.color.customHex ? { customHex: projection.color.customHex } : {}) },
+  color: { mode: projection.color.mode, ...(projection.color.colorId ? { colorId: projection.color.colorId } : {}), ...(projection.color.customHex ? { customHex: projection.color.customHex } : {}), ...(Object.keys(projection.color.componentColors).length ? { componentColors: projection.color.componentColors } : {}) },
   background: projection.background,
   camera: { view: projection.camera.view, defaultView: projection.camera.defaultView, projectionMode: projection.camera.projectionMode, fov: projection.camera.fov, nearClip: projection.camera.nearClip, farClip: projection.camera.farClip, clippingMode: projection.camera.clippingMode },
   representationParameters: projection.representationState.parameters,
@@ -235,7 +249,7 @@ export const fromProjectPresentation = (presentation: ProjectPresentationState, 
     showWater: presentation.layerVisibility.water,
     showIons: presentation.layerVisibility.ions,
     showOther: presentation.layerVisibility.other,
-    color: { ...DEFAULT_COLOR, mode, colorId: presentation.color.colorId ?? null, customHex: presentation.color.customHex ?? null },
+    color: { ...DEFAULT_COLOR, mode, colorId: presentation.color.colorId ?? null, customHex: presentation.color.customHex ?? null, componentColors: Object.fromEntries(Object.entries(presentation.color.componentColors ?? {}).map(([category, value]) => [category, { mode: value.mode, customHex: value.customHex ?? null }])) },
     background: presentation.background as BackgroundColorState,
     representationState: {
       ...projection.representationState,

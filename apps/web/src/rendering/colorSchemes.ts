@@ -1,5 +1,6 @@
 import type { CanonicalAtom, CanonicalMolecularStructure } from "@molecular/contracts";
-import type { ColorMode } from "./presentationState";
+import type { ColorMode, ColorState, RepresentationType } from "./presentationState";
+import { canonicalPartialChargeDatasetComplete } from "../science/datasetValidity";
 
 export type ColorSchemeId =
   | "classic-cpk"
@@ -66,6 +67,38 @@ const residueFor = (structure: CanonicalMolecularStructure, atom: CanonicalAtom)
 
 export type ColorResolution = { status: "READY" | "UNAVAILABLE" | "EXPERIMENTAL"; color: string; diagnostic?: string };
 
+export const representationTypeFor = (representation: "lines" | "sticks" | "spheres" | "cartoon" | "licorice" | "cross" | RepresentationType): RepresentationType => {
+  if (representation === "lines") return "LINES";
+  if (representation === "sticks" || representation === "licorice") return "STICKS";
+  if (representation === "spheres" || representation === "cross") return "SPHERES";
+  if (representation === "cartoon") return "CARTOON";
+  return representation;
+};
+
+/** Resolve explicit presentation colors before the inherited global scheme. */
+export const resolveProjectedAtomColor = (
+  color: Pick<ColorState, "mode" | "customHex" | "atomColors" | "representationOverrides"> & Partial<Pick<ColorState, "componentColors">>,
+  representation: "lines" | "sticks" | "spheres" | "cartoon" | "licorice" | "cross" | RepresentationType,
+  atom: CanonicalAtom | undefined,
+  structure: CanonicalMolecularStructure,
+  explicitGlobalColor?: string,
+): ColorResolution => {
+  const stableId = atom?.stableId;
+  const representationOverride = stableId ? color.representationOverrides[stableId]?.[representationTypeFor(representation)] : undefined;
+  if (representationOverride) return { status: "READY", color: representationOverride };
+  const atomOverride = stableId ? color.atomColors[stableId] : undefined;
+  if (atomOverride) return { status: "READY", color: atomOverride };
+  if (!atom) return { status: "READY", color: explicitGlobalColor ?? "#7f8791" };
+  const category = atom.isPolymer ? "protein" : atom.isLigand ? "ligand" : atom.isWater ? "water" : atom.isIon ? "ions" : "other";
+  const componentOverride = color.componentColors?.[category];
+  if (componentOverride && componentOverride.mode !== "inherit") {
+    if (componentOverride.mode === "custom") return { status: "READY", color: componentOverride.customHex ?? "#d7e0ea" };
+    return resolveAtomColor(componentOverride.mode, atom, structure);
+  }
+  if (color.mode === "named" && explicitGlobalColor) return { status: "READY", color: explicitGlobalColor };
+  return resolveAtomColor(color.mode, atom, structure, color.customHex);
+};
+
 export const colorSchemeDefinition = (id: ColorMode): ColorSchemeDefinition => COLOR_SCHEME_DEFINITIONS.find((definition) => definition.id === id) ?? COLOR_SCHEME_DEFINITIONS[0];
 
 export const resolveAtomColor = (mode: ColorMode, atom: CanonicalAtom, structure: CanonicalMolecularStructure, customHex?: string | null): ColorResolution => {
@@ -87,7 +120,17 @@ export const resolveAtomColor = (mode: ColorMode, atom: CanonicalAtom, structure
     if (atom.formalCharge === undefined || atom.formalCharge === null) return { status: "UNAVAILABLE", color: "#7f8791", diagnostic: "FORMAL_CHARGE_UNKNOWN" }; return { status: "READY", color: diverging(atom.formalCharge / 3) };
   }
   if (mode === "by-partial-charge") {
-    const dataset = structure.partialChargeDataset; if (!dataset) return { status: "UNAVAILABLE", color: "#7f8791", diagnostic: "Partial-charge data unavailable for this molecular revision." }; const value = dataset.atomChargeMap[atom.stableId]; if (value === undefined) return { status: "UNAVAILABLE", color: "#7f8791", diagnostic: "Partial-charge data unavailable for this molecular revision." }; const values = Object.values(dataset.atomChargeMap); const max = Math.max(...values.map((entry) => Math.abs(entry)), 1e-9); return { status: "READY", color: diverging(value / max) };
+    if (!canonicalPartialChargeDatasetComplete(structure)) return { status: "UNAVAILABLE", color: "#7f8791", diagnostic: "Partial-charge data unavailable for this molecular revision." };
+    const dataset = structure.partialChargeDataset!;
+    const value = dataset.atomChargeMap[atom.stableId];
+    const values = Object.values(dataset.atomChargeMap);
+    const complete = structure.atoms.every((candidate) => {
+      const candidateValue = dataset.atomChargeMap[candidate.stableId];
+      return candidateValue !== undefined && Number.isFinite(candidateValue);
+    });
+    if (!complete || value === undefined || !Number.isFinite(value) || values.some((entry) => !Number.isFinite(entry))) return { status: "UNAVAILABLE", color: "#7f8791", diagnostic: "Partial-charge data unavailable for this molecular revision." };
+    const max = Math.max(...values.map((entry) => Math.abs(entry)), 1e-9);
+    return { status: "READY", color: diverging(value / max) };
   }
   if (mode === "esp") return { status: "EXPERIMENTAL", color: "#7f8791", diagnostic: "ESP field unavailable: no electrostatic potential computation is registered for this molecular revision." };
   if (mode === "secondary-structure-standard" || mode === "secondary-structure-jmol" || mode === "secondary-structure") {

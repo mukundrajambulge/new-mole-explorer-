@@ -1,0 +1,647 @@
+{
+  "schemaVersion": 1,
+  "source": "verification/selection/SELECTION_OPERATOR_MATRIX.md",
+  "rowCount": 87,
+  "implementationStatusCounts": {
+    "VERIFIED_WORKING": 83,
+    "MISSING_DEPENDENCY": 3,
+    "INTENTIONALLY_UNSUPPORTED": 1
+  },
+  "liveBrowserStatusCounts": {
+    "PASS (`select all`)": 1,
+    "PASS (selection-matrix-live.spec.ts)": 58,
+    "PASS indirectly": 4,
+    "PASS via named-selection E2E": 1,
+    "PASS (multi-object-state.spec.ts)": 1,
+    "PASS": 1,
+    "PASS (edge-identity E2E; segment-identity E2E; unannotated mini diagnostic)": 2,
+    "PASS (selection-matrix-live.spec.ts; edge-identity E2E; segment-identity E2E)": 1,
+    "PASS (selection-closure E2E; selection-matrix-live.spec.ts)": 4,
+    "PASS (ring-topology E2E)": 1,
+    "PASS (selection-matrix-live.spec.ts diagnostic; bycell E2E)": 1,
+    "PASS (selection-matrix-live.spec.ts; multi-object-state.spec.ts)": 1,
+    "PASS (typed-properties E2E; selection-matrix-live.spec.ts)": 3,
+    "PASS (selection-matrix-live.spec.ts; source-partial-charge E2E)": 1,
+    "PASS (selection-matrix-live.spec.ts; typed-properties E2E)": 3,
+    "PASS (selection-matrix-live.spec.ts; typed mmCIF E2E)": 1,
+    "PASS (typed mmCIF E2E; untyped PDB structured diagnostic)": 1,
+    "PASS (selection-matrix-live.spec.ts; sidechain-identity E2E)": 1,
+    "PASS (`select color red` after `color red, all`; selection-matrix-live.spec.ts)": 1
+  },
+  "oracleStatusCounts": {
+    "ORACLE_PASS": 51,
+    "ORACLE_EQUIVALENT": 35,
+    "ORACLE_PENDING": 1
+  },
+  "entries": [
+    {
+      "operator": "`all`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (`select all`)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "canonical universe"
+    },
+    {
+      "operator": "`*`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "retained alias"
+    },
+    {
+      "operator": "`everything`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "intentional Mole alias for the canonical universe; pinned PyMOL equivalent is `all` because native `everything` is rejected"
+    },
+    {
+      "operator": "`none`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "canonical empty result"
+    },
+    {
+      "operator": "`enabled`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "derived universe is enabled-only"
+    },
+    {
+      "operator": "`present`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "current coordinate universe"
+    },
+    {
+      "operator": "`visible`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application default projection is equivalent to pinned PyMOL with solvent hidden and explicit protein/ligand/ion representations; never aliases `all`"
+    },
+    {
+      "operator": "`name`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS indirectly",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact/wildcard tuple match"
+    },
+    {
+      "operator": "`%name`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS via named-selection E2E",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "immutable stable-ID snapshot"
+    },
+    {
+      "operator": "`?name`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "missing optional name is valid empty"
+    },
+    {
+      "operator": "bare named selection",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "InputRouter sends non-command heads to selection parser"
+    },
+    {
+      "operator": "object-name resolution",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "derived workspace scope metadata"
+    },
+    {
+      "operator": "group-name resolution",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (multi-object-state.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "workspace group registry is bound into the canonical selection context; the live group member scope is equivalent to pinned PyMOL `groupA` on the fixture; group actions remain organizational"
+    },
+    {
+      "operator": "ambiguity handling",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application identity-safety extension: pinned PyMOL keeps object names unique and replaces same-name objects; Mole Explorer rejects an ambiguous display name and requires ObjectID"
+    },
+    {
+      "operator": "`not`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "strongest unary precedence"
+    },
+    {
+      "operator": "`!`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "symbolic alias"
+    },
+    {
+      "operator": "`and`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "parser-owned bare query path"
+    },
+    {
+      "operator": "`&`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "symbolic alias"
+    },
+    {
+      "operator": "`or`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "deterministic stable ordering"
+    },
+    {
+      "operator": "`|`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "symbolic alias"
+    },
+    {
+      "operator": "parentheses",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "Pratt parser precedence"
+    },
+    {
+      "operator": "implicit adjacency",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "implicit adjacency is an explicit application-profile OR; native alias spelling is directly probed"
+    },
+    {
+      "operator": "`first`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "first selected atom only"
+    },
+    {
+      "operator": "`last`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "last selected atom only"
+    },
+    {
+      "operator": "`model`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "ID/name matching"
+    },
+    {
+      "operator": "`object`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "object scope annotations"
+    },
+    {
+      "operator": "`chain`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS indirectly",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "canonical chain field"
+    },
+    {
+      "operator": "`segi`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (edge-identity E2E; segment-identity E2E; unannotated mini diagnostic)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact PDB segment identity; mmCIF segment fields remain canonical application data when PyMOL does not expose them"
+    },
+    {
+      "operator": "`resn`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact/wildcard match"
+    },
+    {
+      "operator": "`resi`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "insertion-aware range"
+    },
+    {
+      "operator": "`alt`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; edge-identity E2E; segment-identity E2E)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact source alternate-location comparison on segment-identity fixture"
+    },
+    {
+      "operator": "`index`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "one-based"
+    },
+    {
+      "operator": "`id`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "stable ID and serial remain distinct"
+    },
+    {
+      "operator": "`rank`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "zero-based"
+    },
+    {
+      "operator": "`label`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-closure E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application safe-label text match is equivalent to pinned PyMOL `label \"CA\"` on the mini fixture; bare `label …` remains the explicit label command"
+    },
+    {
+      "operator": "`pepseq`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "contiguous one-letter motif returns complete canonical residue atoms; invalid/noncanonical motifs fail with `INVALID_VALUE`"
+    },
+    {
+      "operator": "`S1 in S2`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "matches the complete identifier tuple documented by PyMOL; segment identity is optional canonical source data"
+    },
+    {
+      "operator": "`S1 like S2`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "matches name and residue identity; invalid `name like CA` remains a syntax error"
+    },
+    {
+      "operator": "`byobject`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "object-scoped expansion"
+    },
+    {
+      "operator": "`bysegi`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (edge-identity E2E; segment-identity E2E; unannotated mini diagnostic)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact object-scoped expansion over PDB segment identity; fail closed when absent"
+    },
+    {
+      "operator": "`bychain`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "weak modifier precedence preserved"
+    },
+    {
+      "operator": "`byres`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "insertion-aware residue groups"
+    },
+    {
+      "operator": "`bycalpha`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "returns only CA atoms from residues containing a matched atom"
+    },
+    {
+      "operator": "`bymolecule`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "returns complete connected components from canonical bonds; never aliases object scope"
+    },
+    {
+      "operator": "`byfragment`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "decision": "requires complete `canonical-fragment-assignment-v1` membership; no per-atom-hint, connected-component, or coordinate-inferred fallback"
+    },
+    {
+      "operator": "`byring`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (ring-topology E2E)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "bounded canonical simple-cycle expansion matches pinned PyMOL ring expansion on the six-member ring fixture; broader chemistry perception remains profile-scoped"
+    },
+    {
+      "operator": "`bycell`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts diagnostic; bycell E2E)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "bounded current-coordinate fractional-cell membership; no symmetry-mate or PBC expansion"
+    },
+    {
+      "operator": "`neighbor`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "excludes seed atoms"
+    },
+    {
+      "operator": "`bound_to`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "includes directly bonded atoms"
+    },
+    {
+      "operator": "`extend`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "bounded inclusive breadth-first expansion over canonical bonds"
+    },
+    {
+      "operator": "`within`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; multi-object-state.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "exact boundary equality; cross-object evaluation requires explicit `LOCAL_SCIENTIFIC` or `EFFECTIVE_WORLD` policy"
+    },
+    {
+      "operator": "`around`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "excludes reference atoms"
+    },
+    {
+      "operator": "`expand`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "inclusive Cartesian expansion over the active coordinate state"
+    },
+    {
+      "operator": "`near_to`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "candidate atoms within the boundary excluding reference atoms; missing-distance shorthand fails syntax"
+    },
+    {
+      "operator": "`beyond`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "candidate atoms outside the inclusive Cartesian boundary"
+    },
+    {
+      "operator": "`gap`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application prefix maps to `all and (organic gap X)`; strict radius lookup and explicit missing-radius failure"
+    },
+    {
+      "operator": "`formal_charge`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (typed-properties E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact source formal-charge comparison on typed-properties fixture; missing values fail closed"
+    },
+    {
+      "operator": "`partial_charge`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; source-partial-charge E2E)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "promote only complete atom-covered source values with model, units, provenance, and revision binding; absent/incomplete input fails closed"
+    },
+    {
+      "operator": "`b`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (typed-properties E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact source B-factor comparison on typed-properties fixture"
+    },
+    {
+      "operator": "`q` / `occupancy`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "numeric occupancy alias"
+    },
+    {
+      "operator": "`ss`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (typed-properties E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application long-form `HELIX`/`SHEET` tokens map to PyMOL `h`/`s`; canonical assignment only"
+    },
+    {
+      "operator": "`elem`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "canonical element"
+    },
+    {
+      "operator": "`x`, `y`, `z`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "numeric coordinate comparisons"
+    },
+    {
+      "operator": "`state`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "command and selection namespaces remain explicit"
+    },
+    {
+      "operator": "arbitrary property",
+      "implementationStatus": "INTENTIONALLY_UNSUPPORTED",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "dynamic property evaluation is explicitly unavailable; unknown fields fail closed"
+    },
+    {
+      "operator": "`=`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; typed-properties E2E)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact equality is covered by formal-charge and numeric pinned cases"
+    },
+    {
+      "operator": "`!=`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; typed-properties E2E)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application inequality is compared as the complement of pinned native equality because the pinned PyMOL parser rejects the direct `!=` spelling"
+    },
+    {
+      "operator": "`<`, `<=`, `>`, `>=`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; typed-properties E2E)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "exact native coordinate comparison cases cover strict and inclusive numeric boundaries; text properties fail closed"
+    },
+    {
+      "operator": "`hydrogens` / `hydro`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "element H only"
+    },
+    {
+      "operator": "`hetatm`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "source record authority"
+    },
+    {
+      "operator": "`organic`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS indirectly",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "ligand alias"
+    },
+    {
+      "operator": "`inorganic`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "ion classification"
+    },
+    {
+      "operator": "`solvent`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "water alias"
+    },
+    {
+      "operator": "`polymer`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS indirectly",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "canonical polymer flag"
+    },
+    {
+      "operator": "`polymer.protein` / `protein`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; typed mmCIF E2E)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "legacy polymer fallback for untyped sources; typed mmCIF restricts the selector to canonical `PROTEIN` atoms"
+    },
+    {
+      "operator": "`polymer.nucleic`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (typed mmCIF E2E; untyped PDB structured diagnostic)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "use mmCIF `_entity_poly.type` mapped by `_atom_site.label_entity_id`; fail closed when typing is absent or incomplete; no residue-name heuristic"
+    },
+    {
+      "operator": "`backbone`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "conservative backbone name set"
+    },
+    {
+      "operator": "`sidechain`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts; sidechain-identity E2E)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "conservative backbone complement matches pinned PyMOL on the ALA CB fixture; modified-residue chemistry remains profile-scoped"
+    },
+    {
+      "operator": "`guide`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "CA guide atoms"
+    },
+    {
+      "operator": "`metals`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "explicit element set"
+    },
+    {
+      "operator": "`bonded`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "bond endpoint membership"
+    },
+    {
+      "operator": "`donors`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "pinned PyMOL `donors` executes on the mini fixture (7 atoms); application still requires complete canonical donor assignments and makes no heuristic donor claim"
+    },
+    {
+      "operator": "`acceptors`",
+      "implementationStatus": "MISSING_DEPENDENCY",
+      "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "decision": "pinned PyMOL `acceptors` executes on the mini fixture (4 atoms); application still requires complete canonical acceptor assignments and makes no heuristic acceptor claim"
+    },
+    {
+      "operator": "`rep`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-closure E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "effective RenderProjection cartoon contributors match pinned PyMOL `rep cartoon` on the mini fixture; absent context fails closed"
+    },
+    {
+      "operator": "`color`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (`select color red` after `color red, all`; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "application `select color red` after `color red, all` matches pinned PyMOL `color red` after the presentation-matched non-solvent setup; bare `color …` remains the presentation command"
+    },
+    {
+      "operator": "`cartoon_color`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-closure E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "explicit CARTOON color tokens match pinned PyMOL `cartoon_color red` on the explicitly shown protein cartoon scope; generic atom color is not treated as a CARTOON setting"
+    },
+    {
+      "operator": "`ribbon_color`",
+      "implementationStatus": "VERIFIED_WORKING",
+      "liveBrowserStatus": "PASS (selection-closure E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "decision": "explicit RIBBON color tokens are scoped to active ribbon directives and match pinned PyMOL `ribbon_color red` on the explicitly shown protein ribbon; generic atom color is not treated as a RIBBON setting"
+    }
+  ]
+}

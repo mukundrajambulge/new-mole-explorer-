@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CanonicalMolecularStructure } from "@molecular/contracts";
-import { COLOR_SCHEME_DEFINITIONS, resolveAtomColor } from "./colorSchemes";
+import { COLOR_SCHEME_DEFINITIONS, resolveAtomColor, resolveProjectedAtomColor } from "./colorSchemes";
+import { clearColorForSelection, createDefaultRenderProjection, setColorForSelection, setColorScheme, setComponentColor, setLayerVisibility, setProjectionStyle, setRepresentationColorForSelection } from "./presentationState";
 
 const structure = {
   id: "structure:color-fixture",
@@ -39,5 +40,51 @@ describe("G1C renderer-neutral color schemes", () => {
     expect(jmol.status).toBe("READY");
     expect(standard.color).not.toBe(jmol.color);
   });
-  it("renders a supplied partial-charge dataset", () => { const withDataset = { ...structure, partialChargeDataset: { datasetId: "charges:v1", molecularRevision: structure.scientificHash, chargeModel: "fixture", profileVersion: "v1", atomChargeMap: { c: -0.5, n: 0.5 }, units: "e", provenance: "deterministic fixture" } }; expect(resolveAtomColor("by-partial-charge", withDataset.atoms[0], withDataset).status).toBe("READY"); });
+  it("renders only a revision-matched finite partial-charge dataset", () => {
+    const withDataset = { ...structure, partialChargeDataset: { datasetId: "charges:v1", molecularRevision: structure.scientificHash, chargeModel: "fixture", profileVersion: "v1", atomChargeMap: { c: -0.5, n: 0.5, o: 0, lig: 0.1 }, units: "e", provenance: "deterministic fixture" } };
+    expect(resolveAtomColor("by-partial-charge", withDataset.atoms[0], withDataset).status).toBe("READY");
+    const stale = { ...withDataset, partialChargeDataset: { ...withDataset.partialChargeDataset, molecularRevision: "stale" } };
+    expect(resolveAtomColor("by-partial-charge", stale.atoms[0], stale).status).toBe("UNAVAILABLE");
+    const incomplete = { ...withDataset, partialChargeDataset: { ...withDataset.partialChargeDataset, atomChargeMap: { c: -0.5 } } };
+    expect(resolveAtomColor("by-partial-charge", incomplete.atoms[0], incomplete).status).toBe("UNAVAILABLE");
+    const incompleteMetadata = { ...withDataset, partialChargeDataset: { ...withDataset.partialChargeDataset, provenance: "" } };
+    expect(resolveAtomColor("by-partial-charge", incompleteMetadata.atoms[0], incompleteMetadata).status).toBe("UNAVAILABLE");
+  });
+  it("uses explicit ligand color before representation changes, visibility, or global scheme changes", () => {
+    const ligand = structure.atoms[3];
+    const base = createDefaultRenderProjection(structure);
+    const inherited = resolveProjectedAtomColor(base.color, "STICKS", ligand, structure);
+    expect(inherited.color).toBe(resolveAtomColor("rainbow", ligand, structure).color);
+
+    const cpk = setColorScheme(base, "classic-cpk", structure);
+    expect(resolveProjectedAtomColor(cpk.color, "STICKS", ligand, structure).color).toBe(resolveAtomColor("classic-cpk", ligand, structure).color);
+
+    const red = setColorForSelection(cpk, [ligand.stableId], "#ff0000");
+    const ballAndStick = setProjectionStyle(red, structure, "ball-and-stick");
+    const hidden = setLayerVisibility(ballAndStick, "showLigand", false);
+    const shown = setLayerVisibility(hidden, "showLigand", true);
+    const recoloredGlobally = setColorScheme(shown, "modern-jmol", structure);
+    expect(resolveProjectedAtomColor(ballAndStick.color, "STICKS", ligand, structure).color).toBe("#ff0000");
+    expect(resolveProjectedAtomColor(shown.color, "SPHERES", ligand, structure).color).toBe("#ff0000");
+    expect(resolveProjectedAtomColor(recoloredGlobally.color, "STICKS", ligand, structure).color).toBe("#ff0000");
+
+    const reset = clearColorForSelection(recoloredGlobally, [ligand.stableId]);
+    expect(resolveProjectedAtomColor(reset.color, "STICKS", ligand, structure).color).toBe(resolveAtomColor("modern-jmol", ligand, structure).color);
+  });
+  it("applies component color precedence without changing canonical identity", () => {
+    const ligand = structure.atoms[3];
+    const base = createDefaultRenderProjection(structure);
+    const component = setComponentColor(setColorScheme(base, "modern-jmol", structure), "ligand", "custom", "#00ff88");
+    expect(resolveProjectedAtomColor(component.color, "STICKS", ligand, structure).color).toBe("#00ff88");
+    const selected = setColorForSelection(component, [ligand.stableId], "#ff00ff");
+    expect(resolveProjectedAtomColor(selected.color, "STICKS", ligand, structure).color).toBe("#ff00ff");
+    expect(structure.atoms[3].stableId).toBe("lig");
+    expect(selected.color.componentColors.ligand?.mode).toBe("custom");
+    const representationSpecific = setRepresentationColorForSelection(selected, [ligand.stableId], "STICKS", "#112233");
+    expect(resolveProjectedAtomColor(representationSpecific.color, "STICKS", ligand, structure).color).toBe("#112233");
+    expect(resolveProjectedAtomColor(representationSpecific.color, "SPHERES", ligand, structure).color).toBe("#ff00ff");
+    const inherited = clearColorForSelection(representationSpecific, [ligand.stableId]);
+    expect(inherited.color.componentColors.ligand?.mode).toBe("custom");
+    expect(inherited.color.representationOverrides[ligand.stableId]).toBeUndefined();
+  });
 });

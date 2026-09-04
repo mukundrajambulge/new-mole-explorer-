@@ -5,7 +5,7 @@ describe("G1B action registry", () => {
   it("provides a capability for every canonical action", () => {
     for (const actionId of Object.values(ACTION_IDS)) {
       expect(ACTION_REGISTRY[actionId]).toMatchObject({ id: actionId });
-      expect(["SUPPORTED", "EXPERIMENTAL", "COMING_SOON", "UNAVAILABLE"]).toContain(ACTION_REGISTRY[actionId].state);
+      expect(["SUPPORTED", "SUPPORTED_WITH_LIMITATIONS", "EXPERIMENTAL", "COMING_SOON", "UNAVAILABLE"]).toContain(ACTION_REGISTRY[actionId].state);
     }
   });
 

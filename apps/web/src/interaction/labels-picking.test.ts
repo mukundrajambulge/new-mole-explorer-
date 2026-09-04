@@ -14,7 +14,18 @@ describe("safe labels and reverse identity picking", () => {
     const expression = parseSafeLabelExpression("{name} {resn}{resi} / {chain}");
     expect(resolveSafeLabel(expression, structure.atoms[0], structure)).toBe("CA ALA104 / A");
     expect(() => parseSafeLabelExpression("{constructor}" )).toThrow(/Unsupported/);
-    expect(() => parseSafeLabelExpression("{name}; eval(1)" )).not.toThrow();
+    expect(() => parseSafeLabelExpression("{name}; unsupported-call(1)" )).toThrow(/executable syntax/i);
+    expect(() => parseSafeLabelExpression("{name" )).toThrow(/Unbalanced braces/i);
+  });
+
+  it("does not expose stale partial-charge labels", () => {
+    const withDataset = { ...structure, partialChargeDataset: { datasetId: "charges:v1", molecularRevision: structure.scientificHash, chargeModel: "fixture", profileVersion: "v1", atomChargeMap: { "stable-ca": -0.42 }, units: "e", provenance: "deterministic fixture" } };
+    const expression = parseSafeLabelExpression("{partial_charge}");
+    expect(resolveSafeLabel(expression, withDataset.atoms[0], withDataset)).toBe("-0.420");
+    const stale = { ...withDataset, partialChargeDataset: { ...withDataset.partialChargeDataset, molecularRevision: "stale" } };
+    expect(resolveSafeLabel(expression, stale.atoms[0], stale)).toBe("?");
+    const incompleteMetadata = { ...withDataset, partialChargeDataset: { ...withDataset.partialChargeDataset, units: "" } };
+    expect(resolveSafeLabel(expression, incompleteMetadata.atoms[0], incompleteMetadata)).toBe("?");
   });
 
   it("resolves renderer hits through O(1) reverse maps and validates revision", () => {
@@ -50,5 +61,10 @@ describe("safe labels and reverse identity picking", () => {
     expect(plan.labelCount).toBe(0);
     expect(plan.atoms).toHaveLength(0);
     expect(plan.diagnostic).toMatch(new RegExp(String(LABEL_ATOM_SAFETY_LIMIT)));
+  });
+
+  it("binds labels to canonical target membership", () => {
+    const plan = labelPlanForState({ ...DEFAULT_LABEL_STATE, mode: "custom", expression: parseSafeLabelExpression("{name}"), targetStableAtomIds: [structure.atoms[0].stableId] }, [structure.atoms[0], { ...structure.atoms[0], stableId: "other" }]);
+    expect(plan.atoms.map((atom) => atom.stableId)).toEqual(["stable-ca"]);
   });
 });

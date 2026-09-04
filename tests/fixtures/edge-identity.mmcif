@@ -1,0 +1,20 @@
+data_edge
+loop_
+_atom_site.group_PDB
+_atom_site.id
+_atom_site.type_symbol
+_atom_site.label_atom_id
+_atom_site.label_comp_id
+_atom_site.label_asym_id
+_atom_site.label_seq_id
+_atom_site.label_alt_id
+_atom_site.pdbx_PDB_segment_id
+_atom_site.Cartn_x
+_atom_site.Cartn_y
+_atom_site.Cartn_z
+_atom_site.occupancy
+_atom_site.B_iso_or_equiv
+ATOM 1 C CA ALA A 10 A SEG_A 0.0 0.0 0.0 1.00 25.00
+ATOM 2 N N ALA A 10 . SEG_A 1.0 0.0 0.0 1.00 10.00
+ATOM 3 C CA GLY B 10 . SEG_B 2.0 0.0 0.0 1.00 5.00
+HETATM 4 C C1 LIG B 20 . SEG_L 3.0 0.0 0.0 0.50 30.00

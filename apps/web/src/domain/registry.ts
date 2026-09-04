@@ -11,6 +11,7 @@ export const ACTION_IDS = {
   PROJECT_OPEN: "PROJECT.OPEN",
   PROJECT_SAVE: "PROJECT.SAVE",
   STRUCTURE_IMPORT: "STRUCTURE.IMPORT",
+  STRUCTURE_ADD: "STRUCTURE.ADD",
   STRUCTURE_FETCH_RCSB: "STRUCTURE.FETCH_RCSB",
   STRUCTURE_EXPORT: "STRUCTURE.EXPORT",
   FILE_NEW: "FILE.NEW",
@@ -61,6 +62,10 @@ export const ACTION_IDS = {
   MEASURE_ANGLE: "MEASURE.ANGLE",
   MEASURE_DIHEDRAL: "MEASURE.DIHEDRAL",
   MEASURE_CLEAR: "MEASURE.CLEAR",
+  ANALYSIS_H_BONDS: "ANALYSIS.H_BONDS",
+  ANALYSIS_CONTACTS: "ANALYSIS.CONTACTS",
+  ANALYSIS_CLASH: "ANALYSIS.CLASH",
+  ANALYSIS_POCKET: "ANALYSIS.POCKET",
   HELP_OPEN: "HELP.OPEN",
 } as const;
 
@@ -68,7 +73,7 @@ export type ActionId = (typeof ACTION_IDS)[keyof typeof ACTION_IDS];
 
 export type ActionDefinition = Capability & {
   id: ActionId;
-  group: "WORKSPACE" | "FILE" | "SELECTION" | "CANVAS" | "REPRESENTATION" | "COLOR" | "MEASURE" | "EDIT" | "HISTORY" | "DOCKING" | "VIEW" | "HELP";
+  group: "WORKSPACE" | "FILE" | "SELECTION" | "CANVAS" | "REPRESENTATION" | "COLOR" | "MEASURE" | "ANALYSIS" | "EDIT" | "HISTORY" | "DOCKING" | "VIEW" | "HELP";
 };
 
 const supported = (id: ActionId, group: ActionDefinition["group"], label: string, description: string): ActionDefinition => ({
@@ -95,6 +100,14 @@ const unavailable = (id: ActionId, group: ActionDefinition["group"], label: stri
   description,
 });
 
+const limited = (id: ActionId, group: ActionDefinition["group"], label: string, description: string): ActionDefinition => ({
+  id,
+  group,
+  state: "SUPPORTED_WITH_LIMITATIONS",
+  label,
+  description,
+});
+
 export const ACTION_REGISTRY: Record<ActionId, ActionDefinition> = {
   [ACTION_IDS.WORKSPACE_HOME]: supported(ACTION_IDS.WORKSPACE_HOME, "WORKSPACE", "Home workspace", "The G1B workstation home is available."),
   [ACTION_IDS.WORKSPACE_PROJECTS]: comingSoon(ACTION_IDS.WORKSPACE_PROJECTS, "WORKSPACE", "Projects workspace", "Project persistence is reserved for a future gate."),
@@ -106,6 +119,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionDefinition> = {
   [ACTION_IDS.PROJECT_OPEN]: supported(ACTION_IDS.PROJECT_OPEN, "FILE", "Open project", "Open a saved project by its durable project identity."),
   [ACTION_IDS.PROJECT_SAVE]: supported(ACTION_IDS.PROJECT_SAVE, "FILE", "Save project", "Persist canonical structure, provenance and renderer-neutral presentation state."),
   [ACTION_IDS.STRUCTURE_IMPORT]: supported(ACTION_IDS.STRUCTURE_IMPORT, "FILE", "Import structure", "Load an admitted PDB or mmCIF file through the backend ingestion service."),
+  [ACTION_IDS.STRUCTURE_ADD]: supported(ACTION_IDS.STRUCTURE_ADD, "FILE", "Add structure", "Add a second admitted PDB or mmCIF object without replacing loaded objects."),
   [ACTION_IDS.STRUCTURE_FETCH_RCSB]: supported(ACTION_IDS.STRUCTURE_FETCH_RCSB, "FILE", "Fetch RCSB structure", "Fetch official RCSB mmCIF through the backend service."),
   [ACTION_IDS.STRUCTURE_EXPORT]: comingSoon(ACTION_IDS.STRUCTURE_EXPORT, "FILE", "Export structure", "Export writers and loss manifests are not implemented in G1B."),
   [ACTION_IDS.FILE_NEW]: supported(ACTION_IDS.FILE_NEW, "FILE", "New project", "Create an empty persisted project manifest and clear the workspace."),
@@ -113,8 +127,8 @@ export const ACTION_REGISTRY: Record<ActionId, ActionDefinition> = {
   [ACTION_IDS.FILE_SAVE]: supported(ACTION_IDS.FILE_SAVE, "FILE", "Save project", "Persist canonical structure, provenance and renderer-neutral presentation state."),
   [ACTION_IDS.FILE_IMPORT]: supported(ACTION_IDS.FILE_IMPORT, "FILE", "Import structure", "Load an admitted PDB or mmCIF file through the backend ingestion service."),
   [ACTION_IDS.FILE_EXPORT]: comingSoon(ACTION_IDS.FILE_EXPORT, "FILE", "Export", "Export writers and loss manifests are not implemented in G1B."),
-  [ACTION_IDS.SELECTION_EVALUATE]: comingSoon(ACTION_IDS.SELECTION_EVALUATE, "SELECTION", "Evaluate selection", "Authoritative selection evaluation is not wired in G1B."),
-  [ACTION_IDS.SELECTION_CREATE_NAMED]: comingSoon(ACTION_IDS.SELECTION_CREATE_NAMED, "SELECTION", "Create named selection", "Named selections require the future scientific domain layer."),
+  [ACTION_IDS.SELECTION_EVALUATE]: supported(ACTION_IDS.SELECTION_EVALUATE, "SELECTION", "Evaluate selection", "Evaluate the typed canonical selection language against the active molecular revision."),
+  [ACTION_IDS.SELECTION_CREATE_NAMED]: supported(ACTION_IDS.SELECTION_CREATE_NAMED, "SELECTION", "Create named selection", "Create an immutable named selection snapshot from the active canonical result."),
   [ACTION_IDS.CANVAS_SELECT]: supported(ACTION_IDS.CANVAS_SELECT, "CANVAS", "Select canvas tool", "Select atoms through the stable reverse-identity map."),
   [ACTION_IDS.CANVAS_PAN]: supported(ACTION_IDS.CANVAS_PAN, "CANVAS", "Pan canvas", "Presentation interaction state only."),
   [ACTION_IDS.CANVAS_ROTATE]: supported(ACTION_IDS.CANVAS_ROTATE, "CANVAS", "Rotate canvas", "Presentation interaction state only."),
@@ -139,6 +153,10 @@ export const ACTION_REGISTRY: Record<ActionId, ActionDefinition> = {
   [ACTION_IDS.MEASURE_ANGLE]: supported(ACTION_IDS.MEASURE_ANGLE, "MEASURE", "Measure angle", "Accumulate three ordered stable atom picks and create a persistent angle object."),
   [ACTION_IDS.MEASURE_DIHEDRAL]: supported(ACTION_IDS.MEASURE_DIHEDRAL, "MEASURE", "Measure dihedral", "Accumulate four ordered stable atom picks and create a persistent dihedral object."),
   [ACTION_IDS.MEASURE_CLEAR]: supported(ACTION_IDS.MEASURE_CLEAR, "MEASURE", "Clear measurement picks", "Clear transient measurement pick slots without deleting measurements."),
+  [ACTION_IDS.ANALYSIS_H_BONDS]: limited(ACTION_IDS.ANALYSIS_H_BONDS, "ANALYSIS", "H-bonds", "Show inferred donor–acceptor contacts from canonical coordinates using the bounded 3.5 Å profile."),
+  [ACTION_IDS.ANALYSIS_CONTACTS]: limited(ACTION_IDS.ANALYSIS_CONTACTS, "ANALYSIS", "Contacts", "Show non-bonded heavy-atom contacts within the bounded 4.0 Å profile."),
+  [ACTION_IDS.ANALYSIS_CLASH]: limited(ACTION_IDS.ANALYSIS_CLASH, "ANALYSIS", "Clash", "Show non-bonded heavy-atom pairs with more than 0.4 Å VDW overlap."),
+  [ACTION_IDS.ANALYSIS_POCKET]: unavailable(ACTION_IDS.ANALYSIS_POCKET, "ANALYSIS", "Pocket", "Unavailable: no validated pocket-detection algorithm or research profile is admitted in this gate."),
   [ACTION_IDS.EDIT_ATOM_DELETE]: unavailable(ACTION_IDS.EDIT_ATOM_DELETE, "EDIT", "Delete atom", "Scientific molecular editing is intentionally unavailable in G1B."),
   [ACTION_IDS.EDIT_BOND_CREATE]: unavailable(ACTION_IDS.EDIT_BOND_CREATE, "EDIT", "Create bond", "Scientific molecular editing is intentionally unavailable in G1B."),
   [ACTION_IDS.EDIT_BOND_DELETE]: unavailable(ACTION_IDS.EDIT_BOND_DELETE, "EDIT", "Delete bond", "Scientific molecular editing is intentionally unavailable in G1B."),

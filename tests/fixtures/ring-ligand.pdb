@@ -1,0 +1,14 @@
+HEADER    VIS-07 RING TOPOLOGY FIXTURE
+HETATM    1  C1  RIG A   1       1.400   0.000   0.000  1.00 10.00           C
+HETATM    2  C2  RIG A   1       0.700   1.212   0.000  1.00 10.00           C
+HETATM    3  C3  RIG A   1      -0.700   1.212   0.000  1.00 10.00           C
+HETATM    4  C4  RIG A   1      -1.400   0.000   0.000  1.00 10.00           C
+HETATM    5  C5  RIG A   1      -0.700  -1.212   0.000  1.00 10.00           C
+HETATM    6  C6  RIG A   1       0.700  -1.212   0.000  1.00 10.00           C
+CONECT    1    2    6
+CONECT    2    1    3
+CONECT    3    2    4
+CONECT    4    3    5
+CONECT    5    4    6
+CONECT    6    5    1
+END

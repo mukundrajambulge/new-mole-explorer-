@@ -108,6 +108,22 @@ test("G1C-UI-002 keeps component visibility in the Projection & Display authorit
   await expect(page.getByRole("button", { name: "Toggle Protein" })).toHaveAttribute("aria-pressed", "true");
 });
 
+test("G1C-UI-003 keeps the real viewer canvas measurable when side panels collapse responsively", async ({ page }) => {
+  await page.setViewportSize({ width: 720, height: 800 });
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(fixture);
+  await expect(renderer(page)).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  const canvasMetrics = await page.locator(".viewer-host canvas").evaluate((canvas) => {
+    const rect = canvas.getBoundingClientRect();
+    return { width: rect.width, height: rect.height, backingWidth: canvas.width, backingHeight: canvas.height };
+  });
+  expect(canvasMetrics.width).toBeGreaterThan(0);
+  expect(canvasMetrics.height).toBeGreaterThan(0);
+  expect(canvasMetrics.backingWidth).toBeGreaterThan(0);
+  expect(canvasMetrics.backingHeight).toBeGreaterThan(0);
+  await page.screenshot({ path: resolve("verification/evidence/closure-responsive-canvas.png") });
+});
+
 test("G1C-PERF-001 changes presentation without recreating the canonical model", async ({ page }) => {
   await loadFixture(page);
   const initialLoads = await renderer(page).getAttribute("data-renderer-model-loads");

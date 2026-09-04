@@ -1,4 +1,15 @@
+import type { AtomSelectionSpec, GLViewer } from "3dmol";
+
 export type Coordinate3 = { x: number; y: number; z: number };
+
+/** Semantic camera boundary. UI actions target this controller, never 3Dmol directly. */
+export class CameraController {
+  constructor(private readonly viewer: Pick<GLViewer, "center">) {}
+
+  center(target: AtomSelectionSpec): void {
+    this.viewer.center(target);
+  }
+}
 
 export type SceneBounds = {
   min: Coordinate3;

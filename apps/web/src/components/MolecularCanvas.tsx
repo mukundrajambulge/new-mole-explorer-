@@ -5,13 +5,18 @@ import type { RenderProjection } from "../rendering/renderProjection";
 import { ThreeDMolViewerAdapter } from "../rendering/ThreeDMolViewerAdapter";
 import type { PickResult } from "../interaction/picking";
 import type { MeasurementKind, MeasurementObject } from "../interaction/measurements";
+import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
+import type { WorkspaceObject } from "../workspace/workspaceModel";
 import { Icon } from "./Icon";
 
 type CameraCommand = { actionId: ActionId; sequence: number };
 
 type MolecularCanvasProps = {
   structure: StructureLoadResult | null;
+  workspaceObjects?: readonly WorkspaceObject[];
+  globalFrameIndex?: number;
   projection: RenderProjection;
+  activeSelectionMembershipHash?: string;
   activeTool: string;
   cameraCommand?: CameraCommand;
   loading: boolean;
@@ -25,6 +30,7 @@ type MolecularCanvasProps = {
   onBackgroundPick: () => void;
   measurements: readonly MeasurementObject[];
   measurementMode: MeasurementKind | null;
+  analysisOverlays: readonly AnalysisOverlay[];
 };
 
 const toolIcon = (activeTool: string) => {
@@ -36,7 +42,10 @@ const toolIcon = (activeTool: string) => {
 
 export const MolecularCanvas = ({
   structure,
+  workspaceObjects = [],
+  globalFrameIndex = 0,
   projection,
+  activeSelectionMembershipHash = "",
   activeTool,
   cameraCommand,
   loading,
@@ -50,6 +59,7 @@ export const MolecularCanvas = ({
   onBackgroundPick,
   measurements,
   measurementMode,
+  analysisOverlays,
 }: MolecularCanvasProps) => {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -64,6 +74,11 @@ export const MolecularCanvas = ({
   pickRef.current = onPick;
   hoverRef.current = onHover;
   projectionRef.current = projection;
+  const workspaceObjectsForLoadRef = useRef(workspaceObjects);
+  workspaceObjectsForLoadRef.current = workspaceObjects;
+  // State and enable/disable changes are reconciled in-place by the adapter;
+  // only object/model-layout changes require a scene rebuild.
+  const workspaceKey = workspaceObjects.map((object) => `${object.objectId}:${object.loadResult.structure.id}:${object.allStates}`).join("|");
 
   useEffect(() => {
     const host = hostRef.current;
@@ -129,24 +144,31 @@ export const MolecularCanvas = ({
     if (!structure || !adapterRef.current) return;
     try {
       setViewerError(null);
-      adapterRef.current.load(structure, projectionRef.current);
+      const objects = workspaceObjectsForLoadRef.current.length ? workspaceObjectsForLoadRef.current : [{ objectId: `object:${structure.structure.id}`, displayName: structure.structure.name, loadResult: structure, enabled: true, projection: projectionRef.current, stateOrder: structure.structure.stateOrder ?? [], currentStateId: structure.structure.stateOrder?.[0] ?? `${structure.structure.id}:state:1`, allStates: false, lineage: { operation: "LOAD" as const, parentObjectIds: [], parentStructureIds: [structure.structure.id] } }];
+      if (objects.length > 1 || objects.some((object) => object.stateOrder.length > 1 || object.allStates)) adapterRef.current.loadWorkspace(objects);
+      else adapterRef.current.load(structure, projectionRef.current);
     } catch (loadError) {
       setViewerError(loadError instanceof Error ? loadError.message : "The structure could not be rendered.");
     }
-  }, [structure]);
+  }, [structure, workspaceKey]);
 
   useEffect(() => {
     if (!adapterRef.current) return;
     try {
-      adapterRef.current.setProjection(projection);
+      if (workspaceObjects.length > 1 || workspaceObjects.some((object) => object.stateOrder.length > 1 || object.allStates || !object.enabled) || adapterRef.current.isWorkspaceMode()) adapterRef.current.setWorkspaceObjects(workspaceObjects, projection);
+      else adapterRef.current.setProjection(projection);
     } catch (projectionError) {
       setViewerError(projectionError instanceof Error ? projectionError.message : "The display projection could not be applied.");
     }
-  }, [projection, structure]);
+  }, [projection, structure, workspaceObjects]);
 
   useEffect(() => {
     adapterRef.current?.setMeasurements(measurements);
   }, [measurements]);
+
+  useEffect(() => {
+    adapterRef.current?.setAnalysisOverlays(analysisOverlays);
+  }, [analysisOverlays]);
 
   useEffect(() => {
     const adapter = adapterRef.current;
@@ -204,7 +226,7 @@ export const MolecularCanvas = ({
         onPointerUp={endPointerGesture}
         onPointerCancel={endPointerGesture}
       >
-        <div ref={hostRef} className="viewer-host" style={{ bottom: `${viewerBottomInset}px` }} data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} />
+        <div ref={hostRef} className="viewer-host" style={{ bottom: `${viewerBottomInset}px` }} data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} data-global-frame-index={globalFrameIndex} data-renderer-object-count={workspaceObjects.length || (structure ? 1 : 0)} data-selection-membership-hash={activeSelectionMembershipHash} />
         {!structure && !loading && (
           <div className="empty-viewer-state">
             <div className="empty-viewer-card">

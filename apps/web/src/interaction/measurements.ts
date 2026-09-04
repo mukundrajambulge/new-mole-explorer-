@@ -6,6 +6,7 @@ export type MeasurementStatus = "CURRENT" | "STALE" | "INVALID" | "HIDDEN";
 
 export type MeasurementParticipant = {
   ordinal: number;
+  objectId?: string;
   stableAtomId: string;
   atomName: string;
   residueName: string;
@@ -22,6 +23,7 @@ export type MeasurementPresentation = {
 export type MeasurementObject = {
   schemaVersion: 1;
   id: string;
+  objectId?: string;
   kind: MeasurementKind;
   participants: readonly MeasurementParticipant[];
   rawValue: number;
@@ -86,8 +88,9 @@ const atomById = (structure: CanonicalMolecularStructure, stableAtomId: string):
   return atom;
 };
 
-const participantFor = (atom: CanonicalAtom, ordinal: number): MeasurementParticipant => ({
+const participantFor = (atom: CanonicalAtom, ordinal: number, objectId?: string): MeasurementParticipant => ({
   ordinal,
+  ...(objectId ? { objectId } : {}),
   stableAtomId: atom.stableId,
   atomName: atom.atomName,
   residueName: atom.residueName,
@@ -103,6 +106,7 @@ export const createMeasurementObject = (
   structure: CanonicalMolecularStructure,
   coordinateContext: CoordinateContext,
   sequence: number,
+  objectId?: string,
 ): MeasurementObject => {
   const expected = measurementCardinality(kind);
   if (stableAtomIds.length !== expected) throw new MeasurementError(`${kind} requires exactly ${expected} ordered atom picks.`);
@@ -110,9 +114,10 @@ export const createMeasurementObject = (
   const rawValue = kind === "DISTANCE" ? getDistance(atoms[0], atoms[1]) : kind === "ANGLE" ? getAngle(atoms[0], atoms[1], atoms[2]) : getDihedral(atoms[0], atoms[1], atoms[2], atoms[3]);
   return {
     schemaVersion: 1,
-    id: `measurement:${structure.id}:${sequence}`,
+    id: `measurement:${objectId ?? structure.id}:${sequence}`,
     kind,
-    participants: atoms.map((atom, index) => participantFor(atom, index + 1)),
+    ...(objectId ? { objectId } : {}),
+    participants: atoms.map((atom, index) => participantFor(atom, index + 1, objectId)),
     rawValue,
     displayUnit: kind === "DISTANCE" ? "Å" : "°",
     displayPrecision: kind === "DISTANCE" ? 2 : 1,
@@ -126,7 +131,7 @@ export const createMeasurementObject = (
 
 export const measurementStatus = (measurement: MeasurementObject, structure: CanonicalMolecularStructure | null): MeasurementStatus => {
   if (!measurement.presentation.visible) return "HIDDEN";
-  if (!structure || structure.scientificHash !== measurement.molecularRevision || structure.id !== measurement.coordinateContext.modelId) return "STALE";
+  if (!structure || structure.scientificHash !== measurement.molecularRevision || (!measurement.objectId && structure.id !== measurement.coordinateContext.modelId)) return "STALE";
   return measurement.status;
 };
 
@@ -134,13 +139,20 @@ export const formatMeasurement = (measurement: MeasurementObject): string => `${
 
 export class MeasurementAccumulator {
   private slots: string[] = [];
+  private objectId: string | undefined;
 
-  add(stableAtomId: string, kind: MeasurementKind): readonly string[] {
-    if (this.slots.length >= measurementCardinality(kind)) this.slots = [];
+  add(stableAtomId: string, kind: MeasurementKind, objectId?: string): readonly string[] {
+    if (this.slots.length >= measurementCardinality(kind)) {
+      this.slots = [];
+      this.objectId = undefined;
+    }
+    if (this.slots.length > 0 && this.objectId !== objectId) throw new MeasurementError("Measurements must use atoms from one workspace object; clear the current picks before changing objects.");
+    this.objectId = objectId;
     this.slots = [...this.slots, stableAtomId];
     return this.slots;
   }
 
-  clear(): void { this.slots = []; }
+  clear(): void { this.slots = []; this.objectId = undefined; }
   current(): readonly string[] { return this.slots; }
+  currentObjectId(): string | undefined { return this.objectId; }
 };

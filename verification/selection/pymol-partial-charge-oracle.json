@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "oracleSource": "schrodinger/pymol-open-source@5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+  "runtime": "PyMOL 3.2.0a",
+  "fixture": "tests/fixtures/mini-protein.pdb",
+  "setup": [
+    "oracle_fixture & index 1: partial_charge=0.25",
+    "oracle_fixture & index 2: partial_charge=-0.5"
+  ],
+  "row": {
+    "applicationQuery": "partial_charge > 0",
+    "oracleQuery": "partial_charge > 0",
+    "oracleStatus": "ORACLE_PASS",
+    "returnCode": 1,
+    "count": 1,
+    "tuples": ["1|A|ALA|1|N|N"],
+    "membershipHash": "eb7674fed3646839030b00957c80e0e663a875ba732ce82ef46d8f7aee1c7e7e"
+  },
+  "notes": [
+    "The positive probe verifies pinned PyMOL partial-charge comparison semantics on an explicit charge-bearing fixture.",
+    "The application still requires complete, finite, revision-matched canonical source charges and never infers them from this oracle setup."
+  ]
+}

@@ -1,0 +1,7 @@
+HEADER    BOUNDED UNIT CELL SELECTION FIXTURE
+CRYST1   10.000   10.000   10.000  90.00  90.00  90.00 P 1           1
+ATOM      1  CA  ALA A   1       1.000   1.000   1.000  1.00 10.00           C
+ATOM      2  C   ALA A   1       2.000   2.000   2.000  1.00 10.00           C
+HETATM    3  O   HOH A 101      11.000   1.000   1.000  1.00 10.00           O
+HETATM    4  NA  NA  B 201      12.000   2.000   2.000  1.00 10.00          NA
+END

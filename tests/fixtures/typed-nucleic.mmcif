@@ -1,0 +1,22 @@
+data_typed
+loop_
+_entity_poly.entity_id
+_entity_poly.type
+1 polyribonucleotide
+2 polypeptide(L)
+loop_
+_atom_site.group_PDB
+_atom_site.id
+_atom_site.type_symbol
+_atom_site.label_atom_id
+_atom_site.label_comp_id
+_atom_site.label_asym_id
+_atom_site.label_seq_id
+_atom_site.label_entity_id
+_atom_site.Cartn_x
+_atom_site.Cartn_y
+_atom_site.Cartn_z
+ATOM 1 P P A A 1 1 0.0 0.0 0.0
+ATOM 2 C C4 A A 1 1 1.0 0.0 0.0
+ATOM 3 C CA ALA B 1 2 2.0 0.0 0.0
+ATOM 4 N N ALA B 1 2 3.0 0.0 0.0

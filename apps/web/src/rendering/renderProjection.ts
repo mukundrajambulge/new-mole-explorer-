@@ -18,6 +18,8 @@ export {
   setLayerVisibility,
   setColorScheme,
   setColorForSelection,
+  setComponentColor,
+  clearColorForSelection,
   setRepresentationColorForSelection,
   setProjectionStyle,
   setRepresentationParameters,

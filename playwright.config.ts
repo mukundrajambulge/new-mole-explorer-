@@ -3,6 +3,10 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
+  // Real 3Dmol surface generation is GPU/memory intensive. A single browser
+  // worker keeps the complete visual suite deterministic on the supported
+  // local runner; focused suites can still override this when appropriate.
+  workers: 1,
   reporter: "list",
   use: { baseURL: "http://localhost:3101", trace: "on-first-retry" },
   webServer: [

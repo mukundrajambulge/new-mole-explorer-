@@ -7,16 +7,22 @@ import type {
   CanonicalChain,
   CanonicalHierarchy,
   CanonicalMolecularStructure,
+  PeptideSequenceChain,
+  CanonicalPolymerType,
+  CanonicalCoordinateState,
   CanonicalResidue,
   CoordinateBounds,
+  CanonicalUnitCell,
   SecondaryStructureKind,
   StructureFormat,
   StructureLoadResult,
   StructureSourceKind,
+  RemoteStructureProvider,
 } from "@molecular/contracts";
 
 export const MAX_STRUCTURE_BYTES = 25 * 1024 * 1024;
 export const INGESTION_PARSER_PROFILE = "molecular-workstation-g1b-canonical-v1";
+const REMOTE_FETCH_TIMEOUT_MS = 10_000;
 
 const WATER_RESIDUES = new Set(["HOH", "WAT", "H2O", "DOD"]);
 const ION_ELEMENTS = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA", "ZN", "FE", "MN", "CU", "CO", "NI", "CL", "BR", "IOD"]);
@@ -36,7 +42,8 @@ export class IngestionError extends Error {
 type AtomSeed = Omit<CanonicalAtom, "stableId">;
 type BondSeed = { atom1Serial: number; atom2Serial: number; order: BondOrder; source: CanonicalBond["source"] };
 type SecondarySpan = { kind: Exclude<SecondaryStructureKind, "LOOP">; chain: string; start: number; end: number };
-type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[]; secondaryStructureSource?: string };
+type CoordinateSeed = { sourceIndex: number; x: number; y: number; z: number };
+type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[]; coordinateStates?: Array<{ sourceModelNumber: number; coordinates: CoordinateSeed[] }>; secondaryStructureSource?: string; polymerTypingSource?: string; unitCell?: CanonicalUnitCell; partialChargeValues?: Record<string, number> };
 
 const parseNumber = (value: string, label: string): number => {
   const parsed = Number(value.replace(/\(.+\)$/, ""));
@@ -54,6 +61,18 @@ const parseOptionalNumber = (value: string | undefined): number | null | undefin
   if (!normalized || normalized === "." || normalized === "?") return undefined;
   const parsed = Number(normalized.replace(/\(.+\)$/, ""));
   return Number.isFinite(parsed) ? parsed : null;
+};
+
+const makeUnitCell = (values: { a?: string; b?: string; c?: string; alpha?: string; beta?: string; gamma?: string; spaceGroup?: string; zValue?: string }, source: CanonicalUnitCell["source"]): CanonicalUnitCell | undefined => {
+  const cellValues = [values.a, values.b, values.c, values.alpha, values.beta, values.gamma];
+  const supplied = cellValues.filter((value) => value !== undefined && value.trim() !== "" && value !== "." && value !== "?").length;
+  if (supplied === 0) return undefined;
+  if (supplied !== cellValues.length) throw new IngestionError("INVALID_INPUT", "Unit-cell input is incomplete; a, b, c, alpha, beta, and gamma are all required.");
+  const [a, b, c, alpha, beta, gamma] = cellValues.map((value, index) => parseNumber(value!, ["a", "b", "c", "alpha", "beta", "gamma"][index]!));
+  if (a <= 0 || b <= 0 || c <= 0 || alpha <= 0 || alpha >= 180 || beta <= 0 || beta >= 180 || gamma <= 0 || gamma >= 180) throw new IngestionError("INVALID_INPUT", "Unit-cell lengths must be positive and angles must be between 0 and 180 degrees.");
+  const spaceGroup = values.spaceGroup?.trim();
+  const zValue = values.zValue && values.zValue !== "." && values.zValue !== "?" ? parseNumber(values.zValue, "unit-cell Z") : undefined;
+  return { a, b, c, alpha, beta, gamma, ...(spaceGroup ? { spaceGroup } : {}), ...(zValue !== undefined ? { zValue } : {}), source, profileVersion: "fractional-unit-cell-membership-v1" };
 };
 
 const parsePdbFormalCharge = (value: string): number | null | undefined => {
@@ -81,12 +100,36 @@ const classifyAtom = (recordType: "ATOM" | "HETATM", residueName: string, elemen
   return { isPolymer, isLigand, isWater, isIon };
 };
 
+const atomCorrespondenceKey = (atom: AtomSeed): string => [atom.serial, atom.atomName, atom.residueName, atom.residueNumber, atom.insertionCode ?? "", atom.chain, atom.altLoc ?? ""].join("\u0000");
+const componentAtomKey = (component: string, atomName: string): string => `${component.trim().toUpperCase()}\u0000${atomName.trim()}`;
+
 const parsePdb = (content: string): ParsedSource => {
   const atoms: AtomSeed[] = [];
   const bonds: BondSeed[] = [];
   const secondarySpans: SecondarySpan[] = [];
+  const modelAtoms = new Map<number, AtomSeed[]>();
+  let activeModel: number | null = null;
+  let sawModelRecord = false;
+  let unitCell: CanonicalUnitCell | undefined;
   for (const line of content.split(/\r?\n/)) {
     const record = line.slice(0, 6).trim();
+    if (record === "CRYST1") {
+      const nextUnitCell = makeUnitCell({ a: line.slice(6, 15).trim(), b: line.slice(15, 24).trim(), c: line.slice(24, 33).trim(), alpha: line.slice(33, 40).trim(), beta: line.slice(40, 47).trim(), gamma: line.slice(47, 54).trim(), spaceGroup: line.slice(55, 66).trim(), zValue: line.slice(66, 70).trim() }, "PDB_CRYST1");
+      if (unitCell && JSON.stringify(unitCell) !== JSON.stringify(nextUnitCell)) throw new IngestionError("INVALID_INPUT", "PDB contains conflicting CRYST1 unit-cell records.");
+      unitCell = nextUnitCell;
+      continue;
+    }
+    if (record === "MODEL") {
+      sawModelRecord = true;
+      const modelNumber = parseInteger(line.slice(10, 14).trim(), modelAtoms.size + 1);
+      activeModel = modelNumber;
+      if (!modelAtoms.has(modelNumber)) modelAtoms.set(modelNumber, []);
+      continue;
+    }
+    if (record === "ENDMDL") {
+      activeModel = null;
+      continue;
+    }
     if (record === "HELIX" || record === "SHEET") {
       const isHelix = record === "HELIX";
       const chain = line.slice(isHelix ? 19 : 21, isHelix ? 20 : 22).trim();
@@ -116,7 +159,7 @@ const parsePdb = (content: string): ParsedSource => {
     const y = parseNumber(line.slice(38, 46).trim(), "y coordinate");
     const z = parseNumber(line.slice(46, 54).trim(), "z coordinate");
     const element = normalizeElement(line.slice(76, 78), atomName);
-    atoms.push({
+    const atom = {
       serial: parseInteger(line.slice(6, 11).trim(), atoms.length + 1),
       atomName,
       element,
@@ -124,6 +167,7 @@ const parsePdb = (content: string): ParsedSource => {
       residueNumber,
       insertionCode,
       chain,
+      segmentId: line.slice(72, 76).trim() || undefined,
       x,
       y,
       z,
@@ -133,14 +177,34 @@ const parsePdb = (content: string): ParsedSource => {
       altLoc: line.slice(16, 17).trim() || undefined,
       formalCharge: parsePdbFormalCharge(line.slice(78, 80)),
       ...classifyAtom(recordType, residueName, element),
-    });
+    } satisfies AtomSeed;
+    if (sawModelRecord || activeModel !== null) modelAtoms.get(activeModel ?? 1)?.push(atom);
+    else atoms.push(atom);
+  }
+  if (modelAtoms.size > 0) {
+    const orderedModels = [...modelAtoms.entries()].sort(([a], [b]) => a - b);
+    const firstAtoms = orderedModels[0]?.[1] ?? [];
+    if (firstAtoms.length === 0) throw new IngestionError("INVALID_INPUT", "PDB MODEL records did not contain any atom coordinates.");
+    for (const [, candidateAtoms] of orderedModels) {
+      if (candidateAtoms.length !== firstAtoms.length || candidateAtoms.some((atom, index) => atomCorrespondenceKey(atom) !== atomCorrespondenceKey(firstAtoms[index]!))) {
+        throw new IngestionError("INVALID_INPUT", "PDB coordinate models do not have a validated atom correspondence.");
+      }
+    }
+    atoms.push(...firstAtoms);
+    const coordinateStates = orderedModels.map(([sourceModelNumber, stateAtoms]) => ({ sourceModelNumber, coordinates: stateAtoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }));
+    for (const atom of atoms) {
+      const span = secondarySpans.find((candidate) => candidate.chain === atom.chain && atom.residueNumber >= candidate.start && atom.residueNumber <= candidate.end);
+      if (span) atom.secondaryStructure = span.kind;
+    }
+    return { format: "pdb", atoms, bonds, coordinateStates, ...(secondarySpans.length ? { secondaryStructureSource: "PDB HELIX/SHEET records" } : {}), ...(unitCell ? { unitCell } : {}) };
   }
   if (atoms.length === 0) throw new IngestionError("INVALID_INPUT", "No ATOM or HETATM records with coordinates were found.");
   for (const atom of atoms) {
     const span = secondarySpans.find((candidate) => candidate.chain === atom.chain && atom.residueNumber >= candidate.start && atom.residueNumber <= candidate.end);
     if (span) atom.secondaryStructure = span.kind;
   }
-  return { format: "pdb", atoms, bonds, ...(secondarySpans.length ? { secondaryStructureSource: "PDB HELIX/SHEET records" } : {}) };
+
+  return { format: "pdb", atoms, bonds, coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }], ...(secondarySpans.length ? { secondaryStructureSource: "PDB HELIX/SHEET records" } : {}), ...(unitCell ? { unitCell } : {}) };
 };
 
 const tokenizeCif = (content: string): string[] => {
@@ -221,6 +285,15 @@ const cifValue = (row: string[], headers: string[], names: string[]): string | u
   return value && value !== "." && value !== "?" ? value : undefined;
 };
 
+const cifScalar = (tokens: readonly string[], name: string): string | undefined => {
+  for (let index = 0; index < tokens.length - 1; index += 1) {
+    if (tokens[index] !== name) continue;
+    const value = tokens[index + 1];
+    if (value && !value.startsWith("_") && value.toLowerCase() !== "loop_" && !value.toLowerCase().startsWith("data_")) return value;
+  }
+  return undefined;
+};
+
 const parseBondOrder = (value: string | undefined): BondOrder => {
   const normalized = (value ?? "").toUpperCase();
   if (normalized.includes("DOUB")) return "DOUBLE";
@@ -230,11 +303,32 @@ const parseBondOrder = (value: string | undefined): BondOrder => {
   return "UNKNOWN";
 };
 
+const classifyEntityPolymerType = (value: string | undefined): CanonicalPolymerType | undefined => {
+  const normalized = value?.toLowerCase() ?? "";
+  if (normalized.includes("polypeptide")) return "PROTEIN";
+  if (normalized.includes("ribonucleotide") || normalized.includes("deoxyribonucleotide") || normalized.includes("nucleotide")) return "NUCLEIC_ACID";
+  if (normalized.includes("poly") || normalized.includes("peptide")) return "OTHER_POLYMER";
+  return undefined;
+};
+
 const parseMmcif = (content: string): ParsedSource => {
   const loops = readCifLoops(content);
+  const cifTokens = tokenizeCif(content);
+  const unitCell = makeUnitCell({ a: cifScalar(cifTokens, "_cell.length_a"), b: cifScalar(cifTokens, "_cell.length_b"), c: cifScalar(cifTokens, "_cell.length_c"), alpha: cifScalar(cifTokens, "_cell.angle_alpha"), beta: cifScalar(cifTokens, "_cell.angle_beta"), gamma: cifScalar(cifTokens, "_cell.angle_gamma"), spaceGroup: cifScalar(cifTokens, "_symmetry.space_group_name_H-M") ?? cifScalar(cifTokens, "_space_group.name_H-M_alt"), zValue: cifScalar(cifTokens, "_cell.Z_PDB") }, "MMCIF_CELL");
   const atomLoop = loops.find((loop) => loop.headers.some((header) => header.startsWith("_atom_site.")));
   if (!atomLoop) throw new IngestionError("INVALID_INPUT", "No _atom_site loop was found in the mmCIF input.");
-  const atoms: AtomSeed[] = [];
+  const polymerEntityTypes = new Map<string, CanonicalPolymerType>();
+  let hasPolymerEntityLoop = false;
+  for (const loop of loops) {
+    if (!loop.headers.includes("_entity_poly.type")) continue;
+    hasPolymerEntityLoop = true;
+    for (const row of loop.rows) {
+      const entityId = cifValue(row, loop.headers, ["_entity_poly.entity_id"]);
+      const polymerType = classifyEntityPolymerType(cifValue(row, loop.headers, ["_entity_poly.type"]));
+      if (entityId && polymerType) polymerEntityTypes.set(entityId, polymerType);
+    }
+  }
+  const modelAtoms = new Map<number, AtomSeed[]>();
   for (const [rowIndex, row] of atomLoop.rows.entries()) {
     const xValue = cifValue(row, atomLoop.headers, ["_atom_site.Cartn_x"]);
     const yValue = cifValue(row, atomLoop.headers, ["_atom_site.Cartn_y"]);
@@ -246,7 +340,9 @@ const parseMmcif = (content: string): ParsedSource => {
     const chain = cifValue(row, atomLoop.headers, ["_atom_site.label_asym_id", "_atom_site.auth_asym_id"]) ?? "_";
     const residueNumber = parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.label_seq_id", "_atom_site.auth_seq_id"]), 0);
     const element = normalizeElement(cifValue(row, atomLoop.headers, ["_atom_site.type_symbol"]) ?? "", atomName);
-    atoms.push({
+    const entityId = cifValue(row, atomLoop.headers, ["_atom_site.label_entity_id"]);
+    const polymerType = entityId ? polymerEntityTypes.get(entityId) : undefined;
+    const atom = {
       serial: parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.id"]), rowIndex + 1),
       atomName,
       element,
@@ -254,6 +350,7 @@ const parseMmcif = (content: string): ParsedSource => {
       residueNumber,
       insertionCode: cifValue(row, atomLoop.headers, ["_atom_site.pdbx_PDB_ins_code"]),
       chain,
+      segmentId: cifValue(row, atomLoop.headers, ["_atom_site.pdbx_PDB_segment_id"]),
       x: parseNumber(xValue, "x coordinate"),
       y: parseNumber(yValue, "y coordinate"),
       z: parseNumber(zValue, "z coordinate"),
@@ -263,9 +360,19 @@ const parseMmcif = (content: string): ParsedSource => {
       altLoc: cifValue(row, atomLoop.headers, ["_atom_site.label_alt_id", "_atom_site.pdbx_PDB_alt_id"]),
       formalCharge: parseOptionalNumber(cifValue(row, atomLoop.headers, ["_atom_site.pdbx_formal_charge"])),
       ...classifyAtom(record, residueName, element),
-    });
+      ...(polymerType ? { polymerType } : {}),
+    } satisfies AtomSeed;
+    const modelNumber = parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.pdbx_PDB_model_num", "_atom_site.pdbx_model_num"]), 1);
+    modelAtoms.set(modelNumber, [...(modelAtoms.get(modelNumber) ?? []), atom]);
   }
+  const orderedModels = [...modelAtoms.entries()].sort(([a], [b]) => a - b);
+  const atoms = orderedModels[0]?.[1] ?? [];
   if (atoms.length === 0) throw new IngestionError("INVALID_INPUT", "No _atom_site rows with coordinates were found in the mmCIF input.");
+  for (const [, candidateAtoms] of orderedModels) {
+    if (candidateAtoms.length !== atoms.length || candidateAtoms.some((atom, index) => atomCorrespondenceKey(atom) !== atomCorrespondenceKey(atoms[index]!))) {
+      throw new IngestionError("INVALID_INPUT", "mmCIF coordinate models do not have a validated atom correspondence.");
+    }
+  }
 
   const secondarySpans: SecondarySpan[] = [];
   for (const loop of loops) {
@@ -327,7 +434,22 @@ const parseMmcif = (content: string): ParsedSource => {
       }
     }
   }
-  return { format: "mmcif", atoms, bonds, ...(secondarySpans.length ? { secondaryStructureSource: "mmCIF struct_conf/struct_sheet_range records" } : {}) };
+  const partialChargeValues: Record<string, number> = {};
+  const partialChargeLoop = loops.find((loop) => loop.headers.includes("_chem_comp_atom.partial_charge"));
+  if (partialChargeLoop) {
+    for (const row of partialChargeLoop.rows) {
+      const component = cifValue(row, partialChargeLoop.headers, ["_chem_comp_atom.comp_id"]);
+      const atomName = cifValue(row, partialChargeLoop.headers, ["_chem_comp_atom.atom_id"]);
+      const value = cifValue(row, partialChargeLoop.headers, ["_chem_comp_atom.partial_charge"]);
+      if (!component || !atomName || !value) continue;
+      const parsedValue = parseOptionalNumber(value);
+      if (typeof parsedValue !== "number" || !Number.isFinite(parsedValue)) continue;
+      const key = componentAtomKey(component, atomName);
+      if (partialChargeValues[key] === undefined || partialChargeValues[key] === parsedValue) partialChargeValues[key] = parsedValue;
+      else delete partialChargeValues[key];
+    }
+  }
+  return { format: "mmcif", atoms, bonds, coordinateStates: orderedModels.map(([sourceModelNumber, stateAtoms]) => ({ sourceModelNumber, coordinates: stateAtoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) })), ...(secondarySpans.length ? { secondaryStructureSource: "mmCIF struct_conf/struct_sheet_range records" } : {}), ...(hasPolymerEntityLoop && polymerEntityTypes.size > 0 ? { polymerTypingSource: "mmCIF _entity_poly.type mapped by _atom_site.label_entity_id" } : {}), ...(Object.keys(partialChargeValues).length ? { partialChargeValues } : {}), ...(unitCell ? { unitCell } : {}) };
 };
 
 const formatFromFilename = (filename: string): StructureFormat => {
@@ -385,6 +507,23 @@ const summarize = (atoms: CanonicalAtom[]): { counts: CanonicalMolecularStructur
 
 const canonicalBondKey = (atom1: string, atom2: string) => [atom1, atom2].sort().join("|");
 
+const AMINO_ACID_ONE_LETTER: Readonly<Record<string, string>> = {
+  ALA: "A", ARG: "R", ASN: "N", ASP: "D", CYS: "C", GLN: "Q", GLU: "E", GLY: "G",
+  HIS: "H", ILE: "I", LEU: "L", LYS: "K", MET: "M", PHE: "F", PRO: "P", SER: "S",
+  THR: "T", TRP: "W", TYR: "Y", VAL: "V",
+};
+
+const peptideSequenceChainsFor = (hierarchy: CanonicalHierarchy): Record<string, PeptideSequenceChain> =>
+  Object.fromEntries(hierarchy.chainIds.map((chainId) => {
+    const polymerResidues = hierarchy.chains[chainId]!.residueIds
+      .map((residueId) => hierarchy.residues[residueId]!)
+      .filter((residue) => residue.isPolymer);
+    return [chainId, {
+      residueIds: polymerResidues.map((residue) => residue.id),
+      sequence: polymerResidues.map((residue) => AMINO_ACID_ONE_LETTER[residue.name.toUpperCase()] ?? "X").join(""),
+    } satisfies PeptideSequenceChain];
+  }));
+
 export class StructureIngestionService {
   private readonly structures = new Map<string, CanonicalMolecularStructure>();
 
@@ -395,20 +534,39 @@ export class StructureIngestionService {
   async ingestRcsb(pdbId: string): Promise<StructureLoadResult> {
     const normalizedId = pdbId.trim().toUpperCase();
     if (!/^[A-Z0-9]{4}$/.test(normalizedId)) throw new IngestionError("INVALID_INPUT", "Enter a valid four-character PDB ID.");
-    const uri = `https://files.rcsb.org/download/${normalizedId}.cif`;
-    let response: Response;
-    try {
-      response = await fetch(uri, { signal: AbortSignal.timeout(20_000), headers: { accept: "text/plain" } });
-    } catch {
-      throw new IngestionError("REMOTE_FETCH_FAILED", "RCSB could not be reached. Check the network and try again.", 502);
+    const sources: Array<{ provider: RemoteStructureProvider; uri: string }> = [
+      { provider: "RCSB", uri: `https://files.rcsb.org/download/${normalizedId}.cif` },
+      { provider: "PDBE", uri: `https://www.ebi.ac.uk/pdbe/entry-files/download/${normalizedId.toLowerCase()}.cif` },
+    ];
+    let sawNotFound = false;
+    let allResponsesNotFound = true;
+    for (const source of sources) {
+      let response: Response;
+      try {
+        response = await fetch(source.uri, { signal: AbortSignal.timeout(REMOTE_FETCH_TIMEOUT_MS), headers: { accept: "text/plain" } });
+      } catch {
+        allResponsesNotFound = false;
+        continue;
+      }
+      if (response.status === 404) {
+        sawNotFound = true;
+        continue;
+      }
+      allResponsesNotFound = false;
+      if (!response.ok) continue;
+      try {
+        const content = await response.text();
+        return await this.ingest("RCSB", `${normalizedId}.cif`, Buffer.from(content, "utf8"), source.uri, source.provider);
+      } catch (error) {
+        if (error instanceof IngestionError) throw error;
+        continue;
+      }
     }
-    if (response.status === 404) throw new IngestionError("REMOTE_NOT_FOUND", `RCSB could not find structure ${normalizedId}.`, 404);
-    if (!response.ok) throw new IngestionError("REMOTE_FETCH_FAILED", `RCSB returned HTTP ${response.status}.`, 502);
-    const content = await response.text();
-    return this.ingest("RCSB", `${normalizedId}.cif`, Buffer.from(content, "utf8"), uri);
+    if (sawNotFound && allResponsesNotFound) throw new IngestionError("REMOTE_NOT_FOUND", `RCSB/wwPDB could not find structure ${normalizedId}.`, 404);
+    throw new IngestionError("REMOTE_FETCH_FAILED", "RCSB/wwPDB could not be reached. Check the network and try again.", 502);
   }
 
-  private async ingest(kind: StructureSourceKind, filename: string, buffer: Buffer, uri?: string): Promise<StructureLoadResult> {
+  private async ingest(kind: StructureSourceKind, filename: string, buffer: Buffer, uri?: string, provider?: RemoteStructureProvider): Promise<StructureLoadResult> {
     if (buffer.length > MAX_STRUCTURE_BYTES) throw new IngestionError("PAYLOAD_TOO_LARGE", "Structure files must be 25 MB or smaller.");
     const safeFilename = basename(filename).replace(/[^A-Za-z0-9._-]/g, "_");
     const content = buffer.toString("utf8");
@@ -439,12 +597,39 @@ export class StructureIngestionService {
       sha256: hash,
       byteLength: buffer.length,
       ...(uri ? { uri } : {}),
+      ...(provider ? { provider } : {}),
       ingestedAt: new Date().toISOString(),
       parserProfile: INGESTION_PARSER_PROFILE,
     } as const;
     const hierarchy = makeHierarchy(atoms);
     const bonds = [...bondsByKey.values()];
-    const scientificPayload = { atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds };
+    const peptideSequenceChains = peptideSequenceChainsFor(hierarchy);
+    const coordinateStates: CanonicalCoordinateState[] = (parsed.coordinateStates ?? [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }]).map((state, index) => {
+      const coordinates = Object.fromEntries(state.coordinates.map((coordinate) => {
+        const atom = atoms[coordinate.sourceIndex];
+        return atom ? [atom.stableId, { x: coordinate.x, y: coordinate.y, z: coordinate.z }] : [];
+      })) as Record<string, { x: number; y: number; z: number }>;
+      const coordinateHash = createHash("sha256").update(JSON.stringify(coordinates)).digest("hex");
+      return { id: `${hash.slice(0, 16)}:state:${state.sourceModelNumber}`, ordinal: index + 1, sourceModelNumber: state.sourceModelNumber, coordinates, coordinateHash };
+    });
+    const stateOrder = coordinateStates.map((state) => state.id);
+    const sourceChargeMap = parsed.partialChargeValues
+      ? Object.fromEntries(atoms.flatMap((atom) => {
+        const value = parsed.partialChargeValues![componentAtomKey(atom.residueName, atom.atomName)];
+        return typeof value === "number" && Number.isFinite(value) ? [[atom.stableId, value] as const] : [];
+      }))
+      : {};
+    const hasCompleteSourceCharges = parsed.format === "mmcif" && atoms.length > 0 && Object.keys(sourceChargeMap).length === atoms.length;
+    const partialChargeDataset = hasCompleteSourceCharges ? {
+      datasetId: `${hash.slice(0, 16)}:partial-charge`,
+      molecularRevision: "pending",
+      chargeModel: "source-declared mmCIF _chem_comp_atom.partial_charge",
+      profileVersion: "mmcif-chem-comp-partial-charge-v1",
+      atomChargeMap: sourceChargeMap,
+      units: "e",
+      provenance: "Copied from source _chem_comp_atom.partial_charge; no charge inference performed",
+    } : undefined;
+    const scientificPayload = { atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder, unitCell: parsed.unitCell ?? null, polymerTypingSource: parsed.polymerTypingSource ?? null, partialChargeValues: hasCompleteSourceCharges ? sourceChargeMap : null, peptideSequenceChains };
     const scientificHash = createHash("sha256").update(JSON.stringify(scientificPayload)).digest("hex");
     const structure: CanonicalMolecularStructure = {
       id: `structure_${hash.slice(0, 16)}`,
@@ -455,7 +640,13 @@ export class StructureIngestionService {
       bonds,
       hierarchy,
       scientificHash,
+      coordinateStates,
+      stateOrder,
+      ...(parsed.unitCell ? { unitCell: parsed.unitCell } : {}),
+      ...(parsed.polymerTypingSource ? { polymerTypingSource: parsed.polymerTypingSource } : {}),
       ...(parsed.secondaryStructureSource ? { secondaryStructureDataset: { datasetId: `${hash.slice(0, 16)}:secondary-structure`, molecularRevision: scientificHash, assignmentSource: parsed.secondaryStructureSource, profileVersion: "pdb-mmcif-structural-records-v1" } } : {}),
+      ...(partialChargeDataset ? { partialChargeDataset: { ...partialChargeDataset, molecularRevision: scientificHash } } : {}),
+      peptideSequenceDataset: { datasetId: `${hash.slice(0, 16)}:peptide-sequence`, molecularRevision: scientificHash, assignmentSource: "canonical polymer residue names mapped to one-letter amino-acid codes", profileVersion: "canonical-peptide-sequence-v1", chains: peptideSequenceChains },
       ...summary,
     };
     this.structures.set(structure.id, structure);

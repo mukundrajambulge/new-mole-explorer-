@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CanonicalMolecularStructure } from "@molecular/contracts";
-import { applyRepresentationOperation, createDefaultRenderProjection, REPRESENTATION_MASKS, REPRESENTATION_PRESETS, setInteractionState, setProjectionStyle } from "./presentationState";
+import { applyRepresentationOperation, createDefaultRenderProjection, REPRESENTATION_MASKS, REPRESENTATION_PRESETS, setColorScheme, setInteractionState, setProjectionStyle } from "./presentationState";
 
 const structure = {
   id: "structure_test",
@@ -19,6 +19,10 @@ const structure = {
 } satisfies CanonicalMolecularStructure;
 
 describe("G1B renderer-neutral presentation state", () => {
+  it("starts new structures with a clear ordered-polymer color presentation", () => {
+    expect(createDefaultRenderProjection().color.mode).toBe("rainbow");
+  });
+
   it("keeps licorice and ball-and-stick as distinct canonical masks", () => {
     expect(REPRESENTATION_PRESETS.LICORICE).not.toBe(REPRESENTATION_PRESETS.BALL_AND_STICK);
     expect(REPRESENTATION_PRESETS.LICORICE & REPRESENTATION_MASKS.NB_SPHERES).toBeTruthy();
@@ -53,5 +57,19 @@ describe("G1B renderer-neutral presentation state", () => {
     const next = setProjectionStyle(projection, structure, "ball-and-stick");
     expect(next.representationState.atomRepMasks.a).toBe(REPRESENTATION_PRESETS.BALL_AND_STICK);
     expect(structure.scientificHash).toBe("b".repeat(64));
+  });
+
+  it("reports incomplete partial-charge metadata before rendering", () => {
+    const projection = createDefaultRenderProjection(structure);
+    const incomplete = { ...structure, partialChargeDataset: {
+      datasetId: "charges:v1",
+      molecularRevision: structure.scientificHash,
+      chargeModel: "fixture",
+      profileVersion: "v1",
+      atomChargeMap: { a: -0.4, b: 0.4 },
+      units: "",
+      provenance: "fixture",
+    } };
+    expect(setColorScheme(projection, "by-partial-charge", incomplete).colorDiagnostic).toContain("Partial-charge");
   });
 });
