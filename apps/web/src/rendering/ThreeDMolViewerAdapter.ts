@@ -290,6 +290,10 @@ export class ThreeDMolViewerAdapter {
     if (interactionProjection) this.projection = interactionProjection;
     this.renderPrimaryWorkspaceModel();
     this.renderAuxiliaryModels();
+    if (objects[0]) {
+      this.diagnostics = buildRenderProjectionDiagnostics(this.renderLoadResultForState(objects[0]).structure, objects[0].projection);
+      this.writeDiagnostics(this.diagnostics);
+    }
     this.applyWorkspaceSurfaces(objects);
     this.bindWorkspacePicking();
     this.writeWorkspaceProjectionState();

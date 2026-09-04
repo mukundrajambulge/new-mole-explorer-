@@ -145,7 +145,14 @@ export const MolecularCanvas = ({
     try {
       setViewerError(null);
       const objects = workspaceObjectsForLoadRef.current.length ? workspaceObjectsForLoadRef.current : [{ objectId: `object:${structure.structure.id}`, displayName: structure.structure.name, loadResult: structure, enabled: true, projection: projectionRef.current, stateOrder: structure.structure.stateOrder ?? [], currentStateId: structure.structure.stateOrder?.[0] ?? `${structure.structure.id}:state:1`, allStates: false, lineage: { operation: "LOAD" as const, parentObjectIds: [], parentStructureIds: [structure.structure.id] } }];
-      if (objects.length > 1 || objects.some((object) => object.stateOrder.length > 1 || object.allStates)) adapterRef.current.loadWorkspace(objects);
+      if (objects.length) {
+        // A scientific revision changes the canonical payload but not the
+        // mounted viewer/model layout. Let the adapter reconcile those atoms
+        // in place; a real object-layout change is handled by its guarded
+        // setWorkspaceObjects path.
+        if (adapterRef.current.isWorkspaceMode()) adapterRef.current.setWorkspaceObjects(objects, projectionRef.current);
+        else adapterRef.current.loadWorkspace(objects);
+      }
       else adapterRef.current.load(structure, projectionRef.current);
     } catch (loadError) {
       setViewerError(loadError instanceof Error ? loadError.message : "The structure could not be rendered.");
@@ -155,7 +162,7 @@ export const MolecularCanvas = ({
   useEffect(() => {
     if (!adapterRef.current) return;
     try {
-      if (workspaceObjects.length > 1 || workspaceObjects.some((object) => object.stateOrder.length > 1 || object.allStates || !object.enabled) || adapterRef.current.isWorkspaceMode()) adapterRef.current.setWorkspaceObjects(workspaceObjects, projection);
+      if (workspaceObjects.length > 0 || adapterRef.current.isWorkspaceMode()) adapterRef.current.setWorkspaceObjects(workspaceObjects, projection);
       else adapterRef.current.setProjection(projection);
     } catch (projectionError) {
       setViewerError(projectionError instanceof Error ? projectionError.message : "The display projection could not be applied.");
@@ -226,7 +233,7 @@ export const MolecularCanvas = ({
         onPointerUp={endPointerGesture}
         onPointerCancel={endPointerGesture}
       >
-        <div ref={hostRef} className="viewer-host" style={{ bottom: `${viewerBottomInset}px` }} data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} data-global-frame-index={globalFrameIndex} data-renderer-object-count={workspaceObjects.length || (structure ? 1 : 0)} data-selection-membership-hash={activeSelectionMembershipHash} />
+        <div ref={hostRef} className="viewer-host" style={{ bottom: `${viewerBottomInset}px` }} data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} data-global-frame-index={globalFrameIndex} data-renderer-object-count={workspaceObjects.length || (structure ? 1 : 0)} data-selection-membership-hash={activeSelectionMembershipHash} data-scientific-revision={structure?.structure.scientificHash ?? ""} data-canonical-atom-count={structure?.structure.counts.atoms ?? ""} data-canonical-bond-count={structure?.structure.bonds.length ?? ""} data-canonical-atom-ids={structure?.structure.atoms.map((atom) => atom.stableId).join("|") ?? ""} data-canonical-bond-orders={structure?.structure.bonds.map((bond) => `${bond.atom1}:${bond.atom2}:${bond.order}`).join("|") ?? ""} />
         {!structure && !loading && (
           <div className="empty-viewer-state">
             <div className="empty-viewer-card">
