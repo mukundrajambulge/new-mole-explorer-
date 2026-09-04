@@ -3,8 +3,8 @@
   "source": "verification/selection/SELECTION_OPERATOR_MATRIX.md",
   "rowCount": 87,
   "implementationStatusCounts": {
-    "VERIFIED_WORKING": 83,
-    "MISSING_DEPENDENCY": 3,
+    "VERIFIED_WORKING": 85,
+    "MISSING_DEPENDENCY": 1,
     "INTENTIONALLY_UNSUPPORTED": 1
   },
   "liveBrowserStatusCounts": {
@@ -603,17 +603,17 @@
     },
     {
       "operator": "`donors`",
-      "implementationStatus": "MISSING_DEPENDENCY",
+      "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PASS",
-      "decision": "pinned PyMOL `donors` executes on the mini fixture (7 atoms); application still requires complete canonical donor assignments and makes no heuristic donor claim"
+      "decision": "backend produces the complete bounded `canonical-chemistry-roles-v1` dataset only when the canonical topology/inputs satisfy the pinned PyMOL compatibility profile; no renderer or element-only heuristic"
     },
     {
       "operator": "`acceptors`",
-      "implementationStatus": "MISSING_DEPENDENCY",
+      "implementationStatus": "VERIFIED_WORKING",
       "liveBrowserStatus": "PASS (selection-matrix-live.spec.ts)",
       "oracleStatus": "ORACLE_PASS",
-      "decision": "pinned PyMOL `acceptors` executes on the mini fixture (4 atoms); application still requires complete canonical acceptor assignments and makes no heuristic acceptor claim"
+      "decision": "backend produces the complete bounded `canonical-chemistry-roles-v1` dataset only when the canonical topology/inputs satisfy the pinned PyMOL compatibility profile; no renderer or element-only heuristic"
     },
     {
       "operator": "`rep`",

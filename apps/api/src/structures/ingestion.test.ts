@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { readFileSync } from "node:fs";
 import { StructureIngestionService } from "./ingestion.js";
 
 const pdbFixture = `HEADER    TEST\nATOM      1  CA  ALA A   1       1.000   2.000   3.000  1.00 20.00           C\nHETATM    2  C1  LIG A 101       4.000   5.000   6.000  1.00 20.00           C\nHETATM    3  O   HOH A 201       7.000   8.000   9.000  1.00 20.00           O\nEND\n`;
@@ -65,6 +66,25 @@ describe("VIS-01 structure ingestion", () => {
     expect(result.structure.peptideSequenceDataset).toMatchObject({ profileVersion: "canonical-peptide-sequence-v1", chains: { "chain:A": { sequence: "A" } } });
     expect(result.structure.scientificHash).toHaveLength(64);
     expect(result.renderSource.content).toBe(pdbFixture);
+  });
+
+  it("promotes the bounded pinned-PyMOL chemistry role dataset only when canonical topology is available", async () => {
+    const result = await new StructureIngestionService().ingestLocal("mini-protein.pdb", readFileSync(new URL("../../../../tests/fixtures/mini-protein.pdb", import.meta.url)));
+    const dataset = result.structure.chemistryDataset;
+    expect(dataset).toMatchObject({
+      profileVersion: "canonical-chemistry-roles-v1",
+      provenance: expect.stringContaining("5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69"),
+    });
+    expect(dataset?.molecularRevision).toBe(result.structure.scientificHash);
+    expect(dataset?.donorAtomIds).toHaveLength(7);
+    expect(dataset?.acceptorAtomIds).toHaveLength(4);
+    expect(dataset?.donorAtomIds.map((id) => result.structure.atoms.find((atom) => atom.stableId === id)?.serial)).toEqual([1, 4, 5, 8, 10, 11, 12]);
+    expect(dataset?.acceptorAtomIds.map((id) => result.structure.atoms.find((atom) => atom.stableId === id)?.serial)).toEqual([4, 8, 10, 11]);
+  });
+
+  it("fails closed for chemistry roles when a non-solvent atom has no canonical bond topology", async () => {
+    const result = await new StructureIngestionService().ingestLocal("sample.pdb", Buffer.from(pdbFixture));
+    expect(result.structure.chemistryDataset).toBeUndefined();
   });
 
   it("parses the admitted mmCIF atom site loop", async () => {

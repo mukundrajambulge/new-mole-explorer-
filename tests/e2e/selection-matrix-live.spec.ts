@@ -11,6 +11,8 @@ const expectedCounts = new Map<string, number>([
   ["enabled", 12],
   ["present", 12],
   ["visible", 11],
+  ["donors", 7],
+  ["acceptors", 4],
   ["polymer.nucleic", 0],
   ["name CA", 2],
   ["%active_site", 11],
@@ -88,7 +90,7 @@ const expectedSemanticStatus = (value: string): string => {
   if (query === "byfragment ligand") return "MISSING_DEPENDENCY";
   if (/^byring\b/.test(query)) return "VALID_EMPTY";
   if (/^(segi|bysegi|bycell)\b/.test(query)) return "UNSUPPORTED_OPERATOR_OR_PROFILE";
-  if (/^(donors|acceptors)\b/.test(query)) return "MISSING_DEPENDENCY";
+  if (/^(donors|acceptors)\b/.test(query)) return "VALID_NONEMPTY";
   if (query === "gap 0 ligand" || query === "gap 4 ligand") return query === "gap 4 ligand" ? "VALID_EMPTY" : "VALID_NONEMPTY";
   if (/^(partial_charge|polymer\.nucleic)\b/.test(query) || query === "label foo") return "MISSING_DEPENDENCY";
   if (query === "pepseq ag") return "VALID_NONEMPTY";
@@ -136,7 +138,7 @@ test("representative selection families run through the real console input", asy
   const queries = [
     "select active_site, chain A",
     "all within 4 of ligand", "all around 4 of ligand", "all near_to 4 of ligand", "all beyond 4 of ligand",
-    "all", "*", "everything", "none", "enabled", "present", "visible", "polymer.nucleic", "name CA", "%active_site", "?missing", "active_site", "groupA", "not water", "!water", "chain A and protein", "chain A & protein", "ligand or water", "ligand | water", "(chain A or chain B) and name CA", "chain A protein", "first all", "last all", "model mini-protein.pdb", "object mini-protein.pdb", "chain A", "segi A", "resn ALA", "resi 1", "alt A", "index 2", "id 2", "rank 0", "name != CA", "label all, {name}", "select label CA", "pepseq AG", "pepseq 10", "name CA in chain A", "name like CA", "(chain A and name CA) like (chain A and name CA)", "byobject chain A", "bysegi chain A", "bychain ligand", "byres name CA", "bycalpha name CA", "bymolecule ligand", "byfragment ligand", "byring ligand", "bycell chain A", "neighbor ligand", "bound_to ligand", "extend 1 ligand", "within 4 of ligand", "around 4 of ligand", "expand 4 ligand", "near_to ligand", "beyond 4 ligand", "gap 0 ligand", "gap 4 ligand", "formal_charge = 0", "partial_charge > 0", "b > 20", "q >= 0.5", "ss HELIX", "elem C", "x < 2", "x <= 2", "y >= 0", "z <= 100", "state 2", "foo = bar", "rep cartoon", "color red", "select color red", "show sticks, all", "hide sticks, all", "center all", "zoom all", "measure distance", "measure clear", "get_view", "set cartoon_color, red, polymer", "cartoon_color red", "ribbon_color red",
+    "all", "*", "everything", "none", "enabled", "present", "visible", "donors", "acceptors", "polymer.nucleic", "name CA", "%active_site", "?missing", "active_site", "groupA", "not water", "!water", "chain A and protein", "chain A & protein", "ligand or water", "ligand | water", "(chain A or chain B) and name CA", "chain A protein", "first all", "last all", "model mini-protein.pdb", "object mini-protein.pdb", "chain A", "segi A", "resn ALA", "resi 1", "alt A", "index 2", "id 2", "rank 0", "name != CA", "label all, {name}", "select label CA", "pepseq AG", "pepseq 10", "name CA in chain A", "name like CA", "(chain A and name CA) like (chain A and name CA)", "byobject chain A", "bysegi chain A", "bychain ligand", "byres name CA", "bycalpha name CA", "bymolecule ligand", "byfragment ligand", "byring ligand", "bycell chain A", "neighbor ligand", "bound_to ligand", "extend 1 ligand", "within 4 of ligand", "around 4 of ligand", "expand 4 ligand", "near_to ligand", "beyond 4 ligand", "gap 0 ligand", "gap 4 ligand", "formal_charge = 0", "partial_charge > 0", "b > 20", "q >= 0.5", "ss HELIX", "elem C", "x < 2", "x <= 2", "y >= 0", "z <= 100", "state 2", "foo = bar", "rep cartoon", "color red", "select color red", "show sticks, all", "hide sticks, all", "center all", "zoom all", "measure distance", "measure clear", "get_view", "set cartoon_color, red, polymer", "cartoon_color red", "ribbon_color red",
   ];
   const evidence: Array<Record<string, unknown>> = [];
 

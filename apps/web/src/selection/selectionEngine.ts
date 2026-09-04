@@ -361,7 +361,10 @@ const wildcardMatch = (value: string, pattern: string): boolean => {
   return new RegExp(`^${escaped}$`, "i").test(value);
 };
 const residueParts = (value: string): { number: number; insertion: string } | null => { const match = value.match(/^(-?\d+)([A-Za-z]?)$/); return match ? { number: Number(match[1]), insertion: match[2].toUpperCase() } : null; };
-const residueIdFor = (atom: CanonicalAtom): string => `${atom.workspaceObjectId ? `${atom.workspaceObjectId}::` : ""}chain:${atom.chain}:residue:${atom.residueNumber}:${atom.insertionCode ?? ""}`;
+const residueIdFor = (atom: CanonicalAtom): string => {
+  const scoped = atom.workspaceObjectId && atom.stableId.startsWith(`${atom.workspaceObjectId}::`);
+  return `${scoped ? `${atom.workspaceObjectId}::` : ""}chain:${atom.chain}:residue:${atom.residueNumber}:${atom.insertionCode ?? ""}`;
+};
 const peptideSelectionAtomIdsFor = (value: string, structure: CanonicalMolecularStructure, context: EvalContext): Set<string> => {
   const cached = context.peptideSelectionMatches.get(value);
   if (cached) return cached;

@@ -19,6 +19,7 @@ import type {
   StructureSourceKind,
   RemoteStructureProvider,
 } from "@molecular/contracts";
+import { inferCanonicalChemistryRoles } from "./chemistryRoles.js";
 
 export const MAX_STRUCTURE_BYTES = 25 * 1024 * 1024;
 export const INGESTION_PARSER_PROFILE = "molecular-workstation-g1b-canonical-v1";
@@ -629,7 +630,8 @@ export class StructureIngestionService {
       units: "e",
       provenance: "Copied from source _chem_comp_atom.partial_charge; no charge inference performed",
     } : undefined;
-    const scientificPayload = { atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder, unitCell: parsed.unitCell ?? null, polymerTypingSource: parsed.polymerTypingSource ?? null, partialChargeValues: hasCompleteSourceCharges ? sourceChargeMap : null, peptideSequenceChains };
+    const chemistryRoles = inferCanonicalChemistryRoles(atoms, bonds);
+    const scientificPayload = { atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder, unitCell: parsed.unitCell ?? null, polymerTypingSource: parsed.polymerTypingSource ?? null, partialChargeValues: hasCompleteSourceCharges ? sourceChargeMap : null, chemistryRoles: chemistryRoles ? { donorAtomIds: chemistryRoles.donorAtomIds, acceptorAtomIds: chemistryRoles.acceptorAtomIds } : null, peptideSequenceChains };
     const scientificHash = createHash("sha256").update(JSON.stringify(scientificPayload)).digest("hex");
     const structure: CanonicalMolecularStructure = {
       id: `structure_${hash.slice(0, 16)}`,
@@ -646,6 +648,7 @@ export class StructureIngestionService {
       ...(parsed.polymerTypingSource ? { polymerTypingSource: parsed.polymerTypingSource } : {}),
       ...(parsed.secondaryStructureSource ? { secondaryStructureDataset: { datasetId: `${hash.slice(0, 16)}:secondary-structure`, molecularRevision: scientificHash, assignmentSource: parsed.secondaryStructureSource, profileVersion: "pdb-mmcif-structural-records-v1" } } : {}),
       ...(partialChargeDataset ? { partialChargeDataset: { ...partialChargeDataset, molecularRevision: scientificHash } } : {}),
+      ...(chemistryRoles ? { chemistryDataset: { datasetId: `${hash.slice(0, 16)}:chemistry-roles`, molecularRevision: scientificHash, profileVersion: "canonical-chemistry-roles-v1" as const, donorAtomIds: chemistryRoles.donorAtomIds, acceptorAtomIds: chemistryRoles.acceptorAtomIds, provenance: chemistryRoles.provenance } } : {}),
       peptideSequenceDataset: { datasetId: `${hash.slice(0, 16)}:peptide-sequence`, molecularRevision: scientificHash, assignmentSource: "canonical polymer residue names mapped to one-letter amino-acid codes", profileVersion: "canonical-peptide-sequence-v1", chains: peptideSequenceChains },
       ...summary,
     };

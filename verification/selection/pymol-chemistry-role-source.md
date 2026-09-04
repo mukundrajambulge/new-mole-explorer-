@@ -1,8 +1,9 @@
 # Pinned PyMOL chemistry-role source evidence
 
-This note records why `donors` and `acceptors` remain a canonical-data gate in
-the selection closure matrix. It is an evidence artifact, not an application
-chemistry implementation.
+This note records the pinned source semantics and the bounded canonical
+producer used for `donors` and `acceptors` in the selection closure matrix. It
+is an evidence artifact for the admitted compatibility profile; it does not
+claim full PyMOL chemistry perception or general cheminformatics parity.
 
 ## Pinned selector path
 
@@ -35,26 +36,38 @@ revision and must carry provenance. Its producer must establish, at minimum:
 
 The application contract is therefore intentionally strict:
 `canonical-chemistry-roles-v1` is accepted only when both role sets are
-complete, revision-matched, and provenance-bearing. Missing or stale data
-returns `MISSING_DEPENDENCY`; no renderer state or fallback element heuristic
-is promoted to scientific state.
+revision-matched and provenance-bearing. The backend producer in
+`apps/api/src/structures/chemistryRoles.ts` ports the bounded pinned sequence
+of geometry, bond, valence, charge, and hydrogen-state inference. It runs on
+canonical atoms and bonds before the load result is returned; the viewer is
+never consulted. Missing or stale data returns `MISSING_DEPENDENCY`; no
+renderer state or element-only fallback is promoted to scientific state.
 
-## Gap in the admitted PDB/mmCIF ingestion
+The producer fails closed when the admitted input contains an unknown element,
+an explicitly unknown formal charge, an unknown bond order, or a disconnected
+non-water/non-ion atom. An absent formal charge follows the pinned profile's
+zero default and is recorded in the dataset provenance. The role dataset is
+bound to the resulting scientific revision and is covered by the mini-fixture
+oracle: donor serials `[1, 4, 5, 8, 10, 11, 12]` and acceptor serials
+`[4, 8, 10, 11]`.
+
+## Remaining admitted-input boundary
 
 The current PDB/mmCIF ingestion preserves source atom identity, coordinates,
-formal charge where supplied, and admitted topology records. It does not
-produce the complete chemistry-perception inputs or role assignments required
-by the pinned algorithm. The official wwPDB dictionary lists the available
-`chem_comp_atom` fields (including charge and partial charge) but no complete
-per-atom donor/acceptor role fields:
+formal charge where supplied, and admitted topology records. The bounded role
+producer is promoted only when those canonical topology and geometry inputs
+are sufficient. Sources without sufficient inputs remain fail-closed rather
+than receiving guessed roles. The official wwPDB dictionary lists the
+available `chem_comp_atom` fields (including charge and partial charge) but no
+complete per-atom donor/acceptor role fields:
 
 - [`chem_comp_atom` category](https://mmcif.rcsb.org/dictionaries/mmcif_pdbx_v50.dic/Categories/chem_comp_atom.html)
 - [`pdbx_struct_chem_comp_feature` category](https://mmcif.rcsb.org/dictionaries/mmcif_pdbx_v40.dic/Categories/pdbx_struct_chem_comp_feature.html), which is not a complete atom-role assignment category
 
-Adding a rule-based fallback would silently choose a chemistry profile and
-could disagree with the pinned PyMOL behavior for resonance, protonation,
-tautomer, and incomplete-topology cases. That remains out of scope until the
-chemistry-perception profile is accepted and supplied with positive oracle
+This implementation is deliberately a bounded PyMOL compatibility profile.
+It does not infer missing bonds, protonation, tautomer state, resonance, or
+unknown component chemistry, and it is not a substitute for a complete
+cheminformatics perception engine. Broader chemistry claims remain out of
+scope until a separately accepted profile is supplied with positive oracle
 fixtures for benzene, pyridine, pyrrole, amide, carboxylate, protonated amine,
 and unknown components.
-

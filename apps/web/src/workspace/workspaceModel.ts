@@ -515,13 +515,16 @@ export const workspaceSelectionStructure = (objects: readonly WorkspaceObject[])
   const bounds = points.reduce((current, atom) => ({ min: { x: Math.min(current.min.x, atom.x), y: Math.min(current.min.y, atom.y), z: Math.min(current.min.z, atom.z) }, max: { x: Math.max(current.max.x, atom.x), y: Math.max(current.max.y, atom.y), z: Math.max(current.max.z, atom.z) } }), { min: { x: points[0]!.x, y: points[0]!.y, z: points[0]!.z }, max: { x: points[0]!.x, y: points[0]!.y, z: points[0]!.z } });
   const typingComplete = scoped.every((object) => Boolean(object.loadResult.structure.polymerTypingSource) && object.loadResult.structure.atoms.filter((atom) => atom.isPolymer).every((atom) => atom.polymerType !== undefined));
   const polymerTypingSource = typingComplete ? scoped.map((object) => `${object.objectId}: ${object.loadResult.structure.polymerTypingSource}`).join("; ") : undefined;
-  const peptideSequenceDataset = workspacePeptideSequenceDatasetFor(scoped);
-  const chemistryDataset = workspaceChemistryDatasetFor(scoped);
-  const fragmentDataset = workspaceFragmentDatasetFor(scoped);
+  // A single object remains in its canonical ID namespace.  The derived
+  // workspace datasets below intentionally scope IDs only when combining
+  // multiple independent objects.
+  const peptideSequenceDataset = namespaceIds ? workspacePeptideSequenceDatasetFor(scoped) : first.peptideSequenceDataset;
+  const chemistryDataset = namespaceIds ? workspaceChemistryDatasetFor(scoped) : first.chemistryDataset;
+  const fragmentDataset = namespaceIds ? workspaceFragmentDatasetFor(scoped) : first.fragmentDataset;
   const firstWithoutTyping = { ...first };
   delete firstWithoutTyping.polymerTypingSource;
-  delete firstWithoutTyping.peptideSequenceDataset;
   if (namespaceIds) {
+    delete firstWithoutTyping.peptideSequenceDataset;
     delete firstWithoutTyping.unitCell;
     delete firstWithoutTyping.chemistryDataset;
     delete firstWithoutTyping.fragmentDataset;
