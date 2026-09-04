@@ -12,6 +12,7 @@ import type {
   StructureLoadResult,
 } from "@molecular/contracts";
 import type { SelectionResult } from "../selection/selectionEngine";
+import type { PickResult } from "../interaction/picking";
 
 export type ScientificDomain = "TOPOLOGY" | "COORDINATES" | "CHEMISTRY" | "IDENTITY" | "NAMESPACE" | "PRESENTATION";
 
@@ -70,11 +71,58 @@ export type ScientificProvenanceRecord = {
   requestedAt: string;
   actor?: string;
   metadata?: Readonly<Record<string, string>>;
+  chemistryValidation?: ChemistryValidationResult;
+  hydrogenAdditionPolicy?: HydrogenAdditionPolicy;
+  selectionResultIds?: readonly string[];
+  pickResultIds?: readonly string[];
+  attachmentGeometry?: {
+    element: string;
+    bondOrder: BondOrder;
+    requestedValence?: number;
+    geometryProfile?: string;
+    placement: "EXPLICIT" | "DETERMINISTIC";
+  };
+};
+
+/** Structured result of the bounded chemistry kernel.  No chemistry edit is
+ * published unless the status is VALID. */
+export type ChemistryValidationStatus = "VALID" | "INVALID" | "AMBIGUOUS" | "UNSUPPORTED" | "NOT_VALIDATED";
+
+export type ChemistryValidationResult = {
+  status: ChemistryValidationStatus;
+  code?: EditFailureCode;
+  message: string;
+  valenceModelVersion: string;
+  aromaticityPerceptionVersion: string;
+  coordinatePlacementAlgorithmVersion?: string;
+  diagnostics?: readonly string[];
+};
+
+export type HydrogenAdditionPolicy = {
+  policyId: string;
+  implementation: string;
+  implementationVersion: string;
+  compatibilityProfile: string;
+  targetRevisionId: string;
+  targetSelectionResultId?: string;
+  targetPickResultId?: string;
+  stateScope: EditStateSelector;
+  valenceModelVersion: string;
+  aromaticityPerceptionState: string;
+  aromaticityPerceptionVersion: string;
+  formalChargePolicy: string;
+  stereochemistryPolicy: string;
+  coordinatePlacementAlgorithm: string;
+  coordinatePlacementAlgorithmVersion: string;
+  unsupportedChemistryPolicy: "FAIL_CLOSED";
+  legacyMode?: string;
 };
 
 export type ScientificEditCommand = CanonicalEditCommand & {
   /** The full immutable selection evidence is carried alongside its compact target reference. */
   selectionResult?: SelectionResult;
+  /** Optional renderer pick evidence.  It is validated against the base revision before use. */
+  pickResult?: PickResult;
 };
 
 export type ScientificRevision = {
@@ -93,6 +141,8 @@ export type ScientificRevision = {
   identityTransition: IdentityTransition;
   entityLineage: readonly EntityLineageRecord[];
   provenance: ScientificProvenanceRecord;
+  chemistryValidation?: ChemistryValidationResult;
+  hydrogenAdditionPolicy?: HydrogenAdditionPolicy;
   stateOrder: readonly string[];
   currentStateId: string;
   sequence: number;
@@ -147,8 +197,16 @@ export type EditFailureCode =
   | "DUPLICATE_BOND"
   | "BOND_NOT_FOUND"
   | "UNSUPPORTED_BOND_ORDER"
+  | "CHEMISTRY_INVALID"
   | "CHEMISTRY_AMBIGUOUS"
-  | "CHEMISTRY_UNSUPPORTED";
+  | "CHEMISTRY_UNSUPPORTED"
+  | "HYDROGEN_ADDITION_UNSUPPORTED"
+  | "STATE_SCOPE_INVALID"
+  | "LINEAGE_UNRESOLVED"
+  | "TRANSACTION_FAILED_ROLLED_BACK"
+  | "STALE_RENDERER_GENERATION"
+  | "STALE_PICK"
+  | "RETIRED_IDENTITY";
 
 export type EditFailure = {
   ok: false;
@@ -174,6 +232,8 @@ export type EditSuccess = {
   entityLineage: readonly EntityLineageRecord[];
   provenanceRecordId: string;
   diagnostics: readonly string[];
+  chemistryValidation?: ChemistryValidationResult;
+  hydrogenAdditionPolicy?: HydrogenAdditionPolicy;
 };
 
 export type EditResult = EditSuccess | EditFailure;
@@ -535,6 +595,51 @@ export const createDeleteBondCommand = (input: Omit<TopologyCommandInput, "param
 
 export const createReplaceBondSemanticsCommand = (input: Omit<TopologyCommandInput, "parameters"> & { order: Exclude<BondOrder, "UNKNOWN">; bondId?: string; objectIds?: readonly string[] }): ScientificEditCommand => createTopologyCommand({ ...input, parameters: { order: input.order, ...(input.bondId ? { bondId: input.bondId } : {}) } }, "EDIT_REPLACE_BOND_SEMANTICS");
 
+type ChemistryCommandInput = {
+  objectId: string;
+  baseRevisionId: string;
+  selectionResult?: SelectionResult;
+  pickResult?: PickResult;
+  atomIds?: readonly string[];
+  bondIds?: readonly string[];
+  origin: CanonicalEditCommand["origin"];
+  provenance?: Partial<CanonicalEditCommand["provenance"]>;
+  commandId?: string;
+  stateScope?: EditStateSelector;
+  parameters?: Readonly<Record<string, unknown>>;
+};
+
+const createChemistryCommand = (input: ChemistryCommandInput, operation: Extract<EditOperationKind, "EDIT_ADD_HYDROGENS" | "EDIT_REFILL_HYDROGENS" | "EDIT_REMOVE_HYDROGENS" | "EDIT_REPLACE_ATOM" | "EDIT_ADD_ATOM_AND_BOND">): ScientificEditCommand => {
+  const pick = input.pickResult;
+  const atomIds = input.atomIds ?? input.selectionResult?.stableAtomIds ?? (pick?.pickKind === "ATOM" ? [pick.atomRef.stableAtomId] : pick?.pickKind === "BOND" ? [...pick.bondRef.endpoints] : []);
+  const bondIds = input.bondIds ?? (pick?.pickKind === "BOND" ? [pick.bondRef.bondId] : []);
+  const stateScope = input.stateScope ?? { kind: "ALL" as const };
+  const target = { objectId: input.objectId, atomIds: [...atomIds], ...(bondIds.length ? { bondIds: [...bondIds] } : {}), ...(input.selectionResult ? { selectionResultId: input.selectionResult.resultId } : {}), ...(pick ? { pickId: pick.pickId } : {}) };
+  const parameters = { ...(input.parameters ?? {}) };
+  const fingerprint = { operation, objectId: input.objectId, baseRevisionId: input.baseRevisionId, stateScope, target, parameters };
+  return {
+    schemaVersion: 1,
+    commandId: input.commandId ?? `command:${stableHash(fingerprint)}`,
+    operation,
+    objectId: input.objectId,
+    baseRevisionId: input.baseRevisionId,
+    stateScope,
+    target,
+    parameters,
+    origin: input.origin,
+    provenance: { producerId: "molecular-workstation.r07.b3", producerVersion: "1", requestedAt: new Date().toISOString(), ...input.provenance },
+    ...(input.selectionResult ? { selectionResult: input.selectionResult } : {}),
+    ...(pick ? { pickResult: pick } : {}),
+  };
+};
+
+export const createAddHydrogensCommand = (input: ChemistryCommandInput): ScientificEditCommand => createChemistryCommand(input, "EDIT_ADD_HYDROGENS");
+export const createRefillHydrogensCommand = (input: ChemistryCommandInput): ScientificEditCommand => createChemistryCommand(input, "EDIT_REFILL_HYDROGENS");
+export const createRemoveHydrogensCommand = (input: ChemistryCommandInput): ScientificEditCommand => createChemistryCommand(input, "EDIT_REMOVE_HYDROGENS");
+export const createAttachAtomCommand = (input: ChemistryCommandInput & { element: string; coordinate?: Coordinate3D; bondOrder?: Exclude<BondOrder, "UNKNOWN">; valence?: number; geometry?: string }): ScientificEditCommand => createChemistryCommand({ ...input, parameters: { ...(input.parameters ?? {}), element: input.element, ...(input.coordinate ? { coordinate: input.coordinate } : {}), ...(input.bondOrder ? { bondOrder: input.bondOrder } : {}), ...(input.valence !== undefined ? { valence: input.valence } : {}), ...(input.geometry ? { geometry: input.geometry } : {}) } }, "EDIT_ADD_ATOM_AND_BOND");
+export const createAddAtomAndBondCommand = createAttachAtomCommand;
+export const createReplaceAtomCommand = (input: ChemistryCommandInput & { element: string; formalCharge?: number | null; hFill?: boolean; atomName?: string }): ScientificEditCommand => createChemistryCommand({ ...input, parameters: { ...(input.parameters ?? {}), element: input.element, ...(input.formalCharge !== undefined ? { formalCharge: input.formalCharge } : {}), ...(input.hFill !== undefined ? { hFill: input.hFill } : {}), ...(input.atomName ? { atomName: input.atomName } : {}) } }, "EDIT_REPLACE_ATOM");
+
 const topologyOperations = new Set<EditOperationKind>(["EDIT_DELETE_ATOMS", "EDIT_ADD_BOND", "EDIT_DELETE_BOND", "EDIT_REPLACE_BOND_SEMANTICS"]);
 const supportedBondOrders = new Set<Exclude<BondOrder, "UNKNOWN">>(["SINGLE", "DOUBLE", "TRIPLE", "AROMATIC"]);
 const bondWeight = (order: BondOrder): number => order === "DOUBLE" ? 2 : order === "TRIPLE" ? 3 : order === "AROMATIC" ? 1.5 : 1;
@@ -558,11 +663,125 @@ const commandOrder = (command: ScientificEditCommand): BondOrder | null => {
 };
 const objectIdsForCommand = (command: ScientificEditCommand): readonly string[] => command.target.objectIds ?? [command.objectId];
 
+const chemistryValenceModelVersion = "explicit-valence-v1";
+const chemistryAromaticityVersion = "declared-aromaticity-perception-v1";
+const chemistryPlacementVersion = "deterministic-local-frame-v1";
+const normalizedElement = (value: string): string => value.trim().toUpperCase();
+const hydrogenElement = (atom: CanonicalAtom): boolean => normalizedElement(atom.element) === "H";
+const supportedHydrogenTargetElements = new Set(["C", "N", "O", "S", "P"]);
+const supportedAttachedElements = new Set(["H", "C", "N", "O", "F", "CL", "BR", "I", "S", "P"]);
+
+const bondValenceFor = (order: BondOrder): number => order === "DOUBLE" ? 2 : order === "TRIPLE" ? 3 : order === "AROMATIC" ? 1.5 : 1;
+const usedValenceFor = (atomId: string, bonds: readonly CanonicalBond[]): number => bonds.filter((bond) => bond.atom1 === atomId || bond.atom2 === atomId).reduce((sum, bond) => sum + bondValenceFor(bond.order), 0);
+const neighborsFor = (atomId: string, bonds: readonly CanonicalBond[]): string[] => bonds.flatMap((bond) => bond.atom1 === atomId ? [bond.atom2] : bond.atom2 === atomId ? [bond.atom1] : []);
+
+const hydrogenValenceTargetFor = (atom: CanonicalAtom): number | null => {
+  const element = normalizedElement(atom.element);
+  if (element === "C") return 4;
+  if (element === "N") return atom.formalCharge === 1 ? 4 : atom.formalCharge === -1 ? 2 : 3;
+  if (element === "O") return atom.formalCharge === -1 ? 1 : atom.formalCharge === 1 ? 3 : 2;
+  if (element === "F" || element === "CL" || element === "BR" || element === "I") return 1;
+  return null;
+};
+
+const carboxylateLike = (atom: CanonicalAtom, structure: CanonicalMolecularStructure): boolean => {
+  if (normalizedElement(atom.element) !== "O" || (atom.formalCharge ?? 0) >= 0) return false;
+  const attachedCarbon = structure.bonds.find((bond) => (bond.atom1 === atom.stableId || bond.atom2 === atom.stableId) && normalizedElement((structure.atoms.find((candidate) => candidate.stableId === (bond.atom1 === atom.stableId ? bond.atom2 : bond.atom1))?.element ?? "")) === "C");
+  if (!attachedCarbon) return false;
+  const carbonId = attachedCarbon.atom1 === atom.stableId ? attachedCarbon.atom2 : attachedCarbon.atom1;
+  return structure.bonds.some((bond) => (bond.atom1 === carbonId || bond.atom2 === carbonId) && bond.order === "DOUBLE" && bond.id !== attachedCarbon.id);
+};
+
+type HydrogenPlan = { counts: Readonly<Record<string, number>>; validation: ChemistryValidationResult };
+
+const hydrogenPlanFor = (structure: CanonicalMolecularStructure, targetIds: readonly string[], bonds = structure.bonds): HydrogenPlan => {
+  const atomById = new Map(structure.atoms.map((atom) => [atom.stableId, atom]));
+  const counts: Record<string, number> = {};
+  const diagnostics: string[] = [];
+  for (const targetId of targetIds) {
+    const atom = atomById.get(targetId);
+    if (!atom) return { counts, validation: { status: "INVALID", code: "TARGET_NOT_FOUND", message: `AtomUID ${targetId} is not present in the candidate structure.`, valenceModelVersion: chemistryValenceModelVersion, aromaticityPerceptionVersion: chemistryAromaticityVersion } };
+    const element = normalizedElement(atom.element);
+    if (hydrogenElement(atom) || !supportedHydrogenTargetElements.has(element)) return { counts, validation: { status: "UNSUPPORTED", code: "HYDROGEN_ADDITION_UNSUPPORTED", message: `Hydrogen addition for element ${element} is outside the bounded R07-B3 chemistry profile.`, valenceModelVersion: chemistryValenceModelVersion, aromaticityPerceptionVersion: chemistryAromaticityVersion } };
+    if (carboxylateLike(atom, { ...structure, bonds } as CanonicalMolecularStructure)) return { counts, validation: { status: "AMBIGUOUS", code: "CHEMISTRY_AMBIGUOUS", message: `Protonation of negatively charged carboxylate-like AtomUID ${targetId} is ambiguous; no hydrogen was added.`, valenceModelVersion: chemistryValenceModelVersion, aromaticityPerceptionVersion: chemistryAromaticityVersion } };
+    const targetValence = hydrogenValenceTargetFor(atom);
+    if (targetValence === null) return { counts, validation: { status: "UNSUPPORTED", code: "CHEMISTRY_UNSUPPORTED", message: `No admitted valence model is available for ${element}.`, valenceModelVersion: chemistryValenceModelVersion, aromaticityPerceptionVersion: chemistryAromaticityVersion } };
+    const usedValence = usedValenceFor(targetId, bonds);
+    const remaining = targetValence - usedValence;
+    if (remaining < -0.0001) return { counts, validation: { status: "INVALID", code: "CHEMISTRY_INVALID", message: `AtomUID ${targetId} exceeds the explicit valence target for ${element}.`, valenceModelVersion: chemistryValenceModelVersion, aromaticityPerceptionVersion: chemistryAromaticityVersion } };
+    if (Math.abs(remaining - Math.round(remaining)) > 0.0001) return { counts, validation: { status: "AMBIGUOUS", code: "CHEMISTRY_AMBIGUOUS", message: `Aromatic/partial valence around AtomUID ${targetId} does not resolve to an integer hydrogen count.`, valenceModelVersion: chemistryValenceModelVersion, aromaticityPerceptionVersion: chemistryAromaticityVersion } };
+    counts[targetId] = Math.max(0, Math.round(remaining));
+    diagnostics.push(`${targetId}: ${counts[targetId]} H`);
+  }
+  return { counts, validation: { status: "VALID", message: diagnostics.length ? `Hydrogen plan validated (${diagnostics.join(", ")}).` : "Hydrogen plan is empty.", valenceModelVersion: chemistryValenceModelVersion, aromaticityPerceptionVersion: chemistryAromaticityVersion, coordinatePlacementAlgorithmVersion: chemistryPlacementVersion, diagnostics } };
+};
+
+const vectorLength = (vector: Coordinate3D): number => Math.sqrt(vector.x ** 2 + vector.y ** 2 + vector.z ** 2);
+const normalizedVector = (vector: Coordinate3D): Coordinate3D => {
+  const length = vectorLength(vector);
+  return length > 0.000001 ? { x: vector.x / length, y: vector.y / length, z: vector.z / length } : { x: 1, y: 0, z: 0 };
+};
+const crossProduct = (left: Coordinate3D, right: Coordinate3D): Coordinate3D => ({ x: left.y * right.z - left.z * right.y, y: left.z * right.x - left.x * right.z, z: left.x * right.y - left.y * right.x });
+const coordinateForStateId = (state: CanonicalCoordinateState, atom: CanonicalAtom): Coordinate3D => coordinateFor(state, atom);
+
+const deterministicHydrogenCoordinate = (parent: CanonicalAtom, state: CanonicalCoordinateState, structure: CanonicalMolecularStructure, index: number, bonds = structure.bonds): Coordinate3D => {
+  const origin = coordinateForStateId(state, parent);
+  const neighborIds = neighborsFor(parent.stableId, bonds).filter((id) => !hydrogenElement(structure.atoms.find((atom) => atom.stableId === id) ?? parent));
+  const neighborVector = neighborIds.reduce((sum, neighborId) => {
+    const neighbor = structure.atoms.find((atom) => atom.stableId === neighborId);
+    if (!neighbor) return sum;
+    const coordinate = coordinateForStateId(state, neighbor);
+    return { x: sum.x + coordinate.x - origin.x, y: sum.y + coordinate.y - origin.y, z: sum.z + coordinate.z - origin.z };
+  }, { x: 0, y: 0, z: 0 });
+  const primary = normalizedVector({ x: -neighborVector.x || 1, y: -neighborVector.y, z: -neighborVector.z });
+  const basis = Math.abs(primary.x) < 0.8 ? { x: 1, y: 0, z: 0 } : { x: 0, y: 1, z: 0 };
+  const perpendicular = normalizedVector(crossProduct(primary, basis));
+  const secondPerpendicular = normalizedVector(crossProduct(primary, perpendicular));
+  const angle = index * 2.399963229728653;
+  const direction = normalizedVector({ x: primary.x * 0.82 + perpendicular.x * 0.42 * Math.cos(angle) + secondPerpendicular.x * 0.42 * Math.sin(angle), y: primary.y * 0.82 + perpendicular.y * 0.42 * Math.cos(angle) + secondPerpendicular.y * 0.42 * Math.sin(angle), z: primary.z * 0.82 + perpendicular.z * 0.42 * Math.cos(angle) + secondPerpendicular.z * 0.42 * Math.sin(angle) });
+  return { x: origin.x + direction.x, y: origin.y + direction.y, z: origin.z + direction.z };
+};
+
+const residueIdForAtom = (hierarchy: CanonicalHierarchy, atomId: string): string | undefined => Object.keys(hierarchy.residues).find((residueId) => hierarchy.residues[residueId]?.atomIds.includes(atomId));
+const hierarchyForAdditions = (atoms: readonly CanonicalAtom[], previous: CanonicalHierarchy, additions: readonly { atomId: string; parentAtomId: string }[]): CanonicalHierarchy => {
+  const hierarchy = hierarchyFor(atoms, previous);
+  const residues = { ...hierarchy.residues };
+  for (const addition of additions) {
+    const residueId = residueIdForAtom(previous, addition.parentAtomId);
+    if (!residueId || !residues[residueId] || residues[residueId]!.atomIds.includes(addition.atomId)) continue;
+    residues[residueId] = { ...residues[residueId]!, atomIds: [...residues[residueId]!.atomIds, addition.atomId] };
+  }
+  return { ...hierarchy, residues };
+};
+
+const policyFor = (command: ScientificEditCommand, revision: ScientificRevision, targetSelectionResultId?: string): HydrogenAdditionPolicy => ({
+  policyId: "r07-b3-hydrogen-policy-v1",
+  implementation: "molecular-workstation.chemistry",
+  implementationVersion: "1.0.0",
+  compatibilityProfile: "R07_B3_BOUNDED_CHEMISTRY",
+  targetRevisionId: revision.revisionId,
+  ...(targetSelectionResultId ? { targetSelectionResultId } : {}),
+  ...(command.pickResult ? { targetPickResultId: command.pickResult.pickId } : {}),
+  stateScope: command.stateScope,
+  valenceModelVersion: chemistryValenceModelVersion,
+  aromaticityPerceptionState: "DECLARED_TOPOLOGY_ONLY",
+  aromaticityPerceptionVersion: chemistryAromaticityVersion,
+  formalChargePolicy: "PRESERVE_EXPLICIT_FORMAL_CHARGE",
+  stereochemistryPolicy: "PRESERVE_NO_REWRITE",
+  coordinatePlacementAlgorithm: "deterministic-local-frame",
+  coordinatePlacementAlgorithmVersion: chemistryPlacementVersion,
+  unsupportedChemistryPolicy: "FAIL_CLOSED",
+  legacyMode: "NO_LEGACY_INFERENCE",
+});
+
+const chemistryOperations = new Set<EditOperationKind>(["EDIT_ADD_HYDROGENS", "EDIT_REFILL_HYDROGENS", "EDIT_REMOVE_HYDROGENS", "EDIT_REPLACE_ATOM", "EDIT_ADD_ATOM_AND_BOND", "EDIT_ATTACH_FRAGMENT"]);
+
 export class EditTransaction {
   constructor(private readonly history: ObjectRevisionHistory, private readonly command: ScientificEditCommand) {}
 
   commit(): EditResult {
     if (topologyOperations.has(this.command.operation)) return this.commitTopologyEdit();
+    if (chemistryOperations.has(this.command.operation)) return this.commitChemistryEdit();
     return this.commitCoordinateEdit();
   }
 
@@ -829,6 +1048,323 @@ export class EditTransaction {
     this.history.children.set(current.revisionId, parentChildren);
     this.history.currentRevisionId = revisionId;
     return { ok: true, outcome: "COMMITTED", transactionId, objectId: this.command.objectId, baseRevisionId: current.revisionId, resultRevisionId: revisionId, revision, invalidationManifest, identityTransition: revision.identityTransition, entityLineage, provenanceRecordId: provenance.provenanceRecordId, diagnostics: [`Topology operation: ${this.command.operation}`, "All coordinate states were reconciled without cloning or fallback coordinates.", "Scientific candidate validated before publication."] };
+  }
+
+  private commitChemistryEdit(): EditResult {
+    const transactionId = makeTransactionId(this.command);
+    const current = this.history.nodes.get(this.history.currentRevisionId);
+    if (!current) return fail("HISTORY_UNAVAILABLE", `No current revision is retained for object ${this.command.objectId}.`, this.command, transactionId);
+    if (this.command.schemaVersion !== 1 || !this.command.commandId || !this.command.objectId || !this.command.baseRevisionId) return fail("INVALID_EDIT_INPUT", "A chemistry edit command requires schema, command ID, object ID and base revision.", this.command, transactionId);
+    if (this.command.objectId !== this.history.objectId || (this.command.target.objectId && this.command.target.objectId !== this.history.objectId)) return fail("REVISION_CONFLICT", `Command target object ${this.command.target.objectId ?? this.command.objectId} does not match transaction object ${this.history.objectId}.`, this.command, transactionId);
+    if (this.command.baseRevisionId !== current.revisionId) return fail("STALE_BASE_REVISION", `Expected base revision ${this.command.baseRevisionId}, but object ${this.command.objectId} is at ${current.revisionId}.`, this.command, transactionId);
+    if (objectIdsForCommand(this.command).length !== 1 || objectIdsForCommand(this.command)[0] !== this.history.objectId || (this.command.target.atomIds ?? []).some((atomId) => atomId.includes("::"))) return fail("CROSS_OBJECT_TOPOLOGY_UNSUPPORTED", "Picked chemistry edits are object-scoped; cross-object AtomUIDs are rejected atomically.", this.command, transactionId);
+
+    const baseStructure = current.loadResult.structure;
+    const selection = this.command.selectionResult;
+    if (selection) {
+      if (selection.status !== "VALID_NONEMPTY" && selection.status !== "VALID_EMPTY") return fail("INVALID_SELECTION", `Selection ${selection.resultId} is not a valid materialized selection.`, this.command, transactionId);
+      if (selection.structureId !== baseStructure.id || selection.molecularRevision !== baseStructure.scientificHash) return fail("STALE_BASE_REVISION", `Selection ${selection.resultId} is bound to a different molecular revision.`, this.command, transactionId);
+      if (this.command.target.selectionResultId !== selection.resultId) return fail("INVALID_EDIT_INPUT", "The compact selection reference does not match the supplied SelectionResult.", this.command, transactionId);
+    }
+
+    const pick = this.command.pickResult;
+    const expectedGeneration = typeof this.command.parameters.expectedRendererGeneration === "number" ? this.command.parameters.expectedRendererGeneration : typeof this.command.parameters.rendererGeneration === "number" ? this.command.parameters.rendererGeneration : undefined;
+    if (pick) {
+      if (pick.structureId !== baseStructure.id || pick.molecularRevision !== baseStructure.scientificHash || pick.coordinateContext.molecularRevision !== baseStructure.scientificHash) return fail("STALE_PICK", `Pick ${pick.pickId} is stale for revision ${current.revisionId}; re-pick the canonical target.`, this.command, transactionId);
+      if (expectedGeneration !== undefined && pick.rendererGeneration !== expectedGeneration) return fail("STALE_RENDERER_GENERATION", `Pick ${pick.pickId} was produced by renderer generation ${pick.rendererGeneration}, expected ${expectedGeneration}.`, this.command, transactionId);
+      if (pick.pickKind === "BACKGROUND") return fail("AMBIGUOUS_TARGET", "A background pick is not a chemistry edit target.", this.command, transactionId);
+      if (pick.pickKind === "ATOM" && pick.atomRef.objectId && pick.atomRef.objectId !== this.history.objectId) return fail("CROSS_OBJECT_TOPOLOGY_UNSUPPORTED", "The picked AtomUID belongs to a different workspace object.", this.command, transactionId);
+      if (pick.pickKind === "BOND" && pick.bondRef.objectId && pick.bondRef.objectId !== this.history.objectId) return fail("CROSS_OBJECT_TOPOLOGY_UNSUPPORTED", "The picked BondUID belongs to a different workspace object.", this.command, transactionId);
+    }
+
+    const targetAtomIds = [...(this.command.target.atomIds ?? selection?.stableAtomIds ?? (pick?.pickKind === "ATOM" ? [pick.atomRef.stableAtomId] : pick?.pickKind === "BOND" ? [...pick.bondRef.endpoints] : []))];
+    const targetBondIds = [...(this.command.target.bondIds ?? (pick?.pickKind === "BOND" ? [pick.bondRef.bondId] : []))];
+    if (new Set(targetAtomIds).size !== targetAtomIds.length || new Set(targetBondIds).size !== targetBondIds.length) return fail("AMBIGUOUS_TARGET", "A chemistry edit cannot contain duplicate stable AtomUID or BondUID targets.", this.command, transactionId);
+    if (selection && !sameIds(targetAtomIds, selection.stableAtomIds)) return fail("AMBIGUOUS_TARGET", "Chemistry targets must exactly match the immutable SelectionResult AtomUID membership.", this.command, transactionId);
+    if (pick?.pickKind === "ATOM" && (targetAtomIds.length !== 1 || targetAtomIds[0] !== pick.atomRef.stableAtomId)) return fail("AMBIGUOUS_TARGET", "An atom pick must identify exactly its picked AtomUID.", this.command, transactionId);
+    if (pick?.pickKind === "BOND" && (targetBondIds.length !== 1 || targetBondIds[0] !== pick.bondRef.bondId)) return fail("AMBIGUOUS_TARGET", "A bond pick must identify exactly its picked BondUID.", this.command, transactionId);
+
+    const atomById = new Map(baseStructure.atoms.map((atom) => [atom.stableId, atom]));
+    const missingAtomId = targetAtomIds.find((atomId) => !atomById.has(atomId));
+    if (missingAtomId) return fail("RETIRED_IDENTITY", `Stable AtomUID ${missingAtomId} is not present in retained revision ${current.revisionId}; the identity may be retired.`, this.command, transactionId);
+    const bondById = new Map(baseStructure.bonds.map((bond) => [bond.id, bond]));
+    const missingBondId = targetBondIds.find((bondId) => !bondById.has(bondId));
+    if (missingBondId) return fail("RETIRED_IDENTITY", `Stable BondUID ${missingBondId} is not present in retained revision ${current.revisionId}; the identity may be retired.`, this.command, transactionId);
+
+    const states = stateForStructure(baseStructure);
+    const stateResolution = resolveStateIds(current, this.command.stateScope);
+    if ("code" in stateResolution) return fail(stateResolution.code, stateResolution.message, this.command, transactionId);
+    if (states.length > 1 && this.command.stateScope.kind !== "ALL") return fail("STATE_SCOPE_INVALID", "Topology and chemistry identity edits on multi-state objects require explicit ALL state scope; coordinates are never cloned implicitly.", this.command, transactionId);
+    if (stateResolution.ids.length !== states.length) return fail("STATE_SCOPE_INVALID", "The chemistry candidate must cover every coordinate state in canonical state order.", this.command, transactionId);
+
+    const parameters = this.command.parameters;
+    const operation = this.command.operation;
+    const chemistryEdit = operation === "EDIT_ADD_HYDROGENS" || operation === "EDIT_REFILL_HYDROGENS";
+    const hFill = parameters.hFill === undefined ? parameters.h_fill === undefined ? operation === "EDIT_REPLACE_ATOM" : Boolean(parameters.h_fill) : Boolean(parameters.hFill);
+    const targetBond = targetBondIds.length === 1 ? bondById.get(targetBondIds[0]!) : undefined;
+    if (operation === "EDIT_REFILL_HYDROGENS" && targetBondIds.length > 1) return fail("AMBIGUOUS_TARGET", "Hydrogen refill accepts one exact picked BondUID or one exact atom selection.", this.command, transactionId);
+    if ((operation === "EDIT_REPLACE_ATOM" || operation === "EDIT_ADD_ATOM_AND_BOND" || operation === "EDIT_ATTACH_FRAGMENT") && targetAtomIds.length !== 1) return fail("AMBIGUOUS_TARGET", `${operation} requires exactly one exact parent AtomUID.`, this.command, transactionId);
+    if (chemistryEdit && !targetAtomIds.length && !targetBond) return fail("EMPTY_SELECTION", `${operation} requires an exact atom or bond target; no intermediate candidate was created.`, this.command, transactionId);
+    if (operation === "EDIT_REFILL_HYDROGENS" && targetBondIds.length === 1 && !targetBond) return fail("TARGET_NOT_FOUND", `BondUID ${targetBondIds[0]} is not present in the current revision.`, this.command, transactionId);
+
+    const localHydrogenIds = (centerIds: readonly string[], atoms = baseStructure.atoms, bonds = baseStructure.bonds): string[] => {
+      const centerSet = new Set(centerIds);
+      return atoms.filter((atom) => hydrogenElement(atom) && bonds.some((bond) => centerSet.has(bond.atom1 === atom.stableId ? bond.atom2 : bond.atom2 === atom.stableId ? bond.atom1 : ""))).map((atom) => atom.stableId);
+    };
+    const centers = operation === "EDIT_REFILL_HYDROGENS" && targetBond ? [targetBond.atom1, targetBond.atom2] : targetAtomIds;
+    const retiredAtomIds = new Set<string>();
+    const retiredBondIds = new Set<string>();
+    let candidateAtoms = baseStructure.atoms.map((atom) => ({ ...atom }));
+    let candidateBonds = baseStructure.bonds.map((bond) => ({ ...bond }));
+    const additions: Array<{ atomId: string; parentAtomId: string; coordinate?: Coordinate3D; explicit?: boolean }> = [];
+    const replacementAtoms: Array<{ sourceId: string; resultId: string }> = [];
+    const replacementBonds: Array<{ sourceId: string; resultId: string }> = [];
+    let chemistryValidation: ChemistryValidationResult | undefined;
+    let hydrogenPolicy: HydrogenAdditionPolicy | undefined;
+
+    if (operation === "EDIT_REMOVE_HYDROGENS") {
+      const removeIds = [...new Set([...targetAtomIds.filter((atomId) => hydrogenElement(atomById.get(atomId)!)), ...localHydrogenIds(targetAtomIds)])];
+      if (!removeIds.length) return fail("TRANSACTION_VALIDATION_FAILED", "No explicit hydrogen is attached to the exact target selection; no child revision was published.", this.command, transactionId);
+      removeIds.forEach((atomId) => retiredAtomIds.add(atomId));
+      baseStructure.bonds.filter((bond) => retiredAtomIds.has(bond.atom1) || retiredAtomIds.has(bond.atom2)).forEach((bond) => retiredBondIds.add(bond.id));
+      candidateAtoms = candidateAtoms.filter((atom) => !retiredAtomIds.has(atom.stableId));
+      candidateBonds = candidateBonds.filter((bond) => !retiredBondIds.has(bond.id));
+      chemistryValidation = { status: "VALID", message: `Removed ${removeIds.length} explicit hydrogen atom${removeIds.length === 1 ? "" : "s"} from the canonical target.`, valenceModelVersion: chemistryValenceModelVersion, aromaticityPerceptionVersion: chemistryAromaticityVersion };
+    } else {
+      if (operation === "EDIT_REFILL_HYDROGENS") {
+        const localIds = localHydrogenIds(centers);
+        localIds.forEach((atomId) => retiredAtomIds.add(atomId));
+        baseStructure.bonds.filter((bond) => localIds.includes(bond.atom1) || localIds.includes(bond.atom2)).forEach((bond) => retiredBondIds.add(bond.id));
+        candidateAtoms = candidateAtoms.filter((atom) => !retiredAtomIds.has(atom.stableId));
+        candidateBonds = candidateBonds.filter((bond) => !retiredBondIds.has(bond.id));
+      }
+      const hydrogenCandidate = operation === "EDIT_REFILL_HYDROGENS" ? {
+        ...baseStructure,
+        atoms: baseStructure.atoms.filter((atom) => !localHydrogenIds(centers).includes(atom.stableId)),
+        bonds: baseStructure.bonds.filter((bond) => !localHydrogenIds(centers).includes(bond.atom1) && !localHydrogenIds(centers).includes(bond.atom2)),
+      } : baseStructure;
+      const hydrogenCenters = operation === "EDIT_REFILL_HYDROGENS" ? centers : operation === "EDIT_ADD_HYDROGENS" ? targetAtomIds : [];
+      if (hydrogenCenters.some((atomId) => hydrogenElement(atomById.get(atomId)!))) return fail("HYDROGEN_ADDITION_UNSUPPORTED", "Hydrogen addition targets must be heavy atoms; select the parent atom or bond instead.", this.command, transactionId);
+      if (hydrogenCenters.length) {
+        const plan = hydrogenPlanFor(hydrogenCandidate, hydrogenCenters, hydrogenCandidate.bonds);
+        chemistryValidation = plan.validation;
+        if (plan.validation.status !== "VALID") {
+          const failureCode = plan.validation.status === "AMBIGUOUS" ? "CHEMISTRY_AMBIGUOUS" as const : plan.validation.status === "UNSUPPORTED" ? "HYDROGEN_ADDITION_UNSUPPORTED" as const : "CHEMISTRY_INVALID" as const;
+          return fail(failureCode, plan.validation.message, this.command, transactionId);
+        }
+        hydrogenPolicy = policyFor(this.command, current, selection?.resultId);
+        const stateForPlacement = states.find((state) => state.id === current.currentStateId) ?? states[0]!;
+        let hydrogenIndex = 0;
+        for (const parentId of hydrogenCenters) {
+          const parent = hydrogenCandidate.atoms.find((atom) => atom.stableId === parentId);
+          const count = plan.counts[parentId] ?? 0;
+          if (!parent) return fail("LINEAGE_UNRESOLVED", `Hydrogen parent AtomUID ${parentId} could not be resolved in the isolated candidate.`, this.command, transactionId);
+          for (let index = 0; index < count; index += 1) {
+            const atomId = `atom:${this.command.objectId}:H:${stableHash({ parentRevisionId: current.revisionId, operation, parentId, index })}`;
+            const serial = Math.max(0, ...candidateAtoms.map((atom) => atom.serial), ...additions.map((addition) => candidateAtoms.find((atom) => atom.stableId === addition.atomId)?.serial ?? 0)) + 1;
+            const placement = deterministicHydrogenCoordinate(parent, stateForPlacement, hydrogenCandidate, index, hydrogenCandidate.bonds);
+            candidateAtoms.push({ ...parent, stableId: atomId, serial, atomName: `H${index + 1}`, element: "H", x: placement.x, y: placement.y, z: placement.z, formalCharge: 0, isPolymer: parent.isPolymer, polymerType: parent.polymerType, isLigand: parent.isLigand, isWater: parent.isWater, isIon: parent.isIon });
+            const endpointPair = [parentId, atomId].sort();
+            candidateBonds.push({ id: `bond:${this.command.objectId}:H:${stableHash({ parentRevisionId: current.revisionId, operation, endpoints: endpointPair, index })}`, atom1: endpointPair[0]!, atom2: endpointPair[1]!, order: "SINGLE", source: "UNKNOWN" });
+            additions.push({ atomId, parentAtomId: parentId, coordinate: placement });
+            hydrogenIndex += 1;
+          }
+        }
+        if (hydrogenIndex === 0 && operation === "EDIT_ADD_HYDROGENS") return fail("TRANSACTION_VALIDATION_FAILED", "The exact targets already satisfy the admitted valence profile; no child revision was published.", this.command, transactionId);
+      }
+    }
+
+    const suppliedElement = typeof parameters.element === "string" ? normalizedElement(parameters.element) : null;
+    if (operation === "EDIT_ADD_ATOM_AND_BOND" || operation === "EDIT_ATTACH_FRAGMENT") {
+      if (!suppliedElement || !supportedAttachedElements.has(suppliedElement)) return fail("CHEMISTRY_UNSUPPORTED", "Attach Atom requires an explicitly supported element (H, C, N, O, F, Cl, Br, I, S, or P).", this.command, transactionId);
+      if (!targetAtomIds[0]) return fail("AMBIGUOUS_TARGET", "Attach Atom requires one exact parent AtomUID.", this.command, transactionId);
+      const parent = atomById.get(targetAtomIds[0]);
+      if (!parent) return fail("TARGET_NOT_FOUND", `Parent AtomUID ${targetAtomIds[0]} is not present.`, this.command, transactionId);
+      const order = typeof parameters.bondOrder === "string" && supportedBondOrders.has(parameters.bondOrder as Exclude<BondOrder, "UNKNOWN">) ? parameters.bondOrder as Exclude<BondOrder, "UNKNOWN"> : "SINGLE";
+      const parentValence = usedValenceFor(parent.stableId, candidateBonds) + bondValenceFor(order);
+      if (parentValence > valenceCeiling(parent.element) + 0.0001) return fail("CHEMISTRY_INVALID", `Attach Atom would exceed the explicit valence of parent AtomUID ${parent.stableId}.`, this.command, transactionId);
+      const attachedValence = bondValenceFor(order);
+      if (attachedValence > valenceCeiling(suppliedElement) + 0.0001) return fail("CHEMISTRY_INVALID", `The new ${suppliedElement} atom cannot accept the requested ${order} bond.`, this.command, transactionId);
+      const atomId = `atom:${this.command.objectId}:attached:${stableHash({ parentRevisionId: current.revisionId, parentId: parent.stableId, element: suppliedElement, order })}`;
+      const serial = Math.max(0, ...candidateAtoms.map((atom) => atom.serial)) + 1;
+      const explicitCoordinate = parameters.coordinate && validCoordinate(parameters.coordinate) ? parameters.coordinate : null;
+      if (states.length > 1 && explicitCoordinate && !(parameters.coordinatesByState && typeof parameters.coordinatesByState === "object")) return fail("STATE_SCOPE_INVALID", "Multi-state Attach Atom requires an explicit coordinate for every state or a deterministic per-state placement.", this.command, transactionId);
+      const placement = explicitCoordinate ?? deterministicHydrogenCoordinate(parent, states.find((state) => state.id === current.currentStateId) ?? states[0]!, baseStructure, 0, baseStructure.bonds);
+      candidateAtoms.push({ ...parent, stableId: atomId, serial, atomName: typeof parameters.atomName === "string" && parameters.atomName.trim() ? parameters.atomName.trim().slice(0, 4) : suppliedElement, element: suppliedElement, x: placement.x, y: placement.y, z: placement.z, formalCharge: typeof parameters.formalCharge === "number" ? parameters.formalCharge : 0 });
+      const endpoints = [parent.stableId, atomId].sort();
+      candidateBonds.push({ id: `bond:${this.command.objectId}:attached:${stableHash({ parentRevisionId: current.revisionId, endpoints, order })}`, atom1: endpoints[0]!, atom2: endpoints[1]!, order, source: "UNKNOWN" });
+      additions.push({ atomId, parentAtomId: parent.stableId, coordinate: placement, explicit: Boolean(explicitCoordinate) });
+      chemistryValidation = { status: "VALID", message: `Attached ${suppliedElement} to AtomUID ${parent.stableId} with explicit ${order} geometry/valence validation.`, valenceModelVersion: chemistryValenceModelVersion, aromaticityPerceptionVersion: chemistryAromaticityVersion, coordinatePlacementAlgorithmVersion: chemistryPlacementVersion };
+    }
+
+    if (operation === "EDIT_REPLACE_ATOM") {
+      if (!suppliedElement || !supportedAttachedElements.has(suppliedElement)) return fail("CHEMISTRY_UNSUPPORTED", "Replace Atom requires an explicitly supported replacement element.", this.command, transactionId);
+      const source = atomById.get(targetAtomIds[0]!);
+      if (!source) return fail("TARGET_NOT_FOUND", `AtomUID ${targetAtomIds[0]} is not present.`, this.command, transactionId);
+      if (suppliedElement === normalizedElement(source.element)) return fail("TRANSACTION_VALIDATION_FAILED", "Replacement element is already canonical; no child revision was published.", this.command, transactionId);
+      const replacementId = `atom:${this.command.objectId}:replacement:${stableHash({ parentRevisionId: current.revisionId, sourceId: source.stableId, element: suppliedElement })}`;
+      const serial = Math.max(0, ...candidateAtoms.map((atom) => atom.serial)) + 1;
+      const replacement = { ...source, stableId: replacementId, serial, atomName: typeof parameters.atomName === "string" && parameters.atomName.trim() ? parameters.atomName.trim().slice(0, 4) : source.atomName, element: suppliedElement, formalCharge: typeof parameters.formalCharge === "number" ? parameters.formalCharge : source.formalCharge };
+      const incident = candidateBonds.filter((bond) => bond.atom1 === source.stableId || bond.atom2 === source.stableId);
+      const oldHydrogens = incident.filter((bond) => hydrogenElement(atomById.get(bond.atom1 === source.stableId ? bond.atom2 : bond.atom1) ?? source)).map((bond) => atomById.get(bond.atom1 === source.stableId ? bond.atom2 : bond.atom1)!.stableId);
+      if (hFill) oldHydrogens.forEach((atomId) => retiredAtomIds.add(atomId));
+      const bondsToRetire = incident.filter((bond) => bond.atom1 === source.stableId || bond.atom2 === source.stableId).filter((bond) => !hFill || !oldHydrogens.includes(bond.atom1 === source.stableId ? bond.atom2 : bond.atom1));
+      const nonHydrogenValence = bondsToRetire.reduce((sum, bond) => sum + bondValenceFor(bond.order), 0);
+      if (nonHydrogenValence > valenceCeiling(suppliedElement) + 0.0001) return fail("CHEMISTRY_INVALID", `Replacement ${suppliedElement} cannot preserve the incident canonical bond valence of AtomUID ${source.stableId}.`, this.command, transactionId);
+      candidateAtoms = candidateAtoms.filter((atom) => atom.stableId !== source.stableId && !retiredAtomIds.has(atom.stableId));
+      candidateAtoms.push(replacement);
+      candidateBonds = candidateBonds.filter((bond) => bond.atom1 !== source.stableId && bond.atom2 !== source.stableId);
+      for (const bond of bondsToRetire) {
+        const endpoints = [bond.atom1 === source.stableId ? replacementId : bond.atom1, bond.atom2 === source.stableId ? replacementId : bond.atom2].sort();
+        const resultBondId = `bond:${this.command.objectId}:replacement:${stableHash({ parentRevisionId: current.revisionId, sourceBondId: bond.id, replacementId })}`;
+        candidateBonds.push({ ...bond, id: resultBondId, atom1: endpoints[0]!, atom2: endpoints[1]!, source: "UNKNOWN" });
+        replacementBonds.push({ sourceId: bond.id, resultId: resultBondId });
+      }
+      incident.filter((bond) => !bondsToRetire.includes(bond)).forEach((bond) => retiredBondIds.add(bond.id));
+      replacementAtoms.push({ sourceId: source.stableId, resultId: replacementId });
+      additions.push({ atomId: replacementId, parentAtomId: source.stableId, coordinate: { x: replacement.x, y: replacement.y, z: replacement.z } });
+      if (hFill) {
+        const candidateForReplacement = { ...baseStructure, atoms: candidateAtoms, bonds: candidateBonds };
+        const plan = hydrogenPlanFor(candidateForReplacement, [replacementId], candidateBonds);
+        chemistryValidation = plan.validation;
+        if (plan.validation.status !== "VALID") return fail(plan.validation.code ?? "CHEMISTRY_AMBIGUOUS", plan.validation.message, this.command, transactionId);
+        hydrogenPolicy = policyFor(this.command, current, selection?.resultId);
+        const placementState = states.find((state) => state.id === current.currentStateId) ?? states[0]!;
+        const count = plan.counts[replacementId] ?? 0;
+        const parentAtCurrentState = { ...replacement, ...coordinateFor(placementState, source) };
+        for (let index = 0; index < count; index += 1) {
+          const atomId = `atom:${this.command.objectId}:H:${stableHash({ parentRevisionId: current.revisionId, operation, parentId: replacementId, index })}`;
+          const hPlacement = deterministicHydrogenCoordinate(parentAtCurrentState, placementState, candidateForReplacement, index, candidateBonds);
+          const hSerial = Math.max(0, ...candidateAtoms.map((atom) => atom.serial)) + 1;
+          candidateAtoms.push({ ...replacement, stableId: atomId, serial: hSerial, atomName: `H${index + 1}`, element: "H", x: hPlacement.x, y: hPlacement.y, z: hPlacement.z, formalCharge: 0 });
+          const endpoints = [replacementId, atomId].sort();
+          candidateBonds.push({ id: `bond:${this.command.objectId}:H:${stableHash({ parentRevisionId: current.revisionId, operation, endpoints, index })}`, atom1: endpoints[0]!, atom2: endpoints[1]!, order: "SINGLE", source: "UNKNOWN" });
+          additions.push({ atomId, parentAtomId: replacementId, coordinate: hPlacement });
+        }
+      } else chemistryValidation = { status: "VALID", message: `Replaced AtomUID ${source.stableId} with NEW AtomUID ${replacementId} while preserving the explicit bond topology.`, valenceModelVersion: chemistryValenceModelVersion, aromaticityPerceptionVersion: chemistryAromaticityVersion };
+    }
+
+    if (!chemistryValidation) chemistryValidation = { status: "VALID", message: "Candidate chemistry validated under the bounded R07-B3 profile.", valenceModelVersion: chemistryValenceModelVersion, aromaticityPerceptionVersion: chemistryAromaticityVersion };
+    const suppliedCoordinatesByState = parameters.coordinatesByState && typeof parameters.coordinatesByState === "object" ? parameters.coordinatesByState as Record<string, Record<string, unknown>> : null;
+    const nextStates = states.map((state) => {
+      const coordinates: Record<string, Coordinate3D> = Object.fromEntries(Object.entries(state.coordinates).filter(([atomId]) => !retiredAtomIds.has(atomId)));
+      for (const addition of additions) {
+        const supplied = suppliedCoordinatesByState?.[state.id]?.[addition.atomId];
+        if (supplied !== undefined && validCoordinate(supplied)) coordinates[addition.atomId] = { x: supplied.x, y: supplied.y, z: supplied.z };
+        else if ((operation === "EDIT_ADD_ATOM_AND_BOND" || operation === "EDIT_ATTACH_FRAGMENT") && addition.explicit && addition.coordinate) coordinates[addition.atomId] = { ...addition.coordinate };
+        else if (operation === "EDIT_ADD_ATOM_AND_BOND" || operation === "EDIT_ATTACH_FRAGMENT") {
+          const parentId = addition.parentAtomId;
+          const sourceParentId = replacementAtoms.find((relation) => relation.resultId === parentId)?.sourceId ?? parentId;
+          const parent = baseStructure.atoms.find((atom) => atom.stableId === sourceParentId) ?? candidateAtoms.find((atom) => atom.stableId === parentId);
+          if (parent) coordinates[addition.atomId] = deterministicHydrogenCoordinate(parent, state, { ...baseStructure, atoms: candidateAtoms, bonds: candidateBonds }, additions.filter((candidate) => candidate.atomId === addition.atomId).length - 1, candidateBonds);
+          else if (addition.coordinate) coordinates[addition.atomId] = { ...addition.coordinate };
+        } else {
+          const replacementSourceId = replacementAtoms.find((relation) => relation.resultId === addition.atomId)?.sourceId;
+          const parent = candidateAtoms.find((atom) => atom.stableId === addition.parentAtomId) ?? (replacementSourceId ? baseStructure.atoms.find((atom) => atom.stableId === replacementSourceId) : undefined);
+          if (parent) {
+            const sourceParentId = replacementAtoms.find((relation) => relation.resultId === addition.parentAtomId)?.sourceId ?? replacementSourceId ?? addition.parentAtomId;
+            const parentCoordinate = baseStructure.atoms.find((atom) => atom.stableId === sourceParentId) ? coordinateFor(state, baseStructure.atoms.find((atom) => atom.stableId === sourceParentId)!) : coordinateFor(state, parent);
+            if (replacementSourceId) { coordinates[addition.atomId] = { ...parentCoordinate }; continue; }
+            const parentAtState = { ...parent, ...parentCoordinate };
+            coordinates[addition.atomId] = deterministicHydrogenCoordinate(parentAtState, state, { ...baseStructure, atoms: candidateAtoms, bonds: candidateBonds }, additions.filter((candidate) => candidate.parentAtomId === addition.parentAtomId).findIndex((candidate) => candidate.atomId === addition.atomId), candidateBonds);
+          } else if (addition.coordinate) coordinates[addition.atomId] = { ...addition.coordinate };
+        }
+      }
+      return { ...state, coordinates, coordinateHash: `r07-state-${stableHash({ stateId: state.id, coordinates })}` };
+    });
+    const currentState = nextStates.find((state) => state.id === current.currentStateId) ?? nextStates[0]!;
+    const realizedAtoms = atomsForState(candidateAtoms, currentState);
+    const hierarchy = hierarchyForAdditions(realizedAtoms, baseStructure.hierarchy, additions);
+    const nextStructureBase: CanonicalMolecularStructure = {
+      ...clone(baseStructure),
+      atoms: realizedAtoms,
+      bonds: candidateBonds.filter((bond) => candidateAtoms.some((atom) => atom.stableId === bond.atom1) && candidateAtoms.some((atom) => atom.stableId === bond.atom2)),
+      counts: countsFor(realizedAtoms, hierarchy),
+      bounds: boundsFor(realizedAtoms),
+      hierarchy,
+      coordinateStates: nextStates,
+      stateOrder: [...current.stateOrder],
+    };
+    const contentHash = deterministicScientificContentHash(nextStructureBase);
+    const revisionId = `r07-revision-${stableHash({ parentRevisionId: current.revisionId, operation, target: this.command.target, stateScope: this.command.stateScope, parameters, contentHash })}`;
+    const resultIdentityId = identityIdFor(nextStructureBase);
+    const nextStructure = rebindDatasets({ ...nextStructureBase, scientificHash: revisionId }, revisionId);
+    const nextLoadResult: StructureLoadResult = freezeLoadResult(nextLoadResultFrom(nextStructure, nextStates));
+    const newAtomIds = nextStructure.atoms.filter((atom) => !baseStructure.atoms.some((candidate) => candidate.stableId === atom.stableId)).map((atom) => atom.stableId);
+    const newBondIds = nextStructure.bonds.filter((bond) => !baseStructure.bonds.some((candidate) => candidate.id === bond.id)).map((bond) => bond.id);
+    const staleIds = [...new Set([...targetAtomIds, ...targetBondIds, ...retiredAtomIds, ...retiredBondIds, ...newAtomIds, ...newBondIds, ...(selection ? [selection.resultId] : []), ...(pick ? [pick.pickId] : [])])];
+    const invalidationManifest = invalidationManifestFor(["TOPOLOGY", "IDENTITY", "CHEMISTRY"], staleIds);
+    const entityLineage = lineageFor(baseStructure, nextStructure);
+    for (const atomId of newAtomIds) entityLineage.push({ entityKind: "ATOM", resultId: atomId, outcome: "NEW" });
+    for (const bondId of newBondIds) entityLineage.push({ entityKind: "BOND", resultId: bondId, outcome: "NEW" });
+    for (const relation of replacementAtoms) {
+      entityLineage.push({ entityKind: "ATOM", sourceId: relation.sourceId, resultId: relation.resultId, outcome: "REPLACED" });
+      if (!entityLineage.some((record) => record.entityKind === "ATOM" && record.resultId === relation.resultId && record.outcome === "NEW")) entityLineage.push({ entityKind: "ATOM", resultId: relation.resultId, outcome: "NEW" });
+    }
+    for (const relation of replacementBonds) {
+      const source = entityLineage.find((record) => record.entityKind === "BOND" && record.sourceId === relation.sourceId);
+      if (source) { source.outcome = "REPLACED"; source.resultId = relation.resultId; }
+      if (!entityLineage.some((record) => record.entityKind === "BOND" && record.resultId === relation.resultId && record.outcome === "NEW")) entityLineage.push({ entityKind: "BOND", resultId: relation.resultId, outcome: "NEW" });
+    }
+    const provenance: ScientificProvenanceRecord = {
+      provenanceRecordId: `provenance:${transactionId}`,
+      transactionId,
+      commandId: this.command.commandId,
+      operation,
+      objectId: this.command.objectId,
+      baseRevisionId: current.revisionId,
+      resultRevisionId: revisionId,
+      producerId: this.command.provenance.producerId,
+      producerVersion: this.command.provenance.producerVersion,
+      requestedAt: this.command.provenance.requestedAt,
+      ...(this.command.provenance.actor ? { actor: this.command.provenance.actor } : {}),
+      ...(this.command.provenance.metadata ? { metadata: this.command.provenance.metadata } : {}),
+      chemistryValidation,
+      ...(hydrogenPolicy ? { hydrogenAdditionPolicy: hydrogenPolicy } : {}),
+      ...(selection ? { selectionResultIds: [selection.resultId] } : {}),
+      ...(pick ? { pickResultIds: [pick.pickId] } : {}),
+      ...((operation === "EDIT_ADD_ATOM_AND_BOND" || operation === "EDIT_ATTACH_FRAGMENT") && suppliedElement ? {
+        attachmentGeometry: {
+          element: suppliedElement,
+          bondOrder: typeof parameters.bondOrder === "string" && supportedBondOrders.has(parameters.bondOrder as Exclude<BondOrder, "UNKNOWN">) ? parameters.bondOrder as Exclude<BondOrder, "UNKNOWN"> : "SINGLE",
+          ...(typeof parameters.valence === "number" ? { requestedValence: parameters.valence } : {}),
+          ...(typeof parameters.geometry === "string" ? { geometryProfile: parameters.geometry } : {}),
+          placement: parameters.coordinate && validCoordinate(parameters.coordinate) ? "EXPLICIT" as const : "DETERMINISTIC" as const,
+        },
+      } : {}),
+    };
+    const revision: ScientificRevision = deepFreeze({
+      schemaVersion: 1,
+      revisionId,
+      objectId: this.command.objectId,
+      molecularIdentityId: resultIdentityId,
+      scientificContentHash: contentHash,
+      loadResult: nextLoadResult,
+      parentRevisionId: current.revisionId,
+      parentRevisionIds: [current.revisionId],
+      transactionId,
+      operation,
+      changedDomains: ["TOPOLOGY", "IDENTITY", "CHEMISTRY"],
+      invalidationManifest,
+      identityTransition: { sourceIdentityId: current.molecularIdentityId, resultIdentityId, outcome: "DERIVED", reason: "B3 chemistry editing creates an atomic child revision with explicit AtomUID/BondUID lineage and fail-closed chemistry validation." },
+      entityLineage,
+      provenance,
+      chemistryValidation,
+      ...(hydrogenPolicy ? { hydrogenAdditionPolicy: hydrogenPolicy } : {}),
+      stateOrder: [...current.stateOrder],
+      currentStateId: current.currentStateId,
+      sequence: current.sequence + 1,
+    });
+    // Publication is deliberately last. Failed chemistry and coordinate/state
+    // validation return before this point, so no dehydrogenated or partial node
+    // can become visible to history, undo, redo, or the renderer.
+    this.history.nodes.set(revisionId, revision);
+    this.history.children.set(revisionId, new Set());
+    const parentChildren = this.history.children.get(current.revisionId) ?? new Set<string>();
+    parentChildren.add(revisionId);
+    this.history.children.set(current.revisionId, parentChildren);
+    this.history.currentRevisionId = revisionId;
+    return { ok: true, outcome: "COMMITTED", transactionId, objectId: this.command.objectId, baseRevisionId: current.revisionId, resultRevisionId: revisionId, revision, invalidationManifest, identityTransition: revision.identityTransition, entityLineage, provenanceRecordId: provenance.provenanceRecordId, diagnostics: [`Chemistry operation: ${operation}`, `State scope: ${stateResolution.ids.join(", ")}`, chemistryValidation.message, "Candidate topology, identity, coordinates, provenance and chemistry were validated before atomic publication."], chemistryValidation, ...(hydrogenPolicy ? { hydrogenAdditionPolicy: hydrogenPolicy } : {}) };
   }
 }
 

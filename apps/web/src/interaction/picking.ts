@@ -17,6 +17,7 @@ export type StableAtomRef = {
 
 export type StableBondRef = {
   structureId: string;
+  objectId?: string;
   bondId: string;
   endpoints: readonly [string, string];
   molecularRevision: string;
@@ -54,6 +55,7 @@ export class ReverseIdentityMap {
   private readonly ambiguousStableIds = new Set<string>();
   private readonly byRendererSerial = new Map<number, StableAtomRef>();
   private readonly ambiguousSerials = new Set<number>();
+  private readonly bondByObjectAndId = new Map<string, { structureId: string; objectId: string; bondId: string; endpoints: readonly [string, string]; molecularRevision: string; coordinateContext: CoordinateContext }>();
   private structureId: string | null = null;
   private molecularRevision: string | null = null;
   private generation = 0;
@@ -69,6 +71,7 @@ export class ReverseIdentityMap {
     this.ambiguousStableIds.clear();
     this.byRendererSerial.clear();
     this.ambiguousSerials.clear();
+    this.bondByObjectAndId.clear();
     this.structureId = entries.length === 1 ? entries[0]!.structure.id : null;
     this.molecularRevision = entries.length === 1 ? entries[0]!.structure.scientificHash : null;
     this.generation = generation;
@@ -86,6 +89,7 @@ export class ReverseIdentityMap {
         if (!this.byRendererSerial.has(atom.serial)) this.byRendererSerial.set(atom.serial, ref);
         else { this.byRendererSerial.delete(atom.serial); this.ambiguousSerials.add(atom.serial); }
       });
+      entry.structure.bonds.forEach((bond) => this.bondByObjectAndId.set(`${entry.objectId}\u0000${bond.id}`, { structureId: entry.structure.id, objectId: entry.objectId, bondId: bond.id, endpoints: [bond.atom1, bond.atom2], molecularRevision: entry.structure.scientificHash, coordinateContext }));
     }
   }
 
@@ -97,12 +101,13 @@ export class ReverseIdentityMap {
     return { schemaVersion: 1, pickId: pickId(this.generation, hit.index ?? hit.serial ?? 0), pickKind: "ATOM", atomRef: ref, structureId: ref.structureId, molecularRevision: ref.molecularRevision, rendererGeneration: this.generation, coordinateContext: ref.coordinateContext, provenance: "renderer-reverse-identity-map" };
   }
 
-  resolveBond(bond: CanonicalBond, structure: CanonicalMolecularStructure): BondPickResult | null {
-    if (structure.id !== this.structureId || structure.scientificHash !== this.molecularRevision) return null;
-    const ref1 = this.byStableId.get(bond.atom1);
-    const ref2 = this.byStableId.get(bond.atom2);
+  resolveBond(bond: CanonicalBond, structure: CanonicalMolecularStructure, objectId = structure.id): BondPickResult | null {
+    const stored = this.bondByObjectAndId.get(`${objectId}\u0000${bond.id}`);
+    if (!stored || stored.structureId !== structure.id || stored.molecularRevision !== structure.scientificHash) return null;
+    const ref1 = this.byObjectAndStableId.get(`${objectId}\u0000${bond.atom1}`);
+    const ref2 = this.byObjectAndStableId.get(`${objectId}\u0000${bond.atom2}`);
     if (!ref1 || !ref2) return null;
-    const bondRef: StableBondRef = { structureId: structure.id, bondId: bond.id, endpoints: [bond.atom1, bond.atom2], molecularRevision: structure.scientificHash, coordinateContext: coordinateContextFor(structure) };
+    const bondRef: StableBondRef = { structureId: structure.id, objectId, bondId: bond.id, endpoints: [bond.atom1, bond.atom2], molecularRevision: structure.scientificHash, coordinateContext: coordinateContextFor(structure, objectId) };
     return { schemaVersion: 1, pickId: `pick:${this.generation}:bond:${bond.id}`, pickKind: "BOND", bondRef, structureId: structure.id, molecularRevision: structure.scientificHash, rendererGeneration: this.generation, coordinateContext: bondRef.coordinateContext, provenance: "renderer-reverse-identity-map" };
   }
 

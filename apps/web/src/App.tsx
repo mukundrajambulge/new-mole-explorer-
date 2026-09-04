@@ -24,7 +24,7 @@ import { colorRegistry } from "./rendering/colorRegistry";
 import { analyzeStructure, overlaysForAnalysis, type StructuralAnalysisKind, type StructuralAnalysisResult } from "./analysis/structuralAnalysis";
 import { commandHelp, isRecognizedCommandVerb, parseCommand } from "./commands/commandRegistry";
 import { copyWorkspaceObject, createWorkspaceGroup, createWorkspaceObject, createWorkspaceObjectFromSelection, cycleWorkspaceObjectState, joinWorkspaceObjectStates, renameWorkspaceObject, resolveGlobalFrameState, setWorkspaceObjectAllStates, setWorkspaceObjectEnabled, setWorkspaceObjectState, splitWorkspaceObjectStates, structureForWorkspaceObjectState, updateWorkspaceGroup, workspaceScopedStableAtomId, workspaceSelectionStructure, type WorkspaceGroup, type WorkspaceObject } from "./workspace/workspaceModel";
-import { createAddBondCommand, createCoordinateEditCommand, createDeleteAtomsCommand, createDeleteBondCommand, createReplaceBondSemanticsCommand, ScientificHistoryService, type ScientificRevision } from "./editing/editFoundation";
+import { createAddBondCommand, createAddHydrogensCommand, createAttachAtomCommand, createCoordinateEditCommand, createDeleteAtomsCommand, createDeleteBondCommand, createRefillHydrogensCommand, createRemoveHydrogensCommand, createReplaceAtomCommand, createReplaceBondSemanticsCommand, ScientificHistoryService, type ScientificRevision } from "./editing/editFoundation";
 
 const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_SELECT]: "Select",
@@ -96,6 +96,7 @@ export const App = () => {
   const demoLoadStartedRef = useRef(false);
   const namedSelectionsRef = useRef<NamedSelectionStore | null>(null);
   const activeSelectionResultRef = useRef<SelectionResult | null>(null);
+  const activePickResultRef = useRef<PickResult | null>(null);
   const workspaceObjectsRef = useRef<WorkspaceObject[]>([]);
   const workspaceGroupsRef = useRef<WorkspaceGroup[]>([]);
   const pendingImportModeRef = useRef<"replace" | "add">("replace");
@@ -179,6 +180,7 @@ export const App = () => {
 
   const setActiveSelection = (result: SelectionResult | null) => {
     activeSelectionResultRef.current = result;
+    activePickResultRef.current = null;
     setActiveSelectionState(result);
     setProjection((current) => setInteractionState(current, { selectedAtomIds: result?.stableAtomIds ?? [], pickedAtomId: null, measurementPickAtomIds: [] }));
   };
@@ -436,10 +438,11 @@ export const App = () => {
   };
 
   const handlePick = (pick: PickResult) => {
-    if (pick.pickKind !== "ATOM" || !structure) return;
-    const pickedObject = workspaceObjectsRef.current.find((object) => object.objectId === pick.atomRef.objectId);
+    if (!structure || pick.pickKind === "BACKGROUND") return;
+    const pickedObjectId = pick.pickKind === "ATOM" ? pick.atomRef.objectId : pick.bondRef.objectId;
+    const pickedObject = workspaceObjectsRef.current.find((object) => object.objectId === pickedObjectId || object.loadResult.structure.id === pick.structureId);
     const targetStructure = pickedObject ? { ...pickedObject.loadResult, structure: structureForWorkspaceObjectState(pickedObject) } : structure;
-    const stableAtomId = pick.atomRef.stableAtomId;
+    const stableAtomId = pick.pickKind === "ATOM" ? pick.atomRef.stableAtomId : "";
     if (pickedObject && pickedObject.objectId !== activeObjectId) {
       const current = workspaceObjectsRef.current.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object);
       workspaceObjectsRef.current = current;
@@ -451,11 +454,19 @@ export const App = () => {
       setNamedSelections([]);
     }
     if (!measurementMode) {
+      activePickResultRef.current = pick;
+      if (pick.pickKind === "BOND") {
+        setActiveSelection(selectionForStableIds([...pick.bondRef.endpoints], targetStructure.structure));
+        setProjection((current) => setInteractionState(current, { pickedAtomId: pick.bondRef.endpoints[0] ?? null, selectedAtomIds: pick.bondRef.endpoints, measurementPickAtomIds: [] }));
+        activePickResultRef.current = pick;
+        return;
+      }
       setActiveSelection(selectionForStableIds([stableAtomId], targetStructure.structure));
       const projectedId = pickedObject ? workspaceScopedStableAtomId(pickedObject.objectId, stableAtomId) : stableAtomId;
       setProjection((current) => setInteractionState(current, { pickedAtomId: stableAtomId, selectedAtomIds: [projectedId], measurementPickAtomIds: [] }));
       return;
     }
+    if (pick.pickKind !== "ATOM") return;
     let slots: readonly string[];
     try {
       slots = measurementAccumulatorRef.current.add(stableAtomId, measurementMode, pickedObject?.objectId);
@@ -489,7 +500,7 @@ export const App = () => {
   });
   const clearMeasurementPicks = () => { measurementAccumulatorRef.current.clear(); setMeasurementSlots([]); setProjection((current) => setInteractionState(current, { pickedAtomId: null, measurementPickAtomIds: [] })); };
   const clearTransientInteraction = () => setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, measurementPickAtomIds: [] }));
-  const clearSelection = () => { setActiveSelection(null); setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] })); };
+  const clearSelection = () => { activePickResultRef.current = null; setActiveSelection(null); setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] })); };
   const updateMeasurementVisibility = (id: string, visible: boolean) => setMeasurements((current) => current.map((measurement) => measurement.id === id ? { ...measurement, presentation: { ...measurement.presentation, visible }, status: visible ? "CURRENT" : "HIDDEN" } : measurement));
   const deleteMeasurement = (id: string) => setMeasurements((current) => current.filter((measurement) => measurement.id !== id));
 
@@ -553,6 +564,7 @@ export const App = () => {
   };
 
   const applyScientificRevisionToWorkspace = (revision: ScientificRevision): void => {
+    activePickResultRef.current = null;
     const currentObjects = workspaceObjectsRef.current;
     const target = currentObjects.find((object) => object.objectId === revision.objectId);
     if (!target) return;
@@ -715,6 +727,53 @@ export const App = () => {
     return executeTopologyEdit("EDIT_REPLACE_BOND_SEMANTICS", result, order);
   };
 
+  type ChemistryEditOperation = "EDIT_ADD_HYDROGENS" | "EDIT_REFILL_HYDROGENS" | "EDIT_REMOVE_HYDROGENS" | "EDIT_ADD_ATOM_AND_BOND" | "EDIT_REPLACE_ATOM";
+  const executeChemistryEdit = (operation: ChemistryEditOperation, target: CanonicalEditTargetContext, element?: string): ConsoleCommandResult => {
+    const current = historyServiceRef.current.currentRevision(target.object.objectId);
+    if (!current) return { category: "EDIT", status: "HISTORY_UNAVAILABLE: the target object has no scientific revision history." };
+    const pick = activePickResultRef.current;
+    const command = operation === "EDIT_ADD_HYDROGENS"
+      ? createAddHydrogensCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, pickResult: pick ?? undefined, origin: { channel: "UI", actionId: ACTION_IDS.EDIT_HYDROGEN_ADD }, provenance: { producerId: "molecular-workstation.r07.b3.ui", producerVersion: "1" } })
+      : operation === "EDIT_REFILL_HYDROGENS"
+        ? createRefillHydrogensCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, bondIds: pick?.pickKind === "BOND" ? [pick.bondRef.bondId] : undefined, pickResult: pick ?? undefined, origin: { channel: "UI", actionId: ACTION_IDS.EDIT_HYDROGEN_REFILL }, provenance: { producerId: "molecular-workstation.r07.b3.ui", producerVersion: "1" } })
+        : operation === "EDIT_REMOVE_HYDROGENS"
+          ? createRemoveHydrogensCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, origin: { channel: "UI", actionId: ACTION_IDS.EDIT_HYDROGEN_REMOVE }, provenance: { producerId: "molecular-workstation.r07.b3.ui", producerVersion: "1" } })
+          : operation === "EDIT_ADD_ATOM_AND_BOND"
+            ? createAttachAtomCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, pickResult: pick ?? undefined, element: element ?? "H", bondOrder: "SINGLE", valence: 1, geometry: "deterministic-local-frame", origin: { channel: "UI", actionId: ACTION_IDS.EDIT_ATOM_ATTACH }, provenance: { producerId: "molecular-workstation.r07.b3.ui", producerVersion: "1" } })
+            : createReplaceAtomCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, pickResult: pick ?? undefined, element: element ?? "N", hFill: true, origin: { channel: "UI", actionId: ACTION_IDS.EDIT_ATOM_REPLACE }, provenance: { producerId: "molecular-workstation.r07.b3.ui", producerVersion: "1" } });
+    const result = historyServiceRef.current.execute(command);
+    if (!result.ok) return { category: "EDIT", status: `${result.code}: ${result.message}` };
+    applyScientificRevisionToWorkspace(result.revision);
+    clearSelection();
+    return { category: "EDIT", status: `COMMITTED ${operation.replace("EDIT_", "").toLowerCase().replaceAll("_", " ")} · ${result.baseRevisionId} → ${result.resultRevisionId}`, count: result.revision.loadResult.structure.atoms.length };
+  };
+
+  const chemistrySelectionFromQuery = (query: string | null, fallbackMessage: string): CanonicalEditTargetContext | ConsoleCommandResult => {
+    if (query?.trim()) return editSelectionFromQuery(query);
+    const result = activeSelectionResultRef.current ? localizeEditSelection(activeSelectionResultRef.current) : { category: "EDIT" as const, status: `INVALID_SELECTION: ${fallbackMessage}` };
+    return result;
+  };
+
+  const runChemistryCommand = (verb: "h_add" | "h_fill" | "h_remove" | "attach" | "replace", parsedArgument: string, parsedTarget: string | null): ConsoleCommandResult => {
+    if (verb === "attach" || verb === "replace") {
+      const element = parsedArgument.trim().toUpperCase();
+      if (!element || !parsedTarget) return { category: "EDIT", status: `${verb} requires '${verb} <element>, <exact parent selection>'; no chemistry changed.` };
+      const target = chemistrySelectionFromQuery(parsedTarget, "select one exact parent AtomUID before attaching or replacing an atom.");
+      if ("category" in target) return target;
+      return executeChemistryEdit(verb === "attach" ? "EDIT_ADD_ATOM_AND_BOND" : "EDIT_REPLACE_ATOM", target, element);
+    }
+    const target = chemistrySelectionFromQuery(parsedArgument, `${verb} requires an exact canonical atom/bond selection.`);
+    if ("category" in target) return target;
+    return executeChemistryEdit(verb === "h_add" ? "EDIT_ADD_HYDROGENS" : verb === "h_fill" ? "EDIT_REFILL_HYDROGENS" : "EDIT_REMOVE_HYDROGENS", target);
+  };
+
+  const runChemistryAction = (actionId: typeof ACTION_IDS.EDIT_HYDROGEN_ADD | typeof ACTION_IDS.EDIT_HYDROGEN_REFILL | typeof ACTION_IDS.EDIT_HYDROGEN_REMOVE | typeof ACTION_IDS.EDIT_ATOM_ATTACH | typeof ACTION_IDS.EDIT_ATOM_REPLACE): ConsoleCommandResult => {
+    const result = chemistrySelectionFromQuery(null, "select the exact canonical target before editing.");
+    if ("category" in result) return result;
+    const operation = actionId === ACTION_IDS.EDIT_HYDROGEN_ADD ? "EDIT_ADD_HYDROGENS" : actionId === ACTION_IDS.EDIT_HYDROGEN_REFILL ? "EDIT_REFILL_HYDROGENS" : actionId === ACTION_IDS.EDIT_HYDROGEN_REMOVE ? "EDIT_REMOVE_HYDROGENS" : actionId === ACTION_IDS.EDIT_ATOM_ATTACH ? "EDIT_ADD_ATOM_AND_BOND" : "EDIT_REPLACE_ATOM";
+    return executeChemistryEdit(operation, result, operation === "EDIT_ADD_ATOM_AND_BOND" ? "H" : operation === "EDIT_REPLACE_ATOM" ? "N" : undefined);
+  };
+
   const resolveWorkspaceGroup = (name: string) => {
     const normalized = name.trim().replace(/^['"]|['"]$/g, "").toLowerCase();
     const candidates = workspaceGroupsRef.current.filter((group) => group.groupId.toLowerCase() === normalized || group.name.toLowerCase() === normalized);
@@ -760,6 +819,7 @@ export const App = () => {
     if (parsed.verb === "redo") return runHistoryAction(ACTION_IDS.HISTORY_REDO);
     if (parsed.verb === "edit_test") return runDeterministicCoordinateEdit();
     if (parsed.verb === "remove" || parsed.verb === "bond" || parsed.verb === "unbond" || parsed.verb === "set_bond") return runTopologyCommand(parsed.verb, parsed.argument, parsed.target);
+    if (parsed.verb === "h_add" || parsed.verb === "h_fill" || parsed.verb === "h_remove" || parsed.verb === "attach" || parsed.verb === "replace") return runChemistryCommand(parsed.verb, parsed.argument, parsed.target);
     if (parsed.verb === "coordinate_frame") {
       const value = parsed.argument.trim().toLowerCase();
       const policy = value === "local_scientific" ? "LOCAL_SCIENTIFIC" : value === "effective_world" ? "EFFECTIVE_WORLD" : null;
@@ -1110,6 +1170,11 @@ export const App = () => {
     }
     if (actionId === ACTION_IDS.EDIT_ATOM_DELETE || actionId === ACTION_IDS.EDIT_BOND_CREATE || actionId === ACTION_IDS.EDIT_BOND_DELETE) {
       const result = runTopologyAction(actionId);
+      setNotice({ ...capability, state: result.status.startsWith("COMMITTED") ? "SUPPORTED" : "SUPPORTED_WITH_LIMITATIONS", description: result.status });
+      return;
+    }
+    if (actionId === ACTION_IDS.EDIT_HYDROGEN_ADD || actionId === ACTION_IDS.EDIT_HYDROGEN_REFILL || actionId === ACTION_IDS.EDIT_HYDROGEN_REMOVE || actionId === ACTION_IDS.EDIT_ATOM_ATTACH || actionId === ACTION_IDS.EDIT_ATOM_REPLACE) {
+      const result = runChemistryAction(actionId);
       setNotice({ ...capability, state: result.status.startsWith("COMMITTED") ? "SUPPORTED" : "SUPPORTED_WITH_LIMITATIONS", description: result.status });
       return;
     }

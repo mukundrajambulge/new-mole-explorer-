@@ -1,5 +1,5 @@
 export type CommandDomain = "SYSTEM" | "SELECTION" | "PRESENTATION" | "VIEW" | "LABEL" | "MEASURE" | "OBJECT" | "HISTORY" | "EDIT";
-export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "set" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "set_name" | "copy" | "create" | "split_states" | "join_states" | "group" | "delete" | "update" | "enable" | "disable" | "state" | "frame" | "all_states" | "count_states" | "coordinate_frame" | "history" | "undo" | "redo" | "edit_test" | "remove" | "bond" | "unbond" | "set_bond";
+export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "set" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "set_name" | "copy" | "create" | "split_states" | "join_states" | "group" | "delete" | "update" | "enable" | "disable" | "state" | "frame" | "all_states" | "count_states" | "coordinate_frame" | "history" | "undo" | "redo" | "edit_test" | "remove" | "bond" | "unbond" | "set_bond" | "h_add" | "h_fill" | "h_remove" | "attach" | "replace";
 export type ParsedCommand = { domain: CommandDomain; verb: CommandVerb; raw: string; head: string; argument: string; target: string | null; span: { start: number; end: number } };
 export type CommandParseError = { code: "EMPTY" | "UNKNOWN_COMMAND" | "MISSING_ARGUMENT"; message: string; span?: { start: number; end: number } };
 export type CommandDefinition = { verb: CommandVerb; domain: CommandDomain; synopsis: string; description: string; requiresArgument: boolean };
@@ -42,6 +42,11 @@ export const COMMAND_REGISTRY: readonly CommandDefinition[] = [
   { verb: "bond", domain: "EDIT", synopsis: "bond <selection1>, <selection2>[, <order>]", description: "Create one canonical bond between two exact singleton selections.", requiresArgument: true },
   { verb: "unbond", domain: "EDIT", synopsis: "unbond <selection1>, <selection2>", description: "Delete the canonical bond(s) for two exact singleton selections.", requiresArgument: true },
   { verb: "set_bond", domain: "EDIT", synopsis: "set_bond order, <value>, <selection1>, <selection2>", description: "Replace bond semantics with a supported canonical bond order.", requiresArgument: true },
+  { verb: "h_add", domain: "EDIT", synopsis: "h_add <selection>", description: "Add explicit hydrogens through the bounded valence, aromaticity, charge, placement and provenance policy.", requiresArgument: true },
+  { verb: "h_fill", domain: "EDIT", synopsis: "h_fill <selection>", description: "Atomically refill local explicit hydrogens for one exact picked atom/bond or selection.", requiresArgument: true },
+  { verb: "h_remove", domain: "EDIT", synopsis: "h_remove <selection>", description: "Remove exact explicit hydrogen atoms or local hydrogens attached to the selected parent atoms.", requiresArgument: true },
+  { verb: "attach", domain: "EDIT", synopsis: "attach <element>, <selection>", description: "Attach one explicitly specified atom to one exact parent AtomUID.", requiresArgument: true },
+  { verb: "replace", domain: "EDIT", synopsis: "replace <element>, <selection>", description: "Replace one exact AtomUID with a NEW atom identity and explicit lineage.", requiresArgument: true },
 ];
 const definitions = Object.fromEntries(COMMAND_REGISTRY.map((definition) => [definition.verb, definition])) as Record<CommandVerb, CommandDefinition>;
 const verbs = new Set<string>(COMMAND_REGISTRY.map((definition) => definition.verb));
