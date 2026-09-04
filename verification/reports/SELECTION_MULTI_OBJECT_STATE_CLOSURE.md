@@ -13,9 +13,10 @@ The implementation paths, live regressions, multi-object workspace, multi-state 
 - Local root: `C:\Users\mukun\Documents\Codex\2026-08-30\files-pasted-by-the-user-new\outputs\molecular-workstation`
 - Branch: `fix/visualization-final-closure`
 - Starting SHA for this closure pass: `27610d35980b2d233e4f97f240ccdbd6439e5d39`
+- Resumed chemistry-role implementation pass starting SHA: `6829d8cf3fd9a348c2146c54fd706469bbbcb3df`
 - Previous implementation commits: `467313d436b3686443fee5a0ae3237b5ff97451e` (presentation/topology profiles) and `364ec00` (versioned VDW gap profile)
-- Current implementation/evidence baseline commit: `0d5498a4b40d2167d4786bb746e0d059d850531a` (`test(e2e): stabilize group workflow and refresh evidence`)
-- Ending implementation/evidence SHA: `0d5498a4b40d2167d4786bb746e0d059d850531a`
+- Current implementation/evidence baseline commit: `13f4e5a6503c0e5998e4ebb851e811b61696a812` (`feat(selection): promote bounded chemistry roles`)
+- Ending implementation/evidence SHA: `13f4e5a6503c0e5998e4ebb851e811b61696a812`
 - Working tree: clean after the implementation/evidence commit; no unrelated files were changed
 - Development UI: `http://localhost:3101/molstudio`
 - Landing app: `http://localhost:3100`
