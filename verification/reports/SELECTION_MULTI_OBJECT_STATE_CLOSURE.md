@@ -170,6 +170,7 @@ Verification:
 - `verification/selection/pymol-partial-charge-oracle.json`
 - `verification/selection/pymol-byfragment-source.md`
 - `verification/selection/pymol-byfragment-editor-probe.json`
+- `verification/selection/rcsb-4djw-fragment-field-probe.json`
 - `verification/selection/pymol-object-identity-source.md`
 - `verification/selection/pymol-presentation-oracle.json`
 - `verification/selection/pymol-matrix-probe.json`

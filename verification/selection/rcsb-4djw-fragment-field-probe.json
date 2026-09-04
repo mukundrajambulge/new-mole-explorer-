@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "source": "RCSB official coordinate download",
+  "entryId": "4DJW",
+  "sourceUrl": "https://files.rcsb.org/download/4DJW.cif",
+  "retrievedOn": "2026-09-04",
+  "acceptanceStatus": "SUPPORTING_EVIDENCE_ONLY",
+  "generatedBy": "bounded in-memory mmCIF field inspection; not a replacement for the pinned PyMOL oracle",
+  "observations": {
+    "entityPdbxFragmentHeaderPresent": false,
+    "atomSiteFragmentHeaderPresent": false,
+    "fragmentRelatedLineCount": 0
+  },
+  "interpretation": "The official 4DJW mmCIF contains no fragment metadata that can be promoted into complete per-atom fragment membership. Entity-level _entity.pdbx_fragment, when present in other entries, would still be descriptive text rather than an atom assignment. The application must therefore keep byfragment dependency-gated for this admitted source path."
+}
