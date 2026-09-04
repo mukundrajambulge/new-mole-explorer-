@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "gate": "R07-B3",
+  "status": "COMPLETE",
+  "branch": "feature/r07-hydrogen-picked-editing",
+  "baseB2Sha": "6a1018d95f0613ca2275394ea956cbac6b3cb334",
+  "implementationSha": "bb2ce66",
+  "repositoryRoot": "C:\\Users\\mukun\\Desktop\\molecular-workstation",
+  "worktreeMode": "single-checkout",
+  "acceptance": {
+    "AT-R07-17": "PASS",
+    "AT-R07-18": "PASS",
+    "AT-R07-19": "PASS",
+    "AT-R07-20": "PASS",
+    "AT-R07-21": "PASS",
+    "AT-R07-22": "PASS",
+    "AT-R07-23": "PASS",
+    "AT-R07-24": "PASS",
+    "AT-R07-25": "PASS",
+    "AT-R07-26": "PASS",
+    "AT-R07-27": "PASS",
+    "AT-R07-28": "PASS"
+  },
+  "verification": {
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "unitWeb": { "files": 20, "tests": 115, "status": "PASS" },
+    "unitApi": { "files": 2, "tests": 20, "status": "PASS" },
+    "build": "PASS",
+    "focusedB1B2B3E2E": { "tests": 7, "passed": 7, "status": "PASS" },
+    "completeE2E": { "tests": 89, "passed": 83, "failedOutsideB3": 6, "status": "BASELINE_OUTSIDE_B3" },
+    "pymolOracle": "ORACLE_PENDING"
+  },
+  "evidence": [
+    "verification/evidence/r07-b3/hydrogen-addition.png",
+    "verification/evidence/r07-b3/hydrogen-refill.png"
+  ],
+  "readyForB1B2B3Integration": true,
+  "integrationPerformed": false,
+  "r08Started": false
+}
