@@ -640,13 +640,21 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
         matchingObjects = new Set(structure.atoms.filter((candidate) => candidate.workspaceObjectId && (wildcardMatch(candidate.workspaceObjectId, value) || wildcardMatch(candidate.workspaceObjectId.replace(/^object:/i, ""), value) || workspaceNameMatch(candidate.workspaceObjectName ?? "", value))).map((candidate) => candidate.workspaceObjectId!));
         context.objectMatches.set(value, matchingObjects);
       }
+      if (property === "object" && matchingObjects.size === 0) {
+        const loadedNames = [...new Set(structure.atoms.map((candidate) => candidate.workspaceObjectName).filter((name): name is string => Boolean(name)))];
+        if (!context.diagnostics.some((diagnostic) => diagnostic.code === "OBJECT_NOT_FOUND" && diagnostic.message.includes(value))) context.diagnostics.push({ code: "OBJECT_NOT_FOUND", message: `No loaded object matches "${value}". Loaded objects: ${loadedNames.join(", ") || "none"}.` });
+        return false;
+      }
       const exactObjectId = wildcardMatch(atom.workspaceObjectId, value) || wildcardMatch(atom.workspaceObjectId.replace(/^object:/i, ""), value);
       if (matchingObjects.size > 1 && !exactObjectId) {
         if (!context.diagnostics.some((diagnostic) => diagnostic.code === "AMBIGUOUS_NAME")) context.diagnostics.push({ code: "AMBIGUOUS_NAME", message: `Object name \`${value}\` resolves to multiple workspace objects; use a durable ObjectID.` });
         return false;
       }
       matches = exactObjectId || workspaceNameMatch(atom.workspaceObjectName ?? "", value);
-    } else matches = wildcardMatch(structure.id, value) || wildcardMatch(structure.name, value) || wildcardMatch(structure.source.originalFilename, value);
+    } else {
+      matches = wildcardMatch(structure.id, value) || wildcardMatch(structure.name, value) || wildcardMatch(structure.source.originalFilename, value);
+      if (property === "object" && !matches && !context.diagnostics.some((diagnostic) => diagnostic.code === "OBJECT_NOT_FOUND" && diagnostic.message.includes(value))) context.diagnostics.push({ code: "OBJECT_NOT_FOUND", message: `No loaded object matches "${value}". Loaded objects: ${structure.source.originalFilename || structure.name || structure.id}.` });
+    }
   }
   else if (["b", "q", "occupancy", "formal_charge", "partial_charge", "x", "y", "z", "state"].includes(property)) {
     context.needsCoordinates = true;
@@ -1028,6 +1036,7 @@ export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecu
   let status: SelectionStatus = ids.size > 0 ? "VALID_NONEMPTY" : "VALID_EMPTY";
   if (context.diagnostics.some((diagnostic) => diagnostic.code === "UNSUPPORTED_OPERATOR_OR_PROFILE")) status = "UNSUPPORTED_OPERATOR_OR_PROFILE";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "UNKNOWN_PROPERTY")) status = "UNKNOWN_PROPERTY";
+  else if (context.diagnostics.some((diagnostic) => diagnostic.code === "OBJECT_NOT_FOUND")) status = "OBJECT_NOT_FOUND";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "UNKNOWN_NAME")) status = "UNKNOWN_NAME";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "AMBIGUOUS_NAME")) status = "AMBIGUOUS_NAME";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "INVALID_VALUE")) status = "INVALID_VALUE";
