@@ -1,0 +1,6 @@
+HEADER    R07 B3 EXPLICIT HYDROGEN REFILL FIXTURE
+HETATM    1  C1  LIG A 101       0.000   0.000   0.000  1.00  5.00           C
+HETATM    2  H1  LIG A 101       1.000   0.000   0.000  1.00  5.00           H
+CONECT    1    2
+CONECT    2    1
+END

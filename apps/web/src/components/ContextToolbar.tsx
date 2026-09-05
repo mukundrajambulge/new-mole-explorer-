@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import type { BondOrder } from "@molecular/contracts";
 import type { ActionId } from "../domain/registry";
 import { COLOR_MODES, COLOR_SCHEMES, styleProfileFor, type ColorMode, type RepresentationStyle } from "../rendering/renderProjection";
 import { representationCapabilityFor, STYLE_DEFINITIONS } from "../rendering/styleProfiles";
@@ -18,7 +19,7 @@ const ribbonItems: Partial<Record<Exclude<RibbonCategory, "Color" | "Display">, 
     { label: "Fetch", icon: "cloudDownload", actionId: "STRUCTURE.FETCH_RCSB", dividerAfter: true },
     { label: "Export", icon: "download", actionId: "FILE.EXPORT", capability: "Coming Soon" },
   ],
-  Edit: [{ label: "Delete atom", icon: "trash", actionId: "EDIT.ATOM_DELETE", capability: "Unavailable" }, { label: "Create bond", icon: "plus", actionId: "EDIT.BOND_CREATE", capability: "Unavailable" }],
+  Edit: [],
   Select: [{ label: "Select", icon: "pointer", actionId: "CANVAS.SELECT" }, { label: "Evaluate", icon: "command", actionId: "SELECTION.EVALUATE" }],
   Measure: [{ label: "Distance", icon: "ruler", actionId: "MEASURE.DISTANCE" }, { label: "Angle", icon: "move3d", actionId: "MEASURE.ANGLE" }, { label: "Dihedral", icon: "rotate", actionId: "MEASURE.DIHEDRAL" }, { label: "Clear picks", icon: "trash", actionId: "MEASURE.CLEAR" }],
   Analyze: [{ label: "Selection", icon: "command", actionId: "SELECTION.EVALUATE" }],
@@ -32,9 +33,9 @@ const displayLabelFor = (id: string, label: string): string => id === "line" ? "
 const displayItems = (): RibbonItem[] => STYLE_DEFINITIONS.map((definition) => ({ label: displayLabelFor(definition.id, definition.label), icon: displayIconFor(definition.id), actionId: definition.actionId as ActionId, style: definition.id as RepresentationStyle, capability: definition.maySelect ? undefined : definition.capability === "UNAVAILABLE" ? "Unavailable" : "Coming Soon", representationStatus: definition.status }));
 const quickColorSchemes: Array<[ColorMode, string]> = [["classic-cpk", "Classic CPK"], ["chain", "Chain"], ["monochrome", "Uniform"], ["hydrophobicity", "Hydrophobicity"], ["secondary-structure-standard", "Secondary Structure"]];
 
-type ContextToolbarProps = { activeTool: string; activeCategory: RibbonCategory; collapsed: boolean; representation: RepresentationStyle; colorMode: ColorMode; onAction: (actionId: ActionId) => void; onImport?: () => void; onFetchRcsb: (pdbId: string, mode?: "replace" | "add") => void; onColorMode: (mode: ColorMode) => void; onStyleChange: (style: RepresentationStyle) => void; onToggleCollapsed: () => void };
+type ContextToolbarProps = { activeTool: string; activeCategory: RibbonCategory; collapsed: boolean; representation: RepresentationStyle; colorMode: ColorMode; onAction: (actionId: ActionId) => void; onImport?: () => void; onFetchRcsb: (pdbId: string, mode?: "replace" | "add") => void; onColorMode: (mode: ColorMode) => void; onStyleChange: (style: RepresentationStyle) => void; onToggleCollapsed: () => void; editSelectionCount?: number; editObjectName?: string; canUndo?: boolean; canRedo?: boolean; onEditBondOrder?: (order: Exclude<BondOrder, "UNKNOWN">) => void };
 
-export const ContextToolbar = ({ activeTool, activeCategory, collapsed, representation, colorMode, onAction, onImport, onFetchRcsb, onColorMode, onStyleChange, onToggleCollapsed }: ContextToolbarProps) => {
+export const ContextToolbar = ({ activeTool, activeCategory, collapsed, representation, colorMode, onAction, onImport, onFetchRcsb, onColorMode, onStyleChange, onToggleCollapsed, editSelectionCount = 0, editObjectName, canUndo = false, canRedo = false, onEditBondOrder }: ContextToolbarProps) => {
   const [pdbId, setPdbId] = useState("");
   const [showRcsb, setShowRcsb] = useState(false);
   const rcsbInputRef = useRef<HTMLInputElement>(null);
@@ -50,6 +51,19 @@ export const ContextToolbar = ({ activeTool, activeCategory, collapsed, represen
           <label className="ribbon-select-label">Scheme<select aria-label="Ribbon color scheme" value={colorMode} onChange={(event) => onColorMode(event.target.value as ColorMode)}>{COLOR_SCHEMES.map((scheme) => <option key={scheme.id} value={scheme.id}>{scheme.name}</option>)}</select></label>
           <div className="ribbon-color-gallery" role="group" aria-label="Quick color schemes">{quickColorSchemes.map(([mode, label]) => <button key={mode} className={`ribbon-color-button ${colorMode === mode ? "ribbon-color-button--active" : ""}`} type="button" onClick={() => onColorMode(mode)} aria-pressed={colorMode === mode} data-color-mode={mode}>{label}</button>)}</div>
           <span className="ribbon-scheme-count">{COLOR_MODES.length} schemes</span>
+        </div> : activeCategory === "Edit" ? <div className="ribbon-edit-controls" role="group" aria-label="Scientific topology editing">
+          <div className="ribbon-edit-summary"><span className="eyebrow">CANONICAL EDIT</span><strong>{editSelectionCount} atom{editSelectionCount === 1 ? "" : "s"} selected</strong><small>{editObjectName ?? "Select a workspace object"}</small></div>
+          <button className="tool-button" type="button" onClick={() => onAction("HISTORY.UNDO")} disabled={!canUndo} aria-label="Undo" data-action-id="HISTORY.UNDO"><Icon name="undo" size={20} /><span>Undo</span></button>
+          <button className="tool-button" type="button" onClick={() => onAction("HISTORY.REDO")} disabled={!canRedo} aria-label="Redo" data-action-id="HISTORY.REDO"><Icon name="redo" size={20} /><span>Redo</span></button>
+          <button className="tool-button" type="button" onClick={() => onAction("EDIT.ATOM_DELETE")} disabled={editSelectionCount < 1} aria-label="Delete Selected" data-action-id="EDIT.ATOM_DELETE"><Icon name="trash" size={20} /><span>Delete Selected</span></button>
+          <button className="tool-button" type="button" onClick={() => onAction("EDIT.BOND_CREATE")} disabled={editSelectionCount !== 2} aria-label="Create Bond" data-action-id="EDIT.BOND_CREATE"><Icon name="plus" size={20} /><span>Create Bond</span></button>
+          <button className="tool-button" type="button" onClick={() => onAction("EDIT.BOND_DELETE")} disabled={editSelectionCount !== 2} aria-label="Delete Bond" data-action-id="EDIT.BOND_DELETE"><Icon name="minus" size={20} /><span>Delete Bond</span></button>
+          <button className="tool-button" type="button" onClick={() => onAction("EDIT.HYDROGEN_ADD")} disabled={editSelectionCount < 1} aria-label="Add Hydrogens" data-action-id="EDIT.HYDROGEN_ADD"><Icon name="beaker" size={20} /><span>Add Hydrogens</span></button>
+          <button className="tool-button" type="button" onClick={() => onAction("EDIT.HYDROGEN_REFILL")} disabled={editSelectionCount < 1} aria-label="Refill Hydrogens" data-action-id="EDIT.HYDROGEN_REFILL"><Icon name="rotate" size={20} /><span>Refill H</span></button>
+          <button className="tool-button" type="button" onClick={() => onAction("EDIT.HYDROGEN_REMOVE")} disabled={editSelectionCount < 1} aria-label="Remove Explicit H" data-action-id="EDIT.HYDROGEN_REMOVE"><Icon name="trash" size={20} /><span>Remove Explicit H</span></button>
+          <button className="tool-button" type="button" onClick={() => onAction("EDIT.ATOM_ATTACH")} disabled={editSelectionCount !== 1} aria-label="Attach Atom" data-action-id="EDIT.ATOM_ATTACH"><Icon name="atom" size={20} /><span>Attach Atom</span></button>
+          <button className="tool-button" type="button" onClick={() => onAction("EDIT.ATOM_REPLACE")} disabled={editSelectionCount !== 1} aria-label="Replace Atom" data-action-id="EDIT.ATOM_REPLACE"><Icon name="shapes" size={20} /><span>Replace Atom</span></button>
+          <label className="ribbon-select-label">Bond order<select aria-label="Bond order" disabled={editSelectionCount !== 2 || !onEditBondOrder} defaultValue="SINGLE" onChange={(event) => onEditBondOrder?.(event.target.value as Exclude<BondOrder, "UNKNOWN">)}>{["SINGLE", "DOUBLE", "TRIPLE", "AROMATIC"].map((order) => <option key={order} value={order}>{order}</option>)}</select></label>
         </div> : <>
           {activeCategory === "File" && showRcsb && <form className="ribbon-rcsb-form" onSubmit={submitRcsb} aria-label="RCSB structure fetch"><label htmlFor="ribbon-pdb-id">RCSB PDB ID</label><input id="ribbon-pdb-id" ref={rcsbInputRef} aria-label="RCSB PDB ID" placeholder="4DJW" value={pdbId} onChange={(event) => setPdbId(event.target.value)} maxLength={4} /><button type="submit" aria-label="RCSB fetch">Fetch</button><button type="button" aria-label="RCSB add" onClick={addRcsb}>Add</button><span>Official mmCIF via backend</span></form>}
           {items.map((item) => {

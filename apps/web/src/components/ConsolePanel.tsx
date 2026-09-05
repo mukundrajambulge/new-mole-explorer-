@@ -4,7 +4,7 @@ import { commandSuggestions } from "../commands/commandRegistry";
 import { Icon } from "./Icon";
 
 type ConsoleDiagnostic = { message: string; span?: { start: number; end: number } };
-type ConsoleEntry = { category: "SYSTEM" | "SELECTION" | "PRESENTATION" | "MEASURE" | "OBJECT" | "VIEW" | "CAPABILITY"; command: string; status: string; timestamp: string; count?: number; diagnostics?: readonly ConsoleDiagnostic[] };
+type ConsoleEntry = { category: "SYSTEM" | "SELECTION" | "PRESENTATION" | "MEASURE" | "OBJECT" | "VIEW" | "HISTORY" | "EDIT" | "CAPABILITY"; command: string; status: string; timestamp: string; count?: number; diagnostics?: readonly ConsoleDiagnostic[] };
 export type ConsoleCommandResult = { category: ConsoleEntry["category"]; status: string; count?: number; diagnostics?: readonly ConsoleDiagnostic[] };
 
 const initialEntries: ConsoleEntry[] = [

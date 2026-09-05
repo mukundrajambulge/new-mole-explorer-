@@ -1,0 +1,36 @@
+{
+  "gate": "R07-B1",
+  "status": "COMPLETE",
+  "authoritativeRepo": "C:\\Users\\mukun\\Documents\\Codex\\2026-08-30\\files-pasted-by-the-user-new\\outputs\\molecular-workstation",
+  "localRepoRoot": "C:\\Users\\mukun\\Documents\\Codex\\2026-08-30\\files-pasted-by-the-user-new\\outputs\\molecular-workstation",
+  "worktreeRoot": "C:\\Users\\mukun\\Documents\\Codex\\2026-08-30\\files-pasted-by-the-user-new\\outputs\\molecular-workstation-r07-b1",
+  "branch": "feature/r07-editing-foundation",
+  "baseSha": "5aced1b45f8997a9efef90928e6da306e53989e9",
+  "implementationHead": "5e5694a",
+  "researchAuthority": [
+    "R-PYMOL-07 — Molecular Editing, Bonds, Hydrogens & Undo/Redo",
+    "R-PYMOL-05 — Objects, Models, Coordinate States & Multi-Object Workflows"
+  ],
+  "tests": {
+    "webUnitTestFiles": 19,
+    "webUnitTests": 101,
+    "apiUnitTestFiles": 2,
+    "apiUnitTests": 20,
+    "visualizationE2e": { "passed": 10, "total": 10 },
+    "multiObjectStateE2e": { "passed": 11, "total": 11 },
+    "selectionClosureE2e": { "passed": 14, "total": 14 },
+    "r07B1E2e": { "passed": 1, "total": 1 }
+  },
+  "checks": {
+    "typecheck": true,
+    "lint": true,
+    "build": true,
+    "diffCheck": true,
+    "worktreeCleanBeforeDocsCommit": false
+  },
+  "deferred": {
+    "b2": ["full delete atom UI", "remove command", "bond create/delete/order UI and commands", "full edit panel"],
+    "b3": ["hydrogen add/fill", "protonation", "aromaticity", "advanced chemical perception", "fragment attach", "residue chemistry replacement"]
+  },
+  "commits": ["b42cf2f", "6dedcd3", "5e5694a"]
+}

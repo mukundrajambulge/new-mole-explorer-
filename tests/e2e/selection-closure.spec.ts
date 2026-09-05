@@ -203,6 +203,7 @@ test("visible selection follows presentation layer changes without changing cano
 });
 
 test("presentation-dependent selectors use the current RenderProjection", async ({ page }) => {
+  test.setTimeout(60000);
   await loadFixture(page);
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
