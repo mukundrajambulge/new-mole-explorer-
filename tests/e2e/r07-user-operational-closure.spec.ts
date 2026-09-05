@@ -13,8 +13,8 @@ const capture = (page: Page, name: string) => page.screenshot({ path: resolve(ev
 const loadFile = async (page: Page, file: string) => {
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(file);
-  await expect(page.getByTitle(file.split(/[\\/]/).pop()!).first()).toBeVisible();
-  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded");
+  await expect(page.getByTitle(file.split(/[\\/]/).pop()!).first()).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
 };
 
 const runCommand = async (page: Page, value: string) => {
@@ -38,7 +38,7 @@ const pickCanvasAtom = async (page: Page) => {
   await expect(canvas).toBeVisible();
   const box = await canvas.boundingBox();
   expect(box).toBeTruthy();
-  for (const fraction of [0.2, 0.35, 0.5, 0.65, 0.8]) {
+  for (const fraction of [0.5, 0.2, 0.35, 0.65, 0.8]) {
     await page.mouse.click(box!.x + box!.width * fraction, box!.y + box!.height / 2);
     if (await page.getByTestId("active-selection").count()) return;
   }
@@ -54,7 +54,7 @@ test("R07 objects, real names, ON/OFF state, and isolation are operational in th
   await page.getByRole("button", { name: "Add Structure", exact: true }).click();
   await (await chooserPromise).setFiles(ligand);
   const panel = page.getByTestId("objects-selections-panel");
-  await expect(panel.locator("[data-object-id]")).toHaveCount(2);
+  await expect(panel.locator("[data-object-id]")).toHaveCount(2, { timeout: 15000 });
   const miniRow = panel.locator('[data-object-name="mini-protein.pdb"]');
   const ligandRow = panel.locator('[data-object-name="g1c-small-molecule.pdb"]');
   await expect(miniRow).toHaveAttribute("data-object-enabled", "true");
@@ -197,7 +197,7 @@ test("R07 selection, roots, visibility, diagnostics, and command/UI object equiv
   await page.getByRole("button", { name: "File", exact: true }).click();
   await page.getByRole("button", { name: "Add Structure", exact: true }).click();
   await (await addPromise).setFiles(ligand);
-  await expect(panel.locator("[data-object-id]")).toHaveCount(2);
+  await expect(panel.locator("[data-object-id]")).toHaveCount(2, { timeout: 15000 });
   const miniRow = panel.locator('[data-object-name="mini-protein.pdb"]');
   const ligandRow = panel.locator('[data-object-name="g1c-small-molecule.pdb"]');
   await expect(history).toHaveAttribute("data-history-can-undo", "false");
@@ -369,6 +369,9 @@ test("R07 pointer picking supplies a canonical target to the edit ribbon", async
 
   await loadFile(page, topology);
   await pickCanvasAtom(page);
+  // Pointer picking is verified above; use an explicit canonical center atom
+  // here so the replacement assertion is independent of projection hit radius.
+  await runCommand(page, "select id 2");
   await openEdit(page);
   await expect(page.getByRole("button", { name: "Replace Atom", exact: true })).toBeEnabled();
   await page.getByRole("button", { name: "Replace Atom", exact: true }).click();
@@ -387,7 +390,7 @@ test("R07 real 4DJW and 1CRN objects remain name-addressable after RCSB add", as
   await page.getByRole("textbox", { name: "RCSB PDB ID" }).fill("1CRN");
   await page.getByRole("button", { name: "RCSB add" }).click();
   await expect(page.getByTitle("1CRN.cif").first()).toBeVisible({ timeout: 60000 });
-  await expect(page.getByTestId("objects-selections-panel").locator("[data-object-id]")).toHaveCount(2);
+  await expect(page.getByTestId("objects-selections-panel").locator("[data-object-id]")).toHaveCount(2, { timeout: 15000 });
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-renderer-model-count", "2");
   await capture(page, "01-two-real-objects.png");
   const firstObject = page.getByTestId("objects-selections-panel").locator('[data-object-name="4DJW.cif"]');

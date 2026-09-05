@@ -24,7 +24,6 @@ type MolecularCanvasProps = {
   onAction: (actionId: ActionId) => void;
   onImport: () => void;
   onFileDrop: (file: File) => void;
-  consoleExpanded: boolean;
   onPick: (result: PickResult) => void;
   onHover: (result: PickResult | null) => void;
   onBackgroundPick: () => void;
@@ -53,7 +52,6 @@ export const MolecularCanvas = ({
   onAction,
   onImport,
   onFileDrop,
-  consoleExpanded,
   onPick,
   onHover,
   onBackgroundPick,
@@ -67,7 +65,6 @@ export const MolecularCanvas = ({
   const projectionRef = useRef(projection);
   const [dragActive, setDragActive] = useState(false);
   const [viewerError, setViewerError] = useState<string | null>(null);
-  const [viewerBottomInset, setViewerBottomInset] = useState(0);
   const pickRef = useRef(onPick);
   const hoverRef = useRef(onHover);
   const pointerGestureRef = useRef(false);
@@ -105,15 +102,11 @@ export const MolecularCanvas = ({
     const host = hostRef.current;
     if (!adapter || !host) return undefined;
     const updateViewport = () => {
-      const canvasRect = canvasRef.current?.getBoundingClientRect();
       const hostRect = host.getBoundingClientRect();
       const width = hostRect.width;
       const height = hostRect.height;
       const visible = { top: 0, bottom: height, left: 0, right: width };
       const occluder = document.querySelector<HTMLElement>(".console-layer")?.getBoundingClientRect();
-      let bottomInset = 0;
-      if (canvasRect && occluder && occluder.left < canvasRect.right && occluder.right > canvasRect.left && occluder.top < canvasRect.bottom && occluder.bottom > canvasRect.top) bottomInset = Math.max(0, Math.min(canvasRect.height, canvasRect.bottom - occluder.top));
-      setViewerBottomInset((current) => Math.abs(current - bottomInset) < 1 ? current : bottomInset);
       if (occluder && occluder.left < hostRect.right && occluder.right > hostRect.left && occluder.top < hostRect.bottom && occluder.bottom > hostRect.top) {
         const left = Math.max(0, occluder.left - hostRect.left);
         const right = Math.min(width, occluder.right - hostRect.left);
@@ -133,12 +126,12 @@ export const MolecularCanvas = ({
     observer.observe(host);
     const consoleLayer = document.querySelector<HTMLElement>(".console-layer");
     if (consoleLayer) observer.observe(consoleLayer);
-    window.addEventListener("resize", updateViewport);
+      window.addEventListener("resize", updateViewport);
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", updateViewport);
     };
-  }, [consoleExpanded, structure, viewerBottomInset]);
+  }, [structure]);
 
   useEffect(() => {
     if (!structure || !adapterRef.current) return;
@@ -224,6 +217,7 @@ export const MolecularCanvas = ({
       <div
         ref={canvasRef}
         className="molecular-canvas"
+        data-testid="molecular-canvas"
         onDragEnter={(event) => { event.preventDefault(); setDragActive(true); }}
         onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = "copy"; setDragActive(true); }}
         onDragLeave={(event) => { if (event.currentTarget === event.target) setDragActive(false); }}
@@ -233,7 +227,7 @@ export const MolecularCanvas = ({
         onPointerUp={endPointerGesture}
         onPointerCancel={endPointerGesture}
       >
-        <div ref={hostRef} className="viewer-host" style={{ bottom: `${viewerBottomInset}px` }} data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} data-global-frame-index={globalFrameIndex} data-renderer-object-count={workspaceObjects.length || (structure ? 1 : 0)} data-selection-membership-hash={activeSelectionMembershipHash} data-scientific-revision={structure?.structure.scientificHash ?? ""} data-canonical-atom-count={structure?.structure.counts.atoms ?? ""} data-canonical-bond-count={structure?.structure.bonds.length ?? ""} data-canonical-atom-ids={structure?.structure.atoms.map((atom) => atom.stableId).join("|") ?? ""} data-canonical-bond-orders={structure?.structure.bonds.map((bond) => `${bond.atom1}:${bond.atom2}:${bond.order}`).join("|") ?? ""} />
+        <div ref={hostRef} className="viewer-host" data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} data-global-frame-index={globalFrameIndex} data-renderer-object-count={workspaceObjects.length || (structure ? 1 : 0)} data-selection-membership-hash={activeSelectionMembershipHash} data-scientific-revision={structure?.structure.scientificHash ?? ""} data-canonical-atom-count={structure?.structure.counts.atoms ?? ""} data-canonical-bond-count={structure?.structure.bonds.length ?? ""} data-canonical-atom-ids={structure?.structure.atoms.map((atom) => atom.stableId).join("|") ?? ""} data-canonical-bond-orders={structure?.structure.bonds.map((bond) => `${bond.atom1}:${bond.atom2}:${bond.order}`).join("|") ?? ""} />
         {!structure && !loading && (
           <div className="empty-viewer-state">
             <div className="empty-viewer-card">

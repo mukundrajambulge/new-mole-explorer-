@@ -1111,7 +1111,19 @@ export class EditTransaction {
       const centerSet = new Set(centerIds);
       return atoms.filter((atom) => hydrogenElement(atom) && bonds.some((bond) => centerSet.has(bond.atom1 === atom.stableId ? bond.atom2 : bond.atom2 === atom.stableId ? bond.atom1 : ""))).map((atom) => atom.stableId);
     };
-    const centers = operation === "EDIT_REFILL_HYDROGENS" && targetBond ? [targetBond.atom1, targetBond.atom2] : targetAtomIds;
+    const refillCenters = operation === "EDIT_REFILL_HYDROGENS" && !targetBond
+      ? [...new Set(targetAtomIds.flatMap((atomId) => {
+        const atom = atomById.get(atomId);
+        if (!atom || !hydrogenElement(atom)) return [atomId];
+        return baseStructure.bonds.flatMap((bond) => {
+          if (bond.atom1 !== atomId && bond.atom2 !== atomId) return [];
+          const parentId = bond.atom1 === atomId ? bond.atom2 : bond.atom1;
+          const parent = atomById.get(parentId);
+          return parent && !hydrogenElement(parent) ? [parentId] : [];
+        });
+      }))]
+      : targetAtomIds;
+    const centers = operation === "EDIT_REFILL_HYDROGENS" && targetBond ? [targetBond.atom1, targetBond.atom2] : refillCenters;
     const retiredAtomIds = new Set<string>();
     const retiredBondIds = new Set<string>();
     let candidateAtoms = baseStructure.atoms.map((atom) => ({ ...atom }));
