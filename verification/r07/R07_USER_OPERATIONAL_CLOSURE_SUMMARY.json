@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "gate": "R07_USER_OPERATIONAL_CLOSURE",
+  "status": "COMPLETE_PENDING_USER_MANUAL_APPROVAL",
+  "repository": "https://github.com/mukundrajambulge/new-mole-explorer-.git",
+  "repositoryRoot": "C:\\Users\\mukun\\Desktop\\molecular-workstation",
+  "branch": "fix/r07-user-operational-closure",
+  "baseBranch": "integration/r07-b1-b3",
+  "baseSha": "aa6100a0b5f474433d7ec1355495a39655f0fd06",
+  "implementationSha": "c9c8c71820f40cef3947e843b5250698a8942cab",
+  "scope": {
+    "r08Started": false,
+    "mainMerged": false,
+    "alignmentOrRmsdStarted": false,
+    "dockingStarted": false,
+    "canonicalIdentityBypass": false,
+    "historicalReportsRewritten": false
+  },
+  "acceptance": {
+    "objectsAndIsolation": "PASS",
+    "activeObjectAndDiagnostics": "PASS",
+    "historyRootUndoRedoUi": "PASS",
+    "b2DeleteAndBondUi": "PASS",
+    "b3AddRefillRemoveAttachReplaceUi": "PASS",
+    "realCanvasPointerPicking": "PASS",
+    "real4DJWAnd1CRN": "PASS"
+  },
+  "verification": {
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "unitWeb": { "tests": 116, "status": "PASS" },
+    "unitApi": { "tests": 22, "status": "PASS" },
+    "unitTotal": 138,
+    "build": "PASS",
+    "focusedOperational": { "testsPerRun": 6, "runs": 3, "passed": 18, "status": "PASS" },
+    "playwrightListed": { "files": 18, "tests": 96, "status": "PASS" },
+    "completeE2E": { "tests": 96, "passed": 96, "status": "PASS" },
+    "pymolOracle": "ORACLE_PENDING"
+  },
+  "realStructures": {
+    "4DJW": { "objectName": "4DJW.cif", "atoms": 7079, "residues": 786, "chains": 9, "status": "PASS" },
+    "1CRN": { "objectName": "1CRN.cif", "atoms": 327, "residues": 46, "chains": 1, "status": "PASS" }
+  },
+  "evidenceDirectory": "verification/evidence/r07-operational-closure",
+  "evidenceCount": 17,
+  "ci": {
+    "workflow": "molecular-workstation-ci",
+    "implementationRunId": "33959159602",
+    "implementationRunUrl": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33959159602",
+    "implementationRunHeadSha": "c9c8c71820f40cef3947e843b5250698a8942cab",
+    "implementationRunStatus": "PASS",
+    "finalTipRun": "VERIFIED_AFTER_REPORT_PUSH"
+  },
+  "launchUrl": "http://localhost:3101/molstudio",
+  "manualApprovalRequired": true,
+  "readyToMergeMain": false
+}
