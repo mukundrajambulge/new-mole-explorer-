@@ -8,6 +8,7 @@
 | BASE SHA | `1964784dadb436a45cd9ad7c69dba4908a04ed2c` |
 | FIX BRANCH | `fix/manual-gate-02-camera-viewport-integrity` |
 | FINAL CODE/EVIDENCE SHA | `112b972` |
+| REPORT CLOSURE SHA | `4d083d5` |
 | Scope | Camera, viewport, console overlay, structure-integrity proof, Manual Gate 02 only |
 
 R08, alignment/RMSD, docking, coordinate mutation, fabricated bonds, and main-branch merge were not performed.
@@ -85,7 +86,7 @@ The E2E camera assertions compare scientific revision, canonical atom/bond ident
 | MANUAL GATE 01 | PASS — viewer performance/VDW suite |
 | MANUAL GATE 02 | PASS — `1/1` test; `12/12` required screenshots |
 | FULL E2E | PASS — `101/101` |
-| GITHUB CI | PENDING until the pushed final branch tip is reported below |
+| GITHUB CI | PASS — [run 33990679280](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33990679280) on exact tip `4d083d5` |
 
 ## Manual evidence
 

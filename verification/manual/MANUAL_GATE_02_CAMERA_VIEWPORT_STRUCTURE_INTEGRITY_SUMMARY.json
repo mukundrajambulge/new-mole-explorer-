@@ -7,6 +7,7 @@
   },
   "fixBranch": "fix/manual-gate-02-camera-viewport-integrity",
   "finalCodeEvidenceSha": "112b972",
+  "reportClosureSha": "4d083d5",
   "scientificStructureIntegrity": {
     "sourceUri": "https://files.rcsb.org/download/4DJW.cif",
     "sourceSha256": "c816a3b9e947cc71bf5390b2d10aeb117f0b6a2e7b16efbba3bf4c56c8d044f2",
@@ -60,7 +61,12 @@
     "manualGate01": "PASS",
     "manualGate02": { "status": "PASS", "passed": 1, "total": 1 },
     "fullE2e": { "status": "PASS", "passed": 101, "total": 101 },
-    "githubCi": "PENDING"
+    "githubCi": {
+      "status": "PASS",
+      "runId": 33990679280,
+      "headSha": "4d083d5356f30f10482b66ea7a7b8af796b84a82",
+      "url": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33990679280"
+    }
   },
   "evidenceDirectory": "verification/evidence/manual-gate-02",
   "userRetest": "READY",
