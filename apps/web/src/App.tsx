@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { BondOrder, ProjectRecord, StructureLoadResult } from "@molecular/contracts";
 import { CapabilityNotice } from "./components/CapabilityNotice";
 import { ConsolePanel, type ConsoleCommandResult } from "./components/ConsolePanel";
@@ -201,11 +201,11 @@ export const App = () => {
     return () => { mounted = false; };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!activeObjectId) return;
-    // A rapid sequence of presentation updates can leave an older effect in
-    // the queue. Never let that stale closure write an older projection back
-    // over the current workspace state.
+    // Keep the active workspace object authoritative before the canvas effects
+    // run. A large 4DJW projection can otherwise let the adapter see the old
+    // object presentation after the visible projection state has advanced.
     if (projectionStateRef.current !== projection) return;
     const current = workspaceObjectsRef.current;
     const active = current.find((object) => object.objectId === activeObjectId);

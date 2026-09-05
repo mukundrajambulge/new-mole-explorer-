@@ -23,6 +23,22 @@ type StyleRepresentation = "lines" | "sticks" | "spheres" | "cartoon" | "licoric
 type StyleProfile = "default" | "water" | "nonbonded" | "ball" | "space" | "cartoon" | "ribbon" | "trace" | "putty";
 export type ViewerInteractionHandlers = { onPick?: (result: PickResult) => void; onHover?: (result: PickResult | null) => void };
 type SurfaceHandleState = { surfaceIds: number[]; surfaceKinds: Array<"surface" | "mesh">; dotSurfaceShapes: GLShape[]; geometryKey: string; materialKey: string };
+type ViewerModel = ReturnType<GLViewer["addModel"]>;
+
+const sceneProjectionChanged = (previous: RenderProjection | null | undefined, next: RenderProjection): boolean => !previous
+  || previous.representation !== next.representation
+  || previous.showProtein !== next.showProtein
+  || previous.showLigand !== next.showLigand
+  || previous.showWater !== next.showWater
+  || previous.showIons !== next.showIons
+  || previous.showOther !== next.showOther
+  || previous.representationState !== next.representationState
+  || previous.color !== next.color;
+
+const cameraProjectionChanged = (previous: RenderProjection | null | undefined, next: RenderProjection): boolean => !previous || previous.camera !== next.camera;
+const labelsProjectionChanged = (previous: RenderProjection | null | undefined, next: RenderProjection): boolean => !previous || previous.labels !== next.labels;
+const interactionProjectionChanged = (previous: RenderProjection | null | undefined, next: RenderProjection): boolean => !previous || previous.interaction !== next.interaction;
+const isSurfacePrimitive = (primitive: RenderProjectionDiagnostics["directives"][number]["primitive"]): boolean => primitive === "surface" || primitive === "mesh" || primitive === "dots";
 
 const styleFor = (representation: StyleRepresentation, projection: RenderProjection, structure: CanonicalMolecularStructure, profile: StyleProfile = "default", thicknessOverride?: number): AtomStyleSpec => {
   const explicitColor = colorRegistry.cssColor(projection.color);
@@ -119,6 +135,9 @@ export class ThreeDMolViewerAdapter {
   /** Surface handles are scoped to a workspace object/state, never to a global 3Dmol model index. */
   private readonly workspaceSurfaceHandles = new Map<string, SurfaceHandleState>();
   private readonly workspaceSurfaceRebuilds = new Map<string, number>();
+  private readonly styledModels = new Set<ViewerModel>();
+  private readonly surfaceFallbackModels = new Set<ViewerModel>();
+  private readonly surfaceReadyModels = new Set<ViewerModel>();
   private workspaceSurfaceGeneration = 0;
   private measurements: readonly MeasurementObject[] = [];
   private auxiliaryModels: Array<{ model: ReturnType<GLViewer["addModel"]>; object: WorkspaceObject }> = [];
@@ -197,6 +216,9 @@ export class ThreeDMolViewerAdapter {
     this.dotSurfaceShapes = [];
     this.workspaceSurfaceHandles.clear();
     this.workspaceSurfaceRebuilds.clear();
+    this.styledModels.clear();
+    this.surfaceFallbackModels.clear();
+    this.surfaceReadyModels.clear();
     this.activeSurfaceKey = null;
     this.activeSurfaceGeometryKey = null;
     this.interactionShapes = [];
@@ -244,12 +266,13 @@ export class ThreeDMolViewerAdapter {
       model.addAtoms(this.atomSpecsFor(this.renderLoadResultForState(object).structure, object.objectId));
       return { model, object };
     });
-    this.renderPrimaryWorkspaceModel();
-    this.renderAuxiliaryModels();
     // load() applies the primary projection for the single-object path. Once
     // the workspace is known, replace that global surface set with the
     // object/state-scoped surface registry.
     this.clearStandaloneSurfaceHandles();
+    this.surfaceReadyModels.clear();
+    this.renderPrimaryWorkspaceModel();
+    this.renderAuxiliaryModels();
     this.applyWorkspaceSurfaces(objects);
     this.bindWorkspacePicking();
     this.writeWorkspaceProjectionState();
@@ -268,6 +291,10 @@ export class ThreeDMolViewerAdapter {
       return;
     }
     const scientificRevisionChanged = previousObjects.length === effectiveObjects.length && previousObjects.some((previous, index) => previous.loadResult.structure.scientificHash !== effectiveObjects[index]?.loadResult.structure.scientificHash);
+    const modelStateChanged = scientificRevisionChanged || previousObjects.length !== effectiveObjects.length || effectiveObjects.some((object, index) => previousObjects[index]?.currentStateId !== object.currentStateId);
+    const objectSceneChanged = modelStateChanged || effectiveObjects.some((object, index) => sceneProjectionChanged(previousObjects[index]?.projection, object.projection));
+    const objectLabelsChanged = effectiveObjects.some((object, index) => labelsProjectionChanged(previousObjects[index]?.projection, object.projection));
+    const objectInteractionChanged = effectiveObjects.some((object, index) => interactionProjectionChanged(previousObjects[index]?.projection, object.projection));
     if (this.viewer && this.hasModel && effectiveObjects[0]) {
       const primaryChanged = scientificRevisionChanged || previousObjects[0]?.currentStateId !== effectiveObjects[0].currentStateId;
       if (primaryChanged && this.primaryModel) this.replaceModelAtoms(this.primaryModel, effectiveObjects[0]);
@@ -291,13 +318,13 @@ export class ThreeDMolViewerAdapter {
     }
     const previousProjection = this.projection;
     this.workspaceObjects = effectiveObjects;
+    const interactionCameraChanged = interactionProjection ? cameraProjectionChanged(previousProjection, interactionProjection) : false;
+    const interactionBackgroundChanged = interactionProjection ? !previousProjection || previousProjection.background !== interactionProjection.background : false;
     if (!this.viewer || !this.hasModel) return;
     if (interactionProjection) {
-      const backgroundDirty = !previousProjection || previousProjection.background !== interactionProjection.background;
-      const cameraDirty = !previousProjection || previousProjection.camera !== interactionProjection.camera;
       this.projection = interactionProjection;
-      if (backgroundDirty) this.viewer.setBackgroundColor(interactionProjection.background.color, 1);
-      if (cameraDirty) {
+      if (interactionBackgroundChanged) this.viewer.setBackgroundColor(interactionProjection.background.color, 1);
+      if (interactionCameraChanged) {
         const preservedView = this.viewer.getView();
         this.cameraState = { ...interactionProjection.camera, view: preservedView, defaultView: this.baselineView ? [...this.baselineView] : interactionProjection.camera.defaultView };
         this.viewer.setProjection(interactionProjection.camera.projectionMode);
@@ -305,21 +332,28 @@ export class ThreeDMolViewerAdapter {
         this.applyClipping();
       }
     }
-    this.renderPrimaryWorkspaceModel();
-    this.renderAuxiliaryModels();
-    if (effectiveObjects[0]) {
+    if (objectSceneChanged) {
+      this.renderPrimaryWorkspaceModel();
+      this.renderAuxiliaryModels();
+    }
+    if (objectSceneChanged || effectiveObjects[0]) {
+      // Keep the diagnostics bound to the same authoritative object that was
+      // just installed. Camera-only updates still refresh camera metadata, but
+      // do not rebuild model styles or surface geometry.
       this.diagnostics = buildRenderProjectionDiagnostics(this.renderLoadResultForState(effectiveObjects[0]).structure, effectiveObjects[0].projection);
       this.writeDiagnostics(this.diagnostics);
     }
-    this.applyWorkspaceSurfaces(effectiveObjects);
-    this.bindWorkspacePicking();
+    if (objectSceneChanged || modelStateChanged) this.applyWorkspaceSurfaces(effectiveObjects);
+    if (objectSceneChanged || modelStateChanged) this.bindWorkspacePicking();
     this.writeWorkspaceProjectionState();
     this.container?.setAttribute("data-renderer-model-count", String(this.auxiliaryModels.length + 1));
-    if (this.projection) {
+    if (this.projection && objectLabelsChanged) {
       this.projectLabels(this.projection);
+    }
+    if (this.projection && objectInteractionChanged) {
       this.projectInteractionHighlights(this.projection);
     }
-    this.render();
+    if (objectSceneChanged || interactionCameraChanged || interactionBackgroundChanged || objectLabelsChanged || objectInteractionChanged || modelStateChanged) this.render();
   }
 
   setProjection(projection: RenderProjection, options: { preserveView?: boolean } = {}): void {
@@ -383,12 +417,12 @@ export class ThreeDMolViewerAdapter {
   }
   endGesture(): void { if (this.gestureFrame !== null) window.cancelAnimationFrame(this.gestureFrame); this.gestureFrame = null; this.pendingGestureDelta = { x: 0, y: 0 }; this.gesture = null; }
 
-   destroy(): void {
+  destroy(): void {
     if (this.container && mountedAdapters.get(this.container) === this) mountedAdapters.delete(this.container);
     this.resizeObserver?.disconnect(); this.resizeObserver = null;
     if (this.viewer) { this.viewer.clear(); this.viewer = null; }
     this.cameraController = null;
-    this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.auxiliaryModels = []; this.workspaceObjects = []; this.workspaceSurfaceHandles.clear(); this.workspaceSurfaceRebuilds.clear(); this.primaryModel = null; this.primaryObjectEnabled = true; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceKinds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
+    this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.auxiliaryModels = []; this.workspaceObjects = []; this.workspaceSurfaceHandles.clear(); this.workspaceSurfaceRebuilds.clear(); this.styledModels.clear(); this.surfaceFallbackModels.clear(); this.surfaceReadyModels.clear(); this.primaryModel = null; this.primaryObjectEnabled = true; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceKinds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
   }
   getDiagnostics(): RenderProjectionDiagnostics { return this.diagnostics; }
 
@@ -449,9 +483,22 @@ export class ThreeDMolViewerAdapter {
 
   private renderWorkspaceModel(model: ReturnType<GLViewer["addModel"]>, object: WorkspaceObject): void {
     const structure = structureForWorkspaceObjectState(object);
-    if (!object.enabled) { model.setStyle({}, { cartoon: { hidden: true }, stick: { hidden: true }, sphere: { hidden: true }, line: { hidden: true } }); return; }
+    if (!object.enabled) { model.setStyle({}, { cartoon: { hidden: true }, stick: { hidden: true }, sphere: { hidden: true }, line: { hidden: true } }); this.styledModels.delete(model); this.surfaceFallbackModels.delete(model); this.surfaceReadyModels.delete(model); return; }
     const diagnostics = buildRenderProjectionDiagnostics(structure, object.projection);
+    const surfaceOnly = diagnostics.directives.length > 0 && diagnostics.directives.every((directive) => isSurfacePrimitive(directive.primitive));
+    if (surfaceOnly) {
+      // Keep the prior atom presentation while native 3Dmol generates the
+      // replacement surface. A fresh surface-only load gets a lightweight
+      // atom fallback so it is never an empty viewport during generation.
+      if (this.surfaceReadyModels.has(model)) return;
+      if (!this.styledModels.has(model)) this.renderSurfaceFallback(model, structure, object.projection, diagnostics.directives[0]?.targetStableAtomIds ?? []);
+      this.surfaceFallbackModels.add(model);
+      return;
+    }
     model.setStyle({}, {});
+    this.styledModels.add(model);
+    this.surfaceFallbackModels.delete(model);
+    this.surfaceReadyModels.delete(model);
     const targetFor = (stableIds: readonly string[]): AtomSelectionSpec => {
       const ids = new Set(stableIds);
       return { predicate: (atom) => typeof atom.properties?.canonicalStableId === "string" && ids.has(atom.properties.canonicalStableId) };
@@ -474,6 +521,21 @@ export class ThreeDMolViewerAdapter {
     for (const { model, object } of this.auxiliaryModels) {
       this.renderWorkspaceModel(model, object);
     }
+  }
+  private renderSurfaceFallback(model: ViewerModel, structure: CanonicalMolecularStructure, projection: RenderProjection, targetStableAtomIds: readonly string[]): void {
+    model.setStyle({}, {});
+    const targetIds = new Set(targetStableAtomIds.length ? targetStableAtomIds : structure.atoms.map((atom) => atom.stableId));
+    const target = { predicate: (atom: AtomSpec) => typeof atom.properties?.canonicalStableId === "string" && targetIds.has(atom.properties.canonicalStableId) };
+    model.setStyle(target, styleFor("sticks", projection, structure), true);
+    this.styledModels.add(model);
+    this.surfaceFallbackModels.add(model);
+    this.surfaceReadyModels.delete(model);
+  }
+  private clearSurfaceFallback(model: ViewerModel): void {
+    if (this.surfaceFallbackModels.has(model)) model.setStyle({}, {});
+    this.surfaceFallbackModels.delete(model);
+    this.styledModels.delete(model);
+    this.surfaceReadyModels.add(model);
   }
   private canonicalSelection(predicate: (atom: CanonicalMolecularStructure["atoms"][number]) => boolean): AtomSelectionSpec { const indices = new Set(this.structure!.atoms.map((atom, index) => predicate(atom) ? index : -1).filter((index) => index >= 0)); return { predicate: (atom) => atom.index !== undefined && indices.has(atom.index) }; }
 
@@ -558,7 +620,13 @@ export class ThreeDMolViewerAdapter {
 
   private applyProjection(projection: RenderProjection): void {
     this.performance.projectionRebuilds += 1;
-    const viewer = this.viewer!; const structure = this.structure!; const diagnostics = buildRenderProjectionDiagnostics(structure, projection); this.diagnostics = diagnostics; this.writeDiagnostics(diagnostics); viewer.setStyle({}, {});
+    const viewer = this.viewer!; const structure = this.structure!; const diagnostics = buildRenderProjectionDiagnostics(structure, projection); this.diagnostics = diagnostics; this.writeDiagnostics(diagnostics);
+    const surfaceOnly = diagnostics.directives.length > 0 && diagnostics.directives.every((directive) => isSurfacePrimitive(directive.primitive));
+    const preservePriorGeometry = surfaceOnly && this.primaryModel !== null && (this.styledModels.has(this.primaryModel) || this.surfaceReadyModels.has(this.primaryModel));
+    if (!preservePriorGeometry) {
+      if (surfaceOnly && this.primaryModel) this.renderSurfaceFallback(this.primaryModel, structure, projection, diagnostics.directives[0]?.targetStableAtomIds ?? []);
+      else viewer.setStyle({}, {});
+    }
     if (!this.primaryObjectEnabled) {
       viewer.setStyle({}, { cartoon: { hidden: true }, stick: { hidden: true }, sphere: { hidden: true }, line: { hidden: true } });
       this.projectInteractionHighlights(projection);
@@ -575,6 +643,11 @@ export class ThreeDMolViewerAdapter {
       if (directive.primitive === "cross") viewer.addStyle(target, styleFor("cross", projection, structure));
       if (directive.primitive === "cartoon" && directive.styleProfile !== "putty") viewer.addStyle(target, styleFor("cartoon", projection, structure, (directive.styleProfile as StyleProfile | undefined) ?? "cartoon"));
       if (directive.primitive === "cartoon" && directive.styleProfile === "putty") this.applyPuttyStyles(target, projection, structure, directive.targetStableAtomIds);
+    }
+    if (!surfaceOnly && this.primaryModel) {
+      this.styledModels.add(this.primaryModel);
+      this.surfaceFallbackModels.delete(this.primaryModel);
+      this.surfaceReadyModels.delete(this.primaryModel);
     }
     if (diagnostics.waterSphereContributors > 0) viewer.addStyle(this.canonicalSelection((atom) => atom.isWater), styleFor("spheres", projection, structure, "water"));
     const colorDiagnostics = structure.atoms.map((atom) => resolveAtomColor(projection.color.mode, atom, structure, projection.color.customHex).diagnostic).filter((value): value is string => Boolean(value));
@@ -679,6 +752,7 @@ export class ThreeDMolViewerAdapter {
         continue;
       }
       if (previous && previous.geometryKey === geometryKey && previous.materialKey === materialKey) { readyCount += 1; continue; }
+      if (previous && previous.geometryKey !== geometryKey && !this.surfaceFallbackModels.has(entry.model)) this.renderSurfaceFallback(entry.model, entry.structure, entry.projection, surfaceDirectives[0]?.targetStableAtomIds ?? []);
       if (previous) this.clearWorkspaceSurfaceHandle(previous);
       const handle: SurfaceHandleState = { surfaceIds: [], surfaceKinds: [], dotSurfaceShapes: [], geometryKey, materialKey };
       this.workspaceSurfaceHandles.set(entry.key, handle);
@@ -714,6 +788,7 @@ export class ThreeDMolViewerAdapter {
           }
           this.performance.dotGenerations += cached ? 0 : 1;
           readyCount += 1;
+          this.clearSurfaceFallback(entry.model);
           continue;
         }
         if (directive.primitive === "mesh") {
@@ -736,6 +811,7 @@ export class ThreeDMolViewerAdapter {
             this.writeDiagnostics(this.diagnostics);
             this.container?.setAttribute("data-surface-ready", "true");
             this.container?.setAttribute("data-surface-state", "ready");
+            this.clearSurfaceFallback(entry.model);
             this.render();
           });
           if (typeof result === "number") { handle.surfaceIds.push(result); handle.surfaceKinds.push("mesh"); recordMeshGeneration(); }
@@ -748,6 +824,7 @@ export class ThreeDMolViewerAdapter {
           readyCount += 1;
           this.container?.setAttribute("data-surface-ready", "true");
           this.container?.setAttribute("data-surface-state", "ready");
+          this.clearSurfaceFallback(entry.model);
           this.render();
         });
         if (typeof result === "number") { handle.surfaceIds.push(result); handle.surfaceKinds.push("surface"); }
@@ -804,6 +881,7 @@ export class ThreeDMolViewerAdapter {
       this.activeSurfaceKey = nextKey;
       return;
     }
+    if (this.primaryModel && this.surfaceReadyModels.has(this.primaryModel)) this.renderSurfaceFallback(this.primaryModel, this.structure, projection, surfaceDirectives[0]?.targetStableAtomIds ?? []);
     this.viewer.removeAllSurfaces();
     this.dotSurfaceShapes.forEach((shape) => this.viewer?.removeShape(shape));
     this.dotSurfaceShapes = [];
@@ -847,6 +925,7 @@ export class ThreeDMolViewerAdapter {
         this.performance.dotGenerations += cached ? 0 : 1;
         this.container?.setAttribute("data-surface-ready", "true");
         this.container?.setAttribute("data-surface-state", "ready");
+        if (this.primaryModel) this.clearSurfaceFallback(this.primaryModel);
         continue;
       }
       if (directive.primitive === "mesh") {
@@ -874,6 +953,7 @@ export class ThreeDMolViewerAdapter {
           this.container?.setAttribute("data-renderer-surface-point-count", "native");
           this.container?.setAttribute("data-surface-ready", "true");
           this.container?.setAttribute("data-surface-state", "ready");
+          if (this.primaryModel) this.clearSurfaceFallback(this.primaryModel);
           this.render();
         });
         void result;
@@ -892,7 +972,8 @@ export class ThreeDMolViewerAdapter {
         }
         this.container?.setAttribute("data-surface-ready", "true");
         this.container?.setAttribute("data-surface-state", "ready");
-          this.render();
+        if (this.primaryModel) this.clearSurfaceFallback(this.primaryModel);
+        this.render();
       });
       if (typeof result === "number" && this.surfaceCoordinator.isCurrent(generation)) { this.surfaceIds.push(result); this.surfaceKinds.push("surface"); }
     }
@@ -1035,6 +1116,16 @@ export class ThreeDMolViewerAdapter {
   }
   private frameToCanonicalBounds(setBaseline: boolean): void { if (!this.viewer || !this.structure) return; const target = this.boundsForCameraTarget(false); if (!target) return; this.viewer.resize(); this.viewer.center(target.selection); this.viewer.zoomTo(target.selection); this.cameraPivot = target.center; this.appliedViewportShift = { x: 0, y: 0 }; this.applyClipping(); this.applyViewportTranslation(); const view = this.viewer.getView(); this.cameraState = { ...this.cameraState, view, defaultView: this.baselineView ? [...this.baselineView] : this.cameraState.defaultView, viewport: this.viewport }; if (setBaseline || !this.baselineView) { this.baselineView = [...view]; this.baselinePivot = { ...target.center }; this.cameraState = { ...this.cameraState, defaultView: [...view] }; } }
   private applyViewportTranslation(): void { if (!this.viewer || !this.viewport.width || !this.viewport.height) return; const targetX = (this.viewport.visibleLeft + this.viewport.visibleRight - this.viewport.width) / 2; const targetY = (this.viewport.visibleTop + this.viewport.visibleBottom - this.viewport.height) / 2; const deltaX = targetX - this.appliedViewportShift.x; const deltaY = targetY - this.appliedViewportShift.y; if (deltaX || deltaY) this.viewer.translate(deltaX, deltaY); this.appliedViewportShift = { x: targetX, y: targetY }; this.cameraState = { ...this.cameraState, view: this.viewer.getView(), viewport: this.viewport }; }
-  private renderCamera(): void { if (!this.viewer) return; if (this.cameraState.clippingMode === "auto") this.recalculateAutoClipping(); this.cameraState = { ...this.cameraState, view: this.viewer.getView(), defaultView: this.baselineView ? [...this.baselineView] : this.cameraState.defaultView, viewport: this.viewport }; if (this.container) this.writeDiagnostics(this.diagnostics); this.render(); }
+  private renderCamera(): void {
+    if (!this.viewer) return;
+    // The automatic slab is derived from canonical bounds and the current
+    // pivot, not from the camera quaternion or zoom. Recomputing it for every
+    // pointer frame scans all atoms and is pure interaction overhead on large
+    // structures such as 4DJW. Recalculate only when the target/projection
+    // changes; camera presentation remains native to 3Dmol.
+    this.cameraState = { ...this.cameraState, view: this.viewer.getView(), defaultView: this.baselineView ? [...this.baselineView] : this.cameraState.defaultView, viewport: this.viewport };
+    if (this.container) this.writeDiagnostics(this.diagnostics);
+    this.render();
+  }
   private render(): void { if (!this.viewer) return; this.performance.renderCalls += 1; this.viewer.render(); }
 }
