@@ -64,6 +64,6 @@ The integration branch is ready for user manual approval. It is not approved to 
 
 ### Current status
 
-`GITHUB CI: PENDING UNTIL PUSH`
+`GITHUB CI: PASS`
 
-The final report is updated with the Actions result and run URL after the integration branch is pushed.
+Workflow `molecular-workstation-ci` run [#182](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33945939388) completed successfully for commit `7bfbf0f`.

@@ -10,7 +10,7 @@
   },
   "mergeBase": "5aced1b45f8997a9efef90928e6da306e53989e9",
   "integrationBranch": "integration/r07-b1-b3",
-  "integrationSha": null,
+  "integrationSha": "7bfbf0f",
   "conflictsResolved": {
     "textual": false,
     "semantic": [
@@ -35,7 +35,7 @@
     "visualization": "PASS",
     "rotationPerformance": "PASS"
   },
-  "githubCi": { "status": "PENDING", "runUrl": null },
+  "githubCi": { "status": "PASS", "runUrl": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33945939388" },
   "manual": {
     "status": "PASS",
     "url": "http://localhost:3101/molstudio",
