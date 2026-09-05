@@ -1,0 +1,69 @@
+{
+  "gate": "MANUAL_GATE_02_CAMERA_VIEWPORT_STRUCTURE_INTEGRITY",
+  "status": "PASS",
+  "base": {
+    "branch": "fix/r07-user-operational-closure",
+    "sha": "1964784dadb436a45cd9ad7c69dba4908a04ed2c"
+  },
+  "fixBranch": "fix/manual-gate-02-camera-viewport-integrity",
+  "finalCodeEvidenceSha": "112b972",
+  "scientificStructureIntegrity": {
+    "sourceUri": "https://files.rcsb.org/download/4DJW.cif",
+    "sourceSha256": "c816a3b9e947cc71bf5390b2d10aeb117f0b6a2e7b16efbba3bf4c56c8d044f2",
+    "sourceAtomCount": 7079,
+    "canonicalAtomCount": 7079,
+    "coordinateMismatchCount": 0,
+    "maxCoordinateDelta": 0,
+    "canonicalResidueCount": 786,
+    "modeledPolymerResidueCount": 779,
+    "depositedPolymerSequenceRowCount": 828,
+    "polymerAtomCount": 6112,
+    "ligandAtomCount": 82,
+    "waterAtomCount": 885,
+    "coordinateStateCount": 1,
+    "sourceModelNumbers": [1],
+    "canonicalBounds": {
+      "min": [-16.931, -21.559, -4.245],
+      "max": [62.903, 66.74, 94.035]
+    }
+  },
+  "viewer": {
+    "fullCanvas": "PASS",
+    "consoleOverlay": "PASS",
+    "horizontalRenderCutoff": "NONE",
+    "fit": "PASS",
+    "center": "PASS",
+    "orient": "PASS",
+    "reset": "PASS",
+    "freeRotation": "PASS",
+    "rotationClipping": "PASS",
+    "zoom": "PASS",
+    "autoClipping": "PASS",
+    "fourDjwOnly": "PASS",
+    "oneCrnOnly": "PASS",
+    "twoObjectView": "PASS",
+    "oneAtomSelectionCameraIsolation": "PASS",
+    "cameraCreatesScientificHistory": "NO",
+    "consoleCreatesScientificHistory": "NO",
+    "cameraTriggersModelRebuild": "NO",
+    "cameraTriggersSurfaceRebuild": "NO"
+  },
+  "gates": {
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "unit": { "status": "PASS", "passed": 138, "total": 138 },
+    "build": "PASS",
+    "b1": "PASS",
+    "b2": "PASS",
+    "b3": "PASS",
+    "selection": "PASS",
+    "manualGate01": "PASS",
+    "manualGate02": { "status": "PASS", "passed": 1, "total": 1 },
+    "fullE2e": { "status": "PASS", "passed": 101, "total": 101 },
+    "githubCi": "PENDING"
+  },
+  "evidenceDirectory": "verification/evidence/manual-gate-02",
+  "userRetest": "READY",
+  "readyToPromoteToIntegration": "YES",
+  "readyToMergeMain": "NO — USER MANUAL APPROVAL REQUIRED"
+}
