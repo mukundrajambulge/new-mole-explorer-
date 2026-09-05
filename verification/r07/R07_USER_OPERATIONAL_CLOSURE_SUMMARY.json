@@ -52,7 +52,9 @@
     "implementationRunUrl": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33969915186",
     "implementationRunHeadSha": "45d27abe0bbd5c4b91c115811ffdab7667ee7d2b",
     "implementationRunStatus": "PASS",
-    "finalTipRun": "33969915186"
+    "finalTipRun": "33975610086",
+    "finalTipHeadSha": "bd8cc04dd873968205b5f647e146ca5da653a14b",
+    "finalTipRunStatus": "PASS"
   },
   "manualValidation": {
     "codexBrowser": "PASS",

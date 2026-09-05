@@ -167,7 +167,7 @@ The accepted Manual Gate 01 and existing visualization suites remain green. Rota
 | Focused operational repeatability | PASS — 3 consecutive runs, 10/10 each; 30/30 |
 | Full E2E | PASS — 100/100 tests in 18 files |
 | Historical evidence preservation | PASS — generated non-closure fixtures restored; 17 closure images retained |
-| GitHub CI | PASS — exact closure SHA `45d27abe…`; [run 33969915186](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33969915186) |
+| GitHub CI | PASS — implementation SHA `45d27abe…`; final documentation tip `bd8cc04d…`; [implementation run 33969915186](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33969915186), [final-tip run 33975610086](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33975610086) |
 | PyMOL oracle | ORACLE_PENDING — no independent executable PyMOL oracle was available/run |
 
 ## Evidence
