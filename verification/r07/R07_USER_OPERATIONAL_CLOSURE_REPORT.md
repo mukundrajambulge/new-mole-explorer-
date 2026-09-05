@@ -11,7 +11,8 @@ This report records the bounded R07 closure on the authoritative local repositor
 | Fix branch | `fix/r07-user-operational-closure` |
 | Verified base branch | `integration/r07-b1-b3` |
 | Verified base SHA | `aa6100a0b5f474433d7ec1355495a39655f0fd06` |
-| Final implementation SHA | `a82af43c2e0e5346778bd5e14f3f4091f2699bab` |
+| Implementation SHA | `a82af43c2e0e5346778bd5e14f3f4091f2699bab` |
+| CI-verified closure SHA | `45d27abe0bbd5c4b91c115811ffdab7667ee7d2b` |
 | Manual approval | Required before any main merge |
 
 ## Root causes
@@ -166,7 +167,7 @@ The accepted Manual Gate 01 and existing visualization suites remain green. Rota
 | Focused operational repeatability | PASS — 3 consecutive runs, 10/10 each; 30/30 |
 | Full E2E | PASS — 100/100 tests in 18 files |
 | Historical evidence preservation | PASS — generated non-closure fixtures restored; 17 closure images retained |
-| GitHub CI | Pending exact final documentation tip at report push; implementation SHA exact-head run previously passed |
+| GitHub CI | PASS — exact closure SHA `45d27abe…`; [run 33969915186](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33969915186) |
 | PyMOL oracle | ORACLE_PENDING — no independent executable PyMOL oracle was available/run |
 
 ## Evidence

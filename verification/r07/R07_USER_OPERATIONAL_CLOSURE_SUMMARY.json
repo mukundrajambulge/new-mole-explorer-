@@ -7,7 +7,7 @@
   "branch": "fix/r07-user-operational-closure",
   "baseBranch": "integration/r07-b1-b3",
   "baseSha": "aa6100a0b5f474433d7ec1355495a39655f0fd06",
-  "implementationSha": "a82af43c2e0e5346778bd5e14f3f4091f2699bab",
+  "implementationSha": "45d27abe0bbd5c4b91c115811ffdab7667ee7d2b",
   "scope": {
     "r08Started": false,
     "mainMerged": false,
@@ -48,11 +48,11 @@
   "evidenceCount": 17,
   "ci": {
     "workflow": "molecular-workstation-ci",
-    "implementationRunId": "33959159602",
-    "implementationRunUrl": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33959159602",
-    "implementationRunHeadSha": "c9c8c71820f40cef3947e843b5250698a8942cab",
+    "implementationRunId": "33969915186",
+    "implementationRunUrl": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33969915186",
+    "implementationRunHeadSha": "45d27abe0bbd5c4b91c115811ffdab7667ee7d2b",
     "implementationRunStatus": "PASS",
-    "finalTipRun": "PENDING_PUSH_AND_EXACT_HEAD_VERIFICATION"
+    "finalTipRun": "33969915186"
   },
   "manualValidation": {
     "codexBrowser": "PASS",
