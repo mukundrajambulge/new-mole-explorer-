@@ -54,6 +54,24 @@ Committed evidence:
 
 ## Known issues and oracle status
 
+## Manual Gate 01 promotion record
+
+This append-only record preserves the prior candidate provenance above and records promotion of the separately verified Manual Gate 01 fix into R07 integration.
+
+| Item | Value |
+| --- | --- |
+| Previous integration SHA | f85ddc037fde123f52cf8a3b1f8ff3d0aac70891 |
+| Manual Gate 01 fix source | dc76b16034dc070e270826ebae0cd0828029ee44 |
+| New integration SHA | 0edb4e9310702fcecef7eaaa303c84c43207e667 |
+| Merge | Normal history-preserving no-fast-forward merge |
+| Manual Gate 01 user retest | PASS |
+| Full E2E | PASS — 90/90 |
+| GitHub CI | PASS |
+
+The merge preserved the Manual Gate 01 source history and the existing B1, B2, B3, visualization, and selection history. The first post-merge full-suite attempt had two transient live-RCSB timeouts; isolated retries passed, and the subsequent clean full-suite run passed 90/90. Historical reports were not rewritten.
+
+The merged integration candidate is ready for the next user-manual B1 test. It remains not approved for main-branch merge until B1/B2/B3 user-manual testing is complete.
+
 - `PYMOL_ORACLE_PENDING`: no independent PyMOL oracle comparison was run in this integration gate.
 - The documented bounded/limited 3Dmol visualization profiles remain explicit in the UI and closure reports; this is not an integration regression.
 - The selection closure report's external `byfragment` dependency remains pending.
