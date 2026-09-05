@@ -150,7 +150,7 @@ export const MolecularCanvas = ({
         // mounted viewer/model layout. Let the adapter reconcile those atoms
         // in place; a real object-layout change is handled by its guarded
         // setWorkspaceObjects path.
-        if (adapterRef.current.isWorkspaceMode()) adapterRef.current.setWorkspaceObjects(objects, projectionRef.current);
+        if (adapterRef.current.isWorkspaceMode()) adapterRef.current.setWorkspaceObjects(objects, projectionRef.current, objects.find((object) => object.projection === projectionRef.current)?.objectId);
         else adapterRef.current.loadWorkspace(objects);
       }
       else adapterRef.current.load(structure, projectionRef.current);
@@ -162,7 +162,7 @@ export const MolecularCanvas = ({
   useEffect(() => {
     if (!adapterRef.current) return;
     try {
-      if (workspaceObjects.length > 0 || adapterRef.current.isWorkspaceMode()) adapterRef.current.setWorkspaceObjects(workspaceObjects, projection);
+      if (workspaceObjects.length > 0 || adapterRef.current.isWorkspaceMode()) adapterRef.current.setWorkspaceObjects(workspaceObjects, projection, workspaceObjects.find((object) => object.projection === projection)?.objectId);
       else adapterRef.current.setProjection(projection);
     } catch (projectionError) {
       setViewerError(projectionError instanceof Error ? projectionError.message : "The display projection could not be applied.");

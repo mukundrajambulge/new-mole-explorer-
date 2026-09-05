@@ -79,6 +79,8 @@ export const App = () => {
   const [globalFrameIndex, setGlobalFrameIndex] = useState(0);
   const [coordinateFramePolicy, setCoordinateFramePolicy] = useState<CoordinateFramePolicy | null>(null);
   const [projection, setProjection] = useState<RenderProjection>(createDefaultRenderProjection());
+  const projectionStateRef = useRef(projection);
+  projectionStateRef.current = projection;
   const [loadState, setLoadState] = useState<"idle" | "loading" | "error">("idle");
   const [loadError, setLoadError] = useState<string | null>(null);
   const [measurementMode, setMeasurementModeState] = useState<MeasurementKind | null>(null);
@@ -201,6 +203,10 @@ export const App = () => {
 
   useEffect(() => {
     if (!activeObjectId) return;
+    // A rapid sequence of presentation updates can leave an older effect in
+    // the queue. Never let that stale closure write an older projection back
+    // over the current workspace state.
+    if (projectionStateRef.current !== projection) return;
     const current = workspaceObjectsRef.current;
     const active = current.find((object) => object.objectId === activeObjectId);
     if (!active || active.projection === projection) return;

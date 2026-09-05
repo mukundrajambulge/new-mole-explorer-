@@ -22,7 +22,7 @@ test("IMP-PRES-01 keeps menu state and rail ownership truthful", async ({ page }
   await edit.click();
   await expect(file).toHaveAttribute("aria-expanded", "false");
   await expect(edit).toHaveAttribute("aria-expanded", "true");
-  await expect(page.locator('.context-toolbar[data-ribbon-category="Edit"]')).toContainText("Delete atom");
+  await expect(page.locator('.context-toolbar[data-ribbon-category="Edit"]')).toContainText("Delete Selected");
   await expect(page.getByLabel("Structure, context and analysis panel")).toContainText("Context");
   await expect(page.getByLabel("Structure, context and analysis panel")).toContainText("Analysis & Interaction");
   await expect(page.getByLabel("Projection & Display panel").getByRole("heading", { name: "Context" })).toHaveCount(0);

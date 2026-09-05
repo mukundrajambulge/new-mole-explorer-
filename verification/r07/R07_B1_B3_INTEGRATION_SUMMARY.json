@@ -1,0 +1,52 @@
+{
+  "status": "PASS",
+  "visualizationBase": {
+    "branch": "fix/visualization-final-closure",
+    "sha": "c677c61131eaa0b363d93edd3ec12479cc711db0"
+  },
+  "b3Source": {
+    "branch": "feature/r07-hydrogen-picked-editing",
+    "sha": "dba3518f8b9690d283ab4dbc0a715942de775cac"
+  },
+  "mergeBase": "5aced1b45f8997a9efef90928e6da306e53989e9",
+  "integrationBranch": "integration/r07-b1-b3",
+  "integrationSha": null,
+  "conflictsResolved": {
+    "textual": false,
+    "semantic": [
+      "active object projection identity routed through the workspace adapter",
+      "camera, background, labels, and highlights synchronized after projection updates",
+      "workspace surface generations and stale handles guarded",
+      "mesh generation diagnostics made deterministic",
+      "canonical Delete Selected presentation assertion aligned"
+    ]
+  },
+  "checks": {
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "unit": { "status": "PASS", "web": "116/116", "api": "22/22" },
+    "build": "PASS",
+    "focused": "42/42 PASS",
+    "targetedPresentation": "13/13 PASS",
+    "fullE2E": "89/89 PASS",
+    "b1": "PASS",
+    "b2": "PASS",
+    "b3": "PASS",
+    "visualization": "PASS",
+    "rotationPerformance": "PASS"
+  },
+  "githubCi": { "status": "PENDING", "runUrl": null },
+  "manual": {
+    "status": "PASS",
+    "url": "http://localhost:3101/molstudio",
+    "ready": true,
+    "evidenceDirectory": "verification/evidence/r07-integration"
+  },
+  "pymolOracle": "ORACLE_PENDING",
+  "knownIssues": [
+    "PyMOL oracle comparison pending",
+    "Documented bounded/limited 3Dmol profiles",
+    "Selection closure byfragment external dependency pending"
+  ],
+  "readyToMergeMain": "NO — USER MANUAL APPROVAL REQUIRED"
+}
