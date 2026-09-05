@@ -292,7 +292,8 @@ export class ThreeDMolViewerAdapter {
     }
     const scientificRevisionChanged = previousObjects.length === effectiveObjects.length && previousObjects.some((previous, index) => previous.loadResult.structure.scientificHash !== effectiveObjects[index]?.loadResult.structure.scientificHash);
     const modelStateChanged = scientificRevisionChanged || previousObjects.length !== effectiveObjects.length || effectiveObjects.some((object, index) => previousObjects[index]?.currentStateId !== object.currentStateId);
-    const objectSceneChanged = modelStateChanged || effectiveObjects.some((object, index) => sceneProjectionChanged(previousObjects[index]?.projection, object.projection));
+    const objectVisibilityChanged = effectiveObjects.some((object, index) => previousObjects[index]?.enabled !== object.enabled);
+    const objectSceneChanged = modelStateChanged || objectVisibilityChanged || effectiveObjects.some((object, index) => sceneProjectionChanged(previousObjects[index]?.projection, object.projection));
     const objectLabelsChanged = effectiveObjects.some((object, index) => labelsProjectionChanged(previousObjects[index]?.projection, object.projection));
     const objectInteractionChanged = effectiveObjects.some((object, index) => interactionProjectionChanged(previousObjects[index]?.projection, object.projection));
     if (this.viewer && this.hasModel && effectiveObjects[0]) {
@@ -318,6 +319,7 @@ export class ThreeDMolViewerAdapter {
     }
     const previousProjection = this.projection;
     this.workspaceObjects = effectiveObjects;
+    this.primaryObjectEnabled = effectiveObjects[0]?.enabled ?? true;
     const interactionCameraChanged = interactionProjection ? cameraProjectionChanged(previousProjection, interactionProjection) : false;
     const interactionBackgroundChanged = interactionProjection ? !previousProjection || previousProjection.background !== interactionProjection.background : false;
     if (!this.viewer || !this.hasModel) return;
@@ -592,10 +594,12 @@ export class ThreeDMolViewerAdapter {
   private bindPicking(): void {
     if (!this.viewer || !this.structure) return;
     const onClick = (atom: AtomSpec) => {
+      if (!this.primaryObjectEnabled) return;
       const result = this.reverseIdentityMap.resolveAtomHit({ index: atom.index, serial: atom.serial, properties: atom.properties as Record<string, unknown> | undefined });
       if (result) this.interactionHandlers.onPick?.(result);
     };
     const onHover = (atom: AtomSpec) => {
+      if (!this.primaryObjectEnabled) return;
       const result = this.reverseIdentityMap.resolveAtomHit({ index: atom.index, serial: atom.serial, properties: atom.properties as Record<string, unknown> | undefined });
       this.interactionHandlers.onHover?.(result);
     };
@@ -606,12 +610,14 @@ export class ThreeDMolViewerAdapter {
   }
 
   private bindWorkspacePicking(): void {
-    for (const { model } of this.auxiliaryModels) {
+    for (const { model, object } of this.auxiliaryModels) {
       model.setClickable({}, true, (atom: AtomSpec) => {
+        if (!object.enabled) return;
         const result = this.reverseIdentityMap.resolveAtomHit({ index: atom.index, serial: atom.serial, properties: atom.properties as Record<string, unknown> | undefined });
         if (result) this.interactionHandlers.onPick?.(result);
       });
       model.setHoverable({}, true, (atom: AtomSpec) => {
+        if (!object.enabled) return;
         const result = this.reverseIdentityMap.resolveAtomHit({ index: atom.index, serial: atom.serial, properties: atom.properties as Record<string, unknown> | undefined });
         this.interactionHandlers.onHover?.(result);
       }, () => this.interactionHandlers.onHover?.(null));
@@ -740,6 +746,7 @@ export class ThreeDMolViewerAdapter {
     let pointCount = 0;
     let readyCount = 0;
     for (const entry of entries) {
+      if (!entry.object.enabled) continue;
       const diagnostics = buildRenderProjectionDiagnostics(entry.structure, entry.projection);
       const surfaceDirectives = diagnostics.directives.filter((directive) => directive.primitive === "surface" || directive.primitive === "mesh" || directive.primitive === "dots");
       const state = stateForObject(entry.object);

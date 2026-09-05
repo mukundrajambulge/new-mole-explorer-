@@ -360,6 +360,10 @@ const wildcardMatch = (value: string, pattern: string): boolean => {
   const escaped = [...pattern].map((char) => char === "*" ? ".*" : char === "?" ? "." : char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("");
   return new RegExp(`^${escaped}$`, "i").test(value);
 };
+const workspaceNameMatch = (value: string, pattern: string): boolean => {
+  const stem = (candidate: string) => candidate.replace(/\.(?:pdb|cif|mmcif)$/i, "");
+  return wildcardMatch(value, pattern) || wildcardMatch(stem(value), pattern) || wildcardMatch(value, stem(pattern));
+};
 const residueParts = (value: string): { number: number; insertion: string } | null => { const match = value.match(/^(-?\d+)([A-Za-z]?)$/); return match ? { number: Number(match[1]), insertion: match[2].toUpperCase() } : null; };
 const residueIdFor = (atom: CanonicalAtom): string => {
   const scoped = atom.workspaceObjectId && atom.stableId.startsWith(`${atom.workspaceObjectId}::`);
@@ -633,7 +637,7 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
     if (atom.workspaceObjectId) {
       let matchingObjects = context.objectMatches.get(value);
       if (!matchingObjects) {
-        matchingObjects = new Set(structure.atoms.filter((candidate) => candidate.workspaceObjectId && (wildcardMatch(candidate.workspaceObjectId, value) || wildcardMatch(candidate.workspaceObjectId.replace(/^object:/i, ""), value) || wildcardMatch(candidate.workspaceObjectName ?? "", value))).map((candidate) => candidate.workspaceObjectId!));
+        matchingObjects = new Set(structure.atoms.filter((candidate) => candidate.workspaceObjectId && (wildcardMatch(candidate.workspaceObjectId, value) || wildcardMatch(candidate.workspaceObjectId.replace(/^object:/i, ""), value) || workspaceNameMatch(candidate.workspaceObjectName ?? "", value))).map((candidate) => candidate.workspaceObjectId!));
         context.objectMatches.set(value, matchingObjects);
       }
       const exactObjectId = wildcardMatch(atom.workspaceObjectId, value) || wildcardMatch(atom.workspaceObjectId.replace(/^object:/i, ""), value);
@@ -641,7 +645,7 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
         if (!context.diagnostics.some((diagnostic) => diagnostic.code === "AMBIGUOUS_NAME")) context.diagnostics.push({ code: "AMBIGUOUS_NAME", message: `Object name \`${value}\` resolves to multiple workspace objects; use a durable ObjectID.` });
         return false;
       }
-      matches = exactObjectId || wildcardMatch(atom.workspaceObjectName ?? "", value);
+      matches = exactObjectId || workspaceNameMatch(atom.workspaceObjectName ?? "", value);
     } else matches = wildcardMatch(structure.id, value) || wildcardMatch(structure.name, value) || wildcardMatch(structure.source.originalFilename, value);
   }
   else if (["b", "q", "occupancy", "formal_charge", "partial_charge", "x", "y", "z", "state"].includes(property)) {
@@ -694,7 +698,7 @@ const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, 
     const named = context.named?.get(ast.name);
     if (named) return new Set(named.stableAtomIds.filter((id) => context.universe.has(id)));
     const normalizedName = ast.name.toLowerCase();
-    const objectIds = [...new Set(structure.atoms.filter((atom) => atom.workspaceObjectId && (atom.workspaceObjectId.toLowerCase() === normalizedName || atom.workspaceObjectId.replace(/^object:/i, "").toLowerCase() === normalizedName || atom.workspaceObjectName?.toLowerCase() === normalizedName)).map((atom) => atom.workspaceObjectId!))];
+    const objectIds = [...new Set(structure.atoms.filter((atom) => atom.workspaceObjectId && (atom.workspaceObjectId.toLowerCase() === normalizedName || atom.workspaceObjectId.replace(/^object:/i, "").toLowerCase() === normalizedName || workspaceNameMatch(atom.workspaceObjectName ?? "", ast.name))).map((atom) => atom.workspaceObjectId!))];
     const matchingGroups = (context.groups ?? []).filter((group) => group.groupId.toLowerCase() === normalizedName || group.name.toLowerCase() === normalizedName);
     if (objectIds.length + matchingGroups.length > 1) {
       context.diagnostics.push({ code: "AMBIGUOUS_NAME", message: `Workspace name \`${ast.name}\` resolves to multiple objects or groups; use a durable ID or explicit named-selection syntax.` });

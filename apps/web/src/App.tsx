@@ -180,9 +180,9 @@ export const App = () => {
     return { visibleStableAtomIds, representationTokensByStableAtomId, colorTokensByStableAtomId, representationColorTokensByStableAtomId, labelTokensByStableAtomId, revision };
   };
 
-  const setActiveSelection = (result: SelectionResult | null) => {
+  const setActiveSelection = (result: SelectionResult | null, pickResult: PickResult | null = null) => {
     activeSelectionResultRef.current = result;
-    activePickResultRef.current = null;
+    activePickResultRef.current = pickResult;
     setActiveSelectionState(result);
     setProjection((current) => setInteractionState(current, { selectedAtomIds: result?.stableAtomIds ?? [], pickedAtomId: null, measurementPickAtomIds: [] }));
   };
@@ -290,10 +290,30 @@ export const App = () => {
     setActiveSelection(null);
   };
 
-  const toggleWorkspaceObject = (objectId: string) => {
-    const next = workspaceObjectsRef.current.map((object) => object.objectId === objectId ? setWorkspaceObjectEnabled(object, !object.enabled) : object);
+  const clearInteractionForObject = (objectId: string) => {
+    const selection = activeSelectionResultRef.current;
+    const pick = activePickResultRef.current;
+    const selectionTouchesObject = Boolean(selection?.stableAtomIds.some((stableId) => stableId.startsWith(`${objectId}::`)) || (workspaceObjectsRef.current.length === 1 && activeObjectId === objectId && selection?.stableAtomIds.length));
+    const pickObjectId = pick?.pickKind === "ATOM" ? pick.atomRef.objectId : pick?.pickKind === "BOND" ? pick.bondRef.objectId : undefined;
+    if (!selectionTouchesObject && pickObjectId !== objectId) return;
+    activeSelectionResultRef.current = null;
+    activePickResultRef.current = null;
+    setActiveSelectionState(null);
+    setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] }));
+  };
+
+  const setWorkspaceObjectEnabledById = (objectId: string, enabled: boolean) => {
+    const target = workspaceObjectsRef.current.find((object) => object.objectId === objectId);
+    if (!target || target.enabled === enabled) return;
+    if (!enabled) clearInteractionForObject(objectId);
+    const next = workspaceObjectsRef.current.map((object) => object.objectId === objectId ? setWorkspaceObjectEnabled(object, enabled) : object);
     workspaceObjectsRef.current = next;
     setWorkspaceObjects(next);
+  };
+
+  const toggleWorkspaceObject = (objectId: string) => {
+    const target = workspaceObjectsRef.current.find((object) => object.objectId === objectId);
+    if (target) setWorkspaceObjectEnabledById(objectId, !target.enabled);
   };
 
   const cycleObjectState = (objectId: string, direction: -1 | 1) => {
@@ -447,6 +467,13 @@ export const App = () => {
     if (!structure || pick.pickKind === "BACKGROUND") return;
     const pickedObjectId = pick.pickKind === "ATOM" ? pick.atomRef.objectId : pick.bondRef.objectId;
     const pickedObject = workspaceObjectsRef.current.find((object) => object.objectId === pickedObjectId || object.loadResult.structure.id === pick.structureId);
+    if (!pickedObject) return;
+    if (!pickedObject.enabled) {
+      clearInteractionForObject(pickedObject.objectId);
+      const capability = ACTION_REGISTRY[ACTION_IDS.CANVAS_SELECT];
+      showNotice({ ...capability, state: "SUPPORTED_WITH_LIMITATIONS", description: `Object ${pickedObject.displayName} is OFF; enable it before picking or editing.` });
+      return;
+    }
     const targetStructure = pickedObject ? { ...pickedObject.loadResult, structure: structureForWorkspaceObjectState(pickedObject) } : structure;
     const stableAtomId = pick.pickKind === "ATOM" ? pick.atomRef.stableAtomId : "";
     if (pickedObject && pickedObject.objectId !== activeObjectId) {
@@ -460,14 +487,12 @@ export const App = () => {
       setNamedSelections([]);
     }
     if (!measurementMode) {
-      activePickResultRef.current = pick;
       if (pick.pickKind === "BOND") {
-        setActiveSelection(selectionForStableIds([...pick.bondRef.endpoints], targetStructure.structure));
+        setActiveSelection(selectionForStableIds([...pick.bondRef.endpoints], targetStructure.structure), pick);
         setProjection((current) => setInteractionState(current, { pickedAtomId: pick.bondRef.endpoints[0] ?? null, selectedAtomIds: pick.bondRef.endpoints, measurementPickAtomIds: [] }));
-        activePickResultRef.current = pick;
         return;
       }
-      setActiveSelection(selectionForStableIds([stableAtomId], targetStructure.structure));
+      setActiveSelection(selectionForStableIds([stableAtomId], targetStructure.structure), pick);
       const projectedId = pickedObject ? workspaceScopedStableAtomId(pickedObject.objectId, stableAtomId) : stableAtomId;
       setProjection((current) => setInteractionState(current, { pickedAtomId: stableAtomId, selectedAtomIds: [projectedId], measurementPickAtomIds: [] }));
       return;
@@ -534,7 +559,11 @@ export const App = () => {
 
   const workspaceObjectCandidates = (name: string) => {
     const normalized = name.trim().replace(/^['"]|['"]$/g, "").toLowerCase();
-    return workspaceObjectsRef.current.filter((object) => [object.objectId, object.displayName, object.loadResult.structure.id, object.loadResult.structure.name].some((value) => value.toLowerCase() === normalized));
+    const stem = (value: string) => value.replace(/\.(?:pdb|cif|mmcif)$/i, "");
+    return workspaceObjectsRef.current.filter((object) => [object.objectId, object.displayName, object.loadResult.structure.id, object.loadResult.structure.name, object.loadResult.structure.source.originalFilename].some((value) => {
+      const lower = value.toLowerCase();
+      return lower === normalized || stem(lower) === normalized;
+    }));
   };
 
   const resolveWorkspaceObject = (name: string) => {
@@ -621,6 +650,7 @@ export const App = () => {
     const current = historyServiceRef.current.currentRevision(activeObjectId);
     const selection = activeSelectionResultRef.current;
     if (!object || !current) return { category: "EDIT", status: "HISTORY_UNAVAILABLE: the active object has no scientific revision history." };
+    if (!object.enabled) return { category: "EDIT", status: `OBJECT_DISABLED: ${object.displayName} is OFF; enable the object before editing.` };
     const workspaceStructure = workspaceSelectionStructure(workspaceObjectsRef.current);
     if (!selection || !workspaceStructure || selection.structureId !== workspaceStructure.id || selection.molecularRevision !== workspaceStructure.scientificHash) return { category: "EDIT", status: "INVALID_SELECTION: select one canonical atom in the active object before running edit_test." };
     const workspaceScoped = workspaceStructure.id === "workspace";
@@ -660,6 +690,7 @@ export const App = () => {
     const objectId = [...groups.keys()][0] ?? activeObjectId;
     const object = objectId ? workspaceObjectsRef.current.find((candidate) => candidate.objectId === objectId) : undefined;
     if (!object) return { category: "EDIT", status: "HISTORY_UNAVAILABLE: the selection does not resolve to a loaded workspace object." };
+    if (!object.enabled) return { category: "EDIT", status: `OBJECT_DISABLED: ${object.displayName} is OFF; enable the object before editing.` };
     const atomIds = groups.get(object.objectId) ?? [];
     const selection = selectionForStableIds(atomIds, object.loadResult.structure);
     return { object, selection, atomIds };
@@ -881,9 +912,7 @@ export const App = () => {
       const target = resolved.object;
       if (!target) return { category: "OBJECT", status: `Object ${parsed.argument} does not exist; no object state changed.` };
       const enabled = parsed.verb === "enable";
-      const next = workspaceObjectsRef.current.map((object) => object.objectId === target.objectId ? setWorkspaceObjectEnabled(object, enabled) : object);
-      workspaceObjectsRef.current = next;
-      setWorkspaceObjects(next);
+      setWorkspaceObjectEnabledById(target.objectId, enabled);
       return { category: "OBJECT", status: `${enabled ? "Enabled" : "Disabled"} object ${target.displayName}; canonical structure preserved.` };
     }
     if (parsed.verb === "state") {
@@ -1278,7 +1307,18 @@ export const App = () => {
     const capability = ACTION_REGISTRY[ACTION_IDS.EDIT_BOND_ORDER_SET];
     setNotice({ ...capability, state: result.status.startsWith("COMMITTED") ? "SUPPORTED" : "SUPPORTED_WITH_LIMITATIONS", description: result.status });
   };
-  const selectedAtom = structure?.structure.atoms.find((atom) => atom.stableId === (projection.interaction.pickedAtomId ?? projection.interaction.selectedAtomIds[0])) ?? null;
+  const activeWorkspaceObject = workspaceObjects.find((object) => object.objectId === activeObjectId);
+  const editTargetObject = (() => {
+    if (!activeSelection) return activeWorkspaceObject;
+    const targetObjectIds = new Set(activeSelection.stableAtomIds.map((stableId) => stableId.includes("::") ? stableId.slice(0, stableId.indexOf("::")) : activeObjectId).filter((objectId): objectId is string => Boolean(objectId)));
+    return targetObjectIds.size === 1 ? workspaceObjects.find((object) => object.objectId === [...targetObjectIds][0]) : undefined;
+  })();
+  const editSelectionReady = Boolean(activeSelection && editTargetObject?.enabled);
+  const inspectorObject = editTargetObject ?? activeWorkspaceObject;
+  const inspectorStructure = inspectorObject ? structureForWorkspaceObjectState(inspectorObject) : structure?.structure;
+  const inspectorAtomId = projection.interaction.pickedAtomId ?? projection.interaction.selectedAtomIds[0];
+  const inspectorCanonicalAtomId = inspectorAtomId?.includes("::") ? inspectorAtomId.slice(inspectorAtomId.indexOf("::") + 2) : inspectorAtomId;
+  const selectedAtom = inspectorStructure?.atoms.find((atom) => atom.stableId === inspectorCanonicalAtomId) ?? null;
 
   return (
     <div className="app-shell">
@@ -1286,13 +1326,13 @@ export const App = () => {
       <NavRail activeItem={activeNav} onAction={handleAction} />
       <main className="app-main">
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
-        <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} editSelectionCount={activeSelection?.stableAtomIds.length ?? 0} editObjectName={workspaceObjects.find((object) => object.objectId === activeObjectId)?.displayName} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} onEditBondOrder={handleBondOrderAction} />
+        <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} editSelectionCount={activeSelection?.stableAtomIds.length ?? 0} editObjectName={editTargetObject?.displayName ?? activeWorkspaceObject?.displayName} editSelectionReady={editSelectionReady} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} onEditBondOrder={handleBondOrderAction} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
           <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} />
           <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFileDrop={importFile} consoleExpanded={consoleExpanded} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} />
           <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
         </div>
-        <StatusBar apiStatus={apiStatus} structure={structure} project={project} selectedAtomCount={projection.interaction.selectedAtomIds.length} scientificRevision={activeHistoryState?.currentRevisionId ?? null} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} />
+        <StatusBar apiStatus={apiStatus} structure={structure} project={project} selectedAtomCount={projection.interaction.selectedAtomIds.length} scientificRevision={activeHistoryState?.currentRevisionId ?? null} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} activeObjectName={activeWorkspaceObject?.displayName} activeObjectId={activeWorkspaceObject?.objectId} activeObjectEnabled={activeWorkspaceObject?.enabled} />
         {notice && <CapabilityNotice capability={notice} onClose={() => setNotice(null)} />}
         <div className="console-layer"><ConsolePanel expanded={consoleExpanded} onToggle={() => setConsoleExpanded((value) => !value)} structure={structure} namedSelections={namedSelections} onCommand={runConsoleCommand} /></div>
       </main>

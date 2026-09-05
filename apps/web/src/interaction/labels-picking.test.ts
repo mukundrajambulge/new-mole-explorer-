@@ -35,6 +35,7 @@ describe("safe labels and reverse identity picking", () => {
     expect(hit?.atomRef.stableAtomId).toBe("stable-ca");
     expect(hit?.rendererGeneration).toBe(7);
     expect(map.resolveAtomHit({ index: 99 })).toBeNull();
+    expect(map.resolveAtomHit({ index: 0, serial: 42 })).toBeNull();
     expect(map.background().pickKind).toBe("BACKGROUND");
   });
 
