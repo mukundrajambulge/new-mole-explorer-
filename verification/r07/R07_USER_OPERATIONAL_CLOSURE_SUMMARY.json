@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "gate": "R07_USER_OPERATIONAL_CLOSURE",
   "status": "COMPLETE_PENDING_USER_MANUAL_APPROVAL",
-  "repository": "https://github.com/mukundrajambulge/new-mole-explorer-.git",
+  "repository": "https://github.com/mukundrajambulge/new-mole-explorer-.",
   "repositoryRoot": "C:\\Users\\mukun\\Desktop\\molecular-workstation",
   "branch": "fix/r07-user-operational-closure",
   "baseBranch": "integration/r07-b1-b3",
   "baseSha": "aa6100a0b5f474433d7ec1355495a39655f0fd06",
-  "implementationSha": "c9c8c71820f40cef3947e843b5250698a8942cab",
+  "implementationSha": "a82af43c2e0e5346778bd5e14f3f4091f2699bab",
   "scope": {
     "r08Started": false,
     "mainMerged": false,
@@ -20,8 +20,11 @@
     "objectsAndIsolation": "PASS",
     "activeObjectAndDiagnostics": "PASS",
     "historyRootUndoRedoUi": "PASS",
-    "b2DeleteAndBondUi": "PASS",
+    "b2DeleteBondAndOrderUi": "PASS",
     "b3AddRefillRemoveAttachReplaceUi": "PASS",
+    "pickedAtomChemistry": "PASS",
+    "pickedBondUi": "BLOCKED_ADAPTER_HAS_NO_BOND_CALLBACK",
+    "multiStateChemistry": "PASS",
     "realCanvasPointerPicking": "PASS",
     "real4DJWAnd1CRN": "PASS"
   },
@@ -32,9 +35,9 @@
     "unitApi": { "tests": 22, "status": "PASS" },
     "unitTotal": 138,
     "build": "PASS",
-    "focusedOperational": { "testsPerRun": 6, "runs": 3, "passed": 18, "status": "PASS" },
-    "playwrightListed": { "files": 18, "tests": 96, "status": "PASS" },
-    "completeE2E": { "tests": 96, "passed": 96, "status": "PASS" },
+    "focusedOperational": { "testsPerRun": 10, "runs": 3, "passed": 30, "status": "PASS" },
+    "playwrightListed": { "files": 18, "tests": 100, "status": "PASS" },
+    "completeE2E": { "tests": 100, "passed": 100, "status": "PASS" },
     "pymolOracle": "ORACLE_PENDING"
   },
   "realStructures": {
@@ -49,9 +52,12 @@
     "implementationRunUrl": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33959159602",
     "implementationRunHeadSha": "c9c8c71820f40cef3947e843b5250698a8942cab",
     "implementationRunStatus": "PASS",
-    "finalTipRun": "VERIFIED_AFTER_REPORT_PUSH"
+    "finalTipRun": "PENDING_PUSH_AND_EXACT_HEAD_VERIFICATION"
   },
-  "launchUrl": "http://localhost:3101/molstudio",
-  "manualApprovalRequired": true,
-  "readyToMergeMain": false
+  "manualValidation": {
+    "codexBrowser": "PASS",
+    "localUrl": "http://localhost:3101/molstudio",
+    "manualApprovalRequired": true,
+    "readyToMergeMain": false
+  }
 }
