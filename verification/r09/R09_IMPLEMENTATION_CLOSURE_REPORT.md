@@ -1,0 +1,199 @@
+# R09 Implementation Closure
+
+R09 IMPLEMENTATION STATUS:
+PASS
+
+BASE:
+feature/r08-structural-analysis
+09b137bbe73bb1baf880ee4c38f9e275c6e1db59
+
+R07 USER MANUAL APPROVAL:
+DEFERRED
+
+R08 USER MANUAL APPROVAL:
+DEFERRED
+
+R08 FINAL REPORT METADATA:
+RECONCILED
+
+R09 BRANCH:
+feature/r09-native-lifecycle
+
+FINAL SHA:
+ce663e8038d1f3ab7ad91833f9f95f6b7b830714
+
+R09-A ACQUISITION:
+PASS
+
+EXACT LOCAL BYTE HASH:
+PASS
+
+EXACT RCSB BYTE HASH:
+PASS
+
+PDB IMPORT:
+PASS
+
+MMCIF IMPORT:
+PASS
+
+TRANSACTIONAL OPEN:
+PASS
+
+FORMAT POLICY:
+PASS
+
+R09-B SESSION STORE:
+PASS
+
+IMMUTABLE SESSION REVISIONS:
+PASS
+
+MULTI-OBJECT RESTORE:
+PASS
+
+DURABLE SELECTION RESTORE:
+PASS
+
+DURABLE RESULT RESTORE:
+PASS
+
+REVISION CONFLICT:
+PASS
+
+ATOMIC SAVE:
+PASS
+
+R09-C SCENES:
+PASS
+
+SCENE STORE:
+PASS
+
+SCENE RECALL:
+PASS
+
+SCENE UPDATE:
+PASS
+
+SCENE RENAME:
+PASS
+
+SCENE DELETE:
+PASS
+
+SCENE NAVIGATION:
+PASS
+
+SCENE MUTATES SCIENCE:
+NO
+
+R09-D EXPORT:
+PASS
+
+PDB WRITER:
+SUPPORTED_WITH_LIMITATIONS
+
+MMCIF WRITER:
+SUPPORTED_WITH_LIMITATIONS
+
+SELECTION EXPORT:
+PASS
+
+STATE EXPORT:
+PASS
+
+SEMANTIC LOSS MANIFEST:
+PASS
+
+FAIL_ON_LOSS:
+PASS
+
+EXPORT MUTATES SCIENCE:
+NO
+
+R09-E RECOVERY/MIGRATION:
+PASS
+
+DIRTY STATE:
+PASS
+
+CHECKPOINT:
+PASS
+
+RECOVERY:
+PASS
+
+MIGRATION:
+PASS
+
+INTEGRITY VALIDATION:
+PASS
+
+SELF-CONTAINED OFFLINE RESTORE:
+PASS
+
+REFERENCED DIGEST VALIDATION:
+PASS
+
+FOREIGN SESSION SECURITY:
+PASS
+
+PSE/PZE:
+UNAVAILABLE
+
+AT-R09-01..32:
+32/32 PASS
+
+TYPECHECK:
+PASS
+
+LINT:
+PASS
+
+UNIT/API:
+166/166 PASS
+
+BUILD:
+PASS
+
+FULL E2E:
+113/113 PASS
+
+R09 FOCUSED REPEAT:
+3/3 PASS
+
+R07 REGRESSION:
+PASS
+
+R08 REGRESSION:
+PASS
+
+GITHUB CI:
+PASS
+https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34052461583
+
+PYMOL R09 ORACLE:
+ORACLE_PENDING
+
+VERIFIED_PYMOL_CONFORMANCE:
+NO
+
+MANUAL CODEX BROWSER VALIDATION:
+PASS
+
+USER R09 RETEST:
+READY
+
+KNOWN LIMITATIONS:
+- PSE/PZE foreign session compatibility is unavailable and remains behind the secure rejection boundary.
+- PyMOL R09 oracle/conformance remains pending because no executable compatibility evidence was produced.
+- R09 session restore does not fabricate fine-grained R07 undo/redo history; it restores governed scientific heads, retained references, durable results, scenes, and presentation state.
+- PDB/mmCIF export is supported with explicit semantic-loss manifests for fields outside the typed writer scope.
+- R07 Gate 03B, R08, and R09 manual user approvals remain deferred, so main promotion is intentionally blocked.
+
+READY FOR R10:
+NO
+
+READY TO MERGE MAIN:
+NO
