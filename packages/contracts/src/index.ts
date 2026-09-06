@@ -219,6 +219,39 @@ export type StructureSourceMetadata = {
   provider?: RemoteStructureProvider;
   ingestedAt: string;
   parserProfile: string;
+  /** R09 immutable acquisition evidence identity. */
+  sourceArtifactId?: string;
+  acquisitionKind?: "LOCAL_UPLOAD" | "REMOTE_HTTP" | "DERIVED_EXPORT";
+  mediaType?: string;
+  formatEvidence?: readonly FormatEvidence[];
+  providerMetadata?: Readonly<Record<string, string>>;
+  scientificHashProfile?: string;
+};
+
+export type FormatEvidence = {
+  kind: "FILENAME_EXTENSION" | "EXPLICIT_DECLARATION" | "CONTENT_SIGNATURE";
+  value: string;
+};
+
+/** Exact bytes acquired before decoding or parser normalization. */
+export type SourceArtifact = {
+  schemaVersion: 1;
+  sourceArtifactId: string;
+  acquisitionKind: "LOCAL_UPLOAD" | "REMOTE_HTTP" | "DERIVED_EXPORT";
+  sourceUri?: string;
+  provider?: RemoteStructureProvider;
+  accession?: string;
+  originalFilename: string;
+  mediaType: string;
+  byteLength: number;
+  sha256: string;
+  acquiredAt: string;
+  providerMetadata?: Readonly<Record<string, string>>;
+  format: StructureFormat;
+  formatEvidence: readonly FormatEvidence[];
+  parserProfile: string;
+  rawStorageRef?: string;
+  parentExportArtifactId?: string;
 };
 
 export type CanonicalMolecularStructure = {
@@ -232,6 +265,8 @@ export type CanonicalMolecularStructure = {
   bonds: CanonicalBond[];
   hierarchy: CanonicalHierarchy;
   scientificHash: string;
+  /** Versioned canonical scientific serialization used for this digest. */
+  scientificHashProfile?: string;
   /** Optional multi-model foundation; omitted by older persisted G1C records. */
   coordinateStates?: CanonicalCoordinateState[];
   /** Explicit presentation order; never infer scientific identity from array insertion order. */
@@ -255,12 +290,35 @@ export type StructureLoadResult = {
     format: StructureFormat;
     content: string;
   };
+  /** R09 source evidence; optional for pre-R09 fixtures and historical records. */
+  sourceArtifact?: SourceArtifact;
 };
 
 export type StructureError = {
-  code: "UNSUPPORTED_FORMAT" | "INVALID_INPUT" | "REMOTE_FETCH_FAILED" | "REMOTE_NOT_FOUND" | "PAYLOAD_TOO_LARGE" | "PROJECT_NOT_FOUND" | "PROJECT_INVALID" | "INTERNAL_ERROR";
+  code: LifecycleErrorCode | "REMOTE_FETCH_FAILED" | "REMOTE_NOT_FOUND" | "PROJECT_NOT_FOUND" | "PROJECT_INVALID" | "INTERNAL_ERROR";
   message: string;
 };
+
+export type LifecycleErrorCode =
+  | "INVALID_INPUT"
+  | "PAYLOAD_TOO_LARGE"
+  | "UNSUPPORTED_FORMAT"
+  | "FORMAT_MISMATCH"
+  | "PARSE_FAILED"
+  | "IMPORT_POLICY_CONFLICT"
+  | "NAME_COLLISION"
+  | "REVISION_CONFLICT"
+  | "UNSUPPORTED_STATE_SCOPE"
+  | "EXPORT_WOULD_LOSE_SEMANTICS"
+  | "WRITER_FAILED"
+  | "INTEGRITY_MISMATCH"
+  | "SCHEMA_UNSUPPORTED"
+  | "MIGRATION_FAILED"
+  | "MISSING_DEPENDENCY"
+  | "STALE_REFERENCE"
+  | "SESSION_RESTORE_FAILED"
+  | "SCENE_RESTORE_FAILED"
+  | "SECURITY_REJECTED";
 
 export type ProjectPresentationState = {
   schemaVersion: 1;
@@ -306,6 +364,10 @@ export type ProjectRecord = {
   updatedAt: string;
   structure: StructureLoadResult | null;
   presentation: ProjectPresentationState;
+  /** Native R09 session projection; legacy fields remain for compatibility. */
+  session?: SessionManifest;
+  restoreStatus?: RestoreStatus;
+  dirty?: boolean;
 };
 
 export type ProjectSaveRequest = {
@@ -313,6 +375,145 @@ export type ProjectSaveRequest = {
   structure: StructureLoadResult | null;
   presentation: ProjectPresentationState;
   expectedRevision?: number;
+  /** Full native R09 workspace checkpoint. */
+  session?: SessionDraft;
+};
+
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
+export type JsonRecord = { [key: string]: JsonValue };
+
+export type RestoreStatus = "EXACT_RESTORED" | "DEGRADED_RESTORED" | "FAILED";
+export type SessionDependencyMode = "SELF_CONTAINED" | "REFERENCED";
+export type SessionRevisionType = "USER_CHECKPOINT" | "RECOVERY" | "AUTOSAVE" | "MIGRATION";
+
+export type SessionDependency = {
+  dependencyId: string;
+  kind: "SOURCE_ARTIFACT" | "EXPORT_ARTIFACT" | "SESSION_COMPONENT";
+  required: boolean;
+  mode: SessionDependencyMode;
+  uri?: string;
+  provider?: string;
+  expectedSha256: string;
+  byteLength?: number;
+  localStorageRef?: string;
+};
+
+export type SessionObjectRecord = {
+  objectId: string;
+  displayName: string;
+  enabled: boolean;
+  currentStateId: string;
+  stateOrder: readonly string[];
+  allStates: boolean;
+  loadResult: StructureLoadResult;
+  projection: JsonRecord;
+  lineage: JsonRecord;
+  molecularIdentityId: string;
+  scientificRevisionId: string;
+  retainedScientificRevisionIds: readonly string[];
+};
+
+export type DurableSelectionRecord = {
+  selectionId: string;
+  name?: string;
+  definition: JsonRecord;
+  snapshot?: JsonRecord;
+  sourceRevisionRefs: readonly { objectId: string; scientificRevisionId: string }[];
+  membershipHash?: string;
+  disposition: "VALID" | "STALE" | "UNVALIDATED" | "UNSUPPORTED" | "FAILED";
+  staleReason?: string;
+};
+
+export type DurableResultRecord = {
+  resultId: string;
+  kind: "MEASUREMENT" | "STRUCTURAL_ANALYSIS" | "ALIGNMENT" | "ALIGNMENT_OBJECT" | "R07" | "OTHER";
+  payload: JsonValue;
+  sourceRevisionRefs: readonly { objectId: string; scientificRevisionId: string }[];
+  disposition: "VALID" | "STALE" | "UNVALIDATED" | "UNSUPPORTED" | "FAILED";
+  staleReason?: string;
+};
+
+export type SceneStoreDimension = "VIEW" | "COLOR" | "ACTIVE" | "REPRESENTATION" | "FRAME_STATE";
+export type SceneObjectReference = {
+  objectId: string;
+  scientificRevisionId: string;
+  stateId: string;
+};
+
+export type SceneRecord = {
+  schemaVersion: 1;
+  sceneId: string;
+  sceneRevision: number;
+  name: string;
+  orderIndex: number;
+  activeObjectId: string | null;
+  objectRefs: readonly SceneObjectReference[];
+  selectionRefs: readonly string[];
+  resultRefs: readonly string[];
+  storeMask: readonly SceneStoreDimension[];
+  presentation: JsonRecord;
+  provenance: JsonRecord;
+  dependencyStatus: "VALID" | "STALE" | "MISSING_DEPENDENCY";
+};
+
+export type SceneCollection = {
+  schemaVersion: 1;
+  scenes: readonly SceneRecord[];
+  currentSceneId: string | null;
+};
+
+export type SessionDraft = {
+  sessionFormatVersion?: 2;
+  sessionId?: string;
+  name?: string;
+  documents?: readonly JsonRecord[];
+  objects: readonly SessionObjectRecord[];
+  activeObjectId: string | null;
+  globalFrameIndex: number;
+  workspaceGroups: readonly JsonRecord[];
+  coordinateFramePolicy?: string | null;
+  selections: readonly DurableSelectionRecord[];
+  results: readonly DurableResultRecord[];
+  sceneCollection: SceneCollection;
+  presentationState: JsonRecord;
+  activeSelection?: JsonRecord | null;
+  namedSelectionSnapshots?: readonly JsonRecord[];
+  dependencyMode?: SessionDependencyMode;
+  dependencies?: readonly SessionDependency[];
+  requiredCapabilities?: readonly string[];
+  optionalCapabilities?: readonly string[];
+  externalDependencyManifest?: readonly SessionDependency[];
+  commandAudit?: readonly JsonRecord[];
+  provenanceRefs?: readonly JsonRecord[];
+  scientificPolicyVersion?: string;
+  canonicalizationProfileVersion?: string;
+  applicationBuildId?: string;
+  recoveryMetadata?: JsonRecord | null;
+};
+
+export type SessionIntegrityEntry = {
+  artifactId: string;
+  kind: "SESSION_REVISION" | "SOURCE_ARTIFACT" | "EXPORT_ARTIFACT" | "SESSION_COMPONENT";
+  sha256: string;
+  byteLength?: number;
+  storageRef?: string;
+};
+
+export type SessionManifest = SessionDraft & {
+  sessionFormatVersion: 2;
+  sessionId: string;
+  sessionRevisionId: string;
+  parentSessionRevisionIds: readonly string[];
+  revisionType: SessionRevisionType;
+  savedAt: string;
+  integrityProfileVersion: string;
+  integrity: {
+    manifestSha256: string;
+    entries: readonly SessionIntegrityEntry[];
+  };
+  migrationHistory: readonly JsonRecord[];
+  restoreMetadata: JsonRecord;
 };
 
 /**

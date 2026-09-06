@@ -18,8 +18,11 @@ import type {
   StructureLoadResult,
   StructureSourceKind,
   RemoteStructureProvider,
+  FormatEvidence,
 } from "@molecular/contracts";
 import { inferCanonicalChemistryRoles } from "./chemistryRoles.js";
+import { scientificHashFor, sha256Bytes, SCIENTIFIC_HASH_PROFILE } from "../lifecycle/canonicalSerialization.js";
+import { SourceArtifactStore } from "../lifecycle/sourceArtifactStore.js";
 
 export const MAX_STRUCTURE_BYTES = 25 * 1024 * 1024;
 export const INGESTION_PARSER_PROFILE = "molecular-workstation-g1b-canonical-v1";
@@ -31,9 +34,9 @@ const ION_RESIDUES = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA
 
 export class IngestionError extends Error {
   constructor(
-    public readonly code: "UNSUPPORTED_FORMAT" | "INVALID_INPUT" | "REMOTE_FETCH_FAILED" | "REMOTE_NOT_FOUND" | "PAYLOAD_TOO_LARGE" | "PROJECT_NOT_FOUND" | "PROJECT_INVALID",
+    public readonly code: "UNSUPPORTED_FORMAT" | "FORMAT_MISMATCH" | "INVALID_INPUT" | "PARSE_FAILED" | "REMOTE_FETCH_FAILED" | "REMOTE_NOT_FOUND" | "PAYLOAD_TOO_LARGE" | "PROJECT_NOT_FOUND" | "PROJECT_INVALID" | "IMPORT_POLICY_CONFLICT" | "NAME_COLLISION" | "REVISION_CONFLICT" | "UNSUPPORTED_STATE_SCOPE" | "EXPORT_WOULD_LOSE_SEMANTICS" | "WRITER_FAILED" | "INTEGRITY_MISMATCH" | "SCHEMA_UNSUPPORTED" | "MIGRATION_FAILED" | "MISSING_DEPENDENCY" | "STALE_REFERENCE" | "SESSION_RESTORE_FAILED" | "SCENE_RESTORE_FAILED" | "SECURITY_REJECTED",
     message: string,
-    public readonly status = code === "PAYLOAD_TOO_LARGE" ? 413 : code === "REMOTE_NOT_FOUND" || code === "PROJECT_NOT_FOUND" ? 404 : 400,
+    public readonly status = code === "PAYLOAD_TOO_LARGE" ? 413 : code === "REMOTE_NOT_FOUND" || code === "PROJECT_NOT_FOUND" ? 404 : code === "REVISION_CONFLICT" || code === "NAME_COLLISION" ? 409 : code === "REMOTE_FETCH_FAILED" ? 502 : 400,
   ) {
     super(message);
     this.name = "IngestionError";
@@ -460,6 +463,20 @@ const formatFromFilename = (filename: string): StructureFormat => {
   throw new IngestionError("UNSUPPORTED_FORMAT", "Only .pdb, .cif, and .mmcif files are admitted in G1C.");
 };
 
+const formatEvidenceFor = (filename: string, content: string): { format: StructureFormat; evidence: FormatEvidence[] } => {
+  const extension = filename.toLowerCase().split(".").pop();
+  const filenameFormat: StructureFormat | undefined = extension === "pdb" ? "pdb" : extension === "cif" || extension === "mmcif" ? "mmcif" : undefined;
+  if (!filenameFormat) throw new IngestionError("UNSUPPORTED_FORMAT", "Only .pdb, .cif, and .mmcif files are admitted.");
+  const lines = content.split(/\r?\n/);
+  const hasPdbSignature = lines.some((line) => /^(HEADER|TITLE\s|ATOM\s{2}|HETATM|MODEL\s|CRYST1|CONECT|HELIX\s|SHEET\s)/.test(line));
+  const hasMmcifSignature = /^\s*data_[^\s]*/im.test(content) && /_atom_site\./i.test(content);
+  const signature: FormatEvidence | undefined = hasMmcifSignature ? { kind: "CONTENT_SIGNATURE", value: "mmCIF data_ + _atom_site loop" } : hasPdbSignature ? { kind: "CONTENT_SIGNATURE", value: "PDB record columns" } : undefined;
+  if (signature && ((signature.value.startsWith("mmCIF") && filenameFormat !== "mmcif") || (signature.value.startsWith("PDB") && filenameFormat !== "pdb"))) {
+    throw new IngestionError("FORMAT_MISMATCH", `Filename extension declares ${filenameFormat}, but content evidence declares ${signature.value.startsWith("mmCIF") ? "mmCIF" : "PDB"}.`);
+  }
+  return { format: filenameFormat, evidence: [{ kind: "FILENAME_EXTENSION", value: extension! }, ...(signature ? [signature] : [])] };
+};
+
 const parseSource = (filename: string, content: string): ParsedSource => {
   const format = formatFromFilename(filename);
   return format === "pdb" ? parsePdb(content) : parseMmcif(content);
@@ -508,6 +525,43 @@ const summarize = (atoms: CanonicalAtom[]): { counts: CanonicalMolecularStructur
 
 const canonicalBondKey = (atom1: string, atom2: string) => [atom1, atom2].sort().join("|");
 
+/**
+ * Stable scientific identity is intentionally independent of transport bytes.
+ * Source-artifact identity remains byte-exact, while this profile hashes the
+ * parsed molecular content using ordinal atom/state references instead of
+ * source-hash-derived IDs.
+ */
+const scientificPayloadFor = (atoms: readonly CanonicalAtom[], bonds: readonly CanonicalBond[], hierarchy: CanonicalHierarchy, coordinateStates: readonly CanonicalCoordinateState[], stateOrder: readonly string[], summary: { counts: CanonicalMolecularStructure["counts"]; bounds: CoordinateBounds }, parsed: ParsedSource, sourceChargeMap: Readonly<Record<string, number>>, hasCompleteSourceCharges: boolean, peptideSequenceChains: Readonly<Record<string, PeptideSequenceChain>>, chemistryRoles: { donorAtomIds: readonly string[]; acceptorAtomIds: readonly string[] } | undefined) => {
+  const atomIndex = new Map(atoms.map((atom, index) => [atom.stableId, index]));
+  const canonicalAtoms = atoms.map((value) => { const { stableId, ...atom } = value; void stableId; return atom; });
+  const canonicalBonds = bonds.map((value) => { const { id, atom1, atom2, ...bond } = value; void id; return { ...bond, atom1: atomIndex.get(atom1) ?? -1, atom2: atomIndex.get(atom2) ?? -1 }; });
+  const canonicalHierarchy = {
+    chainIds: hierarchy.chainIds,
+    chains: Object.fromEntries(hierarchy.chainIds.map((chainId) => [chainId, { ...hierarchy.chains[chainId], residueIds: [...hierarchy.chains[chainId]!.residueIds] }])),
+    residues: Object.fromEntries(Object.entries(hierarchy.residues).map(([residueId, residue]) => [residueId, { ...residue, atomIds: residue.atomIds.map((atomId) => atomIndex.get(atomId) ?? -1) }])),
+  };
+  const canonicalStates = coordinateStates.map((state) => ({
+    ordinal: state.ordinal,
+    sourceModelNumber: state.sourceModelNumber ?? null,
+    coordinates: atoms.map((atom) => state.coordinates[atom.stableId] ?? { x: atom.x, y: atom.y, z: atom.z }),
+  }));
+  const canonicalCharges = hasCompleteSourceCharges ? atoms.map((atom) => sourceChargeMap[atom.stableId] ?? null) : null;
+  return {
+    atoms: canonicalAtoms,
+    bonds: canonicalBonds,
+    hierarchy: canonicalHierarchy,
+    counts: summary.counts,
+    bounds: summary.bounds,
+    coordinateStates: canonicalStates,
+    stateOrder: stateOrder.map((_stateId, index) => index + 1),
+    unitCell: parsed.unitCell ?? null,
+    polymerTypingSource: parsed.polymerTypingSource ?? null,
+    partialChargeValues: canonicalCharges,
+    chemistryRoles: chemistryRoles ? { donorAtomOrdinals: chemistryRoles.donorAtomIds.map((atomId) => atomIndex.get(atomId) ?? -1).filter((index) => index >= 0), acceptorAtomOrdinals: chemistryRoles.acceptorAtomIds.map((atomId) => atomIndex.get(atomId) ?? -1).filter((index) => index >= 0) } : null,
+    peptideSequenceChains: Object.fromEntries(Object.entries(peptideSequenceChains).map(([chainId, chain]) => [chainId, { ...chain, residueIds: chain.residueIds.map((_id, index) => index) }])),
+  };
+};
+
 const AMINO_ACID_ONE_LETTER: Readonly<Record<string, string>> = {
   ALA: "A", ARG: "R", ASN: "N", ASP: "D", CYS: "C", GLN: "Q", GLU: "E", GLY: "G",
   HIS: "H", ILE: "I", LEU: "L", LYS: "K", MET: "M", PHE: "F", PRO: "P", SER: "S",
@@ -528,8 +582,11 @@ const peptideSequenceChainsFor = (hierarchy: CanonicalHierarchy): Record<string,
 export class StructureIngestionService {
   private readonly structures = new Map<string, CanonicalMolecularStructure>();
 
-  async ingestLocal(filename: string, buffer: Buffer): Promise<StructureLoadResult> {
-    return this.ingest("LOCAL_FILE", filename, buffer);
+  constructor(private readonly sourceArtifacts = new SourceArtifactStore()) {}
+
+  async ingestLocal(filename: string, buffer: Buffer, options: { parentExportArtifactId?: string } = {}): Promise<StructureLoadResult> {
+    if (/\.(pse|pze)$/i.test(filename)) throw new IngestionError("SECURITY_REJECTED", "Foreign PyMOL session files are not executable input in R09; no pickle or arbitrary deserialization path is available.");
+    return this.ingest("LOCAL_FILE", filename, buffer, undefined, undefined, options);
   }
 
   async ingestRcsb(pdbId: string): Promise<StructureLoadResult> {
@@ -556,8 +613,16 @@ export class StructureIngestionService {
       allResponsesNotFound = false;
       if (!response.ok) continue;
       try {
-        const content = await response.text();
-        return await this.ingest("RCSB", `${normalizedId}.cif`, Buffer.from(content, "utf8"), source.uri, source.provider);
+        const responseBytes = Buffer.from(await response.arrayBuffer());
+        const providerMetadata = Object.fromEntries(["etag", "last-modified", "content-length", "content-type"].flatMap((header) => {
+          const value = response.headers.get(header);
+          return value ? [[header, value] as const] : [];
+        }));
+        return await this.ingest("RCSB", `${normalizedId}.cif`, responseBytes, source.uri, source.provider, {
+          mediaType: response.headers.get("content-type")?.split(";", 1)[0]?.trim() || "chemical/x-mmcif",
+          accession: normalizedId,
+          providerMetadata,
+        });
       } catch (error) {
         if (error instanceof IngestionError) throw error;
         continue;
@@ -567,13 +632,29 @@ export class StructureIngestionService {
     throw new IngestionError("REMOTE_FETCH_FAILED", "RCSB/wwPDB could not be reached. Check the network and try again.", 502);
   }
 
-  private async ingest(kind: StructureSourceKind, filename: string, buffer: Buffer, uri?: string, provider?: RemoteStructureProvider): Promise<StructureLoadResult> {
+  private async ingest(kind: StructureSourceKind, filename: string, buffer: Buffer, uri?: string, provider?: RemoteStructureProvider, acquisition: { mediaType?: string; accession?: string; providerMetadata?: Readonly<Record<string, string>>; parentExportArtifactId?: string } = {}): Promise<StructureLoadResult> {
     if (buffer.length > MAX_STRUCTURE_BYTES) throw new IngestionError("PAYLOAD_TOO_LARGE", "Structure files must be 25 MB or smaller.");
     const safeFilename = basename(filename).replace(/[^A-Za-z0-9._-]/g, "_");
+    // This is intentionally before Buffer decoding.  The SourceArtifact
+    // digest is evidence for the received byte stream, not parser text.
+    const hash = sha256Bytes(buffer);
     const content = buffer.toString("utf8");
     if (!content.trim()) throw new IngestionError("INVALID_INPUT", "The structure input is empty.");
+    const formatEvidence = formatEvidenceFor(safeFilename, content);
+    const sourceArtifact = await this.sourceArtifacts.seal({
+      acquisitionKind: kind === "RCSB" ? "REMOTE_HTTP" : "LOCAL_UPLOAD",
+      originalFilename: safeFilename,
+      mediaType: acquisition.mediaType ?? (formatEvidence.format === "pdb" ? "chemical/x-pdb" : "chemical/x-mmcif"),
+      format: formatEvidence.format,
+      formatEvidence: formatEvidence.evidence,
+      parserProfile: INGESTION_PARSER_PROFILE,
+      ...(uri ? { sourceUri: uri } : {}),
+      ...(provider ? { provider } : {}),
+      ...(acquisition.accession ? { accession: acquisition.accession } : {}),
+      ...(acquisition.providerMetadata ? { providerMetadata: acquisition.providerMetadata } : {}),
+      ...(acquisition.parentExportArtifactId ? { parentExportArtifactId: acquisition.parentExportArtifactId, acquisitionKind: "DERIVED_EXPORT" as const } : {}),
+    }, buffer);
     const parsed = parseSource(safeFilename, content);
-    const hash = createHash("sha256").update(buffer).digest("hex");
     const atomIdsBySerial = new Map<number, string[]>();
     const atoms: CanonicalAtom[] = parsed.atoms.map((atom, index) => {
       const stableId = `${hash.slice(0, 16)}:atom:${index + 1}`;
@@ -601,6 +682,12 @@ export class StructureIngestionService {
       ...(provider ? { provider } : {}),
       ingestedAt: new Date().toISOString(),
       parserProfile: INGESTION_PARSER_PROFILE,
+      sourceArtifactId: sourceArtifact.sourceArtifactId,
+      acquisitionKind: sourceArtifact.acquisitionKind,
+      mediaType: sourceArtifact.mediaType,
+      formatEvidence: sourceArtifact.formatEvidence,
+      ...(sourceArtifact.providerMetadata ? { providerMetadata: sourceArtifact.providerMetadata } : {}),
+      scientificHashProfile: SCIENTIFIC_HASH_PROFILE,
     } as const;
     const hierarchy = makeHierarchy(atoms);
     const bonds = [...bondsByKey.values()];
@@ -631,8 +718,8 @@ export class StructureIngestionService {
       provenance: "Copied from source _chem_comp_atom.partial_charge; no charge inference performed",
     } : undefined;
     const chemistryRoles = inferCanonicalChemistryRoles(atoms, bonds);
-    const scientificPayload = { atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder, unitCell: parsed.unitCell ?? null, polymerTypingSource: parsed.polymerTypingSource ?? null, partialChargeValues: hasCompleteSourceCharges ? sourceChargeMap : null, chemistryRoles: chemistryRoles ? { donorAtomIds: chemistryRoles.donorAtomIds, acceptorAtomIds: chemistryRoles.acceptorAtomIds } : null, peptideSequenceChains };
-    const scientificHash = createHash("sha256").update(JSON.stringify(scientificPayload)).digest("hex");
+    const scientificPayload = scientificPayloadFor(atoms, bonds, hierarchy, coordinateStates, stateOrder, summary, parsed, sourceChargeMap, hasCompleteSourceCharges, peptideSequenceChains, chemistryRoles);
+    const scientificHash = scientificHashFor(scientificPayload);
     const structure: CanonicalMolecularStructure = {
       id: `structure_${hash.slice(0, 16)}`,
       name: safeFilename.replace(/\.(pdb|cif|mmcif)$/i, ""),
@@ -642,6 +729,7 @@ export class StructureIngestionService {
       bonds,
       hierarchy,
       scientificHash,
+      scientificHashProfile: SCIENTIFIC_HASH_PROFILE,
       coordinateStates,
       stateOrder,
       ...(parsed.unitCell ? { unitCell: parsed.unitCell } : {}),
@@ -653,6 +741,6 @@ export class StructureIngestionService {
       ...summary,
     };
     this.structures.set(structure.id, structure);
-    return { structure, renderSource: { format: parsed.format, content } };
+    return { structure, renderSource: { format: parsed.format, content }, sourceArtifact };
   }
 }

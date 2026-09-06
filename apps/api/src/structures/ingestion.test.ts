@@ -308,4 +308,39 @@ ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
     expect(result.structure.coordinateStates?.map((state) => state.sourceModelNumber)).toEqual([1, 7]);
     expect(result.structure.coordinateStates?.[1]?.coordinates[result.structure.atoms[0]!.stableId]).toEqual({ x: 4, y: 5, z: 6 });
   });
+
+  it("separates exact acquired bytes from scientific identity", async () => {
+    const lf = await new StructureIngestionService().ingestLocal("line-endings.pdb", Buffer.from(pdbFixture));
+    const crlf = await new StructureIngestionService().ingestLocal("line-endings.pdb", Buffer.from(pdbFixture.replaceAll("\n", "\r\n")));
+    expect(lf.sourceArtifact?.sha256).not.toBe(crlf.sourceArtifact?.sha256);
+    expect(lf.sourceArtifact?.byteLength).not.toBe(crlf.sourceArtifact?.byteLength);
+    expect(lf.structure.scientificHash).toBe(crlf.structure.scientificHash);
+    expect(lf.structure.source.scientificHashProfile).toBe("molexplorer-scientific-canonical-json-v1");
+  });
+
+  it("rejects format-policy mismatches before parser publication", async () => {
+    await expect(new StructureIngestionService().ingestLocal("wrong.pdb", Buffer.from(cifFixture))).rejects.toMatchObject({ code: "FORMAT_MISMATCH" });
+    await expect(new StructureIngestionService().ingestLocal("wrong.xyz", Buffer.from(pdbFixture))).rejects.toMatchObject({ code: "UNSUPPORTED_FORMAT" });
+  });
+
+  it("acquires remote response bytes through arrayBuffer without text re-encoding", async () => {
+    const bytes = Buffer.from(cifFixture.replace("data_test", "data_remote"), "utf8");
+    const response = { status: 200, ok: true, headers: new Headers({ "content-type": "chemical/x-mmcif", etag: "r09-test" }), arrayBuffer: async () => bytes, text: () => { throw new Error("remote text path must not be used"); } } as unknown as Response;
+    vi.stubGlobal("fetch", vi.fn(async () => response));
+    const result = await new StructureIngestionService().ingestRcsb("1abc");
+    expect(result.sourceArtifact?.sha256).toBe((await import("../lifecycle/canonicalSerialization.js")).sha256Bytes(bytes));
+    expect(result.sourceArtifact?.providerMetadata).toMatchObject({ etag: "r09-test" });
+    vi.unstubAllGlobals();
+  });
+
+  it("records export-to-source reimport lineage", async () => {
+    const result = await new StructureIngestionService().ingestLocal("reimport.pdb", Buffer.from(pdbFixture), { parentExportArtifactId: "export_abc" });
+    expect(result.sourceArtifact).toMatchObject({ acquisitionKind: "DERIVED_EXPORT", parentExportArtifactId: "export_abc" });
+    expect(result.structure.source.acquisitionKind).toBe("DERIVED_EXPORT");
+  });
+
+  it("securely rejects foreign PyMOL session containers without deserialization", async () => {
+    await expect(new StructureIngestionService().ingestLocal("foreign.pse", Buffer.from("not pickle"))).rejects.toMatchObject({ code: "SECURITY_REJECTED" });
+    await expect(new StructureIngestionService().ingestLocal("foreign.pze", Buffer.from("not pickle"))).rejects.toMatchObject({ code: "SECURITY_REJECTED" });
+  });
 });
