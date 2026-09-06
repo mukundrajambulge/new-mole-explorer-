@@ -64,7 +64,7 @@ describe("R09 immutable SessionRevision store", () => {
     await writeFile(revisionPath, JSON.stringify({ ...original, sessionFormatVersion: 99 }), "utf8");
     await expect(store.open(created.id)).rejects.toMatchObject({ code: "SCHEMA_UNSUPPORTED" });
     await writeFile(revisionPath, JSON.stringify(original), "utf8");
-    const artifactPath = join(root, draft.objects[0]!.loadResult.sourceArtifact!.rawStorageRef!.replaceAll("/", "\\"));
+    const artifactPath = join(root, ...draft.objects[0]!.loadResult.sourceArtifact!.rawStorageRef!.split("/"));
     await writeFile(artifactPath, Buffer.from("corrupt"));
     await expect(store.open(created.id)).rejects.toMatchObject({ code: "INTEGRITY_MISMATCH" });
   });
