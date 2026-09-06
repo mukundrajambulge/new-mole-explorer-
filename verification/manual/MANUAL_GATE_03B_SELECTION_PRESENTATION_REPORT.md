@@ -83,7 +83,7 @@ FOCUSED REPEAT:
 3/3 PASS
 
 GITHUB CI:
-PENDING
+PASS — [workflow run #197](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34018997729)
 
 USER RETEST:
 READY
@@ -107,4 +107,3 @@ STOP.
 - Actual browser inspection — residue emphasis, `focus selected`, Stick transition, and retained selected emphasis were visually inspected in the live workstation browser.
 
 Evidence: `verification/evidence/manual-gate-03b-selection/`
-
