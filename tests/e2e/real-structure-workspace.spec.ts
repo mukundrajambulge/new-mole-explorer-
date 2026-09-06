@@ -37,7 +37,7 @@ test("4DJW live selection and a second RCSB object share one workspace", async (
   expect(allSelectionHash).toBeTruthy();
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-membership-hash", allSelectionHash!);
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-indicator", "visible");
-  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-highlight-limit", "128");
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-highlight-limit", "none");
   await command.fill("show sticks, all");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByTestId("active-selection")).toContainText(`${loadedAtomCount.toLocaleString("en-US")} atoms`);

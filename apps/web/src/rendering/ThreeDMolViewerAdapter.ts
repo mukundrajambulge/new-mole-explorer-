@@ -63,6 +63,33 @@ const styleFor = (representation: StyleRepresentation, projection: RenderProject
   }
 };
 
+/**
+ * Selection is a presentation overlay, not a second atom-by-atom scene.  The
+ * overlay deliberately uses the active representation primitive so large
+ * selections remain visible without allocating one GLShape per atom.
+ */
+const selectionOverlayStyle = (projection: RenderProjection, representationOverride?: RenderProjection["representation"]): AtomStyleSpec => {
+  const color = "#55d9ff";
+  const colorfunc = () => color;
+  const representation = representationOverride ?? projection.representation;
+  if (representation === "cartoon" || representation === "ribbon" || representation === "trace" || representation === "putty") {
+    return { cartoon: { color, colorfunc, opacity: 0.86, arrows: true, thickness: Math.max(0.24, projection.representationState.parameters.cartoonThickness + 0.08) } } as AtomStyleSpec;
+  }
+  if (representation === "line" || representation === "lines") {
+    return { line: { color, colorfunc, linewidth: Math.max(2.2, projection.representationState.parameters.lineWidth + 1), opacity: 0.95 } } as AtomStyleSpec;
+  }
+  if (representation === "nonbonded-crosses") {
+    return { cross: { color, colorfunc, scale: 0.48, radius: 0.16, opacity: 0.95 } } as AtomStyleSpec;
+  }
+  if (representation === "spheres" || representation === "space-filling" || representation === "nonbonded-spheres") {
+    return { sphere: { color, colorfunc, scale: Math.max(1.05, projection.representationState.parameters.sphereScale * 1.18), opacity: 0.82 } } as AtomStyleSpec;
+  }
+  if (representation === "ball-and-stick") {
+    return { stick: { color, colorfunc, radius: Math.max(0.28, projection.representationState.parameters.stickRadius + 0.06), opacity: 0.86 }, sphere: { color, colorfunc, scale: 1.12, opacity: 0.78 } } as AtomStyleSpec;
+  }
+  return { stick: { color, colorfunc, radius: Math.max(0.26, projection.representationState.parameters.stickRadius + 0.05), opacity: 0.86 } } as AtomStyleSpec;
+};
+
 const orderNumber = (order: CanonicalMolecularStructure["bonds"][number]["order"]): number => order === "DOUBLE" ? 2 : order === "TRIPLE" ? 3 : order === "AROMATIC" ? 4 : 1;
 const secondaryCode = (value: CanonicalMolecularStructure["atoms"][number]["secondaryStructure"]): string | undefined => value === "HELIX" ? "h" : value === "SHEET" ? "s" : value === "LOOP" ? "c" : undefined;
 
@@ -347,9 +374,12 @@ export class ThreeDMolViewerAdapter {
         this.applyClipping();
       }
     }
-    if (objectSceneChanged) {
-      this.renderPrimaryWorkspaceModel();
-      this.renderAuxiliaryModels();
+    if (objectSceneChanged || objectInteractionChanged) {
+      // Clear any prior selection overlay before projecting the next one.
+      // This is a model-style reset; canonical atoms, surfaces, and camera
+      // state remain intact.
+      this.renderPrimaryWorkspaceModel(true);
+      this.renderAuxiliaryModels(true);
     }
     if (objectSceneChanged || effectiveObjects[0]) {
       // Keep the diagnostics bound to the same authoritative object that was
@@ -392,7 +422,15 @@ export class ThreeDMolViewerAdapter {
     if (sceneDirty) this.applyProjection(projection);
     else {
       if (labelsDirty) this.projectLabels(projection);
-      if (interactionDirty) this.projectInteractionHighlights(projection);
+      if (interactionDirty) {
+        if (this.workspaceObjects.length) {
+          this.renderPrimaryWorkspaceModel(true);
+          this.renderAuxiliaryModels(true);
+          this.projectInteractionHighlights(projection);
+        } else {
+          this.applyProjection(projection);
+        }
+      }
     }
     if (cameraDirty) this.applyClipping();
     this.writeDiagnostics(this.diagnostics);
@@ -518,7 +556,7 @@ export class ThreeDMolViewerAdapter {
     model.addAtoms(this.atomSpecsFor(this.renderLoadResultForState(object).structure, object.objectId));
   }
 
-  private renderWorkspaceModel(model: ReturnType<GLViewer["addModel"]>, object: WorkspaceObject): void {
+  private renderWorkspaceModel(model: ReturnType<GLViewer["addModel"]>, object: WorkspaceObject, forceReset = false): void {
     const structure = structureForWorkspaceObjectState(object);
     if (!object.enabled) { model.setStyle({}, { cartoon: { hidden: true }, stick: { hidden: true }, sphere: { hidden: true }, line: { hidden: true } }); this.styledModels.delete(model); this.surfaceFallbackModels.delete(model); this.surfaceReadyModels.delete(model); return; }
     const diagnostics = buildRenderProjectionDiagnostics(structure, object.projection);
@@ -527,8 +565,9 @@ export class ThreeDMolViewerAdapter {
       // Keep the prior atom presentation while native 3Dmol generates the
       // replacement surface. A fresh surface-only load gets a lightweight
       // atom fallback so it is never an empty viewport during generation.
+      if (forceReset) model.setStyle({}, {});
       if (this.surfaceReadyModels.has(model)) return;
-      if (!this.styledModels.has(model)) this.renderSurfaceFallback(model, structure, object.projection, diagnostics.directives[0]?.targetStableAtomIds ?? []);
+      if (forceReset || !this.styledModels.has(model)) this.renderSurfaceFallback(model, structure, object.projection, diagnostics.directives[0]?.targetStableAtomIds ?? []);
       this.surfaceFallbackModels.add(model);
       return;
     }
@@ -550,13 +589,13 @@ export class ThreeDMolViewerAdapter {
     }
     if (diagnostics.waterSphereContributors > 0) model.setStyle(targetFor(structure.atoms.filter((atom) => atom.isWater).map((atom) => atom.stableId)), styleFor("spheres", object.projection, structure, "water"), true);
   }
-  private renderPrimaryWorkspaceModel(): void {
+  private renderPrimaryWorkspaceModel(forceReset = false): void {
     const object = this.workspaceObjects[0];
-    if (object && this.primaryModel) this.renderWorkspaceModel(this.primaryModel, object);
+    if (object && this.primaryModel) this.renderWorkspaceModel(this.primaryModel, object, forceReset);
   }
-  private renderAuxiliaryModels(): void {
+  private renderAuxiliaryModels(forceReset = false): void {
     for (const { model, object } of this.auxiliaryModels) {
-      this.renderWorkspaceModel(model, object);
+      this.renderWorkspaceModel(model, object, forceReset);
     }
   }
   private renderSurfaceFallback(model: ViewerModel, structure: CanonicalMolecularStructure, projection: RenderProjection, targetStableAtomIds: readonly string[]): void {
@@ -701,9 +740,9 @@ export class ThreeDMolViewerAdapter {
     }
     if (!this.primaryObjectEnabled) {
       viewer.setStyle({}, { cartoon: { hidden: true }, stick: { hidden: true }, sphere: { hidden: true }, line: { hidden: true } });
-      this.projectInteractionHighlights(projection);
       this.projectLabels(projection);
-      this.renderAuxiliaryModels();
+      this.renderAuxiliaryModels(true);
+      this.projectInteractionHighlights(projection);
       this.bindWorkspacePicking();
       return;
     }
@@ -726,13 +765,13 @@ export class ThreeDMolViewerAdapter {
     const colorDiagnostic = projection.colorDiagnostic ?? colorDiagnostics[0] ?? null;
     this.diagnostics = { ...this.diagnostics, colorDiagnostic };
     this.writeDiagnostics(this.diagnostics);
-    this.projectInteractionHighlights(projection);
     this.projectLabels(projection);
     this.projectMeasurementShapes();
     this.applySurfaceDirectives(diagnostics, projection);
     this.setAnalysisOverlays(this.analysisOverlays);
-    this.renderPrimaryWorkspaceModel();
-    this.renderAuxiliaryModels();
+    this.renderPrimaryWorkspaceModel(true);
+    this.renderAuxiliaryModels(true);
+    this.projectInteractionHighlights(projection);
     this.bindWorkspacePicking();
   }
 
@@ -1058,27 +1097,65 @@ export class ThreeDMolViewerAdapter {
     this.interactionShapes = [];
     const hoverId = projection.interaction.hoveredAtomId;
     const pickedId = projection.interaction.pickedAtomId;
-    // Keep selection state complete in the presentation model; cap only per-atom
-    // highlight geometry so selecting an entire large structure stays responsive.
-    const selectedIds = new Set(projection.interaction.selectedAtomIds.slice(0, 128));
-    if (this.container) {
-      this.container.dataset.selectionIndicator = selectedIds.size ? "visible" : "none";
-      this.container.dataset.selectionHighlightedAtomCount = String(selectedIds.size);
-      this.container.dataset.selectionHighlightLimit = "128";
+    const selectedIds = new Set(projection.interaction.selectedAtomIds);
+    const selectionEntries = this.workspaceObjects.length
+      ? [
+        ...(this.workspaceObjects[0] && this.primaryModel ? [{ model: this.primaryModel, object: this.workspaceObjects[0], structure: structureForWorkspaceObjectState(this.workspaceObjects[0]) }] : []),
+        ...this.auxiliaryModels.map(({ model, object }) => ({ model, object, structure: structureForWorkspaceObjectState(object) })),
+      ]
+      : (this.primaryModel ? [{ model: this.primaryModel, object: null, structure: this.structure }] : []);
+    const matchedSelectionIds = new Set<string>();
+    const selectedLocalIdsFor = (objectId: string | null): Set<string> => {
+      const local = new Set<string>();
+      for (const selectedId of selectedIds) {
+        if (objectId) {
+          const prefix = `${objectId}::`;
+          if (selectedId.startsWith(prefix)) local.add(selectedId.slice(prefix.length));
+          else if (this.workspaceObjects.length === 1 && !selectedId.includes("::")) local.add(selectedId);
+        } else if (!selectedId.includes("::")) local.add(selectedId);
+      }
+      return local;
+    };
+    for (const entry of selectionEntries) {
+      if (entry.object && !entry.object.enabled) continue;
+      const localIds = selectedLocalIdsFor(entry.object?.objectId ?? null);
+      if (!localIds.size) continue;
+      const matchingLocalIds = new Set(entry.structure.atoms.filter((atom) => localIds.has(atom.stableId)).map((atom) => atom.stableId));
+      if (!matchingLocalIds.size) continue;
+      for (const localId of matchingLocalIds) {
+        const scopedId = entry.object ? workspaceScopedStableAtomId(entry.object.objectId, localId) : localId;
+        if (selectedIds.has(scopedId)) matchedSelectionIds.add(scopedId);
+        else if (selectedIds.has(localId)) matchedSelectionIds.add(localId);
+      }
+      const overlayGroups = new Map<RenderProjection["representation"], string[]>();
+      for (const atom of entry.structure.atoms) {
+        if (!matchingLocalIds.has(atom.stableId)) continue;
+        const representation = (projection.representation === "cartoon" || projection.representation === "ribbon" || projection.representation === "trace" || projection.representation === "putty")
+          ? atom.isPolymer ? "lines" : atom.isWater || atom.isIon ? "spheres" : "sticks"
+          : projection.representation;
+        overlayGroups.set(representation, [...(overlayGroups.get(representation) ?? []), atom.stableId]);
+      }
+      for (const [representation, stableIds] of overlayGroups) {
+        const ids = new Set(stableIds);
+        entry.model.setStyle({ predicate: (atom) => typeof atom.properties?.canonicalStableId === "string" && ids.has(atom.properties.canonicalStableId) }, selectionOverlayStyle(projection, representation), true);
+      }
     }
-    const workspaceAtoms = this.workspaceObjects.length ? this.workspaceObjects.flatMap((object) => structureForWorkspaceObjectState(object).atoms.map((atom) => ({ ...atom, stableId: workspaceScopedStableAtomId(object.objectId, atom.stableId) }))) : this.structure.atoms;
+    if (this.container) {
+      this.container.dataset.selectionIndicator = matchedSelectionIds.size ? "visible" : "none";
+      this.container.dataset.selectionHighlightedAtomCount = String(matchedSelectionIds.size);
+      this.container.dataset.selectionHighlightLimit = "none";
+      this.container.dataset.selectionHighlightMode = matchedSelectionIds.size === 1 ? "atom-halo-overlay" : matchedSelectionIds.size ? "representation-overlay" : "none";
+    }
+    const workspaceAtoms = this.workspaceObjects.length ? this.workspaceObjects.flatMap((object) => object.enabled ? structureForWorkspaceObjectState(object).atoms.map((atom) => ({ ...atom, stableId: workspaceScopedStableAtomId(object.objectId, atom.stableId) })) : []) : this.structure.atoms;
     const addMarker = (stableId: string, color: string, radius: number, wireframe: boolean, opacity: number) => {
       const atoms = workspaceAtoms.filter((candidate) => candidate.stableId === stableId || candidate.stableId.endsWith(`::${stableId}`));
       for (const atom of atoms) this.interactionShapes.push(this.viewer!.addSphere({ center: atom, radius, color, wireframe, opacity }));
     };
     if (hoverId) addMarker(hoverId, "#31d8c4", 0.18, true, 0.7);
     if (pickedId) addMarker(pickedId, "#e5ae32", 0.28, true, 0.8);
-    if (selectedIds.size) {
-      const selectionShape = this.viewer.addShape({ color: "#55d9ff", opacity: 0.28 });
-      for (const selectedId of selectedIds) {
-        for (const atom of workspaceAtoms.filter((candidate) => candidate.stableId === selectedId || candidate.stableId.endsWith(`::${selectedId}`))) selectionShape.addSphere({ center: atom, radius: 0.22, wireframe: false, opacity: 0.28 });
-      }
-      this.interactionShapes.push(selectionShape);
+    if (matchedSelectionIds.size === 1) {
+      const selectedAtom = workspaceAtoms.find((candidate) => matchedSelectionIds.has(candidate.stableId) || [...matchedSelectionIds].some((id) => id.endsWith(`::${candidate.stableId}`)));
+      if (selectedAtom) this.interactionShapes.push(this.viewer.addSphere({ center: selectedAtom, radius: 0.34, color: "#55d9ff", wireframe: true, opacity: 0.88 }));
     }
     for (const measurementId of projection.interaction.measurementPickAtomIds) addMarker(measurementId, "#f5c451", 0.23, true, 0.95);
   }
