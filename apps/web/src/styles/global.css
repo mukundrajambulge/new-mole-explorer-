@@ -132,6 +132,19 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
 .side-column--left .components-card { flex: 0 0 auto; }
 .side-column--left .context-card { flex: 0 0 auto; }
 .side-column--left .analysis-card { flex: 0 0 auto; min-height: 0; overflow: visible; }
+.side-column--left .alignment-workflow { position: relative; z-index: 2; flex: 0 0 auto; overflow: visible; }
+.alignment-form-grid { display: grid; gap: 8px; padding: 0 13px 8px; }
+.alignment-form-grid label { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; color: #9aabba; font-size: 9px; }
+.alignment-form-grid label > span { color: #657487; font-size: 8px; font-weight: 700; letter-spacing: .12em; }
+.alignment-form-grid select, .alignment-form-grid input { width: 100%; min-height: 26px; padding: 4px 6px; color: #dce6f0; border: 1px solid rgba(147, 169, 193, .2); border-radius: 5px; background: rgba(7, 10, 15, .78); font-size: 9px; }
+.alignment-checkbox { display: flex; align-items: center; gap: 6px; margin: 0 13px 8px; color: #aebdce; font-size: 9px; }
+.alignment-checkbox input { accent-color: var(--cyan); }
+.alignment-result-summary { display: flex; flex-direction: column; gap: 6px; margin: 0 13px 10px; }
+.alignment-result-detail { display: flex; flex-direction: column; gap: 3px; padding: 7px; color: #9aabba; border: 1px solid rgba(49, 216, 196, .18); border-radius: 5px; background: rgba(49, 216, 196, .045); font-size: 8px; line-height: 1.35; }
+.alignment-result-detail strong { color: #dffcf7; font-size: 9px; }
+.alignment-pair-links { display: flex; flex-direction: column; gap: 2px; margin-top: 3px; padding-top: 4px; border-top: 1px solid rgba(153, 174, 199, .12); font-family: ui-monospace, monospace; }
+.alignment-pair-links span[data-retained="true"] { color: #70e29b; }
+.alignment-pair-links span[data-retained="false"] { color: #ffb25e; text-decoration: line-through; }
 .side-column--right .inspector-card { flex: 1 1 1px; min-height: 250px; }
 .side-column--right .display-card { flex: 0 0 auto; }
 .panel-card { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: linear-gradient(155deg, rgba(17, 22, 29, .84), rgba(9, 12, 17, .9)); box-shadow: inset 0 1px rgba(255,255,255,.025); }

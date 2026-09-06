@@ -119,6 +119,15 @@ export type AlignmentRequest = Readonly<{
   targetWorldTransform?: RigidTransform;
 }>;
 
+export type AlignmentWorkflowOptions = Readonly<{
+  mappingMode: MappingMode;
+  sourceStateId?: string;
+  targetStateId?: string;
+  refinementCycles: number;
+  transformMode: "ANALYZE_ONLY" | "FIT_AND_APPLY";
+  alignmentObjectRequested: boolean;
+}>;
+
 export type RigidTransform = Readonly<{
   rotation: Matrix3;
   translation: Vec3;

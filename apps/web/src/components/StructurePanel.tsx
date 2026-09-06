@@ -9,6 +9,7 @@ import type { CoordinateFramePolicy, SelectionResult } from "../interaction/sele
 import { Icon } from "./Icon";
 import { AlignmentPanel } from "./AlignmentPanel";
 import type { ConsoleCommandResult } from "./ConsolePanel";
+import type { AlignmentWorkflowOptions } from "../analysis/alignment";
 
 const analysisTools: Array<{ label: string; icon: "target" | "activity" | "waves" | "shapes" | "box" | "circleHelp"; actionId: ActionId; capability?: string }> = [
   { label: "H-Bonds", icon: "waves", actionId: "ANALYSIS.H_BONDS" },
@@ -46,7 +47,9 @@ type StructurePanelProps = {
   onMeasurementClear: () => void;
   analysisResults: readonly StructuralAnalysisResult[];
   fittingResults: readonly (FittingAnalysis & { applyStatus: "ANALYZED" | "APPLIED" | "STALE" })[];
-  onAlignmentCommand: (command: string) => ConsoleCommandResult;
+  onAlignmentCommand: (command: string, options?: AlignmentWorkflowOptions) => ConsoleCommandResult;
+  canUndo?: boolean;
+  canRedo?: boolean;
   loading: boolean;
   error: string | null;
   namedSelections: readonly { name: string; count: number }[];
@@ -98,7 +101,7 @@ const MeasurementCard = ({ measurementMode, measurementSlots, measurements, stru
   </section>;
 };
 
-export const StructurePanel = ({ collapsed, onToggle, onAction, structure, workspaceObjects, workspaceGroups, activeObjectId, coordinateFramePolicy, onCoordinateFrameChange, onObjectSelect, onObjectToggle, onObjectStateCycle, onObjectAllStatesToggle, projection, selectedAtom, activeSelection, onClearSelection, measurementMode, measurementSlots, measurements, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear, analysisResults, fittingResults, onAlignmentCommand, loading, error, namedSelections, onNamedSelectionAction }: StructurePanelProps) => {
+export const StructurePanel = ({ collapsed, onToggle, onAction, structure, workspaceObjects, workspaceGroups, activeObjectId, coordinateFramePolicy, onCoordinateFrameChange, onObjectSelect, onObjectToggle, onObjectStateCycle, onObjectAllStatesToggle, projection, selectedAtom, activeSelection, onClearSelection, measurementMode, measurementSlots, measurements, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear, analysisResults, fittingResults, onAlignmentCommand, canUndo, canRedo, loading, error, namedSelections, onNamedSelectionAction }: StructurePanelProps) => {
   const counts = structure?.structure.counts;
   const components = [
     { label: "Protein", count: counts?.polymerAtoms ?? 0, tone: "blue", visible: projection.showProtein },
@@ -140,7 +143,7 @@ export const StructurePanel = ({ collapsed, onToggle, onAction, structure, works
     </section>
     <section className="panel-card components-card"><div className="panel-heading"><div><span className="eyebrow">STRUCTURE INVENTORY</span><h2>Components</h2></div><span className="capability-tag">Projection only</span></div><div className="component-list">{components.map((component) => <div className="component-row" key={component.label}><span className={`component-dot component-dot--${component.tone} ${component.visible ? "component-dot--visible" : "component-dot--hidden"}`} aria-hidden="true" /><span>{component.label}</span><span className="component-count">{formatCount(component.count)}</span></div>)}</div></section>
     <ContextCard selectedAtom={selectedAtom} onAction={onAction} onClearSelection={onClearSelection} />
-    <AlignmentPanel objects={workspaceObjects} results={fittingResults} onCommand={onAlignmentCommand} />
+    <AlignmentPanel objects={workspaceObjects} results={fittingResults} onCommand={onAlignmentCommand} canUndo={canUndo} canRedo={canRedo} />
     <MeasurementCard measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} structure={structure} onAction={onAction} onMeasurementMode={onMeasurementMode} onMeasurementVisibility={onMeasurementVisibility} onMeasurementDelete={onMeasurementDelete} onMeasurementClear={onMeasurementClear} analysisResults={analysisResults} fittingResults={fittingResults} />
   </aside>;
 };

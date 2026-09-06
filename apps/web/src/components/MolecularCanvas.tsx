@@ -6,6 +6,7 @@ import { ThreeDMolViewerAdapter } from "../rendering/ThreeDMolViewerAdapter";
 import type { PickResult } from "../interaction/picking";
 import type { MeasurementKind, MeasurementObject } from "../interaction/measurements";
 import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
+import type { AlignmentOverlay } from "../analysis/alignmentPresentation";
 import type { WorkspaceObject } from "../workspace/workspaceModel";
 import { Icon } from "./Icon";
 
@@ -30,6 +31,7 @@ type MolecularCanvasProps = {
   measurements: readonly MeasurementObject[];
   measurementMode: MeasurementKind | null;
   analysisOverlays: readonly AnalysisOverlay[];
+  alignmentOverlays: readonly AlignmentOverlay[];
 };
 
 const toolIcon = (activeTool: string) => {
@@ -58,6 +60,7 @@ export const MolecularCanvas = ({
   measurements,
   measurementMode,
   analysisOverlays,
+  alignmentOverlays,
 }: MolecularCanvasProps) => {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -169,6 +172,10 @@ export const MolecularCanvas = ({
   useEffect(() => {
     adapterRef.current?.setAnalysisOverlays(analysisOverlays);
   }, [analysisOverlays]);
+
+  useEffect(() => {
+    adapterRef.current?.setAlignmentOverlays(alignmentOverlays);
+  }, [alignmentOverlays]);
 
   useEffect(() => {
     const adapter = adapterRef.current;

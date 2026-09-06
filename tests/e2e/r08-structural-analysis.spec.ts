@@ -22,6 +22,18 @@ test("R08 UI exposes governed mobile/target alignment workflow", async ({ page }
   await page.screenshot({ path: evidence("03-fit-apply-before.png"), animations: "disabled" });
 });
 
+test("R08 governed Align creates a presentation-only stable-pair overlay", async ({ page }) => {
+  await loadFixture(page);
+  const workflow = page.getByTestId("alignment-workflow");
+  await workflow.locator("select").nth(4).selectOption("align");
+  await expect(workflow.locator("select[aria-label='Mobile state']")).toBeVisible();
+  await workflow.getByTestId("alignment-execute").click();
+  await expect(page.getByTestId("alignment-results")).toContainText("ALIGN");
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-alignment-overlay-count", /[1-9]/);
+  await expect(page.getByLabel("Alignment pair presentation")).toBeVisible();
+  await page.screenshot({ path: evidence("12-alignment-object.png"), animations: "disabled" });
+});
+
 test("R08 current and fitted RMS commands are analysis-only", async ({ page }) => {
   await loadFixture(page);
   const command = page.getByRole("textbox", { name: "Command or selection query" });

@@ -13,6 +13,7 @@ import { buildDotSurfacePoints, type SurfacePoint } from "./surfaceGenerator";
 import { SurfaceGeometryCache, SurfaceRequestCoordinator, surfaceRequestFor } from "./surfaceProfiles";
 import { puttyProfileFor, puttyRadiusForResidue, puttyResidueRadii } from "./putty";
 import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
+import type { AlignmentOverlay } from "../analysis/alignmentPresentation";
 import { stateForObject, structureForWorkspaceObjectState, workspaceScopedStableAtomId, type WorkspaceObject } from "../workspace/workspaceModel";
 
 const diagnosticTypeForStyle = (style: string): RepresentationType => style === "ribbon" ? "RIBBON" : style === "putty" || style === "trace" || style === "cartoon" ? "CARTOON" : style === "nonbonded-crosses" ? "NONBONDED" : style === "nonbonded-spheres" ? "NB_SPHERES" : style === "line" ? "LINES" : style === "stick" || style === "licorice" || style === "ball-and-stick" ? "STICKS" : "SPHERES";
@@ -172,6 +173,8 @@ export class ThreeDMolViewerAdapter {
   private interactionShapes: GLShape[] = [];
   private analysisShapes: GLShape[] = [];
   private analysisOverlays: readonly AnalysisOverlay[] = [];
+  private alignmentShapes: GLShape[] = [];
+  private alignmentOverlays: readonly AlignmentOverlay[] = [];
   private dotSurfaceShapes: GLShape[] = [];
   private surfaceIds: number[] = [];
   private surfaceKinds: Array<"surface" | "mesh"> = [];
@@ -250,6 +253,43 @@ export class ThreeDMolViewerAdapter {
     this.render();
   }
 
+  setAlignmentOverlays(overlays: readonly AlignmentOverlay[]): void {
+    this.alignmentOverlays = overlays;
+    this.projectAlignmentOverlays();
+  }
+
+  private projectAlignmentOverlays(): void {
+    this.alignmentShapes.forEach((shape) => this.viewer?.removeShape(shape));
+    this.alignmentShapes = [];
+    if (!this.viewer || !this.structure) return;
+    const structureFor = (objectId: string, stateId: string): CanonicalMolecularStructure | null => {
+      if (!this.workspaceObjects.length) return this.structure;
+      const object = this.workspaceObjects.find((candidate) => candidate.objectId === objectId);
+      if (!object || object.currentStateId !== stateId) return null;
+      return structureForWorkspaceObjectState(object);
+    };
+    const shapeByResult = new Map<string, GLShape>();
+    for (const overlay of this.alignmentOverlays) {
+      const sourceStructure = structureFor(overlay.sourceObjectId, overlay.sourceStateId);
+      const targetStructure = structureFor(overlay.targetObjectId, overlay.targetStateId);
+      const source = sourceStructure?.atoms.find((atom) => atom.stableId === overlay.sourceAtomUid);
+      const target = targetStructure?.atoms.find((atom) => atom.stableId === overlay.targetAtomUid);
+      if (!source || !target) continue;
+      const color = overlay.retained ? "#43d17d" : "#ff9f43";
+      const shapeKey = `${overlay.resultId}:${overlay.retained ? "retained" : "rejected"}`;
+      const shape = shapeByResult.get(shapeKey) ?? this.viewer.addShape({ color, linewidth: overlay.retained ? 2.2 : 1.4, opacity: overlay.retained ? 0.82 : 0.68 });
+      shapeByResult.set(shapeKey, shape);
+      shape.addLine({ start: source, end: target, dashed: !overlay.retained });
+      if (overlay.residual !== null && Number.isFinite(overlay.residual)) {
+        const center = { x: (source.x + target.x) / 2, y: (source.y + target.y) / 2, z: (source.z + target.z) / 2 };
+        shape.addSphere({ center, radius: Math.min(0.28, 0.08 + Math.max(0, overlay.residual) * 0.035), wireframe: true, color, opacity: 0.8 });
+      }
+    }
+    this.alignmentShapes = [...shapeByResult.values()];
+    this.writeDiagnostics(this.diagnostics);
+    this.render();
+  }
+
   load(result: StructureLoadResult, projection: RenderProjection, objectId?: string): void {
     this.ensureMounted();
     this.structure = result.structure;
@@ -273,6 +313,8 @@ export class ThreeDMolViewerAdapter {
     this.activeSurfaceGeometryKey = null;
     this.interactionShapes = [];
     this.analysisShapes = [];
+    this.alignmentShapes = [];
+    this.alignmentOverlays = [];
     this.analysisOverlays = [];
     this.auxiliaryModels = [];
     this.workspaceObjects = [];
@@ -331,6 +373,7 @@ export class ThreeDMolViewerAdapter {
     this.applyWorkspaceSurfaces(objects);
     this.bindWorkspacePicking();
     this.writeWorkspaceProjectionState();
+    this.projectAlignmentOverlays();
     this.container?.setAttribute("data-renderer-model-count", String(auxiliaryObjects.length + 1));
     this.baselineView = null;
     this.baselinePivot = null;
@@ -410,6 +453,7 @@ export class ThreeDMolViewerAdapter {
     if (objectSceneChanged || modelStateChanged) this.applyWorkspaceSurfaces(effectiveObjects);
     if (objectSceneChanged || modelStateChanged) this.bindWorkspacePicking();
     this.writeWorkspaceProjectionState();
+    if (modelStateChanged || scientificRevisionChanged) this.projectAlignmentOverlays();
     this.container?.setAttribute("data-renderer-model-count", String(this.auxiliaryModels.length + 1));
     if (this.projection && objectLabelsChanged) {
       this.projectLabels(this.projection);
@@ -534,7 +578,7 @@ export class ThreeDMolViewerAdapter {
     this.resizeObserver?.disconnect(); this.resizeObserver = null;
     if (this.viewer) { this.viewer.clear(); this.viewer = null; }
     this.cameraController = null;
-    this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.auxiliaryModels = []; this.workspaceObjects = []; this.workspaceSurfaceHandles.clear(); this.workspaceSurfaceRebuilds.clear(); this.styledModels.clear(); this.surfaceFallbackModels.clear(); this.surfaceReadyModels.clear(); this.primaryModel = null; this.primaryObjectEnabled = true; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceKinds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.cameraPan = { x: 0, y: 0 }; this.cameraTargetMetadata = { atoms: 0, models: 0, objects: 0, mode: "none" }; this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
+    this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.alignmentShapes = []; this.alignmentOverlays = []; this.auxiliaryModels = []; this.workspaceObjects = []; this.workspaceSurfaceHandles.clear(); this.workspaceSurfaceRebuilds.clear(); this.styledModels.clear(); this.surfaceFallbackModels.clear(); this.surfaceReadyModels.clear(); this.primaryModel = null; this.primaryObjectEnabled = true; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceKinds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.cameraPan = { x: 0, y: 0 }; this.cameraTargetMetadata = { atoms: 0, models: 0, objects: 0, mode: "none" }; this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
   }
   getDiagnostics(): RenderProjectionDiagnostics { return this.diagnostics; }
 
@@ -1335,6 +1379,9 @@ export class ThreeDMolViewerAdapter {
     this.container.dataset.measurementPicks = this.projection?.interaction.measurementPickAtomIds.join(",") ?? "";
     this.container.dataset.labelMode = this.projection?.labels.mode ?? "off";
     this.container.dataset.measurementCount = String(this.measurements.length);
+    this.container.dataset.alignmentOverlayCount = String(this.alignmentOverlays.length);
+    this.container.dataset.alignmentRetainedOverlayCount = String(this.alignmentOverlays.filter((overlay) => overlay.retained).length);
+    this.container.dataset.alignmentRejectedOverlayCount = String(this.alignmentOverlays.filter((overlay) => !overlay.retained).length);
     this.container.dataset.rendererStyleProfile = diagnostics.styleProfile;
     this.container.dataset.rendererRepresentationStatus = diagnostics.representation[diagnosticTypeForStyle(diagnostics.styleProfile)].status;
     this.container.dataset.rendererRibbonStatus = diagnostics.representation.RIBBON.status;
