@@ -11,8 +11,8 @@
 | R07 user manual approval | `DEFERRED_BY_USER` |
 | R07 technical status | `GREEN` |
 | R08 branch | `feature/r08-structural-analysis` |
-| R08 implementation tip | `c49547e` |
-| R08 candidate tip | `729ea0758819b1e17dd5f3460f5322d28038ecd5` |
+| R08 implementation tip | `02c1a0ebca4ca60917d554f155fdc7ff68693c5c` |
+| R08 candidate tip | `02c1a0ebca4ca60917d554f155fdc7ff68693c5c` |
 | R07 final approval | Pending; not falsely sealed |
 | Main merge | Not performed |
 | R09 | Not started |
@@ -40,8 +40,8 @@
 | --- | --- | --- |
 | VIS-R08-01 | PASS | Analyze-only RMS/fitting paths do not mutate coordinates; R08 E2E and unit tests pass. |
 | VIS-R08-02 | PASS | Fit application is revision-guarded and commits only the designated mobile selection through R07 history. |
-| VIS-R08-03 | BOUNDED PASS | Immutable alignment-object links are presented in the result panel; dedicated 3D pair-line projection is a known limitation. |
-| VIS-R08-04 | BOUNDED PASS | Retained/rejected counts and pair-link retained flags are exposed; 3D styling is not yet projected. |
+| VIS-R08-03 | PASS | Immutable alignment-object links drive disposable 3D pair-line overlays and the result-panel presentation. |
+| VIS-R08-04 | PASS | Retained links render solid green and rejected links render dashed orange in separate renderer layers; the result panel repeats the retained flags. |
 | VIS-R08-05 | PASS | Pair-link residuals are read from immutable `perPairResiduals`; no renderer recomputation is authoritative. |
 | VIS-R08-06 | PASS | Intra-state results retain explicit state IDs and state-scoped analysis/application semantics. |
 | VIS-R08-07 | PASS | CE guide mapping is not fabricated; unsupported CE produces no overlay/result. |
@@ -71,10 +71,10 @@
 
 - Typecheck: PASS (`npm run typecheck`)
 - Lint: PASS (`npm run lint`, zero warnings)
-- Unit: PASS — web 126/126 and API 22/22, 148 total
+- Unit: PASS — web 128/128 and API 22/22, 150 total
 - Build: PASS (`npm run build`; existing 3Dmol `eval` and bundle-size warnings only)
-- R08 focused E2E: PASS — 4/4 on 3 consecutive runs, plus a post-presentation-change 4/4 run
-- Full E2E: PASS — 109/109
+- R08 focused E2E: PASS — 5/5 on 3 consecutive runs, plus a post-presentation-change Align run
+- Full E2E: PASS — 110/110
 - R07 regression: PASS — B1/B2/B3 history, topology, hydrogen, object, state, and undo/redo suites
 - Gate 01 regression: PASS — viewer, performance, representation, and camera suites
 - Gate 02 regression: PASS — camera/viewport/full-canvas/structure-integrity suite
@@ -85,7 +85,7 @@
 
 ## User-facing workflow
 
-The Alignment panel exposes MOBILE and TARGET object/selection controls, method choices, mapping mode, transform mode, refinement cycles, alignment-object creation, explicit CE unsupported behavior, oracle-pending status, result disposition, RMSD values, pair counts, coverage, state IDs, determinant/uniqueness, and retained pair/residual presentation. Analysis and application are visibly separated; applied fitting is recorded through R07 history.
+The Alignment panel exposes MOBILE and TARGET object/selection/state controls, method choices, all contract mapping modes including explicit PyMOL index-order compatibility, transform mode, refinement cycles, alignment-object creation, explicit CE unsupported behavior, oracle-pending status, result disposition, RMSD values, pair counts, coverage, aligned-residue/sequence-score fields, state IDs, determinant/conditioning/uniqueness, warnings, undo/redo availability, and retained pair/residual presentation. Analysis and application are visibly separated; applied fitting is recorded through R07 history. Valid alignment objects additionally project retained/rejected pair overlays in the 3D viewer without mutating the scientific model.
 
 ## Known limitations
 
@@ -93,10 +93,9 @@ The Alignment panel exposes MOBILE and TARGET object/selection controls, method 
 2. `cealign` is intentionally unsupported and never aliases `align` or `super`.
 3. `super` and `align` are bounded sequence-guided implementations and remain unverified against executable PyMOL behavior.
 4. The effective-world coordinate context hook is implemented, while current workspace object transforms are identity; local scientific coordinates remain authoritative.
-5. Alignment pair/residual information is available as immutable alignment-object/result data and a renderer-neutral result-panel presentation; dedicated 3D pair-line, retained-core, rejected-outlier, and residual-color overlays are not yet projected.
-6. The UI exposes mapping/refinement controls and records the selected workflow intent, while the console adapter currently uses its method-specific request defaults for the actual scientific request; the durable service contract remains explicit and testable.
-7. No independent Biopython/D1 numerical oracle was run; deterministic analytic/native tests are the recorded numerical validation.
-8. `work/pymol-source` was a temporary source-inspection checkout and is not part of the deliverable or commit history.
+5. Pair/residual overlays are bounded presentation graphics, not a scientific oracle; authoritative values remain in immutable alignment results/objects.
+6. No executable pinned PyMOL runtime was available, so `align`/`super` and the other implemented PyMOL-family commands remain `IMPLEMENTED_UNVERIFIED`.
+7. An independent NumPy Kabsch sanity check was run; no Biopython runtime was available.
 
 ## Disposition
 

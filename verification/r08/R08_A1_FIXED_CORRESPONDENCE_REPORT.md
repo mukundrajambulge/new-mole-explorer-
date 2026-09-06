@@ -17,7 +17,7 @@ This checkpoint implements the scientific foundation for fixed-correspondence RM
 
 `AlignmentRequest`, immutable `AlignmentMapping`, immutable pair records, and immutable `AlignmentResult` carry object/revision/state/context, selection identity, mapping mode, fit/evaluation sets, weighting/reflection/tolerance/refinement profiles, compatibility profile, algorithm provenance, dependency signature, diagnostics, and disposition. Stable atom identity is not derived from renderer index, storage order, serial alone, selection ordinal, or coordinate proximity.
 
-Native mapping modes are explicit: `EXPLICIT`, `SOURCE_IDENTITY_STRICT`, and `SEQUENCE_GUIDED`. `INDEX_ORDER` is rejected unless the explicit `PYMOL_INDEX_ORDER` compatibility profile is present. `SYMMETRY_AWARE_LIGAND` and `STRUCTURE_GUIDED` remain capability-gated rather than being silently treated as index order.
+Native mapping modes are explicit: `EXPLICIT`, `SOURCE_IDENTITY_STRICT`, and `SEQUENCE_GUIDED`. `INDEX_ORDER` is rejected unless the explicit `PYMOL_INDEX_ORDER` compatibility profile is present. `SYMMETRY_AWARE_LIGAND` and `STRUCTURE_GUIDED` remain capability-gated rather than being silently treated as index order; both are exposed as explicit UI choices.
 
 The numerical path separates current RMSD, Kabsch fitting, fit/evaluation sets, residuals, refinement history, transform application, and alignment-object construction. Kabsch enforces a proper rotation, reports determinant and orthogonality, and returns singular values, effective rank, condition, uniqueness, degeneracy, and ill-conditioning diagnostics. Invalid, stale, ambiguous, missing-coordinate, and unsupported requests fail structurally.
 
@@ -50,7 +50,7 @@ The deterministic A1 unit suite passes 6/6 files/tests covering AT-R08-01..10, 1
 
 - `npm run typecheck` — PASS
 - `npm run lint` — PASS
-- `npm test` — PASS: web 126/126, API 22/22
+- `npm test` — PASS: web 128/128, API 22/22
 - `npm run build` — PASS
 - `apps/web/src/analysis/alignment.test.ts` — PASS: 6/6
 

@@ -7,7 +7,7 @@ A2 adds governed adapters for the PyMOL low-level fitting family on top of the A
 | Item | Value |
 | --- | --- |
 | A1 base | `3919f53` |
-| R08 A2/A3 implementation commit | `398e1e6` |
+| R08 implementation tip | `02c1a0ebca4ca60917d554f155fdc7ff68693c5c` |
 | Profiles | `PYMOL_RMS_CUR_PROFILE`, `PYMOL_RMS_PROFILE`, `PYMOL_FIT_PROFILE`, `PYMOL_PAIR_FIT_PROFILE` |
 | Transform convention | `x' = R x + t` |
 | Oracle | `PYMOL_ORACLE = ORACLE_PENDING` |
@@ -38,11 +38,11 @@ The compatibility tuple preserves the seven PyMOL-facing values while the native
 ## Verification
 
 - `apps/web/src/analysis/pymolFitting.test.ts` — PASS: 4/4
-- R08 focused E2E — PASS: 4/4 per run, 3 consecutive runs
-- Full E2E — PASS: 109/109
+- R08 focused E2E — PASS: 5/5 per run, 3 consecutive runs
+- Full E2E — PASS: 110/110
 - `npm run typecheck` — PASS
 - `npm run lint` — PASS
-- `npm test` — PASS: web 126/126, API 22/22
+- `npm test` — PASS: web 128/128, API 22/22
 - `npm run build` — PASS
 
 ## PyMOL source and oracle status

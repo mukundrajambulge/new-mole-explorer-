@@ -12,8 +12,8 @@
   },
   "r08": {
     "branch": "feature/r08-structural-analysis",
-    "implementationTip": "c49547e",
-    "candidateTip": "729ea0758819b1e17dd5f3460f5322d28038ecd5",
+    "implementationTip": "02c1a0ebca4ca60917d554f155fdc7ff68693c5c",
+    "candidateTip": "02c1a0ebca4ca60917d554f155fdc7ff68693c5c",
     "mainMerged": false,
     "r09Started": false
   },
@@ -53,10 +53,10 @@
   "verification": {
     "typecheck": "PASS",
     "lint": "PASS",
-    "unit": { "status": "PASS", "web": "126/126", "api": "22/22", "total": "148/148" },
+    "unit": { "status": "PASS", "web": "128/128", "api": "22/22", "total": "150/150" },
     "build": "PASS",
-    "r08Focused": "4/4 PASS x 3 consecutive runs",
-    "fullE2E": "109/109 PASS",
+    "r08Focused": "5/5 PASS x 3 consecutive runs",
+    "fullE2E": "110/110 PASS",
     "r07Regression": "PASS",
     "gate01Regression": "PASS",
     "gate02Regression": "PASS",
@@ -83,9 +83,9 @@
     "cealign is explicitly unsupported.",
     "align and super remain unverified against executable PyMOL.",
     "Effective-world transform hook exists; current workspace object transforms are identity.",
-    "Alignment pair/residual data is presented renderer-neutrally; dedicated 3D overlays are not projected.",
-    "UI mapping/refinement controls currently use method-specific request defaults in the console adapter.",
-    "No independent Biopython/D1 numerical oracle was run."
+    "Pair/residual overlays are bounded presentation graphics; immutable alignment results/objects remain authoritative.",
+    "No executable pinned PyMOL runtime was available, so implemented PyMOL-family commands remain IMPLEMENTED_UNVERIFIED.",
+    "An independent NumPy Kabsch sanity check was run; no Biopython runtime was available."
   ],
   "readyForR09": false,
   "readyToMergeMain": false,

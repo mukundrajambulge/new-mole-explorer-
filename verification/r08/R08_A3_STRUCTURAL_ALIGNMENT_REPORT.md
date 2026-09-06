@@ -43,7 +43,7 @@ The full browser suite exercises the live alignment workflow and R07 regression 
 
 `01-rms-current-result.png`, `02-rms-fit-result.png`, `03-fit-apply-before.png`, `04-fit-apply-after.png`, `05-fit-undo.png`, `06-fit-redo.png`, `07-pair-fit.png`, `08-align-before.png`, `09-align-after.png`, `10-align-result-panel.png`, `11-refinement-rejected-pairs.png`, `12-alignment-object.png`, `13-multi-state-analysis.png`, `14-stale-result.png`, `15-unsupported-super.png`, and `16-unsupported-ce.png`.
 
-The result panel is renderer-neutral and does not make presentation state authoritative. Pair/residual graphics are not yet projected into the 3D renderer; the authoritative pair records and residual values are present in the immutable alignment object/result. This is a deliberate bounded limitation, not a claim of full renderer overlay conformance.
+The result panel remains renderer-neutral and does not make presentation state authoritative. Valid alignment-object links are also projected as disposable 3D overlay shapes: retained links are solid green and rejected links are dashed orange, with residual-sized midpoint rings. The overlay is rebuilt from immutable pair/residual data and is removed for stale results; it never recomputes scientific values or mutates canonical coordinates.
 
 ## Disposition
 
