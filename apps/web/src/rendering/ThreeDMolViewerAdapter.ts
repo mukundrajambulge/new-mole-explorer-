@@ -90,6 +90,25 @@ const selectionOverlayStyle = (projection: RenderProjection, representationOverr
   return { stick: { color, colorfunc, radius: Math.max(0.26, projection.representationState.parameters.stickRadius + 0.05), opacity: 0.86 } } as AtomStyleSpec;
 };
 
+/**
+ * Selection context is intentionally a light model-style overlay.  It keeps
+ * the authoritative base representation and colours intact while making the
+ * unselected context recede enough for the selected content to read first.
+ */
+const selectionDeemphasisStyleFor = (projection: RenderProjection): AtomStyleSpec => {
+  if (projection.representation === "cartoon" || projection.representation === "ribbon" || projection.representation === "trace" || projection.representation === "putty") {
+    // 3Dmol's cartoon spline builder requires a complete polymer stream. A
+    // complete-model pass is safe; selected content is restored with the cyan
+    // overlay immediately afterward.
+    return { cartoon: { opacity: 0.46 } } as AtomStyleSpec;
+  }
+  if (projection.representation === "line" || projection.representation === "lines") return { line: { opacity: 0.46 } } as AtomStyleSpec;
+  if (projection.representation === "spheres" || projection.representation === "space-filling" || projection.representation === "nonbonded-spheres") return { sphere: { opacity: 0.46 } } as AtomStyleSpec;
+  if (projection.representation === "ball-and-stick") return { stick: { opacity: 0.46 }, sphere: { opacity: 0.46 } } as AtomStyleSpec;
+  if (projection.representation === "nonbonded-crosses") return { cross: { opacity: 0.46 } } as AtomStyleSpec;
+  return { stick: { opacity: 0.46 } } as AtomStyleSpec;
+};
+
 const orderNumber = (order: CanonicalMolecularStructure["bonds"][number]["order"]): number => order === "DOUBLE" ? 2 : order === "TRIPLE" ? 3 : order === "AROMATIC" ? 4 : 1;
 const secondaryCode = (value: CanonicalMolecularStructure["atoms"][number]["secondaryStructure"]): string | undefined => value === "HELIX" ? "h" : value === "SHEET" ? "s" : value === "LOOP" ? "c" : undefined;
 
@@ -395,7 +414,7 @@ export class ThreeDMolViewerAdapter {
     if (this.projection && objectLabelsChanged) {
       this.projectLabels(this.projection);
     }
-    if (this.projection && objectInteractionChanged) {
+    if (this.projection && (objectInteractionChanged || objectSceneChanged)) {
       this.projectInteractionHighlights(this.projection);
     }
     if (objectSceneChanged || interactionCameraChanged || interactionBackgroundChanged || objectLabelsChanged || objectInteractionChanged || modelStateChanged) this.render();
@@ -454,6 +473,24 @@ export class ThreeDMolViewerAdapter {
   pan(x = 70, y = 0): void { if (!this.viewer) return; this.translateCamera(x, y); this.lastCameraAction = "PAN"; this.renderCamera(); }
   zoom(factor = 1.2): void { if (!this.viewer) return; this.viewer.zoom(factor); this.lastCameraAction = "ZOOM"; this.renderCamera(); }
   focus(): void { if (!this.viewer || !this.hasModel) return; this.lastCameraAction = "FIT"; this.frameToCanonicalBounds(false); this.renderCamera(); }
+  focusSelection(): void {
+    if (!this.viewer || !this.hasModel) return;
+    const target = this.boundsForCameraTarget(true);
+    if (!target || this.cameraTargetMetadata.mode !== "selection") {
+      this.focus();
+      return;
+    }
+    this.lastCameraAction = "FOCUS_SELECTION";
+    this.resetCameraTranslation();
+    this.viewer.resize();
+    this.viewer.center(target.selection);
+    this.viewer.zoomTo(target.selection);
+    this.fitToSafeViewport();
+    this.cameraPivot = target.center;
+    this.applyClipping();
+    this.applyViewportTranslation();
+    this.renderCamera();
+  }
   center(): void { if (!this.viewer || !this.cameraController || !this.hasModel) return; this.lastCameraAction = "CENTER"; const target = this.boundsForCameraTarget(false); if (!target) return; this.resetCameraTranslation(); this.cameraController.center(target.selection); this.fitToSafeViewport(); this.cameraPivot = target.center; this.recalculateAutoClipping(); this.applyViewportTranslation(); this.renderCamera(); }
   orient(): void { if (!this.viewer || !this.hasModel) return; this.lastCameraAction = "ORIENT"; const target = this.boundsForCameraTarget(false); if (!target) return; this.resetCameraTranslation(); this.viewer.center(target.selection); this.viewer.zoomTo(target.selection); this.fitToSafeViewport(); const view = this.viewer.getView(); const quaternion = principalOrientationQuaternion(target.atoms); view[4] = quaternion[0]; view[5] = quaternion[1]; view[6] = quaternion[2]; view[7] = quaternion[3]; this.viewer.setView(view); this.cameraPivot = target.center; this.recalculateAutoClipping(); this.applyViewportTranslation(); this.renderCamera(); }
   origin(): void { if (!this.viewer || !this.hasModel) return; this.lastCameraAction = "ORIGIN"; const target = this.boundsForCameraTarget(false); if (!target) return; this.resetCameraTranslation(); this.viewer.center(target.selection); this.cameraPivot = target.center; this.recalculateAutoClipping(); this.applyViewportTranslation(); this.renderCamera(); }
@@ -662,7 +699,9 @@ export class ThreeDMolViewerAdapter {
     const selectedAtoms = selectedIds.size > 0
       ? entryAtoms.flatMap(({ entry, atoms }) => atoms.filter((atom) => selectedIds.has(this.workspaceObjects.length > 1 ? workspaceScopedStableAtomId(entry.objectId, atom.stableId) : atom.stableId)))
       : [];
-    const chosen = selectedAtoms.length > 0 ? entryAtoms.map(({ entry, atoms }) => ({ entry, atoms: atoms.filter((atom) => selectedIds.has(this.workspaceObjects.length > 1 ? workspaceScopedStableAtomId(entry.objectId, atom.stableId) : atom.stableId)) })).filter(({ atoms }) => atoms.length > 0) : entryAtoms;
+    const visibleAtomCount = entryAtoms.reduce((count, entry) => count + entry.atoms.length, 0);
+    const fullWorkspaceSelection = preferSelection && selectedAtoms.length > 0 && entries.length > 1 && selectedAtoms.length >= visibleAtomCount;
+    const chosen = selectedAtoms.length > 0 && !fullWorkspaceSelection ? entryAtoms.map(({ entry, atoms }) => ({ entry, atoms: atoms.filter((atom) => selectedIds.has(this.workspaceObjects.length > 1 ? workspaceScopedStableAtomId(entry.objectId, atom.stableId) : atom.stableId)) })).filter(({ atoms }) => atoms.length > 0) : entryAtoms;
     const atoms = chosen.flatMap(({ atoms: values }) => values);
     if (atoms.length === 0) return null;
     const bounds = boundsForCoordinates(atoms);
@@ -672,7 +711,7 @@ export class ThreeDMolViewerAdapter {
       model: chosen.map(({ entry }) => entry.model),
       predicate: (atom) => allowed.has(`${String(atom.properties?.canonicalObjectId ?? "")}::${String(atom.properties?.canonicalStableId ?? "")}`),
     };
-    this.cameraTargetMetadata = { atoms: atoms.length, models: chosen.length, objects: new Set(chosen.map(({ entry }) => entry.objectId)).size, mode: preferSelection && selectedAtoms.length > 0 ? "selection" : "workspace-visible" };
+    this.cameraTargetMetadata = { atoms: atoms.length, models: chosen.length, objects: new Set(chosen.map(({ entry }) => entry.objectId)).size, mode: preferSelection && selectedAtoms.length > 0 && !fullWorkspaceSelection ? "selection" : "workspace-visible" };
     return { atoms, selection, center: bounds.center };
   }
 
@@ -1118,6 +1157,7 @@ export class ThreeDMolViewerAdapter {
     };
     for (const entry of selectionEntries) {
       if (entry.object && !entry.object.enabled) continue;
+      const entryProjection = entry.object?.projection ?? projection;
       const localIds = selectedLocalIdsFor(entry.object?.objectId ?? null);
       if (!localIds.size) continue;
       const matchingLocalIds = new Set(entry.structure.atoms.filter((atom) => localIds.has(atom.stableId)).map((atom) => atom.stableId));
@@ -1125,26 +1165,38 @@ export class ThreeDMolViewerAdapter {
       for (const localId of matchingLocalIds) {
         const scopedId = entry.object ? workspaceScopedStableAtomId(entry.object.objectId, localId) : localId;
         if (selectedIds.has(scopedId)) matchedSelectionIds.add(scopedId);
-        else if (selectedIds.has(localId)) matchedSelectionIds.add(localId);
+          else if (selectedIds.has(localId)) matchedSelectionIds.add(localId);
+      }
+      const surfaceReady = this.surfaceReadyModels.has(entry.model);
+      if (!surfaceReady) {
+        const nonSelectedIds = new Set(entry.structure.atoms.filter((atom) => !matchingLocalIds.has(atom.stableId)).map((atom) => atom.stableId));
+        if (entryProjection.representation === "cartoon" || entryProjection.representation === "ribbon" || entryProjection.representation === "trace" || entryProjection.representation === "putty") {
+          entry.model.setStyle({}, selectionDeemphasisStyleFor(entryProjection), true);
+        } else {
+          entry.model.setStyle({ predicate: (atom) => typeof atom.properties?.canonicalStableId === "string" && nonSelectedIds.has(atom.properties.canonicalStableId) }, selectionDeemphasisStyleFor(entryProjection), true);
+        }
       }
       const overlayGroups = new Map<RenderProjection["representation"], string[]>();
       for (const atom of entry.structure.atoms) {
         if (!matchingLocalIds.has(atom.stableId)) continue;
-        const representation = (projection.representation === "cartoon" || projection.representation === "ribbon" || projection.representation === "trace" || projection.representation === "putty")
-          ? atom.isPolymer ? "lines" : atom.isWater || atom.isIon ? "spheres" : "sticks"
-          : projection.representation;
+        const representation = (entryProjection.representation === "cartoon" || entryProjection.representation === "ribbon" || entryProjection.representation === "trace" || entryProjection.representation === "putty")
+          ? atom.isPolymer ? matchingLocalIds.size <= 64 ? "ball-and-stick" : "sticks" : atom.isWater || atom.isIon ? "spheres" : "sticks"
+          : entryProjection.representation;
         overlayGroups.set(representation, [...(overlayGroups.get(representation) ?? []), atom.stableId]);
       }
       for (const [representation, stableIds] of overlayGroups) {
         const ids = new Set(stableIds);
-        entry.model.setStyle({ predicate: (atom) => typeof atom.properties?.canonicalStableId === "string" && ids.has(atom.properties.canonicalStableId) }, selectionOverlayStyle(projection, representation), true);
+        entry.model.setStyle({ predicate: (atom) => typeof atom.properties?.canonicalStableId === "string" && ids.has(atom.properties.canonicalStableId) }, selectionOverlayStyle(entryProjection, representation), true);
       }
     }
+    this.projectSurfaceSelectionEmphasis(matchedSelectionIds.size > 0);
     if (this.container) {
       this.container.dataset.selectionIndicator = matchedSelectionIds.size ? "visible" : "none";
       this.container.dataset.selectionHighlightedAtomCount = String(matchedSelectionIds.size);
       this.container.dataset.selectionHighlightLimit = "none";
       this.container.dataset.selectionHighlightMode = matchedSelectionIds.size === 1 ? "atom-halo-overlay" : matchedSelectionIds.size ? "representation-overlay" : "none";
+      this.container.dataset.selectionDeemphasis = matchedSelectionIds.size ? "active" : "none";
+      this.container.dataset.selectionDeemphasisOpacity = matchedSelectionIds.size ? "0.46" : "1";
     }
     const workspaceAtoms = this.workspaceObjects.length ? this.workspaceObjects.flatMap((object) => object.enabled ? structureForWorkspaceObjectState(object).atoms.map((atom) => ({ ...atom, stableId: workspaceScopedStableAtomId(object.objectId, atom.stableId) })) : []) : this.structure.atoms;
     const addMarker = (stableId: string, color: string, radius: number, wireframe: boolean, opacity: number) => {
@@ -1158,6 +1210,33 @@ export class ThreeDMolViewerAdapter {
       if (selectedAtom) this.interactionShapes.push(this.viewer.addSphere({ center: selectedAtom, radius: 0.34, color: "#55d9ff", wireframe: true, opacity: 0.88 }));
     }
     for (const measurementId of projection.interaction.measurementPickAtomIds) addMarker(measurementId, "#f5c451", 0.23, true, 0.95);
+  }
+
+  private projectSurfaceSelectionEmphasis(active: boolean): void {
+    if (!this.viewer) return;
+    const dimOpacity = 0.46;
+    const workspaceEntries = this.workspaceObjects.length ? this.workspaceSurfaceEntries(this.workspaceObjects) : [];
+    const projectionByKey = new Map(workspaceEntries.map((entry) => [entry.key, entry.projection]));
+    for (const [key, handle] of this.workspaceSurfaceHandles) {
+      const entryProjection = projectionByKey.get(key) ?? this.projection;
+      if (!entryProjection) continue;
+      handle.surfaceIds.forEach((surfaceId, index) => {
+        const kind = handle.surfaceKinds[index] ?? "surface";
+        const baseOpacity = kind === "mesh" ? entryProjection.representationState.parameters.meshOpacity : entryProjection.representationState.parameters.surfaceOpacity;
+        this.viewer!.setSurfaceMaterialStyle(surfaceId, { opacity: active ? Math.min(baseOpacity, dimOpacity) : baseOpacity });
+      });
+      const baseDotOpacity = entryProjection.representationState.parameters.dotOpacity;
+      handle.dotSurfaceShapes.forEach((shape) => shape.updateStyle({ opacity: active ? Math.min(baseDotOpacity, dimOpacity) : baseDotOpacity }));
+    }
+    if (!this.workspaceObjects.length && this.projection) {
+      this.surfaceIds.forEach((surfaceId, index) => {
+        const kind = this.surfaceKinds[index] ?? "surface";
+        const baseOpacity = kind === "mesh" ? this.projection!.representationState.parameters.meshOpacity : this.projection!.representationState.parameters.surfaceOpacity;
+        this.viewer!.setSurfaceMaterialStyle(surfaceId, { opacity: active ? Math.min(baseOpacity, dimOpacity) : baseOpacity });
+      });
+      const baseDotOpacity = this.projection.representationState.parameters.dotOpacity;
+      this.dotSurfaceShapes.forEach((shape) => shape.updateStyle({ opacity: active ? Math.min(baseDotOpacity, dimOpacity) : baseDotOpacity }));
+    }
   }
 
   private projectLabels(projection: RenderProjection): void {

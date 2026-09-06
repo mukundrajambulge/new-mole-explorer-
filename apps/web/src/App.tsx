@@ -180,11 +180,15 @@ export const App = () => {
     return { visibleStableAtomIds, representationTokensByStableAtomId, colorTokensByStableAtomId, representationColorTokensByStableAtomId, labelTokensByStableAtomId, revision };
   };
 
-  const setActiveSelection = (result: SelectionResult | null, pickResult: PickResult | null = null) => {
+  const setActiveSelection = (result: SelectionResult | null, pickResult: PickResult | null = null, focus = Boolean(result?.count)) => {
     activeSelectionResultRef.current = result;
     activePickResultRef.current = pickResult;
     setActiveSelectionState(result);
     setProjection((current) => setInteractionState(current, { selectedAtomIds: result?.stableAtomIds ?? [], pickedAtomId: null, measurementPickAtomIds: [] }));
+    if (focus && result?.count) {
+      commandSequence.current += 1;
+      setCameraCommand({ actionId: ACTION_IDS.VIEW_FOCUS_SELECTION, sequence: commandSequence.current });
+    }
   };
 
   const resetScientificHistory = useCallback(() => {
@@ -826,6 +830,13 @@ export const App = () => {
     const trimmed = input.trim();
     const head = trimmed.match(/^([^\s]+)/)?.[1] ?? "";
 
+    if (/^(?:focus|center|zoom)\s+(?:selected|selection)$/i.test(trimmed)) {
+      if (!activeSelectionResultRef.current?.count) return { category: "PRESENTATION", status: "No non-empty active selection exists; the view was not changed." };
+      commandSequence.current += 1;
+      setCameraCommand({ actionId: ACTION_IDS.VIEW_FOCUS_SELECTION, sequence: commandSequence.current });
+      return { category: "PRESENTATION", status: "Focused the active selection; scientific state was unchanged." };
+    }
+
     // A registered verb owns command syntax.  Everything else is deliberately
     // handed to the canonical selection parser as a bare selection query.
     // This keeps the textbox promise truthful and prevents command-parser
@@ -898,7 +909,7 @@ export const App = () => {
         const target = requireValidSelection(evaluateSelectionQuery(query, context.structure, selectionOptionsFor(context)));
         const currentSelection = activeSelectionResultRef.current;
         const result = operation === "replace" || !currentSelection ? target : combineSelections(currentSelection, target, operation);
-        setActiveSelection(result);
+        setActiveSelection(result, null, operation === "replace" || !currentSelection);
         setProjection((current) => setInteractionState(current, { selectedAtomIds: result.stableAtomIds, pickedAtomId: result.stableAtomIds[0] ?? null, measurementPickAtomIds: [] }));
         return { category: "SELECTION", status: `Selected ${result.count} atoms · ${operation} · revision ${result.molecularRevision.slice(0, 10)}…` };
       } catch (error) {
@@ -1179,7 +1190,7 @@ export const App = () => {
     if (action === "A" || action === "S") {
       const currentSelection = activeSelectionResultRef.current;
       const result = action === "S" || !currentSelection ? target : combineSelections(currentSelection, target, "add");
-      setActiveSelection(result);
+      setActiveSelection(result, null, action === "A");
       setProjection((current) => setInteractionState(current, { selectedAtomIds: result.stableAtomIds, pickedAtomId: result.stableAtomIds[0] ?? null, measurementPickAtomIds: [] }));
     } else if (action === "H") {
       setProjection((current) => applyRepresentationToSelection(current, "HIDE", (1 << 10) - 1, target.stableAtomIds));
@@ -1286,7 +1297,7 @@ export const App = () => {
       commandSequence.current += 1;
       setCameraCommand({ actionId: ACTION_IDS.VIEW_RESET, sequence: commandSequence.current });
     }
-    const cameraActions = [ACTION_IDS.VIEW_FIT, ACTION_IDS.VIEW_CENTER, ACTION_IDS.VIEW_ORIENT, ACTION_IDS.VIEW_ORIGIN] as ActionId[];
+    const cameraActions = [ACTION_IDS.VIEW_FIT, ACTION_IDS.VIEW_FOCUS_SELECTION, ACTION_IDS.VIEW_CENTER, ACTION_IDS.VIEW_ORIENT, ACTION_IDS.VIEW_ORIGIN] as ActionId[];
     if (cameraActions.includes(actionId) && capability.state === "SUPPORTED") {
       commandSequence.current += 1;
       setCameraCommand({ actionId, sequence: commandSequence.current });
@@ -1330,7 +1341,7 @@ export const App = () => {
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
           <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} />
           <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFileDrop={importFile} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} />
-          <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
+          <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} activeSelectionCount={activeSelection?.count ?? 0} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
         </div>
         <StatusBar apiStatus={apiStatus} structure={structure} project={project} selectedAtomCount={projection.interaction.selectedAtomIds.length} scientificRevision={activeHistoryState?.currentRevisionId ?? null} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} activeObjectName={activeWorkspaceObject?.displayName} activeObjectId={activeWorkspaceObject?.objectId} activeObjectEnabled={activeWorkspaceObject?.enabled} />
         {notice && <CapabilityNotice capability={notice} onClose={() => setNotice(null)} />}
