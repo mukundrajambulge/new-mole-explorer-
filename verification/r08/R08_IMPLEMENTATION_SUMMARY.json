@@ -13,6 +13,7 @@
   "r08": {
     "branch": "feature/r08-structural-analysis",
     "implementationTip": "c49547e",
+    "candidateTip": "729ea0758819b1e17dd5f3460f5322d28038ecd5",
     "mainMerged": false,
     "r09Started": false
   },
@@ -60,7 +61,13 @@
     "gate01Regression": "PASS",
     "gate02Regression": "PASS",
     "gate03bRegression": "PASS",
-    "browserValidation": "PASS"
+    "browserValidation": "PASS",
+    "githubCi": {
+      "status": "PASS",
+      "runId": 34031213060,
+      "runUrl": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34031213060",
+      "sha": "729ea0758819b1e17dd5f3460f5322d28038ecd5"
+    }
   },
   "pymol": {
     "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
