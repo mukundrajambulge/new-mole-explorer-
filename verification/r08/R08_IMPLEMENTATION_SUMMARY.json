@@ -12,8 +12,8 @@
   },
   "r08": {
     "branch": "feature/r08-structural-analysis",
-    "implementationTip": "02c1a0ebca4ca60917d554f155fdc7ff68693c5c",
-    "candidateTip": "02c1a0ebca4ca60917d554f155fdc7ff68693c5c",
+    "implementationTip": "09b137bbe73bb1baf880ee4c38f9e275c6e1db59",
+    "candidateTip": "09b137bbe73bb1baf880ee4c38f9e275c6e1db59",
     "mainMerged": false,
     "r09Started": false
   },
@@ -64,9 +64,9 @@
     "browserValidation": "PASS",
     "githubCi": {
       "status": "PASS",
-      "runId": 34031213060,
-      "runUrl": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34031213060",
-      "sha": "729ea0758819b1e17dd5f3460f5322d28038ecd5"
+      "runId": 34041518667,
+      "runUrl": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34041518667",
+      "sha": "09b137bbe73bb1baf880ee4c38f9e275c6e1db59"
     }
   },
   "pymol": {

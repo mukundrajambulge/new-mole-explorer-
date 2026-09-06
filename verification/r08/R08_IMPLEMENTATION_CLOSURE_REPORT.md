@@ -11,8 +11,8 @@
 | R07 user manual approval | `DEFERRED_BY_USER` |
 | R07 technical status | `GREEN` |
 | R08 branch | `feature/r08-structural-analysis` |
-| R08 implementation tip | `02c1a0ebca4ca60917d554f155fdc7ff68693c5c` |
-| R08 candidate tip | `02c1a0ebca4ca60917d554f155fdc7ff68693c5c` |
+| R08 implementation tip | `09b137bbe73bb1baf880ee4c38f9e275c6e1db59` |
+| R08 candidate tip | `09b137bbe73bb1baf880ee4c38f9e275c6e1db59` |
 | R07 final approval | Pending; not falsely sealed |
 | Main merge | Not performed |
 | R09 | Not started |
@@ -81,7 +81,7 @@
 - Gate 03B regression: PASS — selection focus/presentation suite
 - RCSB-backed browser coverage: PASS in the clean full run
 - Manual Codex browser validation: PASS by the deterministic live-browser campaign represented by the focused and full Playwright runs; no separate PyMOL executable oracle was available
-- GitHub CI: PASS — [run 34031213060](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34031213060) on candidate SHA `729ea0758819b1e17dd5f3460f5322d28038ecd5`
+- GitHub CI: PASS — [run 34041518667](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34041518667) on final technical SHA `09b137bbe73bb1baf880ee4c38f9e275c6e1db59`
 
 ## User-facing workflow
 
