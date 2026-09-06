@@ -1,8 +1,10 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { join } from "node:path";
 import type { BootstrapResponse, HealthResponse, ProjectSaveRequest } from "@molecular/contracts";
 import { IngestionError, StructureIngestionService } from "./structures/ingestion.js";
 import { parseMultipartFile } from "./structures/multipart.js";
 import { ProjectStore } from "./projects/projectStore.js";
+import { SourceArtifactStore } from "./lifecycle/sourceArtifactStore.js";
 
 const port = Number(process.env.API_PORT ?? 8100);
 
@@ -19,22 +21,23 @@ const bootstrap: BootstrapResponse = {
   renderer: { mode: "3dmol", authoritative: true },
   capabilities: {
     "PROJECT.CREATE": { state: "SUPPORTED", label: "Supported", description: "Create an empty persisted project manifest." },
-    "PROJECT.OPEN": { state: "SUPPORTED", label: "Supported", description: "Open a previously saved project manifest and restore its canonical structure and presentation." },
-    "PROJECT.SAVE": { state: "SUPPORTED", label: "Supported", description: "Persist the current canonical structure, provenance and presentation snapshot." },
+    "PROJECT.OPEN": { state: "SUPPORTED", label: "Supported", description: "Open a native immutable session revision and restore its validated workspace." },
+    "PROJECT.SAVE": { state: "SUPPORTED", label: "Supported", description: "Create an immutable native SessionRevision checkpoint with integrity metadata." },
     "STRUCTURE.IMPORT": { state: "SUPPORTED", label: "Supported", description: "Import PDB or mmCIF through the authoritative backend ingestion service." },
     "STRUCTURE.FETCH_RCSB": { state: "SUPPORTED", label: "Supported", description: "Fetch official RCSB mmCIF by PDB ID and retain source provenance." },
-    "STRUCTURE.EXPORT": { state: "COMING_SOON", label: "Coming Soon", description: "Export writers and loss manifests are not implemented in G1B; no fake download is provided." },
+    "STRUCTURE.EXPORT": { state: "SUPPORTED_WITH_LIMITATIONS", label: "Supported with limitations", description: "The web client provides typed PDB/mmCIF writers with exact-byte hashes and explicit loss manifests." },
     "FILE.OPEN": { state: "SUPPORTED", label: "Supported", description: "Choose a PDB or mmCIF structure file; this converges with Import and Drop." },
     "FILE.IMPORT": { state: "SUPPORTED", label: "Supported", description: "Choose a PDB or mmCIF structure file." },
-    "FILE.EXPORT": { state: "COMING_SOON", label: "Coming Soon", description: "Export is not implemented in G1B." },
+    "FILE.EXPORT": { state: "SUPPORTED_WITH_LIMITATIONS", label: "Supported with limitations", description: "The web client provides typed PDB/mmCIF writers with exact-byte hashes and explicit loss manifests." },
     "SELECTION.EVALUATE": { state: "SUPPORTED", label: "Supported", description: "The web client evaluates the typed canonical selection language against the loaded molecular revision." },
     "SELECTION.CREATE_NAMED": { state: "SUPPORTED", label: "Supported", description: "The web client can create immutable named selection snapshots for the active molecular revision." },
     "DOCKING.RUN": { state: "UNAVAILABLE", label: "Unavailable", description: "No docking engine or scores are available in this foundation." },
   },
 };
 
-const ingestionService = new StructureIngestionService();
-const projectStore = new ProjectStore();
+const dataRoot = process.env.MOLECULAR_DATA_DIR ?? join(process.cwd(), ".molecular-data");
+const ingestionService = new StructureIngestionService(new SourceArtifactStore(dataRoot));
+const projectStore = new ProjectStore(dataRoot);
 
 const readJson = async (request: IncomingMessage): Promise<Record<string, unknown>> => {
   const chunks: Buffer[] = [];
@@ -58,7 +61,7 @@ const errorResponse = (response: ServerResponse, error: unknown) => {
 const route = async (request: IncomingMessage, response: ServerResponse) => {
   response.setHeader("access-control-allow-origin", "*");
   response.setHeader("access-control-allow-methods", "GET,POST,PUT,OPTIONS");
-  response.setHeader("access-control-allow-headers", "content-type");
+  response.setHeader("access-control-allow-headers", "content-type,x-parent-export-artifact-id");
   if (request.method === "OPTIONS") {
     response.writeHead(204);
     response.end();
@@ -77,7 +80,8 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
     }
     if (request.method === "POST" && url.pathname === "/api/structures/upload") {
       const file = await parseMultipartFile(request);
-      sendJson(response, 200, await ingestionService.ingestLocal(file.filename, file.data));
+      const parentExportArtifactId = typeof request.headers["x-parent-export-artifact-id"] === "string" ? request.headers["x-parent-export-artifact-id"] : undefined;
+      sendJson(response, 200, await ingestionService.ingestLocal(file.filename, file.data, parentExportArtifactId ? { parentExportArtifactId } : {}));
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/structures/rcsb") {
@@ -91,9 +95,19 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       sendJson(response, 201, await projectStore.create(typeof body.name === "string" ? body.name : undefined));
       return;
     }
+    const revisionsMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/revisions$/);
+    if (revisionsMatch && request.method === "GET") {
+      sendJson(response, 200, { revisions: await projectStore.listRevisions(revisionsMatch[1]!) });
+      return;
+    }
+    const revisionMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/revisions\/([^/]+)$/);
+    if (revisionMatch && request.method === "GET") {
+      sendJson(response, 200, await projectStore.open(revisionMatch[1]!, revisionMatch[2]!));
+      return;
+    }
     const projectMatch = url.pathname.match(/^\/api\/projects\/([^/]+)$/);
     if (projectMatch && request.method === "GET") {
-      sendJson(response, 200, await projectStore.open(projectMatch[1]));
+      sendJson(response, 200, await projectStore.open(projectMatch[1], url.searchParams.get("revision") ?? undefined));
       return;
     }
     if (projectMatch && request.method === "PUT") {
