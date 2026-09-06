@@ -41,7 +41,7 @@ Observed live selection counts included 1 atom, residue 50 = 16 atoms, chain A =
 - Full E2E: PASS — 102/102 tests; baseline was 101 tests
 - Dedicated test: `tests/e2e/manual-gate-03-selection-highlighting.spec.ts`
 - Gate 01 and Gate 02 regression coverage: PASS in the 102-test run
-- GitHub CI: PENDING until the final branch tip is pushed
+- GitHub CI: PASS — workflow run [34009257968](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34009257968), exact implementation tip `430e2e27ea3d772eb7ff0192b39733a223187e67`
 
 ## Merge gate
 
