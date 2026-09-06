@@ -1080,6 +1080,12 @@ export class NamedSelectionStore {
     if (!this.snapshots.has(name)) throw new SelectionResolutionError(`Named selection \`${name}\` does not exist.`);
     return this.createSnapshot(name, result);
   }
+  /** Restore an immutable persisted snapshot without re-evaluating its query. */
+  restoreSnapshot(snapshot: NamedSelectionSnapshot): void {
+    if (!snapshot.name || snapshot.immutable !== true) throw new SelectionResolutionError("Persisted named selection snapshot is not immutable.");
+    this.snapshots.set(snapshot.name, { ...snapshot, stableAtomIds: [...snapshot.stableAtomIds], selectionResult: { ...snapshot.selectionResult, stableAtomIds: [...snapshot.selectionResult.stableAtomIds] } });
+    this.revision += 1;
+  }
   rename(name: string, nextName: string): NamedSelectionSnapshot {
     if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(nextName)) throw new SelectionResolutionError("Named selections must use an identifier such as active_site.");
     const snapshot = this.snapshots.get(name);

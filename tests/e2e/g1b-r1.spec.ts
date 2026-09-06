@@ -154,7 +154,7 @@ test("G1B-REG-021 File ribbon keeps implemented and unavailable operations expli
   await page.goto("/");
   await page.getByRole("button", { name: "File", exact: true }).click();
   await expect(page.getByRole("button", { name: "Import", exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Export", exact: true })).toHaveAttribute("data-capability-state", "Coming Soon");
+  await expect(page.getByRole("button", { name: "Export", exact: true })).toHaveAttribute("data-capability-state", "SUPPORTED");
 });
 
 test("G1B-REG-022 presentation changes keep scientific identity unchanged", async ({ page }) => {

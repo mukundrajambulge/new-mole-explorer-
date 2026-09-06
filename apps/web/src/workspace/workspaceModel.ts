@@ -1,4 +1,4 @@
-import type { CanonicalAtom, CanonicalBond, CanonicalCoordinateState, CanonicalHierarchy, CanonicalMolecularStructure, StructureLoadResult } from "@molecular/contracts";
+import type { CanonicalAtom, CanonicalBond, CanonicalCoordinateState, CanonicalHierarchy, CanonicalMolecularStructure, SessionObjectRecord, StructureLoadResult } from "@molecular/contracts";
 import { canonicalChemistryRolesDatasetComplete, canonicalFragmentDatasetComplete } from "../science/datasetValidity";
 import { createDefaultRenderProjection, type RenderProjection } from "../rendering/renderProjection";
 
@@ -277,6 +277,27 @@ export const createWorkspaceObject = (loadResult: StructureLoadResult, existingI
     currentStateId: safeStateOrder[0]!,
     allStates: false,
     lineage: { operation: "LOAD", parentObjectIds: [], parentStructureIds: [loadResult.structure.id] },
+  };
+};
+
+/** Restore persisted workspace identity exactly; display names never rebind scientific objects. */
+export const restoreWorkspaceObject = (record: SessionObjectRecord): WorkspaceObject => {
+  const states = coordinateStatesFor(record.loadResult.structure);
+  const available = new Set(states.map((state) => state.id));
+  const stateOrder = record.stateOrder.filter((stateId) => available.has(stateId));
+  const safeStateOrder = stateOrder.length ? [...stateOrder] : states.map((state) => state.id);
+  const projection = record.projection && typeof record.projection === "object" ? record.projection as unknown as RenderProjection : createDefaultRenderProjection(record.loadResult.structure);
+  const lineage = record.lineage && typeof record.lineage === "object" ? record.lineage as unknown as WorkspaceLineage : { operation: "LOAD" as const, parentObjectIds: [], parentStructureIds: [record.loadResult.structure.id] };
+  return {
+    objectId: record.objectId,
+    displayName: record.displayName,
+    loadResult: cloneLoadResult(record.loadResult),
+    enabled: record.enabled,
+    projection: cloneProjection(projection),
+    stateOrder: safeStateOrder,
+    currentStateId: safeStateOrder.includes(record.currentStateId) ? record.currentStateId : safeStateOrder[0]!,
+    allStates: record.allStates && safeStateOrder.length > 1,
+    lineage,
   };
 };
 
