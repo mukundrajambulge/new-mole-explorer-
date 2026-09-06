@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
-import { StructureIngestionService } from "./ingestion.js";
+import { MAX_STRUCTURE_BYTES, StructureIngestionService } from "./ingestion.js";
 
 const pdbFixture = `HEADER    TEST\nATOM      1  CA  ALA A   1       1.000   2.000   3.000  1.00 20.00           C\nHETATM    2  C1  LIG A 101       4.000   5.000   6.000  1.00 20.00           C\nHETATM    3  O   HOH A 201       7.000   8.000   9.000  1.00 20.00           O\nEND\n`;
 
@@ -307,6 +307,13 @@ ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
     expect(result.structure.stateOrder).toEqual(result.structure.coordinateStates?.map((state) => state.id));
     expect(result.structure.coordinateStates?.map((state) => state.sourceModelNumber)).toEqual([1, 7]);
     expect(result.structure.coordinateStates?.[1]?.coordinates[result.structure.atoms[0]!.stableId]).toEqual({ x: 4, y: 5, z: 6 });
+  });
+
+  it("enforces the exact upload boundary before parser publication", async () => {
+    const service = new StructureIngestionService();
+    await expect(service.ingestLocal("under-limit.pdb", Buffer.from(pdbFixture))).resolves.toBeTruthy();
+    await expect(service.ingestLocal("at-limit.pdb", Buffer.alloc(MAX_STRUCTURE_BYTES, 0x20))).rejects.toMatchObject({ code: "INVALID_INPUT" });
+    await expect(service.ingestLocal("over-limit.pdb", Buffer.concat([Buffer.from(pdbFixture), Buffer.alloc(MAX_STRUCTURE_BYTES)]))).rejects.toMatchObject({ code: "PAYLOAD_TOO_LARGE" });
   });
 
   it("separates exact acquired bytes from scientific identity", async () => {
