@@ -3,9 +3,12 @@ import type { ActionId } from "../domain/registry";
 import { formatMeasurement, measurementStatus, type MeasurementKind, type MeasurementObject } from "../interaction/measurements";
 import type { RenderProjection } from "../rendering/renderProjection";
 import type { StructuralAnalysisResult } from "../analysis/structuralAnalysis";
+import type { FittingAnalysis } from "../analysis/pymolFitting";
 import type { WorkspaceGroup, WorkspaceObject } from "../workspace/workspaceModel";
 import type { CoordinateFramePolicy, SelectionResult } from "../interaction/selectionResolver";
 import { Icon } from "./Icon";
+import { AlignmentPanel } from "./AlignmentPanel";
+import type { ConsoleCommandResult } from "./ConsolePanel";
 
 const analysisTools: Array<{ label: string; icon: "target" | "activity" | "waves" | "shapes" | "box" | "circleHelp"; actionId: ActionId; capability?: string }> = [
   { label: "H-Bonds", icon: "waves", actionId: "ANALYSIS.H_BONDS" },
@@ -42,6 +45,8 @@ type StructurePanelProps = {
   onMeasurementDelete: (id: string) => void;
   onMeasurementClear: () => void;
   analysisResults: readonly StructuralAnalysisResult[];
+  fittingResults: readonly (FittingAnalysis & { applyStatus: "ANALYZED" | "APPLIED" | "STALE" })[];
+  onAlignmentCommand: (command: string) => ConsoleCommandResult;
   loading: boolean;
   error: string | null;
   namedSelections: readonly { name: string; count: number }[];
@@ -77,12 +82,13 @@ const ContextCard = ({ selectedAtom, onAction, onClearSelection }: { selectedAto
   </section>
 );
 
-const MeasurementCard = ({ measurementMode, measurementSlots, measurements, structure, onAction, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear, analysisResults }: { measurementMode: MeasurementKind | null; measurementSlots: readonly string[]; measurements: readonly MeasurementObject[]; structure: StructureLoadResult | null; onAction: (actionId: ActionId) => void; onMeasurementMode: (kind: MeasurementKind | null) => void; onMeasurementVisibility: (id: string, visible: boolean) => void; onMeasurementDelete: (id: string) => void; onMeasurementClear: () => void; analysisResults: readonly StructuralAnalysisResult[] }) => {
+const MeasurementCard = ({ measurementMode, measurementSlots, measurements, structure, onAction, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear, analysisResults, fittingResults }: { measurementMode: MeasurementKind | null; measurementSlots: readonly string[]; measurements: readonly MeasurementObject[]; structure: StructureLoadResult | null; onAction: (actionId: ActionId) => void; onMeasurementMode: (kind: MeasurementKind | null) => void; onMeasurementVisibility: (id: string, visible: boolean) => void; onMeasurementDelete: (id: string) => void; onMeasurementClear: () => void; analysisResults: readonly StructuralAnalysisResult[]; fittingResults: readonly (FittingAnalysis & { applyStatus: "ANALYZED" | "APPLIED" | "STALE" })[] }) => {
   const measurementKinds: MeasurementKind[] = ["DISTANCE", "ANGLE", "DIHEDRAL"];
   return <section className="panel-card analysis-card measurement-card" data-testid="measurements-panel">
     <div className="panel-heading"><div><span className="eyebrow">ANALYSIS &amp; INTERACTION</span><h2>Analysis &amp; Interaction</h2></div><span className="measurement-count" aria-label={`${measurements.length} measurements`}>{measurements.length}</span></div>
     <div className="analysis-tool-grid">{analysisTools.map((tool) => <button className="quick-tool" key={tool.label} onClick={() => onAction(tool.actionId)} data-action-id={tool.actionId} title={tool.capability ? `${tool.label} — ${tool.capability}` : tool.label}><span className="quick-icon"><Icon name={tool.icon} size={18} /></span><span>{tool.label}</span>{tool.capability && <small>{tool.capability}</small>}</button>)}</div>
     {analysisResults.length > 0 && <div className="analysis-results" data-testid="analysis-results">{analysisResults.map((result) => <div className="analysis-result" key={result.kind} data-analysis-kind={result.kind}><div><strong>{result.kind === "H_BONDS" ? "H-BONDS" : result.kind} · {result.status === "VALID_EMPTY" ? "EMPTY" : result.items.length}</strong><span>{result.diagnostic}</span></div><small>{result.profileId}</small></div>)}</div>}
+    {fittingResults.length > 0 && <div className="analysis-results alignment-results" data-testid="alignment-results"><div className="analysis-subheading"><span>Alignment results</span><span className="capability-tag">SCIENTIFIC</span></div>{fittingResults.map((entry) => <div className={`analysis-result alignment-result alignment-result--${entry.applyStatus.toLowerCase()}`} key={entry.result.resultId} data-alignment-result-id={entry.result.resultId} data-alignment-disposition={entry.result.resultDisposition}><div><strong>{entry.result.operationKind} · {entry.applyStatus}</strong><span>Current {formatOptional(entry.result.currentRmsd, 4)} Å · fitted {formatOptional(entry.result.evaluationRmsd ?? entry.result.refinedCoreRmsd, 4)} Å · {entry.result.retainedPairCount}/{entry.result.initialPairCount} pairs</span></div><small>{entry.result.resultDisposition} · {entry.result.transformUniqueness}</small></div>)}</div>}
     <div className="analysis-divider" />
     <div className="analysis-subheading"><span>Measurements</span><span className="capability-tag">CANONICAL PICKS</span></div>
     <div className="measurement-toolbar">{measurementKinds.map((kind) => <button type="button" className={`measurement-button ${measurementMode === kind ? "measurement-button--active" : ""}`} key={kind} aria-pressed={measurementMode === kind} onClick={() => { if (!structure) { onAction(`MEASURE.${kind}` as ActionId); return; } onMeasurementMode(measurementMode === kind ? null : kind); }}>{measurementLabel(kind)}</button>)}</div>
@@ -92,7 +98,7 @@ const MeasurementCard = ({ measurementMode, measurementSlots, measurements, stru
   </section>;
 };
 
-export const StructurePanel = ({ collapsed, onToggle, onAction, structure, workspaceObjects, workspaceGroups, activeObjectId, coordinateFramePolicy, onCoordinateFrameChange, onObjectSelect, onObjectToggle, onObjectStateCycle, onObjectAllStatesToggle, projection, selectedAtom, activeSelection, onClearSelection, measurementMode, measurementSlots, measurements, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear, analysisResults, loading, error, namedSelections, onNamedSelectionAction }: StructurePanelProps) => {
+export const StructurePanel = ({ collapsed, onToggle, onAction, structure, workspaceObjects, workspaceGroups, activeObjectId, coordinateFramePolicy, onCoordinateFrameChange, onObjectSelect, onObjectToggle, onObjectStateCycle, onObjectAllStatesToggle, projection, selectedAtom, activeSelection, onClearSelection, measurementMode, measurementSlots, measurements, onMeasurementMode, onMeasurementVisibility, onMeasurementDelete, onMeasurementClear, analysisResults, fittingResults, onAlignmentCommand, loading, error, namedSelections, onNamedSelectionAction }: StructurePanelProps) => {
   const counts = structure?.structure.counts;
   const components = [
     { label: "Protein", count: counts?.polymerAtoms ?? 0, tone: "blue", visible: projection.showProtein },
@@ -134,6 +140,7 @@ export const StructurePanel = ({ collapsed, onToggle, onAction, structure, works
     </section>
     <section className="panel-card components-card"><div className="panel-heading"><div><span className="eyebrow">STRUCTURE INVENTORY</span><h2>Components</h2></div><span className="capability-tag">Projection only</span></div><div className="component-list">{components.map((component) => <div className="component-row" key={component.label}><span className={`component-dot component-dot--${component.tone} ${component.visible ? "component-dot--visible" : "component-dot--hidden"}`} aria-hidden="true" /><span>{component.label}</span><span className="component-count">{formatCount(component.count)}</span></div>)}</div></section>
     <ContextCard selectedAtom={selectedAtom} onAction={onAction} onClearSelection={onClearSelection} />
-    <MeasurementCard measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} structure={structure} onAction={onAction} onMeasurementMode={onMeasurementMode} onMeasurementVisibility={onMeasurementVisibility} onMeasurementDelete={onMeasurementDelete} onMeasurementClear={onMeasurementClear} analysisResults={analysisResults} />
+    <AlignmentPanel objects={workspaceObjects} results={fittingResults} onCommand={onAlignmentCommand} />
+    <MeasurementCard measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} structure={structure} onAction={onAction} onMeasurementMode={onMeasurementMode} onMeasurementVisibility={onMeasurementVisibility} onMeasurementDelete={onMeasurementDelete} onMeasurementClear={onMeasurementClear} analysisResults={analysisResults} fittingResults={fittingResults} />
   </aside>;
 };

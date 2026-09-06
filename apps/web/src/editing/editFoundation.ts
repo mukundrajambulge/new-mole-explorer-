@@ -556,6 +556,29 @@ export const createCoordinateEditCommand = (input: {
   };
 };
 
+/**
+ * Applies a previously analyzed rigid transform through the same R07
+ * coordinate transaction used by ordinary coordinate edits.  The numerical
+ * kernel never calls this helper; callers must provide the immutable result's
+ * explicit coordinate patch and transform provenance.
+ */
+export const createRigidTransformCommand = (input: {
+  objectId: string;
+  baseRevisionId: string;
+  selectionResult?: SelectionResult;
+  stableAtomIds?: readonly string[];
+  stateScope: EditStateSelector;
+  coordinates?: Readonly<Record<string, Coordinate3D>>;
+  coordinatesByState?: Readonly<Record<string, Readonly<Record<string, Coordinate3D>>>>;
+  transform: { rotation: readonly number[]; translation: Coordinate3D };
+  origin: CanonicalEditCommand["origin"];
+  provenance?: Partial<CanonicalEditCommand["provenance"]>;
+  commandId?: string;
+}): ScientificEditCommand => {
+  const coordinateCommand = createCoordinateEditCommand(input);
+  return { ...coordinateCommand, operation: "APPLY_RIGID_TRANSFORM", parameters: { ...coordinateCommand.parameters, transform: input.transform } };
+};
+
 type TopologyCommandInput = {
   objectId: string;
   baseRevisionId: string;
@@ -792,7 +815,7 @@ export class EditTransaction {
     if (this.command.schemaVersion !== 1 || !this.command.commandId || !this.command.objectId || !this.command.baseRevisionId) return fail("INVALID_EDIT_INPUT", "A canonical edit command requires schema, command ID, object ID and base revision.", this.command, transactionId);
     if (this.command.objectId !== this.history.objectId || (this.command.target.objectId && this.command.target.objectId !== this.history.objectId)) return fail("REVISION_CONFLICT", `Command target object ${this.command.target.objectId ?? this.command.objectId} does not match transaction object ${this.history.objectId}.`, this.command, transactionId);
     if (this.command.baseRevisionId !== current.revisionId) return fail("STALE_BASE_REVISION", `Expected base revision ${this.command.baseRevisionId}, but object ${this.command.objectId} is at ${current.revisionId}.`, this.command, transactionId);
-    if (this.command.operation !== "APPLY_COORDINATE_EDIT") return fail("UNSUPPORTED_EDIT_OPERATION", `${this.command.operation} is typed but not implemented in R07-B1.`, this.command, transactionId);
+    if (this.command.operation !== "APPLY_COORDINATE_EDIT" && this.command.operation !== "APPLY_RIGID_TRANSFORM") return fail("UNSUPPORTED_EDIT_OPERATION", `${this.command.operation} is typed but not implemented in R07-B1.`, this.command, transactionId);
 
     const baseStructure = current.loadResult.structure;
     const selection = this.command.selectionResult;

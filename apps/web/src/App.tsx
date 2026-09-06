@@ -19,9 +19,11 @@ import { STYLE_DEFINITIONS, representationCapabilityFor, representationStyleForC
 import { combineSelections, evaluateSelectionQuery, NamedSelectionStore, resolveSelection, parseRepresentationCommand, requireValidSelection, SelectionResolutionError, selectionForStableIds, type CoordinateFramePolicy, type SelectionPresentationContext, type SelectionResult } from "./interaction/selectionResolver";
 import { LabelExpressionError, labelExpressionForMode, labelPlanForState, parseSafeLabelExpression, resolveSafeLabel, type LabelMode } from "./interaction/labels";
 import { MeasurementAccumulator, createMeasurementObject, measurementCardinality, type MeasurementKind, type MeasurementObject } from "./interaction/measurements";
-import type { PickResult } from "./interaction/picking";
+import { coordinateContextFor, type PickResult } from "./interaction/picking";
 import { colorRegistry } from "./rendering/colorRegistry";
 import { analyzeStructure, overlaysForAnalysis, type StructuralAnalysisKind, type StructuralAnalysisResult } from "./analysis/structuralAnalysis";
+import { applyFittingResult, applyIntraFittingResults, runAlign, runCEAlign, runFit, runIntraFit, runIntraRms, runIntraRmsCur, runPairFit, runRms, runRmsCur, runSuper, type FittingAnalysis } from "./analysis/pymolFitting";
+import { createDefaultAlignmentRequest, markAlignmentResultStale, type AlignmentOperationKind, type AlignmentRequest } from "./analysis/alignment";
 import { commandHelp, isRecognizedCommandVerb, parseCommand } from "./commands/commandRegistry";
 import { copyWorkspaceObject, createWorkspaceGroup, createWorkspaceObject, createWorkspaceObjectFromSelection, cycleWorkspaceObjectState, joinWorkspaceObjectStates, renameWorkspaceObject, resolveGlobalFrameState, setWorkspaceObjectAllStates, setWorkspaceObjectEnabled, setWorkspaceObjectState, splitWorkspaceObjectStates, structureForWorkspaceObjectState, updateWorkspaceGroup, workspaceScopedStableAtomId, workspaceSelectionStructure, type WorkspaceGroup, type WorkspaceObject } from "./workspace/workspaceModel";
 import { createAddBondCommand, createAddHydrogensCommand, createAttachAtomCommand, createCoordinateEditCommand, createDeleteAtomsCommand, createDeleteBondCommand, createRefillHydrogensCommand, createRemoveHydrogensCommand, createReplaceAtomCommand, createReplaceBondSemanticsCommand, ScientificHistoryService, type ScientificRevision } from "./editing/editFoundation";
@@ -87,6 +89,7 @@ export const App = () => {
   const [measurementSlots, setMeasurementSlots] = useState<readonly string[]>([]);
   const [measurements, setMeasurements] = useState<readonly MeasurementObject[]>([]);
   const [analysisResults, setAnalysisResults] = useState<readonly StructuralAnalysisResult[]>([]);
+  const [fittingResults, setFittingResults] = useState<readonly (FittingAnalysis & { applyStatus: "ANALYZED" | "APPLIED" | "STALE" })[]>([]);
   const [namedSelections, setNamedSelections] = useState<readonly { name: string; count: number }[]>([]);
   const [activeSelection, setActiveSelectionState] = useState<SelectionResult | null>(null);
   const [targetStyles, setTargetStyles] = useState<Record<"protein" | "ligand" | "water" | "ions" | "other", RepresentationStyle>>({ protein: "cartoon", ligand: "ball-and-stick", water: "spheres", ions: "spheres", other: "sticks" });
@@ -548,6 +551,60 @@ export const App = () => {
     setAnalysisResults((current) => [...current.filter((entry) => entry.kind !== kind), result]);
   };
 
+  type LocalAlignmentSelection = { object: WorkspaceObject; selection: SelectionResult };
+  const localizeAlignmentSelection = (result: SelectionResult): LocalAlignmentSelection | ConsoleCommandResult => {
+    const groups = new Map<string, string[]>();
+    for (const stableId of result.stableAtomIds) {
+      const separator = stableId.indexOf("::");
+      const objectId = separator >= 0 ? stableId.slice(0, separator) : activeObjectId;
+      const atomId = separator >= 0 ? stableId.slice(separator + 2) : stableId;
+      if (objectId) groups.set(objectId, [...(groups.get(objectId) ?? []), atomId]);
+    }
+    if (groups.size !== 1) return { category: "ANALYSIS", status: groups.size > 1 ? "AMBIGUOUS_MAPPING: each mobile and target selection must resolve to exactly one workspace object." : "NO_CORRESPONDENCE: selection did not resolve to a loaded workspace object." };
+    const objectId = [...groups.keys()][0]!; const object = workspaceObjectsRef.current.find((candidate) => candidate.objectId === objectId);
+    if (!object) return { category: "ANALYSIS", status: `OBJECT_NOT_FOUND: ${objectId} is not loaded.` };
+    const atomIds = groups.get(objectId)!; return { object, selection: selectionForStableIds(atomIds, object.loadResult.structure) };
+  };
+
+  const alignmentRequestFor = (operationKind: AlignmentOperationKind, mobileQuery: string, targetQuery: string | null): AlignmentRequest | ConsoleCommandResult => {
+    const context = commandSelectionContext(); if (!context.structure) return { category: "ANALYSIS", status: "INVALID_INPUT: load a structure before running structural alignment." };
+    if (!targetQuery?.trim()) return { category: "ANALYSIS", status: "CARDINALITY_ERROR: alignment commands require `mobile selection, target selection`." };
+    try {
+      const mobile = localizeAlignmentSelection(requireValidSelection(evaluateSelectionQuery(mobileQuery, context.structure, selectionOptionsFor(context)))); if ("category" in mobile) return mobile;
+      const target = localizeAlignmentSelection(requireValidSelection(evaluateSelectionQuery(targetQuery, context.structure, selectionOptionsFor(context)))); if ("category" in target) return target;
+      const sourceRevision = historyServiceRef.current.currentRevision(mobile.object.objectId); const targetRevision = historyServiceRef.current.currentRevision(target.object.objectId); if (!sourceRevision || !targetRevision) return { category: "ANALYSIS", status: "HISTORY_UNAVAILABLE: both alignment objects require retained scientific revisions." };
+      const isExplicit = operationKind === "PAIR_FIT"; const sameLength = mobile.selection.stableAtomIds.length === target.selection.stableAtomIds.length;
+      const explicitPairs = isExplicit && sameLength ? mobile.selection.stableAtomIds.map((sourceAtomUid, index) => ({ sourceAtomUid, targetAtomUid: target.selection.stableAtomIds[index]! })) : undefined;
+      return createDefaultAlignmentRequest({ operationKind, sourceObjectId: mobile.object.objectId, targetObjectId: target.object.objectId, sourceRevisionId: sourceRevision.revisionId, targetRevisionId: targetRevision.revisionId, sourceStructure: mobile.object.loadResult.structure, targetStructure: target.object.loadResult.structure, sourceStateId: mobile.object.currentStateId, targetStateId: target.object.currentStateId, sourceSelection: mobile.selection, targetSelection: target.selection, sourceCoordinateContext: coordinateContextFor(mobile.object.loadResult.structure, mobile.object.objectId, mobile.object.currentStateId), targetCoordinateContext: coordinateContextFor(target.object.loadResult.structure, target.object.objectId, target.object.currentStateId), mappingMode: isExplicit ? "EXPLICIT" : operationKind === "ALIGN" || operationKind === "SUPER" ? "SEQUENCE_GUIDED" : "SOURCE_IDENTITY_STRICT", compatibilityProfile: isExplicit ? "PYMOL_INDEX_ORDER" : "MOLEXPLORER_NATIVE_FIXED_CORRESPONDENCE_V1", explicitPairs, transformRequested: operationKind === "FIT" || operationKind === "PAIR_FIT" || operationKind === "ALIGN" || operationKind === "SUPER", alignmentObjectRequested: operationKind === "ALIGN" || operationKind === "SUPER" });
+    } catch (error) { return commandError(error, "ANALYSIS"); }
+  };
+
+  const storeFittingAnalysis = (analysis: FittingAnalysis, applyStatus: "ANALYZED" | "APPLIED" = "ANALYZED") => setFittingResults((current) => [{ ...analysis, applyStatus }, ...current.filter((entry) => entry.result.resultId !== analysis.result.resultId)].slice(0, 8));
+
+  const runAlignmentCommand = (verb: "rms_cur" | "rms" | "fit" | "pair_fit" | "align" | "super" | "cealign" | "intra_rms_cur" | "intra_rms" | "intra_fit", mobileQuery: string, targetQuery: string | null): ConsoleCommandResult => {
+    if (verb === "cealign") { const unsupported = runCEAlign(); return { category: "ANALYSIS", status: `${unsupported.error.code}: ${unsupported.error.message}` }; }
+    if (verb === "intra_rms_cur" || verb === "intra_rms" || verb === "intra_fit") {
+      const request = alignmentRequestFor("RMS", mobileQuery, mobileQuery); if ("category" in request) return request;
+      const intra = verb === "intra_rms_cur" ? runIntraRmsCur(request) : verb === "intra_rms" ? runIntraRms(request) : runIntraFit(request); if (!intra.ok) return { category: "ANALYSIS", status: `${intra.error?.code ?? "FAILED"}: ${intra.error?.message ?? "intra analysis failed."}` };
+      const statuses = intra.value.states.map((state) => `${state.result.sourceCoordinateContext.stateId}=${state.numericValue?.toFixed(4) ?? "n/a"}`).join(", ");
+      if (verb === "intra_fit") {
+        const revision = historyServiceRef.current.currentRevision(request.sourceObjectId); if (!revision) return { category: "ANALYSIS", status: "HISTORY_UNAVAILABLE: no retained mobile revision; no state was changed." };
+        const applied = applyIntraFittingResults(historyServiceRef.current, revision, request, intra.value); if (!applied.ok) return { category: "ANALYSIS", status: applied.error };
+        applyScientificRevisionToWorkspace(applied.transaction.revision);
+      }
+      return { category: "ANALYSIS", status: `${verb} · reference ${intra.value.referenceStateId} · ${statuses || "no state produced a valid result"}${intra.value.stateErrors.length ? ` · ${intra.value.stateErrors.length} state(s) rejected structurally` : ""}${verb === "intra_fit" ? " · APPLIED via R07 history" : ""}` };
+    }
+    const operation = verb === "rms_cur" ? "RMS_CUR" : verb === "rms" ? "RMS" : verb === "fit" ? "FIT" : verb === "pair_fit" ? "PAIR_FIT" : verb === "align" ? "ALIGN" : "SUPER";
+    const request = alignmentRequestFor(operation, mobileQuery, targetQuery); if ("category" in request) return request;
+    const fitting = verb === "rms_cur" ? runRmsCur(request) : verb === "rms" ? runRms(request) : verb === "fit" ? runFit(request) : verb === "pair_fit" ? runPairFit(request) : verb === "align" ? runAlign(request) : runSuper(request);
+    if (!fitting.ok) return { category: "ANALYSIS", status: `${fitting.error?.code ?? "FAILED"}: ${fitting.error?.message ?? "alignment failed structurally; no transform was applied."}` };
+    const shouldApply = verb === "fit" || verb === "pair_fit" || verb === "align" || verb === "super";
+    if (!shouldApply) { storeFittingAnalysis(fitting.value); return { category: "ANALYSIS", status: `${verb} · current RMSD ${fitting.value.result.currentRmsd?.toFixed(4) ?? "n/a"} Å · fitted RMSD ${fitting.value.numericValue?.toFixed(4) ?? "n/a"} Å · ${fitting.value.result.resultDisposition}`, count: fitting.value.result.retainedPairCount }; }
+    const revision = historyServiceRef.current.currentRevision(request.sourceObjectId); if (!revision) return { category: "ANALYSIS", status: "HISTORY_UNAVAILABLE: mobile object has no retained revision; no transform was applied." };
+    const applied = applyFittingResult(historyServiceRef.current, revision, request, fitting.value); if (!applied.ok) { storeFittingAnalysis(fitting.value); return { category: "ANALYSIS", status: `${applied.error} no transform was applied.` }; }
+    applyScientificRevisionToWorkspace(applied.transaction.revision); storeFittingAnalysis(fitting.value, "APPLIED"); return { category: "ANALYSIS", status: `${verb} · ${fitting.value.result.retainedPairCount} pairs · RMSD ${fitting.value.numericValue?.toFixed(4) ?? "n/a"} Å · APPLIED via R07 history ${applied.transaction.baseRevisionId} → ${applied.transaction.resultRevisionId}`, count: fitting.value.result.retainedPairCount };
+  };
+
   const commandError = (error: unknown, category: ConsoleCommandResult["category"]): ConsoleCommandResult => {
     if (error instanceof SelectionResolutionError && error.result) return { category, status: error.message, count: error.result.count, diagnostics: error.result.diagnostics.map((diagnostic) => ({ message: diagnostic.message, span: diagnostic.span })) };
     return { category, status: error instanceof Error ? error.message : "Command rejected." };
@@ -638,6 +695,7 @@ export const App = () => {
     setProjection(nextProjection);
     setMeasurements((current) => current.map((measurement) => measurement.objectId === revision.objectId ? { ...measurement, status: "STALE" } : measurement));
     setAnalysisResults((current) => current.map((result) => result.status === "STALE" ? result : { ...result, status: "STALE", diagnostic: `STALE after scientific revision ${revision.revisionId}. Re-run this analysis on the restored revision.` }));
+    setFittingResults((current) => current.map((entry) => entry.applyStatus === "STALE" ? entry : { ...entry, applyStatus: "STALE" as const, result: markAlignmentResultStale(entry.result) }));
   };
 
   const runHistoryAction = (actionId: typeof ACTION_IDS.HISTORY_UNDO | typeof ACTION_IDS.HISTORY_REDO): ConsoleCommandResult => {
@@ -866,6 +924,7 @@ export const App = () => {
     if (parsed.verb === "undo") return runHistoryAction(ACTION_IDS.HISTORY_UNDO);
     if (parsed.verb === "redo") return runHistoryAction(ACTION_IDS.HISTORY_REDO);
     if (parsed.verb === "edit_test") return runDeterministicCoordinateEdit();
+    if (["rms_cur", "rms", "fit", "pair_fit", "align", "super", "cealign", "intra_rms_cur", "intra_rms", "intra_fit"].includes(parsed.verb)) return runAlignmentCommand(parsed.verb as "rms_cur" | "rms" | "fit" | "pair_fit" | "align" | "super" | "cealign" | "intra_rms_cur" | "intra_rms" | "intra_fit", parsed.argument, parsed.target);
     if (parsed.verb === "remove" || parsed.verb === "bond" || parsed.verb === "unbond" || parsed.verb === "set_bond") return runTopologyCommand(parsed.verb, parsed.argument, parsed.target);
     if (parsed.verb === "h_add" || parsed.verb === "h_fill" || parsed.verb === "h_remove" || parsed.verb === "attach" || parsed.verb === "replace") return runChemistryCommand(parsed.verb, parsed.argument, parsed.target);
     if (parsed.verb === "coordinate_frame") {
@@ -1339,7 +1398,7 @@ export const App = () => {
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
         <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} editSelectionCount={activeSelection?.stableAtomIds.length ?? 0} editObjectName={editTargetObject?.displayName ?? activeWorkspaceObject?.displayName} editSelectionReady={editSelectionReady} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} onEditBondOrder={handleBondOrderAction} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
-          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} />
+          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} onAlignmentCommand={runConsoleCommand} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} />
           <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFileDrop={importFile} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} />
           <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} activeSelectionCount={activeSelection?.count ?? 0} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
         </div>

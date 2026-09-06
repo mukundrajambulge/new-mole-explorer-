@@ -1,5 +1,5 @@
-export type CommandDomain = "SYSTEM" | "SELECTION" | "PRESENTATION" | "VIEW" | "LABEL" | "MEASURE" | "OBJECT" | "HISTORY" | "EDIT";
-export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "set" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "set_name" | "copy" | "create" | "split_states" | "join_states" | "group" | "delete" | "update" | "enable" | "disable" | "state" | "frame" | "all_states" | "count_states" | "coordinate_frame" | "history" | "undo" | "redo" | "edit_test" | "remove" | "bond" | "unbond" | "set_bond" | "h_add" | "h_fill" | "h_remove" | "attach" | "replace";
+export type CommandDomain = "SYSTEM" | "SELECTION" | "PRESENTATION" | "VIEW" | "LABEL" | "MEASURE" | "OBJECT" | "HISTORY" | "EDIT" | "ANALYSIS";
+export type CommandVerb = "select" | "show" | "show_as" | "hide" | "color" | "set" | "label" | "center" | "zoom" | "measure" | "get_view" | "unpick" | "help" | "rename" | "set_name" | "copy" | "create" | "split_states" | "join_states" | "group" | "delete" | "update" | "enable" | "disable" | "state" | "frame" | "all_states" | "count_states" | "coordinate_frame" | "history" | "undo" | "redo" | "edit_test" | "remove" | "bond" | "unbond" | "set_bond" | "h_add" | "h_fill" | "h_remove" | "attach" | "replace" | "rms_cur" | "rms" | "fit" | "pair_fit" | "align" | "super" | "cealign" | "intra_rms_cur" | "intra_rms" | "intra_fit";
 export type ParsedCommand = { domain: CommandDomain; verb: CommandVerb; raw: string; head: string; argument: string; target: string | null; span: { start: number; end: number } };
 export type CommandParseError = { code: "EMPTY" | "UNKNOWN_COMMAND" | "MISSING_ARGUMENT"; message: string; span?: { start: number; end: number } };
 export type CommandDefinition = { verb: CommandVerb; domain: CommandDomain; synopsis: string; description: string; requiresArgument: boolean };
@@ -47,6 +47,16 @@ export const COMMAND_REGISTRY: readonly CommandDefinition[] = [
   { verb: "h_remove", domain: "EDIT", synopsis: "h_remove <selection>", description: "Remove exact explicit hydrogen atoms or local hydrogens attached to the selected parent atoms.", requiresArgument: true },
   { verb: "attach", domain: "EDIT", synopsis: "attach <element>, <selection>", description: "Attach one explicitly specified atom to one exact parent AtomUID.", requiresArgument: true },
   { verb: "replace", domain: "EDIT", synopsis: "replace <element>, <selection>", description: "Replace one exact AtomUID with a NEW atom identity and explicit lineage.", requiresArgument: true },
+  { verb: "rms_cur", domain: "ANALYSIS", synopsis: "rms_cur <mobile>, <target>", description: "Compute current-coordinate RMSD for an explicit correspondence without fitting or mutation.", requiresArgument: true },
+  { verb: "rms", domain: "ANALYSIS", synopsis: "rms <mobile>, <target>", description: "Compute proper-rotation fitted RMSD without mutating coordinates.", requiresArgument: true },
+  { verb: "fit", domain: "ANALYSIS", synopsis: "fit <mobile>, <target>", description: "Fit the mobile coordinates to the target through the R07 scientific history transaction.", requiresArgument: true },
+  { verb: "pair_fit", domain: "ANALYSIS", synopsis: "pair_fit <mobile>, <target>", description: "Fit explicitly paired atom selections through the R08 pair-fit profile.", requiresArgument: true },
+  { verb: "align", domain: "ANALYSIS", synopsis: "align <mobile>, <target>", description: "Run bounded sequence-guided alignment with refinement and optional alignment-object provenance.", requiresArgument: true },
+  { verb: "super", domain: "ANALYSIS", synopsis: "super <mobile>, <target>", description: "Run the distinct bounded superposition profile; its reference conformance remains unverified.", requiresArgument: true },
+  { verb: "cealign", domain: "ANALYSIS", synopsis: "cealign <mobile>, <target>", description: "CE alignment is explicitly unsupported until the bounded CE guide-mapping implementation is admitted.", requiresArgument: true },
+  { verb: "intra_rms_cur", domain: "ANALYSIS", synopsis: "intra_rms_cur <selection>", description: "Compute current RMSD for every coordinate state against the reference state without fitting.", requiresArgument: true },
+  { verb: "intra_rms", domain: "ANALYSIS", synopsis: "intra_rms <selection>", description: "Compute fitted RMSD for every coordinate state without mutation.", requiresArgument: true },
+  { verb: "intra_fit", domain: "ANALYSIS", synopsis: "intra_fit <selection>", description: "Fit each coordinate state through explicit per-state analysis; application requires a separate transaction.", requiresArgument: true },
 ];
 const definitions = Object.fromEntries(COMMAND_REGISTRY.map((definition) => [definition.verb, definition])) as Record<CommandVerb, CommandDefinition>;
 const verbs = new Set<string>(COMMAND_REGISTRY.map((definition) => definition.verb));
@@ -95,6 +105,7 @@ export const commandSuggestions = (prefix: string): readonly string[] => {
     if (head === "color") return ["red", "green", "blue", "cyan", "yellow", "inherit"];
     if (head === "set") return ["cartoon_color", "ribbon_color"];
     if (head === "select" || head === "center" || head === "zoom" || head === "label") return ["all", "none", "polymer", "ligand", "water", "ion", "chain", "resi", "name"];
+    if (["rms_cur", "rms", "fit", "pair_fit", "align", "super", "cealign"].includes(head)) return ["all", "polymer", "name CA", "chain A and polymer"];
   }
   return [...verbs].filter((verb) => !normalized || verb.startsWith(normalized)).sort();
 };
