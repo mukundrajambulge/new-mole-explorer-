@@ -3,6 +3,7 @@ import { join } from "node:path";
 
 const root = join(import.meta.dirname, "..", "..");
 const inventorySource = readFileSync(join(root, "apps", "api", "src", "command", "pymolInventory.ts"), "utf8");
+const fixtures = JSON.parse(readFileSync(join(root, "verification", "r10", "R10_FIXTURES.json"), "utf8"));
 const baseNames = inventorySource.match(/PYMOL_KEYWORD_NAMES = `([^`]*)`/)?.[1]?.split(",") ?? [];
 const names = [...baseNames, "run", "while"];
 const sourceCommit = "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69";
@@ -35,13 +36,14 @@ const summary = {
   bundles: { "R10-A": "PASS", "R10-B": "PASS", "R10-C": "PASS_WITH_FRONTEND_ADAPTER", "R10-D": "PASS", "R10-E": "PASS", "R10-F": "PASS", "R10-G": "PASS_ORACLE_PENDING", "R10-H": "DESIGN_ONLY_NO_EXECUTION" },
   inventory: { sourceCommit, count: entries.length, dispositions: counts, registryValidation: "PASS" },
   safeCompiler: { grammar: "PASS", unsafeRejections: "PASS", boundedStatements: "PASS", selectionDelegationBoundary: "PASS" },
-  dispatcher: { sharedBoundary: "PASS", guiHoverNotRecorded: "PASS", capabilityPreflight: "PASS" },
+  dispatcher: { sharedBoundary: "PASS", guiConsoleAdapter: "PASS", boundedBatchEndpoint: "PASS", guiHoverNotRecorded: "PASS", capabilityPreflight: "PASS" },
   settings: "PASS_TYPED_SCOPED_VALIDATED",
   restSdkHistoryProvenanceReplay: "PASS",
   macrosBatchJobs: "PASS_BOUNDED_DAG",
   compatibilityMatrix: "PASS_GENERATED_ORACLE_PENDING",
+  fixtures: { path: "verification/r10/R10_FIXTURES.json", count: fixtures.fixtures.length },
   acceptanceTests: acceptance,
-  gates: { fullE2E: "112/113_FIRST_RUN; duplicate-display-name-test_isolated_PASS; R09_BASELINE_113/113", focusedThreeConsecutiveRuns: "PENDING_CI", regressions: "PENDING_CI", fuzzSecurity: "PASS_CONTRACT_CORPUS", oracle: "ORACLE_PENDING" },
+  gates: { fullE2E: "110/113_LOCAL; 3_RCSB_FETCH_TIMEOUTS; duplicate-display-name_PASS; R09_BASELINE_113/113", ci: { runId: 34102010115, sha: "f420c7c28d49d1bf967500c0a5fe31126006b9e3", conclusion: "SUCCESS", url: "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34102010115" }, focusedThreeConsecutiveRuns: "PENDING_CI", regressions: "PENDING_CI", fuzzSecurity: "PASS_CONTRACT_CORPUS", oracle: "ORACLE_PENDING" },
   matrixPaths: ["verification/r10/PYMOL_COMPATIBILITY_MATRIX.json", "verification/r10/PYMOL_COMPATIBILITY_MATRIX.md"],
   manualValidation: "PENDING_USER_APPLICATION_CAMPAIGN",
   readyConsolidatedManual: false,

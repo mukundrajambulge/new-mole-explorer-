@@ -30,4 +30,27 @@ describe("R10 safe command compiler", () => {
     expect(compileSafeCommand("state objectA, all_states").command?.normalizedArgs.state).toEqual({ kind: "ALL_STATES" });
     expect(compileSafeCommand("state objectA, 2").command?.normalizedArgs.state).toEqual({ kind: "EXPLICIT_STATE", ordinal: 2 });
   });
+
+  it("binds display references only through the supplied typed binding context", () => {
+    const result = compileSafeCommand("state objectA, state=2, state=3", { bindings: {
+      resolveObject: (reference) => reference === "objectA" ? { id: "object:stable-1", displayName: reference } : { status: "NOT_FOUND" },
+      resolveState: (objectId, selector) => objectId === "object:stable-1" && JSON.stringify(selector) === JSON.stringify({ kind: "EXPLICIT_STATE", ordinal: 2 }) ? { id: "state:stable-2" } : { status: "NOT_FOUND" },
+    } });
+    expect(result.command).toBeNull();
+    expect(result.diagnostics[0]?.code).toBe("DUPLICATE_ARGUMENT");
+
+    const bound = compileSafeCommand("state objectA, 2", { bindings: {
+      resolveObject: () => ({ id: "object:stable-1" }),
+      resolveState: (objectId, selector) => objectId === "object:stable-1" && JSON.stringify(selector) === JSON.stringify({ kind: "EXPLICIT_STATE", ordinal: 2 }) ? { id: "state:stable-2" } : { status: "NOT_FOUND" },
+    } });
+    expect(bound.diagnostics).toEqual([]);
+    expect(bound.command?.normalizedArgs.object).toBe("object:stable-1");
+    expect(bound.command?.boundRefs).toEqual({ objectIds: ["object:stable-1"], stateIds: ["state:stable-2"] });
+  });
+
+  it("supports named arguments with whitespace without treating spaces as nesting", () => {
+    const result = compileSafeCommand("set name = orthoscopic, value = on");
+    expect(result.diagnostics).toEqual([]);
+    expect(result.command?.normalizedArgs).toMatchObject({ name: "orthoscopic", value: "on" });
+  });
 });

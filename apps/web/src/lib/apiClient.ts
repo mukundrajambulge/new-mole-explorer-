@@ -58,6 +58,11 @@ export const apiClient = {
     headers: { "content-type": "application/json", ...(body.idempotencyKey ? { "x-idempotency-key": body.idempotencyKey } : {}), ...(body.correlationId ? { "x-correlation-id": body.correlationId } : {}) },
     body: JSON.stringify(body),
   }),
+  executeCommandBatch: (body: { rawCommand: string; requestedMode?: "SYNC" | "ASYNC" | "AUTO"; correlationId?: string; idempotencyKey?: string }) => request<CommandResult>("/commands/batch", {
+    method: "POST",
+    headers: { "content-type": "application/json", ...(body.idempotencyKey ? { "x-idempotency-key": body.idempotencyKey } : {}), ...(body.correlationId ? { "x-correlation-id": body.correlationId } : {}) },
+    body: JSON.stringify(body),
+  }),
   commandHistory: () => request<{ records: readonly JsonRecord[] }>("/commands/history"),
   commandJob: (jobId: string) => request<CommandJob>(`/commands/jobs/${encodeURIComponent(jobId)}`),
   cancelCommandJob: (jobId: string) => request<CommandJob>(`/commands/jobs/${encodeURIComponent(jobId)}/cancel`, { method: "POST" }),

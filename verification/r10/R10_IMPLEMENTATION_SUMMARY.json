@@ -37,6 +37,8 @@
   },
   "dispatcher": {
     "sharedBoundary": "PASS",
+    "guiConsoleAdapter": "PASS",
+    "boundedBatchEndpoint": "PASS",
     "guiHoverNotRecorded": "PASS",
     "capabilityPreflight": "PASS"
   },
@@ -44,6 +46,10 @@
   "restSdkHistoryProvenanceReplay": "PASS",
   "macrosBatchJobs": "PASS_BOUNDED_DAG",
   "compatibilityMatrix": "PASS_GENERATED_ORACLE_PENDING",
+  "fixtures": {
+    "path": "verification/r10/R10_FIXTURES.json",
+    "count": 15
+  },
   "acceptanceTests": [
     {
       "id": "AT-R10-01",
@@ -297,7 +303,13 @@
     }
   ],
   "gates": {
-    "fullE2E": "112/113_FIRST_RUN; duplicate-display-name-test_isolated_PASS; R09_BASELINE_113/113",
+    "fullE2E": "110/113_LOCAL; 3_RCSB_FETCH_TIMEOUTS; duplicate-display-name_PASS; R09_BASELINE_113/113",
+    "ci": {
+      "runId": 34102010115,
+      "sha": "f420c7c28d49d1bf967500c0a5fe31126006b9e3",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34102010115"
+    },
     "focusedThreeConsecutiveRuns": "PENDING_CI",
     "regressions": "PENDING_CI",
     "fuzzSecurity": "PASS_CONTRACT_CORPUS",

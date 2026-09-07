@@ -72,10 +72,19 @@ export class SettingStore {
     return this.values.get(this.key(spec.name, scope, targetId)) ?? this.values.get(this.key(spec.name, "global"));
   }
 
+  getResult(name: string, scope: SettingScope = "session", targetId?: string): { value?: SettingValue; diagnostic?: SettingDiagnostic } {
+    const spec = settingSpecFor(name);
+    if (!spec) return { diagnostic: { code: "INVALID_SETTING", message: `Unknown setting ${name}.` } };
+    if (!spec.scope.includes(scope)) return { diagnostic: { code: "UNSUPPORTED_SETTING_SCOPE", message: `${spec.name} does not support ${scope} scope.` } };
+    if ((scope === "object" || scope === "selection" || scope === "representation" || scope === "scene") && !targetId) return { diagnostic: { code: "INVALID_SETTING", message: `${scope} scope requires a stable target ID.` } };
+    return { value: this.get(spec.name, scope, targetId) };
+  }
+
   unset(name: string, scope: SettingScope = "session", targetId?: string): { ok: boolean; diagnostic?: SettingDiagnostic } {
     const spec = settingSpecFor(name);
     if (!spec) return { ok: false, diagnostic: { code: "INVALID_SETTING", message: `Unknown setting ${name}.` } };
     if (!spec.scope.includes(scope)) return { ok: false, diagnostic: { code: "UNSUPPORTED_SETTING_SCOPE", message: `${spec.name} does not support ${scope} scope.` } };
+    if ((scope === "object" || scope === "selection" || scope === "representation" || scope === "scene") && !targetId) return { ok: false, diagnostic: { code: "INVALID_SETTING", message: `${scope} scope requires a stable target ID.` } };
     this.values.delete(this.key(spec.name, scope, targetId));
     return { ok: true };
   }

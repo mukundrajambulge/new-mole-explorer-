@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "profile": "SAFE_PYMOL_COMPAT",
+  "fixtures": [
+    { "id": "FX-R10-01", "kind": "registry", "input": "select", "expect": { "commandType": "SELECTION.EVALUATE" } },
+    { "id": "FX-R10-02", "kind": "alias", "input": "sel all", "expect": { "resolvedPublicName": "select" } },
+    { "id": "FX-R10-03", "kind": "prefix", "input": "get_view", "expect": { "commandType": "VIEW.GET" } },
+    { "id": "FX-R10-04", "kind": "selection", "input": "select replace, (chain A and resi 10-20) & organic", "expect": { "nestedSelectionPreserved": true } },
+    { "id": "FX-R10-05", "kind": "typed-argument", "input": "set name = orthoscopic, value = on", "expect": { "booleanCoercion": true } },
+    { "id": "FX-R10-06", "kind": "state-sentinel", "input": "state objectA, all_states", "expect": { "stateKind": "ALL_STATES" } },
+    { "id": "FX-R10-07", "kind": "state-sentinel", "input": "state objectA, append", "expect": { "stateKind": "APPEND_STATE" } },
+    { "id": "FX-R10-08", "kind": "unsafe", "input": "python print(1)", "expect": { "diagnostic": "UNSAFE_COMMAND_REJECTED" } },
+    { "id": "FX-R10-09", "kind": "unsafe", "input": "select all && echo bad", "expect": { "diagnostic": "UNSAFE_COMMAND_REJECTED" } },
+    { "id": "FX-R10-10", "kind": "unsafe", "input": "select ${process.env.SECRET}", "expect": { "diagnostic": "UNSAFE_COMMAND_REJECTED" } },
+    { "id": "FX-R10-11", "kind": "batch", "input": "select all; get_view", "expect": { "boundedStatements": 2 } },
+    { "id": "FX-R10-12", "kind": "settings", "input": "set field_of_view, 90", "expect": { "scope": "session" } },
+    { "id": "FX-R10-13", "kind": "binding", "input": "state display-name, 2", "expect": { "requiresStableObjectBinding": true } },
+    { "id": "FX-R10-14", "kind": "provenance", "input": "get_view", "expect": { "actionRecord": true, "semanticHash": true } },
+    { "id": "FX-R10-15", "kind": "macro", "input": "bounded-dag-foreach", "expect": { "recursion": "rejected" } }
+  ]
+}

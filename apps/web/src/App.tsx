@@ -29,6 +29,7 @@ import { applyFittingResult, applyIntraFittingResults, runAlign, runCEAlign, run
 import { createDefaultAlignmentRequest, markAlignmentResultStale, type AlignmentOperationKind, type AlignmentRequest, type AlignmentWorkflowOptions, type MappingMode } from "./analysis/alignment";
 import { commandHelp, isRecognizedCommandVerb, parseCommand } from "./commands/commandRegistry";
 import { unsafeConsoleDiagnostic } from "./commands/safeBoundary";
+import { dispatchUiCommand } from "./commands/uiDispatcher";
 import { copyWorkspaceObject, createWorkspaceGroup, createWorkspaceObject, createWorkspaceObjectFromSelection, cycleWorkspaceObjectState, joinWorkspaceObjectStates, renameWorkspaceObject, resolveGlobalFrameState, setWorkspaceObjectAllStates, setWorkspaceObjectEnabled, setWorkspaceObjectState, splitWorkspaceObjectStates, structureForWorkspaceObjectState, updateWorkspaceGroup, workspaceScopedStableAtomId, workspaceSelectionStructure, type WorkspaceGroup, type WorkspaceObject } from "./workspace/workspaceModel";
 import { createAddBondCommand, createAddHydrogensCommand, createAttachAtomCommand, createCoordinateEditCommand, createDeleteAtomsCommand, createDeleteBondCommand, createRefillHydrogensCommand, createRemoveHydrogensCommand, createReplaceAtomCommand, createReplaceBondSemanticsCommand, ScientificHistoryService, type ScientificRevision } from "./editing/editFoundation";
 import { buildSessionDraft, restoreSession } from "./lifecycle/sessionCodec";
@@ -1049,7 +1050,7 @@ export const App = () => {
     setWorkspaceGroups(groups);
   };
 
-  const runConsoleCommand = (input: string, alignmentOptions?: AlignmentWorkflowOptions): ConsoleCommandResult => {
+  const runConsoleCommandInternal = (input: string, alignmentOptions?: AlignmentWorkflowOptions): ConsoleCommandResult => {
     const trimmed = input.trim();
     const unsafe = unsafeConsoleDiagnostic(trimmed);
     if (unsafe) return { category: "CAPABILITY", status: unsafe };
@@ -1406,6 +1407,17 @@ export const App = () => {
       return commandError(error, "PRESENTATION");
     }
     return { category: "CAPABILITY", status: "Command is not implemented in the current bounded presentation/interaction gate." };
+  };
+
+  const uiCommandLedgerRef = useRef<readonly ReturnType<typeof dispatchUiCommand>["command"][]>([]);
+  const runConsoleCommand = (input: string, alignmentOptions?: AlignmentWorkflowOptions): ConsoleCommandResult => {
+    const unsafe = unsafeConsoleDiagnostic(input.trim());
+    if (unsafe) return runConsoleCommandInternal(input, alignmentOptions);
+    const execution = dispatchUiCommand(input, (command) => {
+      uiCommandLedgerRef.current = [...uiCommandLedgerRef.current.slice(-255), command];
+      return runConsoleCommandInternal(input, alignmentOptions);
+    }, "CONSOLE");
+    return execution.result;
   };
 
   const handleNamedSelectionAction = (name: string, action: "A" | "S" | "H" | "L" | "C") => {

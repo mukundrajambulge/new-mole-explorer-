@@ -9,7 +9,15 @@ const MAX_NESTING = 32;
 const unsafeHeads = new Set(["python", "exec", "eval", "run", "spawn", "fork", "system", "shell", "powershell", "cmd", "bash", "sh", "javascript", "js", "import"]);
 
 export type CommandSurface = "GUI" | "CONSOLE" | "REST" | "SDK" | "MACRO" | "BATCH";
-export type CompileOptions = { surface?: CommandSurface; profile?: string; requestedMode?: CommandExecutionMode; correlationId?: string; idempotencyKey?: string; target?: CanonicalCommand["target"]; expectedRevisions?: CanonicalCommand["expectedRevisions"] };
+export type BindingLookup =
+  | { id: string; displayName?: string }
+  | { status: "NOT_FOUND" | "AMBIGUOUS"; candidates?: readonly string[] };
+export type CommandBindingContext = {
+  resolveObject?: (reference: string) => BindingLookup;
+  resolveSelection?: (query: string) => BindingLookup;
+  resolveState?: (objectId: string | undefined, selector: JsonValue) => BindingLookup;
+};
+export type CompileOptions = { surface?: CommandSurface; profile?: string; requestedMode?: CommandExecutionMode; correlationId?: string; idempotencyKey?: string; target?: CanonicalCommand["target"]; expectedRevisions?: CanonicalCommand["expectedRevisions"]; bindings?: CommandBindingContext };
 export type CompileResult = { command: CanonicalCommand | null; diagnostics: readonly CommandDiagnostic[] };
 
 const diagnostic = (code: CommandDiagnostic["code"], message: string, sourceSpan?: { start: number; end: number }, argumentPath?: string, retryable = false): CommandDiagnostic => ({ code, message, ...(sourceSpan ? { sourceSpan } : {}), ...(argumentPath ? { argumentPath } : {}), retryable });
@@ -53,11 +61,49 @@ const topLevelEquals = (value: string): number => {
     const char = value[index]!;
     if (quote) { if (char === "\\") index += 1; else if (char === quote) quote = ""; continue; }
     if (char === "\"" || char === "'") { quote = char; continue; }
-    if ("([{ ".includes(char)) depth += 1;
-    if (")] }".includes(char)) depth = Math.max(0, depth - 1);
+    if (char === "(" || char === "[" || char === "{") depth += 1;
+    if (char === ")" || char === "]" || char === "}") depth = Math.max(0, depth - 1);
     if (char === "=" && depth === 0) return index;
   }
   return -1;
+};
+
+const bindingArgumentTypes = (spec: CommandSpec, normalizedArgs: JsonRecord, bindings: CommandBindingContext): { normalizedArgs: JsonRecord; boundRefs: CanonicalCommand["boundRefs"]; diagnostics: CommandDiagnostic[] } => {
+  const nextArgs: JsonRecord = { ...normalizedArgs };
+  const diagnostics: CommandDiagnostic[] = [];
+  const objectIds: string[] = [];
+  const selectionIds: string[] = [];
+  const stateIds: string[] = [];
+  const objectIdForArgument = new Map<string, string>();
+  for (const argument of spec.arguments) {
+    const raw = nextArgs[argument.name];
+    if (typeof raw !== "string") continue;
+    const lookup = argument.type === "object" ? bindings.resolveObject?.(raw) : argument.type === "selection" ? bindings.resolveSelection?.(raw) : undefined;
+    if (!lookup) continue;
+    if ("status" in lookup) {
+      const code = argument.type === "object" ? lookup.status === "AMBIGUOUS" ? "AMBIGUOUS_OBJECT" : "OBJECT_NOT_FOUND" : "SELECTION_BINDING_FAILED";
+      diagnostics.push(diagnostic(code, `${argument.name} reference \`${raw}\` could not be bound (${lookup.status.toLowerCase()}).`, undefined, argument.name));
+      continue;
+    }
+    if (argument.type === "object") {
+      nextArgs[argument.name] = lookup.id;
+      objectIds.push(lookup.id);
+      objectIdForArgument.set(argument.name, lookup.id);
+    } else {
+      selectionIds.push(lookup.id);
+    }
+  }
+  const stateArgument = spec.arguments.find((argument) => argument.type === "state");
+  const rawState = stateArgument ? nextArgs[stateArgument.name] : undefined;
+  if (stateArgument && rawState !== undefined && bindings.resolveState) {
+    const objectArgument = spec.arguments.find((argument) => argument.type === "object");
+    const lookup = bindings.resolveState(objectArgument ? objectIdForArgument.get(objectArgument.name) : undefined, rawState);
+    if ("status" in lookup) diagnostics.push(diagnostic("STATE_OUT_OF_RANGE", `State selector could not be resolved (${lookup.status.toLowerCase()}).`, undefined, stateArgument.name));
+    else { stateIds.push(lookup.id); nextArgs[stateArgument.name] = { kind: "EXPLICIT_STATE_ID", stateId: lookup.id }; }
+  }
+  const settingScope = typeof nextArgs.scope === "string" ? nextArgs.scope : undefined;
+  const targetId = typeof nextArgs.targetId === "string" ? nextArgs.targetId : undefined;
+  return { normalizedArgs: nextArgs, boundRefs: { ...(objectIds.length ? { objectIds } : {}), ...(selectionIds.length ? { selectionIds } : {}), ...(stateIds.length ? { stateIds } : {}), ...(settingScope ? { settingScopes: [targetId ? `${settingScope}:${targetId}` : settingScope] } : {}) }, diagnostics };
 };
 
 const unquote = (value: string): string => value.length >= 2 && ((value.startsWith("\"") && value.endsWith("\"")) || (value.startsWith("'") && value.endsWith("'"))) ? value.slice(1, -1).replace(/\\([\\"'])/g, "$1") : value;
@@ -67,7 +113,7 @@ const unsafeDiagnosticFor = (raw: string): CommandDiagnostic | null => {
   if ([...raw].some((char) => [0, 8, 11, 12].includes(char.charCodeAt(0))) || /`|\$\(|\$\{|&&|\|\||>>|<<|\s[<>]\s*(?:[A-Za-z_]|[A-Za-z]:|[\\/])/.test(raw)) return diagnostic("UNSAFE_COMMAND_REJECTED", "Shell/process interpolation or control syntax is not part of SAFE_PYMOL_COMPAT.");
   const head = raw.trim().match(/^([^\s;,()]+)/)?.[1]?.toLowerCase() ?? "";
   if (unsafeHeads.has(head) || /^python(?:\.|\s|$)/i.test(head)) return diagnostic("UNSAFE_COMMAND_REJECTED", `Command \`${head}\` is rejected by the scientific command safety boundary.`, { start: 0, end: head.length });
-  if (/(^|[\s;])(python|javascript|js|import|exec|eval|spawn|fork|system|powershell|cmd\.exe|bash|sh)(?:\s|\(|$)/i.test(raw)) return diagnostic("UNSAFE_COMMAND_REJECTED", "General code or host-process execution is rejected before parsing.");
+  if (/(^|[\s;])(python|javascript|js|import|exec|eval|spawn|fork|system|powershell|cmd\.exe|bash|sh)(?:\s|\(|:|$)/i.test(raw) || /(?:javascript|data):/i.test(raw)) return diagnostic("UNSAFE_COMMAND_REJECTED", "General code or host-process execution is rejected before parsing.");
   return null;
 };
 
@@ -182,12 +228,10 @@ export const compileSafeCommand = (source: string, options: CompileOptions = {})
   const sourceHash = sha256(raw);
   const surface = options.surface ?? "CONSOLE";
   const profile = options.profile ?? SAFE_PYMOL_COMPAT_PROFILE;
-  const normalizedArgs = bound.args;
-  const boundRefs = {
-    ...(typeof normalizedArgs.object === "string" ? { objectIds: [normalizedArgs.object] } : {}),
-    ...(typeof normalizedArgs.query === "string" ? { selectionIds: [normalizedArgs.query] } : {}),
-    ...(typeof normalizedArgs.state === "object" && normalizedArgs.state !== null ? { stateIds: [stableValue(normalizedArgs.state)] } : {}),
-  };
+  const bindings = options.bindings ? bindingArgumentTypes(resolution.spec, bound.args, options.bindings) : { normalizedArgs: bound.args, boundRefs: {}, diagnostics: [] as CommandDiagnostic[] };
+  if (bindings.diagnostics.length) return { command: null, diagnostics: [...bound.diagnostics, ...bindings.diagnostics] };
+  const normalizedArgs = bindings.normalizedArgs;
+  const boundRefs = bindings.boundRefs;
   const requestedMode = options.requestedMode ?? resolution.spec.synchronization;
   const semanticHash = semanticCommandHash({ commandType: resolution.spec.commandType, commandVersion: resolution.spec.registryVersion, normalizedArgs, boundRefs, policy: profile });
   const correlationId = options.correlationId ?? `corr:${semanticHash.slice(0, 24)}`;
@@ -224,6 +268,7 @@ export const compileSafeCommands = (source: string, options: CompileOptions = {}
     commands.push(...(result.command ? [result.command] : []));
     diagnostics.push(...result.diagnostics);
   });
+  if (diagnostics.length && commands.length) diagnostics.push(diagnostic("PARTIAL_BATCH", "One or more bounded batch statements were rejected; accepted statements were not dispatched.", undefined, undefined, false));
   return { commands, diagnostics };
 };
 

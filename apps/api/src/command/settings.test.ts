@@ -8,6 +8,8 @@ describe("R10 typed settings", () => {
     expect(store.set("fov", 180, "session").diagnostic?.code).toBe("INVALID_SETTING");
     expect(store.set("background_color", "#102030", "scene", "scene-1").value?.value).toBe("#102030");
     expect(store.set("background_color", "red", "object", "object-1").diagnostic?.code).toBe("UNSUPPORTED_SETTING_SCOPE");
+    expect(store.getResult("background_color", "object", "object-1").diagnostic?.code).toBe("UNSUPPORTED_SETTING_SCOPE");
+    expect(store.unset("representation", "object").diagnostic?.code).toBe("INVALID_SETTING");
     expect(store.unset("orthoscopic", "session").ok).toBe(true);
     expect(store.get("orthoscopic", "session")?.value).toBe(false);
   });

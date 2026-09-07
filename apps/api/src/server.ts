@@ -90,6 +90,13 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       sendJson(response, 200, { records: commandDispatcher.history.list() });
       return;
     }
+    if (request.method === "POST" && url.pathname === "/api/commands/batch") {
+      const body = await readJson(request);
+      if (typeof body.rawCommand !== "string") throw new IngestionError("INVALID_INPUT", "A bounded batch requires rawCommand text.");
+      const result = commandDispatcher.dispatchBatch({ rawCommand: body.rawCommand, surface: "BATCH", requestedMode: body.requestedMode === "ASYNC" || body.requestedMode === "AUTO" ? body.requestedMode : "SYNC", correlationId: typeof body.correlationId === "string" ? body.correlationId : request.headers["x-correlation-id"]?.toString(), idempotencyKey: typeof body.idempotencyKey === "string" ? body.idempotencyKey : request.headers["x-idempotency-key"]?.toString() });
+      sendJson(response, result.status === "FAILED" ? 422 : 200, result);
+      return;
+    }
     if (request.method === "POST" && url.pathname === "/api/commands") {
       const body = await readJson(request);
       const rawCommand = typeof body.rawCommand === "string" ? body.rawCommand : undefined;
