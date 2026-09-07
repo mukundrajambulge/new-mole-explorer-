@@ -168,14 +168,15 @@ export class CommandDispatcher {
   }
 
   dispatch(request: DispatchRequest): CommandResult {
-    if (request.idempotencyKey) {
-      const previous = this.history.byIdempotency(request.idempotencyKey);
+    const idempotencyKey = request.idempotencyKey ?? request.command?.idempotencyKey;
+    if (idempotencyKey) {
+      const previous = this.history.byIdempotency(idempotencyKey);
       if (previous) return { commandId: previous.commandId, executionId: previous.executionId, status: previous.status === "SUCCEEDED" ? "SUCCEEDED" : previous.status === "CANCELLED" ? "CANCELLED" : "FAILED", diagnostics: previous.diagnostics, warnings: [], actionRecordId: previous.actionRecordId, provenanceRef: previous.actionRecordId };
-      const pendingJobId = this.pendingIdempotency.get(request.idempotencyKey);
+      const pendingJobId = this.pendingIdempotency.get(idempotencyKey);
       if (pendingJobId) {
         const pending = this.jobs.get(pendingJobId);
         if (pending) return { commandId: pending.commandId, executionId: `exec:${pendingJobId.slice(4)}`, status: "SUCCEEDED", diagnostics: [], warnings: [], job: { jobId: pending.jobId, state: pending.state } };
-        this.pendingIdempotency.delete(request.idempotencyKey);
+        this.pendingIdempotency.delete(idempotencyKey);
       }
     }
     const compiled = request.rawCommand ? compileSafeCommand(request.rawCommand, { surface: request.surface ?? "REST", requestedMode: request.requestedMode, correlationId: request.correlationId, idempotencyKey: request.idempotencyKey, bindings: this.bindings }) : null;
