@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { COMMAND_SPECS, commandInventorySummary, resolveCommand, validateCommandRegistry } from "./registry.js";
+import { COMMAND_SPECS, commandInventorySummary, commandSpecFor, resolveCommand, validateCommandRegistry } from "./registry.js";
 import { PYMOL_INVENTORY, PYMOL_SOURCE_COMMIT } from "./pymolInventory.js";
 
 describe("R10 versioned command registry", () => {
@@ -15,5 +15,12 @@ describe("R10 versioned command registry", () => {
     expect(resolveCommand("as")).toMatchObject({ spec: { canonicalName: "show_as", commandType: "REPRESENTATION.SHOW_AS" } });
     expect(resolveCommand("colour")).toMatchObject({ spec: { canonicalName: "color", commandType: "COLOR.APPLY" } });
     expect(resolveCommand("python")).toMatchObject({ spec: { safetyClass: "UNSAFE_REJECTED" } });
+  });
+
+  it("emits typed binding indexes for command specs", () => {
+    expect(commandSpecFor("state")?.objectFields).toEqual(["object"]);
+    expect(commandSpecFor("state")?.stateFields).toEqual(["state"]);
+    expect(commandSpecFor("select")?.selectionFields).toEqual(["query"]);
+    expect(commandSpecFor("set")?.settingFields).toEqual(["name", "scope", "targetId"]);
   });
 });
