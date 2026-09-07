@@ -16,6 +16,8 @@ The real Molexplorer workstation was launched at `http://localhost:3101/molstudi
 | Base branch | `feature/r10-canonical-command-environment` |
 | Base SHA | `617da648edd06c0cb6dc0632b57a9a2645d88bdc` |
 | Acceptance branch | `fix/final-pymol-manual-acceptance` |
+| Final implementation/fix SHA | `4ec9d54c98ec098798a6bd0af65834be0b61ed3b` |
+| Final closure SHA (code/evidence closure) | `4ec9d54c98ec098798a6bd0af65834be0b61ed3b` |
 | App URL | `http://localhost:3101/molstudio` |
 | Node | `v24.14.1` |
 | Playwright | `1.62.1` |
@@ -68,7 +70,7 @@ All 15 historical defects were deliberately classified as PASS. The complete mat
 - Full hosted E2E: **118/118 PASS**
 - Final focused acceptance E2E: **3/3 PASS**, repeated **3 consecutive runs**
 - Gate 01, Gate 02, Gate 03B, R07, R08, R09, and R10 regressions: **PASS**
-- GitHub CI on the verified R10 base tip: **PASS** ([run 34115885809](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34115885809))
+- GitHub CI on the final implementation/fix tip: **PASS** ([run 34154738375](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34154738375))
 
 ## Scientific and lifecycle integrity
 
