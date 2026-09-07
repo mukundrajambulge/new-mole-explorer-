@@ -578,3 +578,216 @@ export type CanonicalEditCommand = {
     metadata?: Readonly<Record<string, string>>;
   };
 };
+
+/** R10: the shared, transport-independent scientific command vocabulary. */
+export const COMMAND_REGISTRY_VERSION = "r10-command-registry.v1" as const;
+export const SAFE_PYMOL_COMPAT_PROFILE = "SAFE_PYMOL_COMPAT" as const;
+
+export const COMMAND_EFFECT_CLASSES = [
+  "READ_ONLY_QUERY",
+  "VISUAL_MUTATION",
+  "SCIENTIFIC_MUTATION",
+  "LONG_RUNNING_SCIENTIFIC",
+  "EXTERNAL_IO",
+  "ADMINISTRATIVE",
+] as const;
+export type CommandEffectClass = (typeof COMMAND_EFFECT_CLASSES)[number];
+
+export const COMMAND_SAFETY_CLASSES = ["SAFE_TRANSLATABLE", "SAFE_BUT_NOT_IMPLEMENTED", "UNSAFE_REJECTED", "REFERENCE_ONLY_OUT_OF_SCOPE", "INTENTIONAL_DIVERGENCE"] as const;
+export type CommandSafetyClass = (typeof COMMAND_SAFETY_CLASSES)[number];
+export const COMMAND_RESOURCE_CLASSES = ["TINY", "BOUNDED", "LONG_RUNNING", "EXTERNAL"] as const;
+export type CommandResourceClass = (typeof COMMAND_RESOURCE_CLASSES)[number];
+export const COMMAND_EXECUTION_MODES = ["SYNC", "ASYNC", "AUTO"] as const;
+export type CommandExecutionMode = (typeof COMMAND_EXECUTION_MODES)[number];
+
+export type CommandArgumentType = "string" | "number" | "integer" | "boolean" | "enum" | "selection" | "object" | "state" | "json";
+export type CommandArgumentSpec = {
+  name: string;
+  type: CommandArgumentType;
+  required?: boolean;
+  positional?: boolean;
+  repeated?: boolean;
+  enumValues?: readonly string[];
+  defaultValue?: JsonValue;
+  description: string;
+};
+
+export type CommandSpec = {
+  commandType: string;
+  canonicalName: string;
+  registryVersion: typeof COMMAND_REGISTRY_VERSION;
+  aliasesByProfile: Readonly<Record<string, readonly string[]>>;
+  arguments: readonly CommandArgumentSpec[];
+  outputSchema: JsonRecord;
+  selectionFields?: readonly string[];
+  objectFields?: readonly string[];
+  stateFields?: readonly string[];
+  settingFields?: readonly string[];
+  effectClass: CommandEffectClass;
+  capabilityKey: string;
+  capabilityState: CapabilityState;
+  safetyClass: CommandSafetyClass;
+  deterministic: boolean;
+  synchronization: CommandExecutionMode;
+  resourceClass: CommandResourceClass;
+  handlerKey: string;
+  provenanceVersion: string;
+  replayVersion: string;
+  deprecated?: boolean;
+  pymolReference?: { sourceCommit: string; publicNames: readonly string[]; parserMode?: string; oracleStatus: "ORACLE_PASS" | "ORACLE_EQUIVALENT" | "ORACLE_PENDING" | "NOT_APPLICABLE" };
+  knownDivergences?: readonly string[];
+};
+
+export type CommandDiagnosticCode =
+  | "UNKNOWN_COMMAND" | "AMBIGUOUS_COMMAND" | "UNSAFE_COMMAND_REJECTED" | "INVALID_ARGUMENT" | "UNKNOWN_ARGUMENT"
+  | "DUPLICATE_ARGUMENT" | "MISSING_REQUIRED_ARGUMENT" | "INVALID_SELECTION" | "SELECTION_BINDING_FAILED"
+  | "OBJECT_NOT_FOUND" | "AMBIGUOUS_OBJECT" | "STATE_OUT_OF_RANGE" | "INVALID_SETTING" | "UNSUPPORTED_SETTING_SCOPE"
+  | "UNSUPPORTED_COMMAND_SEMANTICS" | "UNSUPPORTED_CAPABILITY" | "REVISION_CONFLICT" | "PRECONDITION_FAILED"
+  | "RESOURCE_LIMIT_EXCEEDED" | "EXTERNAL_IO_REJECTED" | "EXECUTION_FAILED" | "PROVENANCE_COMMIT_FAILED"
+  | "PARTIAL_BATCH" | "REFERENCE_UNAVAILABLE" | "ORACLE_MISMATCH";
+
+export type CommandDiagnostic = {
+  code: CommandDiagnosticCode;
+  message: string;
+  sourceSpan?: { start: number; end: number };
+  argumentPath?: string;
+  retryable?: boolean;
+  details?: JsonRecord;
+};
+
+export type BoundCommandRefs = {
+  objectIds?: readonly string[];
+  selectionIds?: readonly string[];
+  stateIds?: readonly string[];
+  settingScopes?: readonly string[];
+};
+
+export type CanonicalCommand = {
+  commandId: string;
+  commandType: string;
+  commandVersion: string;
+  normalizedArgs: JsonRecord;
+  boundRefs: BoundCommandRefs;
+  target?: { sessionId?: string; projectId?: string; documentId?: string };
+  expectedRevisions?: Readonly<Record<string, string | number>>;
+  origin: {
+    surface: "GUI" | "CONSOLE" | "REST" | "SDK" | "MACRO" | "BATCH";
+    profile: string;
+    profileVersion: string;
+    syntaxVersion: string;
+    sourceHash: string;
+    sourceTextRef?: string;
+    sourceText?: string;
+    resolvedPublicName?: string;
+    sourceMap?: { start: number; end: number; argumentSpans?: Readonly<Record<string, { start: number; end: number }>> };
+  };
+  requestedMode: CommandExecutionMode;
+  parentCommandId?: string;
+  workflowId?: string;
+  correlationId: string;
+  idempotencyKey?: string;
+  submittedAt: string;
+  semanticHash: string;
+};
+
+export const COMMAND_JOB_STATES = ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCEL_REQUESTED", "CANCELLED"] as const;
+export type CommandJobState = (typeof COMMAND_JOB_STATES)[number];
+
+export type CommandResult<T extends JsonValue = JsonValue> = {
+  commandId: string;
+  executionId: string;
+  status: "SUCCEEDED" | "FAILED" | "CANCELLED";
+  payload?: T;
+  artifacts?: readonly JsonRecord[];
+  revisions?: Readonly<Record<string, string | number>>;
+  diagnostics: readonly CommandDiagnostic[];
+  warnings: readonly CommandDiagnostic[];
+  actionRecordId?: string;
+  provenanceRef?: string;
+  job?: { jobId: string; state: CommandJobState };
+};
+
+export type CommandJob = {
+  jobId: string;
+  commandId: string;
+  state: CommandJobState;
+  createdAt: string;
+  updatedAt: string;
+  result?: CommandResult;
+  cancellationRequestedAt?: string;
+};
+
+export type ActionRecord = {
+  schemaVersion: 1;
+  actionRecordId: string;
+  commandId: string;
+  executionId: string;
+  rawIntentRef?: string;
+  sourceHash: string;
+  canonicalCommand: CanonicalCommand;
+  registryVersion: string;
+  compatibilityProfile: string;
+  policyVersion: string;
+  inputRef?: string;
+  outputRef?: string;
+  status: CommandJobState | "SUCCEEDED" | "FAILED" | "CANCELLED";
+  submittedAt: string;
+  startedAt?: string;
+  completedAt?: string;
+  parentCommandId?: string;
+  correlationId: string;
+  idempotencyKey?: string;
+  diagnostics: readonly CommandDiagnostic[];
+  redactedSecrets: readonly string[];
+};
+
+export const SETTING_SCOPES = ["global", "session", "object", "selection", "representation", "scene"] as const;
+export type SettingScope = (typeof SETTING_SCOPES)[number];
+export type SettingValueType = "string" | "number" | "integer" | "boolean" | "enum" | "color";
+export type SettingSpec = {
+  name: string;
+  aliases: readonly string[];
+  valueType: SettingValueType;
+  scope: readonly SettingScope[];
+  defaultValue: JsonPrimitive;
+  enumValues?: readonly string[];
+  min?: number;
+  max?: number;
+  description: string;
+  capabilityState: CapabilityState;
+};
+export type SettingValue = { name: string; value: JsonPrimitive; scope: SettingScope; targetId?: string; revision: number };
+
+export type MacroNode = {
+  nodeId: string;
+  command?: CanonicalCommand;
+  macroId?: string;
+  dependsOn?: readonly string[];
+  foreach?: { values: readonly JsonValue[]; itemArg: string };
+};
+export type MacroDefinition = {
+  schemaVersion: 1;
+  macroId: string;
+  name: string;
+  version: string;
+  nodes: readonly MacroNode[];
+  maxNodes: number;
+  maxIterations: number;
+  errorPolicy: "STOP_ON_ERROR" | "CONTINUE_WITH_RECORDED_FAILURES";
+  deterministic: boolean;
+  provenance: { author?: string; createdAt: string; sourceHash: string };
+};
+
+export type PyMolInventoryDisposition = "SAFE_TRANSLATABLE" | "SAFE_BUT_NOT_IMPLEMENTED" | "ORACLE_PENDING" | "UNSAFE_REJECTED" | "REFERENCE_ONLY_OUT_OF_SCOPE" | "INTENTIONAL_DIVERGENCE";
+export type PyMolInventoryEntry = {
+  publicName: string;
+  aliases: readonly string[];
+  parserMode?: string;
+  disposition: PyMolInventoryDisposition;
+  canonicalCommandType?: string;
+  effectClass: CommandEffectClass;
+  capabilityState: CapabilityState;
+  oracleStatus: "ORACLE_PASS" | "ORACLE_EQUIVALENT" | "ORACLE_PENDING" | "NOT_APPLICABLE";
+  sourceCommit: string;
+  notes?: readonly string[];
+};

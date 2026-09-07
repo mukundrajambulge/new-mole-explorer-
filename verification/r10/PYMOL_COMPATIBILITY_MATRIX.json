@@ -1,0 +1,3479 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "verification/r10/generate-reports.mjs",
+  "source": {
+    "repository": "schrodinger/pymol-open-source",
+    "commit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+    "path": "modules/pymol/keywords.py"
+  },
+  "compatibilityProfile": "SAFE_PYMOL_COMPAT",
+  "keywordCount": 345,
+  "dispositionCounts": {
+    "ORACLE_PENDING": 228,
+    "UNSAFE_REJECTED": 26,
+    "SAFE_TRANSLATABLE": 45,
+    "REFERENCE_ONLY_OUT_OF_SCOPE": 46
+  },
+  "oracleClaim": "No executable PyMOL oracle was run in R10; ORACLE_PENDING entries are not conformance claims.",
+  "commands": [
+    {
+      "publicName": "abort",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "accept",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "alias",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "align",
+      "aliases": [],
+      "canonicalCommandType": "ANALYSIS.ALIGN",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "alignto",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "alter",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "_alt",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "alter_state",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "alphatoall",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "angle",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "api",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "as",
+      "aliases": [
+        "show_as"
+      ],
+      "canonicalCommandType": "REPRESENTATION.SHOW_AS",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "assert",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "assign_stereo",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "attach",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "backward",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "bg_color",
+      "aliases": [
+        "bg_colour"
+      ],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "bond",
+      "aliases": [],
+      "canonicalCommandType": "EDIT.BOND_CREATE",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "button",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "cache",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "callout",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "cartoon",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "capture",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "cealign",
+      "aliases": [],
+      "canonicalCommandType": "ANALYSIS.CEALIGN",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "centerofmass",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "cd",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "center",
+      "aliases": [],
+      "canonicalCommandType": "VIEW.CENTER",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "check",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "clean",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "class",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "clip",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "cls",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "_ctrl",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "_ctsh",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "color",
+      "aliases": [
+        "colour",
+        "recolor"
+      ],
+      "canonicalCommandType": "COLOR.APPLY",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "color_deep",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "config_mouse",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "copy",
+      "aliases": [],
+      "canonicalCommandType": "OBJECT.COPY",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "copy_to",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "count_atoms",
+      "aliases": [],
+      "canonicalCommandType": "SELECTION.COUNT",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "count_frames",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "count_states",
+      "aliases": [],
+      "canonicalCommandType": "OBJECT.COUNT_STATES",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "count_discrete",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "curve_new",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "cycle_valence",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "create",
+      "aliases": [],
+      "canonicalCommandType": "OBJECT.CREATE",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "decline",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "delete",
+      "aliases": [],
+      "canonicalCommandType": "OBJECT.DELETE",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "delete_states",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "def",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "del",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "deprotect",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "desaturate",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "deselect",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "diagnostics",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "dihedral",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "dir",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "disable",
+      "aliases": [],
+      "canonicalCommandType": "OBJECT.DISABLE",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "distance",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "drag",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "draw",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "dss",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "dump",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "edit",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "edit_mode",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "editing_ring",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "embed",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "enable",
+      "aliases": [],
+      "canonicalCommandType": "OBJECT.ENABLE",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "ending",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "extra_fit",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "extract",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "exec",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "fab",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "fnab",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "feedback",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "fetch",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "fit",
+      "aliases": [],
+      "canonicalCommandType": "ANALYSIS.FIT",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "fix_chemistry",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "flag",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "focal_blur",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "for",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "fork",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "forward",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "fragment",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "full_screen",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "fuse",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "frame",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get",
+      "aliases": [],
+      "canonicalCommandType": "SETTING.GET",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_angle",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_area",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_bond",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_chains",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_clip",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_dihedral",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_distance",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_extent",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_position",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_property",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_property_list",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_sasa_relative",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_symmetry",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_renderer",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_title",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_type",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_version",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_view",
+      "aliases": [],
+      "canonicalCommandType": "VIEW.GET",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_viewport",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "global",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "gradient",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "group",
+      "aliases": [],
+      "canonicalCommandType": "OBJECT.GROUP",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "h_add",
+      "aliases": [],
+      "canonicalCommandType": "EDIT.HYDROGEN_ADD",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "h_fill",
+      "aliases": [],
+      "canonicalCommandType": "EDIT.HYDROGEN_REFILL",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "h_fix",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "help",
+      "aliases": [],
+      "canonicalCommandType": "SYSTEM.HELP",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "help_setting",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "hide",
+      "aliases": [],
+      "canonicalCommandType": "REPRESENTATION.HIDE",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "id_atom",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "identify",
+      "aliases": [],
+      "canonicalCommandType": "SELECTION.IDENTIFY",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "if",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "import",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "index",
+      "aliases": [],
+      "canonicalCommandType": "SELECTION.INDEX",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "indicate",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "intra_fit",
+      "aliases": [],
+      "canonicalCommandType": "ANALYSIS.INTRA_FIT",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "intra_rms",
+      "aliases": [],
+      "canonicalCommandType": "ANALYSIS.INTRA_RMS",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "intra_rms_cur",
+      "aliases": [],
+      "canonicalCommandType": "ANALYSIS.INTRA_RMS_CUR",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "invert",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "isodot",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "isolevel",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "isomesh",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "isosurface",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "iterate",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "iterate_state",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "join_states",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "label",
+      "aliases": [],
+      "canonicalCommandType": "LABEL.SET",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "load",
+      "aliases": [],
+      "canonicalCommandType": "PROJECT.OPEN",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "EXTERNAL_IO",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "loadall",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "space",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "load_embedded",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "load_mtz",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "load_png",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "load_traj",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "log",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "log_close",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "log_open",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "look_at",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "ls",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "madd",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mask",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "map_set",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "map_set_border",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "map_double",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "map_halve",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "map_new",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "map_trim",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mappend",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "matrix_reset",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "matrix_copy",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mcopy",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mdelete",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mem",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "meter_reset",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "minsert",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mmove",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "rebond",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "move",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mse2met",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mset",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mdo",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mdump",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mpng",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mplay",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mtoggle",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mstop",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mclear",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "middle",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mmatrix",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mouse",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "morph",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "multisave",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "multifilesave",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "mview",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "order",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "origin",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "orient",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "overlap",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "pair_fit",
+      "aliases": [],
+      "canonicalCommandType": "ANALYSIS.PAIR_FIT",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "pass",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "pbc_unwrap",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "pbc_wrap",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "phi_psi",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "pi_interactions",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "pop",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "protect",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "protonate",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "pseudoatom",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "pwd",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "python",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "skip",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "raise",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "ramp_new",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "ramp_update",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "ray",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "rebuild",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "recolor",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "redo",
+      "aliases": [],
+      "canonicalCommandType": "HISTORY.REDO",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "reference",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "volume_ramp_new",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "reinitialize",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "refresh",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "refresh_wizard",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "remove",
+      "aliases": [],
+      "canonicalCommandType": "EDIT.ATOM_DELETE",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "remove_picked",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "rename",
+      "aliases": [],
+      "canonicalCommandType": "OBJECT.RENAME",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "replace",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "replace_wizard",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "reset",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "resume",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "rewind",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "rock",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "rotate",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "rms",
+      "aliases": [],
+      "canonicalCommandType": "ANALYSIS.RMS",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "rms_cur",
+      "aliases": [],
+      "canonicalCommandType": "ANALYSIS.RMS_CUR",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "save",
+      "aliases": [],
+      "canonicalCommandType": "PROJECT.SAVE",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "EXTERNAL_IO",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "scene",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "scene_order",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "sculpt_purge",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "sculpt_deactivate",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "sculpt_activate",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "sculpt_iterate",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "spectrum",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "select",
+      "aliases": [],
+      "canonicalCommandType": "SELECTION.EVALUATE",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "set",
+      "aliases": [
+        "set_colour"
+      ],
+      "canonicalCommandType": "SETTING.SET",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "set_bond",
+      "aliases": [],
+      "canonicalCommandType": "EDIT.BOND_ORDER_SET",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "set_color",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "set_dihedral",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "set_name",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "set_property",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "set_atom_property",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "set_geometry",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "set_symmetry",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "set_title",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "set_key",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "set_view",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "show",
+      "aliases": [],
+      "canonicalCommandType": "REPRESENTATION.SHOW",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "slice_new",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "smooth",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "sort",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "spawn",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "spheroid",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "splash",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "split_chains",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "split_states",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "_special",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "stereo",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "super",
+      "aliases": [],
+      "canonicalCommandType": "ANALYSIS.SUPER",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "symexp",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "symmetry_copy",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "system",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "toggle",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "torsion",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "translate",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "try",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "turn",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "quit",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "_quit",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "png",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "unbond",
+      "aliases": [],
+      "canonicalCommandType": "EDIT.BOND_DELETE",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "unpick",
+      "aliases": [],
+      "canonicalCommandType": "SELECTION.CLEAR",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "undo",
+      "aliases": [],
+      "canonicalCommandType": "HISTORY.UNDO",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "ungroup",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "uniquify",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "unmask",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "unset",
+      "aliases": [],
+      "canonicalCommandType": "SETTING.UNSET",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "unset_bond",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "unset_deep",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "update",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "usalign",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "valence",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "vdw_fit",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "view",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "viewport",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "volume",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "volume_color",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "volume_panel",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "window",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "wizard",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "zoom",
+      "aliases": [],
+      "canonicalCommandType": "VIEW.ZOOM",
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "SAFE_TRANSLATABLE",
+      "effectClass": "VISUAL_MUTATION",
+      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "util.cbag",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.cbac",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.cbay",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.cbas",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.cbap",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.cbak",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.cbaw",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.cbab",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.cbao",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.cbam",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.cbc",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.chainbow",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.cnc",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.ss",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "util.rainbow",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "movie.load",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "movie.nutate",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "movie.pause",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "movie.produce",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "movie.rock",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "movie.roll",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "movie.screw",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "movie.sweep",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "movie.tdroll",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "movie.zoom",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "commands",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "editing",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "edit_keys",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "examples",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "extend",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "faster",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "find_pairs",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_movie_playing",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_model",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_mtl_obj",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_names",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_object_list",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_object_matrix",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_povray",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "get_pdbstr",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "keyboard",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "launching",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "load_model",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "movies",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "python_help",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "REFERENCE_ONLY_OUT_OF_SCOPE",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "povray",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "read_molstr",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "read_pdbstr",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "read_sdfstr",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "release",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "selections",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "sync",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "stereochemistry",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "text_type",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "transparency",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "ORACLE_PENDING",
+      "effectClass": "READ_ONLY_QUERY",
+      "capabilityState": "COMING_SOON",
+      "oracleStatus": "ORACLE_PENDING"
+    },
+    {
+      "publicName": "@",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "run",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    },
+    {
+      "publicName": "while",
+      "aliases": [],
+      "canonicalCommandType": null,
+      "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+      "disposition": "UNSAFE_REJECTED",
+      "effectClass": "ADMINISTRATIVE",
+      "capabilityState": "UNAVAILABLE",
+      "oracleStatus": "NOT_APPLICABLE"
+    }
+  ]
+}

@@ -1,0 +1,320 @@
+{
+  "r10": "COMPLETE",
+  "baseBranch": "feature/r09-native-lifecycle",
+  "baseSha": "3632c4ad8784d4ac4436b7a718fe2d2d6f3d1fd4",
+  "branch": "feature/r10-canonical-command-environment",
+  "deferredApprovals": [
+    "R07 Gate 03B DEFERRED_BY_USER",
+    "R08 DEFERRED_BY_USER",
+    "R09 DEFERRED_BY_USER"
+  ],
+  "bundles": {
+    "R10-A": "PASS",
+    "R10-B": "PASS",
+    "R10-C": "PASS_WITH_FRONTEND_ADAPTER",
+    "R10-D": "PASS",
+    "R10-E": "PASS",
+    "R10-F": "PASS",
+    "R10-G": "PASS_ORACLE_PENDING",
+    "R10-H": "DESIGN_ONLY_NO_EXECUTION"
+  },
+  "inventory": {
+    "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+    "count": 345,
+    "dispositions": {
+      "ORACLE_PENDING": 228,
+      "UNSAFE_REJECTED": 26,
+      "SAFE_TRANSLATABLE": 45,
+      "REFERENCE_ONLY_OUT_OF_SCOPE": 46
+    },
+    "registryValidation": "PASS"
+  },
+  "safeCompiler": {
+    "grammar": "PASS",
+    "unsafeRejections": "PASS",
+    "boundedStatements": "PASS",
+    "selectionDelegationBoundary": "PASS"
+  },
+  "dispatcher": {
+    "sharedBoundary": "PASS",
+    "guiHoverNotRecorded": "PASS",
+    "capabilityPreflight": "PASS"
+  },
+  "settings": "PASS_TYPED_SCOPED_VALIDATED",
+  "restSdkHistoryProvenanceReplay": "PASS",
+  "macrosBatchJobs": "PASS_BOUNDED_DAG",
+  "compatibilityMatrix": "PASS_GENERATED_ORACLE_PENDING",
+  "acceptanceTests": [
+    {
+      "id": "AT-R10-01",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-02",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-03",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-04",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-05",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-06",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-07",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-08",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-09",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-10",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-11",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-12",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-13",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-14",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-15",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-16",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-17",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-18",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-19",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-20",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-21",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-22",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-23",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-24",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-25",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-26",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-27",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-28",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-29",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-30",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-31",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-32",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-33",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-34",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-35",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-36",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-37",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-38",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-39",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-40",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-41",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-42",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-43",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-44",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-45",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-46",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-47",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-48",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-49",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    },
+    {
+      "id": "AT-R10-50",
+      "status": "PASS",
+      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+    }
+  ],
+  "gates": {
+    "fullE2E": "112/113_FIRST_RUN; duplicate-display-name-test_isolated_PASS; R09_BASELINE_113/113",
+    "focusedThreeConsecutiveRuns": "PENDING_CI",
+    "regressions": "PENDING_CI",
+    "fuzzSecurity": "PASS_CONTRACT_CORPUS",
+    "oracle": "ORACLE_PENDING"
+  },
+  "matrixPaths": [
+    "verification/r10/PYMOL_COMPATIBILITY_MATRIX.json",
+    "verification/r10/PYMOL_COMPATIBILITY_MATRIX.md"
+  ],
+  "manualValidation": "PENDING_USER_APPLICATION_CAMPAIGN",
+  "readyConsolidatedManual": false,
+  "readyDocking": false,
+  "mergeMain": false,
+  "tenStage": "R10_IMPLEMENTATION_COMPLETE_R07_R08_R09_MANUAL_APPROVALS_DEFERRED",
+  "limitations": [
+    "No executable pinned PyMOL runtime was invoked.",
+    "Frontend native domain handlers remain on the existing UI state boundary; REST/console safety preflight converges on the same shared contract.",
+    "Docking/HTS namespace is design-only and cannot execute."
+  ]
+}

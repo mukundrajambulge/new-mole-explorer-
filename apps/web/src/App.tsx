@@ -28,6 +28,7 @@ import { overlaysForAlignment } from "./analysis/alignmentPresentation";
 import { applyFittingResult, applyIntraFittingResults, runAlign, runCEAlign, runFit, runIntraFit, runIntraRms, runIntraRmsCur, runPairFit, runRms, runRmsCur, runSuper, type FittingAnalysis } from "./analysis/pymolFitting";
 import { createDefaultAlignmentRequest, markAlignmentResultStale, type AlignmentOperationKind, type AlignmentRequest, type AlignmentWorkflowOptions, type MappingMode } from "./analysis/alignment";
 import { commandHelp, isRecognizedCommandVerb, parseCommand } from "./commands/commandRegistry";
+import { unsafeConsoleDiagnostic } from "./commands/safeBoundary";
 import { copyWorkspaceObject, createWorkspaceGroup, createWorkspaceObject, createWorkspaceObjectFromSelection, cycleWorkspaceObjectState, joinWorkspaceObjectStates, renameWorkspaceObject, resolveGlobalFrameState, setWorkspaceObjectAllStates, setWorkspaceObjectEnabled, setWorkspaceObjectState, splitWorkspaceObjectStates, structureForWorkspaceObjectState, updateWorkspaceGroup, workspaceScopedStableAtomId, workspaceSelectionStructure, type WorkspaceGroup, type WorkspaceObject } from "./workspace/workspaceModel";
 import { createAddBondCommand, createAddHydrogensCommand, createAttachAtomCommand, createCoordinateEditCommand, createDeleteAtomsCommand, createDeleteBondCommand, createRefillHydrogensCommand, createRemoveHydrogensCommand, createReplaceAtomCommand, createReplaceBondSemanticsCommand, ScientificHistoryService, type ScientificRevision } from "./editing/editFoundation";
 import { buildSessionDraft, restoreSession } from "./lifecycle/sessionCodec";
@@ -1050,6 +1051,8 @@ export const App = () => {
 
   const runConsoleCommand = (input: string, alignmentOptions?: AlignmentWorkflowOptions): ConsoleCommandResult => {
     const trimmed = input.trim();
+    const unsafe = unsafeConsoleDiagnostic(trimmed);
+    if (unsafe) return { category: "CAPABILITY", status: unsafe };
     const head = trimmed.match(/^([^\s]+)/)?.[1] ?? "";
 
     if (/^(?:focus|center|zoom)\s+(?:selected|selection)$/i.test(trimmed)) {

@@ -1,4 +1,4 @@
-import type { BootstrapResponse, HealthResponse, ProjectRecord, ProjectSaveRequest, StructureError, StructureLoadResult } from "@molecular/contracts";
+import type { BootstrapResponse, CanonicalCommand, CommandJob, CommandResult, HealthResponse, JsonRecord, ProjectRecord, ProjectSaveRequest, StructureError, StructureLoadResult } from "@molecular/contracts";
 
 export type SessionRevisionSummary = { sessionRevisionId: string; parentSessionRevisionIds: readonly string[]; savedAt: string; revisionType: "USER_CHECKPOINT" | "RECOVERY" | "AUTOSAVE" | "MIGRATION"; name: string };
 
@@ -52,4 +52,14 @@ export const apiClient = {
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
   }),
+  commandRegistry: () => request<JsonRecord>("/commands/registry"),
+  executeCommand: (body: { rawCommand?: string; command?: CanonicalCommand; surface?: "GUI" | "CONSOLE" | "REST" | "SDK" | "MACRO" | "BATCH"; requestedMode?: "SYNC" | "ASYNC" | "AUTO"; correlationId?: string; idempotencyKey?: string }) => request<CommandResult>("/commands", {
+    method: "POST",
+    headers: { "content-type": "application/json", ...(body.idempotencyKey ? { "x-idempotency-key": body.idempotencyKey } : {}), ...(body.correlationId ? { "x-correlation-id": body.correlationId } : {}) },
+    body: JSON.stringify(body),
+  }),
+  commandHistory: () => request<{ records: readonly JsonRecord[] }>("/commands/history"),
+  commandJob: (jobId: string) => request<CommandJob>(`/commands/jobs/${encodeURIComponent(jobId)}`),
+  cancelCommandJob: (jobId: string) => request<CommandJob>(`/commands/jobs/${encodeURIComponent(jobId)}/cancel`, { method: "POST" }),
+  replayCommand: (actionRecordId: string) => request<CommandResult>(`/commands/history/${encodeURIComponent(actionRecordId)}/replay`, { method: "POST" }),
 };

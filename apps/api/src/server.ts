@@ -1,10 +1,11 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { join } from "node:path";
-import type { BootstrapResponse, HealthResponse, ProjectSaveRequest } from "@molecular/contracts";
+import type { BootstrapResponse, CanonicalCommand, HealthResponse, ProjectSaveRequest } from "@molecular/contracts";
 import { IngestionError, StructureIngestionService } from "./structures/ingestion.js";
 import { parseMultipartFile } from "./structures/multipart.js";
 import { ProjectStore } from "./projects/projectStore.js";
 import { SourceArtifactStore } from "./lifecycle/sourceArtifactStore.js";
+import { CommandDispatcher } from "./command/dispatcher.js";
 
 const port = Number(process.env.API_PORT ?? 8100);
 
@@ -32,12 +33,15 @@ const bootstrap: BootstrapResponse = {
     "SELECTION.EVALUATE": { state: "SUPPORTED", label: "Supported", description: "The web client evaluates the typed canonical selection language against the loaded molecular revision." },
     "SELECTION.CREATE_NAMED": { state: "SUPPORTED", label: "Supported", description: "The web client can create immutable named selection snapshots for the active molecular revision." },
     "DOCKING.RUN": { state: "UNAVAILABLE", label: "Unavailable", description: "No docking engine or scores are available in this foundation." },
+    "COMMAND.CANONICAL": { state: "SUPPORTED", label: "Supported", description: "GUI, safe console, REST, SDK and bounded macro requests converge through the versioned command registry." },
+    "COMMAND.PYMOL_COMPAT": { state: "SUPPORTED_WITH_LIMITATIONS", label: "Supported with limitations", description: "The SAFE_PYMOL_COMPAT profile accepts bounded scientific syntax and rejects code/process execution." },
   },
 };
 
 const dataRoot = process.env.MOLECULAR_DATA_DIR ?? join(process.cwd(), ".molecular-data");
 const ingestionService = new StructureIngestionService(new SourceArtifactStore(dataRoot));
 const projectStore = new ProjectStore(dataRoot);
+const commandDispatcher = new CommandDispatcher({ dataRoot });
 
 const readJson = async (request: IncomingMessage): Promise<Record<string, unknown>> => {
   const chunks: Buffer[] = [];
@@ -61,7 +65,7 @@ const errorResponse = (response: ServerResponse, error: unknown) => {
 const route = async (request: IncomingMessage, response: ServerResponse) => {
   response.setHeader("access-control-allow-origin", "*");
   response.setHeader("access-control-allow-methods", "GET,POST,PUT,OPTIONS");
-  response.setHeader("access-control-allow-headers", "content-type,x-parent-export-artifact-id");
+  response.setHeader("access-control-allow-headers", "content-type,x-parent-export-artifact-id,x-idempotency-key,x-correlation-id");
   if (request.method === "OPTIONS") {
     response.writeHead(204);
     response.end();
@@ -76,6 +80,42 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
     }
     if (request.method === "GET" && url.pathname === "/api/bootstrap") {
       sendJson(response, 200, bootstrap);
+      return;
+    }
+    if (request.method === "GET" && url.pathname === "/api/commands/registry") {
+      sendJson(response, 200, commandDispatcher.registry());
+      return;
+    }
+    if (request.method === "GET" && url.pathname === "/api/commands/history") {
+      sendJson(response, 200, { records: commandDispatcher.history.list() });
+      return;
+    }
+    if (request.method === "POST" && url.pathname === "/api/commands") {
+      const body = await readJson(request);
+      const rawCommand = typeof body.rawCommand === "string" ? body.rawCommand : undefined;
+      const canonicalCommand = body.command && typeof body.command === "object" ? body.command as unknown as CanonicalCommand : undefined;
+      const requestedMode = body.requestedMode === "ASYNC" || body.requestedMode === "AUTO" ? body.requestedMode : body.requestedMode === "SYNC" ? "SYNC" : undefined;
+      const result = commandDispatcher.dispatch({ rawCommand, command: canonicalCommand, surface: body.surface === "GUI" || body.surface === "SDK" || body.surface === "MACRO" || body.surface === "BATCH" ? body.surface : "REST", requestedMode, correlationId: typeof body.correlationId === "string" ? body.correlationId : request.headers["x-correlation-id"]?.toString(), idempotencyKey: typeof body.idempotencyKey === "string" ? body.idempotencyKey : request.headers["x-idempotency-key"]?.toString() });
+      sendJson(response, result.status === "FAILED" ? 422 : 200, result);
+      return;
+    }
+    const commandReplayMatch = url.pathname.match(/^\/api\/commands\/history\/([^/]+)\/replay$/);
+    if (commandReplayMatch && request.method === "POST") {
+      sendJson(response, 200, commandDispatcher.replay(commandReplayMatch[1]!));
+      return;
+    }
+    const commandJobMatch = url.pathname.match(/^\/api\/commands\/jobs\/([^/]+)$/);
+    if (commandJobMatch && request.method === "GET") {
+      const job = commandDispatcher.getJob(commandJobMatch[1]!);
+      if (!job) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "Command job was not found." } }); return; }
+      sendJson(response, 200, job);
+      return;
+    }
+    const commandCancelMatch = url.pathname.match(/^\/api\/commands\/jobs\/([^/]+)\/cancel$/);
+    if (commandCancelMatch && request.method === "POST") {
+      const job = commandDispatcher.cancel(commandCancelMatch[1]!);
+      if (!job) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "Command job was not found." } }); return; }
+      sendJson(response, 200, job);
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/structures/upload") {
