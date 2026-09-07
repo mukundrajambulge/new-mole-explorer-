@@ -1260,14 +1260,15 @@ export class ThreeDMolViewerAdapter {
     if (!this.viewer) return;
     const dimOpacity = 0.46;
     const workspaceEntries = this.workspaceObjects.length ? this.workspaceSurfaceEntries(this.workspaceObjects) : [];
-    const projectionByKey = new Map(workspaceEntries.map((entry) => [entry.key, entry.projection]));
+    const entryByKey = new Map(workspaceEntries.map((entry) => [entry.key, entry]));
     for (const [key, handle] of this.workspaceSurfaceHandles) {
-      const entryProjection = projectionByKey.get(key) ?? this.projection;
+      const entry = entryByKey.get(key);
+      const entryProjection = entry?.projection ?? this.projection;
       if (!entryProjection) continue;
       handle.surfaceIds.forEach((surfaceId, index) => {
         const kind = handle.surfaceKinds[index] ?? "surface";
         const baseOpacity = kind === "mesh" ? entryProjection.representationState.parameters.meshOpacity : entryProjection.representationState.parameters.surfaceOpacity;
-        this.viewer!.setSurfaceMaterialStyle(surfaceId, { opacity: active ? Math.min(baseOpacity, dimOpacity) : baseOpacity });
+        this.viewer!.setSurfaceMaterialStyle(surfaceId, surfaceStyleFor(entryProjection, entry?.structure ?? this.structure!, active ? Math.min(baseOpacity, dimOpacity) : baseOpacity, kind === "mesh"));
       });
       const baseDotOpacity = entryProjection.representationState.parameters.dotOpacity;
       handle.dotSurfaceShapes.forEach((shape) => shape.updateStyle({ opacity: active ? Math.min(baseDotOpacity, dimOpacity) : baseDotOpacity }));
@@ -1276,7 +1277,7 @@ export class ThreeDMolViewerAdapter {
       this.surfaceIds.forEach((surfaceId, index) => {
         const kind = this.surfaceKinds[index] ?? "surface";
         const baseOpacity = kind === "mesh" ? this.projection!.representationState.parameters.meshOpacity : this.projection!.representationState.parameters.surfaceOpacity;
-        this.viewer!.setSurfaceMaterialStyle(surfaceId, { opacity: active ? Math.min(baseOpacity, dimOpacity) : baseOpacity });
+        this.viewer!.setSurfaceMaterialStyle(surfaceId, surfaceStyleFor(this.projection!, this.structure!, active ? Math.min(baseOpacity, dimOpacity) : baseOpacity, kind === "mesh"));
       });
       const baseDotOpacity = this.projection.representationState.parameters.dotOpacity;
       this.dotSurfaceShapes.forEach((shape) => shape.updateStyle({ opacity: active ? Math.min(baseDotOpacity, dimOpacity) : baseDotOpacity }));
