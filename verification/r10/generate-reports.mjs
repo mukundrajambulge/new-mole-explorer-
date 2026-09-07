@@ -46,7 +46,7 @@ const summary = {
   compatibilityMatrix: "PASS_GENERATED_ORACLE_PENDING",
   fixtures: { path: "verification/r10/R10_FIXTURES.json", count: fixtures.fixtures.length },
   acceptanceTests: acceptance,
-  gates: { fullE2E: "R10 E2E coverage added; final hosted denominator/conclusion recorded after this commit", ci: { runId: null, sha: null, conclusion: "PENDING", url: null }, focusedThreeConsecutiveRuns: "PENDING_CI", regressions: "PENDING_CI", fuzzSecurity: "PASS_EXPANDED_CONTRACT_CORPUS", oracle: "ORACLE_PENDING" },
+  gates: { fullE2E: "R10 E2E coverage added; final hosted denominator/conclusion recorded after this commit", ci: { runId: null, sha: null, conclusion: "PENDING", url: null }, focusedThreeConsecutiveRuns: "4/4_PASS x3_LOCAL", regressions: "PENDING_CI", fuzzSecurity: "PASS_EXPANDED_CONTRACT_CORPUS", oracle: "ORACLE_PENDING" },
   matrixPaths: ["verification/r10/PYMOL_COMPATIBILITY_MATRIX.json", "verification/r10/PYMOL_COMPATIBILITY_MATRIX.md"],
   manualValidation: "PENDING_USER_APPLICATION_CAMPAIGN",
   readyConsolidatedManual: false,

@@ -310,7 +310,7 @@
       "conclusion": "PENDING",
       "url": null
     },
-    "focusedThreeConsecutiveRuns": "PENDING_CI",
+    "focusedThreeConsecutiveRuns": "4/4_PASS x3_LOCAL",
     "regressions": "PENDING_CI",
     "fuzzSecurity": "PASS_EXPANDED_CONTRACT_CORPUS",
     "oracle": "ORACLE_PENDING"
