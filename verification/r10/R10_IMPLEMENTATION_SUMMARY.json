@@ -303,15 +303,15 @@
     }
   ],
   "gates": {
-    "fullE2E": "R10 E2E coverage added; final hosted denominator/conclusion recorded after this commit",
+    "fullE2E": "117/117_HOSTED; R10 focused 4/4_PASS x3_LOCAL",
     "ci": {
-      "runId": null,
-      "sha": null,
-      "conclusion": "PENDING",
-      "url": null
+      "runId": 34113414034,
+      "sha": "3685395dc57cd067555ea51f0d1de343563fb18c",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34113414034"
     },
     "focusedThreeConsecutiveRuns": "4/4_PASS x3_LOCAL",
-    "regressions": "PENDING_CI",
+    "regressions": "HOSTED_CI_GREEN",
     "fuzzSecurity": "PASS_EXPANDED_CONTRACT_CORPUS",
     "oracle": "ORACLE_PENDING"
   },

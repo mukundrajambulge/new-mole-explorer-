@@ -20,7 +20,8 @@ const classify = (name) => {
 };
 const entries = [...new Set(names)].map((publicName) => { const classification = classify(publicName); return { referenceName: publicName, publicName, aliases: aliases(publicName), family: familyFor(publicName), sourceCommit, moleType: "COMMAND", syntaxStatus: classification.disposition === "UNSAFE_REJECTED" ? "REJECTED" : translated.has(publicName) ? "SUPPORTED" : "REGISTERED_ONLY", semanticStatus: translated.has(publicName) ? "BOUNDARY_TRANSLATION" : "NOT_IMPLEMENTED", safetyStatus: classification.disposition === "UNSAFE_REJECTED" ? "REJECTED" : "SAFE_BOUNDARY", evidenceRefs: ["R10_REGISTRY", `pymol:${sourceCommit}`], canonicalCommandType: translated.get(publicName) ?? null, ...classification }; });
 const counts = Object.fromEntries([...new Set(entries.map((entry) => entry.disposition))].map((key) => [key, entries.filter((entry) => entry.disposition === key).length]));
-const familyCounts = Object.fromEntries([...new Set(entries.map((entry) => entry.family))].sort().map((family) => [family, entries.filter((entry) => entry.family === family).length]));
+const requiredFamilies = ["selection/query", "representation/color/labels", "view/camera", "measurements", "objects/states", "editing", "alignment/RMSD", "analysis", "files/import/export", "sessions", "scenes", "settings", "macros/batch", "movie/runtime", "unsafe", "docking", "HTS"];
+const familyCounts = Object.fromEntries([...new Set([...entries.map((entry) => entry.family), ...requiredFamilies])].sort().map((family) => [family, entries.filter((entry) => entry.family === family).length]));
 const matrix = { schemaVersion: 1, generatedBy: "verification/r10/generate-reports.mjs", source: { repository: "schrodinger/pymol-open-source", commit: sourceCommit, path: "modules/pymol/keywords.py" }, compatibilityProfile: "SAFE_PYMOL_COMPAT", keywordCount: entries.length, dispositionCounts: counts, familyCounts, oracleClaim: "No executable PyMOL oracle was run in R10; ORACLE_PENDING entries are not conformance claims.", commands: entries };
 const r10 = join(root, "verification", "r10");
 mkdirSync(r10, { recursive: true });
@@ -46,7 +47,7 @@ const summary = {
   compatibilityMatrix: "PASS_GENERATED_ORACLE_PENDING",
   fixtures: { path: "verification/r10/R10_FIXTURES.json", count: fixtures.fixtures.length },
   acceptanceTests: acceptance,
-  gates: { fullE2E: "R10 E2E coverage added; final hosted denominator/conclusion recorded after this commit", ci: { runId: null, sha: null, conclusion: "PENDING", url: null }, focusedThreeConsecutiveRuns: "4/4_PASS x3_LOCAL", regressions: "PENDING_CI", fuzzSecurity: "PASS_EXPANDED_CONTRACT_CORPUS", oracle: "ORACLE_PENDING" },
+  gates: { fullE2E: "117/117_HOSTED; R10 focused 4/4_PASS x3_LOCAL", ci: { runId: 34113414034, sha: "3685395dc57cd067555ea51f0d1de343563fb18c", conclusion: "SUCCESS", url: "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34113414034" }, focusedThreeConsecutiveRuns: "4/4_PASS x3_LOCAL", regressions: "HOSTED_CI_GREEN", fuzzSecurity: "PASS_EXPANDED_CONTRACT_CORPUS", oracle: "ORACLE_PENDING" },
   matrixPaths: ["verification/r10/PYMOL_COMPATIBILITY_MATRIX.json", "verification/r10/PYMOL_COMPATIBILITY_MATRIX.md"],
   manualValidation: "PENDING_USER_APPLICATION_CAMPAIGN",
   readyConsolidatedManual: false,

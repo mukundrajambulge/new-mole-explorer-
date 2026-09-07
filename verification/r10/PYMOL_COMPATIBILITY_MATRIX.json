@@ -15,16 +15,23 @@
     "REFERENCE_ONLY_OUT_OF_SCOPE": 46
   },
   "familyCounts": {
+    "HTS": 0,
     "alignment/RMSD": 10,
+    "analysis": 0,
     "analysis/other": 228,
+    "docking": 0,
     "editing": 11,
     "files/import/export": 5,
+    "macros/batch": 0,
     "measurements": 6,
     "movie/runtime": 10,
     "objects/states": 9,
     "presentation": 15,
     "representation/color/labels": 8,
+    "scenes": 0,
     "selection/query": 5,
+    "sessions": 0,
+    "settings": 0,
     "settings/scenes": 5,
     "unsafe": 25,
     "view/camera": 8
