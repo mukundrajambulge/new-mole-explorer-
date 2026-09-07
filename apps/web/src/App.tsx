@@ -1445,7 +1445,7 @@ export const App = () => {
     window.sessionStorage.setItem("molecular-workstation.ribbon", category);
   };
 
-  const handleAction = (actionId: ActionId) => {
+  const handleActionInternal = (actionId: ActionId) => {
     const capability = ACTION_REGISTRY[actionId];
     if (actionId === ACTION_IDS.HISTORY_UNDO || actionId === ACTION_IDS.HISTORY_REDO) {
       const result = runHistoryAction(actionId);
@@ -1552,6 +1552,31 @@ export const App = () => {
     if (actionId === ACTION_IDS.MEASURE_DIHEDRAL && capability.state === "SUPPORTED") setMeasurementMode("DIHEDRAL");
     if (actionId === ACTION_IDS.MEASURE_CLEAR && capability.state === "SUPPORTED") clearMeasurementPicks();
     if (capability.state !== "SUPPORTED" && !implementedMeasurement) showNotice(capability);
+  };
+
+  const uiCommandTextForAction: Partial<Record<string, string>> = {
+    [ACTION_IDS.HISTORY_UNDO]: "undo",
+    [ACTION_IDS.HISTORY_REDO]: "redo",
+    [ACTION_IDS.SELECTION_EVALUATE]: "select all",
+    [ACTION_IDS.REPRESENTATION_SET_STYLE]: "show_as sticks, all",
+    [ACTION_IDS.VIEW_FIT]: "zoom all",
+    [ACTION_IDS.VIEW_CENTER]: "center all",
+    [ACTION_IDS.VIEW_FOCUS_SELECTION]: "center selected",
+    [ACTION_IDS.MEASURE_DISTANCE]: "measure distance",
+    [ACTION_IDS.MEASURE_ANGLE]: "measure angle",
+    [ACTION_IDS.MEASURE_DIHEDRAL]: "measure dihedral",
+    [ACTION_IDS.MEASURE_CLEAR]: "measure clear",
+  };
+  const handleAction = (actionId: ActionId) => {
+    const commandText = uiCommandTextForAction[actionId];
+    if (!commandText) {
+      handleActionInternal(actionId);
+      return;
+    }
+    dispatchUiCommand(commandText, (command) => {
+      uiCommandLedgerRef.current = [...uiCommandLedgerRef.current.slice(-255), command];
+      handleActionInternal(actionId);
+    }, "GUI");
   };
 
   const updateCustomColor = (hex: string) => setProjection((current) => ({ ...current, color: { ...current.color, mode: "custom", customHex: hex }, colorDiagnostic: null }));
