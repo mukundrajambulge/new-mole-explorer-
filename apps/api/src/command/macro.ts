@@ -1,5 +1,6 @@
 import type { CommandDiagnostic, CommandResult, JsonValue, MacroDefinition, MacroNode } from "@molecular/contracts";
 import { CommandDispatcher } from "./dispatcher.js";
+import { semanticCommandHash } from "./compiler.js";
 
 export const validateMacro = (macro: MacroDefinition): readonly CommandDiagnostic[] => {
   const diagnostics: CommandDiagnostic[] = [];
@@ -49,7 +50,8 @@ export const runMacro = (dispatcher: CommandDispatcher, macro: MacroDefinition):
     for (const value of values) {
       for (const command of commands) {
         const normalizedArgs = node.foreach ? { ...command.normalizedArgs, [node.foreach.itemArg]: value as JsonValue } : command.normalizedArgs;
-        const result = dispatcher.dispatch({ command: { ...command, normalizedArgs, parentCommandId: command.parentCommandId ?? macro.macroId, origin: { ...command.origin, surface: "MACRO" } } });
+        const commandForRun = { ...command, normalizedArgs, parentCommandId: command.parentCommandId ?? macro.macroId, origin: { ...command.origin, surface: "MACRO" as const }, semanticHash: semanticCommandHash({ commandType: command.commandType, commandVersion: command.commandVersion, normalizedArgs, boundRefs: command.boundRefs, policy: command.origin.profile }) };
+        const result = dispatcher.dispatch({ command: commandForRun });
         results.push(result);
         if (result.status !== "SUCCEEDED" || result.diagnostics.length) {
           diagnostics.push(...result.diagnostics);
