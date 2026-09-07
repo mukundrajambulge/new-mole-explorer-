@@ -8,6 +8,6 @@ export const unsafeConsoleDiagnostic = (input: string): string | null => {
   if ([...raw].some((char) => [0, 8, 11, 12].includes(char.charCodeAt(0))) || /`|\$\(|\$\{|&&|\|\||>>|<<|\s[<>]\s*(?:[A-Za-z_]|[A-Za-z]:|[\\/])/.test(raw)) return "UNSAFE_COMMAND_REJECTED: shell/process interpolation and redirection are not supported.";
   const head = raw.match(/^([^\s;,()]+)/)?.[1]?.toLowerCase() ?? "";
   if (["python", "exec", "eval", "run", "spawn", "fork", "system", "shell", "powershell", "cmd", "bash", "sh", "javascript", "js", "import"].includes(head)) return `UNSAFE_COMMAND_REJECTED: ${head} is outside SAFE_PYMOL_COMPAT.`;
-  if (/(^|[\s;])(exec|eval|spawn|fork|system|powershell|cmd\.exe|bash|sh)(?:\s|\(|$)/i.test(raw)) return "UNSAFE_COMMAND_REJECTED: general code/process execution is rejected.";
+  if (/(^|[\s;])(python|javascript|js|import|exec|eval|spawn|fork|system|powershell|cmd\.exe|bash|sh)(?:\s|\(|$)/i.test(raw)) return "UNSAFE_COMMAND_REJECTED: general code/process execution is rejected.";
   return null;
 };

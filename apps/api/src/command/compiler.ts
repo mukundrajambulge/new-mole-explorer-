@@ -67,7 +67,7 @@ const unsafeDiagnosticFor = (raw: string): CommandDiagnostic | null => {
   if ([...raw].some((char) => [0, 8, 11, 12].includes(char.charCodeAt(0))) || /`|\$\(|\$\{|&&|\|\||>>|<<|\s[<>]\s*(?:[A-Za-z_]|[A-Za-z]:|[\\/])/.test(raw)) return diagnostic("UNSAFE_COMMAND_REJECTED", "Shell/process interpolation or control syntax is not part of SAFE_PYMOL_COMPAT.");
   const head = raw.trim().match(/^([^\s;,()]+)/)?.[1]?.toLowerCase() ?? "";
   if (unsafeHeads.has(head) || /^python(?:\.|\s|$)/i.test(head)) return diagnostic("UNSAFE_COMMAND_REJECTED", `Command \`${head}\` is rejected by the scientific command safety boundary.`, { start: 0, end: head.length });
-  if (/(^|[\s;])(exec|eval|spawn|fork|system|powershell|cmd\.exe|bash|sh)(?:\s|\(|$)/i.test(raw)) return diagnostic("UNSAFE_COMMAND_REJECTED", "General code or host-process execution is rejected before parsing.");
+  if (/(^|[\s;])(python|javascript|js|import|exec|eval|spawn|fork|system|powershell|cmd\.exe|bash|sh)(?:\s|\(|$)/i.test(raw)) return diagnostic("UNSAFE_COMMAND_REJECTED", "General code or host-process execution is rejected before parsing.");
   return null;
 };
 
