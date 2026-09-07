@@ -192,9 +192,9 @@ export class CommandDispatcher {
   }
 
   dispatchBatch(request: BatchDispatchRequest): CommandResult {
-    const compiled = compileSafeCommands(request.rawCommand, { surface: request.surface ?? "BATCH", requestedMode: request.requestedMode, correlationId: request.correlationId, idempotencyKey: request.idempotencyKey, bindings: this.bindings });
+    const compiled = compileSafeCommands(request.rawCommand, { surface: request.surface ?? "BATCH", requestedMode: request.requestedMode, correlationId: request.correlationId, bindings: this.bindings });
     if (compiled.diagnostics.length) return { commandId: "uncompiled-batch", executionId: "uncompiled-batch", status: "FAILED", diagnostics: compiled.diagnostics, warnings: [] };
-    const results = compiled.commands.map((command) => this.dispatch({ command, surface: request.surface ?? "BATCH", requestedMode: request.requestedMode }));
+    const results = compiled.commands.map((command, index) => this.dispatch({ command: request.idempotencyKey ? { ...command, idempotencyKey: `${request.idempotencyKey}:${index + 1}` } : command, surface: request.surface ?? "BATCH", requestedMode: request.requestedMode }));
     const diagnostics = results.flatMap((result) => result.diagnostics);
     return { commandId: `batch:${sha256(request.rawCommand).slice(0, 24)}`, executionId: `batch:${sha256(request.rawCommand).slice(0, 24)}`, status: diagnostics.length ? "FAILED" : "SUCCEEDED", payload: json(results), diagnostics, warnings: [] };
   }

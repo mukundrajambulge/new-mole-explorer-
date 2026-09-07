@@ -41,7 +41,11 @@ describe("R10 canonical dispatcher and provenance", () => {
 
   it("compiles and dispatches only a fully valid bounded batch", () => {
     const dispatcher = new CommandDispatcher();
-    expect(dispatcher.dispatchBatch({ rawCommand: "set orthoscopic, on; get_view" }).status).toBe("SUCCEEDED");
+    const batch = dispatcher.dispatchBatch({ rawCommand: "set orthoscopic, on; set background_color, red", idempotencyKey: "batch-once" });
+    expect(batch.status).toBe("SUCCEEDED");
+    expect(dispatcher.history.list()).toHaveLength(2);
+    expect(dispatcher.dispatchBatch({ rawCommand: "set orthoscopic, on; set background_color, red", idempotencyKey: "batch-once" }).status).toBe("SUCCEEDED");
+    expect(dispatcher.history.list()).toHaveLength(2);
     const rejected = dispatcher.dispatchBatch({ rawCommand: "set orthoscopic, on; python print(1)" });
     expect(rejected.status).toBe("FAILED");
     expect(rejected.diagnostics[0]?.code).toBe("UNSAFE_COMMAND_REJECTED");
