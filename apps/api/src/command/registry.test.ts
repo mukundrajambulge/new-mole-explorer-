@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { COMMAND_SPECS, commandInventorySummary, commandSpecFor, resolveCommand, validateCommandRegistry } from "./registry.js";
+import { COMMAND_SPECS, RESERVED_FUTURE_COMMAND_FAMILIES, commandInventorySummary, commandSpecFor, resolveCommand, validateCommandRegistry } from "./registry.js";
 import { PYMOL_INVENTORY, PYMOL_SOURCE_COMMIT } from "./pymolInventory.js";
 
 describe("R10 versioned command registry", () => {
@@ -22,5 +22,10 @@ describe("R10 versioned command registry", () => {
     expect(commandSpecFor("state")?.stateFields).toEqual(["state"]);
     expect(commandSpecFor("select")?.selectionFields).toEqual(["query"]);
     expect(commandSpecFor("set")?.settingFields).toEqual(["name", "scope", "targetId"]);
+  });
+
+  it("reserves future docking and HTS namespaces without admitting execution", () => {
+    expect(RESERVED_FUTURE_COMMAND_FAMILIES.docking).toContain("DOCKING.RUN");
+    expect(resolveCommand("docking.run")).toMatchObject({ error: "UNKNOWN_COMMAND" });
   });
 });

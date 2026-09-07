@@ -86,6 +86,10 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       sendJson(response, 200, commandDispatcher.registry());
       return;
     }
+    if (request.method === "GET" && url.pathname === "/api/v1/commands/registry") {
+      sendJson(response, 200, commandDispatcher.registry());
+      return;
+    }
     if (request.method === "GET" && url.pathname === "/api/commands/history") {
       sendJson(response, 200, { records: commandDispatcher.history.list() });
       return;
@@ -106,22 +110,38 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       sendJson(response, result.status === "FAILED" ? 422 : 200, result);
       return;
     }
+    if (request.method === "POST" && url.pathname === "/api/v1/commands/execute") {
+      const body = await readJson(request);
+      const canonicalCommand = body.command && typeof body.command === "object" ? body.command as unknown as CanonicalCommand : body.commandType ? body as unknown as CanonicalCommand : undefined;
+      const result = commandDispatcher.dispatch({ command: canonicalCommand, surface: "REST", requestedMode: body.requestedMode === "ASYNC" || body.requestedMode === "AUTO" ? body.requestedMode : "SYNC", correlationId: typeof body.correlationId === "string" ? body.correlationId : request.headers["x-correlation-id"]?.toString(), idempotencyKey: typeof body.idempotencyKey === "string" ? body.idempotencyKey : request.headers["x-idempotency-key"]?.toString() });
+      sendJson(response, result.status === "FAILED" ? 422 : 200, result);
+      return;
+    }
     const commandReplayMatch = url.pathname.match(/^\/api\/commands\/history\/([^/]+)\/replay$/);
     if (commandReplayMatch && request.method === "POST") {
-      sendJson(response, 200, commandDispatcher.replay(commandReplayMatch[1]!));
+      const body = await readJson(request);
+      const mode = body.mode === "REVIEW" || body.mode === "REPRODUCTION_ATTEMPT" ? body.mode : "COMMAND_REPLAY";
+      sendJson(response, 200, commandDispatcher.replay(decodeURIComponent(commandReplayMatch[1]!), mode));
       return;
     }
     const commandJobMatch = url.pathname.match(/^\/api\/commands\/jobs\/([^/]+)$/);
     if (commandJobMatch && request.method === "GET") {
-      const job = commandDispatcher.getJob(commandJobMatch[1]!);
+      const job = commandDispatcher.getJob(decodeURIComponent(commandJobMatch[1]!));
       if (!job) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "Command job was not found." } }); return; }
       sendJson(response, 200, job);
       return;
     }
     const commandCancelMatch = url.pathname.match(/^\/api\/commands\/jobs\/([^/]+)\/cancel$/);
     if (commandCancelMatch && request.method === "POST") {
-      const job = commandDispatcher.cancel(commandCancelMatch[1]!);
+      const job = commandDispatcher.cancel(decodeURIComponent(commandCancelMatch[1]!));
       if (!job) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "Command job was not found." } }); return; }
+      sendJson(response, 200, job);
+      return;
+    }
+    const commandRetryMatch = url.pathname.match(/^\/api\/commands\/jobs\/([^/]+)\/retry$/);
+    if (commandRetryMatch && request.method === "POST") {
+      const job = commandDispatcher.retry(decodeURIComponent(commandRetryMatch[1]!));
+      if (!job) { sendJson(response, 409, { error: { code: "RETRY_UNAVAILABLE", message: "Only a failed command job with retained canonical input can be retried." } }); return; }
       sendJson(response, 200, job);
       return;
     }

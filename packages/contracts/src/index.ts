@@ -581,6 +581,7 @@ export type CanonicalEditCommand = {
 
 /** R10: the shared, transport-independent scientific command vocabulary. */
 export const COMMAND_REGISTRY_VERSION = "r10-command-registry.v1" as const;
+export const COMMAND_SCHEMA_VERSION = "r10-command-schema.v1" as const;
 export const SAFE_PYMOL_COMPAT_PROFILE = "SAFE_PYMOL_COMPAT" as const;
 
 export const COMMAND_EFFECT_CLASSES = [
@@ -600,7 +601,7 @@ export type CommandResourceClass = (typeof COMMAND_RESOURCE_CLASSES)[number];
 export const COMMAND_EXECUTION_MODES = ["SYNC", "ASYNC", "AUTO"] as const;
 export type CommandExecutionMode = (typeof COMMAND_EXECUTION_MODES)[number];
 
-export type CommandArgumentType = "string" | "number" | "integer" | "boolean" | "enum" | "selection" | "object" | "state" | "json";
+export type CommandArgumentType = "string" | "number" | "integer" | "float" | "float3" | "boolean" | "enum" | "color" | "selection" | "object" | "state" | "json";
 export type CommandArgumentSpec = {
   name: string;
   type: CommandArgumentType;
@@ -616,6 +617,7 @@ export type CommandSpec = {
   commandType: string;
   canonicalName: string;
   registryVersion: typeof COMMAND_REGISTRY_VERSION;
+  schemaVersion: typeof COMMAND_SCHEMA_VERSION;
   aliasesByProfile: Readonly<Record<string, readonly string[]>>;
   arguments: readonly CommandArgumentSpec[];
   outputSchema: JsonRecord;
@@ -666,6 +668,7 @@ export type CanonicalCommand = {
   commandId: string;
   commandType: string;
   commandVersion: string;
+  schemaVersion: typeof COMMAND_SCHEMA_VERSION;
   normalizedArgs: JsonRecord;
   boundRefs: BoundCommandRefs;
   target?: { sessionId?: string; projectId?: string; documentId?: string };
@@ -690,7 +693,20 @@ export type CanonicalCommand = {
   semanticHash: string;
 };
 
-export const COMMAND_JOB_STATES = ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCEL_REQUESTED", "CANCELLED"] as const;
+/** Cross-runtime semantic hash: stable serialization plus FNV-1a keeps GUI, REST, SDK and macro comparisons deterministic without transport metadata. */
+export const canonicalStableSerialize = (value: unknown): string => {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalStableSerialize).join(",")}]`;
+  return `{${Object.keys(value as Record<string, unknown>).sort().map((key) => `${JSON.stringify(key)}:${canonicalStableSerialize((value as Record<string, unknown>)[key])}`).join(",")}}`;
+};
+export const canonicalSemanticHash = (value: { commandType: string; commandVersion: string; normalizedArgs: JsonRecord; boundRefs: BoundCommandRefs; policy: string }): string => {
+  const input = canonicalStableSerialize(value);
+  let hash = 2166136261;
+  for (let index = 0; index < input.length; index += 1) { hash ^= input.charCodeAt(index); hash = Math.imul(hash, 16777619); }
+  return (hash >>> 0).toString(16).padStart(8, "0");
+};
+
+export const COMMAND_JOB_STATES = ["Created", "Queued", "Running", "Completed", "Failed", "Cancelled"] as const;
 export type CommandJobState = (typeof COMMAND_JOB_STATES)[number];
 
 export type CommandResult<T extends JsonValue = JsonValue> = {
@@ -707,14 +723,19 @@ export type CommandResult<T extends JsonValue = JsonValue> = {
   job?: { jobId: string; state: CommandJobState };
 };
 
+export type CommandReplayMode = "REVIEW" | "COMMAND_REPLAY" | "REPRODUCTION_ATTEMPT";
+
 export type CommandJob = {
   jobId: string;
   commandId: string;
+  executionId: string;
+  attempt: number;
   state: CommandJobState;
   createdAt: string;
   updatedAt: string;
   result?: CommandResult;
   cancellationRequestedAt?: string;
+  previousAttemptId?: string;
 };
 
 export type ActionRecord = {
@@ -726,8 +747,16 @@ export type ActionRecord = {
   sourceHash: string;
   canonicalCommand: CanonicalCommand;
   registryVersion: string;
+  commandSchemaVersion: typeof COMMAND_SCHEMA_VERSION;
   compatibilityProfile: string;
   policyVersion: string;
+  handlerVersion: string;
+  inputRevisionRefs: readonly string[];
+  inputArtifactHashes: readonly string[];
+  outputRefs: readonly string[];
+  outputHashes: readonly string[];
+  validation: readonly CommandDiagnostic[];
+  attempt: number;
   inputRef?: string;
   outputRef?: string;
   status: CommandJobState | "SUCCEEDED" | "FAILED" | "CANCELLED";
@@ -741,22 +770,25 @@ export type ActionRecord = {
   redactedSecrets: readonly string[];
 };
 
-export const SETTING_SCOPES = ["global", "session", "object", "selection", "representation", "scene"] as const;
+export const SETTING_SCOPES = ["GLOBAL", "OBJECT", "OBJECT_STATE", "ATOM_SELECTION", "BOND_SELECTION"] as const;
 export type SettingScope = (typeof SETTING_SCOPES)[number];
-export type SettingValueType = "string" | "number" | "integer" | "boolean" | "enum" | "color";
+export type SettingValueType = "string" | "integer" | "float" | "float3" | "boolean" | "enum" | "color";
 export type SettingSpec = {
   name: string;
   aliases: readonly string[];
   valueType: SettingValueType;
   scope: readonly SettingScope[];
-  defaultValue: JsonPrimitive;
+  defaultValue: JsonValue;
+  version: string;
+  inheritance: "DEFAULT" | "GLOBAL_THEN_OBJECT" | "GLOBAL_THEN_OBJECT_STATE" | "GLOBAL_THEN_SELECTION";
+  classification: "PRESENTATION" | "SCIENTIFIC" | "LIFECYCLE";
   enumValues?: readonly string[];
   min?: number;
   max?: number;
   description: string;
   capabilityState: CapabilityState;
 };
-export type SettingValue = { name: string; value: JsonPrimitive; scope: SettingScope; targetId?: string; revision: number };
+export type SettingValue = { name: string; value: JsonValue; scope: SettingScope; targetId?: string; revision: number };
 
 export type MacroNode = {
   nodeId: string;
@@ -775,6 +807,11 @@ export type MacroDefinition = {
   maxIterations: number;
   errorPolicy: "STOP_ON_ERROR" | "CONTINUE_WITH_RECORDED_FAILURES";
   deterministic: boolean;
+  contentHash: string;
+  parameters?: readonly { name: string; type: CommandArgumentType; required?: boolean }[];
+  declaredOutputs?: readonly string[];
+  requiredCapabilities?: readonly string[];
+  resourcePolicy?: { maxCommands: number; maxDurationMs?: number };
   provenance: { author?: string; createdAt: string; sourceHash: string };
 };
 

@@ -1,12 +1,19 @@
 import type { CapabilityState, CommandArgumentSpec, CommandSpec, JsonRecord, JsonValue } from "@molecular/contracts";
-import { COMMAND_REGISTRY_VERSION, SAFE_PYMOL_COMPAT_PROFILE } from "@molecular/contracts";
+import { COMMAND_REGISTRY_VERSION, COMMAND_SCHEMA_VERSION, SAFE_PYMOL_COMPAT_PROFILE } from "@molecular/contracts";
 import { PYMOL_INVENTORY, PYMOL_SOURCE_COMMIT } from "./pymolInventory.js";
 
+export const RESERVED_FUTURE_COMMAND_FAMILIES = Object.freeze({
+  docking: ["DOCKING.PREPARE_RECEPTOR", "DOCKING.PREPARE_LIGAND", "DOCKING.DEFINE_SEARCH_SPACE", "DOCKING.CONFIGURE", "DOCKING.RUN", "DOCKING.STATUS", "DOCKING.CANCEL", "DOCKING.RESULTS.GET", "DOCKING.RESULTS.EXPORT"],
+  hts: ["HTS.LIBRARY.DEFINE", "HTS.LIBRARY.IMPORT", "HTS.SCREEN.RUN", "HTS.SCREEN.STATUS", "HTS.SCREEN.CANCEL", "HTS.RESULTS.GET", "HTS.RESULTS.EXPORT"],
+} as const);
+const reservedFutureFamiliesJson = () => ({ docking: [...RESERVED_FUTURE_COMMAND_FAMILIES.docking], hts: [...RESERVED_FUTURE_COMMAND_FAMILIES.hts] });
+
 const argument = (name: string, type: CommandArgumentSpec["type"], description: string, options: Partial<CommandArgumentSpec> = {}): CommandArgumentSpec => ({ name, type, description, ...options });
-const schema = (spec: Omit<CommandSpec, "registryVersion" | "aliasesByProfile"> & { aliases?: readonly string[] }): CommandSpec => ({
+const schema = (spec: Omit<CommandSpec, "registryVersion" | "schemaVersion" | "aliasesByProfile"> & { aliases?: readonly string[] }): CommandSpec => ({
   ...spec,
   aliasesByProfile: { [SAFE_PYMOL_COMPAT_PROFILE]: spec.aliases ?? [] },
   registryVersion: COMMAND_REGISTRY_VERSION,
+  schemaVersion: COMMAND_SCHEMA_VERSION,
 });
 
 const safeCommand = (name: string, type: string, args: readonly CommandArgumentSpec[], effectClass: CommandSpec["effectClass"], capabilityKey: string, handlerKey: string, aliases: readonly string[] = [], capabilityState: CapabilityState = "SUPPORTED_WITH_LIMITATIONS"): CommandSpec => schema({
@@ -19,9 +26,9 @@ const builtinSpecs: readonly CommandSpec[] = [
   safeCommand("show_as", "REPRESENTATION.SHOW_AS", [argument("representation", "string", "Representation profile.", { required: true, positional: true }), argument("query", "selection", "Target selection.", { positional: true, defaultValue: "all" })], "VISUAL_MUTATION", "REPRESENTATION.SET_STYLE", "presentation.showAs", ["as"]),
   safeCommand("hide", "REPRESENTATION.HIDE", [argument("representation", "string", "Representation profile.", { required: true, positional: true }), argument("query", "selection", "Target selection.", { positional: true, defaultValue: "all" })], "VISUAL_MUTATION", "REPRESENTATION.SET_STYLE", "presentation.hide"),
   safeCommand("color", "COLOR.APPLY", [argument("color", "string", "Named, canonical or custom color.", { required: true, positional: true }), argument("query", "selection", "Target selection.", { positional: true, defaultValue: "all" })], "VISUAL_MUTATION", "COLOR.APPLY", "presentation.color", ["colour", "recolor"]),
-  safeCommand("set", "SETTING.SET", [argument("name", "string", "Setting or representation setting name.", { required: true, positional: true }), argument("value", "string", "Typed setting value.", { required: true, positional: true }), argument("query", "selection", "Optional presentation scope.", { positional: true }), argument("scope", "enum", "Durable setting scope.", { enumValues: ["global", "session", "object", "selection", "representation", "scene"] }), argument("targetId", "string", "Stable scope target ID.")], "VISUAL_MUTATION", "SETTING.SET", "setting.set", ["set_colour"]),
-  safeCommand("get", "SETTING.GET", [argument("name", "string", "Setting name.", { required: true, positional: true }), argument("scope", "enum", "Durable setting scope.", { enumValues: ["global", "session", "object", "selection", "representation", "scene"] }), argument("targetId", "string", "Stable scope target ID.")], "READ_ONLY_QUERY", "SETTING.GET", "setting.get"),
-  safeCommand("unset", "SETTING.UNSET", [argument("name", "string", "Setting name.", { required: true, positional: true }), argument("scope", "enum", "Durable setting scope.", { enumValues: ["global", "session", "object", "selection", "representation", "scene"] }), argument("targetId", "string", "Stable scope target ID.")], "VISUAL_MUTATION", "SETTING.UNSET", "setting.unset"),
+  safeCommand("set", "SETTING.SET", [argument("name", "string", "Setting or representation setting name.", { required: true, positional: true }), argument("value", "string", "Typed setting value.", { required: true, positional: true }), argument("query", "selection", "Optional presentation scope.", { positional: true }), argument("scope", "enum", "Durable setting scope.", { enumValues: ["GLOBAL", "OBJECT", "OBJECT_STATE", "ATOM_SELECTION", "BOND_SELECTION"] }), argument("targetId", "string", "Stable scope target ID.")], "VISUAL_MUTATION", "SETTING.SET", "setting.set", ["set_colour"]),
+  safeCommand("get", "SETTING.GET", [argument("name", "string", "Setting name.", { required: true, positional: true }), argument("scope", "enum", "Durable setting scope.", { enumValues: ["GLOBAL", "OBJECT", "OBJECT_STATE", "ATOM_SELECTION", "BOND_SELECTION"] }), argument("targetId", "string", "Stable scope target ID.")], "READ_ONLY_QUERY", "SETTING.GET", "setting.get"),
+  safeCommand("unset", "SETTING.UNSET", [argument("name", "string", "Setting name.", { required: true, positional: true }), argument("scope", "enum", "Durable setting scope.", { enumValues: ["GLOBAL", "OBJECT", "OBJECT_STATE", "ATOM_SELECTION", "BOND_SELECTION"] }), argument("targetId", "string", "Stable scope target ID.")], "VISUAL_MUTATION", "SETTING.UNSET", "setting.unset"),
   safeCommand("label", "LABEL.SET", [argument("query", "selection", "Target selection.", { required: true, positional: true }), argument("expression", "string", "Safe field-template expression.", { required: true, positional: true })], "VISUAL_MUTATION", "LABELS.SET", "presentation.label"),
   safeCommand("center", "VIEW.CENTER", [argument("query", "selection", "Target selection.", { required: true, positional: true })], "VISUAL_MUTATION", "VIEW.CENTER", "view.center"),
   safeCommand("zoom", "VIEW.ZOOM", [argument("query", "selection", "Target selection.", { required: true, positional: true })], "VISUAL_MUTATION", "VIEW.FIT", "view.zoom"),
@@ -58,6 +65,8 @@ const builtinSpecs: readonly CommandSpec[] = [
   safeCommand("intra_rms_cur", "ANALYSIS.INTRA_RMS_CUR", [argument("query", "selection", "State comparison selection.", { required: true, positional: true })], "READ_ONLY_QUERY", "ANALYSIS.INTRA_RMS_CUR", "analysis.intraRmsCur"),
   safeCommand("intra_rms", "ANALYSIS.INTRA_RMS", [argument("query", "selection", "State comparison selection.", { required: true, positional: true })], "READ_ONLY_QUERY", "ANALYSIS.INTRA_RMS", "analysis.intraRms"),
   safeCommand("intra_fit", "ANALYSIS.INTRA_FIT", [argument("query", "selection", "State comparison selection.", { required: true, positional: true })], "SCIENTIFIC_MUTATION", "ANALYSIS.INTRA_FIT", "analysis.intraFit"),
+  safeCommand("distance", "MEASURE.DISTANCE", [argument("selection1", "selection", "First measurement endpoint selection.", { required: true, positional: true }), argument("selection2", "selection", "Second measurement endpoint selection.", { required: true, positional: true })], "READ_ONLY_QUERY", "MEASURE.DISTANCE", "measurement.distance"),
+  safeCommand("scene_store", "SCENE.STORE", [argument("name", "string", "Stable scene name.", { required: true, positional: true })], "VISUAL_MUTATION", "SCENE.STORE", "scene.store"),
   safeCommand("save", "PROJECT.SAVE", [argument("path", "string", "Logical project artifact name; server paths are never accepted.", { required: true, positional: true })], "EXTERNAL_IO", "PROJECT.SAVE", "project.save", [], "SUPPORTED_WITH_LIMITATIONS"),
   safeCommand("load", "PROJECT.OPEN", [argument("path", "string", "Logical project artifact name; server paths are never accepted.", { required: true, positional: true })], "EXTERNAL_IO", "PROJECT.OPEN", "project.open", [], "SUPPORTED_WITH_LIMITATIONS"),
 ];
@@ -69,6 +78,7 @@ const inventorySpecs = PYMOL_INVENTORY.filter((entry) => !builtInByName.has(entr
   commandType: entry.canonicalCommandType ?? `PYMOL.${entry.publicName.toUpperCase().replace(/[^A-Z0-9]+/g, "_")}`,
   canonicalName: entry.publicName,
   registryVersion: COMMAND_REGISTRY_VERSION,
+  schemaVersion: COMMAND_SCHEMA_VERSION,
   aliasesByProfile: { [SAFE_PYMOL_COMPAT_PROFILE]: entry.aliases },
   arguments: [argument("raw", "string", "Source-pinned command arguments.", { positional: true })],
   outputSchema: {},
@@ -127,11 +137,13 @@ export const validateCommandRegistry = (specs: readonly CommandSpec[] = COMMAND_
 
 export const commandInventorySummary = () => ({
   registryVersion: COMMAND_REGISTRY_VERSION,
+  schemaVersion: COMMAND_SCHEMA_VERSION,
   compatibilityProfile: SAFE_PYMOL_COMPAT_PROFILE,
   sourceCommit: PYMOL_SOURCE_COMMIT,
   count: COMMAND_SPECS.length,
   sourceKeywordCount: PYMOL_INVENTORY.length,
   validationErrors: [...validateCommandRegistry()],
+  reservedFutureFamilies: reservedFutureFamiliesJson(),
 });
 
 export const commandSpecFor = (name: string): CommandSpec | undefined => {
@@ -148,14 +160,26 @@ export const jsonValueFrom = (value: unknown): JsonValue => {
 
 export const commandRegistryAsJson = (): JsonRecord => ({
   summary: commandInventorySummary(),
+  reservedFutureFamilies: reservedFutureFamiliesJson(),
   commands: COMMAND_SPECS.map((spec) => ({
     canonicalName: spec.canonicalName,
     commandType: spec.commandType,
+    registryVersion: spec.registryVersion,
+    schemaVersion: spec.schemaVersion,
     effectClass: spec.effectClass,
     capabilityState: spec.capabilityState,
     safetyClass: spec.safetyClass,
     aliases: [...aliasesFor(spec)],
     arguments: spec.arguments.map((item) => ({ name: item.name, type: item.type, ...(item.required !== undefined ? { required: item.required } : {}), ...(item.positional !== undefined ? { positional: item.positional } : {}), ...(item.repeated !== undefined ? { repeated: item.repeated } : {}), ...(item.enumValues ? { enumValues: [...item.enumValues] } : {}), ...(item.defaultValue !== undefined ? { defaultValue: item.defaultValue } : {}), description: item.description })),
+    handlerKey: spec.handlerKey,
+    selectionFields: [...(spec.selectionFields ?? [])],
+    objectFields: [...(spec.objectFields ?? [])],
+    stateFields: [...(spec.stateFields ?? [])],
+    settingFields: [...(spec.settingFields ?? [])],
+    provenanceVersion: spec.provenanceVersion,
+    replayVersion: spec.replayVersion,
+    knownDivergences: [...(spec.knownDivergences ?? [])],
+    ...(spec.pymolReference ? { pymolReference: { ...spec.pymolReference, publicNames: [...spec.pymolReference.publicNames] } } : {}),
     oracleStatus: spec.pymolReference?.oracleStatus ?? "NOT_APPLICABLE",
   })),
 });

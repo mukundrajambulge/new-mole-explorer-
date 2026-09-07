@@ -58,6 +58,11 @@ export const apiClient = {
     headers: { "content-type": "application/json", ...(body.idempotencyKey ? { "x-idempotency-key": body.idempotencyKey } : {}), ...(body.correlationId ? { "x-correlation-id": body.correlationId } : {}) },
     body: JSON.stringify(body),
   }),
+  executeCanonicalCommand: (command: CanonicalCommand) => request<CommandResult>("/v1/commands/execute", {
+    method: "POST",
+    headers: { "content-type": "application/json", ...(command.idempotencyKey ? { "x-idempotency-key": command.idempotencyKey } : {}), ...(command.correlationId ? { "x-correlation-id": command.correlationId } : {}) },
+    body: JSON.stringify({ command }),
+  }),
   executeCommandBatch: (body: { rawCommand: string; requestedMode?: "SYNC" | "ASYNC" | "AUTO"; correlationId?: string; idempotencyKey?: string }) => request<CommandResult>("/commands/batch", {
     method: "POST",
     headers: { "content-type": "application/json", ...(body.idempotencyKey ? { "x-idempotency-key": body.idempotencyKey } : {}), ...(body.correlationId ? { "x-correlation-id": body.correlationId } : {}) },
@@ -66,5 +71,6 @@ export const apiClient = {
   commandHistory: () => request<{ records: readonly JsonRecord[] }>("/commands/history"),
   commandJob: (jobId: string) => request<CommandJob>(`/commands/jobs/${encodeURIComponent(jobId)}`),
   cancelCommandJob: (jobId: string) => request<CommandJob>(`/commands/jobs/${encodeURIComponent(jobId)}/cancel`, { method: "POST" }),
+  retryCommandJob: (jobId: string) => request<CommandJob>(`/commands/jobs/${encodeURIComponent(jobId)}/retry`, { method: "POST" }),
   replayCommand: (actionRecordId: string) => request<CommandResult>(`/commands/history/${encodeURIComponent(actionRecordId)}/replay`, { method: "POST" }),
 };

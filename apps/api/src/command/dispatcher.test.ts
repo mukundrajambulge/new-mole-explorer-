@@ -16,11 +16,11 @@ describe("R10 canonical dispatcher and provenance", () => {
   it("fails closed before handler execution and supports async job states", async () => {
     const dispatcher = new CommandDispatcher();
     expect(dispatcher.dispatch({ rawCommand: "python print(1)" }).diagnostics[0]?.code).toBe("UNSAFE_COMMAND_REJECTED");
-    const pending = dispatcher.dispatch({ rawCommand: "align all, all", requestedMode: "ASYNC" });
-    expect(pending.job?.state).toBe("QUEUED");
+    const pending = dispatcher.dispatch({ rawCommand: "set orthoscopic, on", requestedMode: "ASYNC" });
+    expect(pending.job?.state).toBe("Queued");
     await Promise.resolve();
     const job = dispatcher.getJob(pending.job!.jobId);
-    expect(job?.state).toBe("SUCCEEDED");
+    expect(job?.state).toBe("Completed");
   });
 
   it("enforces expected revisions before a handler can mutate state", () => {
@@ -33,8 +33,8 @@ describe("R10 canonical dispatcher and provenance", () => {
 
   it("does not duplicate a queued idempotent job", async () => {
     const dispatcher = new CommandDispatcher();
-    const first = dispatcher.dispatch({ rawCommand: "align all, all", requestedMode: "ASYNC", idempotencyKey: "queued-once" });
-    const second = dispatcher.dispatch({ rawCommand: "align all, all", requestedMode: "ASYNC", idempotencyKey: "queued-once" });
+    const first = dispatcher.dispatch({ rawCommand: "set orthoscopic, on", requestedMode: "ASYNC", idempotencyKey: "queued-once" });
+    const second = dispatcher.dispatch({ rawCommand: "set orthoscopic, on", requestedMode: "ASYNC", idempotencyKey: "queued-once" });
     expect(second.job?.jobId).toBe(first.job?.jobId);
     await Promise.resolve();
   });
@@ -49,5 +49,22 @@ describe("R10 canonical dispatcher and provenance", () => {
     const rejected = dispatcher.dispatchBatch({ rawCommand: "set orthoscopic, on; python print(1)" });
     expect(rejected.status).toBe("FAILED");
     expect(rejected.diagnostics[0]?.code).toBe("UNSAFE_COMMAND_REJECTED");
+  });
+
+  it("keeps the exact durable job states and creates a new retry attempt", async () => {
+    const dispatcher = new CommandDispatcher();
+    const pending = dispatcher.dispatch({ rawCommand: "cealign all, all", requestedMode: "ASYNC" });
+    expect(pending.job?.state).toBe("Queued");
+    await Promise.resolve();
+    const failed = dispatcher.getJob(pending.job!.jobId)!;
+    expect(failed.state).toBe("Failed");
+    const retried = dispatcher.retry(failed.jobId)!;
+    expect(retried.attempt).toBe(2);
+    expect(retried.executionId).not.toBe(failed.executionId);
+    expect(retried.previousAttemptId).toBe(failed.executionId);
+    await Promise.resolve();
+    expect(dispatcher.getJob(retried.jobId)?.state).toBe("Failed");
+    expect(dispatcher.history.list().map((record) => record.attempt).sort()).toEqual([1, 2]);
+    expect(dispatcher.listJobs().every((job) => ["Created", "Queued", "Running", "Completed", "Failed", "Cancelled"].includes(job.state))).toBe(true);
   });
 });

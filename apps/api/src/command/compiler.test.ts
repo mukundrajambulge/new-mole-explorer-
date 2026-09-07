@@ -9,6 +9,15 @@ describe("R10 safe command compiler", () => {
     expect(result.command?.semanticHash).toBe(semanticCommandHash(result.command!));
   });
 
+  it("keeps semantic hashes stable across surface metadata", () => {
+    const consoleCommand = compileSafeCommand("show sticks, chain A and resi 10", { surface: "CONSOLE" }).command!;
+    const restCommand = compileSafeCommand("show representation=sticks, query=chain A and resi 10", { surface: "REST" }).command!;
+    const sdkCommand = compileSafeCommand("show sticks, chain A and resi 10", { surface: "SDK" }).command!;
+    expect(consoleCommand.semanticHash).toBe(sdkCommand.semanticHash);
+    expect(consoleCommand.semanticHash).toBe(restCommand.semanticHash);
+    expect(consoleCommand.origin.surface).not.toBe(restCommand.origin.surface);
+  });
+
   it("supports unique prefixes and rejects ambiguous prefixes", () => {
     expect(compileSafeCommand("sel all").command?.origin.resolvedPublicName).toBe("select");
     expect(compileSafeCommand("co sticks").diagnostics[0]?.code).toBe("AMBIGUOUS_COMMAND");

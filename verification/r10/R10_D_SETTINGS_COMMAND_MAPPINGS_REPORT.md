@@ -1,3 +1,3 @@
 # R10 D SETTINGS COMMAND MAPPINGS REPORT
 
-Status: PASS. SETTING.SET/GET/UNSET use typed SettingSpec records with coercion, bounded validation, supported scopes, revisioned values and durable session/object/selection/representation/scene scope metadata. Existing R02–R09 presentation, view, selection, editing and analysis vocabulary is represented in the command registry.
+Status: PASS_TYPED_CANONICAL_SCOPES. SETTING.SET/GET/UNSET use typed SettingSpec records with GLOBAL, OBJECT, OBJECT_STATE, ATOM_SELECTION and BOND_SELECTION scope validation, inheritance/default restoration, float3 support, revisioned values and explicit unsupported-scope diagnostics. Existing R02–R09 vocabulary remains capability-gated.

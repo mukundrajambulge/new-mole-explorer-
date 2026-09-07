@@ -15,4 +15,10 @@ describe("R10 UI canonical dispatcher boundary", () => {
     expect(executed.result).toBe("VIEW.ZOOM");
     expect(executed.command.origin.surface).toBe("GUI");
   });
+
+  it("uses the same semantic measure type as the REST command registry", () => {
+    const command = createUiCanonicalCommand("measure id 1, id 2", "GUI");
+    expect(command.commandType).toBe("MEASURE.DISTANCE");
+    expect(command.normalizedArgs).toEqual({ selection1: "id 1", selection2: "id 2" });
+  });
 });

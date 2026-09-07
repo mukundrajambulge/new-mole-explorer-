@@ -1,5 +1,5 @@
 {
-  "r10": "COMPLETE",
+  "r10": "IMPLEMENTATION_COMPLETE_PENDING_FINAL_VERIFICATION",
   "baseBranch": "feature/r09-native-lifecycle",
   "baseSha": "3632c4ad8784d4ac4436b7a718fe2d2d6f3d1fd4",
   "branch": "feature/r10-canonical-command-environment",
@@ -42,9 +42,9 @@
     "guiHoverNotRecorded": "PASS",
     "capabilityPreflight": "PASS"
   },
-  "settings": "PASS_TYPED_SCOPED_VALIDATED",
-  "restSdkHistoryProvenanceReplay": "PASS",
-  "macrosBatchJobs": "PASS_BOUNDED_DAG",
+  "settings": "PASS_TYPED_CANONICAL_SCOPES_VALIDATED",
+  "restSdkHistoryProvenanceReplay": "PASS_VERSIONED_REST_TYPED_SDK_DURABLE_HISTORY",
+  "macrosBatchJobs": "PASS_BOUNDED_DAG_EXACT_JOB_STATES_RETRY_LINEAGE",
   "compatibilityMatrix": "PASS_GENERATED_ORACLE_PENDING",
   "fixtures": {
     "path": "verification/r10/R10_FIXTURES.json",
@@ -54,265 +54,265 @@
     {
       "id": "AT-R10-01",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-02",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-03",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-04",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-05",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-06",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-07",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-08",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-09",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-10",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-11",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-12",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-13",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-14",
-      "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "status": "PENDING_APPLICATION_ORACLE",
+      "evidence": "Requires the real-application campaign, session integration, or external PyMOL oracle"
     },
     {
       "id": "AT-R10-15",
-      "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "status": "PENDING_APPLICATION_ORACLE",
+      "evidence": "Requires the real-application campaign, session integration, or external PyMOL oracle"
     },
     {
       "id": "AT-R10-16",
-      "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "status": "PENDING_APPLICATION_ORACLE",
+      "evidence": "Requires the real-application campaign, session integration, or external PyMOL oracle"
     },
     {
       "id": "AT-R10-17",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-18",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-19",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-20",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-21",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-22",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-23",
-      "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "status": "PENDING_APPLICATION_ORACLE",
+      "evidence": "Requires the real-application campaign, session integration, or external PyMOL oracle"
     },
     {
       "id": "AT-R10-24",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-25",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-26",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-27",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-28",
-      "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "status": "PENDING_APPLICATION_ORACLE",
+      "evidence": "Requires the real-application campaign, session integration, or external PyMOL oracle"
     },
     {
       "id": "AT-R10-29",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-30",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-31",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-32",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-33",
-      "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "status": "PENDING_APPLICATION_ORACLE",
+      "evidence": "Requires the real-application campaign, session integration, or external PyMOL oracle"
     },
     {
       "id": "AT-R10-34",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-35",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-36",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-37",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-38",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-39",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-40",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-41",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-42",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-43",
-      "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "status": "PENDING_APPLICATION_ORACLE",
+      "evidence": "Requires the real-application campaign, session integration, or external PyMOL oracle"
     },
     {
       "id": "AT-R10-44",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-45",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-46",
-      "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "status": "PENDING_APPLICATION_ORACLE",
+      "evidence": "Requires the real-application campaign, session integration, or external PyMOL oracle"
     },
     {
       "id": "AT-R10-47",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-48",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-49",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     },
     {
       "id": "AT-R10-50",
       "status": "PASS",
-      "evidence": "R10 command contract tests and deterministic registry/compiler checks"
+      "evidence": "R10 registry/compiler/dispatcher/security contract tests"
     }
   ],
   "gates": {
-    "fullE2E": "110/113_LOCAL; 3_RCSB_FETCH_TIMEOUTS; duplicate-display-name_PASS; R09_BASELINE_113/113",
+    "fullE2E": "R10 E2E coverage added; final hosted denominator/conclusion recorded after this commit",
     "ci": {
-      "runId": 34102010115,
-      "sha": "f420c7c28d49d1bf967500c0a5fe31126006b9e3",
-      "conclusion": "SUCCESS",
-      "url": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34102010115"
+      "runId": null,
+      "sha": null,
+      "conclusion": "PENDING",
+      "url": null
     },
     "focusedThreeConsecutiveRuns": "PENDING_CI",
     "regressions": "PENDING_CI",
-    "fuzzSecurity": "PASS_CONTRACT_CORPUS",
+    "fuzzSecurity": "PASS_EXPANDED_CONTRACT_CORPUS",
     "oracle": "ORACLE_PENDING"
   },
   "matrixPaths": [

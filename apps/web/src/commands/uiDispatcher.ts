@@ -1,14 +1,8 @@
 import type { CanonicalCommand, JsonRecord } from "@molecular/contracts";
-import { COMMAND_REGISTRY_VERSION, SAFE_PYMOL_COMPAT_PROFILE } from "@molecular/contracts";
+import { canonicalSemanticHash, COMMAND_REGISTRY_VERSION, COMMAND_SCHEMA_VERSION, SAFE_PYMOL_COMPAT_PROFILE } from "@molecular/contracts";
 import { isRecognizedCommandVerb, parseCommand, type CommandVerb } from "./commandRegistry";
 
 export type UiCommandExecution<T> = (command: CanonicalCommand) => T;
-
-const stable = (value: unknown): string => {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(stable).join(",")}]`;
-  return `{${Object.keys(value as Record<string, unknown>).sort().map((key) => `${JSON.stringify(key)}:${stable((value as Record<string, unknown>)[key])}`).join(",")}}`;
-};
 
 const digest = (value: string): string => {
   let hash = 2166136261;
@@ -20,7 +14,7 @@ const digest = (value: string): string => {
 };
 
 const typeFor = (verb: CommandVerb): string => ({
-  select: "SELECTION.EVALUATE", show: "REPRESENTATION.SHOW", show_as: "REPRESENTATION.SHOW_AS", hide: "REPRESENTATION.HIDE", color: "COLOR.APPLY", set: "SETTING.SET", label: "LABEL.SET", center: "VIEW.CENTER", zoom: "VIEW.ZOOM", measure: "MEASURE.RUN", get_view: "VIEW.GET", unpick: "SELECTION.CLEAR", help: "SYSTEM.HELP", rename: "OBJECT.RENAME", set_name: "OBJECT.RENAME", copy: "OBJECT.COPY", create: "OBJECT.CREATE", split_states: "OBJECT.SPLIT_STATES", join_states: "OBJECT.JOIN_STATES", group: "OBJECT.GROUP", delete: "OBJECT.DELETE", update: "OBJECT.UPDATE", enable: "OBJECT.ENABLE", disable: "OBJECT.DISABLE", state: "OBJECT.STATE", frame: "OBJECT.FRAME", all_states: "OBJECT.ALL_STATES", count_states: "OBJECT.COUNT_STATES", coordinate_frame: "SETTING.SET", history: "HISTORY.LIST", undo: "HISTORY.UNDO", redo: "HISTORY.REDO", edit_test: "EDIT.TEST", remove: "EDIT.ATOM_DELETE", bond: "EDIT.BOND_CREATE", unbond: "EDIT.BOND_DELETE", set_bond: "EDIT.BOND_ORDER_SET", h_add: "EDIT.HYDROGEN_ADD", h_fill: "EDIT.HYDROGEN_REFILL", h_remove: "EDIT.HYDROGEN_REMOVE", attach: "EDIT.ATOM_ATTACH", replace: "EDIT.ATOM_REPLACE", rms_cur: "ANALYSIS.RMS_CUR", rms: "ANALYSIS.RMS", fit: "ANALYSIS.FIT", pair_fit: "ANALYSIS.PAIR_FIT", align: "ANALYSIS.ALIGN", super: "ANALYSIS.SUPER", cealign: "ANALYSIS.CEALIGN", intra_rms_cur: "ANALYSIS.INTRA_RMS_CUR", intra_rms: "ANALYSIS.INTRA_RMS", intra_fit: "ANALYSIS.INTRA_FIT",
+  select: "SELECTION.EVALUATE", show: "REPRESENTATION.SHOW", show_as: "REPRESENTATION.SHOW_AS", hide: "REPRESENTATION.HIDE", color: "COLOR.APPLY", set: "SETTING.SET", label: "LABEL.SET", center: "VIEW.CENTER", zoom: "VIEW.ZOOM", measure: "MEASURE.DISTANCE", get_view: "VIEW.GET", unpick: "SELECTION.CLEAR", help: "SYSTEM.HELP", rename: "OBJECT.RENAME", set_name: "OBJECT.RENAME", copy: "OBJECT.COPY", create: "OBJECT.CREATE", split_states: "OBJECT.SPLIT_STATES", join_states: "OBJECT.JOIN_STATES", group: "OBJECT.GROUP", delete: "OBJECT.DELETE", update: "OBJECT.UPDATE", enable: "OBJECT.ENABLE", disable: "OBJECT.DISABLE", state: "OBJECT.STATE", frame: "OBJECT.FRAME", all_states: "OBJECT.ALL_STATES", count_states: "OBJECT.COUNT_STATES", coordinate_frame: "SETTING.SET", history: "HISTORY.LIST", undo: "HISTORY.UNDO", redo: "HISTORY.REDO", edit_test: "EDIT.TEST", remove: "EDIT.ATOM_DELETE", bond: "EDIT.BOND_CREATE", unbond: "EDIT.BOND_DELETE", set_bond: "EDIT.BOND_ORDER_SET", h_add: "EDIT.HYDROGEN_ADD", h_fill: "EDIT.HYDROGEN_REFILL", h_remove: "EDIT.HYDROGEN_REMOVE", attach: "EDIT.ATOM_ATTACH", replace: "EDIT.ATOM_REPLACE", rms_cur: "ANALYSIS.RMS_CUR", rms: "ANALYSIS.RMS", fit: "ANALYSIS.FIT", pair_fit: "ANALYSIS.PAIR_FIT", align: "ANALYSIS.ALIGN", super: "ANALYSIS.SUPER", cealign: "ANALYSIS.CEALIGN", intra_rms_cur: "ANALYSIS.INTRA_RMS_CUR", intra_rms: "ANALYSIS.INTRA_RMS", intra_fit: "ANALYSIS.INTRA_FIT",
 } as Record<CommandVerb, string>)[verb];
 
 const normalizedArgsFor = (verb: CommandVerb, argument: string, target: string | null): JsonRecord => {
@@ -35,6 +29,9 @@ const normalizedArgsFor = (verb: CommandVerb, argument: string, target: string |
   } else if (["show", "show_as", "hide", "color"].includes(verb)) {
     args[verb === "color" ? "color" : "representation"] = argument;
     args.query = target ?? "all";
+  } else if (verb === "measure") {
+    args.selection1 = argument;
+    args.selection2 = target ?? "";
   } else if (["rms_cur", "rms", "fit", "pair_fit", "align", "super", "cealign"].includes(verb)) {
     args.mobile = argument;
     args.target = target ?? "";
@@ -52,11 +49,12 @@ export const createUiCanonicalCommand = (source: string, surface: "GUI" | "CONSO
   const verb = parsed.command?.verb;
   const commandType = verb && isRecognizedCommandVerb(verb) ? typeFor(verb) : "SELECTION.EVALUATE";
   const normalizedArgs = verb && parsed.command ? normalizedArgsFor(verb, parsed.command.argument, parsed.command.target) : { operation: "replace", query: trimmed };
-  const semanticHash = digest(stable({ commandType, commandVersion: COMMAND_REGISTRY_VERSION, normalizedArgs, profile: SAFE_PYMOL_COMPAT_PROFILE }));
+  const semanticHash = canonicalSemanticHash({ commandType, commandVersion: COMMAND_REGISTRY_VERSION, normalizedArgs, boundRefs: {}, policy: SAFE_PYMOL_COMPAT_PROFILE });
   return {
     commandId: `ui:${sourceHash}`,
     commandType,
     commandVersion: COMMAND_REGISTRY_VERSION,
+    schemaVersion: COMMAND_SCHEMA_VERSION,
     normalizedArgs,
     boundRefs: {},
     origin: { surface, profile: SAFE_PYMOL_COMPAT_PROFILE, profileVersion: "safe-pymol-compat.v1", syntaxVersion: "r10-safe-grammar.v1", sourceHash, sourceText: trimmed, ...(verb ? { resolvedPublicName: verb } : {}), sourceMap: { start: 0, end: trimmed.length } },

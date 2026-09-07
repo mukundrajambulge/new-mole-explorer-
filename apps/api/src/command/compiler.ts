@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import type { CommandArgumentSpec, CommandDiagnostic, CommandExecutionMode, CanonicalCommand, CommandSpec, JsonRecord, JsonValue } from "@molecular/contracts";
-import { SAFE_PYMOL_COMPAT_PROFILE } from "@molecular/contracts";
+import { canonicalSemanticHash, COMMAND_SCHEMA_VERSION, SAFE_PYMOL_COMPAT_PROFILE } from "@molecular/contracts";
 import { resolveCommand, type CommandResolution } from "./registry.js";
 
 const MAX_COMMAND_LENGTH = 16_384;
@@ -22,13 +22,8 @@ export type CompileResult = { command: CanonicalCommand | null; diagnostics: rea
 
 const diagnostic = (code: CommandDiagnostic["code"], message: string, sourceSpan?: { start: number; end: number }, argumentPath?: string, retryable = false): CommandDiagnostic => ({ code, message, ...(sourceSpan ? { sourceSpan } : {}), ...(argumentPath ? { argumentPath } : {}), retryable });
 
-const stableValue = (value: unknown): string => {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(stableValue).join(",")}]`;
-  return `{${Object.keys(value as Record<string, unknown>).sort().map((key) => `${JSON.stringify(key)}:${stableValue((value as Record<string, unknown>)[key])}`).join(",")}}`;
-};
 export const sha256 = (value: string): string => createHash("sha256").update(value, "utf8").digest("hex");
-export const semanticCommandHash = (value: Pick<CanonicalCommand, "commandType" | "commandVersion" | "normalizedArgs" | "boundRefs"> & { policy?: string }): string => sha256(stableValue({ commandType: value.commandType, commandVersion: value.commandVersion, normalizedArgs: value.normalizedArgs, boundRefs: value.boundRefs, policy: value.policy ?? SAFE_PYMOL_COMPAT_PROFILE }));
+export const semanticCommandHash = (value: Pick<CanonicalCommand, "commandType" | "commandVersion" | "normalizedArgs" | "boundRefs"> & { policy?: string }): string => canonicalSemanticHash({ commandType: value.commandType, commandVersion: value.commandVersion, normalizedArgs: value.normalizedArgs, boundRefs: value.boundRefs, policy: value.policy ?? SAFE_PYMOL_COMPAT_PROFILE });
 
 type ArgumentPart = { text: string; start: number; end: number };
 
@@ -127,6 +122,15 @@ const asJson = (value: unknown): JsonValue => {
 const coerce = (spec: CommandArgumentSpec, rawValue: string, span: { start: number; end: number }): { value?: JsonValue; diagnostic?: CommandDiagnostic } => {
   const value = unquote(rawValue.trim());
   if (spec.type === "string" || spec.type === "selection" || spec.type === "object") return { value };
+  if (spec.type === "color") {
+    if (/^#[0-9a-f]{6}$/i.test(value) || /^[a-z][a-z0-9-]*$/i.test(value)) return { value };
+    return { diagnostic: diagnostic("INVALID_ARGUMENT", `${spec.name} must be a named color or #RRGGBB.`, span, spec.name) };
+  }
+  if (spec.type === "float3") {
+    const components = value.split(/\s+/).map(Number);
+    if (components.length !== 3 || components.some((component) => !Number.isFinite(component))) return { diagnostic: diagnostic("INVALID_ARGUMENT", `${spec.name} must contain exactly three finite numbers.`, span, spec.name) };
+    return { value: components };
+  }
   if (spec.type === "state") {
     const lowered = value.toLowerCase();
     if (lowered === "current" || lowered === "current_resolved") return { value: { kind: "CURRENT_RESOLVED" } };
@@ -138,7 +142,7 @@ const coerce = (spec: CommandArgumentSpec, rawValue: string, span: { start: numb
     if (value) return { value: { kind: "EXPLICIT_STATE_ID", stateId: value } };
     return { diagnostic: diagnostic("STATE_OUT_OF_RANGE", "A state selector is required.", span, spec.name) };
   }
-  if (spec.type === "number" || spec.type === "integer") {
+  if (spec.type === "number" || spec.type === "float" || spec.type === "integer") {
     const parsed = Number(value);
     if (!Number.isFinite(parsed) || (spec.type === "integer" && !Number.isInteger(parsed))) return { diagnostic: diagnostic("INVALID_ARGUMENT", `${spec.name} must be a ${spec.type}.`, span, spec.name) };
     return { value: parsed };
@@ -239,6 +243,7 @@ export const compileSafeCommand = (source: string, options: CompileOptions = {})
     commandId: `cmd:${sourceHash.slice(0, 24)}`,
     commandType: resolution.spec.commandType,
     commandVersion: resolution.spec.registryVersion,
+    schemaVersion: COMMAND_SCHEMA_VERSION,
     normalizedArgs,
     boundRefs,
     ...(options.target ? { target: options.target } : {}),

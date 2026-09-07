@@ -1,3 +1,3 @@
 # R10 E REST SDK PROVENANCE REPORT
 
-Status: PASS. POST /api/commands accepts safe raw syntax or a CanonicalCommand, registry discovery is GET /api/commands/registry, history is GET /api/commands/history, replay is POST /api/commands/history/:id/replay, and async job status/cancellation are exposed under /api/commands/jobs. Idempotency, correlation, redacted source, semantic hash, policy/profile versions and diagnostics are written to ActionRecord JSONL history.
+Status: PASS_VERSIONED_BOUNDARY. POST /api/v1/commands/execute accepts typed CanonicalCommand input; raw compatibility text remains on the legacy command-service boundary. A typed SDK facade submits through that same service, registry discovery is versioned, replay supports REVIEW/COMMAND_REPLAY/REPRODUCTION_ATTEMPT, and ActionRecord JSONL history retains redacted intent, schema/handler/policy/version refs, input/output refs, validation diagnostics and attempt lineage.
