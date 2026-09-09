@@ -20,6 +20,8 @@ The complete inventory contains 345 source keywords and 348 runtime command spec
 
 The feature inventory contains 220 feature rows, all mapped to contract or live evidence (`FEATURE_COVERAGE_PERCENT: 100`). It includes 87 selection operators, 18 rendering styles, 15 color schemes, camera/visibility/labels/measurements, R07–R10 lifecycle and command surfaces, and performance observations.
 
+`FEATURE_STRUCTURE_MATRIX.csv` is a complete 220 × 22 matrix (4,840 rows). Each cell has an explicit status and evidence reference; direct canonical observations are marked PASS, unsupported implementations are marked UNSUPPORTED, bounded failures are marked BLOCKED, and structure-independent or non-targeted combinations are marked NOT_APPLICABLE rather than being left blank.
+
 ## Scientific corpus and query campaign
 
 `DATASET_MANIFEST.json` contains 22 structures: 18 PASS and 4 BLOCKED, from 3 to 58,870 atoms, spanning XS, S, S/M, M, L, XL, and XXL classes. Real RCSB structures include 1CRN, 1UBQ, 4DJW, 1BNA, 1TRA, 1EH1, 1G6V, 1C3W, 1AON, and 5LE5. The malformed local fixture and real 1AFO multi-model correspondence failure are retained as negative cases. 3J9M was stopped after 995.1 seconds without a validated result; 4V6F is blocked by the 26,214,400-byte application ingestion limit.
@@ -28,7 +30,7 @@ The feature inventory contains 220 feature rows, all mapped to contract or live 
 
 ## Real-app visual and performance evidence
 
-The real app was exercised through the running browser workspace. 4DJW loaded with 7,079 atoms, 786 residues, and 9 chains; `select chain A` reported 3,060 atoms; the 3Dmol.js adapter and explicit docking-unavailable state were visible. Ten canonical, checksummed screenshots are archived under `evidence/` and prior Gate 01/02/03B evidence remains available under `verification/evidence/`.
+The real app was exercised through the running browser workspace. 4DJW loaded with 7,079 atoms, 786 residues, and 9 chains; `select chain A` reported 3,060 atoms; the 3Dmol.js adapter and explicit docking-unavailable state were visible. Ten canonical, checksummed screenshots are archived under `evidence/`; all 40 prior Gate 01/02/03B evidence files are also archived in Drive and remain available locally under `verification/evidence/`.
 
 Measured local API ingestion was 1CRN 327 atoms in 237 ms and 4DJW 7,079 atoms in 5,284 ms in this run. The performance report records architecture/invariant checks from Gate 01 rather than inventing an FPS threshold. XS through L passed bounded ingestion/render tests; XL and XXL are explicitly blocked as described above.
 
@@ -44,6 +46,7 @@ Measured local API ingestion was 1CRN 327 atoms in 237 ms and 4DJW 7,079 atoms i
 | Full Chromium E2E | PASS — 120/120 |
 | `npm run verify:selection-matrix` | PASS — 87 rows; 85 working, 1 missing dependency, 1 intentionally unsupported |
 | `npm run verify:r10` | PASS — regenerated 345-keyword matrix |
+| Feature × structure matrix | PASS — 4,840 explicit cells (220 features × 22 structures) |
 | Focused final acceptance | PASS — 3/3 for 3 consecutive runs |
 | Gate 01 | PASS |
 | Gate 02 | PASS |

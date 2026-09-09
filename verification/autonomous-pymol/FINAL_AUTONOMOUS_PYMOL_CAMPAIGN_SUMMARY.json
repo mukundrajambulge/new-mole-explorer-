@@ -38,6 +38,18 @@
     "uiControlsMapped": 128,
     "uiControlsUnmapped": 0
   },
+  "featureStructureMatrix": {
+    "path": "verification/autonomous-pymol/FEATURE_STRUCTURE_MATRIX.csv",
+    "rows": 4840,
+    "features": 220,
+    "structures": 22,
+    "statusCounts": {
+      "PASS": 306,
+      "NOT_APPLICABLE": 3600,
+      "BLOCKED": 880,
+      "UNSUPPORTED": 54
+    }
+  },
   "dataset": {
     "manifest": "verification/autonomous-pymol/DATASET_MANIFEST.json",
     "structures": 22,
@@ -81,7 +93,8 @@
   "visualEvidence": {
     "manifest": "verification/autonomous-pymol/evidence/VISUAL_EVIDENCE_MANIFEST.json",
     "canonicalScreenshotsArchived": 10,
-    "priorAcceptanceScreenshotsAvailable": 32,
+    "priorAcceptanceScreenshotsAvailable": 40,
+    "screenshotsReviewed": 50,
     "realAppObserved": ["4DJW 7079 atoms / 786 residues / 9 chains", "select chain A 3060 atoms", "3Dmol.js ready", "docking visibly unavailable"]
   },
   "performance": {
