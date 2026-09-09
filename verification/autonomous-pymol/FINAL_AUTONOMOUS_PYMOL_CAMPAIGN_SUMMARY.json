@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "campaign": "MOLEXPLORER_FINAL_AUTONOMOUS_PYMOL_CONFORMANCE_2026-09-09",
+  "status": "PASS_WITH_EXPLICIT_LIMITATIONS",
+  "decision": "READY TO SEAL PYMOL CORE: NO",
+  "startBranch": "fix/final-pymol-manual-acceptance",
+  "requiredStartSha": "bf742ff896a289492990744be9f34ec1898c54b3",
+  "campaignBranch": "qa/final-pymol-autonomous-conformance-2026-09-09",
+  "implementationEvidenceSha": "227da51",
+  "repository": {
+    "remoteName": "new-origin",
+    "remoteUrl": "https://github.com/mukundrajambulge/new-mole-explorer-.git",
+    "mainMerged": false,
+    "dockingStarted": false,
+    "htsStarted": false,
+    "worktreeCleanAtEvidenceCommit": true
+  },
+  "environment": {
+    "os": "Windows 11 Pro 64-bit 10.0.26200",
+    "node": "v24.14.1",
+    "npm": "11.11.0",
+    "python": "3.14.2",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12500H; 16 logical processors",
+    "ramBytes": 16781881344,
+    "gpu": "Intel(R) Iris(R) Xe Graphics",
+    "hostedCiNode": "22",
+    "pymolExecutableOracle": "BLOCKED",
+    "pymolExecutableBlocker": "No pymol/pymol.exe executable or importable pymol module installed"
+  },
+  "featureInventory": {
+    "total": 220,
+    "testedOrMapped": 220,
+    "unmapped": 0,
+    "coveragePercent": 100,
+    "selectionOperators": 87,
+    "renderStyles": 18,
+    "colorSchemes": 15,
+    "uiControlsMapped": 128,
+    "uiControlsUnmapped": 0
+  },
+  "dataset": {
+    "manifest": "verification/autonomous-pymol/DATASET_MANIFEST.json",
+    "structures": 22,
+    "pass": 18,
+    "blocked": 4,
+    "atomRange": {"min": 3, "max": 58870},
+    "sizeClasses": ["XS", "S", "S/M", "M", "L", "XL", "XXL"],
+    "blockedCases": {
+      "1AFO": "INVALID_INPUT: mmCIF coordinate models lack validated correspondence",
+      "3J9M": "PROBE_TIMEOUT after 995.1 seconds; 899579904 bytes observed memory",
+      "4V6F": "BLOCKED by 26214400-byte application hard limit",
+      "LOCAL-g1c-malformed": "INVALID_INPUT: invalid x coordinate"
+    }
+  },
+  "queryCampaign": {
+    "corpus": "verification/autonomous-pymol/QUERY_CORPUS.json",
+    "comparison": "verification/autonomous-pymol/QUERY_ORACLE_COMPARISON.json",
+    "operators": 87,
+    "cases": 266,
+    "positive": 88,
+    "zeroResult": 88,
+    "invalid": 90,
+    "oracleVerified": 88,
+    "oracleEquivalent": 35,
+    "oraclePending": 92,
+    "executableOracle": "BLOCKED"
+  },
+  "commandInventory": {
+    "sourceKeywords": 345,
+    "runtimeSpecs": 348,
+    "SAFE_TRANSLATABLE": 44,
+    "SAFE_BUT_NOT_IMPLEMENTED": 1,
+    "ORACLE_PENDING": 228,
+    "UNSAFE_REJECTED": 26,
+    "REFERENCE_ONLY_OUT_OF_SCOPE": 46,
+    "cealign": {"status": "SAFE_BUT_NOT_IMPLEMENTED", "capability": "UNAVAILABLE", "oracle": "ORACLE_PENDING"},
+    "super": {"status": "SAFE_TRANSLATABLE", "capability": "SUPPORTED_WITH_LIMITATIONS", "oracle": "ORACLE_PENDING"},
+    "PSE": "REFERENCE_ONLY_OR_NOT_IN_SOURCE_KEYWORD_SET",
+    "PZE": "REFERENCE_ONLY_OR_NOT_IN_SOURCE_KEYWORD_SET"
+  },
+  "visualEvidence": {
+    "manifest": "verification/autonomous-pymol/evidence/VISUAL_EVIDENCE_MANIFEST.json",
+    "canonicalScreenshotsArchived": 10,
+    "priorAcceptanceScreenshotsAvailable": 32,
+    "realAppObserved": ["4DJW 7079 atoms / 786 residues / 9 chains", "select chain A 3060 atoms", "3Dmol.js ready", "docking visibly unavailable"]
+  },
+  "performance": {
+    "report": "verification/autonomous-pymol/PERFORMANCE_STRESS_REPORT.json",
+    "apiHealthMs": 198,
+    "ingestMs": {"1CRN": 237, "4DJW": 5284},
+    "xs": "PASS",
+    "s": "PASS",
+    "m": "PASS",
+    "l": "PASS",
+    "xl": "BLOCKED",
+    "xxl": "BLOCKED",
+    "numericFps": "NOT_CAPTURED",
+    "methodLimit": "Architecture/invariant counters and bounded local timings; no fabricated FPS threshold"
+  },
+  "tests": {
+    "npmCi": "PASS",
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "unit": "PASS: 138 web + 57 API",
+    "build": "PASS",
+    "fullE2E": "PASS: 120/120",
+    "selectionMatrix": "PASS: 87 rows",
+    "r10": "PASS: 345-keyword matrix regenerated",
+    "focusedFinalAcceptance": "PASS: 3/3 x 3 consecutive runs",
+    "gate01": "PASS",
+    "gate02": "PASS",
+    "gate03b": "PASS after isolated retry; combined run 2/3 then retry PASS"
+  },
+  "defects": {"P0": 0, "P1": 1, "P2": 228, "p1Items": ["CEALIGN remains visibly unavailable pending validated implementation and executable oracle"]},
+  "driveEvidence": {
+    "status": "UPLOADED_SELECTED_EVIDENCE",
+    "folder": "https://drive.google.com/drive/folders/1Pzt1KBGdA6ZIFbh9gg1WFlqYGhSztfy1",
+    "runFolder": "https://drive.google.com/drive/folders/1ibe0bIIaUdNNpUKNekAB1syMUzkHZ3E-",
+    "rawRcsbDownloads": "LOCAL_ONLY_IGNORED_BY_GIT"
+  },
+  "limitations": [
+    "No executable PyMOL oracle was available; source/doc comparison is not executable conformance.",
+    "228 source keywords remain ORACLE_PENDING/coming-soon.",
+    "3J9M and 4V6F are blocked by bounded local stress limits.",
+    "PSE/PZE, movie/imaging, docking and HTS remain reference-only or design-only.",
+    "Final report commit is documentation after implementationEvidenceSha; exact branch tip is reported by Git/CI after that documentation commit."
+  ],
+  "readyToSealPymolCore": false,
+  "readyToMergeMain": false
+}
