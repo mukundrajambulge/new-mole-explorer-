@@ -1,0 +1,35 @@
+{
+  "caseId": "LOCAL-ring-ligand.pdb",
+  "source": "LOCAL_FIXTURE",
+  "pdbId": "",
+  "inputFormat": "pdb",
+  "bytes": 649,
+  "sha256": "00a7b08a863719012d3955ab92bd80803ee4e72ff2f00153fe11bcb55766cc2e",
+  "collectedAt": "2026-09-09T10:33:40.726Z",
+  "status": "PASS",
+  "format": "pdb",
+  "counts": {
+    "atoms": 6,
+    "residues": 1,
+    "chains": 1,
+    "polymerAtoms": 0,
+    "ligandAtoms": 6,
+    "waterAtoms": 0,
+    "ionAtoms": 0,
+    "otherAtoms": 0
+  },
+  "bondCount": 6,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": false,
+    "secondaryStructure": false,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": true,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

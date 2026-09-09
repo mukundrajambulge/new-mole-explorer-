@@ -1,0 +1,11 @@
+{
+  "caseId": "LOCAL-4V6F.cif",
+  "source": "LOCAL_FIXTURE",
+  "pdbId": "",
+  "inputFormat": "mmcif",
+  "bytes": 38137644,
+  "sha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+  "collectedAt": "2026-09-09T10:45:07.015Z",
+  "status": "BLOCKED",
+  "blockedReason": "Application ingestion hard limit is 26214400 bytes."
+}

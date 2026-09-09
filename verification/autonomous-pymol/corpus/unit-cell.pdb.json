@@ -1,0 +1,35 @@
+{
+  "caseId": "LOCAL-unit-cell.pdb",
+  "source": "LOCAL_FIXTURE",
+  "pdbId": "",
+  "inputFormat": "pdb",
+  "bytes": 437,
+  "sha256": "2fb538656ec23d0cc1c6c61154aa5ea3da93d9f7e9310d639fe62b804b9437fc",
+  "collectedAt": "2026-09-09T10:33:40.877Z",
+  "status": "PASS",
+  "format": "pdb",
+  "counts": {
+    "atoms": 4,
+    "residues": 3,
+    "chains": 2,
+    "polymerAtoms": 2,
+    "ligandAtoms": 0,
+    "waterAtoms": 1,
+    "ionAtoms": 1,
+    "otherAtoms": 0
+  },
+  "bondCount": 0,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": true,
+    "secondaryStructure": false,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": false,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

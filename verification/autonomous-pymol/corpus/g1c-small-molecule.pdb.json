@@ -1,0 +1,35 @@
+{
+  "caseId": "LOCAL-g1c-small-molecule.pdb",
+  "source": "LOCAL_FIXTURE",
+  "pdbId": "",
+  "inputFormat": "pdb",
+  "bytes": 334,
+  "sha256": "169c56dca4a9cba7e1111add90faa19299992d5ff7e628aefdb4c11d1d26018f",
+  "collectedAt": "2026-09-09T10:33:40.720Z",
+  "status": "PASS",
+  "format": "pdb",
+  "counts": {
+    "atoms": 3,
+    "residues": 1,
+    "chains": 1,
+    "polymerAtoms": 0,
+    "ligandAtoms": 3,
+    "waterAtoms": 0,
+    "ionAtoms": 0,
+    "otherAtoms": 0
+  },
+  "bondCount": 2,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": false,
+    "secondaryStructure": false,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": true,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

@@ -1,0 +1,12 @@
+{
+  "caseId": "RCSB-1AFO",
+  "source": "RCSB",
+  "pdbId": "1AFO",
+  "inputFormat": "mmcif",
+  "bytes": 2402940,
+  "sha256": "d044d24cbd91d658083d6f6dd465e11fce53b2049671db08a4f4f3cfceec8171",
+  "collectedAt": "2026-09-09T10:46:31.255Z",
+  "status": "BLOCKED",
+  "blockedReason": "mmCIF coordinate models do not have a validated atom correspondence.",
+  "errorCode": "INVALID_INPUT"
+}

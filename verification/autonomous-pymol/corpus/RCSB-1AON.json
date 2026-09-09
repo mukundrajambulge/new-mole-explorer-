@@ -1,0 +1,35 @@
+{
+  "caseId": "LOCAL-1AON.cif",
+  "source": "LOCAL_FIXTURE",
+  "pdbId": "",
+  "inputFormat": "mmcif",
+  "bytes": 6293816,
+  "sha256": "6b202f340ffb9a1924d5315ce9e837e02cee1dbd745df675be76f6d4e1b8e66f",
+  "collectedAt": "2026-09-09T10:40:03.169Z",
+  "status": "PASS",
+  "format": "mmcif",
+  "counts": {
+    "atoms": 58870,
+    "residues": 8029,
+    "chains": 35,
+    "polymerAtoms": 58674,
+    "ligandAtoms": 189,
+    "waterAtoms": 0,
+    "ionAtoms": 7,
+    "otherAtoms": 0
+  },
+  "bondCount": 51323,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": true,
+    "secondaryStructure": true,
+    "partialCharge": false,
+    "polymerTyping": true,
+    "chemistryRoles": false,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

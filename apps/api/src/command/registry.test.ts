@@ -17,6 +17,11 @@ describe("R10 versioned command registry", () => {
     expect(resolveCommand("python")).toMatchObject({ spec: { safetyClass: "UNSAFE_REJECTED" } });
   });
 
+  it("keeps the recognized CE alignment command unavailable at runtime", () => {
+    expect(PYMOL_INVENTORY.find((entry) => entry.publicName === "cealign")).toMatchObject({ disposition: "SAFE_BUT_NOT_IMPLEMENTED", capabilityState: "UNAVAILABLE" });
+    expect(commandSpecFor("cealign")).toMatchObject({ capabilityState: "UNAVAILABLE", handlerKey: "analysis.cealign" });
+  });
+
   it("emits typed binding indexes for command specs", () => {
     expect(commandSpecFor("state")?.objectFields).toEqual(["object"]);
     expect(commandSpecFor("state")?.stateFields).toEqual(["state"]);

@@ -1,0 +1,35 @@
+{
+  "caseId": "RCSB-1UBQ",
+  "source": "RCSB",
+  "pdbId": "1UBQ",
+  "inputFormat": "mmcif",
+  "bytes": 103220,
+  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+  "collectedAt": "2026-09-09T10:33:52.123Z",
+  "status": "PASS",
+  "format": "mmcif",
+  "counts": {
+    "atoms": 660,
+    "residues": 77,
+    "chains": 2,
+    "polymerAtoms": 602,
+    "ligandAtoms": 0,
+    "waterAtoms": 58,
+    "ionAtoms": 0,
+    "otherAtoms": 0
+  },
+  "bondCount": 533,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": true,
+    "secondaryStructure": true,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": true,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

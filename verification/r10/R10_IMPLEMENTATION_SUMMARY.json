@@ -24,8 +24,9 @@
     "dispositions": {
       "ORACLE_PENDING": 228,
       "UNSAFE_REJECTED": 26,
-      "SAFE_TRANSLATABLE": 45,
-      "REFERENCE_ONLY_OUT_OF_SCOPE": 46
+      "SAFE_TRANSLATABLE": 44,
+      "REFERENCE_ONLY_OUT_OF_SCOPE": 46,
+      "SAFE_BUT_NOT_IMPLEMENTED": 1
     },
     "registryValidation": "PASS"
   },

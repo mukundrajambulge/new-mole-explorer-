@@ -1,0 +1,14 @@
+{
+  "collectedAt": "2026-09-09T10:59:46.3123683Z",
+  "bytes": 18038641,
+  "pdbId": "3J9M",
+  "errorCode": "PROBE_TIMEOUT",
+  "memoryObservedBytes": 899579904,
+  "caseId": "RCSB-3J9M",
+  "source": "RCSB",
+  "blockedReason": "Canonical ingestion probe exceeded 995 seconds (~16.6 minutes) without producing a validated result; probe was terminated to preserve the bounded campaign environment.",
+  "status": "BLOCKED",
+  "inputFormat": "mmcif",
+  "probeElapsedSeconds": 995.1,
+  "sha256": "40247a658d68a4c6100420bf020e87da04ec402c8904dff66a19c1a5e883b93f"
+}

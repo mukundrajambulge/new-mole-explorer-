@@ -3,7 +3,7 @@
 Source-pinned inventory from `keywords.py` at `5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69`. The SAFE_PYMOL_COMPAT profile is a translation boundary, not an embedded PyMOL runtime. Exact executable reference behavior remains ORACLE_PENDING unless separately evidenced.
 
 - Registry source keyword count: 345
-- Disposition counts: {"ORACLE_PENDING":228,"UNSAFE_REJECTED":26,"SAFE_TRANSLATABLE":45,"REFERENCE_ONLY_OUT_OF_SCOPE":46}
+- Disposition counts: {"ORACLE_PENDING":228,"UNSAFE_REJECTED":26,"SAFE_TRANSLATABLE":44,"REFERENCE_ONLY_OUT_OF_SCOPE":46,"SAFE_BUT_NOT_IMPLEMENTED":1}
 - Unsafe process/code commands are rejected before parsing and are never executed.
 
 | Public name | Disposition | Mole command type | Capability | Oracle |
@@ -31,7 +31,7 @@ Source-pinned inventory from `keywords.py` at `5e8bfca5a7f5dc4d5e7f84fa1d15af707
 | callout | ORACLE_PENDING | — | COMING_SOON | ORACLE_PENDING |
 | cartoon | ORACLE_PENDING | — | COMING_SOON | ORACLE_PENDING |
 | capture | ORACLE_PENDING | — | COMING_SOON | ORACLE_PENDING |
-| cealign | SAFE_TRANSLATABLE | ANALYSIS.CEALIGN | SUPPORTED_WITH_LIMITATIONS | ORACLE_PENDING |
+| cealign | SAFE_BUT_NOT_IMPLEMENTED | ANALYSIS.CEALIGN | UNAVAILABLE | ORACLE_PENDING |
 | centerofmass | ORACLE_PENDING | — | COMING_SOON | ORACLE_PENDING |
 | cd | ORACLE_PENDING | — | COMING_SOON | ORACLE_PENDING |
 | center | SAFE_TRANSLATABLE | VIEW.CENTER | SUPPORTED_WITH_LIMITATIONS | ORACLE_PENDING |

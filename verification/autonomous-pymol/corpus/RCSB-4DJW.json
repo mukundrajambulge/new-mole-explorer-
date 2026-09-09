@@ -1,0 +1,35 @@
+{
+  "caseId": "RCSB-4DJW",
+  "source": "RCSB",
+  "pdbId": "4DJW",
+  "inputFormat": "mmcif",
+  "bytes": 1289288,
+  "sha256": "c816a3b9e947cc71bf5390b2d10aeb117f0b6a2e7b16efbba3bf4c56c8d044f2",
+  "collectedAt": "2026-09-09T10:33:52.401Z",
+  "status": "PASS",
+  "format": "mmcif",
+  "counts": {
+    "atoms": 7079,
+    "residues": 786,
+    "chains": 9,
+    "polymerAtoms": 6112,
+    "ligandAtoms": 82,
+    "waterAtoms": 885,
+    "ionAtoms": 0,
+    "otherAtoms": 0
+  },
+  "bondCount": 5582,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": true,
+    "secondaryStructure": true,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": false,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

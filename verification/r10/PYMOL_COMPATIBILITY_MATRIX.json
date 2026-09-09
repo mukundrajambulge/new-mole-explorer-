@@ -11,8 +11,9 @@
   "dispositionCounts": {
     "ORACLE_PENDING": 228,
     "UNSAFE_REJECTED": 26,
-    "SAFE_TRANSLATABLE": 45,
-    "REFERENCE_ONLY_OUT_OF_SCOPE": 46
+    "SAFE_TRANSLATABLE": 44,
+    "REFERENCE_ONLY_OUT_OF_SCOPE": 46,
+    "SAFE_BUT_NOT_IMPLEMENTED": 1
   },
   "familyCounts": {
     "HTS": 0,
@@ -509,17 +510,18 @@
       "family": "alignment/RMSD",
       "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
       "moleType": "COMMAND",
-      "syntaxStatus": "SUPPORTED",
-      "semanticStatus": "BOUNDARY_TRANSLATION",
+      "syntaxStatus": "REGISTERED_ONLY",
+      "semanticStatus": "NOT_IMPLEMENTED",
       "safetyStatus": "SAFE_BOUNDARY",
       "evidenceRefs": [
         "R10_REGISTRY",
-        "pymol:5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69"
+        "pymol:5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+        "RUNTIME_PROBE:UNAVAILABLE"
       ],
       "canonicalCommandType": "ANALYSIS.CEALIGN",
-      "disposition": "SAFE_TRANSLATABLE",
-      "effectClass": "VISUAL_MUTATION",
-      "capabilityState": "SUPPORTED_WITH_LIMITATIONS",
+      "disposition": "SAFE_BUT_NOT_IMPLEMENTED",
+      "effectClass": "SCIENTIFIC_MUTATION",
+      "capabilityState": "UNAVAILABLE",
       "oracleStatus": "ORACLE_PENDING"
     },
     {

@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-09T11:01:45.9484433Z",
+  "method": "Direct POST to running API plus real-app CUA observation; timings include RCSB acquisition and canonical ingestion, with no fabricated FPS threshold",
+  "apiHealth": {
+    "elapsedMs": 198,
+    "status": "ok"
+  },
+  "measured": [
+    {
+      "pdbId": "1CRN",
+      "status": "PASS",
+      "elapsedMs": 237,
+      "counts": {
+        "atoms": 327,
+        "residues": 46,
+        "chains": 1,
+        "polymerAtoms": 327,
+        "ligandAtoms": 0,
+        "waterAtoms": 0,
+        "ionAtoms": 0,
+        "otherAtoms": 0
+      }
+    },
+    {
+      "pdbId": "4DJW",
+      "status": "PASS",
+      "elapsedMs": 5284,
+      "counts": {
+        "atoms": 7079,
+        "residues": 786,
+        "chains": 9,
+        "polymerAtoms": 6112,
+        "ligandAtoms": 82,
+        "waterAtoms": 885,
+        "ionAtoms": 0,
+        "otherAtoms": 0
+      }
+    }
+  ],
+  "sizeStress": [
+    {
+      "sizeClass": "XS",
+      "status": "PASS",
+      "evidence": "local deterministic fixtures 3-12 atoms"
+    },
+    {
+      "sizeClass": "S",
+      "status": "PASS",
+      "evidence": "1CRN/1UBQ/1BNA/1TRA and local multistate fixtures"
+    },
+    {
+      "sizeClass": "M",
+      "status": "PASS",
+      "evidence": "4DJW (7,079 atoms), 1C3W, 1G6V"
+    },
+    {
+      "sizeClass": "L",
+      "status": "PASS",
+      "evidence": "1AON (58,870 atoms), 5LE5 (52,161 atoms)"
+    },
+    {
+      "sizeClass": "XL",
+      "status": "BLOCKED",
+      "evidence": "3J9M 18,038,641-byte file; canonical probe stopped after 995.1 seconds without result"
+    },
+    {
+      "sizeClass": "XXL",
+      "status": "BLOCKED",
+      "evidence": "4V6F 38,137,644 bytes exceeds 26,214,400-byte hard limit"
+    }
+  ],
+  "interactionStress": {
+    "realApp": "PASS",
+    "numericFps": "NOT_CAPTURED",
+    "observed": [
+      "4DJW load in CUA: 7,079 atoms / 786 residues / 9 chains",
+      "select chain A: 3,060 atoms",
+      "VDW/camera/selection evidence retained from Gate 01/Gate 02"
+    ],
+    "stallPolicy": "Architecture/invariant counters used by prior Gate 01; no brittle FPS threshold claimed"
+  },
+  "limitations": [
+    "API timings are local single-run observations, not a statistical benchmark",
+    "Headless screenshot capture was bounded during concurrent stress and is not used as a pass claim",
+    "XL/XXL limits are recorded as blocked, not silently passed"
+  ]
+}
