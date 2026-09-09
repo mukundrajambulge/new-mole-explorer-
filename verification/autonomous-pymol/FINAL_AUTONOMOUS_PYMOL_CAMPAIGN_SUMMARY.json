@@ -109,7 +109,8 @@
     "focusedFinalAcceptance": "PASS: 3/3 x 3 consecutive runs",
     "gate01": "PASS",
     "gate02": "PASS",
-    "gate03b": "PASS after isolated retry; combined run 2/3 then retry PASS"
+    "gate03b": "PASS after isolated retry; combined run 2/3 then retry PASS",
+    "hostedCi": {"runId": 34358363969, "headSha": "ee513f80ce74f0a94223a2bc45ed51224672ecbf", "status": "completed", "conclusion": "success", "node": "22", "url": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34358363969"}
   },
   "defects": {"P0": 0, "P1": 1, "P2": 228, "p1Items": ["CEALIGN remains visibly unavailable pending validated implementation and executable oracle"]},
   "driveEvidence": {

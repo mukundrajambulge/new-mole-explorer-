@@ -49,6 +49,8 @@ Measured local API ingestion was 1CRN 327 atoms in 237 ms and 4DJW 7,079 atoms i
 | Gate 02 | PASS |
 | Gate 03B | PASS — 2/3 in combined run plus isolated retry PASS; all three cases pass in the final evidence set |
 
+Hosted GitHub Actions run [34358363969](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34358363969) completed successfully on exact tip `ee513f80ce74f0a94223a2bc45ed51224672ecbf` with Node 22.
+
 No P0 defect remains in the claimed surface. CEALIGN is the single P1 implementation gap; the remaining 228 source rows are explicitly coming-soon/oracle-pending rather than implied support.
 
 ## Evidence archive
