@@ -5,6 +5,7 @@ const pqrFixture = resolve("tests/fixtures/charged.pqr");
 const sdfFixture = resolve("tests/fixtures/ethanol.sdf");
 const xyzFixture = resolve("tests/fixtures/water.xyz");
 const proteinFixture = resolve("tests/fixtures/mini-protein.pdb");
+const ligandFixture = resolve("tests/fixtures/g1c-small-molecule.pdb");
 
 test("AT-FSR-A-001 exposes the approved scientific shell with a collapsed console", async ({ page }) => {
   await page.goto("/");
@@ -64,6 +65,21 @@ test("AT-FSR-G-001 admits a bounded XYZ coordinate frame as a molecule", async (
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
   await expect(page.getByTestId("source-provenance")).toContainText("XYZ");
   await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_G_XYZ_IMPORT.png") });
+});
+
+test("AT-FSR-H-000 keeps two local coordinate objects visible after workspace assembly", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(proteinFixture);
+  await expect(page.getByTitle("mini-protein.pdb")).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: "File", exact: true }).click();
+  const fileInput = page.locator('input[type="file"]');
+  await page.getByRole("button", { name: "Add Structure", exact: true }).click();
+  await fileInput.setInputFiles(ligandFixture);
+  await expect(page.getByTitle("g1c-small-molecule.pdb")).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId("objects-selections-panel").locator("[data-object-id]")).toHaveCount(2);
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-renderer-model-count", "2");
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_H_LOCAL_TWO_OBJECTS.png") });
 });
 
 test("AT-FSR-C-001 executes top-level console batches and rejects malformed nesting", async ({ page }) => {

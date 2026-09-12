@@ -504,9 +504,11 @@ export class ThreeDMolViewerAdapter {
     this.viewport = viewport;
     this.cameraState = { ...this.cameraState, viewport };
     if (!this.viewer) return;
-    // The console is an overlay. Resize the full WebGL canvas, but do not
-    // translate, refit, or reclamp the camera as a consequence of layout.
+    // The console is an overlay. Resize the full WebGL canvas, then reconcile
+    // the existing safe-region translation with the new occluder bounds. Do
+    // not refit or rebuild the model as a consequence of layout alone.
     this.viewer.resize();
+    this.applyViewportTranslation();
     this.cameraState = { ...this.cameraState, view: this.viewer.getView(), viewport };
     this.writeCameraDiagnostics();
     if (this.hasModel) this.render();
@@ -1416,8 +1418,20 @@ export class ThreeDMolViewerAdapter {
     if (!target) return;
     this.resetCameraTranslation();
     this.viewer.resize();
-    this.viewer.center(target.selection);
-    this.viewer.zoomTo(target.selection);
+    // 3Dmol cannot reliably frame a composed selection spanning model
+    // instances. Keep the proven primary-model camera target while every
+    // visible model remains independently rendered in the shared viewer.
+    const visibleWorkspaceObjects = this.workspaceObjects.filter((object) => object.enabled);
+    if (visibleWorkspaceObjects.length > 1) {
+      const primary = visibleWorkspaceObjects[0];
+      const primaryStructure = primary && this.primaryModel ? structureForWorkspaceObjectState(primary) : null;
+      const primaryTarget = primaryStructure && this.primaryModel ? this.selectionForModel(primaryStructure, this.primaryModel) : target.selection;
+      this.viewer.center(primaryTarget);
+      this.viewer.zoomTo(primaryTarget);
+    } else {
+      this.viewer.center(target.selection);
+      this.viewer.zoomTo(target.selection);
+    }
     this.fitToSafeViewport();
     this.cameraPivot = target.center;
     this.appliedViewportShift = { x: 0, y: 0 };
