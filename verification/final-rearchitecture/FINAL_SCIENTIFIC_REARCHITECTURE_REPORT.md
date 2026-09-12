@@ -1,7 +1,7 @@
 # MOLEXPLORER final scientific UI rearchitecture report
 
 Status: **bounded implementation verified; full binary trajectory decoding and executable PyMOL oracle remain pending**
-Commit: `8e6a89e` (`docs: seal final biological data release`)
+Commit: `0cfe02b` (`fix: close planned tool controls in scientific rail`)
 Branch: `feature/final-scientific-ui-pymol-conformance`
 
 ## Delivered behavior
@@ -30,7 +30,37 @@ Repository checks pass:
 - `npm run verify:r10`
 - `git diff --check`
 
-Local visual evidence is stored under `verification/final-rearchitecture/evidence/` and the inherited acceptance evidence directories. J-slice evidence covers the open biological-data dialog, sequence viewer, density-map viewer, and trajectory viewer. The three R07 console/action harness paths were corrected to expand the intentionally collapsed console and use the visible scientific action labels; their isolated rerun passes 4/4 and the final full regression passes 138/138. The machine-readable inventories are `FEATURE_INVENTORY.json`, `UI_CONTROL_INVENTORY.json`, `PYMOL_CONFORMANCE_MATRIX.json`, and `GOOGLE_DRIVE_EVIDENCE_MANIFEST.json`; the required mirrored PyMOL artifacts are also present under `verification/pymol/`. Wizard and Movie scope are recorded in `PYMOL_WIZARD_GAP_MATRIX.md` and `PYMOL_MOVIE_IMPLEMENTATION_PLAN.md`. The user guide is in `docs/user-guide/` with a coverage index in `USER_GUIDE_COVERAGE.md`.
+Local visual evidence is stored under `verification/final-rearchitecture/evidence/` and the inherited acceptance evidence directories. J-slice evidence covers the open biological-data dialog, sequence viewer, density-map viewer, and trajectory viewer. The three R07 console/action harness paths were corrected to expand the intentionally collapsed console and use the visible scientific action labels; their isolated rerun passes 4/4 and the final full regression passes 138/138. The machine-readable inventories are `FEATURE_INVENTORY.json`, `UI_CONTROL_INVENTORY.json`, `PYMOL_CONFORMANCE_MATRIX.json`, and `GOOGLE_DRIVE_EVIDENCE_MANIFEST.json`; the required mirrored PyMOL artifacts are also present under `verification/pymol/`. Wizard and Movie scope are recorded in `PYMOL_WIZARD_GAP_MATRIX.md` and `PYMOL_MOVIE_IMPLEMENTATION_PLAN.md`. The user guide is in `docs/user-guide/` with coverage indexes in `docs/user-guide/USER_GUIDE_COVERAGE.md` and `verification/final-rearchitecture/USER_GUIDE_COVERAGE.md`.
+
+## Release answer sheet
+
+| Requirement | Current answer |
+| --- | --- |
+| Repository | `C:\Users\mukun\Desktop\molecular-workstation`; `new-origin` → `https://github.com/mukundrajambulge/new-mole-explorer-.git` |
+| Branch / baseline / final implementation SHA | `feature/final-scientific-ui-pymol-conformance` / `3cb632770b8be70a3fc45c4809706c0b58f8a6cb` / `0cfe02b` |
+| UI rearchitecture | **PASS** — approved menus, inward right rail, dominant canvas, left object panel, collapsed console, status bar |
+| Universal import | **PARTIAL, bounded** — coordinate adapters and typed biological viewers are implemented; research trajectory formats remain explicitly limited |
+| PDB; mmCIF/CIF; SDF; MOL/MOL2 | **PASS** within the documented single-object/declared-connectivity limits |
+| PQR; XYZ; PDBQT | **PASS** within source-field and no-inference limits |
+| FASTA; FASTQ; GenBank; EMBL | **PASS** through typed sequence/read-quality viewers; no coordinates are fabricated |
+| MRC/CCP4/DX maps | **PASS** within bounded voxel payload and slice controls |
+| Trajectories | **PARTIAL** — multi-frame XYZ and GRO are ready; DCD is header-only and XTC/TRR metadata-only |
+| Multi-object workspace | **PASS** — real 4DJW + 1CRN and local two-object gates pass |
+| Selection | **PASS, bounded** — membership-aware live matrix and clear/overlay workflows pass |
+| PyMOL selection oracle | **BOUNDED** — 51 direct oracle passes, 35 documented equivalents, 1 pending; executable oracle unavailable |
+| Display / Color / Measurements / Editing / Undo–Redo / Sessions / Scenes | **PASS** within documented renderer, revision, and persistence limits |
+| Ligand interaction workflow | **PASS, bounded** — zero-command rail provides ligand selection and proximity/H-bond/contact/clash diagnostics; no docking or affinity inference |
+| Alignment | **PARTIAL** — RMS/RMS_CUR/FIT/PAIR_FIT/ALIGN gates pass; `super` remains oracle-limited and `cealign` is unsupported |
+| `super` / `cealign` runtime | Bounded `super` implementation with reference parity pending / `UNSUPPORTED` |
+| Wizards / Movie | No active wizard controls; Movie is planned and visibly disabled |
+| Console / semicolon batches | **PASS** — tokenizer, balanced delimiters, quoted semicolons, stop-on-error, and safe dispatch are covered |
+| GUI–console / API convergence | **PASS where an API exists**; typed biological viewers are GUI import routes in this gate |
+| Security | **PASS** — host Python, shell, arbitrary process, filesystem, and network execution are rejected |
+| Historical defects | **A–Q PASS** in the historical defect matrix and regression gates |
+| Test results | `npm ci`; 147 web + 64 API unit tests; typecheck; lint; build; selection-matrix; R10; full Chromium **138/138** |
+| Oracle / visual / stress | Oracle ledger 51/35/1; 21 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked |
+| Google Drive evidence | **BLOCKED_CREDENTIAL_OR_ENVIRONMENT**; local hashes and upload manifest retained |
+| PyMOL conformance | Bounded source/documentation/runtime classification; no complete PyMOL compatibility claim |
 
 ## Conformance and release limits
 

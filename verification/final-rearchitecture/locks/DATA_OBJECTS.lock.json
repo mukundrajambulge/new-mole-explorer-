@@ -3,7 +3,7 @@
   "scope": "DATA_OBJECTS",
   "status": "LOCKED_BOUNDED",
   "capturedAt": "2026-09-13",
-  "commit": "8e6a89e",
+  "commit": "0cfe02b",
   "statement": "Canonical object/state lineage, bounded coordinate ingestion, multi-object rendering, explicit frame policy, and object-qualified selection are verified.",
   "admittedFormats": ["PDB", "mmCIF", "CIF", "PQR", "SDF", "MOL", "XYZ", "MOL2", "PDBQT"],
   "evidence": ["AT-FSR-B-001", "AT-FSR-B-002", "AT-FSR-G-001", "AT-FSR-H-000", "AT-FSR-H-001", "tests/e2e/multi-object-state.spec.ts", "tests/e2e/real-structure-workspace.spec.ts"],

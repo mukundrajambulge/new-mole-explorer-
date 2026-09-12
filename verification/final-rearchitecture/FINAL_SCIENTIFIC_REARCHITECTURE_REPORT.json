@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "capturedAt": "2026-09-13",
   "status": "BOUNDED_IMPLEMENTATION_VERIFIED",
-  "commit": "8e6a89e",
+  "commit": "0cfe02b",
   "branch": "feature/final-scientific-ui-pymol-conformance",
   "server": {
     "workbench": "http://localhost:3101/molstudio",
@@ -57,5 +57,59 @@
     "docking, virtual screening, HTS, and main-branch merge"
   ],
   "evidenceManifest": "verification/final-rearchitecture/GOOGLE_DRIVE_EVIDENCE_MANIFEST.json",
-  "additionalReports": ["verification/pymol/PYMOL_CONFORMANCE_MATRIX.md", "verification/pymol/PYMOL_CONFORMANCE_MATRIX.json", "verification/final-rearchitecture/PYMOL_WIZARD_GAP_MATRIX.md", "verification/final-rearchitecture/PYMOL_MOVIE_IMPLEMENTATION_PLAN.md"]
+  "additionalReports": [
+    "verification/pymol/PYMOL_CONFORMANCE_MATRIX.md",
+    "verification/pymol/PYMOL_CONFORMANCE_MATRIX.json",
+    "verification/final-rearchitecture/PYMOL_WIZARD_GAP_MATRIX.md",
+    "verification/final-rearchitecture/PYMOL_MOVIE_IMPLEMENTATION_PLAN.md",
+    "verification/final-rearchitecture/USER_GUIDE_COVERAGE.md"
+  ],
+  "finalAnswerSheet": {
+    "uiRearchitecture": "PASS",
+    "universalImport": "PARTIAL_BOUNDED",
+    "coordinateFormats": {
+      "pdb": "PASS",
+      "mmcifCif": "PASS",
+      "pqr": "PASS",
+      "sdfMol": "PASS",
+      "mol2": "PASS",
+      "xyz": "PASS",
+      "pdbqt": "PASS"
+    },
+    "typedBiologicalFormats": {
+      "fasta": "PASS",
+      "fastq": "PASS",
+      "genbank": "PASS",
+      "embl": "PASS",
+      "maps": "PASS_BOUNDED",
+      "trajectories": "PARTIAL"
+    },
+    "multiObject": "PASS",
+    "selection": "PASS_BOUNDED",
+    "pymolSelectionOracle": "BOUNDED_51_DIRECT_35_EQUIVALENT_1_PENDING_EXECUTABLE_BLOCKED",
+    "display": "PASS_BOUNDED",
+    "color": "PASS",
+    "measurements": "PASS",
+    "ligandWorkflow": "PASS_BOUNDED",
+    "alignment": "PARTIAL",
+    "superRuntime": "BOUNDED_REFERENCE_PENDING",
+    "cealignRuntime": "UNSUPPORTED",
+    "editing": "PASS",
+    "undoRedo": "PASS",
+    "sessions": "PASS",
+    "scenes": "PASS",
+    "wizard": "PLANNED_SUBSET_ONLY",
+    "movie": "PLANNED_DISABLED",
+    "console": "PASS",
+    "semicolonBatches": "PASS",
+    "guiConsoleConvergence": "PASS",
+    "apiConvergence": "PASS_WHERE_API_EXISTS",
+    "security": "PASS",
+    "historicalDefects": "A-Q_PASS",
+    "googleDrive": "BLOCKED_CREDENTIAL_OR_ENVIRONMENT",
+    "screenshots": {
+      "finalRearchitecturePng": 21,
+      "inheritedEvidencePng": 200
+    }
+  }
 }
