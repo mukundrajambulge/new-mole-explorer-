@@ -30,6 +30,7 @@ import { createDefaultAlignmentRequest, markAlignmentResultStale, type Alignment
 import { commandHelp, isRecognizedCommandVerb, parseCommand } from "./commands/commandRegistry";
 import { unsafeConsoleDiagnostic } from "./commands/safeBoundary";
 import { dispatchUiCommand } from "./commands/uiDispatcher";
+import { tokenizeCommandBatch } from "./commands/batchTokenizer";
 import { copyWorkspaceObject, createWorkspaceGroup, createWorkspaceObject, createWorkspaceObjectFromSelection, cycleWorkspaceObjectState, joinWorkspaceObjectStates, renameWorkspaceObject, resolveGlobalFrameState, setWorkspaceObjectAllStates, setWorkspaceObjectEnabled, setWorkspaceObjectState, splitWorkspaceObjectStates, structureForWorkspaceObjectState, updateWorkspaceGroup, workspaceScopedStableAtomId, workspaceSelectionStructure, type WorkspaceGroup, type WorkspaceObject } from "./workspace/workspaceModel";
 import { createAddBondCommand, createAddHydrogensCommand, createAttachAtomCommand, createCoordinateEditCommand, createDeleteAtomsCommand, createDeleteBondCommand, createRefillHydrogensCommand, createRemoveHydrogensCommand, createReplaceAtomCommand, createReplaceBondSemanticsCommand, ScientificHistoryService, type ScientificRevision } from "./editing/editFoundation";
 import { buildSessionDraft, restoreSession } from "./lifecycle/sessionCodec";
@@ -1410,13 +1411,22 @@ export const App = () => {
 
   const uiCommandLedgerRef = useRef<readonly ReturnType<typeof dispatchUiCommand>["command"][]>([]);
   const runConsoleCommand = (input: string, alignmentOptions?: AlignmentWorkflowOptions): ConsoleCommandResult => {
-    const unsafe = unsafeConsoleDiagnostic(input.trim());
-    if (unsafe) return runConsoleCommandInternal(input, alignmentOptions);
-    const execution = dispatchUiCommand(input, (command) => {
-      uiCommandLedgerRef.current = [...uiCommandLedgerRef.current.slice(-255), command];
-      return runConsoleCommandInternal(input, alignmentOptions);
-    }, "CONSOLE");
-    return execution.result;
+    const batch = tokenizeCommandBatch(input);
+    if (batch.error) return { category: "CAPABILITY", status: `${batch.error.message} (characters ${batch.error.start + 1}–${batch.error.end})`, diagnostics: [{ message: batch.error.message, span: { start: batch.error.start, end: batch.error.end } }] };
+    if (batch.commands.length === 0) return { category: "CAPABILITY", status: "A command is required." };
+    const results: ConsoleCommandResult[] = [];
+    for (const commandText of batch.commands) {
+      const unsafe = unsafeConsoleDiagnostic(commandText);
+      const result = unsafe ? runConsoleCommandInternal(commandText, alignmentOptions) : dispatchUiCommand(commandText, (command) => {
+        uiCommandLedgerRef.current = [...uiCommandLedgerRef.current.slice(-255), command];
+        return runConsoleCommandInternal(commandText, alignmentOptions);
+      }, "CONSOLE").result;
+      results.push(result);
+      if (result.category === "CAPABILITY" && /(?:Unknown command|requires|not implemented|unavailable|not parsed|not admitted|rejected)/i.test(result.status)) break;
+    }
+    if (results.length === 1) return results[0]!;
+    const last = results[results.length - 1]!;
+    return { category: last.category, status: `Batch executed ${results.length}/${batch.commands.length} command${batch.commands.length === 1 ? "" : "s"}: ${results.map((result, index) => `${index + 1}. ${result.status}`).join(" | ")}`, count: last.count };
   };
 
   const handleNamedSelectionAction = (name: string, action: "A" | "S" | "H" | "L" | "C") => {

@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 
 const pqrFixture = resolve("tests/fixtures/charged.pqr");
 const sdfFixture = resolve("tests/fixtures/ethanol.sdf");
+const proteinFixture = resolve("tests/fixtures/mini-protein.pdb");
 
 test("AT-FSR-A-001 exposes the approved scientific shell with a collapsed console", async ({ page }) => {
   await page.goto("/");
@@ -53,4 +54,19 @@ test("AT-FSR-B-002 admits one V2000 SDF molecule as a coordinate-bearing object"
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
   await expect(page.getByTestId("source-provenance")).toContainText("SDF");
   await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_B_SDF_IMPORT.png") });
+});
+
+test("AT-FSR-C-001 executes top-level console batches and rejects malformed nesting", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(proteinFixture);
+  await expect(page.getByTitle("mini-protein.pdb")).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: "Command Console" }).click();
+  const command = page.getByRole("textbox", { name: "Command or selection query" });
+  await command.fill("select polymer; show sticks, all");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(page.getByLabel("Command console")).toContainText("Batch executed 2/2 commands");
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-renderer-stick-cylinders", "8");
+  await command.fill("select (chain A; color red, all");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(page.getByLabel("Command console")).toContainText("Unterminated parenthesized expression");
 });
