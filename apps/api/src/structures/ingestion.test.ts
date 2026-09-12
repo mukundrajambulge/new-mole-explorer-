@@ -11,6 +11,19 @@ ATOM      2  CA  ALA A   1       0.000   2.000   3.000  0.1000 1.7000
 HETATM    3  O   HOH A   2       1.000   2.000   3.000 -0.8000 1.5200
 `;
 
+const sdfFixture = `ethanol
+  Molexplorer
+
+  3  2  0  0  0  0            999 V2000
+    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.5000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    2.1000    1.1000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+  1  2  1  0
+  2  3  1  0
+M  END
+$$$$
+`;
+
 const partialChargeCifFixture = `data_charges
 loop_
 _chem_comp_atom.comp_id
@@ -112,6 +125,18 @@ describe("VIS-01 structure ingestion", () => {
     expect(result.structure.partialChargeDataset?.atomChargeMap[result.structure.atoms[2]!.stableId]).toBe(-0.8);
   });
 
+  it("parses a single MDL V2000 SDF molecule with source bond orders", async () => {
+    const result = await new StructureIngestionService().ingestLocal("ethanol.sdf", Buffer.from(sdfFixture));
+    expect(result.structure.format).toBe("sdf");
+    expect(result.structure.counts).toMatchObject({ atoms: 3, ligandAtoms: 3 });
+    expect(result.structure.atoms.map((atom) => atom.element)).toEqual(["C", "C", "O"]);
+    expect(result.structure.bonds.map((bond) => bond.order)).toEqual(["SINGLE", "SINGLE"]);
+  });
+
+  it("fails closed for multi-record SDF until multi-object import is admitted", async () => {
+    await expect(new StructureIngestionService().ingestLocal("many.sdf", Buffer.from(`${sdfFixture}${sdfFixture}`))).rejects.toMatchObject({ code: "INVALID_INPUT" });
+  });
+
   it("promotes complete source-declared mmCIF partial charges without inference", async () => {
     const result = await new StructureIngestionService().ingestLocal("charges.mmcif", Buffer.from(partialChargeCifFixture));
     const dataset = result.structure.partialChargeDataset;
@@ -181,7 +206,7 @@ ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
   });
 
   it("rejects unadmitted formats without creating a structure", async () => {
-    await expect(new StructureIngestionService().ingestLocal("sample.sdf", Buffer.from("not admitted"))).rejects.toMatchObject({ code: "UNSUPPORTED_FORMAT" });
+    await expect(new StructureIngestionService().ingestLocal("sample.xyz", Buffer.from("not admitted"))).rejects.toMatchObject({ code: "UNSUPPORTED_FORMAT" });
   });
 
   it("fetches mmCIF from the official RCSB download endpoint", async () => {

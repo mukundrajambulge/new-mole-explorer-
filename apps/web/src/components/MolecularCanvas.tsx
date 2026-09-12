@@ -241,14 +241,14 @@ export const MolecularCanvas = ({
             <div className="empty-viewer-card">
               <span className="empty-viewer-icon"><Icon name="atom" size={28} /></span>
               <strong>No structure loaded</strong>
-              <span>Drop a PDB, mmCIF, or PQR file here, or import one from the toolbar.</span>
+              <span>Drop a PDB, mmCIF, PQR, or SDF/MOL file here, or import one from the toolbar.</span>
               <button className="empty-viewer-action" type="button" onClick={onImport}><Icon name="upload" size={14} /> Import structure</button>
             </div>
           </div>
         )}
         {loading && <div className="viewer-message viewer-message--loading"><Icon name="loader" size={18} /> Loading structure…</div>}
         {(error || viewerError) && <div className="viewer-message viewer-message--error"><Icon name="circleHelp" size={17} /> {error ?? viewerError}</div>}
-        {dragActive && <div className="drop-overlay"><Icon name="upload" size={24} /><strong>Drop PDB, mmCIF, or PQR</strong><span>Backend validation will keep the current structure safe.</span></div>}
+        {dragActive && <div className="drop-overlay"><Icon name="upload" size={24} /><strong>Drop a supported coordinate file</strong><span>Backend validation will keep the current structure safe.</span></div>}
         <div className="canvas-axis-readout" aria-label="Orientation axes"><span className="axis-readout-y">Y</span><span className="axis-readout-x">X</span><span className="axis-readout-z">Z</span></div>
         <button className="canvas-reset" onClick={() => onAction("VIEW.RESET")} aria-label="Reset view" data-action-id="VIEW.RESET"><Icon name="plus" size={16} /></button>
         <div className="canvas-tool-readout"><span className="tool-readout-icon"><Icon name={toolIcon(activeTool)} size={13} /></span>{measurementMode ? `MEASURE ${measurementMode}` : activeTool.toUpperCase()}</div>

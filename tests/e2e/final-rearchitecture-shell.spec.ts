@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 
 const pqrFixture = resolve("tests/fixtures/charged.pqr");
+const sdfFixture = resolve("tests/fixtures/ethanol.sdf");
 
 test("AT-FSR-A-001 exposes the approved scientific shell with a collapsed console", async ({ page }) => {
   await page.goto("/");
@@ -43,4 +44,13 @@ test("AT-FSR-B-001 admits PQR as a coordinate-bearing object", async ({ page }) 
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
   await expect(page.getByTestId("source-provenance")).toContainText("PQR");
   await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_B_PQR_IMPORT.png") });
+});
+
+test("AT-FSR-B-002 admits one V2000 SDF molecule as a coordinate-bearing object", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(sdfFixture);
+  await expect(page.getByTitle("ethanol.sdf")).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await expect(page.getByTestId("source-provenance")).toContainText("SDF");
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_B_SDF_IMPORT.png") });
 });

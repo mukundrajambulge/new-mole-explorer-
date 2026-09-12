@@ -245,6 +245,37 @@ const parsePqr = (content: string): ParsedSource => {
   return { format: "pqr", atoms, bonds: [], coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }], partialChargeBySourceIndex };
 };
 
+/** Bounded MDL V2000 reader for one coordinate-bearing molecule per import. */
+const parseSdf = (content: string): ParsedSource => {
+  const records = content.split(/^\$\$\$\$\s*$/m).map((record) => record.trim()).filter(Boolean);
+  if (records.length !== 1) throw new IngestionError("INVALID_INPUT", "SDF import currently accepts exactly one molecule record. Split multi-record SDF files before importing.");
+  const lines = records[0]!.split(/\r?\n/);
+  if (lines.length < 4 || !/V2000\s*$/i.test(lines[3] ?? "")) throw new IngestionError("INVALID_INPUT", "Only coordinate-bearing MDL V2000 MOL/SDF records are admitted.");
+  const atomCount = parseInteger(lines[3]!.slice(0, 3).trim(), -1);
+  const bondCount = parseInteger(lines[3]!.slice(3, 6).trim(), -1);
+  if (atomCount < 1 || bondCount < 0 || lines.length < 4 + atomCount + bondCount) throw new IngestionError("INVALID_INPUT", "MOL/SDF counts or atom block are incomplete.");
+  const atoms: AtomSeed[] = [];
+  for (let index = 0; index < atomCount; index += 1) {
+    const line = lines[4 + index]!;
+    const x = parseNumber(line.slice(0, 10).trim(), "x coordinate");
+    const y = parseNumber(line.slice(10, 20).trim(), "y coordinate");
+    const z = parseNumber(line.slice(20, 30).trim(), "z coordinate");
+    const element = normalizeElement(line.slice(31, 34), "X");
+    if (element === "X") throw new IngestionError("INVALID_INPUT", "MOL/SDF atom records require an element symbol.");
+    atoms.push({ serial: index + 1, atomName: `${element}${index + 1}`, element, residueName: "MOL", residueNumber: 1, chain: "_", x, y, z, recordType: "HETATM", ...classifyAtom("HETATM", "MOL", element) });
+  }
+  const bonds: BondSeed[] = [];
+  for (let index = 0; index < bondCount; index += 1) {
+    const line = lines[4 + atomCount + index]!;
+    const atom1Serial = parseInteger(line.slice(0, 3).trim(), -1);
+    const atom2Serial = parseInteger(line.slice(3, 6).trim(), -1);
+    const orderCode = parseInteger(line.slice(6, 9).trim(), 0);
+    if (atom1Serial < 1 || atom1Serial > atomCount || atom2Serial < 1 || atom2Serial > atomCount || atom1Serial === atom2Serial) throw new IngestionError("INVALID_INPUT", "MOL/SDF bond records reference an invalid atom.");
+    bonds.push({ atom1Serial, atom2Serial, order: orderCode === 1 ? "SINGLE" : orderCode === 2 ? "DOUBLE" : orderCode === 3 ? "TRIPLE" : orderCode === 4 ? "AROMATIC" : "UNKNOWN", source: "UNKNOWN" });
+  }
+  return { format: "sdf", atoms, bonds, coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }] };
+};
+
 const tokenizeCif = (content: string): string[] => {
   const tokens: string[] = [];
   let token = "";
@@ -495,19 +526,21 @@ const formatFromFilename = (filename: string): StructureFormat => {
   if (extension === "pdb") return "pdb";
   if (extension === "cif" || extension === "mmcif") return "mmcif";
   if (extension === "pqr") return "pqr";
-  throw new IngestionError("UNSUPPORTED_FORMAT", "This file is not an admitted coordinate format. Supported coordinate formats are PDB, mmCIF, and PQR.");
+  if (extension === "sdf" || extension === "mol") return "sdf";
+  throw new IngestionError("UNSUPPORTED_FORMAT", "This file is not an admitted coordinate format. Supported coordinate formats are PDB, mmCIF, PQR, and SDF/MOL.");
 };
 
 const formatEvidenceFor = (filename: string, content: string): { format: StructureFormat; evidence: FormatEvidence[] } => {
   const extension = filename.toLowerCase().split(".").pop();
-  const filenameFormat: StructureFormat | undefined = extension === "pdb" ? "pdb" : extension === "cif" || extension === "mmcif" ? "mmcif" : extension === "pqr" ? "pqr" : undefined;
-  if (!filenameFormat) throw new IngestionError("UNSUPPORTED_FORMAT", "This file is not an admitted coordinate format. Supported coordinate formats are PDB, mmCIF, and PQR.");
+  const filenameFormat: StructureFormat | undefined = extension === "pdb" ? "pdb" : extension === "cif" || extension === "mmcif" ? "mmcif" : extension === "pqr" ? "pqr" : extension === "sdf" || extension === "mol" ? "sdf" : undefined;
+  if (!filenameFormat) throw new IngestionError("UNSUPPORTED_FORMAT", "This file is not an admitted coordinate format. Supported coordinate formats are PDB, mmCIF, PQR, and SDF/MOL.");
   const lines = content.split(/\r?\n/);
   const hasPdbSignature = lines.some((line) => /^(HEADER|TITLE\s|ATOM\s{2}|HETATM|MODEL\s|CRYST1|CONECT|HELIX\s|SHEET\s)/.test(line));
   const hasMmcifSignature = /^\s*data_[^\s]*/im.test(content) && /_atom_site\./i.test(content);
   const hasPqrSignature = lines.some((line) => /^(ATOM|HETATM)\s+\d+\s+\S+\s+\S+(?:\s+\S+)?\s+-?\d+\s+-?\d/.test(line));
-  const signature: FormatEvidence | undefined = hasMmcifSignature ? { kind: "CONTENT_SIGNATURE", value: "mmCIF data_ + _atom_site loop" } : filenameFormat === "pqr" && hasPqrSignature ? { kind: "CONTENT_SIGNATURE", value: "PQR whitespace atom records" } : hasPdbSignature ? { kind: "CONTENT_SIGNATURE", value: "PDB record columns" } : undefined;
-  const signatureFormat = signature?.value.startsWith("mmCIF") ? "mmcif" : signature?.value.startsWith("PQR") ? "pqr" : signature?.value.startsWith("PDB") ? "pdb" : undefined;
+  const hasSdfSignature = lines.length >= 4 && /V2000\s*$/i.test(lines[3] ?? "");
+  const signature: FormatEvidence | undefined = hasMmcifSignature ? { kind: "CONTENT_SIGNATURE", value: "mmCIF data_ + _atom_site loop" } : filenameFormat === "sdf" && hasSdfSignature ? { kind: "CONTENT_SIGNATURE", value: "MDL V2000 molfile" } : filenameFormat === "pqr" && hasPqrSignature ? { kind: "CONTENT_SIGNATURE", value: "PQR whitespace atom records" } : hasPdbSignature ? { kind: "CONTENT_SIGNATURE", value: "PDB record columns" } : undefined;
+  const signatureFormat = signature?.value.startsWith("mmCIF") ? "mmcif" : signature?.value.startsWith("MDL") ? "sdf" : signature?.value.startsWith("PQR") ? "pqr" : signature?.value.startsWith("PDB") ? "pdb" : undefined;
   if (signatureFormat && filenameFormat !== signatureFormat) {
     throw new IngestionError("FORMAT_MISMATCH", `Filename extension declares ${filenameFormat}, but content evidence declares ${signatureFormat}.`);
   }
@@ -516,7 +549,7 @@ const formatEvidenceFor = (filename: string, content: string): { format: Structu
 
 const parseSource = (filename: string, content: string): ParsedSource => {
   const format = formatFromFilename(filename);
-  return format === "pdb" ? parsePdb(content) : format === "pqr" ? parsePqr(content) : parseMmcif(content);
+  return format === "pdb" ? parsePdb(content) : format === "pqr" ? parsePqr(content) : format === "sdf" ? parseSdf(content) : parseMmcif(content);
 };
 
 const makeHierarchy = (atoms: CanonicalAtom[]): CanonicalHierarchy => {
@@ -681,7 +714,7 @@ export class StructureIngestionService {
     const sourceArtifact = await this.sourceArtifacts.seal({
       acquisitionKind: kind === "RCSB" ? "REMOTE_HTTP" : "LOCAL_UPLOAD",
       originalFilename: safeFilename,
-      mediaType: acquisition.mediaType ?? (formatEvidence.format === "pdb" ? "chemical/x-pdb" : formatEvidence.format === "pqr" ? "chemical/x-pqr" : "chemical/x-mmcif"),
+      mediaType: acquisition.mediaType ?? (formatEvidence.format === "pdb" ? "chemical/x-pdb" : formatEvidence.format === "pqr" ? "chemical/x-pqr" : formatEvidence.format === "sdf" ? "chemical/x-mdl-sdfile" : "chemical/x-mmcif"),
       format: formatEvidence.format,
       formatEvidence: formatEvidence.evidence,
       parserProfile: INGESTION_PARSER_PROFILE,
@@ -764,7 +797,7 @@ export class StructureIngestionService {
     const scientificHash = scientificHashFor(scientificPayload);
     const structure: CanonicalMolecularStructure = {
       id: `structure_${hash.slice(0, 16)}`,
-      name: safeFilename.replace(/\.(pdb|pqr|cif|mmcif)$/i, ""),
+      name: safeFilename.replace(/\.(pdb|pqr|sdf|mol|cif|mmcif)$/i, ""),
       format: parsed.format,
       source,
       atoms,
