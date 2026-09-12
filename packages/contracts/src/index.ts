@@ -31,7 +31,8 @@ export type BootstrapResponse = {
   capabilities: Record<string, Capability>;
 };
 
-export const STRUCTURE_FORMATS = ["pdb", "mmcif"] as const;
+/** Formats that currently produce an admitted, coordinate-bearing molecular object. */
+export const STRUCTURE_FORMATS = ["pdb", "mmcif", "pqr"] as const;
 export type StructureFormat = (typeof STRUCTURE_FORMATS)[number];
 
 export type StructureSourceKind = "LOCAL_FILE" | "RCSB";

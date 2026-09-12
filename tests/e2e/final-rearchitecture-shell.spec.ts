@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 
+const pqrFixture = resolve("tests/fixtures/charged.pqr");
+
 test("AT-FSR-A-001 exposes the approved scientific shell with a collapsed console", async ({ page }) => {
   await page.goto("/");
 
@@ -32,4 +34,13 @@ test("AT-FSR-A-002 opens menus and right-rail panels without changing the canvas
   await page.getByRole("button", { name: "Session panel" }).click();
   await expect(page.getByTestId("scene-manager")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Scenes" })).toBeVisible();
+});
+
+test("AT-FSR-B-001 admits PQR as a coordinate-bearing object", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(pqrFixture);
+  await expect(page.getByTitle("charged.pqr")).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await expect(page.getByTestId("source-provenance")).toContainText("PQR");
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_B_PQR_IMPORT.png") });
 });

@@ -6,6 +6,11 @@ const pdbFixture = `HEADER    TEST\nATOM      1  CA  ALA A   1       1.000   2.0
 
 const cifFixture = `data_test\nloop_\n_atom_site.group_PDB\n_atom_site.id\n_atom_site.type_symbol\n_atom_site.label_atom_id\n_atom_site.label_comp_id\n_atom_site.label_asym_id\n_atom_site.label_seq_id\n_atom_site.Cartn_x\n_atom_site.Cartn_y\n_atom_site.Cartn_z\nATOM 1 C CA ALA A 1 1.0 2.0 3.0\nHETATM 2 O O HOH A 2 4.0 5.0 6.0\n`;
 
+const pqrFixture = `ATOM      1  N   ALA A   1      -1.100   2.000   3.000 -0.3000 1.5500
+ATOM      2  CA  ALA A   1       0.000   2.000   3.000  0.1000 1.7000
+HETATM    3  O   HOH A   2       1.000   2.000   3.000 -0.8000 1.5200
+`;
+
 const partialChargeCifFixture = `data_charges
 loop_
 _chem_comp_atom.comp_id
@@ -91,6 +96,20 @@ describe("VIS-01 structure ingestion", () => {
     const result = await new StructureIngestionService().ingestLocal("sample.mmcif", Buffer.from(cifFixture));
     expect(result.structure.format).toBe("mmcif");
     expect(result.structure.counts).toMatchObject({ atoms: 2, polymerAtoms: 1, waterAtoms: 1 });
+  });
+
+  it("parses PQR coordinates and preserves complete source-declared charges", async () => {
+    const result = await new StructureIngestionService().ingestLocal("charged.pqr", Buffer.from(pqrFixture));
+    expect(result.structure.format).toBe("pqr");
+    expect(result.structure.counts).toMatchObject({ atoms: 3, polymerAtoms: 2, waterAtoms: 1 });
+    expect(result.structure.atoms.map((atom) => [atom.x, atom.y, atom.z])).toEqual([[-1.1, 2, 3], [0, 2, 3], [1, 2, 3]]);
+    expect(result.structure.partialChargeDataset).toMatchObject({
+      chargeModel: "source-declared PQR atomic charge",
+      profileVersion: "pqr-atomic-charge-v1",
+      provenance: "Copied from source PQR charge field; no charge inference performed",
+    });
+    expect(result.structure.partialChargeDataset?.atomChargeMap[result.structure.atoms[0]!.stableId]).toBe(-0.3);
+    expect(result.structure.partialChargeDataset?.atomChargeMap[result.structure.atoms[2]!.stableId]).toBe(-0.8);
   });
 
   it("promotes complete source-declared mmCIF partial charges without inference", async () => {

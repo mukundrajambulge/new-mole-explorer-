@@ -47,7 +47,7 @@ type AtomSeed = Omit<CanonicalAtom, "stableId">;
 type BondSeed = { atom1Serial: number; atom2Serial: number; order: BondOrder; source: CanonicalBond["source"] };
 type SecondarySpan = { kind: Exclude<SecondaryStructureKind, "LOOP">; chain: string; start: number; end: number };
 type CoordinateSeed = { sourceIndex: number; x: number; y: number; z: number };
-type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[]; coordinateStates?: Array<{ sourceModelNumber: number; coordinates: CoordinateSeed[] }>; secondaryStructureSource?: string; polymerTypingSource?: string; unitCell?: CanonicalUnitCell; partialChargeValues?: Record<string, number> };
+type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[]; coordinateStates?: Array<{ sourceModelNumber: number; coordinates: CoordinateSeed[] }>; secondaryStructureSource?: string; polymerTypingSource?: string; unitCell?: CanonicalUnitCell; partialChargeValues?: Record<string, number>; partialChargeBySourceIndex?: Record<number, number> };
 
 const parseNumber = (value: string, label: string): number => {
   const parsed = Number(value.replace(/\(.+\)$/, ""));
@@ -209,6 +209,40 @@ const parsePdb = (content: string): ParsedSource => {
   }
 
   return { format: "pdb", atoms, bonds, coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }], ...(secondarySpans.length ? { secondaryStructureSource: "PDB HELIX/SHEET records" } : {}), ...(unitCell ? { unitCell } : {}) };
+};
+
+/**
+ * PQR retains PDB atom identity while storing coordinates, charge, and radius
+ * as whitespace-delimited fields.  Radius is source metadata and is not used
+ * to mutate the application VDW model.
+ */
+const parsePqr = (content: string): ParsedSource => {
+  const atoms: AtomSeed[] = [];
+  const partialChargeBySourceIndex: Record<number, number> = {};
+  for (const line of content.split(/\r?\n/)) {
+    if (!/^(ATOM|HETATM)\s/.test(line)) continue;
+    const fields = line.trim().split(/\s+/);
+    if (fields.length < 10) throw new IngestionError("INVALID_INPUT", "PQR atom records require identity, XYZ coordinates, charge, and radius.");
+    const recordType = fields[0] as "ATOM" | "HETATM";
+    const serial = parseInteger(fields[1], atoms.length + 1);
+    const atomName = fields[2] || "X";
+    const residueName = fields[3] || "UNK";
+    // A chain ID is optional in PQR. The final five fields are always resi XYZ charge radius.
+    const coordinateStart = fields.length - 5;
+    const residueNumber = parseInteger(fields[coordinateStart - 1], 0);
+    const chain = coordinateStart > 5 ? (fields[coordinateStart - 2] || "_") : "_";
+    const x = parseNumber(fields[coordinateStart]!, "x coordinate");
+    const y = parseNumber(fields[coordinateStart + 1]!, "y coordinate");
+    const z = parseNumber(fields[coordinateStart + 2]!, "z coordinate");
+    const charge = parseNumber(fields[coordinateStart + 3]!, "PQR charge");
+    const radius = parseNumber(fields[coordinateStart + 4]!, "PQR radius");
+    if (radius <= 0) throw new IngestionError("INVALID_INPUT", "PQR atomic radii must be positive.");
+    const element = normalizeElement("", atomName);
+    atoms.push({ serial, atomName, element, residueName, residueNumber, chain, x, y, z, recordType, ...classifyAtom(recordType, residueName, element) });
+    partialChargeBySourceIndex[atoms.length - 1] = charge;
+  }
+  if (atoms.length === 0) throw new IngestionError("INVALID_INPUT", "No ATOM or HETATM records with coordinates were found in the PQR input.");
+  return { format: "pqr", atoms, bonds: [], coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }], partialChargeBySourceIndex };
 };
 
 const tokenizeCif = (content: string): string[] => {
@@ -460,26 +494,29 @@ const formatFromFilename = (filename: string): StructureFormat => {
   const extension = filename.toLowerCase().split(".").pop();
   if (extension === "pdb") return "pdb";
   if (extension === "cif" || extension === "mmcif") return "mmcif";
-  throw new IngestionError("UNSUPPORTED_FORMAT", "Only .pdb, .cif, and .mmcif files are admitted in G1C.");
+  if (extension === "pqr") return "pqr";
+  throw new IngestionError("UNSUPPORTED_FORMAT", "This file is not an admitted coordinate format. Supported coordinate formats are PDB, mmCIF, and PQR.");
 };
 
 const formatEvidenceFor = (filename: string, content: string): { format: StructureFormat; evidence: FormatEvidence[] } => {
   const extension = filename.toLowerCase().split(".").pop();
-  const filenameFormat: StructureFormat | undefined = extension === "pdb" ? "pdb" : extension === "cif" || extension === "mmcif" ? "mmcif" : undefined;
-  if (!filenameFormat) throw new IngestionError("UNSUPPORTED_FORMAT", "Only .pdb, .cif, and .mmcif files are admitted.");
+  const filenameFormat: StructureFormat | undefined = extension === "pdb" ? "pdb" : extension === "cif" || extension === "mmcif" ? "mmcif" : extension === "pqr" ? "pqr" : undefined;
+  if (!filenameFormat) throw new IngestionError("UNSUPPORTED_FORMAT", "This file is not an admitted coordinate format. Supported coordinate formats are PDB, mmCIF, and PQR.");
   const lines = content.split(/\r?\n/);
   const hasPdbSignature = lines.some((line) => /^(HEADER|TITLE\s|ATOM\s{2}|HETATM|MODEL\s|CRYST1|CONECT|HELIX\s|SHEET\s)/.test(line));
   const hasMmcifSignature = /^\s*data_[^\s]*/im.test(content) && /_atom_site\./i.test(content);
-  const signature: FormatEvidence | undefined = hasMmcifSignature ? { kind: "CONTENT_SIGNATURE", value: "mmCIF data_ + _atom_site loop" } : hasPdbSignature ? { kind: "CONTENT_SIGNATURE", value: "PDB record columns" } : undefined;
-  if (signature && ((signature.value.startsWith("mmCIF") && filenameFormat !== "mmcif") || (signature.value.startsWith("PDB") && filenameFormat !== "pdb"))) {
-    throw new IngestionError("FORMAT_MISMATCH", `Filename extension declares ${filenameFormat}, but content evidence declares ${signature.value.startsWith("mmCIF") ? "mmCIF" : "PDB"}.`);
+  const hasPqrSignature = lines.some((line) => /^(ATOM|HETATM)\s+\d+\s+\S+\s+\S+(?:\s+\S+)?\s+-?\d+\s+-?\d/.test(line));
+  const signature: FormatEvidence | undefined = hasMmcifSignature ? { kind: "CONTENT_SIGNATURE", value: "mmCIF data_ + _atom_site loop" } : filenameFormat === "pqr" && hasPqrSignature ? { kind: "CONTENT_SIGNATURE", value: "PQR whitespace atom records" } : hasPdbSignature ? { kind: "CONTENT_SIGNATURE", value: "PDB record columns" } : undefined;
+  const signatureFormat = signature?.value.startsWith("mmCIF") ? "mmcif" : signature?.value.startsWith("PQR") ? "pqr" : signature?.value.startsWith("PDB") ? "pdb" : undefined;
+  if (signatureFormat && filenameFormat !== signatureFormat) {
+    throw new IngestionError("FORMAT_MISMATCH", `Filename extension declares ${filenameFormat}, but content evidence declares ${signatureFormat}.`);
   }
   return { format: filenameFormat, evidence: [{ kind: "FILENAME_EXTENSION", value: extension! }, ...(signature ? [signature] : [])] };
 };
 
 const parseSource = (filename: string, content: string): ParsedSource => {
   const format = formatFromFilename(filename);
-  return format === "pdb" ? parsePdb(content) : parseMmcif(content);
+  return format === "pdb" ? parsePdb(content) : format === "pqr" ? parsePqr(content) : parseMmcif(content);
 };
 
 const makeHierarchy = (atoms: CanonicalAtom[]): CanonicalHierarchy => {
@@ -644,7 +681,7 @@ export class StructureIngestionService {
     const sourceArtifact = await this.sourceArtifacts.seal({
       acquisitionKind: kind === "RCSB" ? "REMOTE_HTTP" : "LOCAL_UPLOAD",
       originalFilename: safeFilename,
-      mediaType: acquisition.mediaType ?? (formatEvidence.format === "pdb" ? "chemical/x-pdb" : "chemical/x-mmcif"),
+      mediaType: acquisition.mediaType ?? (formatEvidence.format === "pdb" ? "chemical/x-pdb" : formatEvidence.format === "pqr" ? "chemical/x-pqr" : "chemical/x-mmcif"),
       format: formatEvidence.format,
       formatEvidence: formatEvidence.evidence,
       parserProfile: INGESTION_PARSER_PROFILE,
@@ -701,28 +738,33 @@ export class StructureIngestionService {
       return { id: `${hash.slice(0, 16)}:state:${state.sourceModelNumber}`, ordinal: index + 1, sourceModelNumber: state.sourceModelNumber, coordinates, coordinateHash };
     });
     const stateOrder = coordinateStates.map((state) => state.id);
-    const sourceChargeMap = parsed.partialChargeValues
+    const sourceChargeMap = parsed.partialChargeBySourceIndex
+      ? Object.fromEntries(atoms.flatMap((atom, sourceIndex) => {
+        const value = parsed.partialChargeBySourceIndex![sourceIndex];
+        return typeof value === "number" && Number.isFinite(value) ? [[atom.stableId, value] as const] : [];
+      }))
+      : parsed.partialChargeValues
       ? Object.fromEntries(atoms.flatMap((atom) => {
         const value = parsed.partialChargeValues![componentAtomKey(atom.residueName, atom.atomName)];
         return typeof value === "number" && Number.isFinite(value) ? [[atom.stableId, value] as const] : [];
       }))
       : {};
-    const hasCompleteSourceCharges = parsed.format === "mmcif" && atoms.length > 0 && Object.keys(sourceChargeMap).length === atoms.length;
+    const hasCompleteSourceCharges = (parsed.format === "mmcif" || parsed.format === "pqr") && atoms.length > 0 && Object.keys(sourceChargeMap).length === atoms.length;
     const partialChargeDataset = hasCompleteSourceCharges ? {
       datasetId: `${hash.slice(0, 16)}:partial-charge`,
       molecularRevision: "pending",
-      chargeModel: "source-declared mmCIF _chem_comp_atom.partial_charge",
-      profileVersion: "mmcif-chem-comp-partial-charge-v1",
+      chargeModel: parsed.format === "pqr" ? "source-declared PQR atomic charge" : "source-declared mmCIF _chem_comp_atom.partial_charge",
+      profileVersion: parsed.format === "pqr" ? "pqr-atomic-charge-v1" : "mmcif-chem-comp-partial-charge-v1",
       atomChargeMap: sourceChargeMap,
       units: "e",
-      provenance: "Copied from source _chem_comp_atom.partial_charge; no charge inference performed",
+      provenance: parsed.format === "pqr" ? "Copied from source PQR charge field; no charge inference performed" : "Copied from source _chem_comp_atom.partial_charge; no charge inference performed",
     } : undefined;
     const chemistryRoles = inferCanonicalChemistryRoles(atoms, bonds);
     const scientificPayload = scientificPayloadFor(atoms, bonds, hierarchy, coordinateStates, stateOrder, summary, parsed, sourceChargeMap, hasCompleteSourceCharges, peptideSequenceChains, chemistryRoles);
     const scientificHash = scientificHashFor(scientificPayload);
     const structure: CanonicalMolecularStructure = {
       id: `structure_${hash.slice(0, 16)}`,
-      name: safeFilename.replace(/\.(pdb|cif|mmcif)$/i, ""),
+      name: safeFilename.replace(/\.(pdb|pqr|cif|mmcif)$/i, ""),
       format: parsed.format,
       source,
       atoms,
