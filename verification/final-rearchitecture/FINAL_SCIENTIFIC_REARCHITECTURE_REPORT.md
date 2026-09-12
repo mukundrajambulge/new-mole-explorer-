@@ -1,7 +1,7 @@
 # MOLEXPLORER final scientific UI rearchitecture report
 
 Status: **bounded implementation verified; full binary trajectory decoding and executable PyMOL oracle remain pending**
-Commit: `746e587` (`fix: coalesce online structure acquisitions`)
+Commit: `9e8d7dc` (`fix: preserve unavailable action notice semantics`)
 Branch: `feature/final-scientific-ui-pymol-conformance`
 
 ## Delivered behavior
@@ -18,7 +18,7 @@ Selection, presentation, camera, measurement, analysis, alignment, topology edit
 
 The final rearchitecture shell suite passes 18/18, including the new biological import and viewer cases. The biological adapter unit suite passes 6/6 and the browser J acceptance suite passes 7/7, covering the import dialog, paste routing, FASTA, FASTQ, OpenDX, multi-frame XYZ, UniProt, and PubChem routes. The final PyMOL acceptance suite passes 3/3. Multi-object state coverage passes 11/11. The live selection matrix passes 1/1 across its representative command families; the generated matrix contains 87 rows: 85 verified working, one dependency-gated row (`byfragment`), and one intentionally unsupported arbitrary-property row. The selection oracle ledger records 51 direct oracle passes, 35 documented/application equivalents, and one pending row.
 
-The R07 edit/topology/hydrogen suites, R08 structural analysis suite, and R09 native lifecycle suite pass after the rail-state and menu-overlay corrections. Manual viewer, camera, selection highlighting, selection presentation, and real 4DJW plus 1CRN workspace gates pass in the stored evidence. The stored full Chromium regression covers the legacy G0, G1B, G1C, IMP-PRES, V-FINAL, V2, real-structure, and biological-data suites: **138/138 passed** with one worker at implementation commit `0cfe02b`. A fresh rerun on 2026-09-13 was attempted after the final control fixes but was blocked in `manual-gate-01-viewer` because both RCSB and PDBe endpoints timed out for 4DJW; the app and API endpoints remained healthy.
+The R07 edit/topology/hydrogen suites, R08 structural analysis suite, and R09 native lifecycle suite pass after the rail-state and menu-overlay corrections. Manual viewer, camera, selection highlighting, selection presentation, and real 4DJW plus 1CRN workspace gates pass. The latest full Chromium regression covers the legacy G0, G1B, G1C, IMP-PRES, V-FINAL, V2, real-structure, and biological-data suites: **138/138 passed** with one worker at implementation commit `9e8d7dc`.
 
 Repository checks pass:
 
@@ -37,7 +37,7 @@ Local visual evidence is stored under `verification/final-rearchitecture/evidenc
 | Requirement | Current answer |
 | --- | --- |
 | Repository | `C:\Users\mukun\Desktop\molecular-workstation`; `new-origin` → `https://github.com/mukundrajambulge/new-mole-explorer-.git` |
-| Branch / baseline / final implementation SHA | `feature/final-scientific-ui-pymol-conformance` / `3cb632770b8be70a3fc45c4809706c0b58f8a6cb` / `746e587` |
+| Branch / baseline / final implementation SHA | `feature/final-scientific-ui-pymol-conformance` / `3cb632770b8be70a3fc45c4809706c0b58f8a6cb` / `9e8d7dc` |
 | UI rearchitecture | **PASS** — approved menus, inward right rail, dominant canvas, left object panel, collapsed console, status bar |
 | Universal import | **PARTIAL, bounded** — coordinate adapters and typed biological viewers are implemented; research trajectory formats remain explicitly limited |
 | PDB; mmCIF/CIF; SDF; MOL/MOL2 | **PASS** within the documented single-object/declared-connectivity limits |
@@ -57,8 +57,8 @@ Local visual evidence is stored under `verification/final-rearchitecture/evidenc
 | GUI–console / API convergence | **PASS where an API exists**; typed biological viewers are GUI import routes in this gate |
 | Security | **PASS** — host Python, shell, arbitrary process, filesystem, and network execution are rejected |
 | Historical defects | **A–Q PASS** in the historical defect matrix and regression gates |
-| Test results | `npm ci`; 147 web + 65 API unit tests; serial typecheck; lint; build; selection-matrix; R10; stored full Chromium **138/138** at `0cfe02b`; fresh full rerun blocked by RCSB 4DJW timeout |
-| Oracle / visual / stress | Oracle ledger 51/35/1; 21 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; fresh 4DJW gate blocked by unavailable remote endpoint |
+| Test results | `npm ci`; 147 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium **138/138** at `9e8d7dc` |
+| Oracle / visual / stress | Oracle ledger 51/35/1; 21 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; latest 4DJW gate PASS |
 | Google Drive evidence | **BLOCKED_CREDENTIAL_OR_ENVIRONMENT**; local hashes and upload manifest retained |
 | PyMOL conformance | Bounded source/documentation/runtime classification; no complete PyMOL compatibility claim |
 
