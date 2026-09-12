@@ -443,6 +443,21 @@ ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
     vi.unstubAllGlobals();
   });
 
+  it("coalesces concurrent and repeated RCSB acquisitions within one API process", async () => {
+    const fetchMock = vi.fn(async (input: string | URL | Request) => {
+      expect(String(input)).toBe("https://files.rcsb.org/download/1ABC.cif");
+      return new Response(cifFixture, { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const service = new StructureIngestionService();
+    const [first, second] = await Promise.all([service.ingestRcsb("1abc"), service.ingestRcsb("1ABC")]);
+    const third = await service.ingestRcsb("1abc");
+    expect(first.structure.scientificHash).toBe(second.structure.scientificHash);
+    expect(second.structure.scientificHash).toBe(third.structure.scientificHash);
+    expect(fetchMock).toHaveBeenCalledOnce();
+    vi.unstubAllGlobals();
+  });
+
   it("records export-to-source reimport lineage", async () => {
     const result = await new StructureIngestionService().ingestLocal("reimport.pdb", Buffer.from(pdbFixture), { parentExportArtifactId: "export_abc" });
     expect(result.sourceArtifact).toMatchObject({ acquisitionKind: "DERIVED_EXPORT", parentExportArtifactId: "export_abc" });

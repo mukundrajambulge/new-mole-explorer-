@@ -758,6 +758,9 @@ const peptideSequenceChainsFor = (hierarchy: CanonicalHierarchy): Record<string,
 
 export class StructureIngestionService {
   private readonly structures = new Map<string, CanonicalMolecularStructure>();
+  /** Coalesce and retain successful online acquisitions for the lifetime of the API process. */
+  private readonly rcsbCache = new Map<string, StructureLoadResult>();
+  private readonly rcsbInflight = new Map<string, Promise<StructureLoadResult>>();
 
   constructor(private readonly sourceArtifacts = new SourceArtifactStore()) {}
 
@@ -769,6 +772,22 @@ export class StructureIngestionService {
   async ingestRcsb(pdbId: string): Promise<StructureLoadResult> {
     const normalizedId = pdbId.trim().toUpperCase();
     if (!/^[A-Z0-9]{4}$/.test(normalizedId)) throw new IngestionError("INVALID_INPUT", "Enter a valid four-character PDB ID.");
+    const cached = this.rcsbCache.get(normalizedId);
+    if (cached) return cached;
+    const inflight = this.rcsbInflight.get(normalizedId);
+    if (inflight) return inflight;
+    const request = this.ingestRcsbRemote(normalizedId);
+    this.rcsbInflight.set(normalizedId, request);
+    try {
+      const result = await request;
+      this.rcsbCache.set(normalizedId, result);
+      return result;
+    } finally {
+      this.rcsbInflight.delete(normalizedId);
+    }
+  }
+
+  private async ingestRcsbRemote(normalizedId: string): Promise<StructureLoadResult> {
     const sources: Array<{ provider: RemoteStructureProvider; uri: string }> = [
       { provider: "RCSB", uri: `https://files.rcsb.org/download/${normalizedId}.cif` },
       { provider: "PDBE", uri: `https://www.ebi.ac.uk/pdbe/entry-files/download/${normalizedId.toLowerCase()}.cif` },
