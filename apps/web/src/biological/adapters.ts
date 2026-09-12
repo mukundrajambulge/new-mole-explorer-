@@ -49,6 +49,8 @@ export class BiologicalAdapterError extends Error {
 const MAX_SEQUENCE_RECORDS = 100_000;
 const MAX_SEQUENCE_LENGTH = 10_000_000;
 const MAX_MAP_VALUES = 2_000_000;
+const MAX_TRAJECTORY_FRAMES = 5_000;
+const MAX_TRAJECTORY_ATOMS = 200_000;
 
 const alphabetFor = (records: readonly SequenceRecord[]): "DNA" | "RNA" | "PROTEIN" | "MIXED" => {
   const sequence = records.map((record) => record.sequence).join("").toUpperCase();
@@ -205,17 +207,69 @@ const parseGro = (content: string): TrajectoryFrame[] => {
   return [{ index: 0, label: lines[0]!.trim() || "GRO frame", atoms }];
 };
 
-const parseDcdHeader = (buffer: ArrayBuffer): { frameCount: number; atomCount: number } => {
+type FortranRecord = { payloadOffset: number; length: number; nextOffset: number };
+
+const readFortranRecord = (view: DataView, offset: number, little: boolean, label: string): FortranRecord => {
+  if (offset + 8 > view.byteLength) throw new BiologicalAdapterError(`DCD ${label} record is truncated.`, "INVALID_INPUT");
+  const length = view.getInt32(offset, little);
+  if (length < 0 || offset + length + 8 > view.byteLength) throw new BiologicalAdapterError(`DCD ${label} record length is invalid.`, "INVALID_INPUT");
+  const trailer = view.getInt32(offset + length + 4, little);
+  if (trailer !== length) throw new BiologicalAdapterError(`DCD ${label} record markers do not match.`, "INVALID_INPUT");
+  return { payloadOffset: offset + 4, length, nextOffset: offset + length + 8 };
+};
+
+const likelyDcdUnitCell = (view: DataView, record: FortranRecord, little: boolean): boolean => {
+  if (record.length !== 24 && record.length !== 48) return false;
+  const values = Array.from({ length: 6 }, (_, index) => record.length === 24 ? view.getFloat32(record.payloadOffset + index * 4, little) : view.getFloat64(record.payloadOffset + index * 8, little));
+  return values.every(Number.isFinite) && values.slice(0, 3).every((value) => value > 0 && value < 1_000_000) && values.slice(3).every((value) => value > 0 && value <= 360);
+};
+
+const parseDcd = (buffer: ArrayBuffer): { frameCount: number; atomCount: number; frames: TrajectoryFrame[] } => {
   if (buffer.byteLength < 32) throw new BiologicalAdapterError("DCD input is shorter than its header.", "INVALID_INPUT");
-  const view = new DataView(buffer); const little = view.getInt32(0, true) === 84 ? true : view.getInt32(0, false) === 84 ? false : null;
-  if (little === null || String.fromCharCode(view.getUint8(4), view.getUint8(5), view.getUint8(6), view.getUint8(7)) !== "CORD") throw new BiologicalAdapterError("DCD header signature is not recognized.", "INVALID_INPUT");
-  const frameCount = view.getInt32(8, little); let offset = 4 + view.getInt32(0, little) + 4;
-  if (offset + 8 > buffer.byteLength) throw new BiologicalAdapterError("DCD title block is missing.", "INVALID_INPUT");
-  const titleBytes = view.getInt32(offset, little); offset += 4 + titleBytes + 4;
-  if (offset + 8 > buffer.byteLength) throw new BiologicalAdapterError("DCD atom-count block is missing.", "INVALID_INPUT");
-  const atomBytes = view.getInt32(offset, little); if (atomBytes < 4 || offset + atomBytes + 8 > buffer.byteLength) throw new BiologicalAdapterError("DCD atom-count block is invalid.", "INVALID_INPUT");
-  const atomCount = view.getInt32(offset + 4, little); if (frameCount < 1 || atomCount < 1) throw new BiologicalAdapterError("DCD header declares no frames or atoms.", "INVALID_INPUT");
-  return { frameCount, atomCount };
+  const view = new DataView(buffer);
+  const little = view.getInt32(0, true) === 84 ? true : view.getInt32(0, false) === 84 ? false : null;
+  if (little === null) throw new BiologicalAdapterError("DCD header record marker is not recognized.", "INVALID_INPUT");
+  const header = readFortranRecord(view, 0, little, "header");
+  if (header.length !== 84 || String.fromCharCode(view.getUint8(header.payloadOffset), view.getUint8(header.payloadOffset + 1), view.getUint8(header.payloadOffset + 2), view.getUint8(header.payloadOffset + 3)) !== "CORD") throw new BiologicalAdapterError("DCD header signature is not recognized.", "INVALID_INPUT");
+  const headerInts = Array.from({ length: 20 }, (_, index) => view.getInt32(header.payloadOffset + 4 + index * 4, little));
+  const frameCount = headerInts[0] ?? 0;
+  const atomCount = (() => {
+    let offset = header.nextOffset;
+    const title = readFortranRecord(view, offset, little, "title"); offset = title.nextOffset;
+    const atomBlock = readFortranRecord(view, offset, little, "atom-count");
+    if (atomBlock.length < 4) throw new BiologicalAdapterError("DCD atom-count block is invalid.", "INVALID_INPUT");
+    return view.getInt32(atomBlock.payloadOffset, little);
+  })();
+  const fixedAtomCount = headerInts[4] ?? 0;
+  if (frameCount < 1 || frameCount > MAX_TRAJECTORY_FRAMES || atomCount < 1 || atomCount > MAX_TRAJECTORY_ATOMS) throw new BiologicalAdapterError(`DCD declares ${frameCount.toLocaleString()} frames and ${atomCount.toLocaleString()} atoms, outside the bounded trajectory limits.`, "INVALID_INPUT");
+  if (fixedAtomCount > 0) throw new BiologicalAdapterError("DCD files with fixed atoms are not supported because their frame topology requires an explicit fixed-coordinate reconstruction.", "INVALID_INPUT");
+  let offset = header.nextOffset;
+  offset = readFortranRecord(view, offset, little, "title").nextOffset;
+  offset = readFortranRecord(view, offset, little, "atom-count").nextOffset;
+  const frames: TrajectoryFrame[] = [];
+  let coordinateBytes: number | null = null;
+  const charmmVersion = headerInts[19] ?? 0;
+  for (let frameIndex = 0; frameIndex < frameCount; frameIndex += 1) {
+    const first = readFortranRecord(view, offset, little, `frame ${frameIndex + 1}`);
+    const expectedFloatBytes = atomCount * 4;
+    const expectedDoubleBytes = atomCount * 8;
+    const hasUnitCell = charmmVersion >= 22 && (first.length !== expectedFloatBytes && first.length !== expectedDoubleBytes || likelyDcdUnitCell(view, first, little));
+    if (hasUnitCell) offset = first.nextOffset;
+    const xRecord = hasUnitCell ? readFortranRecord(view, offset, little, `frame ${frameIndex + 1} X`) : first;
+    const precisionBytes = xRecord.length === expectedDoubleBytes ? 8 : xRecord.length === expectedFloatBytes ? 4 : 0;
+    if (!precisionBytes) throw new BiologicalAdapterError(`DCD frame ${frameIndex + 1} X coordinate record has an unexpected length.`, "INVALID_INPUT");
+    if (coordinateBytes === null) coordinateBytes = precisionBytes; else if (coordinateBytes !== precisionBytes) throw new BiologicalAdapterError("DCD coordinate precision changes between frames.", "INVALID_INPUT");
+    const yRecord = readFortranRecord(view, xRecord.nextOffset, little, `frame ${frameIndex + 1} Y`);
+    const zRecord = readFortranRecord(view, yRecord.nextOffset, little, `frame ${frameIndex + 1} Z`);
+    if (yRecord.length !== xRecord.length || zRecord.length !== xRecord.length) throw new BiologicalAdapterError(`DCD frame ${frameIndex + 1} coordinate records do not have a consistent length.`, "INVALID_INPUT");
+    const readCoordinate = (record: FortranRecord, index: number) => precisionBytes === 8 ? view.getFloat64(record.payloadOffset + index * 8, little) : view.getFloat32(record.payloadOffset + index * 4, little);
+    const atoms: TrajectoryAtom[] = Array.from({ length: atomCount }, (_, index) => ({ index, element: "X", x: readCoordinate(xRecord, index), y: readCoordinate(yRecord, index), z: readCoordinate(zRecord, index) }));
+    if (atoms.some((atom) => ![atom.x, atom.y, atom.z].every(Number.isFinite))) throw new BiologicalAdapterError(`DCD frame ${frameIndex + 1} contains a non-finite coordinate.`, "INVALID_INPUT");
+    const step = (headerInts[1] ?? 0) + frameIndex * (headerInts[2] ?? 1);
+    frames.push({ index: frameIndex, label: `Frame ${frameIndex + 1}${step ? ` · step ${step}` : ""}`, atoms });
+    offset = zRecord.nextOffset;
+  }
+  return { frameCount, atomCount, frames };
 };
 
 const parseResearchTrajectoryHeader = (buffer: ArrayBuffer, format: "xtc" | "trr"): number => {
@@ -225,6 +279,56 @@ const parseResearchTrajectoryHeader = (buffer: ArrayBuffer, format: "xtc" | "trr
   const expected = format === "xtc" ? 1995 : 1993;
   if (magic !== expected) throw new BiologicalAdapterError(`${format.toUpperCase()} header magic is not recognized.`, "INVALID_INPUT");
   return magic;
+};
+
+const readBeI32 = (view: DataView, offset: number, label: string) => {
+  if (offset + 4 > view.byteLength) throw new BiologicalAdapterError(`TRR ${label} is truncated.`, "INVALID_INPUT");
+  return view.getInt32(offset, false);
+};
+
+const readBeReal = (view: DataView, offset: number, bytes: 4 | 8, label: string) => {
+  if (offset + bytes > view.byteLength) throw new BiologicalAdapterError(`TRR ${label} is truncated.`, "INVALID_INPUT");
+  return bytes === 8 ? view.getFloat64(offset, false) : view.getFloat32(offset, false);
+};
+
+const parseTrr = (buffer: ArrayBuffer): { frameCount: number; atomCount: number; frames: TrajectoryFrame[] } => {
+  const view = new DataView(buffer);
+  let offset = 0; let frameCount = 0; let atomCount: number | null = null; let precisionBytes: 4 | 8 | null = null;
+  const frames: TrajectoryFrame[] = [];
+  while (offset < view.byteLength) {
+    if (frameCount >= MAX_TRAJECTORY_FRAMES) throw new BiologicalAdapterError(`TRR exceeds the bounded ${MAX_TRAJECTORY_FRAMES.toLocaleString()} frame limit.`, "INVALID_INPUT");
+    const magic = readBeI32(view, offset, "magic"); offset += 4;
+    if (magic !== 1993) throw new BiologicalAdapterError("TRR frame magic is not recognized.", "INVALID_INPUT");
+    const versionLength = readBeI32(view, offset, "version length"); offset += 4;
+    if (versionLength < 0 || offset + versionLength > view.byteLength) throw new BiologicalAdapterError("TRR version string is invalid.", "INVALID_INPUT");
+    offset += versionLength;
+    const sizes = Array.from({ length: 9 }, (_, index) => { const value = readBeI32(view, offset, `header size ${index + 1}`); offset += 4; return value; });
+    const [irSize, eSize, boxSize, virSize, presSize, topSize, symSize, xSize, vSize] = sizes;
+    const fSize = readBeI32(view, offset, "force size"); offset += 4;
+    const natoms = readBeI32(view, offset, "atom count"); offset += 4;
+    const step = readBeI32(view, offset, "step"); offset += 4;
+    const nre = readBeI32(view, offset, "energy count"); offset += 4;
+    if (natoms < 1 || natoms > MAX_TRAJECTORY_ATOMS || xSize < 0 || xSize % (natoms * 3) !== 0) throw new BiologicalAdapterError("TRR atom count or coordinate block is invalid.", "INVALID_INPUT");
+    const framePrecision = xSize === 0 ? (eSize === 0 ? 4 : eSize % 8 === 0 ? 8 : 4) as 4 | 8 : (xSize / (natoms * 3) === 8 ? 8 : xSize / (natoms * 3) === 4 ? 4 : 0) as 4 | 8 | 0;
+    if (!framePrecision) throw new BiologicalAdapterError("TRR coordinate precision is not IEEE float32 or float64.", "INVALID_INPUT");
+    if (atomCount === null) atomCount = natoms; else if (atomCount !== natoms) throw new BiologicalAdapterError("TRR frames must have identical atom counts.", "INVALID_INPUT");
+    if (precisionBytes === null) precisionBytes = framePrecision; else if (precisionBytes !== framePrecision) throw new BiologicalAdapterError("TRR coordinate precision changes between frames.", "INVALID_INPUT");
+    if (irSize < 0 || eSize < 0 || boxSize < 0 || virSize < 0 || presSize < 0 || topSize < 0 || symSize < 0 || vSize < 0 || fSize < 0) throw new BiologicalAdapterError("TRR header contains a negative block size.", "INVALID_INPUT");
+    offset += irSize + eSize;
+    offset += boxSize + virSize + presSize + topSize + symSize;
+    if (offset + xSize > view.byteLength) throw new BiologicalAdapterError("TRR coordinate block is truncated.", "INVALID_INPUT");
+    const xOffset = offset; const yOffset = xOffset + xSize; const zOffset = yOffset + vSize;
+    const readCoordinate = (base: number, index: number) => readBeReal(view, base + index * framePrecision, framePrecision, "coordinate");
+    const atoms: TrajectoryAtom[] = Array.from({ length: natoms }, (_, index) => ({ index, element: "X", x: readCoordinate(xOffset, index * 3), y: readCoordinate(xOffset, index * 3 + 1), z: readCoordinate(xOffset, index * 3 + 2) }));
+    if (atoms.some((atom) => ![atom.x, atom.y, atom.z].every(Number.isFinite))) throw new BiologicalAdapterError(`TRR frame ${frameCount + 1} contains a non-finite coordinate.`, "INVALID_INPUT");
+    frames.push({ index: frameCount, label: `Frame ${frameCount + 1}${step ? ` · step ${step}` : ""}`, atoms });
+    frameCount += 1;
+    offset = zOffset + fSize;
+    if (offset > view.byteLength) throw new BiologicalAdapterError("TRR velocity/force blocks are truncated.", "INVALID_INPUT");
+    void nre;
+  }
+  if (!frames.length || atomCount === null) throw new BiologicalAdapterError("TRR contains no coordinate frames.", "INVALID_INPUT");
+  return { frameCount, atomCount, frames };
 };
 
 const parsePsf = (content: string): { atomCount: number; bondCount: number | null; residueCount: number | null } => {
@@ -268,8 +372,9 @@ export const parseBiologicalData = (filename: string, input: string | ArrayBuffe
   if (format === "mrc" || format === "ccp4") { if (typeof input === "string") throw new BiologicalAdapterError("MRC/CCP4 adapters require binary file bytes.", "INVALID_INPUT"); return { kind: "MAP", format, sourceName, grid: parseMrc(input), encoding: "MRC_BINARY" }; }
   if (format === "xyz-trajectory") { const frames = parseXyzTrajectory(String(input)); return { kind: "TRAJECTORY", format, sourceName, frames, atomCount: frames[0]!.atoms.length, status: "READY" }; }
   if (format === "gro") { const frames = parseGro(String(input)); return { kind: "TRAJECTORY", format, sourceName, frames, atomCount: frames[0]!.atoms.length, status: "READY" }; }
-  if (format === "dcd") { if (typeof input === "string") throw new BiologicalAdapterError("DCD adapters require binary file bytes.", "INVALID_INPUT"); const header = parseDcdHeader(input); return { kind: "TRAJECTORY", format, sourceName, frames: [], atomCount: header.atomCount, status: "HEADER_ONLY", diagnostic: `DCD header verified: ${header.frameCount.toLocaleString()} frames and ${header.atomCount.toLocaleString()} atoms. Coordinate frame decoding is not enabled in this build.` }; }
-  if (format === "xtc" || format === "trr") { parseResearchTrajectoryHeader(typeof input === "string" ? (() => { throw new BiologicalAdapterError(`${format.toUpperCase()} adapters require binary file bytes.`, "INVALID_INPUT"); })() : input, format); return { kind: "TRAJECTORY", format, sourceName, frames: [], atomCount: 0, status: "HEADER_ONLY", diagnostic: `${format.toUpperCase()} header verified; compressed/binary coordinate decoding is not enabled in this build.` }; }
+  if (format === "dcd") { if (typeof input === "string") throw new BiologicalAdapterError("DCD adapters require binary file bytes.", "INVALID_INPUT"); const decoded = parseDcd(input); return { kind: "TRAJECTORY", format, sourceName, frames: decoded.frames, atomCount: decoded.atomCount, status: "READY" }; }
+  if (format === "xtc") { parseResearchTrajectoryHeader(typeof input === "string" ? (() => { throw new BiologicalAdapterError("XTC adapters require binary file bytes.", "INVALID_INPUT"); })() : input, format); return { kind: "TRAJECTORY", format, sourceName, frames: [], atomCount: 0, status: "HEADER_ONLY", diagnostic: "XTC header verified; compressed coordinate decoding is not enabled in this build." }; }
+  if (format === "trr") { if (typeof input === "string") throw new BiologicalAdapterError("TRR adapters require binary file bytes.", "INVALID_INPUT"); const decoded = parseTrr(input); return { kind: "TRAJECTORY", format, sourceName, frames: decoded.frames, atomCount: decoded.atomCount, status: "READY" }; }
   if (format === "psf") { const result = parsePsf(String(input)); return { kind: "TOPOLOGY", format, sourceName, ...result, status: "READY" }; }
   if (format === "prmtop") { const result = parsePrmtop(String(input)); return { kind: "TOPOLOGY", format, sourceName, ...result, status: "READY" }; }
   const records = String(input).split(/\r?\n/).map((line) => line.trim()).filter(Boolean).map((notation, index) => { const [name, value] = notation.includes("\t") ? notation.split(/\t+/, 2) : notation.split(/\s+/, 2); return { id: `smiles-${index + 1}`, notation: value ?? name!, ...(value ? { name } : {}) }; });

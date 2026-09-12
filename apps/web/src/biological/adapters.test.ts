@@ -11,13 +11,33 @@ const mrcFixture = (): ArrayBuffer => {
   return buffer;
 };
 
+const concat = (parts: Uint8Array[]): ArrayBuffer => {
+  const result = new Uint8Array(parts.reduce((sum, part) => sum + part.byteLength, 0)); let offset = 0;
+  for (const part of parts) { result.set(part, offset); offset += part.byteLength; }
+  return result.buffer;
+};
+
+const dcdRecord = (payload: Uint8Array): Uint8Array => {
+  const record = new Uint8Array(payload.byteLength + 8); const view = new DataView(record.buffer);
+  view.setInt32(0, payload.byteLength, true); record.set(payload, 4); view.setInt32(payload.byteLength + 4, payload.byteLength, true); return record;
+};
+
 const dcdFixture = (): ArrayBuffer => {
-  const buffer = new ArrayBuffer(120);
-  const view = new DataView(buffer);
-  view.setInt32(0, 84, true); [67, 79, 82, 68].forEach((value, index) => view.setUint8(4 + index, value));
-  view.setInt32(8, 2, true);
-  view.setInt32(92, 4, true); view.setInt32(104, 4, true); view.setInt32(108, 3, true);
-  return buffer;
+  const headerPayload = new Uint8Array(84); const headerView = new DataView(headerPayload.buffer);
+  headerPayload.set([67, 79, 82, 68], 0); headerView.setInt32(4, 2, true); headerView.setInt32(8, 10, true); headerView.setInt32(12, 5, true);
+  const titlePayload = new Uint8Array(4); const atomPayload = new Uint8Array(4); new DataView(atomPayload.buffer).setInt32(0, 3, true);
+  const frame = (values: number[][]) => concat(values.map((axis) => { const payload = new Uint8Array(axis.length * 4); const view = new DataView(payload.buffer); axis.forEach((value, index) => view.setFloat32(index * 4, value, true)); return dcdRecord(payload); }));
+  return concat([dcdRecord(headerPayload), dcdRecord(titlePayload), dcdRecord(atomPayload), new Uint8Array(frame([[0, 1, 2], [0, 0, 0], [0, 0, 0]])), new Uint8Array(frame([[0.1, 1.1, 2.1], [0.2, 0.2, 0.2], [0.3, 0.3, 0.3]]))]);
+};
+
+const trrFixture = (): ArrayBuffer => {
+  const frame = (step: number, coordinates: number[]): Uint8Array => {
+    const payload = new Uint8Array(4 + 4 + 3 + (10 + 3) * 4 + coordinates.length * 4); const view = new DataView(payload.buffer); let offset = 0;
+    view.setInt32(offset, 1993, false); offset += 4; view.setInt32(offset, 3, false); offset += 4; payload.set([49, 46, 48], offset); offset += 3;
+    const sizes = [0, 0, 0, 0, 0, 0, 0, coordinates.length * 4, 0, 0, coordinates.length / 3, step, 0]; sizes.forEach((value) => { view.setInt32(offset, value, false); offset += 4; });
+    coordinates.forEach((value) => { view.setFloat32(offset, value, false); offset += 4; }); return payload;
+  };
+  return concat([frame(1, [0, 0, 0, 1, 0, 0]), frame(2, [0, 0.5, 0, 1, 0.5, 0])]);
 };
 
 const trajectoryHeaderFixture = (magic: number): ArrayBuffer => {
@@ -51,24 +71,27 @@ describe("biological data adapters", () => {
     expect(mrc.grid.valueRange.mean).toBe(0.5);
   });
 
-  it("parses ready trajectories and marks binary trajectories header-only", () => {
+  it("parses ready trajectories and decodes DCD/TRR binary frames while keeping XTC bounded", () => {
     const xyz = "2\nframe one\nC 0 0 0\nO 1 0 0\n2\nframe two\nC 0 1 0\nO 1 1 0\n";
     const trajectory = parseBiologicalData("movie.xyz-trajectory", xyz);
     const gro = parseBiologicalData("frame.gro", "Test frame\n2\n    1ALA    CA    1   0.100   0.200   0.300\n    1ALA    CB    2   0.200   0.300   0.400\n   1.0 1.0 1.0\n");
     const dcd = parseBiologicalData("movie.dcd", dcdFixture());
     const xtc = parseBiologicalData("movie.xtc", trajectoryHeaderFixture(1995));
-    const trr = parseBiologicalData("movie.trr", trajectoryHeaderFixture(1993));
+    const trr = parseBiologicalData("movie.trr", trrFixture());
     if (trajectory.kind !== "TRAJECTORY" || gro.kind !== "TRAJECTORY" || dcd.kind !== "TRAJECTORY" || xtc.kind !== "TRAJECTORY" || trr.kind !== "TRAJECTORY") throw new Error("trajectory adapters returned the wrong data kind");
     expect(isMultiFrameXyz(xyz)).toBe(true);
     expect(trajectory.kind).toBe("TRAJECTORY");
     expect(trajectory.status).toBe("READY");
     expect(trajectory.frames).toHaveLength(2);
     expect(gro.frames[0]?.atoms[0]?.x).toBeCloseTo(1);
-    expect(dcd.status).toBe("HEADER_ONLY");
+    expect(dcd.status).toBe("READY");
     expect(dcd.atomCount).toBe(3);
-    expect(dcd.frames).toHaveLength(0);
+    expect(dcd.frames).toHaveLength(2);
+    expect(dcd.frames[1]?.atoms[2]?.x).toBeCloseTo(2.1);
     expect(xtc.status).toBe("HEADER_ONLY");
-    expect(trr.status).toBe("HEADER_ONLY");
+    expect(trr.status).toBe("READY");
+    expect(trr.frames).toHaveLength(2);
+    expect(trr.frames[1]?.atoms[1]?.y).toBeCloseTo(0.5);
   });
 
   it("parses topology and notation sources as separate data kinds", () => {
