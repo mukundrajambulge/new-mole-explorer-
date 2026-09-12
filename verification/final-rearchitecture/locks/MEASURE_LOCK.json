@@ -1,1 +1,1 @@
-{"name":"MEASURE","SHA":"0cfe02b","tests":["AT-FSR-D-001","measurements.test.ts","v-final.spec.ts"],"evidence":["PERFORMANCE_REPORT.md"],"date":"2026-09-13","knownLimitations":["Measurement geometry is revision-bound."],"status":"LOCKED"}
+{"name":"MEASURE","SHA":"31b5b05","tests":["AT-FSR-D-001","measurements.test.ts","v-final.spec.ts"],"evidence":["PERFORMANCE_REPORT.md"],"date":"2026-09-13","knownLimitations":["Measurement geometry is revision-bound."],"status":"LOCKED"}

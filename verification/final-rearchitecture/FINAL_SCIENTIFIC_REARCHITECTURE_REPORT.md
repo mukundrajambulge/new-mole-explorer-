@@ -1,7 +1,7 @@
 # MOLEXPLORER final scientific UI rearchitecture report
 
 Status: **bounded implementation verified; full binary trajectory decoding and executable PyMOL oracle remain pending**
-Commit: `0cfe02b` (`fix: close planned tool controls in scientific rail`)
+Commit: `31b5b05` (`fix: close remaining inactive scientific controls`)
 Branch: `feature/final-scientific-ui-pymol-conformance`
 
 ## Delivered behavior
@@ -18,7 +18,7 @@ Selection, presentation, camera, measurement, analysis, alignment, topology edit
 
 The final rearchitecture shell suite passes 18/18, including the new biological import and viewer cases. The biological adapter unit suite passes 6/6 and the browser J acceptance suite passes 7/7, covering the import dialog, paste routing, FASTA, FASTQ, OpenDX, multi-frame XYZ, UniProt, and PubChem routes. The final PyMOL acceptance suite passes 3/3. Multi-object state coverage passes 11/11. The live selection matrix passes 1/1 across its representative command families; the generated matrix contains 87 rows: 85 verified working, one dependency-gated row (`byfragment`), and one intentionally unsupported arbitrary-property row. The selection oracle ledger records 51 direct oracle passes, 35 documented/application equivalents, and one pending row.
 
-The R07 edit/topology/hydrogen suites, R08 structural analysis suite, and R09 native lifecycle suite pass after the rail-state and menu-overlay corrections. Manual viewer, camera, selection highlighting, selection presentation, and real 4DJW plus 1CRN workspace gates pass. The final full Chromium regression covers the legacy G0, G1B, G1C, IMP-PRES, V-FINAL, V2, real-structure, and biological-data suites: **138/138 passed** with one worker.
+The R07 edit/topology/hydrogen suites, R08 structural analysis suite, and R09 native lifecycle suite pass after the rail-state and menu-overlay corrections. Manual viewer, camera, selection highlighting, selection presentation, and real 4DJW plus 1CRN workspace gates pass in the stored evidence. The stored full Chromium regression covers the legacy G0, G1B, G1C, IMP-PRES, V-FINAL, V2, real-structure, and biological-data suites: **138/138 passed** with one worker at implementation commit `0cfe02b`. A fresh rerun on 2026-09-13 was attempted after the final control fixes but was blocked in `manual-gate-01-viewer` because both RCSB and PDBe endpoints timed out for 4DJW; the app and API endpoints remained healthy.
 
 Repository checks pass:
 
@@ -30,14 +30,14 @@ Repository checks pass:
 - `npm run verify:r10`
 - `git diff --check`
 
-Local visual evidence is stored under `verification/final-rearchitecture/evidence/` and the inherited acceptance evidence directories. J-slice evidence covers the open biological-data dialog, sequence viewer, density-map viewer, and trajectory viewer. The three R07 console/action harness paths were corrected to expand the intentionally collapsed console and use the visible scientific action labels; their isolated rerun passes 4/4 and the final full regression passes 138/138. The machine-readable inventories are `FEATURE_INVENTORY.json`, `UI_CONTROL_INVENTORY.json`, `PYMOL_CONFORMANCE_MATRIX.json`, and `GOOGLE_DRIVE_EVIDENCE_MANIFEST.json`; the required mirrored PyMOL artifacts are also present under `verification/pymol/`. Wizard and Movie scope are recorded in `PYMOL_WIZARD_GAP_MATRIX.md` and `PYMOL_MOVIE_IMPLEMENTATION_PLAN.md`. The user guide is in `docs/user-guide/` with coverage indexes in `docs/user-guide/USER_GUIDE_COVERAGE.md` and `verification/final-rearchitecture/USER_GUIDE_COVERAGE.md`.
+Local visual evidence is stored under `verification/final-rearchitecture/evidence/` and the inherited acceptance evidence directories. J-slice evidence covers the open biological-data dialog, sequence viewer, density-map viewer, and trajectory viewer. The three R07 console/action harness paths were corrected to expand the intentionally collapsed console and use the visible scientific action labels; their isolated rerun passes 4/4 and the stored full regression passes 138/138. The machine-readable inventories are `FEATURE_INVENTORY.json`, `UI_CONTROL_INVENTORY.json`, `PYMOL_CONFORMANCE_MATRIX.json`, and `GOOGLE_DRIVE_EVIDENCE_MANIFEST.json`; the required mirrored PyMOL artifacts are also present under `verification/pymol/`. Wizard and Movie scope are recorded in `PYMOL_WIZARD_GAP_MATRIX.md` and `PYMOL_MOVIE_IMPLEMENTATION_PLAN.md`. The user guide is in `docs/user-guide/` with coverage indexes in `docs/user-guide/USER_GUIDE_COVERAGE.md` and `verification/final-rearchitecture/USER_GUIDE_COVERAGE.md`.
 
 ## Release answer sheet
 
 | Requirement | Current answer |
 | --- | --- |
 | Repository | `C:\Users\mukun\Desktop\molecular-workstation`; `new-origin` → `https://github.com/mukundrajambulge/new-mole-explorer-.git` |
-| Branch / baseline / final implementation SHA | `feature/final-scientific-ui-pymol-conformance` / `3cb632770b8be70a3fc45c4809706c0b58f8a6cb` / `0cfe02b` |
+| Branch / baseline / final implementation SHA | `feature/final-scientific-ui-pymol-conformance` / `3cb632770b8be70a3fc45c4809706c0b58f8a6cb` / `31b5b05` |
 | UI rearchitecture | **PASS** — approved menus, inward right rail, dominant canvas, left object panel, collapsed console, status bar |
 | Universal import | **PARTIAL, bounded** — coordinate adapters and typed biological viewers are implemented; research trajectory formats remain explicitly limited |
 | PDB; mmCIF/CIF; SDF; MOL/MOL2 | **PASS** within the documented single-object/declared-connectivity limits |
@@ -57,8 +57,8 @@ Local visual evidence is stored under `verification/final-rearchitecture/evidenc
 | GUI–console / API convergence | **PASS where an API exists**; typed biological viewers are GUI import routes in this gate |
 | Security | **PASS** — host Python, shell, arbitrary process, filesystem, and network execution are rejected |
 | Historical defects | **A–Q PASS** in the historical defect matrix and regression gates |
-| Test results | `npm ci`; 147 web + 64 API unit tests; typecheck; lint; build; selection-matrix; R10; full Chromium **138/138** |
-| Oracle / visual / stress | Oracle ledger 51/35/1; 21 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked |
+| Test results | `npm ci`; 147 web + 64 API unit tests; serial typecheck; lint; build; selection-matrix; R10; stored full Chromium **138/138** at `0cfe02b`; fresh full rerun blocked by RCSB 4DJW timeout |
+| Oracle / visual / stress | Oracle ledger 51/35/1; 21 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; fresh 4DJW gate blocked by unavailable remote endpoint |
 | Google Drive evidence | **BLOCKED_CREDENTIAL_OR_ENVIRONMENT**; local hashes and upload manifest retained |
 | PyMOL conformance | Bounded source/documentation/runtime classification; no complete PyMOL compatibility claim |
 
