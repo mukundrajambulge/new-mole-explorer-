@@ -70,3 +70,19 @@ test("AT-FSR-C-001 executes top-level console batches and rejects malformed nest
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByLabel("Command console")).toContainText("Unterminated parenthesized expression");
 });
+
+test("AT-FSR-D-001 opens working Measure and Analyze panels from the scientific rail", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(proteinFixture);
+  await expect(page.getByTitle("mini-protein.pdb")).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId("measurements-panel")).toHaveCount(0);
+  await page.getByRole("button", { name: "Measure panel" }).click();
+  await expect(page.getByRole("heading", { name: "Measure" })).toBeVisible();
+  await page.getByRole("button", { name: "Angle", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Angle", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Analyze panel" }).click();
+  await expect(page.getByRole("heading", { name: "Analyze" })).toBeVisible();
+  await page.getByRole("button", { name: "H-Bonds", exact: true }).click();
+  await expect(page.getByTestId("analysis-results")).toBeVisible();
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_D_ANALYZE_RAIL.png") });
+});
