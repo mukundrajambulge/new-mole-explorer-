@@ -1,0 +1,10 @@
+{
+  "lockVersion": 1,
+  "scope": "LIGAND_CONTEXT",
+  "status": "LOCKED_BOUNDED",
+  "capturedAt": "2026-09-13",
+  "commit": "fa995f4",
+  "statement": "Ligand context rail actions for ligand selection, binding shell, H-bond, contact, and clash diagnostics are verified against the bounded local fixture.",
+  "evidence": ["AT-FSR-I-001", "verification/final-rearchitecture/evidence/SLICE_I_LIGAND_CONTEXT.png"],
+  "limits": ["No docking score, affinity, or unvalidated chemical interaction class is inferred.", "Source-backed chemistry evidence against a real protein-ligand acquisition remains next phase."]
+}
