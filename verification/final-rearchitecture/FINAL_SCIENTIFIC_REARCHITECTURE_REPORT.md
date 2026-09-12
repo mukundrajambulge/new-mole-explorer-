@@ -1,7 +1,7 @@
 # MOLEXPLORER final scientific UI rearchitecture report
 
 Status: **bounded implementation verified; full binary trajectory decoding and executable PyMOL oracle remain pending**
-Commit: `631ae8c` (`fix: align edit actions with scientific acceptance harness`)
+Commit: `8e6a89e` (`docs: seal final biological data release`)
 Branch: `feature/final-scientific-ui-pymol-conformance`
 
 ## Delivered behavior

@@ -1,6 +1,6 @@
 # Locked subsystem index
 
-All records below are tied to SHA `631ae8c` and were created after the
+All records below are tied to SHA `8e6a89e` and were created after the
 corresponding functional, scientific, visual, and regression checks.
 
 | Subsystem | Lock record | Gate |
