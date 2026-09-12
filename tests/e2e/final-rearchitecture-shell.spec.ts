@@ -48,7 +48,7 @@ test("AT-FSR-A-002 opens menus and right-rail panels without changing the canvas
   await expect(page.getByTestId("scene-manager")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Scenes" })).toBeVisible();
   await page.getByRole("button", { name: "Analyze panel" }).click();
-  await expect(page.getByTestId("measurements-panel").getByRole("button", { name: /Pocket/ })).toBeDisabled();
+  await expect(page.getByTestId("measurements-panel").getByRole("button", { name: "Pocket Unavailable", exact: true })).toBeEnabled();
   await page.getByRole("button", { name: "View", exact: true }).click();
   await expect(page.getByRole("button", { name: "Projection", exact: true })).toBeEnabled();
   await expect(page.getByRole("button", { name: "Clipping", exact: true })).toBeDisabled();
