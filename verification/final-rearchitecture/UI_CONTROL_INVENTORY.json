@@ -17,7 +17,7 @@
   },
   "controls": [
     { "id": "menu.file", "label": "File", "location": "top menu", "actionId": "FILE.OPEN|FILE.IMPORT|FILE.SAVE|FILE.EXPORT", "expectedResult": "Open/import, fetch, save, export, or add a structure", "testId": "AT-FSR-A-002" },
-    { "id": "dialog.biological-import", "label": "Biological import dialog", "location": "modal from File → Import", "actionId": "FILE.IMPORT", "expectedResult": "Choose Local file, Online ID, or Paste / text and route to a typed viewer", "testId": "AT-FSR-J-001" },
+    { "id": "dialog.biological-import", "label": "Biological import dialog", "location": "modal from File → Import", "actionId": "FILE.IMPORT", "expectedResult": "Choose Local file, Online ID, or Paste / text and route to a typed viewer", "testId": "AT-FSR-J-001/006/007" },
     { "id": "viewer.sequence", "label": "Sequence viewer", "location": "center workspace", "actionId": "DATA.SEQUENCE_VIEW", "expectedResult": "Inspect records, search, residues, and FASTQ quality", "testId": "AT-FSR-J-002/003" },
     { "id": "viewer.map", "label": "Density-map viewer", "location": "center workspace", "actionId": "DATA.MAP_VIEW", "expectedResult": "Inspect grid metadata, values, and Z slices", "testId": "AT-FSR-J-004" },
     { "id": "viewer.trajectory", "label": "Trajectory viewer", "location": "center workspace", "actionId": "DATA.TRAJECTORY_VIEW", "expectedResult": "Inspect validated frames and change the active frame", "testId": "AT-FSR-J-005" },

@@ -3,9 +3,9 @@
   "scope": "DATA_OBJECTS",
   "status": "LOCKED_BOUNDED",
   "capturedAt": "2026-09-13",
-  "commit": "fa995f4",
+  "commit": "631ae8c",
   "statement": "Canonical object/state lineage, bounded coordinate ingestion, multi-object rendering, explicit frame policy, and object-qualified selection are verified.",
   "admittedFormats": ["PDB", "mmCIF", "CIF", "PQR", "SDF", "MOL", "XYZ", "MOL2", "PDBQT"],
   "evidence": ["AT-FSR-B-001", "AT-FSR-B-002", "AT-FSR-G-001", "AT-FSR-H-000", "AT-FSR-H-001", "tests/e2e/multi-object-state.spec.ts", "tests/e2e/real-structure-workspace.spec.ts"],
-  "limits": ["Sequence, map, and trajectory formats require distinct viewers and are not admitted.", "Identity transforms are the only validated cross-object transform profile."]
+  "limits": ["Typed biological datasets are covered by BIOLOGICAL_DATA.lock.json and do not become coordinate objects.", "Identity transforms are the only validated cross-object transform profile."]
 }
