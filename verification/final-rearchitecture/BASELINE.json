@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "campaign": "MOLEXPLORER_FINAL_SCIENTIFIC_UI_REARCHITECTURE_2026-09-12",
+  "capturedAt": "2026-09-12",
+  "repository": {
+    "root": "C:\\Users\\mukun\\Desktop\\molecular-workstation",
+    "remoteName": "new-origin",
+    "remoteUrl": "https://github.com/mukundrajambulge/new-mole-explorer-.git",
+    "baselineBranch": "qa/final-pymol-autonomous-conformance-2026-09-09",
+    "campaignBranch": "feature/final-scientific-ui-pymol-conformance",
+    "baselineSha": "3cb632770b8be70a3fc45c4809706c0b58f8a6cb",
+    "worktreeCleanAtBranchCreation": true,
+    "descendsFromAcceptedClosure": true,
+    "acceptedClosureSha": "bf742ff896a289492990744be9f34ec1898c54b3"
+  },
+  "environment": {
+    "os": "Windows 11 Pro 10.0.26200 64-bit",
+    "node": "v24.14.1",
+    "npm": "11.11.0",
+    "python": "3.14.2",
+    "playwright": "1.62.1",
+    "browser": "Chromium",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12500H; 16 logical processors",
+    "ramBytes": 16781881344
+  },
+  "previousAcceptance": {
+    "manualReport": "verification/final/FINAL_PYMOL_MANUAL_ACCEPTANCE_REPORT.md",
+    "autonomousReport": "verification/autonomous-pymol/FINAL_AUTONOMOUS_PYMOL_CAMPAIGN_REPORT.md",
+    "previousE2E": "120/120 PASS",
+    "pymolExecutableOracle": "BLOCKED",
+    "cealign": "UNAVAILABLE",
+    "docking": "NOT_STARTED",
+    "hts": "NOT_STARTED"
+  },
+  "realAppBaseline": {
+    "url": "http://localhost:3101/molstudio",
+    "apiConnected": true,
+    "screenshot": "verification/final-rearchitecture/evidence/BASELINE_WORKSPACE.png",
+    "findings": [
+      "Permanent Native Lifecycle / Scenes area consumes workspace height.",
+      "Console is expanded by default.",
+      "Display is an in-flow pane instead of a far-right inward-opening rail panel.",
+      "Internal R08, oracle, canonical, and presentation labels are exposed to normal users.",
+      "Import advertises only PDB/mmCIF.",
+      "Dock menu is visible while docking is unavailable."
+    ]
+  }
+}
