@@ -6,6 +6,10 @@ const sdfFixture = resolve("tests/fixtures/ethanol.sdf");
 const xyzFixture = resolve("tests/fixtures/water.xyz");
 const proteinFixture = resolve("tests/fixtures/mini-protein.pdb");
 const ligandFixture = resolve("tests/fixtures/g1c-small-molecule.pdb");
+const fastaFixture = resolve("tests/fixtures/sample.fasta");
+const fastqFixture = resolve("tests/fixtures/sample.fastq");
+const dxFixture = resolve("tests/fixtures/sample.dx");
+const trajectoryFixture = resolve("tests/fixtures/sample.multi.xyz");
 
 test("AT-FSR-A-001 exposes the approved scientific shell with a collapsed console", async ({ page }) => {
   await page.goto("/");
@@ -168,4 +172,68 @@ test("AT-FSR-F-001 keeps Select-rail, Escape, and console selection state conver
   await page.keyboard.press("Escape");
   await expect(panel).toContainText("No active selection");
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selected-atoms", "0");
+});
+
+test("AT-FSR-J-001 exposes the unified biological import dialog and paste routing", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "File", exact: true }).click();
+  await page.getByRole("button", { name: "Import", exact: true }).click();
+  const dialog = page.getByTestId("biological-import-dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("tab")).toHaveText(["Local file", "Online ID", "Paste / text"]);
+  await dialog.getByRole("tab", { name: "Paste / text" }).click();
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_J_IMPORT_DIALOG_OPEN.png") });
+  await dialog.getByLabel("Pasted data format").selectOption("genbank");
+  await dialog.getByLabel("Pasted data filename").fill("pasted-data.fasta");
+  await dialog.getByLabel("Pasted biological data").fill("LOCUS       PASTE  8 bp\nORIGIN\n        1 acgtacgt\n//");
+  await dialog.getByRole("button", { name: "Validate and open" }).click();
+  await expect(page.getByTestId("sequence-viewer")).toHaveAttribute("data-sequence-format", "genbank");
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_J_IMPORT_DIALOG_SEQUENCE.png") });
+});
+
+test("AT-FSR-J-002 opens a FASTA dataset in the dedicated sequence viewer", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(fastaFixture);
+  const viewer = page.getByTestId("sequence-viewer");
+  await expect(viewer).toBeVisible({ timeout: 15000 });
+  await expect(viewer).toHaveAttribute("data-sequence-format", "fasta");
+  await expect(viewer).toContainText("alpha");
+  await expect(viewer).toContainText("2 records");
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_J_FASTA_VIEWER.png") });
+});
+
+test("AT-FSR-J-003 opens FASTQ quality data without treating it as coordinates", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(fastqFixture);
+  const viewer = page.getByTestId("sequence-viewer");
+  await expect(viewer).toBeVisible({ timeout: 15000 });
+  await expect(viewer).toHaveAttribute("data-sequence-format", "fastq");
+  await expect(viewer).toContainText("Read quality");
+  await expect(page.getByTestId("molecular-viewer")).toHaveCount(0);
+});
+
+test("AT-FSR-J-004 opens an OpenDX density map in the map viewer", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(dxFixture);
+  const viewer = page.getByTestId("map-viewer");
+  await expect(viewer).toBeVisible({ timeout: 15000 });
+  await expect(viewer).toHaveAttribute("data-map-format", "dx");
+  await expect(viewer).toHaveAttribute("data-map-complete", "true");
+  await expect(viewer).toContainText("4 × 3 × 2");
+  await page.getByLabel("Map slice").fill("1");
+  await expect(viewer).toContainText("2 / 2");
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_J_DENSITY_MAP.png") });
+});
+
+test("AT-FSR-J-005 opens multi-frame XYZ as a trajectory viewer", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(trajectoryFixture);
+  const viewer = page.getByTestId("trajectory-viewer");
+  await expect(viewer).toBeVisible({ timeout: 15000 });
+  await expect(viewer).toHaveAttribute("data-trajectory-format", "xyz-trajectory");
+  await expect(viewer).toHaveAttribute("data-trajectory-status", "READY");
+  await expect(viewer).toContainText("2");
+  await page.getByLabel("Trajectory frame").fill("1");
+  await expect(viewer).toContainText("frame two");
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_J_TRAJECTORY.png") });
 });

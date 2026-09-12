@@ -14,6 +14,8 @@ import { ScientificToolRail, type ScientificToolPanel } from "./components/Scien
 import { ScientificEditPanel } from "./components/ScientificEditPanel";
 import { ScientificSelectionPanel } from "./components/ScientificSelectionPanel";
 import { ScientificLigandPanel } from "./components/ScientificLigandPanel";
+import { BiologicalDataViewer } from "./components/BiologicalDataViewer";
+import { ImportDialog } from "./components/ImportDialog";
 import { ACTION_IDS, ACTION_REGISTRY, type ActionId, type ActionDefinition } from "./domain/registry";
 import { ApiClientError, apiClient } from "./lib/apiClient";
 import { applyRepresentationToSelection, clearColorForSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setComponentColor, setInteractionState, setLabelState, setProjectionStyle, setRepresentationColorForSelection, setRepresentationParameters, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
@@ -39,6 +41,7 @@ import { createAddBondCommand, createAddHydrogensCommand, createAttachAtomComman
 import { buildSessionDraft, restoreSession } from "./lifecycle/sessionCodec";
 import { exportStructure, type ExportArtifact, type ExportFormat, type ExportLossPolicy, type ExportStateScope } from "./lifecycle/export";
 import { SceneStore } from "./lifecycle/scenes";
+import { detectBiologicalFormat, isMultiFrameXyz, parseBiologicalData, type BiologicalData, type BiologicalFormat, BiologicalAdapterError } from "./biological/adapters";
 
 const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_SELECT]: "Select",
@@ -48,7 +51,8 @@ const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_FOCUS]: "Focus",
 };
 
-const isAdmittedFile = (file: File) => /\.(pdb|cif|mmcif|pqr|sdf|mol|xyz|mol2|pdbqt)$/i.test(file.name);
+const isAdmittedFile = (file: File) => /\.(pdb|cif|mmcif|pqr|sdf|mol|xyz|mol2|pdbqt|fasta|fa|fna|faa|fastq|fq|gb|gbk|genbank|embl|emb|dx|mrc|map|ccp4|dcd|xtc|trr|gro|psf|prmtop|prm7|smi|smiles)$/i.test(file.name);
+const isCoordinateFile = (file: File) => /\.(pdb|cif|mmcif|pqr|sdf|mol|xyz|mol2|pdbqt)$/i.test(file.name);
 const splitCommandArguments = (value: string): string[] => {
   const parts: string[] = [];
   let start = 0;
@@ -94,6 +98,10 @@ export const App = () => {
   const [exportArtifact, setExportArtifact] = useState<ExportArtifact | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
   const [structure, setStructure] = useState<StructureLoadResult | null>(null);
+  const [biologicalData, setBiologicalData] = useState<BiologicalData | null>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [biologicalImportBusy, setBiologicalImportBusy] = useState(false);
+  const [biologicalImportError, setBiologicalImportError] = useState<string | null>(null);
   const [workspaceObjects, setWorkspaceObjects] = useState<WorkspaceObject[]>([]);
   const [workspaceGroups, setWorkspaceGroups] = useState<WorkspaceGroup[]>([]);
   const [activeObjectId, setActiveObjectId] = useState<string | null>(null);
@@ -131,7 +139,7 @@ export const App = () => {
   const alignmentOverlays = useMemo(() => overlaysForAlignment(fittingResults), [fittingResults]);
   const viewerWorkspaceObjects = useMemo(() => workspaceObjects.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object), [activeObjectId, projection, workspaceObjects]);
   const activeHistoryState = activeObjectId ? historyServiceRef.current.historyState(activeObjectId) : null;
-  const workspaceFingerprint = useMemo(() => JSON.stringify({ workspaceObjects, workspaceGroups, activeObjectId, globalFrameIndex, coordinateFramePolicy, activeSelection, namedSelections, measurements, analysisResults, fittingResults, sceneCollection, projection }), [activeObjectId, activeSelection, analysisResults, coordinateFramePolicy, fittingResults, globalFrameIndex, measurements, namedSelections, projection, sceneCollection, workspaceGroups, workspaceObjects]);
+  const workspaceFingerprint = useMemo(() => JSON.stringify({ workspaceObjects, workspaceGroups, activeObjectId, globalFrameIndex, coordinateFramePolicy, activeSelection, namedSelections, measurements, analysisResults, fittingResults, sceneCollection, projection, biologicalData }), [activeObjectId, activeSelection, analysisResults, biologicalData, coordinateFramePolicy, fittingResults, globalFrameIndex, measurements, namedSelections, projection, sceneCollection, workspaceGroups, workspaceObjects]);
 
   useEffect(() => {
     if (!project) return;
@@ -291,6 +299,8 @@ export const App = () => {
        if (mode === "replace") { workspaceGroupsRef.current = []; setWorkspaceGroups([]); setCoordinateFramePolicy(null); sceneStoreRef.current = new SceneStore(); setSceneCollection(sceneStoreRef.current.value); }
       setActiveObjectId(workspaceObject.objectId);
       setStructure(result);
+      setBiologicalData(null);
+      setBiologicalImportError(null);
       namedSelectionsRef.current = new NamedSelectionStore(result.structure);
       setProjection(createDefaultRenderProjection(result.structure));
       setTargetStyles({ protein: "cartoon", ligand: "ball-and-stick", water: "spheres", ions: "spheres", other: "sticks" });
@@ -310,17 +320,129 @@ export const App = () => {
     }
   }, [registerScientificRoot, resetScientificHistory]);
 
+  const fetchRcsb = (pdbId: string, mode: "replace" | "add" = "replace") => void runLoad(() => apiClient.fetchRcsb(pdbId), mode);
+
+  const commitBiologicalData = (data: BiologicalData) => {
+    resetScientificHistory();
+    workspaceObjectsRef.current = [];
+    setWorkspaceObjects([]);
+    workspaceGroupsRef.current = [];
+    setWorkspaceGroups([]);
+    setActiveObjectId(null);
+    setCoordinateFramePolicy(null);
+    setStructure(null);
+    setBiologicalData(data);
+    measurementAccumulatorRef.current.clear();
+    setMeasurementSlots([]);
+    setMeasurements([]);
+    setAnalysisResults([]);
+    setFittingResults([]);
+    setActiveSelection(null);
+    setNamedSelections([]);
+    setProjection(createDefaultRenderProjection());
+    setTargetStyles({ protein: "cartoon", ligand: "ball-and-stick", water: "spheres", ions: "spheres", other: "sticks" });
+    setLoadError(null);
+    setLoadState("idle");
+    setBiologicalImportError(null);
+    if (project) setDirty(true);
+  };
+
+  const importBiologicalText = (filename: string, format: BiologicalFormat | undefined, text: string | ArrayBuffer) => {
+    setBiologicalImportBusy(true);
+    setBiologicalImportError(null);
+    try {
+      const parseFilename = filename;
+      const detected = format ?? detectBiologicalFormat(parseFilename, typeof text === "string" ? text : "");
+      if (!detected) throw new BiologicalAdapterError(`No biological adapter recognizes ${filename}.`, "UNSUPPORTED_FORMAT");
+      const data = parseBiologicalData(parseFilename, text, detected);
+      commitBiologicalData(data);
+      setImportDialogOpen(false);
+    } catch (error) {
+      const message = error instanceof BiologicalAdapterError ? error.message : error instanceof Error ? error.message : "The biological dataset could not be parsed.";
+      setBiologicalImportError(message);
+      setLoadError(message);
+      setLoadState("error");
+    } finally {
+      setBiologicalImportBusy(false);
+    }
+  };
+
+  const importBiologicalFile = async (file: File) => {
+    try {
+      const extension = file.name.toLowerCase().split(".").pop() ?? "";
+      const binary = ["mrc", "map", "ccp4", "dcd", "xtc", "trr"].includes(extension);
+      const content = binary ? await file.arrayBuffer() : await file.text();
+      const trajectoryXyz = extension === "xyz" && typeof content === "string" && isMultiFrameXyz(content);
+      importBiologicalText(file.name, trajectoryXyz ? "xyz-trajectory" : undefined, content);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "The biological file could not be read.";
+      setBiologicalImportError(message);
+      setLoadError(message);
+      setLoadState("error");
+    }
+  };
+
   const importFile = (file: File, mode: "replace" | "add" = pendingImportModeRef.current) => {
     pendingImportModeRef.current = "replace";
     if (!isAdmittedFile(file)) {
       setLoadState("error");
-      setLoadError("Choose an admitted coordinate file: PDB, mmCIF/CIF, PQR, SDF/MOL, XYZ, MOL2, or PDBQT. The current structure was kept.");
+      setLoadError("Choose an admitted biological data file: PDB, mmCIF/CIF, PQR, SDF/MOL, XYZ, MOL2, PDBQT, FASTA, FASTQ, GenBank, EMBL, DX, MRC/CCP4, GRO, DCD, XTC, TRR, PSF, PRMTOP, or SMILES. The current dataset was kept.");
+      return;
+    }
+    if (mode === "add" && !isCoordinateFile(file)) {
+      setLoadState("error");
+      setLoadError("Add Structure accepts coordinate-bearing files only. Use File → Import for sequence, map, trajectory, topology, or SMILES data; the current workspace was kept.");
+      return;
+    }
+    if (!isCoordinateFile(file) || /\.xyz$/i.test(file.name)) {
+      if (/\.xyz$/i.test(file.name)) {
+        void file.text().then((content) => {
+          if (isMultiFrameXyz(content)) importBiologicalText(file.name, "xyz-trajectory", content);
+          else void runLoad(() => apiClient.uploadStructure(file), mode);
+        }).catch((error) => { setLoadState("error"); setLoadError(error instanceof Error ? error.message : "The biological file could not be read."); });
+      } else void importBiologicalFile(file);
       return;
     }
     void runLoad(() => apiClient.uploadStructure(file), mode);
   };
 
-  const fetchRcsb = (pdbId: string, mode: "replace" | "add" = "replace") => void runLoad(() => apiClient.fetchRcsb(pdbId), mode);
+  const importOnlineBiologicalData = async (provider: "RCSB" | "PubChem" | "UniProt", accession: string) => {
+    setBiologicalImportBusy(true);
+    setBiologicalImportError(null);
+    try {
+      const normalized = accession.trim();
+      if (provider === "RCSB") {
+        if (!/^[A-Z0-9]{4}$/i.test(normalized)) throw new BiologicalAdapterError("RCSB PDB IDs must contain exactly four letters or digits.", "INVALID_INPUT");
+        setImportDialogOpen(false);
+        fetchRcsb(normalized.toUpperCase());
+        return;
+      }
+      if (!/^[A-Za-z0-9_.-]{2,40}$/.test(normalized)) throw new BiologicalAdapterError("Online accession contains unsupported characters.", "INVALID_INPUT");
+      if (provider === "UniProt") {
+        const response = await fetch(`https://rest.uniprot.org/uniprotkb/${encodeURIComponent(normalized)}.fasta`, { headers: { accept: "text/plain" } });
+        if (!response.ok) throw new BiologicalAdapterError(`UniProt did not return ${normalized} (${response.status}).`, "PARSE_FAILED");
+        importBiologicalText(`${normalized}.fasta`, "fasta", await response.text());
+      } else {
+        const response = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(normalized)}/property/CanonicalSMILES,Title/JSON`, { headers: { accept: "application/json" } });
+        if (!response.ok) throw new BiologicalAdapterError(`PubChem did not return ${normalized} (${response.status}).`, "PARSE_FAILED");
+        const payload = await response.json() as { PropertyTable?: { Properties?: Array<{ ConnectivitySMILES?: string; CanonicalSMILES?: string; IUPACName?: string; Title?: string }> } };
+        const property = payload.PropertyTable?.Properties?.[0]; const notation = property?.ConnectivitySMILES ?? property?.CanonicalSMILES;
+        if (!notation) throw new BiologicalAdapterError(`PubChem returned no canonical SMILES for ${normalized}.`, "PARSE_FAILED");
+        importBiologicalText(`${property?.Title ?? normalized}.smi`, "smiles", `${property?.Title ?? normalized}\t${notation}`);
+      }
+    } catch (error) {
+      const message = error instanceof BiologicalAdapterError ? error.message : error instanceof Error ? error.message : "The online biological dataset could not be fetched.";
+      setBiologicalImportError(message);
+    } finally {
+      setBiologicalImportBusy(false);
+    }
+  };
+
+  const openImportDialog = () => {
+    setBiologicalImportError(null);
+    setRibbonCollapsed(true);
+    setImportDialogOpen(true);
+  };
 
   const activateWorkspaceObject = (objectId: string) => {
     const current = workspaceObjectsRef.current.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object);
@@ -514,6 +636,9 @@ export const App = () => {
       setActiveObjectId(null);
       setCoordinateFramePolicy(null);
       setStructure(null);
+      setBiologicalData(null);
+      setBiologicalImportError(null);
+      setImportDialogOpen(false);
       setProjection(createDefaultRenderProjection());
       measurementAccumulatorRef.current.clear();
       setMeasurementSlots([]);
@@ -1513,7 +1638,11 @@ export const App = () => {
       applyStyle("van-der-waals-surface");
       return;
     }
-    if (actionId === ACTION_IDS.FILE_OPEN || actionId === ACTION_IDS.FILE_IMPORT || actionId === ACTION_IDS.STRUCTURE_IMPORT) {
+    if (actionId === ACTION_IDS.FILE_IMPORT) {
+      openImportDialog();
+      return;
+    }
+    if (actionId === ACTION_IDS.FILE_OPEN || actionId === ACTION_IDS.STRUCTURE_IMPORT) {
       fileInputRef.current?.click();
       return;
     }
@@ -1618,13 +1747,13 @@ export const App = () => {
 
   return (
     <div className="app-shell">
-      <input id="structure-file" ref={fileInputRef} className="visually-hidden-input" type="file" accept=".pdb,.cif,.mmcif,.pqr,.sdf,.mol,.xyz,.mol2,.pdbqt,text/plain" onChange={(event) => { const file = event.target.files?.[0]; if (file) importFile(file); event.target.value = ""; }} />
+      <input id="structure-file" ref={fileInputRef} className="visually-hidden-input" type="file" accept=".pdb,.cif,.mmcif,.pqr,.sdf,.mol,.xyz,.mol2,.pdbqt,.fasta,.fa,.fna,.faa,.fastq,.fq,.gb,.gbk,.genbank,.embl,.emb,.dx,.mrc,.map,.ccp4,.dcd,.xtc,.trr,.gro,.psf,.prmtop,.prm7,.smi,.smiles,text/plain" onChange={(event) => { const file = event.target.files?.[0]; if (file) importFile(file); event.target.value = ""; }} />
       <main className="app-main">
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
-        <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
+         <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={openImportDialog} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${activeRailPanel ? "workspace-grid--right-expanded" : ""}`}>
           <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} onAlignmentCommand={runConsoleCommand} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} showOperations={false} />
-          <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFileDrop={importFile} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearSelection} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} alignmentOverlays={alignmentOverlays} />
+            {biologicalData ? <BiologicalDataViewer data={biologicalData} onImport={openImportDialog} /> : <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={openImportDialog} onFileDrop={importFile} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearSelection} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} alignmentOverlays={alignmentOverlays} />}
           <ScientificToolRail activePanel={activeRailPanel} onPanelChange={setActiveRailPanel}>
             {activeRailPanel === "Display" || activeRailPanel === "Color" ? <InspectorPanel collapsed={false} onToggle={() => setActiveRailPanel(null)} onAction={handleAction} structure={structure} projection={projection} activeSelectionCount={activeSelection?.count ?? 0} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} /> : activeRailPanel === "Select" ? <ScientificSelectionPanel activeSelection={activeSelection} canSelect={Boolean(structure)} onAction={handleAction} onClearSelection={clearSelection} /> : activeRailPanel === "Measure" || activeRailPanel === "Analyze" ? <ScientificOperationsPanel mode={activeRailPanel === "Measure" ? "measure" : "analyze"} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} structure={structure} onAction={handleAction} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} /> : activeRailPanel === "Ligand" ? <ScientificLigandPanel structure={structure} activeSelection={activeSelection} onAction={handleAction} onCommand={runLigandContextCommand} /> : activeRailPanel === "Edit" ? <ScientificEditPanel selectionCount={activeSelection?.count ?? 0} objectName={editTargetObject?.displayName ?? activeWorkspaceObject?.displayName} selectionReady={editSelectionReady} canUndo={activeHistoryState?.canUndo ?? false} canRedo={activeHistoryState?.canRedo ?? false} onAction={handleAction} onBondOrder={handleBondOrderAction} /> : activeRailPanel === "Session" ? <ScenePanel collection={sceneCollection} onStore={(name) => storeScene(name)} onRecall={(sceneId) => recallScene(sceneId)} onUpdate={(sceneId) => updateScene(sceneId)} onRename={(sceneId, name) => renameScene(sceneId, name)} onDelete={(sceneId) => deleteScene(sceneId)} onStep={(direction) => stepScene(direction)} /> : <section className="rail-transition-panel" aria-live="polite"><h2>{activeRailPanel}</h2><p>This tool is being moved into the scientific rail. Its current working controls remain available in Objects &amp; Selections while the transition is verified.</p></section>}
           </ScientificToolRail>
@@ -1633,6 +1762,7 @@ export const App = () => {
         {notice && <CapabilityNotice capability={notice} onClose={() => setNotice(null)} />}
         <div className="console-layer"><ConsolePanel expanded={consoleExpanded} onToggle={() => setConsoleExpanded((value) => !value)} structure={structure} namedSelections={namedSelections} onCommand={runConsoleCommand} /></div>
         {exportOpen && <ExportPanel object={activeWorkspaceObject} selection={activeSelection} format={exportFormat} stateScope={exportStateScope} lossPolicy={exportLossPolicy} artifact={exportArtifact} error={exportError} onClose={() => setExportOpen(false)} onFormat={setExportFormat} onStateScope={setExportStateScope} onLossPolicy={setExportLossPolicy} onExport={() => { void runExport(); }} onDownload={downloadExport} onReimport={reimportExport} />}
+         {importDialogOpen && <ImportDialog onClose={() => setImportDialogOpen(false)} onFile={importFile} onPaste={importBiologicalText} onOnline={importOnlineBiologicalData} busy={biologicalImportBusy} error={biologicalImportError} />}
       </main>
     </div>
   );

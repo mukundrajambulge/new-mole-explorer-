@@ -1,3 +1,11 @@
 # Import formats
 
-PDB, mmCIF/CIF, PQR, SDF/MOL, XYZ, MOL2, and PDBQT are admitted as bounded coordinate objects. SDF/XYZ/MOL2/PDBQT validation is deliberately limited to the supported single-object forms. SMILES, FASTA/FASTQ/GenBank/EMBL, MRC/CCP4/DX, and trajectory/topology families fail closed until their distinct viewers and validation gates exist.
+Use **File → Import** for the unified biological-data flow. The dialog has three source tabs:
+
+- **Local file** reads an admitted file from disk.
+- **Online ID** fetches an explicit RCSB PDB ID, PubChem compound name, or UniProt accession.
+- **Paste / text** validates pasted FASTA, FASTQ, GenBank, EMBL, DX, SMILES, XYZ trajectory, GRO, PSF, or PRMTOP text.
+
+Coordinate files (PDB, mmCIF/CIF, PQR, SDF/MOL, single-frame XYZ, MOL2, and PDBQT) continue through the canonical molecular ingestion path. Biological sources stay typed: FASTA/FASTQ/GenBank/EMBL open in the sequence viewer, DX/MRC/CCP4 open in the density-map viewer, multi-frame XYZ and GRO open in the trajectory viewer, PSF/PRMTOP open in the topology viewer, and SMILES opens in the notation viewer. No sequence or notation is converted into invented coordinates.
+
+DCD is admitted for validated header metadata and is shown as **HEADER_ONLY** until frame decoding is implemented. XTC and TRR show the same explicit limitation. Malformed files fail closed and leave the current dataset unchanged.

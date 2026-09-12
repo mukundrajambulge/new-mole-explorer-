@@ -9,9 +9,16 @@
 | XYZ | One coordinate frame as 3D object | Source-declared elements and Cartesian coordinates; XYZ does not declare bonds, so no bond inference is claimed; additional frames fail closed | `AT-FSR-G-001`, `ingestion.test.ts` |
 | MOL2 | One SYBYL molecule as 3D object | Cartesian coordinates, declared MOL2 bond types, and complete source atom charges when present; multi-molecule files fail closed | `ingestion.test.ts` |
 | PDBQT | One docking coordinate object | PDBQT coordinates and source partial charges; no bond inference is claimed because PDBQT does not carry authoritative connectivity | `ingestion.test.ts` |
-| SMILES | Not admitted | No 3D coordinates are fabricated from a line notation | Planned chemistry adapter |
-| FASTA/FASTQ/GenBank/EMBL | Not admitted yet | No coordinates are fabricated | Planned sequence adapters |
-| MRC/CCP4/DX | Not admitted yet | No density/map rendering claim | Planned map adapters |
-| Trajectories | Not admitted yet | No trajectory support claim | Research-only pending corpus and performance gate |
+| SMILES | Typed notation viewer | Records and names are preserved; no 3D coordinates are fabricated from line notation | `adapters.test.ts`, `AT-FSR-J-001` paste path |
+| FASTA | Sequence viewer | Multi-record sequence, alphabet, descriptions, search, and bounded character rendering | `adapters.test.ts`, `AT-FSR-J-002` |
+| FASTQ | Sequence + quality viewer | Sequence and Phred+33 quality are validated and shown separately; no coordinates are fabricated | `adapters.test.ts`, `AT-FSR-J-003` |
+| GenBank / EMBL | Sequence viewer | ORIGIN/SQ sequence extraction with source identifiers; no coordinates are fabricated | `adapters.test.ts`, `AT-FSR-J-001` |
+| OpenDX (DX) | Density-map viewer | Grid counts, origin, spacing, values, completeness, slice control, and range statistics | `adapters.test.ts`, `AT-FSR-J-004` |
+| MRC / CCP4 | Density-map viewer | Binary header, supported scalar modes, voxel payload, spacing, and range statistics are decoded within bounded limits | `adapters.test.ts` binary fixture |
+| XYZ trajectory | Trajectory viewer | Multi-frame XYZ is validated with constant atom count and frame slider; single-frame XYZ remains a coordinate object | `adapters.test.ts`, `AT-FSR-J-005` |
+| GRO | Trajectory viewer | One coordinate frame is parsed with nm→Å conversion; topology is not inferred | `adapters.test.ts` |
+| DCD | Header-only trajectory status | Signature, frame count, title block, and atom count are validated; coordinate frames are not decoded | `adapters.test.ts`; viewer status is `HEADER_ONLY` |
+| XTC / TRR | Header-only trajectory status | Sources are admitted to the registry with an explicit decoder limitation; no coordinates are fabricated | Adapter registry and viewer diagnostic |
+| PSF / PRMTOP | Topology metadata viewer | Atom/bond/residue metadata is shown separately; no coordinate rendering is claimed | `adapters.test.ts` |
 
-The UI lists only admitted coordinate formats. Unsupported formats continue to fail closed at the import boundary.
+The File → Import dialog lists coordinate and biological adapters separately and offers Local file, Online ID, and Paste / text routes. Unsupported or malformed sources fail closed at the import boundary. Online RCSB IDs use the existing canonical structure ingestion; PubChem returns typed SMILES and UniProt returns typed FASTA.

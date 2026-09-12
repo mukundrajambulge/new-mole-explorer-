@@ -10,7 +10,7 @@ Molexplorer opens the molecular workstation at `http://localhost:3101/molstudio`
 4. Use **View → Fit**, **Center**, or **Orient** to restore the camera.
 5. Open **Command Console** for advanced, semicolon-separated commands. `Esc` clears the active selection.
 
-Admitted coordinate formats are PDB, mmCIF/CIF, PQR, SDF/MOL, single-frame XYZ, one-molecule MOL2, and one-molecule PDBQT. FASTA/FASTQ, maps, and trajectories are deliberately not rendered as coordinates.
+Admitted coordinate formats are PDB, mmCIF/CIF, PQR, SDF/MOL, single-frame XYZ, one-molecule MOL2, and one-molecule PDBQT. Use **File → Import** for FASTA/FASTQ/GenBank/EMBL sequence data, DX/MRC/CCP4 maps, multi-frame XYZ or GRO trajectories, PSF/PRMTOP topology metadata, and SMILES notation. These sources open in dedicated typed viewers and are never rendered as invented coordinates. DCD is currently validated as header-only; XTC and TRR show explicit metadata-only status.
 
 ## Scientific limits
 
