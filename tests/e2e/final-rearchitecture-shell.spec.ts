@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 
 const pqrFixture = resolve("tests/fixtures/charged.pqr");
 const sdfFixture = resolve("tests/fixtures/ethanol.sdf");
+const xyzFixture = resolve("tests/fixtures/water.xyz");
 const proteinFixture = resolve("tests/fixtures/mini-protein.pdb");
 
 test("AT-FSR-A-001 exposes the approved scientific shell with a collapsed console", async ({ page }) => {
@@ -54,6 +55,15 @@ test("AT-FSR-B-002 admits one V2000 SDF molecule as a coordinate-bearing object"
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
   await expect(page.getByTestId("source-provenance")).toContainText("SDF");
   await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_B_SDF_IMPORT.png") });
+});
+
+test("AT-FSR-G-001 admits a bounded XYZ coordinate frame as a molecule", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(xyzFixture);
+  await expect(page.getByTitle("water.xyz")).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await expect(page.getByTestId("source-provenance")).toContainText("XYZ");
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_G_XYZ_IMPORT.png") });
 });
 
 test("AT-FSR-C-001 executes top-level console batches and rejects malformed nesting", async ({ page }) => {

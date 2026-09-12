@@ -47,7 +47,7 @@ const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_FOCUS]: "Focus",
 };
 
-const isAdmittedFile = (file: File) => /\.(pdb|cif|mmcif|pqr|sdf|mol)$/i.test(file.name);
+const isAdmittedFile = (file: File) => /\.(pdb|cif|mmcif|pqr|sdf|mol|xyz)$/i.test(file.name);
 const splitCommandArguments = (value: string): string[] => {
   const parts: string[] = [];
   let start = 0;
@@ -313,7 +313,7 @@ export const App = () => {
     pendingImportModeRef.current = "replace";
     if (!isAdmittedFile(file)) {
       setLoadState("error");
-      setLoadError("Choose an admitted coordinate file: PDB, mmCIF, PQR, or SDF/MOL. The current structure was kept.");
+      setLoadError("Choose an admitted coordinate file: PDB, mmCIF, PQR, SDF/MOL, or XYZ. The current structure was kept.");
       return;
     }
     void runLoad(() => apiClient.uploadStructure(file), mode);
@@ -1611,7 +1611,7 @@ export const App = () => {
 
   return (
     <div className="app-shell">
-      <input id="structure-file" ref={fileInputRef} className="visually-hidden-input" type="file" accept=".pdb,.cif,.mmcif,.pqr,.sdf,.mol,text/plain" onChange={(event) => { const file = event.target.files?.[0]; if (file) importFile(file); event.target.value = ""; }} />
+      <input id="structure-file" ref={fileInputRef} className="visually-hidden-input" type="file" accept=".pdb,.cif,.mmcif,.pqr,.sdf,.mol,.xyz,text/plain" onChange={(event) => { const file = event.target.files?.[0]; if (file) importFile(file); event.target.value = ""; }} />
       <main className="app-main">
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
         <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />

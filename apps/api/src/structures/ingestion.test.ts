@@ -24,6 +24,13 @@ M  END
 $$$$
 `;
 
+const xyzFixture = `3
+water-like coordinates
+O 0.000 0.000 0.000
+H 0.758 0.000 0.504
+H -0.758 0.000 0.504
+`;
+
 const partialChargeCifFixture = `data_charges
 loop_
 _chem_comp_atom.comp_id
@@ -137,6 +144,19 @@ describe("VIS-01 structure ingestion", () => {
     await expect(new StructureIngestionService().ingestLocal("many.sdf", Buffer.from(`${sdfFixture}${sdfFixture}`))).rejects.toMatchObject({ code: "INVALID_INPUT" });
   });
 
+  it("parses a bounded XYZ coordinate frame without inferring bonds", async () => {
+    const result = await new StructureIngestionService().ingestLocal("water.xyz", Buffer.from(xyzFixture));
+    expect(result.structure.format).toBe("xyz");
+    expect(result.structure.counts).toMatchObject({ atoms: 3, ligandAtoms: 3 });
+    expect(result.structure.atoms.map((atom) => [atom.element, atom.x, atom.y, atom.z])).toEqual([["O", 0, 0, 0], ["H", 0.758, 0, 0.504], ["H", -0.758, 0, 0.504]]);
+    expect(result.structure.bonds).toEqual([]);
+    expect(result.structure.source.formatEvidence).toContainEqual({ kind: "CONTENT_SIGNATURE", value: "XYZ atom-count coordinate frame" });
+  });
+
+  it("rejects XYZ files with a second coordinate frame", async () => {
+    await expect(new StructureIngestionService().ingestLocal("many.xyz", Buffer.from(`${xyzFixture}1\nsecond frame\nH 0 0 0\n`))).rejects.toMatchObject({ code: "INVALID_INPUT" });
+  });
+
   it("promotes complete source-declared mmCIF partial charges without inference", async () => {
     const result = await new StructureIngestionService().ingestLocal("charges.mmcif", Buffer.from(partialChargeCifFixture));
     const dataset = result.structure.partialChargeDataset;
@@ -206,7 +226,7 @@ ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
   });
 
   it("rejects unadmitted formats without creating a structure", async () => {
-    await expect(new StructureIngestionService().ingestLocal("sample.xyz", Buffer.from("not admitted"))).rejects.toMatchObject({ code: "UNSUPPORTED_FORMAT" });
+    await expect(new StructureIngestionService().ingestLocal("sample.mol2", Buffer.from("not admitted"))).rejects.toMatchObject({ code: "UNSUPPORTED_FORMAT" });
   });
 
   it("fetches mmCIF from the official RCSB download endpoint", async () => {
@@ -371,7 +391,7 @@ ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
 
   it("rejects format-policy mismatches before parser publication", async () => {
     await expect(new StructureIngestionService().ingestLocal("wrong.pdb", Buffer.from(cifFixture))).rejects.toMatchObject({ code: "FORMAT_MISMATCH" });
-    await expect(new StructureIngestionService().ingestLocal("wrong.xyz", Buffer.from(pdbFixture))).rejects.toMatchObject({ code: "UNSUPPORTED_FORMAT" });
+    await expect(new StructureIngestionService().ingestLocal("wrong.xyz", Buffer.from(pdbFixture))).rejects.toMatchObject({ code: "FORMAT_MISMATCH" });
   });
 
   it("acquires remote response bytes through arrayBuffer without text re-encoding", async () => {

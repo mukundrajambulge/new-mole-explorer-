@@ -133,14 +133,23 @@ const atomMaskForStyle = (atom: CanonicalMolecularStructure["atoms"][number], st
   return maskForStyle(style);
 };
 
-export const createRepresentationState = (structure: CanonicalMolecularStructure | null, style: RepresentationStyle = "cartoon"): RepresentationState => ({
+export const createRepresentationState = (structure: CanonicalMolecularStructure | null, style: RepresentationStyle = "cartoon"): RepresentationState => {
+  const bondedAtomIds = new Set(structure?.bonds.flatMap((bond) => [bond.atom1, bond.atom2]) ?? []);
+  const defaultMaskFor = (atom: CanonicalMolecularStructure["atoms"][number]) => style === "cartoon" || style === "ribbon" || style === "trace" || style === "putty"
+    ? atom.isLigand && !bondedAtomIds.has(atom.stableId) ? REPRESENTATION_MASKS.SPHERES : atomMaskForStyle(atom, style)
+    : atomMaskForStyle(atom, style);
+  const defaultStyleFor = (atom: CanonicalMolecularStructure["atoms"][number]) => ["cartoon", "ribbon", "trace", "putty"].includes(style)
+    ? atom.isPolymer ? style : atom.isLigand ? bondedAtomIds.has(atom.stableId) ? "ball-and-stick" : "spheres" : "spheres"
+    : style;
+  return {
   presentationRevision: 1,
   objectEnabled: structure ? { [structure.id]: true } : {},
-  atomRepMasks: structure ? Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, atomMaskForStyle(atom, style)])) : {},
-  atomRepStyles: structure ? Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, ["cartoon", "ribbon", "trace", "putty"].includes(style) ? atom.isPolymer ? style : atom.isLigand ? "ball-and-stick" : "spheres" : style])) : {},
+  atomRepMasks: structure ? Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, defaultMaskFor(atom)])) : {},
+  atomRepStyles: structure ? Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, defaultStyleFor(atom)])) : {},
   directives: [],
   parameters: DEFAULT_REPRESENTATION_PARAMETERS,
-});
+  };
+};
 
 export const createDefaultRenderProjection = (structure: CanonicalMolecularStructure | null = null): RenderProjection => ({
   representation: "cartoon",
