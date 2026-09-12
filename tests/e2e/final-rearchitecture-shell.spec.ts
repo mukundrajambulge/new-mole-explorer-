@@ -21,7 +21,12 @@ test("AT-FSR-A-001 exposes the approved scientific shell with a collapsed consol
   await expect(page.getByRole("button", { name: "Edit", exact: true })).toHaveCount(0);
   await expect(page.getByLabel("Contextual toolbar")).toHaveCount(0);
   await expect(page.getByLabel("Command console").getByRole("button", { name: "Command Console" })).toHaveAttribute("aria-expanded", "false");
-  await expect(page.getByLabel("Scientific tool panels").getByRole("button")).toHaveCount(10);
+  const toolRail = page.getByLabel("Scientific tool panels");
+  await expect(toolRail.getByRole("button")).toHaveCount(10);
+  await expect(toolRail.getByRole("button", { name: /Movie panel/ })).toBeDisabled();
+  await expect(toolRail.getByRole("button", { name: /Settings panel/ })).toBeDisabled();
+  await expect(toolRail.getByRole("button", { name: /Movie panel/ })).toHaveAttribute("title", "Movie unavailable in current gate");
+  await expect(toolRail.getByRole("button", { name: /Settings panel/ })).toHaveAttribute("title", "Settings unavailable in current gate");
   await expect(page.getByTestId("scene-manager")).toHaveCount(0);
   await expect(page.getByText("NATIVE LIFECYCLE", { exact: true })).toHaveCount(0);
   await expect(page.getByText("PRESENTATION RIBBON", { exact: true })).toHaveCount(0);
@@ -116,6 +121,9 @@ test("AT-FSR-C-001 executes top-level console batches and rejects malformed nest
   await command.fill("select (chain A; color red, all");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByLabel("Command console")).toContainText("Unterminated parenthesized expression");
+  await page.getByRole("button", { name: "Clear console" }).click();
+  await expect(page.getByLabel("Command console")).toContainText("No command events yet.");
+  await expect(page.getByLabel("Command console")).not.toContainText("G1C");
 });
 
 test("AT-FSR-D-001 opens working Measure and Analyze panels from the scientific rail", async ({ page }) => {

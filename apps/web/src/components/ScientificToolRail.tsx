@@ -27,20 +27,26 @@ type ScientificToolRailProps = {
 export const ScientificToolRail = ({ activePanel, onPanelChange, children }: ScientificToolRailProps) => (
   <aside className={`scientific-tool-rail ${activePanel ? "scientific-tool-rail--open" : ""}`} aria-label="Scientific tools">
     <nav className="scientific-tool-rail__buttons" aria-label="Scientific tool panels">
-      {SCIENTIFIC_TOOL_PANELS.map((panel) => (
+      {SCIENTIFIC_TOOL_PANELS.map((panel) => {
+        const unavailable = panel === "Movie" || panel === "Settings";
+        const label = unavailable ? `${panel} panel (unavailable in current gate)` : `${panel} panel`;
+        return (
         <button
           key={panel}
           type="button"
-          className={activePanel === panel ? "scientific-tool-rail__button scientific-tool-rail__button--active" : "scientific-tool-rail__button"}
-          aria-label={`${panel} panel`}
+          className={`${activePanel === panel ? "scientific-tool-rail__button scientific-tool-rail__button--active" : "scientific-tool-rail__button"}${unavailable ? " scientific-tool-rail__button--unavailable" : ""}`}
+          aria-label={label}
           aria-pressed={activePanel === panel}
-          title={panel}
+          aria-disabled={unavailable}
+          disabled={unavailable}
+          title={unavailable ? `${panel} unavailable in current gate` : panel}
           onClick={() => onPanelChange(activePanel === panel ? null : panel)}
         >
           <Icon name={icons[panel]} size={17} />
           <span>{panel}</span>
         </button>
-      ))}
+        );
+      })}
     </nav>
     {activePanel && <div className="scientific-tool-rail__panel" data-rail-panel={activePanel}>{children}</div>}
   </aside>

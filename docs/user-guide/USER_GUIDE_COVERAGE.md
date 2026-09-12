@@ -12,3 +12,4 @@
 | Session/scenes | [SESSION.md](SESSION.md) | R09 suites and AT-FSR-A-002 |
 | Console | [CONSOLE.md](CONSOLE.md) | AT-FSR-C-001 and safe-boundary tests |
 | Wizards | [WIZARDS.md](WIZARDS.md) | Explicitly planned; no active placeholders |
+| Movie and settings | [COMPLETE_USER_GUIDE.md](COMPLETE_USER_GUIDE.md) | AT-FSR-A-001; controls are visibly disabled while planned |

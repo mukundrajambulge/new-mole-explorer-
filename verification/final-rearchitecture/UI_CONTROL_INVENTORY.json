@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "capturedAt": "2026-09-12",
+  "capturedAt": "2026-09-13",
   "slice": "J",
   "normalWorkspace": {
     "topMenus": ["File", "Select", "Display", "Color", "Measure", "Analyze", "View", "Help"],
@@ -39,5 +39,10 @@
     { "id": "objects.toggle", "label": "Enable/disable object", "location": "Objects & Selections", "actionId": "OBJECT.ENABLE|OBJECT.DISABLE", "expectedResult": "Toggle one object while preserving other objects", "testId": "AT-FSR-H-001" }
   ],
   "coverageRule": "Every active control has a test ID; Movie and Settings are explicitly unavailable and do not expose active placeholder controls.",
+  "disabledPlannedControls": [
+    { "label": "Movie panel", "reason": "Movie/state playback is planned and has no admitted implementation in this release.", "testId": "AT-FSR-A-001" },
+    { "label": "Settings panel", "reason": "Settings preferences are planned and have no admitted implementation in this release.", "testId": "AT-FSR-A-001" },
+    { "label": "Theme", "reason": "Theme preferences are reserved for a future gate.", "testId": "AT-FSR-A-001" }
+  ],
   "prohibitedNormalUi": ["Dock", "R08", "ORACLE PENDING", "NATIVE LIFECYCLE", "PRESENTATION RIBBON", "G1C PRESENTATION"]
 }

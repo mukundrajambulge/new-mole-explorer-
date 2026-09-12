@@ -23,7 +23,7 @@ export const ConsolePanel = ({ expanded, onToggle, structure, namedSelections = 
   const submitQuery = () => {
     const trimmed = query.trim();
     if (!trimmed) return;
-    const result = onCommand?.(trimmed) ?? { category: "CAPABILITY" as const, status: "Not executed · authoritative command service is not connected in G1C" };
+    const result = onCommand?.(trimmed) ?? { category: "CAPABILITY" as const, status: "Command service is not connected." };
     setEntries((current) => [...current, { category: result.category, command: trimmed, status: result.status, count: result.count, diagnostics: result.diagnostics, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }) }]);
     setQuery("");
     setHistoryIndex(-1);
@@ -52,7 +52,7 @@ export const ConsolePanel = ({ expanded, onToggle, structure, namedSelections = 
       </div>
       {expanded && <>
         <div className="console-history">
-          {entries.length === 0 && <div className="console-empty">No command events yet. G1C does not execute scientific queries.</div>}
+          {entries.length === 0 && <div className="console-empty">No command events yet.</div>}
           {visibleEntries.map((entry, index) => <div className="console-entry" key={`${entry.timestamp}-${index}`}><span className="console-prompt">›</span><div className="console-entry-body"><div className="console-command"><span className={`console-category console-category--${entry.category.toLowerCase()}`}>{entry.category}</span><code>{entry.command}</code></div><div className="console-result"><span className="result-dot">●</span>{entry.status}{entry.count !== undefined && <small> · {entry.count.toLocaleString("en-US")} atoms</small>}</div>{entry.diagnostics?.map((diagnostic, diagnosticIndex) => <div className="console-diagnostic" key={`${diagnostic.message}-${diagnosticIndex}`}>{diagnostic.message}{diagnostic.span ? ` · characters ${diagnostic.span.start + 1}–${diagnostic.span.end}` : ""}</div>)}</div><time>{entry.timestamp}</time></div>)}
         </div>
         <form className="console-input-row" onSubmit={submit}><span className="console-prompt">›</span><input value={query} onChange={(event) => { setQuery(event.target.value); setHistoryIndex(-1); }} onKeyDown={onInputKeyDown} placeholder="Type a selection query or command" aria-label="Command or selection query" /><button className="console-submit" type="submit">Run <span>↵</span></button></form>

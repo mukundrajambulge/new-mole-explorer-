@@ -1,6 +1,6 @@
 # Historical defect matrix
 
-The prior manual acceptance ledger classifies defects A–O as PASS. This campaign rechecked the changed shell and added regressions for the multi-object and ligand-rail issues.
+The prior manual acceptance ledger classifies defects A–O as PASS. This campaign rechecked the changed shell and added regressions for the multi-object and ligand-rail issues (P–Q).
 
 | Defect | Original symptom | Root cause / correction | Automated evidence | Screenshot | Status |
 | --- | --- | --- | --- | --- | --- |

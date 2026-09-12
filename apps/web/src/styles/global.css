@@ -154,6 +154,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
 .scientific-tool-rail__button { display: grid; place-items: center; width: 36px; min-height: 34px; padding: 4px; color: #8390a2; border-radius: 6px; background: transparent; }
 .scientific-tool-rail__button:hover, .scientific-tool-rail__button--active { color: #dffff8; background: rgba(49,216,196,.12); }
 .scientific-tool-rail__button--active { box-shadow: inset -2px 0 var(--cyan); }
+.scientific-tool-rail__button--unavailable, .scientific-tool-rail__button--unavailable:hover, .scientific-tool-rail__button:disabled { color: #536174; background: transparent; box-shadow: none; cursor: not-allowed; opacity: .62; }
 .scientific-tool-rail__button span { display: none; }
 .scientific-tool-rail__panel { display: flex; flex: 1 1 auto; min-width: 0; margin-right: 7px; overflow: auto; }
 .scientific-tool-rail__panel .side-column--right { width: 100%; }
