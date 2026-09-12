@@ -31,6 +31,25 @@ H 0.758 0.000 0.504
 H -0.758 0.000 0.504
 `;
 
+const mol2Fixture = `@<TRIPOS>MOLECULE
+ethanol
+3 2 1 0 0
+SMALL
+NO_CHARGES
+@<TRIPOS>ATOM
+1 C1 0.000 0.000 0.000 C.3 1 ETH 0.120
+2 C2 1.500 0.000 0.000 C.3 1 ETH -0.050
+3 O3 2.100 1.100 0.000 O.3 1 ETH -0.070
+@<TRIPOS>BOND
+1 1 2 1
+2 2 3 1
+`;
+
+const pdbqtFixture = `HETATM    1  C1  LIG A   1       0.000   0.000   0.000  1.00  0.00    -0.120 C
+HETATM    2  O1  LIG A   1       1.200   0.000   0.000  1.00  0.00    -0.300 O
+ENDMDL
+`;
+
 const partialChargeCifFixture = `data_charges
 loop_
 _chem_comp_atom.comp_id
@@ -157,6 +176,26 @@ describe("VIS-01 structure ingestion", () => {
     await expect(new StructureIngestionService().ingestLocal("many.xyz", Buffer.from(`${xyzFixture}1\nsecond frame\nH 0 0 0\n`))).rejects.toMatchObject({ code: "INVALID_INPUT" });
   });
 
+  it("parses one MOL2 molecule with declared bonds and complete atom charges", async () => {
+    const result = await new StructureIngestionService().ingestLocal("ethanol.mol2", Buffer.from(mol2Fixture));
+    expect(result.structure.format).toBe("mol2");
+    expect(result.structure.counts).toMatchObject({ atoms: 3, ligandAtoms: 3 });
+    expect(result.structure.atoms.map((atom) => atom.element)).toEqual(["C", "C", "O"]);
+    expect(result.structure.bonds.map((bond) => bond.order)).toEqual(["SINGLE", "SINGLE"]);
+    expect(result.structure.partialChargeDataset).toMatchObject({ chargeModel: "source-declared MOL2 atom charge", profileVersion: "mol2-atomic-charge-v1" });
+    expect(result.structure.source.formatEvidence).toContainEqual({ kind: "CONTENT_SIGNATURE", value: "SYBYL MOL2 TRIPOS sections" });
+  });
+
+  it("parses PDBQT coordinates and preserves complete source partial charges", async () => {
+    const result = await new StructureIngestionService().ingestLocal("ligand.pdbqt", Buffer.from(pdbqtFixture));
+    expect(result.structure.format).toBe("pdbqt");
+    expect(result.structure.counts).toMatchObject({ atoms: 2, ligandAtoms: 2 });
+    expect(result.structure.atoms.map((atom) => [atom.element, atom.x, atom.y, atom.z])).toEqual([["C", 0, 0, 0], ["O", 1.2, 0, 0]]);
+    expect(result.structure.bonds).toEqual([]);
+    expect(result.structure.partialChargeDataset).toMatchObject({ chargeModel: "source-declared PDBQT partial charge", profileVersion: "pdbqt-atomic-charge-v1" });
+    expect(result.structure.source.formatEvidence).toContainEqual({ kind: "CONTENT_SIGNATURE", value: "PDBQT charged atom records" });
+  });
+
   it("promotes complete source-declared mmCIF partial charges without inference", async () => {
     const result = await new StructureIngestionService().ingestLocal("charges.mmcif", Buffer.from(partialChargeCifFixture));
     const dataset = result.structure.partialChargeDataset;
@@ -226,7 +265,7 @@ ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
   });
 
   it("rejects unadmitted formats without creating a structure", async () => {
-    await expect(new StructureIngestionService().ingestLocal("sample.mol2", Buffer.from("not admitted"))).rejects.toMatchObject({ code: "UNSUPPORTED_FORMAT" });
+    await expect(new StructureIngestionService().ingestLocal("sample.foo", Buffer.from("not admitted"))).rejects.toMatchObject({ code: "UNSUPPORTED_FORMAT" });
   });
 
   it("fetches mmCIF from the official RCSB download endpoint", async () => {

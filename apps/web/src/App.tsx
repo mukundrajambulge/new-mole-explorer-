@@ -47,7 +47,7 @@ const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_FOCUS]: "Focus",
 };
 
-const isAdmittedFile = (file: File) => /\.(pdb|cif|mmcif|pqr|sdf|mol|xyz)$/i.test(file.name);
+const isAdmittedFile = (file: File) => /\.(pdb|cif|mmcif|pqr|sdf|mol|xyz|mol2|pdbqt)$/i.test(file.name);
 const splitCommandArguments = (value: string): string[] => {
   const parts: string[] = [];
   let start = 0;
@@ -792,7 +792,7 @@ export const App = () => {
 
   const workspaceObjectCandidates = (name: string) => {
     const normalized = name.trim().replace(/^['"]|['"]$/g, "").toLowerCase();
-    const stem = (value: string) => value.replace(/\.(?:pdb|cif|mmcif)$/i, "");
+    const stem = (value: string) => value.replace(/\.(?:pdb|cif|mmcif|pqr|sdf|mol|xyz|mol2|pdbqt)$/i, "");
     return workspaceObjectsRef.current.filter((object) => [object.objectId, object.displayName, object.loadResult.structure.id, object.loadResult.structure.name, object.loadResult.structure.source.originalFilename].some((value) => {
       const lower = value.toLowerCase();
       return lower === normalized || stem(lower) === normalized;
@@ -1611,7 +1611,7 @@ export const App = () => {
 
   return (
     <div className="app-shell">
-      <input id="structure-file" ref={fileInputRef} className="visually-hidden-input" type="file" accept=".pdb,.cif,.mmcif,.pqr,.sdf,.mol,.xyz,text/plain" onChange={(event) => { const file = event.target.files?.[0]; if (file) importFile(file); event.target.value = ""; }} />
+      <input id="structure-file" ref={fileInputRef} className="visually-hidden-input" type="file" accept=".pdb,.cif,.mmcif,.pqr,.sdf,.mol,.xyz,.mol2,.pdbqt,text/plain" onChange={(event) => { const file = event.target.files?.[0]; if (file) importFile(file); event.target.value = ""; }} />
       <main className="app-main">
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
         <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />

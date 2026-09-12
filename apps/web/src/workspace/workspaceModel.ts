@@ -376,7 +376,7 @@ export const splitWorkspaceObjectStates = (source: WorkspaceObject, selector: st
     const state = states.find((candidate) => candidate.id === stateId);
     if (!state) continue;
     const ordinal = state.ordinal;
-    const namePrefix = selector?.trim().toLowerCase().startsWith("prefix ") ? selector.trim().slice("prefix ".length).trim() : source.displayName.replace(/\.(pdb|cif|mmcif)$/i, "");
+    const namePrefix = selector?.trim().toLowerCase().startsWith("prefix ") ? selector.trim().slice("prefix ".length).trim() : source.displayName.replace(/\.(pdb|cif|mmcif|pqr|sdf|mol|xyz|mol2|pdbqt)$/i, "");
     const displayName = `${namePrefix || source.displayName}_state_${ordinal}`;
     const provisionalStructureId = `derived_${shortHash(`split|${source.objectId}|${state.id}|${displayName}`)}`;
     const objectId = objectIdFor(provisionalStructureId, occupiedIds);

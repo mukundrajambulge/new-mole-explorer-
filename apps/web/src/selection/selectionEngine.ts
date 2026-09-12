@@ -361,7 +361,7 @@ const wildcardMatch = (value: string, pattern: string): boolean => {
   return new RegExp(`^${escaped}$`, "i").test(value);
 };
 const workspaceNameMatch = (value: string, pattern: string): boolean => {
-  const stem = (candidate: string) => candidate.replace(/\.(?:pdb|cif|mmcif)$/i, "");
+  const stem = (candidate: string) => candidate.replace(/\.(?:pdb|cif|mmcif|pqr|sdf|mol|xyz|mol2|pdbqt)$/i, "");
   return wildcardMatch(value, pattern) || wildcardMatch(stem(value), pattern) || wildcardMatch(value, stem(pattern));
 };
 const residueParts = (value: string): { number: number; insertion: string } | null => { const match = value.match(/^(-?\d+)([A-Za-z]?)$/); return match ? { number: Number(match[1]), insertion: match[2].toUpperCase() } : null; };
