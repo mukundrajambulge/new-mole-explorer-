@@ -1588,6 +1588,14 @@ export const App = () => {
 
   const handleActionInternal = (actionId: ActionId) => {
     const capability = ACTION_REGISTRY[actionId];
+    if (actionId === ACTION_IDS.HELP_OPEN) {
+      showNotice({ ...capability, description: "Use File → Import for coordinate and typed biological data, the right rail for working tools, and the Command Console for the documented safe command subset. See the Complete User Guide for every current action." });
+      return;
+    }
+    if (actionId === ACTION_IDS.VIEW_PROJECTION && capability.state === "SUPPORTED") {
+      setCameraProjection(projection.camera.projectionMode === "perspective" ? "orthographic" : "perspective");
+      return;
+    }
     if (actionId === ACTION_IDS.HISTORY_UNDO || actionId === ACTION_IDS.HISTORY_REDO) {
       const result = runHistoryAction(actionId);
       setNotice({ ...capability, state: result.status.startsWith("UNDO") || result.status.startsWith("REDO") || result.status.startsWith("HISTORY") ? "SUPPORTED_WITH_LIMITATIONS" : capability.state, description: result.status });

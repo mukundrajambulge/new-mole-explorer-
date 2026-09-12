@@ -47,6 +47,19 @@ test("AT-FSR-A-002 opens menus and right-rail panels without changing the canvas
   await page.getByRole("button", { name: "Session panel" }).click();
   await expect(page.getByTestId("scene-manager")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Scenes" })).toBeVisible();
+  await page.getByRole("button", { name: "Analyze panel" }).click();
+  await expect(page.getByTestId("measurements-panel").getByRole("button", { name: /Pocket/ })).toBeDisabled();
+  await page.getByRole("button", { name: "View", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Projection", exact: true })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Clipping", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Background", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Axes", exact: true })).toBeDisabled();
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-camera-projection", "perspective");
+  await page.getByRole("button", { name: "Projection", exact: true }).click();
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-camera-projection", "orthographic");
+  await page.getByRole("button", { name: "Help", exact: true }).first().click();
+  await page.getByRole("button", { name: "Help", exact: true }).last().click();
+  await expect(page.getByRole("status")).toContainText("Complete User Guide");
 });
 
 test("AT-FSR-B-001 admits PQR as a coordinate-bearing object", async ({ page }) => {
