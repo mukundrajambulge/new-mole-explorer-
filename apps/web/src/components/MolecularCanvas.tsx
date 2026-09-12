@@ -221,7 +221,7 @@ export const MolecularCanvas = ({
 
   return (
     <section className="canvas-stage" aria-label="Molecular render projection">
-      <div className="canvas-status"><span className="live-dot" />3DMOL.JS <span className="canvas-status-separator">/</span> RENDER PROJECTION</div>
+      <div className="canvas-status"><span className="live-dot" />MOLECULAR VIEW</div>
       <div
         ref={canvasRef}
         className="molecular-canvas"

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-12",
+  "sourceOfTruth": "apps/web/src/domain/registry.ts",
+  "preservedCapabilities": [
+    "PDB/mmCIF import and RCSB acquisition",
+    "multi-object workspace enable/disable and states",
+    "selection, named selection, clear selection and membership hashes",
+    "representation, color, labels and camera projection",
+    "distance, angle and dihedral measurement objects",
+    "structural contacts, H-bonds, clashes and bounded fitting workflows",
+    "scientific edit history, session save/open, scenes and typed export",
+    "console, GUI and SDK action dispatch through the command registry"
+  ],
+  "outOfScopeByLock": ["docking", "high-throughput screening", "main-branch merge"]
+}

@@ -1,0 +1,35 @@
+import { expect, test } from "@playwright/test";
+import { resolve } from "node:path";
+
+test("AT-FSR-A-001 exposes the approved scientific shell with a collapsed console", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByRole("navigation", { name: "Application menu" }).getByRole("button")).toHaveText([
+    "File", "Select", "Display", "Color", "Measure", "Analyze", "View", "Help",
+  ]);
+  await expect(page.getByRole("button", { name: "Dock", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Edit", exact: true })).toHaveCount(0);
+  await expect(page.getByLabel("Contextual toolbar")).toHaveCount(0);
+  await expect(page.getByLabel("Command console").getByRole("button", { name: "Command Console" })).toHaveAttribute("aria-expanded", "false");
+  await expect(page.getByLabel("Scientific tool panels").getByRole("button")).toHaveCount(10);
+  await expect(page.getByTestId("scene-manager")).toHaveCount(0);
+  await expect(page.getByText("NATIVE LIFECYCLE", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("PRESENTATION RIBBON", { exact: true })).toHaveCount(0);
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_A_EMPTY_WORKSPACE.png") });
+});
+
+test("AT-FSR-A-002 opens menus and right-rail panels without changing the canvas shell", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "File", exact: true }).click();
+  await expect(page.getByLabel("Contextual toolbar")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Import", exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: "Display panel" }).click();
+  await expect(page.getByTestId("projection-display-panel")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Display" })).toBeVisible();
+  await expect(page.getByTestId("scene-manager")).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Session panel" }).click();
+  await expect(page.getByTestId("scene-manager")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Scenes" })).toBeVisible();
+});

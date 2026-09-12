@@ -9,7 +9,6 @@ export type ConsoleCommandResult = { category: ConsoleEntry["category"]; status:
 
 const initialEntries: ConsoleEntry[] = [
   { category: "SYSTEM", command: "renderer status", status: "3Dmol.js adapter ready · no structure loaded", timestamp: "09:41:12" },
-  { category: "CAPABILITY", command: "dock run", status: "Unavailable in G1C · no docking engine connected", timestamp: "09:41:15" },
 ];
 
 export const ConsolePanel = ({ expanded, onToggle, structure, namedSelections = [], onCommand }: { expanded: boolean; onToggle: () => void; structure: StructureLoadResult | null; namedSelections?: readonly { name: string; count: number }[]; onCommand?: (command: string) => ConsoleCommandResult }) => {
@@ -33,7 +32,7 @@ export const ConsolePanel = ({ expanded, onToggle, structure, namedSelections = 
     event.preventDefault();
     submitQuery();
   };
-  const commandHistory = entries.filter((entry) => entry.command !== "renderer status" && entry.command !== "dock run").map((entry) => entry.command);
+  const commandHistory = entries.filter((entry) => entry.command !== "renderer status").map((entry) => entry.command);
   const structureSuggestions = structure ? ["all", "none", "polymer", "ligand", "water", "ions", ...[...new Set(structure.structure.atoms.map((atom) => atom.chain).filter(Boolean))].map((chain) => `chain ${chain}`), ...[...new Set(structure.structure.atoms.map((atom) => atom.residueNumber))].slice(0, 3).map((resi) => `resi ${resi}`), ...structure.structure.atoms.slice(0, 3).map((atom) => `name ${atom.atomName}`), ...namedSelections.map((selection) => `%${selection.name}`)] : [];
   const suggestions = /^(select|center|zoom|label)\s+/i.test(query) ? [...new Set([...commandSuggestions(query), ...structureSuggestions])] : commandSuggestions(query);
   const onInputKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
@@ -45,10 +44,10 @@ export const ConsolePanel = ({ expanded, onToggle, structure, namedSelections = 
   };
 
   return (
-    <section className={`console-panel ${expanded ? "console-panel--expanded" : "console-panel--collapsed"}`} aria-label="Command and selection console">
+    <section className={`console-panel ${expanded ? "console-panel--expanded" : "console-panel--collapsed"}`} aria-label="Command console">
       <div className="console-header">
-        <button className="console-title" onClick={onToggle} aria-expanded={expanded}><span className="console-chevron">›_</span><strong>Command &amp; Selection Console</strong><span className="console-live" /></button>
-        {expanded && <div className="console-actions"><span className="console-mode">G1C / PRESENTATION</span><button className="icon-button icon-button--quiet" onClick={onToggle} aria-label="Collapse console"><Icon name="arrowDown" size={15} /></button><button className="icon-button icon-button--quiet" onClick={() => setEntries([])} aria-label="Clear console"><Icon name="trash" size={15} /></button></div>}
+        <button className="console-title" onClick={onToggle} aria-expanded={expanded}><span className="console-chevron">›_</span><strong>Command Console</strong><span className="console-live" /></button>
+        {expanded && <div className="console-actions"><span className="console-mode">READY</span><button className="icon-button icon-button--quiet" onClick={onToggle} aria-label="Collapse console"><Icon name="arrowDown" size={15} /></button><button className="icon-button icon-button--quiet" onClick={() => setEntries([])} aria-label="Clear console"><Icon name="trash" size={15} /></button></div>}
         {!expanded && <button className="icon-button icon-button--quiet" onClick={onToggle} aria-label="Expand console"><Icon name="arrowUp" size={15} /></button>}
       </div>
       {expanded && <>

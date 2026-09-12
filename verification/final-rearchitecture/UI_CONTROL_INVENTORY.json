@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-12",
+  "slice": "A",
+  "normalWorkspace": {
+    "topMenus": ["File", "Select", "Display", "Color", "Measure", "Analyze", "View", "Help"],
+    "leftPanel": "Objects & Selections",
+    "center": "Molecular canvas",
+    "rightRail": ["Display", "Color", "Select", "Measure", "Analyze", "Ligand", "Edit", "Session", "Movie", "Settings"],
+    "console": { "label": "Command Console", "default": "collapsed" },
+    "statusBar": true
+  },
+  "transitionalPanels": {
+    "workingInRail": ["Display", "Color", "Session"],
+    "stillInObjectsPanel": ["Select", "Measure", "Analyze", "Edit"],
+    "notYetImplemented": ["Ligand", "Movie", "Settings"]
+  },
+  "prohibitedNormalUi": ["Dock", "R08", "ORACLE PENDING", "NATIVE LIFECYCLE", "PRESENTATION RIBBON", "G1C PRESENTATION"]
+}
