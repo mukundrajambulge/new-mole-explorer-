@@ -86,3 +86,24 @@ test("AT-FSR-D-001 opens working Measure and Analyze panels from the scientific 
   await expect(page.getByTestId("analysis-results")).toBeVisible();
   await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_D_ANALYZE_RAIL.png") });
 });
+
+test("AT-FSR-E-001 exposes canonical topology editing through the Edit rail", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(proteinFixture);
+  await expect(page.getByTitle("mini-protein.pdb")).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: "Edit panel" }).click();
+  const panel = page.getByRole("region", { name: "Edit panel" });
+  await expect(panel).toBeVisible();
+  await expect(panel).toContainText("0 atoms selected");
+  await expect(panel.getByRole("button", { name: "Delete atoms" })).toBeDisabled();
+
+  await page.getByRole("button", { name: "Command Console" }).click();
+  await page.getByRole("textbox", { name: "Command or selection query" }).fill("select polymer");
+  await page.getByRole("button", { name: /Run/ }).click();
+  await expect(panel).toContainText("8 atoms selected");
+  await expect(panel.getByRole("button", { name: "Delete atoms" })).toBeEnabled();
+  await expect(panel.getByRole("button", { name: "Create bond" })).toBeDisabled();
+  await page.getByRole("button", { name: "Command Console" }).click();
+  await expect(page.getByLabel("Command console").getByRole("button", { name: "Command Console" })).toHaveAttribute("aria-expanded", "false");
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_E_EDIT_RAIL.png") });
+});
