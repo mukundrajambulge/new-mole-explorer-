@@ -31,6 +31,7 @@
     "biologicalBrowser": "7/7",
     "finalRearchitectureShell": "18/18",
     "r07UiReruns": "4/4",
+    "fullE2E": "138/138",
     "manualAndRealStructureGates": "pass",
     "unitWeb": "147/147",
     "unitApi": "64/64",
@@ -55,5 +56,6 @@
     "wizard/movie work",
     "docking, virtual screening, HTS, and main-branch merge"
   ],
-  "evidenceManifest": "verification/final-rearchitecture/GOOGLE_DRIVE_EVIDENCE_MANIFEST.json"
+  "evidenceManifest": "verification/final-rearchitecture/GOOGLE_DRIVE_EVIDENCE_MANIFEST.json",
+  "additionalReports": ["verification/pymol/PYMOL_CONFORMANCE_MATRIX.md", "verification/pymol/PYMOL_CONFORMANCE_MATRIX.json", "verification/final-rearchitecture/PYMOL_WIZARD_GAP_MATRIX.md", "verification/final-rearchitecture/PYMOL_MOVIE_IMPLEMENTATION_PLAN.md"]
 }

@@ -1,0 +1,1 @@
+{"name":"DISPLAY","SHA":"631ae8c","tests":["AT-FSR-A-002","g1c-visualization.spec.ts","manual-gate-01-viewer.spec.ts"],"evidence":["SLICE_D_ANALYZE_RAIL.png"],"date":"2026-09-13","knownLimitations":["Renderer-qualified profiles do not claim pixel-identical PyMOL output."],"status":"LOCKED"}

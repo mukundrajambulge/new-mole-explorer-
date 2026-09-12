@@ -29,8 +29,11 @@ const runCommand = async (page: Page, value: string) => {
 };
 
 const openEdit = async (page: Page) => {
-  await page.getByRole("button", { name: "Edit panel", exact: true }).click();
-  await expect(page.getByRole("region", { name: "Edit panel" })).toBeVisible();
+  const panel = page.getByRole("region", { name: "Edit panel" });
+  if (!(await panel.isVisible().catch(() => false))) {
+    await page.getByRole("button", { name: "Edit panel", exact: true }).click();
+  }
+  await expect(panel).toBeVisible();
 };
 
 const pickCanvasAtom = async (page: Page) => {
@@ -159,7 +162,7 @@ test("R07 B3 UI buttons commit add, refill, remove, attach, and replace operatio
   await expect(viewer).toHaveAttribute("data-canonical-atom-count", "2");
   await runCommand(page, "select id 2");
   await openEdit(page);
-  await page.getByRole("button", { name: "Remove Explicit H", exact: true }).click();
+  await page.getByRole("button", { name: "Remove Hydrogens", exact: true }).click();
   await expect(viewer).toHaveAttribute("data-canonical-atom-count", "1");
   await capture(page, "13-b3-remove-h.png");
 
