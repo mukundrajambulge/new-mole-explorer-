@@ -1223,8 +1223,11 @@ export class ThreeDMolViewerAdapter {
       const overlayGroups = new Map<RenderProjection["representation"], string[]>();
       for (const atom of entry.structure.atoms) {
         if (!matchingLocalIds.has(atom.stableId)) continue;
+        // A topology selection must never promote a polymer atom into a
+        // space-filling sphere. In the cartoon family, selected polymer atoms
+        // use a thin stick overlay and retain the single-atom halo below.
         const representation = (entryProjection.representation === "cartoon" || entryProjection.representation === "ribbon" || entryProjection.representation === "trace" || entryProjection.representation === "putty")
-          ? atom.isPolymer ? matchingLocalIds.size <= 64 ? "ball-and-stick" : "sticks" : atom.isWater || atom.isIon ? "spheres" : "sticks"
+          ? atom.isPolymer ? "sticks" : atom.isWater || atom.isIon ? "spheres" : "sticks"
           : entryProjection.representation;
         overlayGroups.set(representation, [...(overlayGroups.get(representation) ?? []), atom.stableId]);
       }
