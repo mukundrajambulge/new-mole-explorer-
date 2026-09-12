@@ -237,3 +237,31 @@ test("AT-FSR-J-005 opens multi-frame XYZ as a trajectory viewer", async ({ page 
   await expect(viewer).toContainText("frame two");
   await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_J_TRAJECTORY.png") });
 });
+
+test("AT-FSR-J-006 fetches an explicit UniProt accession into the sequence viewer", async ({ page }) => {
+  await page.route("https://rest.uniprot.org/uniprotkb/P01308.fasta", (route) => route.fulfill({ status: 200, contentType: "text/plain", body: ">sp|P01308|INS_HUMAN insulin\nMALWMRLLPLLALLALWGPDPAAA\n" }));
+  await page.goto("/");
+  await page.getByRole("button", { name: "File", exact: true }).click();
+  await page.getByRole("button", { name: "Import", exact: true }).click();
+  const dialog = page.getByTestId("biological-import-dialog");
+  await dialog.getByRole("tab", { name: "Online ID" }).click();
+  await dialog.getByLabel("Online provider").selectOption("UniProt");
+  await dialog.getByLabel("Online accession").fill("P01308");
+  await dialog.getByRole("button", { name: "Fetch and open" }).click();
+  await expect(page.getByTestId("sequence-viewer")).toHaveAttribute("data-sequence-format", "fasta");
+  await expect(page.getByTestId("sequence-viewer")).toContainText("P01308");
+});
+
+test("AT-FSR-J-007 fetches a PubChem compound into the SMILES viewer", async ({ page }) => {
+  await page.route("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/aspirin/property/CanonicalSMILES,Title/JSON", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ PropertyTable: { Properties: [{ Title: "Aspirin", ConnectivitySMILES: "CC(=O)OC1=CC=CC=C1C(=O)O" }] } }) }));
+  await page.goto("/");
+  await page.getByRole("button", { name: "File", exact: true }).click();
+  await page.getByRole("button", { name: "Import", exact: true }).click();
+  const dialog = page.getByTestId("biological-import-dialog");
+  await dialog.getByRole("tab", { name: "Online ID" }).click();
+  await dialog.getByLabel("Online provider").selectOption("PubChem");
+  await dialog.getByLabel("Online accession").fill("aspirin");
+  await dialog.getByRole("button", { name: "Fetch and open" }).click();
+  await expect(page.getByTestId("smiles-viewer")).toBeVisible();
+  await expect(page.getByTestId("smiles-viewer")).toContainText("CC(=O)OC1=CC=CC=C1C(=O)O");
+});

@@ -141,7 +141,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionDefinition> = {
   [ACTION_IDS.FILE_NEW]: supported(ACTION_IDS.FILE_NEW, "FILE", "New project", "Create an empty persisted project manifest and clear the workspace."),
   [ACTION_IDS.FILE_OPEN]: supported(ACTION_IDS.FILE_OPEN, "FILE", "Open structure", "Choose an admitted coordinate file; this converges with Import and Drop."),
   [ACTION_IDS.FILE_SAVE]: supported(ACTION_IDS.FILE_SAVE, "FILE", "Save project", "Persist canonical structure, provenance and renderer-neutral presentation state."),
-  [ACTION_IDS.FILE_IMPORT]: supported(ACTION_IDS.FILE_IMPORT, "FILE", "Import structure", "Load an admitted coordinate file through the backend ingestion service."),
+  [ACTION_IDS.FILE_IMPORT]: supported(ACTION_IDS.FILE_IMPORT, "FILE", "Import biological data", "Open the unified Local file, Online ID, and Paste / text routes for coordinate and typed biological sources."),
   [ACTION_IDS.FILE_EXPORT]: limited(ACTION_IDS.FILE_EXPORT, "FILE", "Export", "Typed PDB and mmCIF writers emit exact bytes and an explicit loss manifest."),
   [ACTION_IDS.SELECTION_EVALUATE]: supported(ACTION_IDS.SELECTION_EVALUATE, "SELECTION", "Evaluate selection", "Evaluate the typed canonical selection language against the active molecular revision."),
   [ACTION_IDS.SELECTION_CREATE_NAMED]: supported(ACTION_IDS.SELECTION_CREATE_NAMED, "SELECTION", "Create named selection", "Create an immutable named selection snapshot from the active canonical result."),

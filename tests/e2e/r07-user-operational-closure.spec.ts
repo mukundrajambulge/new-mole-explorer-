@@ -282,6 +282,7 @@ test("R07 B2 UI covers Delete Bond and all supported bond-order transitions", as
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const run = async (value: string) => {
+    if (await page.getByRole("button", { name: "Expand console", exact: true }).count()) await page.getByRole("button", { name: "Expand console", exact: true }).click();
     await command.fill(value);
     await page.getByRole("button", { name: /Run/ }).click();
     await expect(consoleRegion.locator(".console-entry").last()).toContainText(value);
@@ -323,6 +324,7 @@ test("R07 multi-state chemistry remains explicit and undoable through the UI", a
   const viewer = page.getByTestId("molecular-viewer");
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const history = page.getByTestId("scientific-history-state");
+  if (await page.getByRole("button", { name: "Expand console", exact: true }).count()) await page.getByRole("button", { name: "Expand console", exact: true }).click();
   await command.fill("select id 1");
   await page.getByRole("button", { name: /Run/ }).click();
   await page.getByRole("button", { name: "Edit panel", exact: true }).click();
