@@ -3,7 +3,7 @@
   "scope": "BIOLOGICAL_DATA",
   "status": "LOCKED_BOUNDED",
   "capturedAt": "2026-09-13",
-  "commit": "31b5b05",
+  "commit": "746e587",
   "statement": "Unified File → Import routes typed sequence, map, trajectory, topology, and SMILES sources to dedicated viewers while preserving source semantics and never fabricating coordinates.",
   "admittedFormats": ["FASTA", "FASTQ", "GenBank", "EMBL", "DX", "MRC", "CCP4", "XYZ trajectory", "GRO", "DCD header", "XTC metadata", "TRR metadata", "PSF", "PRMTOP", "SMILES"],
   "evidence": ["AT-FSR-J-001", "AT-FSR-J-002", "AT-FSR-J-003", "AT-FSR-J-004", "AT-FSR-J-005", "AT-FSR-J-006", "AT-FSR-J-007", "apps/web/src/biological/adapters.test.ts", "verification/final-rearchitecture/evidence/SLICE_J_IMPORT_DIALOG_OPEN.png", "verification/final-rearchitecture/evidence/SLICE_J_DENSITY_MAP.png", "verification/final-rearchitecture/evidence/SLICE_J_TRAJECTORY.png"],

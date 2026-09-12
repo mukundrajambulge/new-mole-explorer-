@@ -3,7 +3,7 @@
   "scope": "RELEASE_EVIDENCE",
   "status": "LOCKED_LOCAL_EVIDENCE",
   "capturedAt": "2026-09-13",
-  "commit": "31b5b05",
+  "commit": "746e587",
   "statement": "The bounded implementation report, inventories, user guide, biological-data lock, conformance matrix, defect matrix, performance report, and local screenshots are present and tied to the release commit.",
   "evidence": ["FINAL_SCIENTIFIC_REARCHITECTURE_REPORT.md", "FINAL_SCIENTIFIC_REARCHITECTURE_REPORT.json", "BIOLOGICAL_DATA.lock.json", "LOCK_INDEX.md", "IMPORT_LOCK.json", "OBJECT_MODEL_LOCK.json", "SELECTION_LOCK.json", "DISPLAY_LOCK.json", "COLOR_LOCK.json", "MEASURE_LOCK.json", "LIGAND_LOCK.json", "ANALYZE_LOCK.json", "SESSION_LOCK.json", "CONSOLE_LOCK.json", "DOCUMENTATION_LOCK.json", "GOOGLE_DRIVE_EVIDENCE_MANIFEST.json", "HISTORICAL_DEFECT_MATRIX.md", "PERFORMANCE_REPORT.md", "docs/user-guide/USER_GUIDE_COVERAGE.md"],
   "limits": ["Google Drive publication is blocked by credentials/environment.", "Executable PyMOL parity is blocked by the missing oracle.", "Full binary trajectory decoding, topology-coordinate pairing, docking, virtual screening, HTS, and main-branch promotion remain outside this bounded release."]

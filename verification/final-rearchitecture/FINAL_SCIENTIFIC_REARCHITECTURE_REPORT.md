@@ -1,14 +1,14 @@
 # MOLEXPLORER final scientific UI rearchitecture report
 
 Status: **bounded implementation verified; full binary trajectory decoding and executable PyMOL oracle remain pending**
-Commit: `31b5b05` (`fix: close remaining inactive scientific controls`)
+Commit: `746e587` (`fix: coalesce online structure acquisitions`)
 Branch: `feature/final-scientific-ui-pymol-conformance`
 
 ## Delivered behavior
 
 The workbench now uses the approved scientific workspace shell: File, Select, Display, Color, Measure, Analyze, View, and Help menus; a persistent Objects & Selections panel; a molecular canvas; inward right-rail panels; a collapsed command console; and a status bar. Display, Color, Select, Measure, Analyze, Ligand, Edit, and Session are working rail panels. Movie and Settings remain explicitly unavailable.
 
-The bounded coordinate ingestion surface admits PDB, mmCIF/CIF, PQR, SDF/MOL, single-frame XYZ, MOL2, and PDBQT. The parser preserves canonical atom identity, coordinate provenance, object/state lineage, source metadata, and fail-closed diagnostics. File → Import now provides Local file, Online ID, and Paste / text routes for typed FASTA/FASTQ/GenBank/EMBL sequence data, MRC/CCP4/DX maps, multi-frame XYZ/GRO trajectories, PSF/PRMTOP topology metadata, and SMILES notation. These sources use dedicated viewers and never become fabricated molecular coordinates. DCD is validated as header-only; XTC/TRR are validated as metadata-only registry entries.
+The bounded coordinate ingestion surface admits PDB, mmCIF/CIF, PQR, SDF/MOL, single-frame XYZ, MOL2, and PDBQT. Successful online RCSB acquisitions are coalesced and cached for the API process so concurrent or repeated IDs do not trigger duplicate remote downloads. The parser preserves canonical atom identity, coordinate provenance, object/state lineage, source metadata, and fail-closed diagnostics. File → Import now provides Local file, Online ID, and Paste / text routes for typed FASTA/FASTQ/GenBank/EMBL sequence data, MRC/CCP4/DX maps, multi-frame XYZ/GRO trajectories, PSF/PRMTOP topology metadata, and SMILES notation. These sources use dedicated viewers and never become fabricated molecular coordinates. DCD is validated as header-only; XTC/TRR are validated as metadata-only registry entries.
 
 The workspace supports multiple canonical objects and coordinate states in one viewer, explicit cross-object coordinate-frame policy, object-qualified selection, independent enable/disable state, state switching, object copy/rename/create/split/join, groups, and full-canvas Fit. The Ligand rail provides ligand selection, binding-shell selection, H-bond, contact, and clash actions with bounded coordinate/chemistry diagnostics. It does not infer docking scores, affinity, or unvalidated chemical interaction classes.
 
@@ -24,7 +24,7 @@ Repository checks pass:
 
 - `npm run typecheck`
 - `npm run lint`
-- `npm test` — 147 web tests and 64 API tests
+- `npm test` — 147 web tests and 65 API tests
 - `npm run build`
 - `npm run verify:selection-matrix`
 - `npm run verify:r10`
@@ -37,7 +37,7 @@ Local visual evidence is stored under `verification/final-rearchitecture/evidenc
 | Requirement | Current answer |
 | --- | --- |
 | Repository | `C:\Users\mukun\Desktop\molecular-workstation`; `new-origin` → `https://github.com/mukundrajambulge/new-mole-explorer-.git` |
-| Branch / baseline / final implementation SHA | `feature/final-scientific-ui-pymol-conformance` / `3cb632770b8be70a3fc45c4809706c0b58f8a6cb` / `31b5b05` |
+| Branch / baseline / final implementation SHA | `feature/final-scientific-ui-pymol-conformance` / `3cb632770b8be70a3fc45c4809706c0b58f8a6cb` / `746e587` |
 | UI rearchitecture | **PASS** — approved menus, inward right rail, dominant canvas, left object panel, collapsed console, status bar |
 | Universal import | **PARTIAL, bounded** — coordinate adapters and typed biological viewers are implemented; research trajectory formats remain explicitly limited |
 | PDB; mmCIF/CIF; SDF; MOL/MOL2 | **PASS** within the documented single-object/declared-connectivity limits |
@@ -57,7 +57,7 @@ Local visual evidence is stored under `verification/final-rearchitecture/evidenc
 | GUI–console / API convergence | **PASS where an API exists**; typed biological viewers are GUI import routes in this gate |
 | Security | **PASS** — host Python, shell, arbitrary process, filesystem, and network execution are rejected |
 | Historical defects | **A–Q PASS** in the historical defect matrix and regression gates |
-| Test results | `npm ci`; 147 web + 64 API unit tests; serial typecheck; lint; build; selection-matrix; R10; stored full Chromium **138/138** at `0cfe02b`; fresh full rerun blocked by RCSB 4DJW timeout |
+| Test results | `npm ci`; 147 web + 65 API unit tests; serial typecheck; lint; build; selection-matrix; R10; stored full Chromium **138/138** at `0cfe02b`; fresh full rerun blocked by RCSB 4DJW timeout |
 | Oracle / visual / stress | Oracle ledger 51/35/1; 21 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; fresh 4DJW gate blocked by unavailable remote endpoint |
 | Google Drive evidence | **BLOCKED_CREDENTIAL_OR_ENVIRONMENT**; local hashes and upload manifest retained |
 | PyMOL conformance | Bounded source/documentation/runtime classification; no complete PyMOL compatibility claim |
