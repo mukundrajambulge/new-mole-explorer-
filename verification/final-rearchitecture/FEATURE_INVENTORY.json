@@ -1,16 +1,23 @@
 {
   "schemaVersion": 1,
   "capturedAt": "2026-09-12",
-  "sourceOfTruth": "apps/web/src/domain/registry.ts",
-  "preservedCapabilities": [
-    "PDB/mmCIF import and RCSB acquisition",
-    "multi-object workspace enable/disable and states",
-    "selection, named selection, clear selection and membership hashes",
-    "representation, color, labels and camera projection",
-    "distance, angle and dihedral measurement objects",
-    "structural contacts, H-bonds, clashes and bounded fitting workflows",
-    "scientific edit history, session save/open, scenes and typed export",
-    "console, GUI and SDK action dispatch through the command registry"
-  ],
-  "outOfScopeByLock": ["docking", "high-throughput screening", "main-branch merge"]
+  "branch": "feature/final-scientific-ui-pymol-conformance",
+  "features": [
+    { "id": "import.coordinate", "label": "Coordinate import", "implemented": true, "gui": true, "console": false, "api": true, "test": "AT-FSR-B-001/002, AT-FSR-G-001, ingestion.test.ts", "screenshot": "SLICE_B_PQR_IMPORT.png; SLICE_B_SDF_IMPORT.png; SLICE_G_XYZ_IMPORT.png", "limitation": "Single bounded objects for SDF, XYZ, MOL2, and PDBQT; sequence/map/trajectory files are not admitted." },
+    { "id": "objects.multi", "label": "Multi-object workspace", "implemented": true, "gui": true, "console": true, "api": true, "test": "AT-FSR-H-000/001", "screenshot": "SLICE_H_BOTH_VISIBLE_FIT_ALL.png", "limitation": "Objects currently use identity transforms and explicit coordinate-frame policy for cross-object spatial queries." },
+    { "id": "selection.core", "label": "Selection and clear", "implemented": true, "gui": true, "console": true, "api": true, "test": "AT-FSR-F-001; selectionEngine.test.ts", "screenshot": "SLICE_F_SELECT_RAIL.png", "limitation": "Unsupported valid operators remain explicit capability outcomes." },
+    { "id": "display.representations", "label": "Representation and visibility", "implemented": true, "gui": true, "console": true, "api": false, "test": "AT-FSR-D-001; g1c-visualization.spec.ts", "screenshot": "SLICE_D_ANALYZE_RAIL.png", "limitation": "Renderer-qualified profiles; exact PyMOL pixel parity is not claimed." },
+    { "id": "color.scopes", "label": "Scoped color", "implemented": true, "gui": true, "console": true, "api": false, "test": "selection-closure.spec.ts", "screenshot": "03-ligand-custom-color.png", "limitation": "Named schemes are limited to the ColorRegistry." },
+    { "id": "camera.view", "label": "Fit, center, orient, projection", "implemented": true, "gui": true, "console": true, "api": false, "test": "manual-gate-02-camera-viewport.spec.ts", "screenshot": "14-orthographic.png; 15-perspective.png", "limitation": "Presentation state only; no coordinate mutation." },
+    { "id": "measurements", "label": "Distance, angle, dihedral", "implemented": true, "gui": true, "console": true, "api": false, "test": "v-final.spec.ts; measurements.test.ts", "screenshot": "Inherited V-FINAL evidence", "limitation": "Geometry is tied to canonical coordinate revisions." },
+    { "id": "ligand.context", "label": "Ligand context rail", "implemented": true, "gui": true, "console": true, "api": false, "test": "AT-FSR-I-001", "screenshot": "Local fixture gate", "limitation": "Actions expose bounded proximity diagnostics; no unvalidated interaction class or docking score is inferred." },
+    { "id": "analysis.structural", "label": "H-bonds, contacts, clashes", "implemented": true, "gui": true, "console": true, "api": false, "test": "AT-FSR-D-001; structuralAnalysis.test.ts", "screenshot": "SLICE_D_ANALYZE_RAIL.png", "limitation": "Coordinate/profile based diagnostics with explicit limitations." },
+    { "id": "analysis.alignment", "label": "RMS/RMS_CUR/FIT/ALIGN/SUPER", "implemented": true, "gui": true, "console": true, "api": true, "test": "pymolFitting.test.ts; R08 suites", "screenshot": "23-r08-alignment.png", "limitation": "Reference conformance remains unverified; CEALIGN is unavailable at runtime." },
+    { "id": "editing.history", "label": "Topology editing and undo/redo", "implemented": true, "gui": true, "console": true, "api": true, "test": "AT-FSR-E-001; R07 suites", "screenshot": "19-edit-before.png through 22-edit-redo.png", "limitation": "Bounded chemistry operations only." },
+    { "id": "session.scenes", "label": "Session and scenes", "implemented": true, "gui": true, "console": true, "api": true, "test": "R09 suites; AT-FSR-A-002", "screenshot": "25-scene-a.png through 28-export.png", "limitation": "Movie playback and advanced persistence are planned." },
+    { "id": "console.safe", "label": "Tokenized safe command console", "implemented": true, "gui": true, "console": true, "api": true, "test": "AT-FSR-C-001; batchTokenizer.test.ts; securityFuzz.test.ts", "screenshot": "29-command-console.png", "limitation": "Host Python, shell, arbitrary process, filesystem, and network execution are rejected by design." },
+    { "id": "sequence", "label": "Sequence viewers", "implemented": false, "gui": false, "console": false, "api": false, "test": "Not admitted", "screenshot": null, "limitation": "FASTA/FASTQ/GenBank/EMBL require distinct viewers." },
+    { "id": "maps", "label": "Density/map viewers", "implemented": false, "gui": false, "console": false, "api": false, "test": "Not admitted", "screenshot": null, "limitation": "MRC/CCP4/DX are not rendered." },
+    { "id": "trajectories", "label": "Trajectory viewers", "implemented": false, "gui": false, "console": false, "api": false, "test": "Not admitted", "screenshot": null, "limitation": "DCD/XTC/TRR/GRO/PSF/PRMTOP remain planned." }
+  ]
 }

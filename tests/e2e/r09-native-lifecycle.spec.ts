@@ -4,17 +4,28 @@ import { resolve } from "node:path";
 const mini = resolve("tests/fixtures/mini-protein.pdb");
 const ligand = resolve("tests/fixtures/g1c-small-molecule.pdb");
 
-const fileRibbon = async (page: import("@playwright/test").Page) => { await page.getByRole("button", { name: "File", exact: true }).click(); };
+const fileRibbon = async (page: import("@playwright/test").Page) => {
+  const file = page.getByRole("button", { name: "File", exact: true });
+  const toolbarCollapsed = await page.getByRole("button", { name: "Expand menu tools", exact: true }).count() === 0;
+  if (await file.getAttribute("aria-expanded") !== "true" || toolbarCollapsed) await file.click();
+  const expand = page.getByRole("button", { name: "Expand menu tools", exact: true });
+  if (await expand.count()) await expand.click();
+};
+const closeFileRibbon = async (page: import("@playwright/test").Page) => {
+  const collapse = page.getByRole("button", { name: "Collapse menu tools", exact: true });
+  if (await collapse.count()) await collapse.click();
+};
 const newProject = async (page: import("@playwright/test").Page) => {
   await page.goto("/");
   await fileRibbon(page);
   const responsePromise = page.waitForResponse((response) => response.url().endsWith("/api/projects") && response.request().method() === "POST");
   await page.getByRole("button", { name: "New", exact: true }).click();
   const response = await responsePromise;
+  await closeFileRibbon(page);
   return await response.json() as { id: string; revision: number };
 };
 const importFile = async (page: import("@playwright/test").Page, path: string, add = false) => {
-  if (add) { await fileRibbon(page); const chooser = page.waitForEvent("filechooser"); await page.getByRole("button", { name: "Add Structure", exact: true }).click(); await (await chooser).setFiles(path); }
+  if (add) { await fileRibbon(page); const chooser = page.waitForEvent("filechooser"); await page.getByRole("button", { name: "Add Structure", exact: true }).click(); await (await chooser).setFiles(path); await closeFileRibbon(page); }
   else await page.locator('input[type="file"]').setInputFiles(path);
 };
 const capture = (page: import("@playwright/test").Page, folder: string, name: string) => page.screenshot({ path: `verification/evidence/r09/${folder}/${name}`, fullPage: true });
@@ -35,13 +46,17 @@ test("AT-R09-08/09/10/11/12/13/14/15 scenes are renderer-neutral and export is t
   await newProject(page);
   await importFile(page, mini);
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await page.getByRole("button", { name: "Session panel" }).click();
+  await closeFileRibbon(page);
   const sceneName = page.getByTestId("scene-name");
   await sceneName.fill("Overview"); await page.getByTestId("scene-store").click();
   await expect(page.getByTestId("scene-card")).toContainText("Overview");
   await capture(page, "scenes", "06-scene-a.png");
   const before = await page.getByTestId("scientific-history-state").getAttribute("data-history-current-revision");
-  await page.getByRole("button", { name: "Display", exact: true }).click();
-  await page.getByRole("button", { name: "Ball & Stick", exact: true }).click();
+  await page.getByRole("button", { name: "Display panel" }).click();
+  await closeFileRibbon(page);
+  await page.getByRole("combobox", { name: "Style" }).selectOption("ball-and-stick");
+  await page.getByRole("button", { name: "Session panel" }).click();
   await sceneName.fill("Alternate"); await page.getByTestId("scene-store").click();
   await capture(page, "scenes", "07-scene-b.png");
   await page.getByTestId("scene-card").first().getByRole("button", { name: "Recall" }).click();
@@ -65,15 +80,17 @@ test("AT-R09-16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32 immutable save, 
   const project = await newProject(page);
   await importFile(page, mini);
   await importFile(page, ligand, true);
+  await closeFileRibbon(page);
   const saveResponsePromise = page.waitForResponse((response) => response.url().endsWith(`/api/projects/${project.id}`) && response.request().method() === "PUT");
+  await page.getByRole("button", { name: "Analyze panel" }).click();
   await page.getByRole("button", { name: "H-Bonds", exact: true }).click();
   await fileRibbon(page); await page.getByRole("button", { name: "Save", exact: true }).click();
   const saved = await (await saveResponsePromise).json() as { revision: number; session?: { objects: unknown[]; sceneCollection: { scenes: unknown[] } } };
   expect(saved.revision).toBe(2); expect(saved.session?.objects).toHaveLength(2);
   await capture(page, "sessions", "02-save-session-revision.png");
-  await page.getByRole("button", { name: "Display", exact: true }).click(); await page.getByRole("button", { name: "Ball & Stick", exact: true }).click();
+  await closeFileRibbon(page); await page.getByRole("button", { name: "Display panel" }).click(); await page.getByRole("combobox", { name: "Style" }).selectOption("ball-and-stick");
   const secondSavePromise = page.waitForResponse((response) => response.url().endsWith(`/api/projects/${project.id}`) && response.request().method() === "PUT");
-  await page.getByRole("button", { name: "File", exact: true }).click(); await page.getByRole("button", { name: "Save", exact: true }).click();
+  await fileRibbon(page); await page.getByRole("button", { name: "Save", exact: true }).click();
   const secondSaved = await (await secondSavePromise).json() as { revision: number; session?: { sessionRevisionId: string } };
   expect(secondSaved.revision).toBe(3); await capture(page, "sessions", "03-modified-workspace-second-save.png");
   const firstRevisionId = (saved as { session?: { sessionRevisionId: string } }).session!.sessionRevisionId;

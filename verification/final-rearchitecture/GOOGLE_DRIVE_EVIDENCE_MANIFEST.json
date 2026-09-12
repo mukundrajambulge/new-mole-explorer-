@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "status": "BLOCKED_CREDENTIAL_OR_ENVIRONMENT",
+  "capturedAt": "2026-09-12",
+  "reason": "No authenticated Google Drive connector was available in this execution environment.",
+  "localEvidenceRoot": "verification/final-rearchitecture/evidence",
+  "uploadPolicy": "Retain local evidence and upload only after authenticated remote verification.",
+  "files": [
+    { "phase": "BASELINE", "filename": "BASELINE_WORKSPACE.png", "localSha256": "C87215B5B7B4DD536F99FCCB52BD4B6E570AA489ED147F0E709183D12DCAD05F", "remotePath": null, "uploadVerified": false },
+    { "phase": "MULTI_OBJECT", "filename": "SLICE_H_BOTH_VISIBLE_FIT_ALL.png", "localSha256": "3A65A46A0145D297BB296B124A34B880C8FC4578164DDF86F268645A1371A159", "remotePath": null, "uploadVerified": false },
+    { "phase": "LIGAND", "filename": "SLICE_I_LIGAND_CONTEXT.png", "localSha256": "5F665192CF7B2FF7242250D32214368071EB47EC2D46A4511D7BBC264DA945AC", "remotePath": null, "uploadVerified": false }
+  ]
+}

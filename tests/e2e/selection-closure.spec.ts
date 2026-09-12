@@ -10,11 +10,17 @@ const sourcePartialChargeFixture = resolve("tests/fixtures/source-partial-charge
 const segmentIdentityFixture = resolve("tests/fixtures/segment-identity.pdb");
 const sidechainIdentityFixture = resolve("tests/fixtures/sidechain-identity.pdb");
 const unitCellFixture = resolve("tests/fixtures/unit-cell.pdb");
+const openConsole = async (page: Page) => {
+  const expand = page.getByRole("button", { name: "Expand console", exact: true });
+  if (await expand.count()) await expand.click();
+};
 const loadFixture = async (page: Page) => {
   await page.goto("/molstudio");
   await page.locator('input[type="file"]').setInputFiles(fixture);
   await expect(page.getByTitle("mini-protein.pdb")).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await page.getByRole("button", { name: "Display panel" }).click();
+  await page.getByRole("button", { name: "Expand console", exact: true }).click();
 };
 
 test("source-backed mmCIF polymer typing drives nucleic selection", async ({ page }) => {
@@ -22,6 +28,7 @@ test("source-backed mmCIF polymer typing drives nucleic selection", async ({ pag
   await page.locator('input[type="file"]').setInputFiles(typedNucleicFixture);
   await expect(page.getByTitle("typed-nucleic.mmcif")).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await openConsole(page);
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   await command.fill("polymer.nucleic");
   await page.getByRole("button", { name: /Run/ }).click();
@@ -35,6 +42,7 @@ test("canonical mmCIF segment identity drives segi and bysegi selection", async 
   await page.goto("/molstudio");
   await page.locator('input[type="file"]').setInputFiles(edgeIdentityFixture);
   await expect(page.getByTitle("edge-identity.mmcif")).toBeVisible({ timeout: 15000 });
+  await openConsole(page);
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const run = async (value: string, count: number) => {
@@ -53,6 +61,7 @@ test("canonical PDB segment identity and alternate location match the pinned ide
   await page.goto("/molstudio");
   await page.locator('input[type="file"]').setInputFiles(segmentIdentityFixture);
   await expect(page.getByTitle("segment-identity.pdb")).toBeVisible({ timeout: 15000 });
+  await openConsole(page);
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const run = async (value: string, count: number) => {
@@ -71,6 +80,7 @@ test("canonical ring topology expands byring from a seed atom", async ({ page })
   await page.locator('input[type="file"]').setInputFiles(ringFixture);
   await expect(page.getByTitle("ring-ligand.pdb")).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await openConsole(page);
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   await command.fill("byring name C1");
@@ -89,6 +99,7 @@ test("source-backed unit-cell parameters drive bounded bycell selection", async 
   await page.locator('input[type="file"]').setInputFiles(unitCellFixture);
   await expect(page.getByTitle("unit-cell.pdb")).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await openConsole(page);
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const entries = consoleRegion.locator(".console-entry");
@@ -106,6 +117,7 @@ test("canonical sidechain selection matches the pinned backbone partition fixtur
   await page.locator('input[type="file"]').setInputFiles(sidechainIdentityFixture);
   await expect(page.getByTitle("sidechain-identity.pdb")).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await openConsole(page);
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const run = async (value: string, count: number) => {
@@ -123,6 +135,7 @@ test("canonical PDB formal charge and secondary structure predicates run live", 
   await page.locator('input[type="file"]').setInputFiles(typedPropertiesFixture);
   await expect(page.getByTitle("typed-properties.pdb")).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await openConsole(page);
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const run = async (value: string, count: number) => {
@@ -148,6 +161,7 @@ test("source-declared mmCIF partial charges run through the real console", async
   await page.locator('input[type="file"]').setInputFiles(sourcePartialChargeFixture);
   await expect(page.getByTitle("source-partial-charge.mmcif")).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await openConsole(page);
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   await command.fill("partial_charge > 0");
@@ -286,6 +300,7 @@ test("analysis and measurement controls remain reachable in the left rail", asyn
     return { clientHeight: element.clientHeight, scrollHeight: element.scrollHeight };
   });
   expect(dimensions.scrollHeight).toBeGreaterThan(dimensions.clientHeight);
+  await page.getByRole("button", { name: "Measure panel" }).click();
   await expect(page.getByTestId("measurements-panel").getByRole("button", { name: "Distance", exact: true })).toBeVisible();
   await expect(page.getByTestId("measurements-panel").getByRole("button", { name: "Dihedral", exact: true })).toBeVisible();
   await page.screenshot({ path: resolve("verification/evidence/analysis-interaction-scroll.png"), animations: "disabled" });

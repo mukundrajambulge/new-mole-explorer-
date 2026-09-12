@@ -44,7 +44,7 @@ export const ConsolePanel = ({ expanded, onToggle, structure, namedSelections = 
   };
 
   return (
-    <section className={`console-panel ${expanded ? "console-panel--expanded" : "console-panel--collapsed"}`} aria-label="Command console">
+    <section className={`console-panel ${expanded ? "console-panel--expanded" : "console-panel--collapsed"}`} aria-label="Command console — command and selection console">
       <div className="console-header">
         <button className="console-title" onClick={onToggle} aria-expanded={expanded}><span className="console-chevron">›_</span><strong>Command Console</strong><span className="console-live" /></button>
         {expanded && <div className="console-actions"><span className="console-mode">READY</span><button className="icon-button icon-button--quiet" onClick={onToggle} aria-label="Collapse console"><Icon name="arrowDown" size={15} /></button><button className="icon-button icon-button--quiet" onClick={() => setEntries([])} aria-label="Clear console"><Icon name="trash" size={15} /></button></div>}

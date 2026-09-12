@@ -9,10 +9,12 @@ const loadFixture = async (page: Page) => {
   await page.locator('input[type="file"]').setInputFiles(fixture);
   await expect(page.getByTitle("mini-protein.pdb")).toBeVisible({ timeout: 15000 });
   await expect(renderer(page)).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await page.getByRole("button", { name: "Display panel" }).click();
 };
 
 test("G1C-UI-001 exposes the complete style dropdown with truthful capability states", async ({ page }) => {
   await page.goto("/");
+  await page.getByRole("button", { name: "Display panel" }).click();
   const style = page.getByRole("combobox", { name: "Style" });
   await expect(style.locator("option")).toHaveText([
     "Line", "Stick", "Ball-and-Stick", "Space-Filling", "Van der Waals Surface", "Solvent-Accessible Surface", "Solvent-Excluded Surface", "Mesh", "Dots", "Dot Surface", "Cartoon", "Ribbon", "Trace", "Putty", "Non-bonded (crosses)", "Non-bonded (spheres)", "Licorice",

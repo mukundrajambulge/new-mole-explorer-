@@ -9,24 +9,22 @@ const loadFixture = async (page: Page) => {
   await page.locator('input[type="file"]').setInputFiles(fixture);
   await expect(page.getByTitle("mini-protein.pdb")).toBeVisible({ timeout: 15000 });
   await expect(viewer(page)).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await page.getByRole("button", { name: "Display panel" }).click();
 };
 
 test("IMP-PRES-01 keeps menu state and rail ownership truthful", async ({ page }) => {
   await page.goto("/");
   const file = page.getByRole("button", { name: "File", exact: true });
-  const edit = page.getByRole("button", { name: "Edit", exact: true });
   await file.click();
   await expect(file).toHaveAttribute("aria-expanded", "true");
   await expect(file).toHaveAttribute("data-menu-active", "true");
   await expect(page.getByRole("button", { name: "Save", exact: true })).toBeVisible();
-  await edit.click();
-  await expect(file).toHaveAttribute("aria-expanded", "false");
-  await expect(edit).toHaveAttribute("aria-expanded", "true");
-  await expect(page.locator('.context-toolbar[data-ribbon-category="Edit"]')).toContainText("Delete Selected");
+  await page.getByRole("button", { name: "Edit panel" }).click();
+  await expect(file).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByRole("region", { name: "Edit panel" })).toContainText("Delete atoms");
   await expect(page.getByLabel("Structure, context and analysis panel")).toContainText("Context");
-  await expect(page.getByLabel("Structure, context and analysis panel")).toContainText("Analysis & Interaction");
-  await expect(page.getByLabel("Projection & Display panel").getByRole("heading", { name: "Context" })).toHaveCount(0);
-  await expect(page.getByLabel("Projection & Display panel").getByRole("heading", { name: "Interaction / Measurements" })).toHaveCount(0);
+  await expect(page.getByLabel("Structure, context and analysis panel")).toContainText("Alignment");
+  await expect(page.getByTestId("projection-display-panel")).toHaveCount(0);
 });
 
 test("IMP-PRES-01 derives label cardinality before renderer projection", async ({ page }) => {
@@ -56,6 +54,7 @@ test("IMP-PRES-01 keeps side-rail controls reachable at required workbench sizes
     await page.goto("/");
     const dimensions = await page.locator("html").evaluate((node) => ({ clientWidth: node.clientWidth, scrollWidth: node.scrollWidth }));
     expect(dimensions.scrollWidth).toBe(dimensions.clientWidth);
+    await page.getByRole("button", { name: "Display panel" }).click();
     await page.getByText("Advanced Display", { exact: true }).click();
     await expect(page.getByRole("button", { name: "Reset clipping to Auto" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Structure" })).toBeVisible();
@@ -64,6 +63,7 @@ test("IMP-PRES-01 keeps side-rail controls reachable at required workbench sizes
 
 test("IMP-PRES-01 exposes measurement mode in the left interaction rail", async ({ page }) => {
   await loadFixture(page);
+  await page.getByRole("button", { name: "Measure panel" }).click();
   const measurements = page.getByTestId("measurements-panel");
   await measurements.getByRole("button", { name: "Distance", exact: true }).click();
   await expect(measurements).toContainText("Pick 2 atoms in order");

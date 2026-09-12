@@ -12,6 +12,7 @@ const loadFile = async (page: Page, file: string) => {
 };
 
 const runCommand = async (page: Page, value: string) => {
+  if (await page.getByRole("button", { name: "Expand console", exact: true }).count()) await page.getByRole("button", { name: "Expand console", exact: true }).click();
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   await command.fill(value);
@@ -29,9 +30,9 @@ test("R07-B2 delete selected reconciles canonical topology, viewer model, and ex
   const initialGeneration = await viewer.getAttribute("data-renderer-generation");
   const initialModelLoads = await viewer.getAttribute("data-renderer-model-loads");
   await runCommand(page, "select id 2");
-  await page.getByRole("button", { name: "Edit", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Delete Selected", exact: true })).toBeEnabled();
-  await page.getByRole("button", { name: "Delete Selected", exact: true }).click();
+  await page.getByRole("button", { name: "Edit panel", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Delete atoms", exact: true })).toBeEnabled();
+  await page.getByRole("button", { name: "Delete atoms", exact: true }).click();
   await expect(viewer).toHaveAttribute("data-canonical-atom-count", "3");
   await expect(viewer).toHaveAttribute("data-canonical-bond-count", "0");
   expect(await viewer.getAttribute("data-renderer-generation")).not.toBe(initialGeneration);

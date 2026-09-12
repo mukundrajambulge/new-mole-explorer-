@@ -58,6 +58,7 @@ test("MANUAL GATE 02 camera, viewport, structure integrity, and full-canvas clos
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto("/molstudio");
   await openRcsb(page, "4DJW");
+  await page.getByRole("button", { name: "Display panel" }).click();
 
   const target = viewer(page);
   await expect(target).toHaveAttribute("data-canonical-atom-count", "7079", { timeout: 60000 });
@@ -75,6 +76,7 @@ test("MANUAL GATE 02 camera, viewport, structure integrity, and full-canvas clos
   await displayPanel(page).getByRole("button", { name: "Fit", exact: true }).click();
   await expect(target).toHaveAttribute("data-camera-action", "FIT");
   await expect(target).toHaveAttribute("data-camera-target-mode", "workspace-visible");
+  await page.getByRole("button", { name: "Expand console", exact: true }).click();
   await page.screenshot({ path: "verification/evidence/manual-gate-02/01-4djw-only-fit-console-expanded.png", animations: "disabled" });
 
   await page.getByRole("button", { name: "Collapse console", exact: true }).click();
@@ -137,6 +139,7 @@ test("MANUAL GATE 02 camera, viewport, structure integrity, and full-canvas clos
   await page.goto("/molstudio");
   await page.setViewportSize({ width: 1440, height: 900 });
   await openRcsb(page, "1CRN");
+  await page.getByRole("button", { name: "Display panel" }).click();
   await displayPanel(page).getByRole("button", { name: "Fit", exact: true }).click();
   await expect(viewer(page)).toHaveAttribute("data-camera-action", "FIT");
   await expect(viewer(page)).toHaveAttribute("data-camera-target-object-count", "1");
@@ -147,6 +150,7 @@ test("MANUAL GATE 02 camera, viewport, structure integrity, and full-canvas clos
   await page.setViewportSize({ width: 1440, height: 900 });
   await openRcsb(page, "4DJW");
   await openRcsb(page, "1CRN", true);
+  await page.getByRole("button", { name: "Display panel" }).click();
   await expect(page.getByTestId("objects-selections-panel").locator("[data-object-id]")).toHaveCount(2);
   await expect(target).toHaveAttribute("data-renderer-model-count", "2");
   const twoObjectRevision = await target.getAttribute("data-scientific-revision");

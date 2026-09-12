@@ -241,7 +241,7 @@ export const MolecularCanvas = ({
             <div className="empty-viewer-card">
               <span className="empty-viewer-icon"><Icon name="atom" size={28} /></span>
               <strong>No structure loaded</strong>
-              <span>Drop a PDB, mmCIF, PQR, or SDF/MOL file here, or import one from the toolbar.</span>
+              <span>Drop a PDB, mmCIF/CIF, PQR, SDF/MOL, XYZ, MOL2, or PDBQT file here, or import one from the toolbar.</span>
               <button className="empty-viewer-action" type="button" onClick={onImport}><Icon name="upload" size={14} /> Import structure</button>
             </div>
           </div>

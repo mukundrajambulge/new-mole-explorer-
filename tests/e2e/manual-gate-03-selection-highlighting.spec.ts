@@ -16,6 +16,7 @@ const openRcsb = async (page: Page, id: string, add = false) => {
 };
 
 const runCommand = async (page: Page, value: string) => {
+  if (await page.getByRole("button", { name: "Expand console", exact: true }).count()) await page.getByRole("button", { name: "Expand console", exact: true }).click();
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   await command.fill(value);

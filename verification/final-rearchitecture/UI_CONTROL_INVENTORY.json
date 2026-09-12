@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "capturedAt": "2026-09-12",
-  "slice": "A",
+  "slice": "I",
   "normalWorkspace": {
     "topMenus": ["File", "Select", "Display", "Color", "Measure", "Analyze", "View", "Help"],
     "leftPanel": "Objects & Selections",
@@ -11,9 +11,29 @@
     "statusBar": true
   },
   "transitionalPanels": {
-    "workingInRail": ["Display", "Color", "Session"],
-    "stillInObjectsPanel": ["Select", "Measure", "Analyze", "Edit"],
-    "notYetImplemented": ["Ligand", "Movie", "Settings"]
+    "workingInRail": ["Display", "Color", "Select", "Measure", "Analyze", "Ligand", "Edit", "Session"],
+    "stillInObjectsPanel": [],
+    "notYetImplemented": ["Movie", "Settings"]
   },
+  "controls": [
+    { "id": "menu.file", "label": "File", "location": "top menu", "actionId": "FILE.OPEN|FILE.IMPORT|FILE.SAVE|FILE.EXPORT", "expectedResult": "Open/import, fetch, save, export, or add a structure", "testId": "AT-FSR-A-002" },
+    { "id": "menu.select", "label": "Select", "location": "top menu", "actionId": "SELECTION.EVALUATE", "expectedResult": "Open selection tools", "testId": "AT-FSR-F-001" },
+    { "id": "menu.display", "label": "Display", "location": "top menu", "actionId": "REPRESENTATION.SET_STYLE", "expectedResult": "Open display tools", "testId": "AT-FSR-A-002" },
+    { "id": "menu.color", "label": "Color", "location": "top menu", "actionId": "COLOR.APPLY", "expectedResult": "Open color tools", "testId": "AT-FSR-A-002" },
+    { "id": "menu.measure", "label": "Measure", "location": "top menu", "actionId": "MEASURE.DISTANCE|MEASURE.ANGLE|MEASURE.DIHEDRAL", "expectedResult": "Open measurement tools", "testId": "AT-FSR-D-001" },
+    { "id": "menu.analyze", "label": "Analyze", "location": "top menu", "actionId": "ANALYSIS.H_BONDS|ANALYSIS.CONTACTS|ANALYSIS.CLASH", "expectedResult": "Open structural analysis tools", "testId": "AT-FSR-D-001" },
+    { "id": "menu.view", "label": "View", "location": "top menu", "actionId": "VIEW.FIT|VIEW.CENTER|VIEW.ORIENT|VIEW.PROJECTION", "expectedResult": "Open camera and projection tools", "testId": "AT-FSR-H-001" },
+    { "id": "rail.display", "label": "Display panel", "location": "right rail", "actionId": "REPRESENTATION.SET_STYLE", "expectedResult": "Open display panel inward from the right rail", "testId": "AT-FSR-A-002" },
+    { "id": "rail.color", "label": "Color panel", "location": "right rail", "actionId": "COLOR.APPLY", "expectedResult": "Open color panel inward from the right rail", "testId": "AT-FSR-A-002" },
+    { "id": "rail.select", "label": "Select panel", "location": "right rail", "actionId": "SELECTION.EVALUATE", "expectedResult": "Select, clear, and inspect active membership", "testId": "AT-FSR-F-001" },
+    { "id": "rail.measure", "label": "Measure panel", "location": "right rail", "actionId": "MEASURE.DISTANCE|MEASURE.ANGLE|MEASURE.DIHEDRAL", "expectedResult": "Create and manage persistent measurements", "testId": "AT-FSR-D-001" },
+    { "id": "rail.analyze", "label": "Analyze panel", "location": "right rail", "actionId": "ANALYSIS.H_BONDS|ANALYSIS.CONTACTS|ANALYSIS.CLASH", "expectedResult": "Run bounded structural diagnostics", "testId": "AT-FSR-D-001" },
+    { "id": "rail.ligand", "label": "Ligand panel", "location": "right rail", "actionId": "SELECTION.EVALUATE|ANALYSIS.H_BONDS|ANALYSIS.CONTACTS|ANALYSIS.CLASH", "expectedResult": "Inspect ligand context and run proximity diagnostics", "testId": "AT-FSR-I-001" },
+    { "id": "rail.edit", "label": "Edit panel", "location": "right rail", "actionId": "EDIT.ATOM_DELETE|EDIT.BOND_CREATE|HISTORY.UNDO|HISTORY.REDO", "expectedResult": "Run bounded topology edits with history", "testId": "AT-FSR-E-001" },
+    { "id": "rail.session", "label": "Session panel", "location": "right rail", "actionId": "SCENE.STORE|SCENE.RECALL", "expectedResult": "Store, recall, and step through scenes", "testId": "AT-FSR-A-002" },
+    { "id": "console.toggle", "label": "Command Console", "location": "bottom console bar", "actionId": "WORKSPACE.CONSOLE", "expectedResult": "Expand or collapse the command console", "testId": "AT-FSR-C-001" },
+    { "id": "objects.toggle", "label": "Enable/disable object", "location": "Objects & Selections", "actionId": "OBJECT.ENABLE|OBJECT.DISABLE", "expectedResult": "Toggle one object while preserving other objects", "testId": "AT-FSR-H-001" }
+  ],
+  "coverageRule": "Every active control has a test ID; Movie and Settings are explicitly unavailable and do not expose active placeholder controls.",
   "prohibitedNormalUi": ["Dock", "R08", "ORACLE PENDING", "NATIVE LIFECYCLE", "PRESENTATION RIBBON", "G1C PRESENTATION"]
 }

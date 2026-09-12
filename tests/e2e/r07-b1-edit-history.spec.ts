@@ -38,6 +38,7 @@ test("R07-B1 edit, exact undo/redo, and multi-object isolation stay live without
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const run = async (value: string) => {
+    if (await page.getByRole("button", { name: "Expand console", exact: true }).count()) await page.getByRole("button", { name: "Expand console", exact: true }).click();
     await command.fill(value);
     await page.getByRole("button", { name: /Run/ }).click();
     await expect(consoleRegion.locator(".console-entry").last()).toContainText(value);
@@ -74,7 +75,7 @@ test("R07-B1 edit, exact undo/redo, and multi-object isolation stay live without
   expect(await viewer.getAttribute("data-renderer-generation")).not.toBe(editRendererGeneration);
 
   // The Edit ribbon action IDs converge on the same canonical history service.
-  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  await page.getByRole("button", { name: "Edit panel", exact: true }).click();
   await page.getByRole("button", { name: "Undo", exact: true }).click();
   await expect(historyState).toContainText("root");
   await expect(historyState).toContainText("redo");

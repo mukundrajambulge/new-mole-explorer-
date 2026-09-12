@@ -13,6 +13,7 @@ const loadFixture = async (page: import("@playwright/test").Page) => {
 };
 
 const runCommand = async (page: import("@playwright/test").Page, value: string) => {
+  if (await page.getByRole("button", { name: "Expand console", exact: true }).count()) await page.getByRole("button", { name: "Expand console", exact: true }).click();
   const input = page.getByRole("textbox", { name: "Command or selection query" });
   await input.fill(value);
   await page.getByRole("button", { name: /Run/ }).click();
@@ -23,6 +24,7 @@ test("final acceptance keeps scenes, ownership and console within the workspace"
   await page.goto("/molstudio");
   await page.locator('input[type="file"]').setInputFiles("tests/fixtures/mini-protein.pdb");
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded");
+  await page.getByRole("button", { name: "Session panel" }).click();
   for (const size of [{ width: 1440, height: 900 }, { width: 1280, height: 720 }, { width: 1920, height: 1080 }]) {
     await page.setViewportSize(size);
     const scenes = page.getByTestId("scene-manager");
@@ -33,12 +35,12 @@ test("final acceptance keeps scenes, ownership and console within the workspace"
     const owner = page.getByTestId("active-object-state");
     expect(await owner.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
     const before = (await page.getByTestId("molecular-viewer").boundingBox())!;
+    await page.getByRole("button", { name: "Expand console", exact: true }).click();
+    const consoleBox = (await page.getByRole("region", { name: "Command and selection console" }).boundingBox())!;
+    expect(consoleBox.y + consoleBox.height).toBeLessThanOrEqual(size.height);
     await page.getByRole("button", { name: "Collapse console", exact: true }).click();
     const collapsed = (await page.getByTestId("molecular-viewer").boundingBox())!;
     expect(collapsed).toEqual(before);
-    await page.getByRole("button", { name: "Expand console", exact: true }).click();
-    const consoleBox = (await page.getByRole("region", { name: "Command and selection console" }).boundingBox())!;
-    expect(consoleBox.y + consoleBox.height).toBeLessThanOrEqual(sceneBox.y);
   }
   await page.getByTestId("scene-name").fill("Acceptance scene");
   await page.getByTestId("scene-store").click();
@@ -48,6 +50,7 @@ test("final acceptance keeps scenes, ownership and console within the workspace"
 test("final acceptance covers camera, ligand color, selection, and representation together", async ({ page }) => {
   await loadFixture(page);
   const target = viewer(page);
+  await page.getByRole("button", { name: "Display panel" }).click();
   await page.getByRole("combobox", { name: "Protein representation" }).selectOption("sticks");
   await page.getByRole("combobox", { name: "Ligand representation" }).selectOption("sticks");
   const ligandColor = page.getByRole("combobox", { name: "Ligand color" });
@@ -57,6 +60,7 @@ test("final acceptance covers camera, ligand color, selection, and representatio
   await expect(target).toHaveAttribute("data-camera-projection", "orthographic");
   await page.getByRole("button", { name: "Fit", exact: true }).click();
   await expect(target).toHaveAttribute("data-camera-action", "FIT");
+  await page.getByRole("button", { name: "Close Display panel", exact: true }).click();
   await runCommand(page, "select object mini-protein.pdb and resi 1");
   await expect(page.getByTestId("active-selection")).toContainText("4 atoms");
   await expect(target).toHaveAttribute("data-selection-indicator", "visible");
@@ -77,9 +81,11 @@ test("final acceptance covers R07 edit undo/redo, R08 alignment, R09 scene save,
   await expect(page.getByTestId("scientific-history-state")).toContainText("undo");
   await runCommand(page, "rms_cur all, all");
   await expect(page.getByTestId("alignment-results")).toContainText("RMS");
+  await page.getByRole("button", { name: "Session panel" }).click();
   await page.getByTestId("scene-name").fill("Final acceptance A");
   await page.getByTestId("scene-store").click();
   await expect(page.getByTestId("scene-card")).toContainText("Final acceptance A");
+  await page.getByRole("button", { name: "Session panel", exact: true }).click();
   await runCommand(page, "python print(\"hello\")");
   await expect(page.getByRole("region", { name: "Command and selection console" }).locator(".console-entry").last()).toContainText("UNSAFE_COMMAND_REJECTED");
   await expect(target).toHaveAttribute("data-viewer-state", "loaded");

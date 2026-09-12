@@ -12,6 +12,7 @@ const load4DJW = async (page: Page) => {
   await expect(page.getByTitle("4DJW.cif").first()).toBeVisible({ timeout: 60000 });
   await expect(viewer(page)).toHaveAttribute("data-canonical-atom-count", "7079", { timeout: 60000 });
   await expect(viewer(page)).toHaveAttribute("data-renderer-model-count", "1");
+  await page.getByRole("button", { name: "Display panel" }).click();
 };
 
 const dragCanvas = async (page: Page, fromFraction: [number, number], toFraction: [number, number]) => {
@@ -47,6 +48,7 @@ test("MANUAL GATE 01 keeps 4DJW responsive and VDW visible", async ({ page }) =>
     revision: await target.getAttribute("data-scientific-revision"),
   };
 
+  await page.getByRole("button", { name: "Expand console", exact: true }).click();
   await page.getByRole("button", { name: "Collapse console", exact: true }).click();
   await page.screenshot({ path: "verification/evidence/manual-gate-01/vdw-surface-visible.png", animations: "disabled" });
 

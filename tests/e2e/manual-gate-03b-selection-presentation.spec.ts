@@ -16,6 +16,7 @@ const openRcsb = async (page: Page, id: string, add = false) => {
 };
 
 const runCommand = async (page: Page, value: string) => {
+  if (await page.getByRole("button", { name: "Expand console", exact: true }).count()) await page.getByRole("button", { name: "Expand console", exact: true }).click();
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   await command.fill(value);
@@ -73,6 +74,7 @@ test("MANUAL GATE 03B focuses residue and chain selections across representation
   await expect(target).toHaveAttribute("data-selection-highlight-mode", "representation-overlay");
   await capture(page, "03-chain-cartoon.png");
 
+  await page.getByRole("button", { name: "Display panel" }).click();
   await page.getByLabel("Style").selectOption("sticks");
   await expect(target).toHaveAttribute("data-projection", "sticks");
   await expectFocusedSelection(page, chainCount);
@@ -118,6 +120,7 @@ test("MANUAL GATE 03B keeps ligand focus visible while ligand representation cha
   expect(chainCount).toBeGreaterThan(100);
   await expectFocusedSelection(page, chainCount);
 
+  await page.getByRole("button", { name: "Display panel" }).click();
   const ligandRepresentation = page.getByLabel("Ligand representation");
   await expect(ligandRepresentation.locator("option[value=mesh]")).toBeEnabled();
   await ligandRepresentation.selectOption("mesh");

@@ -18,6 +18,7 @@ const loadFile = async (page: Page, file: string) => {
 };
 
 const runCommand = async (page: Page, value: string) => {
+  if (await page.getByRole("button", { name: "Expand console", exact: true }).count()) await page.getByRole("button", { name: "Expand console", exact: true }).click();
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   await command.fill(value);
@@ -28,8 +29,8 @@ const runCommand = async (page: Page, value: string) => {
 };
 
 const openEdit = async (page: Page) => {
-  await page.getByRole("button", { name: "Edit", exact: true }).click();
-  await expect(page.getByTestId("edit-state")).toBeVisible();
+  await page.getByRole("button", { name: "Edit panel", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Edit panel" })).toBeVisible();
 };
 
 const pickCanvasAtom = async (page: Page) => {
@@ -68,7 +69,7 @@ test("R07 objects, real names, ON/OFF state, and isolation are operational in th
   await expect(await runCommand(page, "object mini-protein.pdb")).toContainText(/Selected [\d,]+ atoms/);
   await openEdit(page);
   await expect(page.getByTestId("edit-state")).toHaveAttribute("data-edit-selection-ready", "false");
-  await expect(page.getByRole("button", { name: "Delete Selected", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Delete atoms", exact: true })).toBeDisabled();
   await expect(await runCommand(page, "remove object mini-protein.pdb")).toContainText("OBJECT_DISABLED");
   await ligandRow.getByRole("button", { name: "Disable g1c-small-molecule.pdb" }).click();
   await expect(ligandRow).toHaveAttribute("data-object-enabled", "false");
@@ -120,7 +121,7 @@ test("R07 B2 UI buttons commit delete and bond edits through canonical history",
   const viewer = page.getByTestId("molecular-viewer");
   await runCommand(page, "select id 2");
   await openEdit(page);
-  const deleteSelected = page.getByRole("button", { name: "Delete Selected", exact: true });
+  const deleteSelected = page.getByRole("button", { name: "Delete atoms", exact: true });
   await expect(deleteSelected).toBeEnabled();
   await deleteSelected.click();
   await expect(viewer).toHaveAttribute("data-canonical-atom-count", "3");
@@ -130,7 +131,7 @@ test("R07 B2 UI buttons commit delete and bond edits through canonical history",
   await loadFile(page, topology);
   await runCommand(page, "select id 3 or id 4");
   await openEdit(page);
-  const createBond = page.getByRole("button", { name: "Create Bond", exact: true });
+  const createBond = page.getByRole("button", { name: "Create bond", exact: true });
   await expect(createBond).toBeEnabled();
   await createBond.click();
   await expect(viewer).toHaveAttribute("data-canonical-bond-count", "3");
@@ -144,7 +145,7 @@ test("R07 B3 UI buttons commit add, refill, remove, attach, and replace operatio
   await loadFile(page, topology);
   await runCommand(page, "select id 1");
   await openEdit(page);
-  await page.getByRole("button", { name: "Add Hydrogens", exact: true }).click();
+  await page.getByRole("button", { name: "Add hydrogens", exact: true }).click();
   await expect(viewer).toHaveAttribute("data-canonical-atom-count", "7");
   await capture(page, "11-b3-add-h.png");
 
@@ -187,6 +188,7 @@ test("R07 selection, roots, visibility, diagnostics, and command/UI object equiv
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const run = async (value: string) => {
+    if (await page.getByRole("button", { name: "Expand console", exact: true }).count()) await page.getByRole("button", { name: "Expand console", exact: true }).click();
     await command.fill(value);
     await page.getByRole("button", { name: /Run/ }).click();
     const entry = consoleRegion.locator(".console-entry").last();
@@ -209,8 +211,8 @@ test("R07 selection, roots, visibility, diagnostics, and command/UI object equiv
   await expect(await run("object nonexistent-structure.cif and id 1")).toContainText(/No loaded object matches|OBJECT_NOT_FOUND|does not resolve/);
   await run("unpick");
   await expect(page.getByTestId("active-selection")).toHaveCount(0);
-  await page.getByRole("button", { name: "Edit", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Delete Selected", exact: true })).toBeDisabled();
+  await page.getByRole("button", { name: "Edit panel", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Delete atoms", exact: true })).toBeDisabled();
 
   const initialProjection = await viewer.getAttribute("data-renderer-object-projection");
   expect(initialProjection).toBeTruthy();
@@ -243,6 +245,7 @@ test("R07 history supports multiple revisions and fail-closed branch-after-undo 
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const run = async (value: string) => {
+    if (await page.getByRole("button", { name: "Expand console", exact: true }).count()) await page.getByRole("button", { name: "Expand console", exact: true }).click();
     await command.fill(value);
     await page.getByRole("button", { name: /Run/ }).click();
     const entry = consoleRegion.locator(".console-entry").last();
@@ -284,12 +287,12 @@ test("R07 B2 UI covers Delete Bond and all supported bond-order transitions", as
     await expect(consoleRegion.locator(".console-entry").last()).toContainText(value);
   };
   await run("select id 3 or id 4");
-  await page.getByRole("button", { name: "Edit", exact: true }).click();
-  await page.getByRole("button", { name: "Create Bond", exact: true }).click();
+  await page.getByRole("button", { name: "Edit panel", exact: true }).click();
+  await page.getByRole("button", { name: "Create bond", exact: true }).click();
   await expect(viewer).toHaveAttribute("data-canonical-bond-count", "3");
   await run("select id 3 or id 4");
-  await expect(page.getByRole("button", { name: "Delete Bond", exact: true })).toBeEnabled();
-  await page.getByRole("button", { name: "Delete Bond", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Delete bond", exact: true })).toBeEnabled();
+  await page.getByRole("button", { name: "Delete bond", exact: true }).click();
   await expect(viewer).toHaveAttribute("data-canonical-bond-count", "2");
   await expect(page.getByTestId("active-selection")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Undo", exact: true })).toBeEnabled();
@@ -301,7 +304,7 @@ test("R07 B2 UI covers Delete Bond and all supported bond-order transitions", as
   for (const order of ["DOUBLE", "TRIPLE", "AROMATIC", "SINGLE"]) {
     await loadFile(page, topology);
     await run("select id 1 or id 2");
-    await page.getByRole("button", { name: "Edit", exact: true }).click();
+    await page.getByRole("button", { name: "Edit panel", exact: true }).click();
     const orderSelect = page.getByRole("combobox", { name: "Bond order" });
     await expect(orderSelect).toBeEnabled();
     await orderSelect.selectOption(order);
@@ -322,8 +325,8 @@ test("R07 multi-state chemistry remains explicit and undoable through the UI", a
   const history = page.getByTestId("scientific-history-state");
   await command.fill("select id 1");
   await page.getByRole("button", { name: /Run/ }).click();
-  await page.getByRole("button", { name: "Edit", exact: true }).click();
-  await page.getByRole("button", { name: "Add Hydrogens", exact: true }).click();
+  await page.getByRole("button", { name: "Edit panel", exact: true }).click();
+  await page.getByRole("button", { name: "Add hydrogens", exact: true }).click();
   await expect(row).toContainText("2 states");
   await expect(viewer).toHaveAttribute("data-canonical-atom-count", "7");
   const stateOneIds = await viewer.getAttribute("data-canonical-atom-ids");
@@ -349,8 +352,8 @@ test("R07 pointer picking supplies a canonical target to the edit ribbon", async
   await expect(page.getByTestId("context-panel")).toContainText(/Element/);
   await capture(page, "16-picked-edit.png");
   await openEdit(page);
-  await expect(page.getByRole("button", { name: "Add Hydrogens", exact: true })).toBeEnabled();
-  await page.getByRole("button", { name: "Add Hydrogens", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Add hydrogens", exact: true })).toBeEnabled();
+  await page.getByRole("button", { name: "Add hydrogens", exact: true }).click();
   await expect(viewer).not.toHaveAttribute("data-canonical-atom-count", "4");
 
   await loadFile(page, explicitHydrogen);

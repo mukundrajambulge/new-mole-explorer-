@@ -82,6 +82,23 @@ test("AT-FSR-H-000 keeps two local coordinate objects visible after workspace as
   await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_H_LOCAL_TWO_OBJECTS.png") });
 });
 
+test("AT-FSR-I-001 exposes contextual ligand interaction actions", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(ligandFixture);
+  await expect(page.getByTitle("g1c-small-molecule.pdb")).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: "Ligand panel" }).click();
+
+  const panel = page.getByTestId("ligand-interaction-panel");
+  await expect(panel).toBeVisible();
+  await expect(panel).toContainText("Ligand interactions");
+  await expect(panel).toContainText("3 ligand atoms");
+  await expect(panel.getByRole("button", { name: "Select ligand" })).toBeVisible();
+  await expect(panel.getByRole("button", { name: "H-Bonds" })).toBeVisible();
+  await expect(panel.getByRole("button", { name: "Contacts" })).toBeVisible();
+  await expect(panel.getByRole("button", { name: "Clashes" })).toBeVisible();
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_I_LIGAND_CONTEXT.png") });
+});
+
 test("AT-FSR-C-001 executes top-level console batches and rejects malformed nesting", async ({ page }) => {
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(proteinFixture);

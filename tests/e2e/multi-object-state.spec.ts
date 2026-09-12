@@ -4,6 +4,10 @@ import { resolve } from "node:path";
 const mini = resolve("tests/fixtures/mini-protein.pdb");
 const ligand = resolve("tests/fixtures/g1c-small-molecule.pdb");
 const multiState = resolve("tests/fixtures/multistate.pdb");
+const openConsole = async (page: import("@playwright/test").Page) => {
+  const expand = page.getByRole("button", { name: "Expand console", exact: true });
+  if (await expand.count()) await expand.click();
+};
 
 test("multiple canonical objects share one viewer and keep object scope independent", async ({ page }) => {
   await page.goto("/");
@@ -13,6 +17,7 @@ test("multiple canonical objects share one viewer and keep object scope independ
   await page.getByRole("button", { name: "File", exact: true }).click();
   await page.getByRole("button", { name: "Add Structure", exact: true }).click();
   await (await chooserPromise).setFiles(ligand);
+  await openConsole(page);
 
   const panel = page.getByTestId("objects-selections-panel");
   await expect(panel.locator("[data-object-id]")).toHaveCount(2);
@@ -37,6 +42,7 @@ test("multiple canonical objects share one viewer and keep object scope independ
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 14 atoms");
 
+  await page.getByRole("button", { name: "Display panel" }).click();
   const ligandRow = panel.locator("[data-object-id]").filter({ hasText: "g1c-small-molecule.pdb" });
   await ligandRow.getByRole("button", { name: "Focus g1c-small-molecule.pdb" }).click();
   await page.getByRole("combobox", { name: "Style" }).selectOption("sticks");
@@ -85,6 +91,7 @@ test("cross-object spatial selection requires and records an explicit coordinate
   await page.getByRole("button", { name: "File", exact: true }).click();
   await page.getByRole("button", { name: "Add Structure", exact: true }).click();
   await (await chooserPromise).setFiles(ligand);
+  await openConsole(page);
 
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const command = page.getByRole("textbox", { name: "Command or selection query" });
@@ -110,6 +117,7 @@ test("multi-model ingestion exposes explicit state order and state switching", a
   await page.locator('input[type="file"]').setInputFiles(multiState);
   const panel = page.getByTestId("objects-selections-panel");
   await expect(page.getByTitle("multistate.pdb").first()).toBeVisible();
+  await openConsole(page);
   const row = panel.locator("[data-object-id]").filter({ hasText: "multistate.pdb" });
   await expect(row).toContainText("2 states");
   await expect(row).toContainText("1/2");
@@ -163,6 +171,7 @@ test("duplicate display names require a durable object identity", async ({ page 
   await page.getByRole("button", { name: "File", exact: true }).click();
   await page.getByRole("button", { name: "Add Structure", exact: true }).click();
   await (await chooserPromise).setFiles(mini);
+  await openConsole(page);
 
   const panel = page.getByTestId("objects-selections-panel");
   await expect(panel.locator("[data-object-id]")).toHaveCount(2);
@@ -185,6 +194,7 @@ test("object-scoped surfaces survive an unrelated coordinate-state change", asyn
   await page.getByRole("button", { name: "File", exact: true }).click();
   await page.getByRole("button", { name: "Add Structure", exact: true }).click();
   await (await chooserPromise).setFiles(mini);
+  await page.getByRole("button", { name: "Display panel" }).click();
   const panel = page.getByTestId("objects-selections-panel");
   const stateRow = panel.locator("[data-object-id]").filter({ hasText: "multistate.pdb" });
   const miniRow = panel.locator("[data-object-id]").filter({ hasText: "mini-protein.pdb" });
@@ -224,6 +234,7 @@ test("multi-object workspace projects every bounded surface family", async ({ pa
   await page.getByRole("button", { name: "Add Structure", exact: true }).click();
   await (await chooserPromise).setFiles(mini);
   await expect(page.getByTitle("mini-protein.pdb").first()).toBeVisible();
+  await page.getByRole("button", { name: "Display panel" }).click();
 
   const panel = page.getByTestId("objects-selections-panel");
   const stateRow = panel.locator("[data-object-id]").filter({ hasText: "multistate.pdb" });
@@ -266,6 +277,8 @@ test("console presentation commands target canonical workspace objects and keep 
   await page.getByRole("button", { name: "File", exact: true }).click();
   await page.getByRole("button", { name: "Add Structure", exact: true }).click();
   await (await chooserPromise).setFiles(ligand);
+  await page.getByRole("button", { name: "Display panel" }).click();
+  await openConsole(page);
 
   const panel = page.getByTestId("objects-selections-panel");
   const renderer = page.getByTestId("molecular-viewer");
@@ -311,6 +324,7 @@ test("a single object remains render-synchronized across disable and re-enable",
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(mini);
   await expect(page.getByTitle("mini-protein.pdb").first()).toBeVisible();
+  await page.getByRole("button", { name: "Display panel" }).click();
   const row = page.getByTestId("objects-selections-panel").locator("[data-object-id]").first();
   const renderer = page.getByTestId("molecular-viewer");
   await row.getByRole("button", { name: "Disable mini-protein.pdb" }).click();
@@ -325,6 +339,7 @@ test("create from a canonical selection produces a new lineage object without ch
   await page.locator('input[type="file"]').setInputFiles(mini);
   const panel = page.getByTestId("objects-selections-panel");
   await expect(panel.locator("[data-object-id]")).toHaveCount(1);
+  await openConsole(page);
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   await command.fill("create ligand-object, ligand");
   await page.getByRole("button", { name: /Run/ }).click();
@@ -344,6 +359,7 @@ test("create from a canonical selection produces a new lineage object without ch
 test("split_states and strict join_states preserve explicit state lineage", async ({ page }) => {
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(multiState);
+  await openConsole(page);
   const panel = page.getByTestId("objects-selections-panel");
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   await command.fill("split_states multistate.pdb");
@@ -365,6 +381,7 @@ test("workspace groups organize objects without changing their canonical scope",
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(mini);
   await expect(page.getByTitle("mini-protein.pdb").first()).toBeVisible();
+  await openConsole(page);
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   await command.fill("group create ensemble");

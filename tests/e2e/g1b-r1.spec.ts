@@ -8,6 +8,7 @@ const loadFixture = async (page: Page) => {
   await page.locator('input[type="file"]').setInputFiles(fixture);
   await expect(page.getByTitle("mini-protein.pdb")).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await page.getByRole("button", { name: "Display panel" }).click();
 };
 
 const renderer = (page: Page) => page.getByTestId("molecular-viewer");
@@ -33,14 +34,14 @@ test("G1B-REG-003 exposes the RCSB fetch entry point in File", async ({ page }) 
 
 test("G1B-REG-004 renders Spheres without stick cylinders", async ({ page }) => {
   await loadFixture(page);
-  await page.getByRole("button", { name: "Spheres", exact: true }).click();
+  await page.getByRole("combobox", { name: "Style" }).selectOption("space-filling");
   await expect(renderer(page)).toHaveAttribute("data-renderer-sphere-primitives", "11");
   await expect(renderer(page)).toHaveAttribute("data-renderer-stick-cylinders", "0");
 });
 
 test("G1B-REG-005 renders Ball & Stick as spheres plus canonical sticks", async ({ page }) => {
   await loadFixture(page);
-  await page.getByRole("button", { name: "Ball & Stick", exact: true }).click();
+  await page.getByRole("combobox", { name: "Style" }).selectOption("ball-and-stick");
   await expect(renderer(page)).toHaveAttribute("data-renderer-sphere-primitives", "11");
   await expect(renderer(page)).toHaveAttribute("data-renderer-stick-cylinders", "8");
   await expect(renderer(page)).toHaveAttribute("data-renderer-canonical-bond-source", "canonical");
@@ -48,21 +49,21 @@ test("G1B-REG-005 renders Ball & Stick as spheres plus canonical sticks", async 
 
 test("G1B-REG-006 renders Licorice with a distinct stick profile", async ({ page }) => {
   await loadFixture(page);
-  await page.getByRole("button", { name: "Licorice", exact: true }).click();
+  await page.getByRole("combobox", { name: "Style" }).selectOption("licorice");
   await expect(renderer(page)).toHaveAttribute("data-renderer-stick-cylinders", "8");
   await expect(renderer(page)).toHaveAttribute("data-renderer-sphere-primitives", "1");
 });
 
 test("G1B-REG-007 renders Lines from canonical bonds", async ({ page }) => {
   await loadFixture(page);
-  await page.getByRole("button", { name: "Lines", exact: true }).click();
+  await page.getByRole("combobox", { name: "Style" }).selectOption("line");
   await expect(renderer(page)).toHaveAttribute("data-renderer-line-segments", "8");
   await expect(renderer(page)).toHaveAttribute("data-renderer-stick-cylinders", "0");
 });
 
 test("G1B-REG-008 renders Sticks from canonical bonds only", async ({ page }) => {
   await loadFixture(page);
-  await page.getByRole("button", { name: "Sticks", exact: true }).click();
+  await page.getByRole("combobox", { name: "Style" }).selectOption("sticks");
   await expect(renderer(page)).toHaveAttribute("data-renderer-stick-cylinders", "8");
   await expect(renderer(page)).toHaveAttribute("data-renderer-canonical-bond-source", "canonical");
 });
@@ -75,13 +76,15 @@ test("G1B-REG-009 keeps Cartoon protein contributors separate from ligand sticks
 
 test("VIS-REG-010 projects Surface with an explicit limited profile", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Surface", exact: true }).first().click();
+  await page.getByRole("button", { name: "Display panel" }).click();
+  await page.getByRole("combobox", { name: "Style" }).selectOption("van-der-waals-surface");
   await expect(renderer(page)).toHaveAttribute("data-renderer-style-profile", "van-der-waals-surface");
 });
 
 test("VIS-REG-011 exposes Ribbon as a distinct limited profile", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Ribbon", exact: true }).click();
+  await page.getByRole("button", { name: "Display panel" }).click();
+  await page.getByRole("combobox", { name: "Style" }).selectOption("ribbon");
   await expect(renderer(page)).toHaveAttribute("data-renderer-style-profile", "ribbon");
 });
 
@@ -144,10 +147,11 @@ test("G1B-REG-019 top-level menu buttons switch ribbon content", async ({ page }
 
 test("G1B-REG-020 ribbon collapse and expand preserve the shell", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Collapse ribbon" }).click();
-  await expect(page.getByRole("button", { name: "Expand ribbon" })).toBeVisible();
-  await page.getByRole("button", { name: "Expand ribbon" }).click();
-  await expect(page.getByRole("button", { name: "Lines", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "View", exact: true }).click();
+  await page.getByRole("button", { name: "Collapse menu tools" }).click();
+  await expect(page.getByLabel("Contextual toolbar")).toHaveCount(0);
+  await page.getByRole("button", { name: "View", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Rotate", exact: true })).toBeVisible();
 });
 
 test("G1B-REG-021 File ribbon keeps implemented and unavailable operations explicit", async ({ page }) => {
@@ -160,7 +164,7 @@ test("G1B-REG-021 File ribbon keeps implemented and unavailable operations expli
 test("G1B-REG-022 presentation changes keep scientific identity unchanged", async ({ page }) => {
   await loadFixture(page);
   const initialFile = await page.locator(".status-file").textContent();
-  await page.getByRole("button", { name: "Ball & Stick", exact: true }).click();
+  await page.getByRole("combobox", { name: "Style" }).selectOption("ball-and-stick");
   await page.getByRole("button", { name: "Toggle Water" }).click();
   await page.getByRole("button", { name: "Color", exact: true }).click();
   await page.getByRole("button", { name: "Uniform", exact: true }).click();

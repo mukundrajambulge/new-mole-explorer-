@@ -36,6 +36,7 @@ test("R08 governed Align creates a presentation-only stable-pair overlay", async
 
 test("R08 current and fitted RMS commands are analysis-only", async ({ page }) => {
   await loadFixture(page);
+  await page.getByRole("button", { name: "Expand console", exact: true }).click();
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   await command.fill("rms_cur all, all");
   await page.locator(".console-submit").click();
@@ -56,6 +57,7 @@ test("R08 current and fitted RMS commands are analysis-only", async ({ page }) =
 
 test("R08 unsupported CE alignment is explicit and does not create a result", async ({ page }) => {
   await loadFixture(page);
+  await page.getByRole("button", { name: "Expand console", exact: true }).click();
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   await command.fill("cealign all, all");
   await page.locator(".console-submit").click();
@@ -66,6 +68,7 @@ test("R08 unsupported CE alignment is explicit and does not create a result", as
 
 test("R08 alignment result becomes stale after a scientific coordinate edit", async ({ page }) => {
   await loadFixture(page);
+  await page.getByRole("button", { name: "Expand console", exact: true }).click();
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   await command.fill("rms all, all");
   await page.locator(".console-submit").click();

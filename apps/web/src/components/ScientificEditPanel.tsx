@@ -13,12 +13,12 @@ type ScientificEditPanelProps = {
 };
 
 export const ScientificEditPanel = ({ selectionCount, objectName, selectionReady, canUndo, canRedo, onAction, onBondOrder }: ScientificEditPanelProps) => (
-  <section className="panel-card scientific-edit-panel" aria-label="Edit panel">
+  <section className="panel-card scientific-edit-panel" aria-label="Edit panel" data-testid="edit-state" data-edit-selection-ready={selectionReady ? "true" : "false"}>
     <div className="panel-heading"><div><h2>Edit</h2></div></div>
     <div className="scientific-edit-summary"><strong>{selectionCount} atom{selectionCount === 1 ? "" : "s"} selected</strong><span>{objectName ?? "No active object"}</span></div>
     <div className="scientific-edit-grid">
-      <button type="button" onClick={() => onAction("HISTORY.UNDO")} disabled={!canUndo}><Icon name="undo" size={16} />Undo</button>
-      <button type="button" onClick={() => onAction("HISTORY.REDO")} disabled={!canRedo}><Icon name="redo" size={16} />Redo</button>
+      <button type="button" data-action-id="HISTORY.UNDO" onClick={() => onAction("HISTORY.UNDO")} disabled={!canUndo}><Icon name="undo" size={16} />Undo</button>
+      <button type="button" data-action-id="HISTORY.REDO" onClick={() => onAction("HISTORY.REDO")} disabled={!canRedo}><Icon name="redo" size={16} />Redo</button>
       <button type="button" onClick={() => onAction("EDIT.ATOM_DELETE")} disabled={!selectionReady || selectionCount < 1}><Icon name="trash" size={16} />Delete atoms</button>
       <button type="button" onClick={() => onAction("EDIT.BOND_CREATE")} disabled={!selectionReady || selectionCount !== 2}><Icon name="plus" size={16} />Create bond</button>
       <button type="button" onClick={() => onAction("EDIT.BOND_DELETE")} disabled={!selectionReady || selectionCount !== 2}><Icon name="minus" size={16} />Delete bond</button>

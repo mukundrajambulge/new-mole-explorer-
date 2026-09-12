@@ -130,6 +130,8 @@ test("representative selection families run through the real console input", asy
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(resolve("tests/fixtures/mini-protein.pdb"));
   await expect(page.getByTitle("mini-protein.pdb").first()).toBeVisible();
+  await page.getByRole("button", { name: "Display panel" }).click();
+  await page.getByRole("button", { name: "Expand console", exact: true }).click();
   const command = page.getByRole("textbox", { name: "Command or selection query" });
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   const entries = consoleRegion.locator(".console-entry");

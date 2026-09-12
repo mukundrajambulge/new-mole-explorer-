@@ -10,10 +10,12 @@ const loadFixture = async (page: Page) => {
   await page.locator('input[type="file"]').setInputFiles(fixture);
   await expect(page.getByTitle("mini-protein.pdb")).toBeVisible({ timeout: 15000 });
   await expect(viewer(page)).toHaveAttribute("data-viewer-state", "loaded", { timeout: 15000 });
+  await page.getByRole("button", { name: "Display panel" }).click();
 };
 
 test("V-FINAL admits bounded H-bonds, Contacts, and Clash diagnostics and keeps Pocket truthful", async ({ page }) => {
   await loadFixture(page);
+  await page.getByRole("button", { name: "Analyze panel" }).click();
   const analysis = page.getByTestId("analysis-results");
 
   await page.getByRole("button", { name: "H-Bonds", exact: true }).click();
@@ -115,7 +117,6 @@ test("V-FINAL Center routes through the camera controller and labels remain cano
 
 test("V-FINAL captures the clean local upload evidence state", async ({ page }) => {
   await loadFixture(page);
-  await page.getByRole("button", { name: "Collapse console", exact: true }).click();
   await page.screenshot({ path: resolve("verification/evidence/visualization-final/uploaded-protein-cartoon-ligand-sticks.png"), animations: "disabled" });
   await page.getByRole("combobox", { name: "Ligand representation" }).selectOption("space-filling");
   await page.screenshot({ path: resolve("verification/evidence/visualization-final/space-filling-ligand-only.png"), animations: "disabled" });
