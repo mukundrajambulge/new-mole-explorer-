@@ -107,3 +107,22 @@ test("AT-FSR-E-001 exposes canonical topology editing through the Edit rail", as
   await expect(page.getByLabel("Command console").getByRole("button", { name: "Command Console" })).toHaveAttribute("aria-expanded", "false");
   await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_E_EDIT_RAIL.png") });
 });
+
+test("AT-FSR-F-001 keeps Select-rail, Escape, and console selection state convergent", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(proteinFixture);
+  await expect(page.getByTitle("mini-protein.pdb")).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: "Select panel" }).click();
+  const panel = page.getByRole("region", { name: "Select panel" });
+  await expect(panel).toContainText("No active selection");
+  await panel.getByRole("button", { name: "Select all" }).click();
+  await expect(panel).toContainText("12 atoms selected");
+  await expect(panel.getByRole("button", { name: "Clear selection" })).toBeEnabled();
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_F_SELECT_RAIL.png") });
+  await panel.getByRole("button", { name: "Clear selection" }).click();
+  await expect(panel).toContainText("No active selection");
+  await panel.getByRole("button", { name: "Select all" }).click();
+  await page.keyboard.press("Escape");
+  await expect(panel).toContainText("No active selection");
+  await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selected-atoms", "0");
+});

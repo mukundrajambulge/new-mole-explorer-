@@ -170,6 +170,14 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
 .scientific-edit-grid button:disabled { cursor: not-allowed; opacity: .42; }
 .scientific-edit-order { display: grid; gap: 5px; padding: 0 13px 13px; color: #9aaaba; font-size: 9px; }
 .scientific-edit-order select { min-height: 28px; padding: 4px 6px; color: #dce6f0; border: 1px solid rgba(147,169,193,.2); border-radius: 5px; background: rgba(7,10,15,.78); font-size: 10px; }
+.scientific-selection-panel { width: 100%; align-self: flex-start; }
+.scientific-selection-summary { display: grid; gap: 4px; padding: 0 13px 11px; color: #92a3b4; font-size: 10px; }
+.scientific-selection-summary strong { color: #e1ebf4; font-size: 11px; }
+.scientific-selection-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 0 13px 10px; }
+.scientific-selection-actions button { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 31px; color: #c4d2dd; border: 1px solid rgba(147,169,193,.18); border-radius: 5px; background: rgba(115,140,169,.06); font-size: 10px; }
+.scientific-selection-actions button:hover:not(:disabled) { color: #fff; border-color: rgba(49,216,196,.36); background: rgba(49,216,196,.09); }
+.scientific-selection-actions button:disabled { cursor: not-allowed; opacity: .42; }
+.scientific-selection-help { margin: 0; padding: 0 13px 13px; color: #7f91a3; font-size: 9px; line-height: 1.45; }
 
 .scene-manager { max-height: 150px; overflow-y: auto; min-height: 0; margin: 0 9px 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: rgba(12, 17, 24, .92); }
 .scene-manager__heading, .scene-manager__store, .scene-card, .scene-card__actions { display: flex; align-items: center; gap: 7px; }

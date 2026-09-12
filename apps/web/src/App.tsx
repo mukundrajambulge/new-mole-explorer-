@@ -12,6 +12,7 @@ import { ScenePanel } from "./components/ScenePanel";
 import { ExportPanel } from "./components/ExportPanel";
 import { ScientificToolRail, type ScientificToolPanel } from "./components/ScientificToolRail";
 import { ScientificEditPanel } from "./components/ScientificEditPanel";
+import { ScientificSelectionPanel } from "./components/ScientificSelectionPanel";
 import { ACTION_IDS, ACTION_REGISTRY, type ActionId, type ActionDefinition } from "./domain/registry";
 import { ApiClientError, apiClient } from "./lib/apiClient";
 import { applyRepresentationToSelection, clearColorForSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setComponentColor, setInteractionState, setLabelState, setProjectionStyle, setRepresentationColorForSelection, setRepresentationParameters, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
@@ -221,6 +222,12 @@ export const App = () => {
     }
   };
 
+  const clearSelection = useCallback(() => {
+    activePickResultRef.current = null;
+    setActiveSelection(null);
+    setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] }));
+  }, []);
+
   const resetScientificHistory = useCallback(() => {
     historyServiceRef.current = new ScientificHistoryService();
   }, []);
@@ -255,11 +262,11 @@ export const App = () => {
       measurementAccumulatorRef.current.clear();
       setMeasurementSlots([]);
       setMeasurementModeState(null);
-      setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, measurementPickAtomIds: [] }));
+      clearSelection();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [clearSelection]);
 
   const showNotice = (capability: ActionDefinition) => {
     setNotice(capability);
@@ -697,8 +704,6 @@ export const App = () => {
     return setInteractionState(current, { hoveredAtomId: pick?.pickKind === "ATOM" ? object ? workspaceScopedStableAtomId(object.objectId, pick.atomRef.stableAtomId) : pick.atomRef.stableAtomId : null });
   });
   const clearMeasurementPicks = () => { measurementAccumulatorRef.current.clear(); setMeasurementSlots([]); setProjection((current) => setInteractionState(current, { pickedAtomId: null, measurementPickAtomIds: [] })); };
-  const clearTransientInteraction = () => setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, measurementPickAtomIds: [] }));
-  const clearSelection = () => { activePickResultRef.current = null; setActiveSelection(null); setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] })); };
   const updateMeasurementVisibility = (id: string, visible: boolean) => setMeasurements((current) => current.map((measurement) => measurement.id === id ? { ...measurement, presentation: { ...measurement.presentation, visible }, status: visible ? "CURRENT" : "HIDDEN" } : measurement));
   const deleteMeasurement = (id: string) => setMeasurements((current) => current.filter((measurement) => measurement.id !== id));
 
@@ -1579,7 +1584,7 @@ export const App = () => {
     }
     dispatchUiCommand(commandText, (command) => {
       uiCommandLedgerRef.current = [...uiCommandLedgerRef.current.slice(-255), command];
-      handleActionInternal(actionId);
+      return runConsoleCommandInternal(commandText);
     }, "GUI");
   };
 
@@ -1612,9 +1617,9 @@ export const App = () => {
         <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${activeRailPanel ? "workspace-grid--right-expanded" : ""}`}>
           <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} onAlignmentCommand={runConsoleCommand} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} showOperations={false} />
-          <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFileDrop={importFile} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} alignmentOverlays={alignmentOverlays} />
+          <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFileDrop={importFile} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearSelection} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} alignmentOverlays={alignmentOverlays} />
           <ScientificToolRail activePanel={activeRailPanel} onPanelChange={setActiveRailPanel}>
-            {activeRailPanel === "Display" || activeRailPanel === "Color" ? <InspectorPanel collapsed={false} onToggle={() => setActiveRailPanel(null)} onAction={handleAction} structure={structure} projection={projection} activeSelectionCount={activeSelection?.count ?? 0} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} /> : activeRailPanel === "Measure" || activeRailPanel === "Analyze" ? <ScientificOperationsPanel mode={activeRailPanel === "Measure" ? "measure" : "analyze"} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} structure={structure} onAction={handleAction} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} /> : activeRailPanel === "Edit" ? <ScientificEditPanel selectionCount={activeSelection?.count ?? 0} objectName={editTargetObject?.displayName ?? activeWorkspaceObject?.displayName} selectionReady={editSelectionReady} canUndo={activeHistoryState?.canUndo ?? false} canRedo={activeHistoryState?.canRedo ?? false} onAction={handleAction} onBondOrder={handleBondOrderAction} /> : activeRailPanel === "Session" ? <ScenePanel collection={sceneCollection} onStore={(name) => storeScene(name)} onRecall={(sceneId) => recallScene(sceneId)} onUpdate={(sceneId) => updateScene(sceneId)} onRename={(sceneId, name) => renameScene(sceneId, name)} onDelete={(sceneId) => deleteScene(sceneId)} onStep={(direction) => stepScene(direction)} /> : <section className="rail-transition-panel" aria-live="polite"><h2>{activeRailPanel}</h2><p>This tool is being moved into the scientific rail. Its current working controls remain available in Objects &amp; Selections while the transition is verified.</p></section>}
+            {activeRailPanel === "Display" || activeRailPanel === "Color" ? <InspectorPanel collapsed={false} onToggle={() => setActiveRailPanel(null)} onAction={handleAction} structure={structure} projection={projection} activeSelectionCount={activeSelection?.count ?? 0} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} /> : activeRailPanel === "Select" ? <ScientificSelectionPanel activeSelection={activeSelection} canSelect={Boolean(structure)} onAction={handleAction} onClearSelection={clearSelection} /> : activeRailPanel === "Measure" || activeRailPanel === "Analyze" ? <ScientificOperationsPanel mode={activeRailPanel === "Measure" ? "measure" : "analyze"} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} structure={structure} onAction={handleAction} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} /> : activeRailPanel === "Edit" ? <ScientificEditPanel selectionCount={activeSelection?.count ?? 0} objectName={editTargetObject?.displayName ?? activeWorkspaceObject?.displayName} selectionReady={editSelectionReady} canUndo={activeHistoryState?.canUndo ?? false} canRedo={activeHistoryState?.canRedo ?? false} onAction={handleAction} onBondOrder={handleBondOrderAction} /> : activeRailPanel === "Session" ? <ScenePanel collection={sceneCollection} onStore={(name) => storeScene(name)} onRecall={(sceneId) => recallScene(sceneId)} onUpdate={(sceneId) => updateScene(sceneId)} onRename={(sceneId, name) => renameScene(sceneId, name)} onDelete={(sceneId) => deleteScene(sceneId)} onStep={(direction) => stepScene(direction)} /> : <section className="rail-transition-panel" aria-live="polite"><h2>{activeRailPanel}</h2><p>This tool is being moved into the scientific rail. Its current working controls remain available in Objects &amp; Selections while the transition is verified.</p></section>}
           </ScientificToolRail>
         </div>
         <StatusBar apiStatus={apiStatus} structure={structure} project={project} dirty={dirty} selectedAtomCount={projection.interaction.selectedAtomIds.length} scientificRevision={activeHistoryState?.currentRevisionId ?? null} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} activeObjectName={activeWorkspaceObject?.displayName} activeObjectId={activeWorkspaceObject?.objectId} activeObjectEnabled={activeWorkspaceObject?.enabled} />
