@@ -183,6 +183,7 @@ describe("biological data adapters", () => {
     expect(() => parseBiologicalData("bad.fastq", "@read\nACGT\n+\nIII")).toThrow(BiologicalAdapterError);
     expect(() => parseBiologicalData("bad.dx", "object 1 class gridpositions counts 2 2 1")).toThrow(BiologicalAdapterError);
     expect(() => parseBiologicalData("bad.xtc", trajectoryHeaderFixture(0))).toThrow(BiologicalAdapterError);
+    expect(() => parseBiologicalData("truncated.xtc", xtcCompressedFixture().slice(0, -2))).toThrow(BiologicalAdapterError);
     expect(() => parseBiologicalData("bad.smi", "binary")).toThrow(BiologicalAdapterError);
   });
 });
