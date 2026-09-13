@@ -5,7 +5,7 @@
 **Codex consolidated manual campaign: PASS**  
 **User final manual approval: PENDING — ready for user final retest**
 
-The real Molexplorer workstation was launched at `http://localhost:3101/molstudio` on the acceptance branch. The campaign used 4DJW as the canonical RCSB fixture (7,079 atoms), the local deterministic fixtures, and Chromium at a 1440×900 observation size. Manual browser inspection covered boot, full-canvas console overlay, 4DJW Cartoon, protein Stick and Ball-and-Stick, VDW, Mesh, residue selection, selection overlays, camera controls, and the historical representation/color failures. A concrete layout defect and a surface-material regression were fixed and manually retested.
+The real Molexplorer workstation was launched at `http://localhost:3101/molstudio` on the acceptance branch. The campaign used 4DJW as the canonical RCSB fixture (7,079 atoms), the local deterministic fixtures, and Chromium at a 1440×900 observation size. Manual browser inspection covered boot, full-canvas console overlay, 4DJW Cartoon, protein Stick and Ball-and-Stick, VDW, Mesh, residue selection, selection overlays, camera controls, and the historical representation/color failures. A concrete layout defect and a surface-material regression were fixed and manually retested. The final biological-data slice also manually inspected sequence, density-map, DCD/TRR/XTC trajectory, and PSF topology-pairing viewers at the same workstation.
 
 ## Repository and environment
 
@@ -16,8 +16,8 @@ The real Molexplorer workstation was launched at `http://localhost:3101/molstudi
 | Base branch | `feature/r10-canonical-command-environment` |
 | Base SHA | `617da648edd06c0cb6dc0632b57a9a2645d88bdc` |
 | Acceptance branch | `fix/final-pymol-manual-acceptance` |
-| Final implementation/fix SHA | `4ec9d54c98ec098798a6bd0af65834be0b61ed3b` |
-| Final closure SHA (code/evidence closure) | `4ec9d54c98ec098798a6bd0af65834be0b61ed3b` |
+| Final implementation/fix SHA | `1ccbc04a3acad4d10b721c792ed8bfcff9620ae4` |
+| Final closure SHA (code/evidence closure) | `37797bd0466187e443399c96b1eb62df6736b6dc` |
 | App URL | `http://localhost:3101/molstudio` |
 | Node | `v24.14.1` |
 | Playwright | `1.62.1` |
@@ -28,6 +28,7 @@ The real Molexplorer workstation was launched at `http://localhost:3101/molstudi
 
 1. The app grid now reserves an explicit row for the scene manager, preventing scene controls from being clipped below the workspace. Canonical active-object and selection ownership text now wraps within the sidebar.
 2. Selection emphasis now reapplies the complete surface material, including `wireframe` and `wireframeLinewidth`, so Mesh remains a mesh after selection highlighting is applied or cleared.
+3. Biological imports now decode bounded DCD/TRR/XTC coordinate frames and pair atom-count-compatible PSF/PRMTOP topology metadata with trajectory atoms. Mismatches fail closed without replacing the current dataset.
 
 The surface behavior is covered by `apps/web/src/rendering/surfaceMaterial.test.ts`; the integrated acceptance paths are covered by `tests/e2e/final-pymol-acceptance.spec.ts`.
 
@@ -55,6 +56,7 @@ The surface behavior is covered by `apps/web/src/rendering/surfaceMaterial.test.
 | Safe macro / batch bounds | PASS | API and R10 regression suites |
 | Command history / provenance | PASS | R07/R09/R10 suites |
 | Cross-feature workflow | PASS | `32-final-cross-feature-workspace.png` |
+| Typed biological-data import and topology pairing | PASS, bounded | `SLICE_J_XTC_TRAJECTORY.png`, `SLICE_J_TRAJECTORY_TOPOLOGY.png`, adapter tests |
 
 ## Historical defects A–O
 
@@ -62,15 +64,15 @@ All 15 historical defects were deliberately classified as PASS. The complete mat
 
 ## Automated verification
 
-- API: **56/56 PASS**
-- Web: **138/138 PASS**
+- API: **65/65 PASS**
+- Web: **150/150 PASS**
 - Lint: **PASS**
 - Typecheck: **PASS**
 - Build: **PASS**
-- Full hosted E2E: **118/118 PASS**
+- Full hosted E2E: **142/142 PASS**
 - Final focused acceptance E2E: **3/3 PASS**, repeated **3 consecutive runs**
 - Gate 01, Gate 02, Gate 03B, R07, R08, R09, and R10 regressions: **PASS**
-- GitHub CI on the final implementation/fix tip: **PASS** ([run 34154738375](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34154738375))
+- GitHub CI on the final implementation/fix tip: **PENDING remote run after authorized branch push**
 
 ## Scientific and lifecycle integrity
 
@@ -81,6 +83,8 @@ The canonical backend structure remains the scientific authority. Presentation c
 - Pinned executable PyMOL oracle: **ORACLE_PENDING**; verified executable conformance: **NO**.
 - PSE/PZE: **UNAVAILABLE**.
 - CEALIGN: **UNSUPPORTED**.
+- Google Drive evidence publication: **BLOCKED_CREDENTIAL_OR_ENVIRONMENT**; local hashes and upload manifest are retained.
+- Larger research-trajectory corpus/performance gates remain pending; Movie and wizard controls remain visibly unavailable.
 - Docking execution: **NOT IMPLEMENTED IN R10; NOT STARTED**.
 - HTS execution: **NOT IMPLEMENTED IN R10; NOT STARTED**.
 
