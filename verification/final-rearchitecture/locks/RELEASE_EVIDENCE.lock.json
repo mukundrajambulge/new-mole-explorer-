@@ -29,6 +29,6 @@
   "limits": [
     "Google Drive publication is blocked by credentials/environment.",
     "Executable PyMOL parity is blocked by the missing oracle.",
-    "Topology-coordinate pairing and larger trajectory performance gates, docking, virtual screening, HTS, and main-branch promotion remain outside this bounded release."
+    "Larger trajectory corpus/performance gates, docking, virtual screening, HTS, and main-branch promotion remain outside this bounded release."
   ]
 }

@@ -13,6 +13,7 @@ const trajectoryFixture = resolve("tests/fixtures/sample.multi.xyz");
 const dcdFixture = resolve("tests/fixtures/sample.dcd");
 const xtcFixture = resolve("tests/fixtures/sample.xtc");
 const trrFixture = resolve("tests/fixtures/sample.trr");
+const psfFixture = resolve("tests/fixtures/sample.psf");
 
 test("AT-FSR-A-001 exposes the approved scientific shell with a collapsed console", async ({ page }) => {
   await page.goto("/");
@@ -299,6 +300,22 @@ test("AT-FSR-J-010 decodes compressed XTC coordinate frames in the typed traject
   await page.getByLabel("Trajectory frame").fill("1");
   await expect(viewer).toContainText("step 2");
   await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_J_XTC_TRAJECTORY.png") });
+});
+
+test("AT-FSR-J-011 pairs a validated PSF topology with an existing DCD trajectory", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(dcdFixture);
+  const viewer = page.getByTestId("trajectory-viewer");
+  await expect(viewer).toBeVisible({ timeout: 15000 });
+  await expect(viewer).toHaveAttribute("data-trajectory-status", "READY");
+  await page.getByRole("button", { name: "Open another dataset" }).click();
+  const dialog = page.getByTestId("biological-import-dialog");
+  await expect(dialog).toBeVisible();
+  await dialog.locator('input[type="file"]').setInputFiles(psfFixture);
+  await expect(viewer).toBeVisible({ timeout: 15000 });
+  await expect(viewer).toHaveAttribute("data-topology-source", "sample.psf");
+  await expect(viewer).toContainText("Topology");
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_J_TRAJECTORY_TOPOLOGY.png") });
 });
 
 test("AT-FSR-J-006 fetches an explicit UniProt accession into the sequence viewer", async ({ page }) => {

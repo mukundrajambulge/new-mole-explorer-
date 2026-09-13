@@ -1,6 +1,6 @@
 # MOLEXPLORER final scientific UI rearchitecture report
 
-Status: **bounded implementation verified; topology pairing and executable PyMOL oracle remain pending**
+Status: **bounded implementation verified; executable PyMOL oracle and larger trajectory performance gates remain pending**
 Commit: `3911991` (`test: guard truncated xtc frames`)
 Branch: `feature/final-scientific-ui-pymol-conformance`
 
@@ -16,21 +16,21 @@ Selection, presentation, camera, measurement, analysis, alignment, topology edit
 
 ## Evidence and verification
 
-The final rearchitecture shell suite passes 21/21, including the new biological import and viewer cases. The biological adapter unit suite passes 7/7 and the browser J acceptance suite passes 10/10, covering the import dialog, paste routing, FASTA, FASTQ, OpenDX, multi-frame XYZ, DCD, TRR, XTC, UniProt, and PubChem routes. The final PyMOL acceptance suite passes 3/3. Multi-object state coverage passes 11/11. The live selection matrix passes 1/1 across its representative command families; the generated matrix contains 87 rows: 85 verified working, one dependency-gated row (`byfragment`), and one intentionally unsupported arbitrary-property row. The selection oracle ledger records 51 direct oracle passes, 35 documented/application equivalents, and one pending row.
+The final rearchitecture shell suite passes 22/22, including the biological import, viewer, and topology-pairing cases. The biological adapter unit suite passes 8/8 and the browser J acceptance suite passes 11/11, covering the import dialog, paste routing, FASTA, FASTQ, OpenDX, multi-frame XYZ, DCD, TRR, XTC, topology pairing, UniProt, and PubChem routes. The final PyMOL acceptance suite passes 3/3. Multi-object state coverage passes 11/11. The live selection matrix passes 1/1 across its representative command families; the generated matrix contains 87 rows: 85 verified working, one dependency-gated row (`byfragment`), and one intentionally unsupported arbitrary-property row. The selection oracle ledger records 51 direct oracle passes, 35 documented/application equivalents, and one pending row.
 
-The R07 edit/topology/hydrogen suites, R08 structural analysis suite, and R09 native lifecycle suite pass after the rail-state and menu-overlay corrections. Manual viewer, camera, selection highlighting, selection presentation, and real 4DJW plus 1CRN workspace gates pass. The latest full Chromium regression covers the legacy G0, G1B, G1C, IMP-PRES, V-FINAL, V2, real-structure, and biological-data suites: **141/141 passed** with one worker at implementation commit `b3c21fe`; the final source commit adds only the fail-closed truncated-XTC unit guard.
+The R07 edit/topology/hydrogen suites, R08 structural analysis suite, and R09 native lifecycle suite pass after the rail-state and menu-overlay corrections. Manual viewer, camera, selection highlighting, selection presentation, and real 4DJW plus 1CRN workspace gates pass. The latest full Chromium regression covers the legacy G0, G1B, G1C, IMP-PRES, V-FINAL, V2, real-structure, and biological-data suites: **142/142 passed** with one worker at implementation commit `b3c21fe`; the final source commit adds bounded topology pairing and its acceptance guard.
 
 Repository checks pass:
 
 - `npm run typecheck`
 - `npm run lint`
-- `npm test` — 148 web tests and 65 API tests
+- `npm test` — 149 web tests and 65 API tests
 - `npm run build`
 - `npm run verify:selection-matrix`
 - `npm run verify:r10`
 - `git diff --check`
 
-Local visual evidence is stored under `verification/final-rearchitecture/evidence/` and the inherited acceptance evidence directories. J-slice evidence covers the open biological-data dialog, sequence viewer, density-map viewer, and XYZ/DCD/TRR/XTC trajectory viewers. The three R07 console/action harness paths were corrected to expand the intentionally collapsed console and use the visible scientific action labels; their isolated rerun passes 4/4 and the latest full regression passes 141/141. The machine-readable inventories are `FEATURE_INVENTORY.json`, `UI_CONTROL_INVENTORY.json`, `PYMOL_CONFORMANCE_MATRIX.json`, and `GOOGLE_DRIVE_EVIDENCE_MANIFEST.json`; the required mirrored PyMOL artifacts are also present under `verification/pymol/`. Wizard and Movie scope are recorded in `PYMOL_WIZARD_GAP_MATRIX.md` and `PYMOL_MOVIE_IMPLEMENTATION_PLAN.md`. The user guide is in `docs/user-guide/` with coverage indexes in `docs/user-guide/USER_GUIDE_COVERAGE.md` and `verification/final-rearchitecture/USER_GUIDE_COVERAGE.md`.
+Local visual evidence is stored under `verification/final-rearchitecture/evidence/` and the inherited acceptance evidence directories. J-slice evidence covers the open biological-data dialog, sequence viewer, density-map viewer, XYZ/DCD/TRR/XTC trajectory viewers, and atom-count-checked PSF pairing. The three R07 console/action harness paths were corrected to expand the intentionally collapsed console and use the visible scientific action labels; their isolated rerun passes 4/4 and the latest full regression passes 142/142. The machine-readable inventories are `FEATURE_INVENTORY.json`, `UI_CONTROL_INVENTORY.json`, `PYMOL_CONFORMANCE_MATRIX.json`, and `GOOGLE_DRIVE_EVIDENCE_MANIFEST.json`; the required mirrored PyMOL artifacts are also present under `verification/pymol/`. Wizard and Movie scope are recorded in `PYMOL_WIZARD_GAP_MATRIX.md` and `PYMOL_MOVIE_IMPLEMENTATION_PLAN.md`. The user guide is in `docs/user-guide/` with coverage indexes in `docs/user-guide/USER_GUIDE_COVERAGE.md` and `verification/final-rearchitecture/USER_GUIDE_COVERAGE.md`.
 
 ## Release answer sheet
 
@@ -44,7 +44,7 @@ Local visual evidence is stored under `verification/final-rearchitecture/evidenc
 | PQR; XYZ; PDBQT | **PASS** within source-field and no-inference limits |
 | FASTA; FASTQ; GenBank; EMBL | **PASS** through typed sequence/read-quality viewers; no coordinates are fabricated |
 | MRC/CCP4/DX maps | **PASS** within bounded voxel payload and slice controls |
-| Trajectories | **PARTIAL** — multi-frame XYZ and GRO are ready; DCD, TRR, and XTC frames are decoded within bounded limits; topology pairing remains separate |
+| Trajectories | **PARTIAL** — multi-frame XYZ and GRO are ready; DCD, TRR, and XTC frames are decoded within bounded limits; PSF/PRMTOP pairing is atom-count checked and enriches trajectory metadata |
 | Multi-object workspace | **PASS** — real 4DJW + 1CRN and local two-object gates pass |
 | Selection | **PASS, bounded** — membership-aware live matrix and clear/overlay workflows pass |
 | PyMOL selection oracle | **BOUNDED** — 51 direct oracle passes, 35 documented equivalents, 1 pending; executable oracle unavailable |
@@ -57,8 +57,8 @@ Local visual evidence is stored under `verification/final-rearchitecture/evidenc
 | GUI–console / API convergence | **PASS where an API exists**; typed biological viewers are GUI import routes in this gate |
 | Security | **PASS** — host Python, shell, arbitrary process, filesystem, and network execution are rejected |
 | Historical defects | **A–Q PASS** in the historical defect matrix and regression gates |
-| Test results | `npm ci`; 148 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium **141/141** at `b3c21fe` (final source `3911991` adds the truncated-XTC unit guard) |
-| Oracle / visual / stress | Oracle ledger 51/35/1; 24 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/XYZ/DCD/TRR/XTC trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; latest 4DJW gate PASS |
+| Test results | `npm ci`; 149 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium **142/142** at `b3c21fe` (final source `3911991` adds bounded topology pairing and its acceptance guard) |
+| Oracle / visual / stress | Oracle ledger 51/35/1; 25 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/XYZ/DCD/TRR/XTC/topology-paired trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; latest 4DJW gate PASS |
 | Google Drive evidence | **BLOCKED_CREDENTIAL_OR_ENVIRONMENT**; local hashes and upload manifest retained |
 | PyMOL conformance | Bounded source/documentation/runtime classification; no complete PyMOL compatibility claim |
 

@@ -29,13 +29,13 @@
     "selectionClosure": "14/14",
     "selectionMatrixLive": "1/1",
     "r07R08R09": "15/15 across final targeted runs",
-    "biologicalAdapters": "7/7",
-    "biologicalBrowser": "10/10",
-    "finalRearchitectureShell": "21/21",
+    "biologicalAdapters": "8/8",
+    "biologicalBrowser": "11/11",
+    "finalRearchitectureShell": "22/22",
     "r07UiReruns": "4/4",
-    "fullE2E": "141/141",
+    "fullE2E": "142/142",
     "manualAndRealStructureGates": "pass",
-    "unitWeb": "148/148",
+    "unitWeb": "149/149",
     "unitApi": "65/65",
     "typecheck": "pass",
     "lint": "pass",
@@ -43,7 +43,7 @@
     "latestRegressionAttempt": {
       "command": "npm run test:e2e -- --project=chromium --workers=1",
       "status": "PASS",
-      "result": "141/141",
+      "result": "142/142",
       "date": "2026-09-13",
       "commit": "b3c21fe"
     }
@@ -60,7 +60,7 @@
   "blockedOrPending": [
     "executable PyMOL oracle",
     "Google Drive credentials/environment",
-    "topology-coordinate pairing and larger trajectory performance gates",
+    "larger trajectory corpus and performance gates",
     "larger biological corpus and performance gates",
     "wizard/movie work",
     "docking, virtual screening, HTS, and main-branch merge"
@@ -117,10 +117,10 @@
     "historicalDefects": "A-Q_PASS",
     "googleDrive": "BLOCKED_CREDENTIAL_OR_ENVIRONMENT",
     "screenshots": {
-      "finalRearchitecturePng": 24,
+      "finalRearchitecturePng": 25,
       "inheritedEvidencePng": 200
     },
-    "testResults": "148 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium 141/141 at b3c21fe (final source 3911991 adds the truncated-XTC unit guard)",
-    "oracleVisualStress": "Oracle ledger 51/35/1; 24 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/XYZ/DCD/TRR/XTC trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; latest 4DJW manual gate PASS"
+    "testResults": "149 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium 142/142 at b3c21fe (final source 3911991 adds bounded topology pairing and its acceptance guard)",
+    "oracleVisualStress": "Oracle ledger 51/35/1; 25 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/XYZ/DCD/TRR/XTC/topology-paired trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; latest 4DJW manual gate PASS"
   }
 }

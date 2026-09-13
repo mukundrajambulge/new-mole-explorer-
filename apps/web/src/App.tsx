@@ -41,7 +41,7 @@ import { createAddBondCommand, createAddHydrogensCommand, createAttachAtomComman
 import { buildSessionDraft, restoreSession } from "./lifecycle/sessionCodec";
 import { exportStructure, type ExportArtifact, type ExportFormat, type ExportLossPolicy, type ExportStateScope } from "./lifecycle/export";
 import { SceneStore } from "./lifecycle/scenes";
-import { detectBiologicalFormat, isMultiFrameXyz, parseBiologicalData, type BiologicalData, type BiologicalFormat, BiologicalAdapterError } from "./biological/adapters";
+import { detectBiologicalFormat, isMultiFrameXyz, pairTopologyWithTrajectory, parseBiologicalData, type BiologicalData, type BiologicalFormat, BiologicalAdapterError } from "./biological/adapters";
 
 const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_SELECT]: "Select",
@@ -323,6 +323,9 @@ export const App = () => {
   const fetchRcsb = (pdbId: string, mode: "replace" | "add" = "replace") => void runLoad(() => apiClient.fetchRcsb(pdbId), mode);
 
   const commitBiologicalData = (data: BiologicalData) => {
+    const pairedData = biologicalData && ((biologicalData.kind === "TOPOLOGY" && data.kind === "TRAJECTORY") || (biologicalData.kind === "TRAJECTORY" && data.kind === "TOPOLOGY"))
+      ? biologicalData.kind === "TOPOLOGY" ? pairTopologyWithTrajectory(biologicalData, data as Extract<BiologicalData, { kind: "TRAJECTORY" }>) : pairTopologyWithTrajectory(data as Extract<BiologicalData, { kind: "TOPOLOGY" }>, biologicalData)
+      : data;
     resetScientificHistory();
     workspaceObjectsRef.current = [];
     setWorkspaceObjects([]);
@@ -331,7 +334,7 @@ export const App = () => {
     setActiveObjectId(null);
     setCoordinateFramePolicy(null);
     setStructure(null);
-    setBiologicalData(data);
+    setBiologicalData(pairedData);
     measurementAccumulatorRef.current.clear();
     setMeasurementSlots([]);
     setMeasurements([]);

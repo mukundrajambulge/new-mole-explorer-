@@ -33,17 +33,19 @@
     "AT-FSR-J-008",
     "AT-FSR-J-009",
     "AT-FSR-J-010",
+    "AT-FSR-J-011",
     "apps/web/src/biological/adapters.test.ts",
     "verification/final-rearchitecture/evidence/SLICE_J_IMPORT_DIALOG_OPEN.png",
     "verification/final-rearchitecture/evidence/SLICE_J_DENSITY_MAP.png",
     "verification/final-rearchitecture/evidence/SLICE_J_TRAJECTORY.png",
     "verification/final-rearchitecture/evidence/SLICE_J_DCD_TRAJECTORY.png",
     "verification/final-rearchitecture/evidence/SLICE_J_TRR_TRAJECTORY.png",
-    "verification/final-rearchitecture/evidence/SLICE_J_XTC_TRAJECTORY.png"
+    "verification/final-rearchitecture/evidence/SLICE_J_XTC_TRAJECTORY.png",
+    "verification/final-rearchitecture/evidence/SLICE_J_TRAJECTORY_TOPOLOGY.png"
   ],
   "limits": [
     "DCD/TRR/XTC bounded coordinate frame decoding is enabled.",
-    "Topology viewers do not fabricate coordinates or pair PSF/PRMTOP with trajectories.",
+    "PSF/PRMTOP pairing is atom-count checked and enriches trajectory metadata; coordinates are never fabricated.",
     "Online providers require network access and explicit identifiers."
   ]
 }

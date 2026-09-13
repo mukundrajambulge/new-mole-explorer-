@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BiologicalAdapterError, detectBiologicalFormat, isMultiFrameXyz, parseBiologicalData } from "./adapters";
+import { BiologicalAdapterError, detectBiologicalFormat, isMultiFrameXyz, pairTopologyWithTrajectory, parseBiologicalData } from "./adapters";
 
 const mrcFixture = (): ArrayBuffer => {
   const buffer = new ArrayBuffer(1024 + 8);
@@ -170,6 +170,16 @@ describe("biological data adapters", () => {
     expect(prmtop.residueCount).toBe(1);
     expect(smiles.kind).toBe("SMILES");
     expect(smiles.records[0]).toMatchObject({ name: "ethanol", notation: "CCO" });
+  });
+
+  it("pairs atom-count-compatible topology with trajectory metadata and rejects mismatches", () => {
+    const topology = parseBiologicalData("system.psf", "PSF\n\n       3 !NATOM\n       1 SEG 1 ALA N N 0.0 14.0 0\n       2 SEG 1 ALA CA C 0.0 12.0 0\n       3 SEG 1 ALA C C 0.0 12.0 0\n\n       2 !NBOND: bonds\n       1       2       2       3\n");
+    const trajectory = parseBiologicalData("movie.dcd", dcdFixture());
+    if (topology.kind !== "TOPOLOGY" || trajectory.kind !== "TRAJECTORY") throw new Error("pairing fixtures returned the wrong data kind");
+    const paired = pairTopologyWithTrajectory(topology, trajectory);
+    expect(paired.topology).toMatchObject({ format: "psf", sourceName: "system.psf", atomCount: 3, bondCount: 2 });
+    expect(paired.frames[0]?.atoms[1]).toMatchObject({ name: "CA", residue: "ALA", chain: "SEG" });
+    expect(() => pairTopologyWithTrajectory({ ...topology, atomCount: 2 }, trajectory)).toThrow(BiologicalAdapterError);
   });
 
   it("supports an explicit paste format even when the filename has another suffix", () => {

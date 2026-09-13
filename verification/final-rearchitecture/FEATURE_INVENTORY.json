@@ -21,9 +21,9 @@
       "gui": true,
       "console": false,
       "api": false,
-      "test": "AT-FSR-J-001–010; adapters.test.ts",
-      "screenshot": "SLICE_J_IMPORT_DIALOG_OPEN.png; SLICE_J_IMPORT_DIALOG_SEQUENCE.png; SLICE_J_DCD_TRAJECTORY.png; SLICE_J_TRR_TRAJECTORY.png; SLICE_J_XTC_TRAJECTORY.png",
-      "limitation": "Online RCSB uses canonical structure ingestion; PubChem and UniProt are browser-fetch paths; DCD/TRR/XTC decode bounded frames."
+      "test": "AT-FSR-J-001–011; adapters.test.ts",
+      "screenshot": "SLICE_J_IMPORT_DIALOG_OPEN.png; SLICE_J_IMPORT_DIALOG_SEQUENCE.png; SLICE_J_DCD_TRAJECTORY.png; SLICE_J_TRR_TRAJECTORY.png; SLICE_J_XTC_TRAJECTORY.png; SLICE_J_TRAJECTORY_TOPOLOGY.png",
+      "limitation": "Online RCSB uses canonical structure ingestion; PubChem and UniProt are browser-fetch paths; DCD/TRR/XTC decode bounded frames; PSF/PRMTOP pairing is atom-count checked."
     },
     {
       "id": "objects.multi",
@@ -186,9 +186,9 @@
       "gui": true,
       "console": false,
       "api": false,
-      "test": "AT-FSR-J-005, AT-FSR-J-008, AT-FSR-J-009, AT-FSR-J-010; adapters.test.ts",
-      "screenshot": "SLICE_J_TRAJECTORY.png; SLICE_J_DCD_TRAJECTORY.png; SLICE_J_TRR_TRAJECTORY.png; SLICE_J_XTC_TRAJECTORY.png",
-      "limitation": "Multi-frame XYZ and GRO are ready; DCD/TRR/XTC decode bounded frames; PSF/PRMTOP show topology metadata without coordinates."
+      "test": "AT-FSR-J-005, AT-FSR-J-008, AT-FSR-J-009, AT-FSR-J-010, AT-FSR-J-011; adapters.test.ts",
+      "screenshot": "SLICE_J_TRAJECTORY.png; SLICE_J_DCD_TRAJECTORY.png; SLICE_J_TRR_TRAJECTORY.png; SLICE_J_XTC_TRAJECTORY.png; SLICE_J_TRAJECTORY_TOPOLOGY.png",
+      "limitation": "Multi-frame XYZ and GRO are ready; DCD/TRR/XTC decode bounded frames; PSF/PRMTOP pair by matching atom count and enrich trajectory metadata without fabricating coordinates."
     },
     {
       "id": "notation.smiles",

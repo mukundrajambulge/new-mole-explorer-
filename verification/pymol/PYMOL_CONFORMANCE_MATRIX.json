@@ -154,14 +154,14 @@
     {
       "feature": "trajectory data",
       "officialBehavior": "Load coordinate states and trajectory frames for inspection.",
-      "implementation": "Typed trajectory viewer for multi-frame XYZ/GRO/DCD/TRR/XTC with bounded coordinate decoding.",
+      "implementation": "Typed trajectory viewer for multi-frame XYZ/GRO/DCD/TRR/XTC with bounded coordinate decoding and atom-count-checked PSF/PRMTOP metadata pairing.",
       "gui": "Biological-data import and trajectory viewer",
       "console": false,
       "api": false,
-      "test": "AT-FSR-J-005/008/009/010; adapters.test.ts",
-      "evidence": "SLICE_J_TRAJECTORY.png; SLICE_J_DCD_TRAJECTORY.png; SLICE_J_TRR_TRAJECTORY.png; SLICE_J_XTC_TRAJECTORY.png",
+      "test": "AT-FSR-J-005/008/009/010/011; adapters.test.ts",
+      "evidence": "SLICE_J_TRAJECTORY.png; SLICE_J_DCD_TRAJECTORY.png; SLICE_J_TRR_TRAJECTORY.png; SLICE_J_XTC_TRAJECTORY.png; SLICE_J_TRAJECTORY_TOPOLOGY.png",
       "status": "IMPLEMENTED_WITH_LIMITATIONS",
-      "limitation": "Topology pairing and trajectory performance gates remain pending."
+      "limitation": "Larger trajectory corpus/performance gates and broader topology identity remain pending."
     },
     {
       "feature": "movie playback",

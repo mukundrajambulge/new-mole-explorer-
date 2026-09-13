@@ -20,6 +20,6 @@
 | DCD | Decoded trajectory frames | Fortran records, frame count, atom count, float32/float64 coordinates, and bounded frame slider; fixed-atom reconstruction is rejected explicitly | `adapters.test.ts`, `AT-FSR-J-008` |
 | XTC | Decoded trajectory frames | Big-endian XTC headers, small uncompressed frames, GROMACS compressed coordinate blocks, bounded frame slider, and Å viewer conversion | `adapters.test.ts`, `AT-FSR-J-010` |
 | TRR | Decoded trajectory frames | Big-endian frame headers, float32/float64 coordinate blocks, constant atom count, and bounded frame slider | `adapters.test.ts`, `AT-FSR-J-009` |
-| PSF / PRMTOP | Topology metadata viewer | Atom/bond/residue metadata is shown separately; no coordinate rendering is claimed | `adapters.test.ts` |
+| PSF / PRMTOP | Topology metadata viewer and trajectory metadata pairing | Atom/bond/residue metadata is shown separately; matching atom counts attach source names/residues/chains to trajectory atoms without coordinate fabrication | `adapters.test.ts`, `AT-FSR-J-011` |
 
 The File → Import dialog lists coordinate and biological adapters separately and offers Local file, Online ID, and Paste / text routes. Unsupported or malformed sources fail closed at the import boundary. Online RCSB IDs use the existing canonical structure ingestion; PubChem returns typed SMILES and UniProt returns typed FASTA.

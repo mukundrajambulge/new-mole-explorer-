@@ -89,6 +89,13 @@
       "localSha256": "B077E903B9719D43B2E00C2B5267816602E2F647EA0D34210A19136AEFE7B9FF",
       "remotePath": null,
       "uploadVerified": false
+    },
+    {
+      "phase": "BIOLOGICAL_TRAJECTORY",
+      "filename": "SLICE_J_TRAJECTORY_TOPOLOGY.png",
+      "localSha256": "02EE00997B5EA856D765FFCAC860171B475336AA5F822AA52666A7FA3785D389",
+      "remotePath": null,
+      "uploadVerified": false
     }
   ]
 }

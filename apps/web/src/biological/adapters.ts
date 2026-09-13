@@ -30,13 +30,14 @@ export type MapGrid = {
 
 export type TrajectoryAtom = { index: number; element: string; x: number; y: number; z: number; name?: string; residue?: string; chain?: string };
 export type TrajectoryFrame = { index: number; label: string; atoms: readonly TrajectoryAtom[] };
+export type TopologyAtom = { index: number; name?: string; residue?: string; chain?: string };
 
 export type BiologicalData =
   | { kind: "SEQUENCE"; format: Exclude<BiologicalFormat, "fastq" | "dx" | "mrc" | "ccp4" | "xyz-trajectory" | "dcd" | "xtc" | "trr" | "gro" | "psf" | "prmtop" | "smiles">; sourceName: string; records: readonly SequenceRecord[]; alphabet: "DNA" | "RNA" | "PROTEIN" | "MIXED" }
   | { kind: "SEQUENCE_QUALITY"; format: "fastq"; sourceName: string; records: readonly SequenceRecord[]; alphabet: "DNA" | "RNA" | "PROTEIN" | "MIXED" }
   | { kind: "MAP"; format: "dx" | "mrc" | "ccp4"; sourceName: string; grid: MapGrid; encoding: "ASCII_DX" | "MRC_BINARY" }
-  | { kind: "TRAJECTORY"; format: "xyz-trajectory" | "dcd" | "xtc" | "trr" | "gro"; sourceName: string; frames: readonly TrajectoryFrame[]; atomCount: number; status: "READY" | "HEADER_ONLY"; diagnostic?: string }
-  | { kind: "TOPOLOGY"; format: "psf" | "prmtop"; sourceName: string; atomCount: number; bondCount: number | null; residueCount: number | null; status: "READY" | "METADATA_ONLY"; diagnostic?: string }
+  | { kind: "TRAJECTORY"; format: "xyz-trajectory" | "dcd" | "xtc" | "trr" | "gro"; sourceName: string; frames: readonly TrajectoryFrame[]; atomCount: number; status: "READY" | "HEADER_ONLY"; diagnostic?: string; topology?: { format: "psf" | "prmtop"; sourceName: string; atomCount: number; bondCount: number | null; residueCount: number | null } }
+  | { kind: "TOPOLOGY"; format: "psf" | "prmtop"; sourceName: string; atomCount: number; bondCount: number | null; residueCount: number | null; atoms?: readonly TopologyAtom[]; status: "READY" | "METADATA_ONLY"; diagnostic?: string }
   | { kind: "SMILES"; format: "smiles"; sourceName: string; records: readonly { id: string; notation: string; name?: string }[] };
 
 export class BiologicalAdapterError extends Error {
@@ -519,19 +520,49 @@ const parseTrr = (buffer: ArrayBuffer): { frameCount: number; atomCount: number;
   return { frameCount, atomCount, frames };
 };
 
-const parsePsf = (content: string): { atomCount: number; bondCount: number | null; residueCount: number | null } => {
+const parsePsf = (content: string): { atomCount: number; bondCount: number | null; residueCount: number | null; atoms: TopologyAtom[] } => {
   const atomMatch = content.match(/\n\s*(\d+)\s+!NATOM/i); if (!atomMatch) throw new BiologicalAdapterError("PSF input has no !NATOM section.", "INVALID_INPUT");
   const atomCount = Number(atomMatch[1]); const bondMatch = content.match(/\n\s*(\d+)\s+!NBOND/i); const bondCount = bondMatch ? Number(bondMatch[1]) : null;
-  const atomStart = content.indexOf(atomMatch[0]) + atomMatch[0].length; const atomLines = content.slice(atomStart).split(/\r?\n/).slice(0, atomCount); const residues = new Set(atomLines.map((line) => line.trim().split(/\s+/)[2]).filter(Boolean));
-  return { atomCount, bondCount, residueCount: residues.size || null };
+  const atomStart = content.indexOf(atomMatch[0]) + atomMatch[0].length; const atomLines = content.slice(atomStart).split(/\r?\n/).filter((line) => line.trim()).slice(0, atomCount);
+  if (atomLines.length !== atomCount) throw new BiologicalAdapterError("PSF !NATOM section is incomplete.", "INVALID_INPUT");
+  const atoms = atomLines.map((line, index) => {
+    const fields = line.trim().split(/\s+/); const parsedIndex = Number(fields[0]);
+    if (!Number.isInteger(parsedIndex) || parsedIndex < 1 || !fields[1] || !fields[2] || !fields[3] || !fields[4]) throw new BiologicalAdapterError(`PSF atom ${index + 1} is invalid.`, "INVALID_INPUT");
+    return { index: parsedIndex - 1, name: fields[4], residue: fields[3], chain: fields[1] };
+  });
+  const residues = new Set(atoms.map((atom) => `${atom.chain ?? ""}:${atom.residue ?? ""}`));
+  return { atomCount, bondCount, residueCount: residues.size || null, atoms };
 };
 
-const parsePrmtop = (content: string): { atomCount: number; bondCount: number | null; residueCount: number | null } => {
+const parsePrmtop = (content: string): { atomCount: number; bondCount: number | null; residueCount: number | null; atoms?: TopologyAtom[] } => {
   const pointerBlock = content.match(/%FLAG POINTERS[\s\S]*?%FLAG/i)?.[0] ?? ""; const values = pointerBlock.replace(/%FLAG POINTERS|%FORMAT[^\n]*/gi, "").match(/[-+]?\d+/g)?.map(Number) ?? [];
   if (!values.length) throw new BiologicalAdapterError("AMBER PRMTOP input has no POINTERS section.", "INVALID_INPUT");
   const atomCount = values[0] ?? 0; const residueCount = values[11] ?? null; const bondCount = values[2] !== undefined && values[3] !== undefined ? Math.floor((values[2] + values[3]) / 3) : null;
   if (atomCount < 1) throw new BiologicalAdapterError("AMBER PRMTOP declares no atoms.", "INVALID_INPUT");
-  return { atomCount, residueCount: residueCount && residueCount > 0 ? residueCount : null, bondCount };
+  const fixedWidthValues = (flag: string, width: number) => {
+    const block = content.match(new RegExp(`%FLAG ${flag}\\s*[\\s\\S]*?(?=%FLAG|$)`, "i"))?.[0] ?? "";
+    return block.replace(/^%FLAG[^\n]*\n|^%FORMAT[^\n]*\n/gi, "").replace(/\r?\n/g, "").match(new RegExp(`.{1,${width}}`, "g"))?.map((value) => value.trim()).filter(Boolean) ?? [];
+  };
+  const names = fixedWidthValues("ATOM_NAME", 4).slice(0, atomCount); const residues = fixedWidthValues("RESIDUE_LABEL", 4);
+  const atoms = names.length === atomCount ? names.map((name, index) => ({ index, name, residue: residues[index] })) : undefined;
+  return { atomCount, residueCount: residueCount && residueCount > 0 ? residueCount : null, bondCount, ...(atoms ? { atoms } : {}) };
+};
+
+export const pairTopologyWithTrajectory = (
+  topology: Extract<BiologicalData, { kind: "TOPOLOGY" }>,
+  trajectory: Extract<BiologicalData, { kind: "TRAJECTORY" }>,
+): Extract<BiologicalData, { kind: "TRAJECTORY" }> => {
+  if (topology.atomCount !== trajectory.atomCount) {
+    throw new BiologicalAdapterError(`Topology ${topology.sourceName} declares ${topology.atomCount.toLocaleString()} atoms but trajectory ${trajectory.sourceName} contains ${trajectory.atomCount.toLocaleString()} atoms. Pairing was rejected.`, "INVALID_INPUT");
+  }
+  const frames = trajectory.frames.map((frame) => ({
+    ...frame,
+    atoms: frame.atoms.map((atom) => {
+      const metadata = topology.atoms?.[atom.index];
+      return metadata ? { ...atom, ...(metadata.name ? { name: metadata.name } : {}), ...(metadata.residue ? { residue: metadata.residue } : {}), ...(metadata.chain ? { chain: metadata.chain } : {}) } : atom;
+    }),
+  }));
+  return { ...trajectory, frames, topology: { format: topology.format, sourceName: topology.sourceName, atomCount: topology.atomCount, bondCount: topology.bondCount, residueCount: topology.residueCount } };
 };
 
 export const detectBiologicalFormat = (filename: string, content = ""): BiologicalFormat | null => {

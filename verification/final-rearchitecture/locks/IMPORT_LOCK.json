@@ -14,7 +14,8 @@
     "AT-FSR-J-007",
     "AT-FSR-J-008",
     "AT-FSR-J-009",
-    "AT-FSR-J-010"
+    "AT-FSR-J-010",
+    "AT-FSR-J-011"
   ],
   "evidence": [
     "FILE_FORMAT_SUPPORT_MATRIX.md",
@@ -22,7 +23,7 @@
   ],
   "date": "2026-09-13",
   "knownLimitations": [
-    "DCD/TRR/XTC decode bounded frames."
+    "DCD/TRR/XTC decode bounded frames; PSF/PRMTOP pairing requires matching atom counts."
   ],
   "status": "LOCKED"
 }
