@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "capturedAt": "2026-09-13",
   "status": "BOUNDED_IMPLEMENTATION_VERIFIED",
-  "commit": "77b4b6b",
+  "commit": "1ccbc04",
   "branch": "feature/final-scientific-ui-pymol-conformance",
   "server": {
     "workbench": "http://localhost:3101/molstudio",
@@ -20,7 +20,8 @@
     "typed sequence, density-map, trajectory, topology, and SMILES viewers",
     "user guide, inventories, conformance matrix, defect matrix, performance report, and local evidence",
     "coalesced and cached successful online RCSB acquisitions per API process",
-    "bounded DCD/TRR/XTC coordinate-frame decoding"
+    "bounded DCD/TRR/XTC coordinate-frame decoding",
+    "fixed-width PRMTOP atom metadata promotion"
   ],
   "acceptance": {
     "finalRearchitectureAndG0ImpPres": "24/24",
@@ -29,13 +30,13 @@
     "selectionClosure": "14/14",
     "selectionMatrixLive": "1/1",
     "r07R08R09": "15/15 across final targeted runs",
-    "biologicalAdapters": "8/8",
+    "biologicalAdapters": "9/9",
     "biologicalBrowser": "11/11",
     "finalRearchitectureShell": "22/22",
     "r07UiReruns": "4/4",
     "fullE2E": "142/142",
     "manualAndRealStructureGates": "pass",
-    "unitWeb": "149/149",
+    "unitWeb": "150/150",
     "unitApi": "65/65",
     "typecheck": "pass",
     "lint": "pass",
@@ -120,7 +121,7 @@
       "finalRearchitecturePng": 25,
       "inheritedEvidencePng": 200
     },
-    "testResults": "149 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium 142/142 at 77b4b6b",
+    "testResults": "150 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium 142/142 at 77b4b6b (final source 1ccbc04 adds fixed-width PRMTOP metadata coverage)",
     "oracleVisualStress": "Oracle ledger 51/35/1; 25 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/XYZ/DCD/TRR/XTC/topology-paired trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; latest 4DJW manual gate PASS"
   }
 }

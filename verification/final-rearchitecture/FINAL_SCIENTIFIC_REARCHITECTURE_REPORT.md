@@ -1,7 +1,7 @@
 # MOLEXPLORER final scientific UI rearchitecture report
 
 Status: **bounded implementation verified; executable PyMOL oracle and larger trajectory performance gates remain pending**
-Commit: `77b4b6b` (`feat: pair validated topologies with trajectories`)
+Commit: `1ccbc04` (`fix: preserve prmtop atom metadata`)
 Branch: `feature/final-scientific-ui-pymol-conformance`
 
 ## Delivered behavior
@@ -16,15 +16,15 @@ Selection, presentation, camera, measurement, analysis, alignment, topology edit
 
 ## Evidence and verification
 
-The final rearchitecture shell suite passes 22/22, including the biological import, viewer, and topology-pairing cases. The biological adapter unit suite passes 8/8 and the browser J acceptance suite passes 11/11, covering the import dialog, paste routing, FASTA, FASTQ, OpenDX, multi-frame XYZ, DCD, TRR, XTC, topology pairing, UniProt, and PubChem routes. The final PyMOL acceptance suite passes 3/3. Multi-object state coverage passes 11/11. The live selection matrix passes 1/1 across its representative command families; the generated matrix contains 87 rows: 85 verified working, one dependency-gated row (`byfragment`), and one intentionally unsupported arbitrary-property row. The selection oracle ledger records 51 direct oracle passes, 35 documented/application equivalents, and one pending row.
+The final rearchitecture shell suite passes 22/22, including the biological import, viewer, and topology-pairing cases. The biological adapter unit suite passes 9/9 and the browser J acceptance suite passes 11/11, covering the import dialog, paste routing, FASTA, FASTQ, OpenDX, multi-frame XYZ, DCD, TRR, XTC, topology pairing, fixed-width PRMTOP metadata, UniProt, and PubChem routes. The final PyMOL acceptance suite passes 3/3. Multi-object state coverage passes 11/11. The live selection matrix passes 1/1 across its representative command families; the generated matrix contains 87 rows: 85 verified working, one dependency-gated row (`byfragment`), and one intentionally unsupported arbitrary-property row. The selection oracle ledger records 51 direct oracle passes, 35 documented/application equivalents, and one pending row.
 
-The R07 edit/topology/hydrogen suites, R08 structural analysis suite, and R09 native lifecycle suite pass after the rail-state and menu-overlay corrections. Manual viewer, camera, selection highlighting, selection presentation, and real 4DJW plus 1CRN workspace gates pass. The latest full Chromium regression covers the legacy G0, G1B, G1C, IMP-PRES, V-FINAL, V2, real-structure, and biological-data suites: **142/142 passed** with one worker at implementation commit `77b4b6b`.
+The R07 edit/topology/hydrogen suites, R08 structural analysis suite, and R09 native lifecycle suite pass after the rail-state and menu-overlay corrections. Manual viewer, camera, selection highlighting, selection presentation, and real 4DJW plus 1CRN workspace gates pass. The latest full Chromium regression covers the legacy G0, G1B, G1C, IMP-PRES, V-FINAL, V2, real-structure, and biological-data suites: **142/142 passed** with one worker at implementation commit `77b4b6b`; the final source commit adds fixed-width PRMTOP metadata coverage.
 
 Repository checks pass:
 
 - `npm run typecheck`
 - `npm run lint`
-- `npm test` — 149 web tests and 65 API tests
+- `npm test` — 150 web tests and 65 API tests
 - `npm run build`
 - `npm run verify:selection-matrix`
 - `npm run verify:r10`
@@ -37,7 +37,7 @@ Local visual evidence is stored under `verification/final-rearchitecture/evidenc
 | Requirement | Current answer |
 | --- | --- |
 | Repository | `C:\Users\mukun\Desktop\molecular-workstation`; `new-origin` → `https://github.com/mukundrajambulge/new-mole-explorer-.git` |
-| Branch / baseline / final implementation SHA | `feature/final-scientific-ui-pymol-conformance` / `3cb632770b8be70a3fc45c4809706c0b58f8a6cb` / `77b4b6b` |
+| Branch / baseline / final implementation SHA | `feature/final-scientific-ui-pymol-conformance` / `3cb632770b8be70a3fc45c4809706c0b58f8a6cb` / `1ccbc04` |
 | UI rearchitecture | **PASS** — approved menus, inward right rail, dominant canvas, left object panel, collapsed console, status bar |
 | Universal import | **PARTIAL, bounded** — coordinate adapters and typed biological viewers are implemented; research trajectory formats remain explicitly limited |
 | PDB; mmCIF/CIF; SDF; MOL/MOL2 | **PASS** within the documented single-object/declared-connectivity limits |
@@ -57,7 +57,7 @@ Local visual evidence is stored under `verification/final-rearchitecture/evidenc
 | GUI–console / API convergence | **PASS where an API exists**; typed biological viewers are GUI import routes in this gate |
 | Security | **PASS** — host Python, shell, arbitrary process, filesystem, and network execution are rejected |
 | Historical defects | **A–Q PASS** in the historical defect matrix and regression gates |
-| Test results | `npm ci`; 149 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium **142/142** at `77b4b6b` |
+| Test results | `npm ci`; 150 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium **142/142** at `77b4b6b` (final source `1ccbc04` adds fixed-width PRMTOP metadata coverage) |
 | Oracle / visual / stress | Oracle ledger 51/35/1; 25 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/XYZ/DCD/TRR/XTC/topology-paired trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; latest 4DJW gate PASS |
 | Google Drive evidence | **BLOCKED_CREDENTIAL_OR_ENVIRONMENT**; local hashes and upload manifest retained |
 | PyMOL conformance | Bounded source/documentation/runtime classification; no complete PyMOL compatibility claim |

@@ -1,1 +1,1 @@
-{"name":"ANALYZE","SHA":"77b4b6b","tests":["AT-FSR-D-001","r08-structural-analysis.spec.ts","structuralAnalysis.test.ts"],"evidence":["PYMOL_CONFORMANCE_MATRIX.md"],"date":"2026-09-13","knownLimitations":["SUPER executable parity is blocked; CEALIGN is unsupported."],"status":"LOCKED"}
+{"name":"ANALYZE","SHA":"1ccbc04","tests":["AT-FSR-D-001","r08-structural-analysis.spec.ts","structuralAnalysis.test.ts"],"evidence":["PYMOL_CONFORMANCE_MATRIX.md"],"date":"2026-09-13","knownLimitations":["SUPER executable parity is blocked; CEALIGN is unsupported."],"status":"LOCKED"}
