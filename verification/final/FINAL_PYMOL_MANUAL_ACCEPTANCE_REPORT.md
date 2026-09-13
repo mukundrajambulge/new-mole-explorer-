@@ -17,18 +17,19 @@ The real Molexplorer workstation was launched at `http://localhost:3101/molstudi
 | Base SHA | `617da648edd06c0cb6dc0632b57a9a2645d88bdc` |
 | Acceptance branch | `fix/final-pymol-manual-acceptance` |
 | Final implementation/fix SHA | `1ccbc04a3acad4d10b721c792ed8bfcff9620ae4` |
-| Final closure SHA (code/evidence closure) | `37797bd0466187e443399c96b1eb62df6736b6dc` |
+| Final closure SHA (tested application/acceptance tip) | `a79736e54382680567bdc61db2ca2bb4fa536075` |
 | App URL | `http://localhost:3101/molstudio` |
 | Node | `v24.14.1` |
 | Playwright | `1.62.1` |
 | Browser | Chromium |
-| Date | 2026-09-08 |
+| Date | 2026-09-13 |
 
 ## Fixes made in this campaign
 
 1. The app grid now reserves an explicit row for the scene manager, preventing scene controls from being clipped below the workspace. Canonical active-object and selection ownership text now wraps within the sidebar.
 2. Selection emphasis now reapplies the complete surface material, including `wireframe` and `wireframeLinewidth`, so Mesh remains a mesh after selection highlighting is applied or cleared.
 3. Biological imports now decode bounded DCD/TRR/XTC coordinate frames and pair atom-count-compatible PSF/PRMTOP topology metadata with trajectory atoms. Mismatches fail closed without replacing the current dataset.
+4. Hosted Chromium acceptance waits now cover the measured 3Dmol reconciliation and authoritative re-import settling window without weakening any functional assertion.
 
 The surface behavior is covered by `apps/web/src/rendering/surfaceMaterial.test.ts`; the integrated acceptance paths are covered by `tests/e2e/final-pymol-acceptance.spec.ts`.
 
@@ -72,7 +73,7 @@ All 15 historical defects were deliberately classified as PASS. The complete mat
 - Full hosted E2E: **142/142 PASS**
 - Final focused acceptance E2E: **3/3 PASS**, repeated **3 consecutive runs**
 - Gate 01, Gate 02, Gate 03B, R07, R08, R09, and R10 regressions: **PASS**
-- GitHub CI on the final implementation/fix tip: **PENDING remote run after authorized branch push**
+- GitHub CI on the final tested acceptance tip: **PASS — 142/142 E2E; all lint, typecheck, unit, and build stages PASS** ([run 34742157392](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34742157392))
 
 ## Scientific and lifecycle integrity
 
