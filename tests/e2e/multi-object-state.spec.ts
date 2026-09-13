@@ -10,6 +10,10 @@ const openConsole = async (page: import("@playwright/test").Page) => {
 };
 
 test("multiple canonical objects share one viewer and keep object scope independent", async ({ page }) => {
+  // Hosted Chromium can spend tens of seconds in 3Dmol style reconciliation
+  // after a full-workspace selection. Keep the test attached to the live UI
+  // long enough to observe the eventual command-console state.
+  test.setTimeout(120_000);
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(mini);
   await expect(page.getByTitle("mini-protein.pdb").first()).toBeVisible();

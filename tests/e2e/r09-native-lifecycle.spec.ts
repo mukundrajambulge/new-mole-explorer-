@@ -72,7 +72,9 @@ test("AT-R09-08/09/10/11/12/13/14/15 scenes are renderer-neutral and export is t
   expect(download.suggestedFilename()).toMatch(/\.pdb$/);
   await capture(page, "export", "11-export-success.png");
   await page.getByRole("button", { name: "Re-import as new source artifact" }).click();
-  await expect(page.getByTestId("objects-selections-panel").locator("[data-object-id]")).toHaveCount(2);
+  // Re-import includes a fresh authoritative ingestion request. Hosted API
+  // runners can take longer than the default five-second assertion window.
+  await expect(page.getByTestId("objects-selections-panel").locator("[data-object-id]")).toHaveCount(2, { timeout: 30_000 });
   await expect(page.getByTestId("source-provenance")).toContainText("DERIVED EXPORT");
 });
 
