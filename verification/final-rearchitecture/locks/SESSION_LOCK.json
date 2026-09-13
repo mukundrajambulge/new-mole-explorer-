@@ -1,1 +1,1 @@
-{"name":"SESSION","SHA":"9e8d7dc","tests":["r09-native-lifecycle.spec.ts","AT-FSR-A-002"],"evidence":["SESSION.md","RELEASE_EVIDENCE.lock.json"],"date":"2026-09-13","knownLimitations":["Movie playback and advanced persistence remain planned."],"status":"LOCKED"}
+{"name":"SESSION","SHA":"d399059","tests":["r09-native-lifecycle.spec.ts","AT-FSR-A-002"],"evidence":["SESSION.md","RELEASE_EVIDENCE.lock.json"],"date":"2026-09-13","knownLimitations":["Movie playback and advanced persistence remain planned."],"status":"LOCKED"}

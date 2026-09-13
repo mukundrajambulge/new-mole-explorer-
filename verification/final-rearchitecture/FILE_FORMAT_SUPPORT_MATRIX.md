@@ -17,8 +17,9 @@
 | MRC / CCP4 | Density-map viewer | Binary header, supported scalar modes, voxel payload, spacing, and range statistics are decoded within bounded limits | `adapters.test.ts` binary fixture |
 | XYZ trajectory | Trajectory viewer | Multi-frame XYZ is validated with constant atom count and frame slider; single-frame XYZ remains a coordinate object | `adapters.test.ts`, `AT-FSR-J-005` |
 | GRO | Trajectory viewer | One coordinate frame is parsed with nm→Å conversion; topology is not inferred | `adapters.test.ts` |
-| DCD | Header-only trajectory status | Signature, frame count, title block, and atom count are validated; coordinate frames are not decoded | `adapters.test.ts`; viewer status is `HEADER_ONLY` |
-| XTC / TRR | Header-only trajectory status | Sources are admitted to the registry with an explicit decoder limitation; no coordinates are fabricated | Adapter registry and viewer diagnostic |
+| DCD | Decoded trajectory frames | Fortran records, frame count, atom count, float32/float64 coordinates, and bounded frame slider; fixed-atom reconstruction is rejected explicitly | `adapters.test.ts`, `AT-FSR-J-008` |
+| XTC | Header-only trajectory status | Big-endian magic is validated; compressed coordinate frames remain gated and no coordinates are fabricated | Adapter registry and viewer diagnostic |
+| TRR | Decoded trajectory frames | Big-endian frame headers, float32/float64 coordinate blocks, constant atom count, and bounded frame slider | `adapters.test.ts`, `AT-FSR-J-009` |
 | PSF / PRMTOP | Topology metadata viewer | Atom/bond/residue metadata is shown separately; no coordinate rendering is claimed | `adapters.test.ts` |
 
 The File → Import dialog lists coordinate and biological adapters separately and offers Local file, Online ID, and Paste / text routes. Unsupported or malformed sources fail closed at the import boundary. Online RCSB IDs use the existing canonical structure ingestion; PubChem returns typed SMILES and UniProt returns typed FASTA.

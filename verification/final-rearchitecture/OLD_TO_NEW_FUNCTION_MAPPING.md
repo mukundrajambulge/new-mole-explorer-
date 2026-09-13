@@ -15,5 +15,5 @@
 | Fit/center/orient/projection | View and Display panels | Camera controller | PASS | Gate 02 |
 | Object visibility/focus | Objects & Selections | Workspace object state | PASS | AT-FSR-H-001 |
 | Docking/HTS | No active route | None | Deferred | Explicitly not started |
-| Sequence/maps/trajectories | File → Import dialog; typed center viewers | Biological adapter registry → sequence/map/trajectory/topology/SMILES viewers | PASS, bounded | AT-FSR-J-001–007; adapter tests; BIOLOGICAL_DATA.lock.json |
+| Sequence/maps/trajectories | File → Import dialog; typed center viewers | Biological adapter registry → sequence/map/trajectory/topology/SMILES viewers | PASS, bounded | AT-FSR-J-001–009; adapter tests; BIOLOGICAL_DATA.lock.json |
 | Full binary trajectory playback | No active route | Future Movie/States subsystem | Planned | PYMOL_MOVIE_IMPLEMENTATION_PLAN.md |

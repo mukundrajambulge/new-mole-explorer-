@@ -3,9 +3,45 @@
   "scope": "BIOLOGICAL_DATA",
   "status": "LOCKED_BOUNDED",
   "capturedAt": "2026-09-13",
-  "commit": "9e8d7dc",
+  "commit": "d399059",
   "statement": "Unified File → Import routes typed sequence, map, trajectory, topology, and SMILES sources to dedicated viewers while preserving source semantics and never fabricating coordinates.",
-  "admittedFormats": ["FASTA", "FASTQ", "GenBank", "EMBL", "DX", "MRC", "CCP4", "XYZ trajectory", "GRO", "DCD header", "XTC metadata", "TRR metadata", "PSF", "PRMTOP", "SMILES"],
-  "evidence": ["AT-FSR-J-001", "AT-FSR-J-002", "AT-FSR-J-003", "AT-FSR-J-004", "AT-FSR-J-005", "AT-FSR-J-006", "AT-FSR-J-007", "apps/web/src/biological/adapters.test.ts", "verification/final-rearchitecture/evidence/SLICE_J_IMPORT_DIALOG_OPEN.png", "verification/final-rearchitecture/evidence/SLICE_J_DENSITY_MAP.png", "verification/final-rearchitecture/evidence/SLICE_J_TRAJECTORY.png"],
-  "limits": ["DCD/XTC/TRR coordinate frame decoding is not enabled; only validated metadata/header status is shown.", "Topology viewers do not fabricate coordinates or pair PSF/PRMTOP with trajectories.", "Online providers require network access and explicit identifiers."]
+  "admittedFormats": [
+    "FASTA",
+    "FASTQ",
+    "GenBank",
+    "EMBL",
+    "DX",
+    "MRC",
+    "CCP4",
+    "XYZ trajectory",
+    "GRO",
+    "DCD frames",
+    "XTC metadata",
+    "TRR frames",
+    "PSF",
+    "PRMTOP",
+    "SMILES"
+  ],
+  "evidence": [
+    "AT-FSR-J-001",
+    "AT-FSR-J-002",
+    "AT-FSR-J-003",
+    "AT-FSR-J-004",
+    "AT-FSR-J-005",
+    "AT-FSR-J-006",
+    "AT-FSR-J-007",
+    "AT-FSR-J-008",
+    "AT-FSR-J-009",
+    "apps/web/src/biological/adapters.test.ts",
+    "verification/final-rearchitecture/evidence/SLICE_J_IMPORT_DIALOG_OPEN.png",
+    "verification/final-rearchitecture/evidence/SLICE_J_DENSITY_MAP.png",
+    "verification/final-rearchitecture/evidence/SLICE_J_TRAJECTORY.png",
+    "verification/final-rearchitecture/evidence/SLICE_J_DCD_TRAJECTORY.png",
+    "verification/final-rearchitecture/evidence/SLICE_J_TRR_TRAJECTORY.png"
+  ],
+  "limits": [
+    "DCD/TRR bounded coordinate frame decoding is enabled; XTC compressed decoding remains gated.",
+    "Topology viewers do not fabricate coordinates or pair PSF/PRMTOP with trajectories.",
+    "Online providers require network access and explicit identifiers."
+  ]
 }

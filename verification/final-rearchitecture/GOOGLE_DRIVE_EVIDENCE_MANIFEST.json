@@ -6,14 +6,82 @@
   "localEvidenceRoot": "verification/final-rearchitecture/evidence",
   "uploadPolicy": "Retain local evidence and upload only after authenticated remote verification.",
   "files": [
-    { "phase": "BASELINE", "filename": "BASELINE_WORKSPACE.png", "localSha256": "C87215B5B7B4DD536F99FCCB52BD4B6E570AA489ED147F0E709183D12DCAD05F", "remotePath": null, "uploadVerified": false },
-    { "phase": "UI_SHELL", "filename": "SLICE_A_EMPTY_WORKSPACE.png", "localSha256": "C607FB16F2066E712242DA3E88882A50D91870EC56B0D2F27F3440E1C522D4C9", "remotePath": null, "uploadVerified": false },
-    { "phase": "MULTI_OBJECT", "filename": "SLICE_H_BOTH_VISIBLE_FIT_ALL.png", "localSha256": "3A65A46A0145D297BB296B124A34B880C8FC4578164DDF86F268645A1371A159", "remotePath": null, "uploadVerified": false },
-    { "phase": "LIGAND", "filename": "SLICE_I_LIGAND_CONTEXT.png", "localSha256": "5F665192CF7B2FF7242250D32214368071EB47EC2D46A4511D7BBC264DA945AC", "remotePath": null, "uploadVerified": false },
-    { "phase": "BIOLOGICAL_IMPORT", "filename": "SLICE_J_IMPORT_DIALOG_OPEN.png", "localSha256": "D440177E1C4FD3FCC6089572E5ED5A5EA37F19ADB800E5458A434EC894CA398E", "remotePath": null, "uploadVerified": false },
-    { "phase": "BIOLOGICAL_IMPORT_RESULT", "filename": "SLICE_J_IMPORT_DIALOG_SEQUENCE.png", "localSha256": "209AD48CD1BFA3EA8C1DEFC8D1909F6E38A6990A97C990DA6DD7716E44BEB7F2", "remotePath": null, "uploadVerified": false },
-    { "phase": "BIOLOGICAL_SEQUENCE", "filename": "SLICE_J_FASTA_VIEWER.png", "localSha256": "2B397427243A108123E8585D881F73745D7F42DA35538FCA0A39CF226A87140C", "remotePath": null, "uploadVerified": false },
-    { "phase": "BIOLOGICAL_MAP", "filename": "SLICE_J_DENSITY_MAP.png", "localSha256": "C2409D7BEA32D1BC65282B0AA6D29A3AF57F585F2D2A7A4EE8DD90A844108ED7", "remotePath": null, "uploadVerified": false },
-    { "phase": "BIOLOGICAL_TRAJECTORY", "filename": "SLICE_J_TRAJECTORY.png", "localSha256": "34D1C8476320C425BB0049C6CA8416018BE6AA02830CD027B2D1BA272B3A60D5", "remotePath": null, "uploadVerified": false }
+    {
+      "phase": "BASELINE",
+      "filename": "BASELINE_WORKSPACE.png",
+      "localSha256": "C87215B5B7B4DD536F99FCCB52BD4B6E570AA489ED147F0E709183D12DCAD05F",
+      "remotePath": null,
+      "uploadVerified": false
+    },
+    {
+      "phase": "UI_SHELL",
+      "filename": "SLICE_A_EMPTY_WORKSPACE.png",
+      "localSha256": "C607FB16F2066E712242DA3E88882A50D91870EC56B0D2F27F3440E1C522D4C9",
+      "remotePath": null,
+      "uploadVerified": false
+    },
+    {
+      "phase": "MULTI_OBJECT",
+      "filename": "SLICE_H_BOTH_VISIBLE_FIT_ALL.png",
+      "localSha256": "3A65A46A0145D297BB296B124A34B880C8FC4578164DDF86F268645A1371A159",
+      "remotePath": null,
+      "uploadVerified": false
+    },
+    {
+      "phase": "LIGAND",
+      "filename": "SLICE_I_LIGAND_CONTEXT.png",
+      "localSha256": "5F665192CF7B2FF7242250D32214368071EB47EC2D46A4511D7BBC264DA945AC",
+      "remotePath": null,
+      "uploadVerified": false
+    },
+    {
+      "phase": "BIOLOGICAL_IMPORT",
+      "filename": "SLICE_J_IMPORT_DIALOG_OPEN.png",
+      "localSha256": "D440177E1C4FD3FCC6089572E5ED5A5EA37F19ADB800E5458A434EC894CA398E",
+      "remotePath": null,
+      "uploadVerified": false
+    },
+    {
+      "phase": "BIOLOGICAL_IMPORT_RESULT",
+      "filename": "SLICE_J_IMPORT_DIALOG_SEQUENCE.png",
+      "localSha256": "209AD48CD1BFA3EA8C1DEFC8D1909F6E38A6990A97C990DA6DD7716E44BEB7F2",
+      "remotePath": null,
+      "uploadVerified": false
+    },
+    {
+      "phase": "BIOLOGICAL_SEQUENCE",
+      "filename": "SLICE_J_FASTA_VIEWER.png",
+      "localSha256": "2B397427243A108123E8585D881F73745D7F42DA35538FCA0A39CF226A87140C",
+      "remotePath": null,
+      "uploadVerified": false
+    },
+    {
+      "phase": "BIOLOGICAL_MAP",
+      "filename": "SLICE_J_DENSITY_MAP.png",
+      "localSha256": "C2409D7BEA32D1BC65282B0AA6D29A3AF57F585F2D2A7A4EE8DD90A844108ED7",
+      "remotePath": null,
+      "uploadVerified": false
+    },
+    {
+      "phase": "BIOLOGICAL_TRAJECTORY",
+      "filename": "SLICE_J_TRAJECTORY.png",
+      "localSha256": "34D1C8476320C425BB0049C6CA8416018BE6AA02830CD027B2D1BA272B3A60D5",
+      "remotePath": null,
+      "uploadVerified": false
+    },
+    {
+      "phase": "BIOLOGICAL_TRAJECTORY",
+      "filename": "SLICE_J_DCD_TRAJECTORY.png",
+      "localSha256": "31BDFFBDB00163317CE6953B6BE8BA9D439C3EC6F63DB0051E3770669E5E7011",
+      "remotePath": null,
+      "uploadVerified": false
+    },
+    {
+      "phase": "BIOLOGICAL_TRAJECTORY",
+      "filename": "SLICE_J_TRR_TRAJECTORY.png",
+      "localSha256": "9879FB8AC970F9BB7AB1A8AF1CDF6839F39B6D8FFD98670A0E88AA507AD7A54B",
+      "remotePath": null,
+      "uploadVerified": false
+    }
   ]
 }

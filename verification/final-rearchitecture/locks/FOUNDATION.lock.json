@@ -3,7 +3,7 @@
   "scope": "FOUNDATION",
   "status": "LOCKED_VERIFIED",
   "capturedAt": "2026-09-13",
-  "commit": "fa995f4",
+  "commit": "d399059",
   "statement": "Scientific workspace shell, rail ownership, collapsed console, status bar, and safe command boundary are verified.",
   "evidence": ["AT-FSR-A-001", "AT-FSR-A-002", "AT-FSR-C-001", "npm run typecheck", "npm run lint", "npm test", "npm run build"],
   "limits": ["Movie and Settings remain unavailable.", "Host execution remains intentionally rejected."]

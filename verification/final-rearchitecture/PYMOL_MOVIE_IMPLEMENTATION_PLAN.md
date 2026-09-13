@@ -14,7 +14,7 @@ future playback engine.
 | Interpolation | No interpolation | Per-state coordinate interpolation only where source semantics allow | No interpolation across incompatible objects/topologies | PLANNED |
 | Frame rendering/export | Typed trajectory metadata and scene export exist | Rendered frame sequence export with provenance manifest | Reproducible frame count, format, and source hash | PLANNED |
 
-Research trajectory policy: DCD is currently header-only and XTC/TRR are
-metadata-only. Full binary frame decoding, topology-coordinate pairing, and
+Research trajectory policy: DCD and TRR decode bounded coordinate frames; XTC remains
+metadata-only. Full XTC frame decoding, topology-coordinate pairing, and
 performance limits must land before Movie is promoted from the unavailable
 right-rail state. This plan does not authorize docking or HTS.

@@ -12,7 +12,7 @@ Molexplorer opens the molecular workstation at `http://localhost:3101/molstudio`
 
 The **Movie** and **Settings** controls in the scientific rail are visibly disabled in this release because their implementation gates are not complete. The footer Theme and Settings icons carry the same disabled state; use the working Display, Color, View, and Session panels for current presentation and persistence controls.
 
-Admitted coordinate formats are PDB, mmCIF/CIF, PQR, SDF/MOL, single-frame XYZ, one-molecule MOL2, and one-molecule PDBQT. Use **File → Import** for FASTA/FASTQ/GenBank/EMBL sequence data, DX/MRC/CCP4 maps, multi-frame XYZ or GRO trajectories, PSF/PRMTOP topology metadata, and SMILES notation. These sources open in dedicated typed viewers and are never rendered as invented coordinates. DCD is currently validated as header-only; XTC and TRR show explicit metadata-only status.
+Admitted coordinate formats are PDB, mmCIF/CIF, PQR, SDF/MOL, single-frame XYZ, one-molecule MOL2, and one-molecule PDBQT. Use **File → Import** for FASTA/FASTQ/GenBank/EMBL sequence data, DX/MRC/CCP4 maps, multi-frame XYZ or GRO trajectories, PSF/PRMTOP topology metadata, and SMILES notation. These sources open in dedicated typed viewers and are never rendered as invented coordinates. DCD and TRR coordinate frames are decoded within bounded limits; XTC shows explicit metadata-only status.
 
 ## Scientific limits
 

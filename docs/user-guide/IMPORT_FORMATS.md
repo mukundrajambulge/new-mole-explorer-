@@ -8,4 +8,4 @@ Use **File → Import** for the unified biological-data flow. The dialog has thr
 
 Coordinate files (PDB, mmCIF/CIF, PQR, SDF/MOL, single-frame XYZ, MOL2, and PDBQT) continue through the canonical molecular ingestion path. Biological sources stay typed: FASTA/FASTQ/GenBank/EMBL open in the sequence viewer, DX/MRC/CCP4 open in the density-map viewer, multi-frame XYZ and GRO open in the trajectory viewer, PSF/PRMTOP open in the topology viewer, and SMILES opens in the notation viewer. No sequence or notation is converted into invented coordinates.
 
-DCD is admitted for validated header metadata and is shown as **HEADER_ONLY** until frame decoding is implemented. XTC and TRR show the same explicit limitation. Malformed files fail closed and leave the current dataset unchanged.
+DCD and TRR are admitted with bounded binary frame decoding and open in the ready trajectory viewer. DCD fixed-atom reconstruction is rejected explicitly. XTC is admitted for validated magic/header metadata and remains **HEADER_ONLY** until compressed frame decoding is implemented. Malformed files fail closed and leave the current dataset unchanged.
