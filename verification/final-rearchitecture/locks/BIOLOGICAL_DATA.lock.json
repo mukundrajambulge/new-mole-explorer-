@@ -3,7 +3,7 @@
   "scope": "BIOLOGICAL_DATA",
   "status": "LOCKED_BOUNDED",
   "capturedAt": "2026-09-13",
-  "commit": "3911991",
+  "commit": "77b4b6b",
   "statement": "Unified File → Import routes typed sequence, map, trajectory, topology, and SMILES sources to dedicated viewers while preserving source semantics and never fabricating coordinates.",
   "admittedFormats": [
     "FASTA",

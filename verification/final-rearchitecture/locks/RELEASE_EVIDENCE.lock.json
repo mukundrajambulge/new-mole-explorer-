@@ -3,7 +3,7 @@
   "scope": "RELEASE_EVIDENCE",
   "status": "LOCKED_LOCAL_EVIDENCE",
   "capturedAt": "2026-09-13",
-  "commit": "3911991",
+  "commit": "77b4b6b",
   "statement": "The bounded implementation report, inventories, user guide, biological-data lock, conformance matrix, defect matrix, performance report, and local screenshots are present and tied to the release commit.",
   "evidence": [
     "FINAL_SCIENTIFIC_REARCHITECTURE_REPORT.md",
