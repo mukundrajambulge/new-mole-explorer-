@@ -11,6 +11,7 @@ const fastqFixture = resolve("tests/fixtures/sample.fastq");
 const dxFixture = resolve("tests/fixtures/sample.dx");
 const trajectoryFixture = resolve("tests/fixtures/sample.multi.xyz");
 const dcdFixture = resolve("tests/fixtures/sample.dcd");
+const xtcFixture = resolve("tests/fixtures/sample.xtc");
 const trrFixture = resolve("tests/fixtures/sample.trr");
 
 test("AT-FSR-A-001 exposes the approved scientific shell with a collapsed console", async ({ page }) => {
@@ -285,6 +286,19 @@ test("AT-FSR-J-009 decodes TRR coordinate frames in the typed trajectory viewer"
   await page.getByLabel("Trajectory frame").fill("1");
   await expect(viewer).toContainText("0.500");
   await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_J_TRR_TRAJECTORY.png") });
+});
+
+test("AT-FSR-J-010 decodes compressed XTC coordinate frames in the typed trajectory viewer", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles(xtcFixture);
+  const viewer = page.getByTestId("trajectory-viewer");
+  await expect(viewer).toBeVisible({ timeout: 15000 });
+  await expect(viewer).toHaveAttribute("data-trajectory-format", "xtc");
+  await expect(viewer).toHaveAttribute("data-trajectory-status", "READY");
+  await expect(viewer).toContainText("2");
+  await page.getByLabel("Trajectory frame").fill("1");
+  await expect(viewer).toContainText("step 2");
+  await page.screenshot({ path: resolve("verification/final-rearchitecture/evidence/SLICE_J_XTC_TRAJECTORY.png") });
 });
 
 test("AT-FSR-J-006 fetches an explicit UniProt accession into the sequence viewer", async ({ page }) => {

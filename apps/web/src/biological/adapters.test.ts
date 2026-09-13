@@ -57,6 +57,35 @@ const trrDoubleFixture = (): ArrayBuffer => {
   return payload.buffer;
 };
 
+const xtcUncompressedFixture = (): ArrayBuffer => {
+  const frame = (step: number, coordinates: number[]): Uint8Array => {
+    const bytes = new Uint8Array(56 + coordinates.length * 4); const view = new DataView(bytes.buffer); let offset = 0;
+    view.setInt32(offset, 1995, false); offset += 4; view.setInt32(offset, coordinates.length / 3, false); offset += 4; view.setInt32(offset, step, false); offset += 4; view.setFloat32(offset, step / 10, false); offset += 4;
+    [1, 0, 0, 0, 1, 0, 0, 0, 1].forEach((value) => { view.setFloat32(offset, value, false); offset += 4; });
+    view.setInt32(offset, coordinates.length / 3, false); offset += 4;
+    coordinates.forEach((value) => { view.setFloat32(offset, value / 10, false); offset += 4; });
+    return bytes;
+  };
+  return concat([frame(2, [0, 0, 0, 1, 0, 0, 0, 1, 0]), frame(4, [0.1, 0, 0, 1.1, 0, 0, 0.1, 1, 0])]);
+};
+
+const xtcCompressedFixture = (): ArrayBuffer => {
+  const writeBits = (target: number[], bitCount: number, value: number) => { for (let shift = bitCount - 1; shift >= 0; shift -= 1) target.push((Math.floor(value / 2 ** shift) % 2)); };
+  const frame = (step: number, reverse: boolean): Uint8Array => {
+    const bits: number[] = [];
+    for (let index = 0; index < 10; index += 1) { writeBits(bits, 4, reverse ? 9 - index : index); if (index === 0) { writeBits(bits, 1, 1); writeBits(bits, 5, 1); } else writeBits(bits, 1, 0); }
+    const compressed = new Uint8Array(Math.ceil(bits.length / 8)); bits.forEach((bit, index) => { compressed[Math.floor(index / 8)] |= bit << (7 - (index % 8)); });
+    const bytes = new Uint8Array(56 + 32 + 4 + Math.ceil(compressed.length / 4) * 4); const view = new DataView(bytes.buffer); let offset = 0;
+    view.setInt32(offset, 1995, false); offset += 4; view.setInt32(offset, 10, false); offset += 4; view.setInt32(offset, step, false); offset += 4; view.setFloat32(offset, step / 10, false); offset += 4;
+    [1, 0, 0, 0, 1, 0, 0, 0, 1].forEach((value) => { view.setFloat32(offset, value, false); offset += 4; });
+    view.setInt32(offset, 10, false); offset += 4; view.setFloat32(offset, 100, false); offset += 4;
+    [0, 0, 0, 9, 0, 0].forEach((value) => { view.setInt32(offset, value, false); offset += 4; });
+    view.setInt32(offset, 9, false); offset += 4; view.setInt32(offset, compressed.length, false); offset += 4; bytes.set(compressed, offset);
+    return bytes;
+  };
+  return concat([frame(1, false), frame(2, true)]);
+};
+
 const trajectoryHeaderFixture = (magic: number): ArrayBuffer => {
   const buffer = new ArrayBuffer(4); new DataView(buffer).setInt32(0, magic, false); return buffer;
 };
@@ -88,14 +117,15 @@ describe("biological data adapters", () => {
     expect(mrc.grid.valueRange.mean).toBe(0.5);
   });
 
-  it("parses ready trajectories and decodes DCD/TRR binary frames while keeping XTC bounded", () => {
+  it("parses ready trajectories and decodes DCD/TRR/XTC binary frames", () => {
     const xyz = "2\nframe one\nC 0 0 0\nO 1 0 0\n2\nframe two\nC 0 1 0\nO 1 1 0\n";
     const trajectory = parseBiologicalData("movie.xyz-trajectory", xyz);
     const gro = parseBiologicalData("frame.gro", "Test frame\n2\n    1ALA    CA    1   0.100   0.200   0.300\n    1ALA    CB    2   0.200   0.300   0.400\n   1.0 1.0 1.0\n");
     const dcd = parseBiologicalData("movie.dcd", dcdFixture());
-    const xtc = parseBiologicalData("movie.xtc", trajectoryHeaderFixture(1995));
+    const xtc = parseBiologicalData("movie.xtc", xtcUncompressedFixture());
+    const xtcCompressed = parseBiologicalData("compressed.xtc", xtcCompressedFixture());
     const trr = parseBiologicalData("movie.trr", trrFixture());
-    if (trajectory.kind !== "TRAJECTORY" || gro.kind !== "TRAJECTORY" || dcd.kind !== "TRAJECTORY" || xtc.kind !== "TRAJECTORY" || trr.kind !== "TRAJECTORY") throw new Error("trajectory adapters returned the wrong data kind");
+    if (trajectory.kind !== "TRAJECTORY" || gro.kind !== "TRAJECTORY" || dcd.kind !== "TRAJECTORY" || xtc.kind !== "TRAJECTORY" || xtcCompressed.kind !== "TRAJECTORY" || trr.kind !== "TRAJECTORY") throw new Error("trajectory adapters returned the wrong data kind");
     expect(isMultiFrameXyz(xyz)).toBe(true);
     expect(trajectory.kind).toBe("TRAJECTORY");
     expect(trajectory.status).toBe("READY");
@@ -105,7 +135,13 @@ describe("biological data adapters", () => {
     expect(dcd.atomCount).toBe(3);
     expect(dcd.frames).toHaveLength(2);
     expect(dcd.frames[1]?.atoms[2]?.x).toBeCloseTo(2.1);
-    expect(xtc.status).toBe("HEADER_ONLY");
+    expect(xtc.status).toBe("READY");
+    expect(xtc.frames).toHaveLength(2);
+    expect(xtc.frames[1]?.atoms[1]?.x).toBeCloseTo(1.1);
+    expect(xtcCompressed.status).toBe("READY");
+    expect(xtcCompressed.frames).toHaveLength(2);
+    expect(xtcCompressed.frames[0]?.atoms[9]?.x).toBeCloseTo(0.9);
+    expect(xtcCompressed.frames[1]?.atoms[0]?.x).toBeCloseTo(0.9);
     expect(trr.status).toBe("READY");
     expect(trr.frames).toHaveLength(2);
     expect(trr.frames[1]?.atoms[1]?.y).toBeCloseTo(0.5);

@@ -272,13 +272,201 @@ const parseDcd = (buffer: ArrayBuffer): { frameCount: number; atomCount: number;
   return { frameCount, atomCount, frames };
 };
 
-const parseResearchTrajectoryHeader = (buffer: ArrayBuffer, format: "xtc" | "trr"): number => {
-  if (buffer.byteLength < 4) throw new BiologicalAdapterError(`${format.toUpperCase()} input is shorter than its binary header.`, "INVALID_INPUT");
+const XTC_MAGIC = 1995;
+const XTC_NEW_MAGIC = 2023;
+const XTC_MAX_NATOMS_UNCOMPRESSED = 9;
+const MAX_TRAJECTORY_FRAME_BYTES = 64 * 1024 * 1024;
+const XTC_MAGICINTS = [
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 10, 12, 16, 20, 25, 32, 40, 50, 64, 80,
+  101, 128, 161, 203, 256, 322, 406, 512, 645, 812, 1024, 1290, 1625, 2048,
+  2580, 3250, 4096, 5060, 6501, 8192, 10321, 13003, 16384, 20642, 26007,
+  32768, 41285, 52015, 65536, 82570, 104031, 131072, 165140, 208063, 262144,
+  330280, 416127, 524287, 660561, 832255, 1048576, 1321122, 1664510,
+  2097152, 2642245, 3329021, 4194304, 5284491, 6658042, 8388607, 10568983,
+  13316085, 16777216,
+] as const;
+
+class XtcBitReader {
+  private bitOffset = 0;
+
+  constructor(private readonly bytes: Uint8Array) {}
+
+  read(bitCount: number): number {
+    if (!Number.isInteger(bitCount) || bitCount < 0 || bitCount > 32) throw new BiologicalAdapterError("XTC compressed bit width is invalid.", "INVALID_INPUT");
+    let result = 0;
+    let remaining = bitCount;
+    while (remaining > 0) {
+      const byteOffset = Math.floor(this.bitOffset / 8);
+      if (byteOffset >= this.bytes.length) throw new BiologicalAdapterError("XTC compressed coordinate data is truncated.", "INVALID_INPUT");
+      const bitInByte = this.bitOffset % 8;
+      const available = 8 - bitInByte;
+      const take = Math.min(remaining, available);
+      const shift = available - take;
+      const mask = 2 ** take - 1;
+      const chunk = (this.bytes[byteOffset]! >> shift) & mask;
+      result = result * 2 ** take + chunk;
+      this.bitOffset += take;
+      remaining -= take;
+    }
+    return result;
+  }
+}
+
+const xtcSizeOfInt = (size: number): number => {
+  let bits = 0;
+  let power = 1;
+  while (size >= power && bits < 53) { bits += 1; power *= 2; }
+  return bits;
+};
+
+const xtcSizeOfInts = (sizes: readonly number[]): number => {
+  let product = 1n;
+  for (const size of sizes) product *= BigInt(size);
+  let bits = 0;
+  let power = 1n;
+  while (product >= power && bits < 256) { bits += 1; power <<= 1n; }
+  return bits;
+};
+
+const decodeXtcInts = (reader: XtcBitReader, bitCount: number, sizes: readonly number[]): [number, number, number] => {
+  let encoded = 0n;
+  let remaining = bitCount;
+  let shift = 0n;
+  while (remaining >= 8) {
+    encoded |= BigInt(reader.read(8)) << shift;
+    shift += 8n;
+    remaining -= 8;
+  }
+  if (remaining > 0) encoded |= BigInt(reader.read(remaining)) << shift;
+  const sizeZ = BigInt(sizes[2]!);
+  const sizeY = BigInt(sizes[1]!);
+  const sizeZY = sizeZ * sizeY;
+  const x = encoded / sizeZY;
+  const remainder = encoded - x * sizeZY;
+  const y = remainder / sizeZ;
+  const z = remainder - y * sizeZ;
+  return [Number(x), Number(y), Number(z)];
+};
+
+const decodeXtcCompressed = (payload: Uint8Array, natoms: number, precision: number, minint: readonly number[], maxint: readonly number[], smallidx: number): number[][] => {
+  if (!Number.isFinite(precision) || precision <= 0) throw new BiologicalAdapterError("XTC coordinate precision is invalid.", "INVALID_INPUT");
+  if (!Number.isInteger(smallidx) || smallidx < 9 || smallidx >= XTC_MAGICINTS.length) throw new BiologicalAdapterError("XTC small-index value is invalid.", "INVALID_INPUT");
+  const sizeint = maxint.map((value, index) => value - minint[index]! + 1);
+  if (sizeint.some((size) => !Number.isSafeInteger(size) || size < 1)) throw new BiologicalAdapterError("XTC coordinate integer ranges are invalid.", "INVALID_INPUT");
+  const bitsizeint = sizeint.map(xtcSizeOfInt);
+  const bitsize = sizeint.some((size) => size > 0xffffff) ? 0 : xtcSizeOfInts(sizeint);
+  let currentSmallidx = smallidx;
+  let smaller = XTC_MAGICINTS[Math.max(9, currentSmallidx - 1)]! / 2;
+  let smallnum = XTC_MAGICINTS[currentSmallidx]! / 2;
+  let run = 0;
+  const sizesmall = () => [XTC_MAGICINTS[currentSmallidx]!, XTC_MAGICINTS[currentSmallidx]!, XTC_MAGICINTS[currentSmallidx]!] as const;
+  const reader = new XtcBitReader(payload);
+  const integerCoordinates: number[][] = [];
+  let readIndex = 0;
+  while (readIndex < natoms) {
+    const base = bitsize === 0
+      ? [reader.read(bitsizeint[0]!), reader.read(bitsizeint[1]!), reader.read(bitsizeint[2]!)]
+      : decodeXtcInts(reader, bitsize, sizeint);
+    const prev = [base[0]! + minint[0]!, base[1]! + minint[1]!, base[2]! + minint[2]!];
+    let isSmaller = 0;
+    const hasRun = reader.read(1) !== 0;
+    if (hasRun) {
+      run = reader.read(5);
+      isSmaller = run % 3;
+      run -= isSmaller;
+      isSmaller -= 1;
+    }
+    if (run < 0 || run % 3 !== 0 || run > 24 || readIndex + run / 3 >= natoms + 1) throw new BiologicalAdapterError("XTC compressed run length is invalid.", "INVALID_INPUT");
+    if (run > 0) {
+      let previous = prev;
+      for (let componentOffset = 0; componentOffset < run; componentOffset += 3) {
+        const diff = decodeXtcInts(reader, currentSmallidx, sizesmall());
+        const decoded = [diff[0] + previous[0]! - smallnum, diff[1] + previous[1]! - smallnum, diff[2] + previous[2]! - smallnum];
+        if (componentOffset === 0) {
+          integerCoordinates.push(previous);
+          previous = decoded;
+          integerCoordinates.push(decoded);
+        } else {
+          previous = decoded;
+          integerCoordinates.push(decoded);
+        }
+      }
+      readIndex += run / 3;
+    } else {
+      integerCoordinates.push(prev);
+      readIndex += 1;
+    }
+    if (isSmaller < 0) {
+      if (currentSmallidx <= 9) throw new BiologicalAdapterError("XTC small-index underflow.", "INVALID_INPUT");
+      currentSmallidx -= 1;
+      smallnum = smaller;
+      smaller = currentSmallidx > 9 ? XTC_MAGICINTS[currentSmallidx - 1]! / 2 : 0;
+    } else if (isSmaller > 0) {
+      if (currentSmallidx >= XTC_MAGICINTS.length - 1) throw new BiologicalAdapterError("XTC small-index overflow.", "INVALID_INPUT");
+      currentSmallidx += 1;
+      smaller = smallnum;
+      smallnum = XTC_MAGICINTS[currentSmallidx]! / 2;
+    }
+  }
+  if (integerCoordinates.length !== natoms) throw new BiologicalAdapterError("XTC compressed coordinate count does not match the frame header.", "INVALID_INPUT");
+  const inversePrecision = 1 / precision;
+  return integerCoordinates.map((coordinate) => coordinate.map((value) => value * inversePrecision * 10));
+};
+
+const readXtcOpaque = (view: DataView, offset: number, longFormat: boolean): { payload: Uint8Array; nextOffset: number } => {
+  let count: number;
+  if (longFormat) {
+    if (offset + 8 > view.byteLength) throw new BiologicalAdapterError("XTC compressed-data length is truncated.", "INVALID_INPUT");
+    const high = view.getUint32(offset, false); const low = view.getUint32(offset + 4, false);
+    count = high * 2 ** 32 + low; offset += 8;
+  } else {
+    if (offset + 4 > view.byteLength) throw new BiologicalAdapterError("XTC compressed-data length is truncated.", "INVALID_INPUT");
+    count = view.getUint32(offset, false); offset += 4;
+  }
+  if (!Number.isSafeInteger(count) || count < 1 || count > MAX_TRAJECTORY_FRAME_BYTES) throw new BiologicalAdapterError("XTC compressed-data length exceeds the bounded frame limit.", "INVALID_INPUT");
+  const padded = count + ((4 - (count % 4)) % 4);
+  if (offset + padded > view.byteLength) throw new BiologicalAdapterError("XTC compressed coordinate data is truncated.", "INVALID_INPUT");
+  return { payload: new Uint8Array(view.buffer, view.byteOffset + offset, count), nextOffset: offset + padded };
+};
+
+const parseXtc = (buffer: ArrayBuffer): { frameCount: number; atomCount: number; frames: TrajectoryFrame[] } => {
   const view = new DataView(buffer);
-  const magic = view.getInt32(0, false);
-  const expected = format === "xtc" ? 1995 : 1993;
-  if (magic !== expected) throw new BiologicalAdapterError(`${format.toUpperCase()} header magic is not recognized.`, "INVALID_INPUT");
-  return magic;
+  let offset = 0;
+  let atomCount: number | null = null;
+  const frames: TrajectoryFrame[] = [];
+  while (offset < view.byteLength) {
+    if (frames.length >= MAX_TRAJECTORY_FRAMES) throw new BiologicalAdapterError(`XTC exceeds the bounded ${MAX_TRAJECTORY_FRAMES.toLocaleString()} frame limit.`, "INVALID_INPUT");
+    if (offset + 56 > view.byteLength) throw new BiologicalAdapterError("XTC frame header is truncated.", "INVALID_INPUT");
+    const magic = view.getInt32(offset, false); offset += 4;
+    if (magic !== XTC_MAGIC && magic !== XTC_NEW_MAGIC) throw new BiologicalAdapterError("XTC frame magic is not recognized.", "INVALID_INPUT");
+    const natoms = view.getInt32(offset, false); offset += 4;
+    const step = view.getInt32(offset, false); offset += 4;
+    const time = view.getFloat32(offset, false); offset += 4;
+    const box = Array.from({ length: 9 }, () => { const value = view.getFloat32(offset, false); offset += 4; return value; });
+    const natomsAgain = view.getInt32(offset, false); offset += 4;
+    if (natoms < 1 || natoms > MAX_TRAJECTORY_ATOMS || natomsAgain !== natoms) throw new BiologicalAdapterError("XTC atom count is invalid or inconsistent.", "INVALID_INPUT");
+    if (!Number.isFinite(time) || box.some((value) => !Number.isFinite(value))) throw new BiologicalAdapterError("XTC frame metadata contains a non-finite value.", "INVALID_INPUT");
+    if (atomCount === null) atomCount = natoms; else if (atomCount !== natoms) throw new BiologicalAdapterError("XTC frames must have identical atom counts.", "INVALID_INPUT");
+    let coordinates: number[][];
+    if (natoms <= XTC_MAX_NATOMS_UNCOMPRESSED) {
+      if (offset + natoms * 3 * 4 > view.byteLength) throw new BiologicalAdapterError("XTC uncompressed coordinates are truncated.", "INVALID_INPUT");
+      coordinates = Array.from({ length: natoms }, (_, index) => { const base = offset + index * 12; return [view.getFloat32(base, false) * 10, view.getFloat32(base + 4, false) * 10, view.getFloat32(base + 8, false) * 10]; });
+      offset += natoms * 3 * 4;
+    } else {
+      if (offset + 32 > view.byteLength) throw new BiologicalAdapterError("XTC compressed coordinate header is truncated.", "INVALID_INPUT");
+      const precision = view.getFloat32(offset, false); offset += 4;
+      const minint = Array.from({ length: 3 }, () => { const value = view.getInt32(offset, false); offset += 4; return value; });
+      const maxint = Array.from({ length: 3 }, () => { const value = view.getInt32(offset, false); offset += 4; return value; });
+      const smallidx = view.getInt32(offset, false); offset += 4;
+      const opaque = readXtcOpaque(view, offset, magic === XTC_NEW_MAGIC); offset = opaque.nextOffset;
+      coordinates = decodeXtcCompressed(opaque.payload, natoms, precision, minint, maxint, smallidx);
+    }
+    if (coordinates.some((coordinate) => coordinate.some((value) => !Number.isFinite(value)))) throw new BiologicalAdapterError(`XTC frame ${frames.length + 1} contains a non-finite coordinate.`, "INVALID_INPUT");
+    const atoms = coordinates.map((coordinate, index) => ({ index, element: "X", x: coordinate[0]!, y: coordinate[1]!, z: coordinate[2]! }));
+    frames.push({ index: frames.length, label: `Frame ${frames.length + 1}${step ? ` · step ${step}` : ""}`, atoms });
+  }
+  if (!frames.length || atomCount === null) throw new BiologicalAdapterError("XTC contains no coordinate frames.", "INVALID_INPUT");
+  return { frameCount: frames.length, atomCount, frames };
 };
 
 const readBeI32 = (view: DataView, offset: number, label: string) => {
@@ -373,7 +561,7 @@ export const parseBiologicalData = (filename: string, input: string | ArrayBuffe
   if (format === "xyz-trajectory") { const frames = parseXyzTrajectory(String(input)); return { kind: "TRAJECTORY", format, sourceName, frames, atomCount: frames[0]!.atoms.length, status: "READY" }; }
   if (format === "gro") { const frames = parseGro(String(input)); return { kind: "TRAJECTORY", format, sourceName, frames, atomCount: frames[0]!.atoms.length, status: "READY" }; }
   if (format === "dcd") { if (typeof input === "string") throw new BiologicalAdapterError("DCD adapters require binary file bytes.", "INVALID_INPUT"); const decoded = parseDcd(input); return { kind: "TRAJECTORY", format, sourceName, frames: decoded.frames, atomCount: decoded.atomCount, status: "READY" }; }
-  if (format === "xtc") { parseResearchTrajectoryHeader(typeof input === "string" ? (() => { throw new BiologicalAdapterError("XTC adapters require binary file bytes.", "INVALID_INPUT"); })() : input, format); return { kind: "TRAJECTORY", format, sourceName, frames: [], atomCount: 0, status: "HEADER_ONLY", diagnostic: "XTC header verified; compressed coordinate decoding is not enabled in this build." }; }
+  if (format === "xtc") { if (typeof input === "string") throw new BiologicalAdapterError("XTC adapters require binary file bytes.", "INVALID_INPUT"); const decoded = parseXtc(input); return { kind: "TRAJECTORY", format, sourceName, frames: decoded.frames, atomCount: decoded.atomCount, status: "READY" }; }
   if (format === "trr") { if (typeof input === "string") throw new BiologicalAdapterError("TRR adapters require binary file bytes.", "INVALID_INPUT"); const decoded = parseTrr(input); return { kind: "TRAJECTORY", format, sourceName, frames: decoded.frames, atomCount: decoded.atomCount, status: "READY" }; }
   if (format === "psf") { const result = parsePsf(String(input)); return { kind: "TOPOLOGY", format, sourceName, ...result, status: "READY" }; }
   if (format === "prmtop") { const result = parsePrmtop(String(input)); return { kind: "TOPOLOGY", format, sourceName, ...result, status: "READY" }; }
