@@ -541,7 +541,8 @@ const parsePrmtop = (content: string): { atomCount: number; bondCount: number | 
   if (atomCount < 1) throw new BiologicalAdapterError("AMBER PRMTOP declares no atoms.", "INVALID_INPUT");
   const fixedWidthValues = (flag: string, width: number) => {
     const block = content.match(new RegExp(`%FLAG ${flag}\\s*[\\s\\S]*?(?=%FLAG|$)`, "i"))?.[0] ?? "";
-    return block.replace(/^%FLAG[^\n]*\n|^%FORMAT[^\n]*\n/gi, "").replace(/\r?\n/g, "").match(new RegExp(`.{1,${width}}`, "g"))?.map((value) => value.trim()).filter(Boolean) ?? [];
+    const payload = block.split(/\r?\n/).slice(2).join("");
+    return payload.match(new RegExp(`.{1,${width}}`, "g"))?.map((value) => value.trim()).filter(Boolean) ?? [];
   };
   const names = fixedWidthValues("ATOM_NAME", 4).slice(0, atomCount); const residues = fixedWidthValues("RESIDUE_LABEL", 4);
   const atoms = names.length === atomCount ? names.map((name, index) => ({ index, name, residue: residues[index] })) : undefined;

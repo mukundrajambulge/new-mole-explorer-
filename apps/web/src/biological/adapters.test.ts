@@ -182,6 +182,13 @@ describe("biological data adapters", () => {
     expect(() => pairTopologyWithTrajectory({ ...topology, atomCount: 2 }, trajectory)).toThrow(BiologicalAdapterError);
   });
 
+  it("promotes fixed-width PRMTOP atom names when the source supplies them", () => {
+    const prmtop = parseBiologicalData("system.prmtop", "%FLAG POINTERS\n%FORMAT(10I8)\n       3       0       3       0       0       0       0       0       0       0       0       1\n%FLAG ATOM_NAME\n%FORMAT(20a4)\nN   CA  C   \n%FLAG RESIDUE_LABEL\n%FORMAT(20a4)\nALA \n");
+    expect(prmtop.kind).toBe("TOPOLOGY");
+    if (prmtop.kind !== "TOPOLOGY") throw new Error("PRMTOP adapter returned the wrong data kind");
+    expect(prmtop.atoms).toEqual([{ index: 0, name: "N", residue: "ALA" }, { index: 1, name: "CA", residue: undefined }, { index: 2, name: "C", residue: undefined }]);
+  });
+
   it("supports an explicit paste format even when the filename has another suffix", () => {
     const parsed = parseBiologicalData("pasted-data.fasta", "LOCUS       TEST  4 bp\nORIGIN\n        1 acgt\n//", "genbank");
     expect(parsed.kind).toBe("SEQUENCE");
