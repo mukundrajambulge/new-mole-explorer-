@@ -1,6 +1,6 @@
 {
   "name": "IMPORT",
-  "SHA": "d399059",
+  "SHA": "3911991",
   "tests": [
     "AT-FSR-B-001",
     "AT-FSR-B-002",
@@ -13,7 +13,8 @@
     "AT-FSR-J-006",
     "AT-FSR-J-007",
     "AT-FSR-J-008",
-    "AT-FSR-J-009"
+    "AT-FSR-J-009",
+    "AT-FSR-J-010"
   ],
   "evidence": [
     "FILE_FORMAT_SUPPORT_MATRIX.md",
@@ -21,7 +22,7 @@
   ],
   "date": "2026-09-13",
   "knownLimitations": [
-    "DCD/TRR decode bounded frames; XTC remains metadata-only."
+    "DCD/TRR/XTC decode bounded frames."
   ],
   "status": "LOCKED"
 }

@@ -14,7 +14,7 @@ This is a bounded compatibility audit, not a claim of complete PyMOL integration
 | camera (`zoom`, `center`, `set_view`) | View rail; Console | camera viewport suite | IMPLEMENTED_WITH_LIMITATIONS | Presentation-only state. |
 | sessions/scenes | File and Session | R09 suites | IMPLEMENTED_WITH_LIMITATIONS | PSE/PZE/movie work is out of scope. |
 | host Python/shell/system | Safe boundary | securityFuzz and R10 suites | INTENTIONAL_SECURITY_DIVERGENCE | Arbitrary host execution is rejected. |
-| trajectory data | Typed trajectory viewer for multi-frame XYZ/GRO/DCD/TRR; XTC explicit metadata-only status | AT-FSR-J-005/008/009; adapter tests | IMPLEMENTED_WITH_LIMITATIONS | XTC frame decoding, topology pairing, and performance gates remain pending. |
+| trajectory data | Typed trajectory viewer for multi-frame XYZ/GRO/DCD/TRR/XTC with bounded coordinate decoding | AT-FSR-J-005/008/009/010; adapter tests | IMPLEMENTED_WITH_LIMITATIONS | Topology pairing and trajectory performance gates remain pending. |
 | movie playback | No active control | Planned | PLANNED | Requires a separate state-clock, animation, and export gate. |
 
 The machine-readable version is [PYMOL_CONFORMANCE_MATRIX.json](PYMOL_CONFORMANCE_MATRIX.json). The larger historical 345-keyword inventory remains in `verification/autonomous-pymol` and `verification/r10` with explicit oracle-pending rows.

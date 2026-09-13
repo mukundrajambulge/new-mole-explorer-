@@ -4,7 +4,7 @@ This release keeps the canonical action guide in [`docs/user-guide/`](../../docs
 
 | Surface | Guide | Acceptance evidence |
 | --- | --- | --- |
-| File and import | [FILE.md](../../docs/user-guide/FILE.md), [IMPORT_FORMATS.md](../../docs/user-guide/IMPORT_FORMATS.md) | AT-FSR-B-001/002, AT-FSR-G-001, AT-FSR-J-001–009, adapter tests |
+| File and import | [FILE.md](../../docs/user-guide/FILE.md), [IMPORT_FORMATS.md](../../docs/user-guide/IMPORT_FORMATS.md) | AT-FSR-B-001/002, AT-FSR-G-001, AT-FSR-J-001–010, adapter tests |
 | Select and clear | [SELECT.md](../../docs/user-guide/SELECT.md) | AT-FSR-F-001 |
 | Display and color | [DISPLAY.md](../../docs/user-guide/DISPLAY.md), [COLOR.md](../../docs/user-guide/COLOR.md) | R01–R06 and selection-closure suites |
 | Measure and analyze | [MEASURE.md](../../docs/user-guide/MEASURE.md), [ANALYZE.md](../../docs/user-guide/ANALYZE.md) | AT-FSR-D-001 and V-FINAL suites |

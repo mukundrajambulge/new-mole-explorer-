@@ -23,7 +23,7 @@
       "feature": "deselect / unpick",
       "officialBehavior": "Clear the active selection.",
       "implementation": "Canonical clear action shared by rail, Escape, canvas, and console.",
-      "gui": "Select rail \u00e2\u2020\u2019 Clear selection",
+      "gui": "Select rail â†’ Clear selection",
       "console": true,
       "api": false,
       "test": "AT-FSR-F-001",
@@ -154,14 +154,14 @@
     {
       "feature": "trajectory data",
       "officialBehavior": "Load coordinate states and trajectory frames for inspection.",
-      "implementation": "Typed trajectory viewer for multi-frame XYZ/GRO/DCD/TRR; XTC remains metadata-only.",
+      "implementation": "Typed trajectory viewer for multi-frame XYZ/GRO/DCD/TRR/XTC with bounded coordinate decoding.",
       "gui": "Biological-data import and trajectory viewer",
       "console": false,
       "api": false,
-      "test": "AT-FSR-J-005/008/009; adapters.test.ts",
-      "evidence": "SLICE_J_TRAJECTORY.png; SLICE_J_DCD_TRAJECTORY.png; SLICE_J_TRR_TRAJECTORY.png",
+      "test": "AT-FSR-J-005/008/009/010; adapters.test.ts",
+      "evidence": "SLICE_J_TRAJECTORY.png; SLICE_J_DCD_TRAJECTORY.png; SLICE_J_TRR_TRAJECTORY.png; SLICE_J_XTC_TRAJECTORY.png",
       "status": "IMPLEMENTED_WITH_LIMITATIONS",
-      "limitation": "XTC frame decoding, topology pairing, and performance gates remain pending."
+      "limitation": "Topology pairing and trajectory performance gates remain pending."
     },
     {
       "feature": "movie playback",

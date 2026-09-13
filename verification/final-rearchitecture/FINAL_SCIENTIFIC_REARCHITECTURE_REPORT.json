@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "capturedAt": "2026-09-13",
   "status": "BOUNDED_IMPLEMENTATION_VERIFIED",
-  "commit": "d399059",
+  "commit": "3911991",
   "branch": "feature/final-scientific-ui-pymol-conformance",
   "server": {
     "workbench": "http://localhost:3101/molstudio",
@@ -19,7 +19,8 @@
     "unified biological-data import dialog with local, online, and paste routes",
     "typed sequence, density-map, trajectory, topology, and SMILES viewers",
     "user guide, inventories, conformance matrix, defect matrix, performance report, and local evidence",
-    "coalesced and cached successful online RCSB acquisitions per API process"
+    "coalesced and cached successful online RCSB acquisitions per API process",
+    "bounded DCD/TRR/XTC coordinate-frame decoding"
   ],
   "acceptance": {
     "finalRearchitectureAndG0ImpPres": "24/24",
@@ -29,10 +30,10 @@
     "selectionMatrixLive": "1/1",
     "r07R08R09": "15/15 across final targeted runs",
     "biologicalAdapters": "7/7",
-    "biologicalBrowser": "9/9",
-    "finalRearchitectureShell": "20/20",
+    "biologicalBrowser": "10/10",
+    "finalRearchitectureShell": "21/21",
     "r07UiReruns": "4/4",
-    "fullE2E": "140/140",
+    "fullE2E": "141/141",
     "manualAndRealStructureGates": "pass",
     "unitWeb": "148/148",
     "unitApi": "65/65",
@@ -42,8 +43,9 @@
     "latestRegressionAttempt": {
       "command": "npm run test:e2e -- --project=chromium --workers=1",
       "status": "PASS",
-      "result": "140/140",
-      "date": "2026-09-13"
+      "result": "141/141",
+      "date": "2026-09-13",
+      "commit": "b3c21fe"
     }
   },
   "selectionMatrix": {
@@ -58,7 +60,7 @@
   "blockedOrPending": [
     "executable PyMOL oracle",
     "Google Drive credentials/environment",
-    "full XTC frame decoding and topology-coordinate pairing",
+    "topology-coordinate pairing and larger trajectory performance gates",
     "larger biological corpus and performance gates",
     "wizard/movie work",
     "docking, virtual screening, HTS, and main-branch merge"
@@ -115,10 +117,10 @@
     "historicalDefects": "A-Q_PASS",
     "googleDrive": "BLOCKED_CREDENTIAL_OR_ENVIRONMENT",
     "screenshots": {
-      "finalRearchitecturePng": 23,
+      "finalRearchitecturePng": 24,
       "inheritedEvidencePng": 200
     },
-    "testResults": "148 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium 140/140",
-    "oracleVisualStress": "Oracle ledger 51/35/1; 23 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/XYZ/DCD/TRR trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; latest 4DJW manual gate PASS"
+    "testResults": "148 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium 141/141 at b3c21fe (final source 3911991 adds the truncated-XTC unit guard)",
+    "oracleVisualStress": "Oracle ledger 51/35/1; 24 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/XYZ/DCD/TRR/XTC trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; latest 4DJW manual gate PASS"
   }
 }

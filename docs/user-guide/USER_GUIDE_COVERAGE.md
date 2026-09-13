@@ -2,7 +2,7 @@
 
 | Surface | Guide | Acceptance evidence |
 | --- | --- | --- |
-| File and import | [FILE.md](FILE.md), [IMPORT_FORMATS.md](IMPORT_FORMATS.md) | AT-FSR-B-001/002, AT-FSR-G-001, AT-FSR-J-001–009, adapter tests |
+| File and import | [FILE.md](FILE.md), [IMPORT_FORMATS.md](IMPORT_FORMATS.md) | AT-FSR-B-001/002, AT-FSR-G-001, AT-FSR-J-001–010, adapter tests |
 | Select and clear | [SELECT.md](SELECT.md) | AT-FSR-F-001 |
 | Display and color | [DISPLAY.md](DISPLAY.md), [COLOR.md](COLOR.md) | R01–R06 and selection closure suites |
 | Measure and analyze | [MEASURE.md](MEASURE.md), [ANALYZE.md](ANALYZE.md) | AT-FSR-D-001 and V-FINAL suites |

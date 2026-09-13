@@ -1,1 +1,1 @@
-{"name":"COLOR","SHA":"d399059","tests":["selection-closure.spec.ts","g1c-visualization.spec.ts"],"evidence":["PYMOL_CONFORMANCE_MATRIX.md"],"date":"2026-09-13","knownLimitations":["Named schemes are limited to the ColorRegistry."],"status":"LOCKED"}
+{"name":"COLOR","SHA":"3911991","tests":["selection-closure.spec.ts","g1c-visualization.spec.ts"],"evidence":["PYMOL_CONFORMANCE_MATRIX.md"],"date":"2026-09-13","knownLimitations":["Named schemes are limited to the ColorRegistry."],"status":"LOCKED"}

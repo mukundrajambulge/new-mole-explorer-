@@ -18,7 +18,7 @@
 | XYZ trajectory | Trajectory viewer | Multi-frame XYZ is validated with constant atom count and frame slider; single-frame XYZ remains a coordinate object | `adapters.test.ts`, `AT-FSR-J-005` |
 | GRO | Trajectory viewer | One coordinate frame is parsed with nm→Å conversion; topology is not inferred | `adapters.test.ts` |
 | DCD | Decoded trajectory frames | Fortran records, frame count, atom count, float32/float64 coordinates, and bounded frame slider; fixed-atom reconstruction is rejected explicitly | `adapters.test.ts`, `AT-FSR-J-008` |
-| XTC | Header-only trajectory status | Big-endian magic is validated; compressed coordinate frames remain gated and no coordinates are fabricated | Adapter registry and viewer diagnostic |
+| XTC | Decoded trajectory frames | Big-endian XTC headers, small uncompressed frames, GROMACS compressed coordinate blocks, bounded frame slider, and Å viewer conversion | `adapters.test.ts`, `AT-FSR-J-010` |
 | TRR | Decoded trajectory frames | Big-endian frame headers, float32/float64 coordinate blocks, constant atom count, and bounded frame slider | `adapters.test.ts`, `AT-FSR-J-009` |
 | PSF / PRMTOP | Topology metadata viewer | Atom/bond/residue metadata is shown separately; no coordinate rendering is claimed | `adapters.test.ts` |
 
