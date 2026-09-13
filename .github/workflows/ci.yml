@@ -10,7 +10,7 @@ jobs:
     # The expanded R07/R08 browser matrix runs the full 110-test E2E suite.
     # The real 3D viewer/manual-gate cases are intentionally serialized and
     # require more than the prior 30-minute budget on hosted runners.
-    timeout-minutes: 45
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
