@@ -40,6 +40,23 @@ const trrFixture = (): ArrayBuffer => {
   return concat([frame(1, [0, 0, 0, 1, 0, 0]), frame(2, [0, 0.5, 0, 1, 0.5, 0])]);
 };
 
+const dcdBigEndianFixture = (): ArrayBuffer => {
+  const record = (payload: Uint8Array): Uint8Array => { const result = new Uint8Array(payload.byteLength + 8); const view = new DataView(result.buffer); view.setInt32(0, payload.byteLength, false); result.set(payload, 4); view.setInt32(payload.byteLength + 4, payload.byteLength, false); return result; };
+  const headerPayload = new Uint8Array(84); const headerView = new DataView(headerPayload.buffer); headerPayload.set([67, 79, 82, 68], 0); headerView.setInt32(4, 1, false); headerView.setInt32(8, 1, false); headerView.setInt32(12, 1, false); headerView.setInt32(80, 24, false);
+  const atomPayload = new Uint8Array(4); new DataView(atomPayload.buffer).setInt32(0, 3, false);
+  const floats = (values: number[]) => { const payload = new Uint8Array(values.length * 4); const view = new DataView(payload.buffer); values.forEach((value, index) => view.setFloat32(index * 4, value, false)); return record(payload); };
+  const cellPayload = new Uint8Array(48); const cellView = new DataView(cellPayload.buffer); [10, 11, 12, 90, 90, 90].forEach((value, index) => cellView.setFloat64(index * 8, value, false));
+  return concat([record(headerPayload), record(new Uint8Array(4)), record(atomPayload), record(cellPayload), floats([0, 1, 2]), floats([0, 1, 2]), floats([0, 0, 0])]);
+};
+
+const trrDoubleFixture = (): ArrayBuffer => {
+  const payload = new Uint8Array(4 + 4 + 3 + (10 + 3) * 4 + 2 * 3 * 8); const view = new DataView(payload.buffer); let offset = 0;
+  view.setInt32(offset, 1993, false); offset += 4; view.setInt32(offset, 3, false); offset += 4; payload.set([49, 46, 48], offset); offset += 3;
+  const sizes = [0, 0, 0, 0, 0, 0, 0, 2 * 3 * 8, 0, 0, 2, 3, 0]; sizes.forEach((value) => { view.setInt32(offset, value, false); offset += 4; });
+  [0, 0, 0, 1, 0.25, 0].forEach((value) => { view.setFloat64(offset, value, false); offset += 8; });
+  return payload.buffer;
+};
+
 const trajectoryHeaderFixture = (magic: number): ArrayBuffer => {
   const buffer = new ArrayBuffer(4); new DataView(buffer).setInt32(0, magic, false); return buffer;
 };
@@ -92,6 +109,18 @@ describe("biological data adapters", () => {
     expect(trr.status).toBe("READY");
     expect(trr.frames).toHaveLength(2);
     expect(trr.frames[1]?.atoms[1]?.y).toBeCloseTo(0.5);
+  });
+
+  it("handles big-endian DCD unit-cell records and double-precision TRR coordinates", () => {
+    const dcd = parseBiologicalData("big-endian.dcd", dcdBigEndianFixture());
+    const trr = parseBiologicalData("double.trr", trrDoubleFixture());
+    if (dcd.kind !== "TRAJECTORY" || trr.kind !== "TRAJECTORY") throw new Error("binary trajectory adapters returned the wrong data kind");
+    expect(dcd.kind).toBe("TRAJECTORY");
+    expect(dcd.status).toBe("READY");
+    expect(dcd.frames[0]?.atoms[1]?.y).toBeCloseTo(1);
+    expect(trr.kind).toBe("TRAJECTORY");
+    expect(trr.status).toBe("READY");
+    expect(trr.frames[0]?.atoms[1]?.y).toBeCloseTo(0.25);
   });
 
   it("parses topology and notation sources as separate data kinds", () => {
