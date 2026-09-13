@@ -46,7 +46,7 @@
       "status": "PASS",
       "result": "142/142",
       "date": "2026-09-13",
-      "commit": "77b4b6b"
+      "commit": "a79736e54382680567bdc61db2ca2bb4fa536075"
     }
   },
   "selectionMatrix": {
@@ -121,7 +121,7 @@
       "finalRearchitecturePng": 25,
       "inheritedEvidencePng": 200
     },
-    "testResults": "150 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium 142/142 at 77b4b6b (final source 1ccbc04 adds fixed-width PRMTOP metadata coverage)",
+    "testResults": "150 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium 142/142 at tested acceptance tip a79736e (final source 1ccbc04 adds fixed-width PRMTOP metadata coverage)",
     "oracleVisualStress": "Oracle ledger 51/35/1; 25 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/XYZ/DCD/TRR/XTC/topology-paired trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; latest 4DJW manual gate PASS"
   }
 }
