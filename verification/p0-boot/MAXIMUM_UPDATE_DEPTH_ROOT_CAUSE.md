@@ -95,8 +95,8 @@ Evidence captured by the P0 tests:
 | Focused P0 suite | PASS — 3 tests in 2.9 minutes |
 | Focused historical acceptance/IMP-PRES/multi-object suite | PASS — 19 tests in 3.7 minutes |
 | Full Chromium E2E | PASS — 145 tests in 32.6 minutes |
+| GitHub Actions run 34820638492 | PASS — hosted lint, typecheck, unit tests, build, and 145-test E2E |
 
 ## Delivery
 
-The branch is kept separate from `main` and points at the exact requested remote. Local evidence is retained in this directory. Google Drive upload was not attempted because no authorized Drive connector is available in this session.
-
+The branch is kept separate from `main` and points at the exact requested remote. Hosted verification is recorded in [GitHub Actions run 34820638492](https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34820638492). Local evidence is retained in this directory. Google Drive upload was not attempted because no authorized Drive connector is available in this session.
