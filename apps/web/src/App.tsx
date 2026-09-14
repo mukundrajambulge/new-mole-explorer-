@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { BondOrder, ProjectRecord, StructureLoadResult } from "@molecular/contracts";
 import { CapabilityNotice } from "./components/CapabilityNotice";
 import { ConsolePanel, type ConsoleCommandResult } from "./components/ConsolePanel";
@@ -108,8 +108,6 @@ export const App = () => {
   const [globalFrameIndex, setGlobalFrameIndex] = useState(0);
   const [coordinateFramePolicy, setCoordinateFramePolicy] = useState<CoordinateFramePolicy | null>(null);
   const [projection, setProjection] = useState<RenderProjection>(createDefaultRenderProjection());
-  const projectionStateRef = useRef(projection);
-  projectionStateRef.current = projection;
   const [loadState, setLoadState] = useState<"idle" | "loading" | "error">("idle");
   const [loadError, setLoadError] = useState<string | null>(null);
   const [measurementMode, setMeasurementModeState] = useState<MeasurementKind | null>(null);
@@ -135,6 +133,10 @@ export const App = () => {
   const historyServiceRef = useRef(new ScientificHistoryService());
   const sceneStoreRef = useRef(new SceneStore());
   const savedFingerprintRef = useRef<string | null>(null);
+  // The active object's presentation is authoritative in `projection`.
+  // Workspace objects keep durable snapshots for inactive objects and are
+  // updated by explicit workspace actions; the active overlay below feeds the
+  // viewer without an effect that writes derived state back into the store.
   const analysisOverlays = useMemo(() => overlaysForAnalysis(analysisResults), [analysisResults]);
   const alignmentOverlays = useMemo(() => overlaysForAlignment(fittingResults), [fittingResults]);
   const viewerWorkspaceObjects = useMemo(() => workspaceObjects.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object), [activeObjectId, projection, workspaceObjects]);
@@ -250,20 +252,6 @@ export const App = () => {
     apiClient.health().then(() => mounted && setApiStatus("connected")).catch(() => mounted && setApiStatus("offline"));
     return () => { mounted = false; };
   }, []);
-
-  useLayoutEffect(() => {
-    if (!activeObjectId) return;
-    // Keep the active workspace object authoritative before the canvas effects
-    // run. A large 4DJW projection can otherwise let the adapter see the old
-    // object presentation after the visible projection state has advanced.
-    if (projectionStateRef.current !== projection) return;
-    const current = workspaceObjectsRef.current;
-    const active = current.find((object) => object.objectId === activeObjectId);
-    if (!active || active.projection === projection) return;
-    const next = current.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object);
-    workspaceObjectsRef.current = next;
-    setWorkspaceObjects(next);
-  }, [activeObjectId, projection]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
