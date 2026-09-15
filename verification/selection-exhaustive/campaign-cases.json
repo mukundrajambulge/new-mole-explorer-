@@ -1,0 +1,4192 @@
+{
+  "schemaVersion": 1,
+  "sourceAttachment": "pasted-text-1.txt",
+  "generatedAt": "2026-09-15",
+  "caseCount": 523,
+  "cases": [
+    {
+      "testId": "A-001",
+      "category": "A",
+      "sourceQuery": "all",
+      "kind": "QUERY",
+      "query": "all",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-002",
+      "category": "A",
+      "sourceQuery": "none",
+      "kind": "QUERY",
+      "query": "none",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-003",
+      "category": "A",
+      "sourceQuery": "enabled",
+      "kind": "QUERY",
+      "query": "enabled",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-004",
+      "category": "A",
+      "sourceQuery": "present",
+      "kind": "QUERY",
+      "query": "present",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-005",
+      "category": "A",
+      "sourceQuery": "visible",
+      "kind": "QUERY",
+      "query": "visible",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-006",
+      "category": "A",
+      "sourceQuery": "polymer",
+      "kind": "QUERY",
+      "query": "polymer",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-007",
+      "category": "A",
+      "sourceQuery": "polymer.protein",
+      "kind": "QUERY",
+      "query": "polymer.protein",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-008",
+      "category": "A",
+      "sourceQuery": "polymer.nucleic",
+      "kind": "QUERY",
+      "query": "polymer.nucleic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-009",
+      "category": "A",
+      "sourceQuery": "organic",
+      "kind": "QUERY",
+      "query": "organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-010",
+      "category": "A",
+      "sourceQuery": "inorganic",
+      "kind": "QUERY",
+      "query": "inorganic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-011",
+      "category": "A",
+      "sourceQuery": "solvent",
+      "kind": "QUERY",
+      "query": "solvent",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-012",
+      "category": "A",
+      "sourceQuery": "metals",
+      "kind": "QUERY",
+      "query": "metals",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-013",
+      "category": "A",
+      "sourceQuery": "hydrogens",
+      "kind": "QUERY",
+      "query": "hydrogens",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-014",
+      "category": "A",
+      "sourceQuery": "hetatm",
+      "kind": "QUERY",
+      "query": "hetatm",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-015",
+      "category": "A",
+      "sourceQuery": "backbone",
+      "kind": "QUERY",
+      "query": "backbone",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-016",
+      "category": "A",
+      "sourceQuery": "sidechain",
+      "kind": "QUERY",
+      "query": "sidechain",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-017",
+      "category": "A",
+      "sourceQuery": "guide",
+      "kind": "QUERY",
+      "query": "guide",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-018",
+      "category": "A",
+      "sourceQuery": "bonded",
+      "kind": "QUERY",
+      "query": "bonded",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-019",
+      "category": "A",
+      "sourceQuery": "donors",
+      "kind": "QUERY",
+      "query": "donors",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "A-020",
+      "category": "A",
+      "sourceQuery": "acceptors",
+      "kind": "QUERY",
+      "query": "acceptors",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AA-001",
+      "category": "AA",
+      "sourceQuery": "show cartoon, polymer.protein",
+      "kind": "ACTION",
+      "query": "show cartoon, polymer.protein",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AA-002",
+      "category": "AA",
+      "sourceQuery": "rep cartoon",
+      "kind": "QUERY",
+      "query": "rep cartoon",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AA-003",
+      "category": "AA",
+      "sourceQuery": "hide cartoon, polymer.protein",
+      "kind": "ACTION",
+      "query": "hide cartoon, polymer.protein",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AA-004",
+      "category": "AA",
+      "sourceQuery": "rep cartoon",
+      "kind": "QUERY",
+      "query": "rep cartoon",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AB-001",
+      "category": "AB",
+      "sourceQuery": "color blue, chain A",
+      "kind": "ACTION",
+      "query": "color blue, chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AB-002",
+      "category": "AB",
+      "sourceQuery": "color blue",
+      "kind": "QUERY",
+      "query": "color blue",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AB-003",
+      "category": "AB",
+      "sourceQuery": "color red, chain A",
+      "kind": "ACTION",
+      "query": "color red, chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AB-004",
+      "category": "AB",
+      "sourceQuery": "color blue",
+      "kind": "QUERY",
+      "query": "color blue",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AB-005",
+      "category": "AB",
+      "sourceQuery": "color red",
+      "kind": "QUERY",
+      "query": "color red",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AC-001",
+      "category": "AC",
+      "sourceQuery": "select active_site, byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "query": "select active_site, byres (polymer.protein within 4 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AC-002",
+      "category": "AC",
+      "sourceQuery": "active_site",
+      "kind": "QUERY",
+      "query": "active_site",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AC-003",
+      "category": "AC",
+      "sourceQuery": "%active_site",
+      "kind": "QUERY",
+      "query": "%active_site",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AC-004",
+      "category": "AC",
+      "sourceQuery": "?active_site",
+      "kind": "QUERY",
+      "query": "?active_site",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AC-005",
+      "category": "AC",
+      "sourceQuery": "?does_not_exist",
+      "kind": "QUERY",
+      "query": "?does_not_exist",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AD-001",
+      "category": "AD",
+      "sourceQuery": "select ligand_test, organic",
+      "kind": "QUERY",
+      "query": "select ligand_test, organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AD-002",
+      "category": "AD",
+      "sourceQuery": "select pocket_test, byres (polymer.protein within 4 of ligand_test)",
+      "kind": "QUERY",
+      "query": "select pocket_test, byres (polymer.protein within 4 of ligand_test)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AD-003",
+      "category": "AD",
+      "sourceQuery": "pocket_test and chain <A>",
+      "kind": "QUERY",
+      "query": "pocket_test and chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AD-004",
+      "category": "AD",
+      "sourceQuery": "pocket_test and name CA",
+      "kind": "QUERY",
+      "query": "pocket_test and name CA",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AD-005",
+      "category": "AD",
+      "sourceQuery": "not pocket_test",
+      "kind": "QUERY",
+      "query": "not pocket_test",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AD-006",
+      "category": "AD",
+      "sourceQuery": "bychain pocket_test",
+      "kind": "QUERY",
+      "query": "bychain pocket_test",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AE-001",
+      "category": "AE",
+      "sourceQuery": "model <OBJECT_A> in model <OBJECT_B>",
+      "kind": "QUERY",
+      "query": "model mini-protein.pdb in model mini-protein.pdb",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AF-001",
+      "category": "AF",
+      "sourceQuery": "model <OBJECT_A> like model <OBJECT_B>",
+      "kind": "QUERY",
+      "query": "model mini-protein.pdb like model mini-protein.pdb",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AG-001",
+      "category": "AG",
+      "sourceQuery": "chain ZZZ",
+      "kind": "QUERY",
+      "query": "chain ZZZ",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AG-002",
+      "category": "AG",
+      "sourceQuery": "resi 999999",
+      "kind": "QUERY",
+      "query": "resi 999999",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AG-003",
+      "category": "AG",
+      "sourceQuery": "resn ZZZ",
+      "kind": "QUERY",
+      "query": "resn ZZZ",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AG-004",
+      "category": "AG",
+      "sourceQuery": "name DOESNOTEXIST",
+      "kind": "QUERY",
+      "query": "name DOESNOTEXIST",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AG-005",
+      "category": "AG",
+      "sourceQuery": "elem Xe",
+      "kind": "QUERY",
+      "query": "elem Xe",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AG-006",
+      "category": "AG",
+      "sourceQuery": "model does_not_exist",
+      "kind": "QUERY",
+      "query": "model does_not_exist",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AG-007",
+      "category": "AG",
+      "sourceQuery": "polymer.nucleic",
+      "kind": "QUERY",
+      "query": "polymer.nucleic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AG-008",
+      "category": "AG",
+      "sourceQuery": "metals",
+      "kind": "QUERY",
+      "query": "metals",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AG-009",
+      "category": "AG",
+      "sourceQuery": "hydrogens",
+      "kind": "QUERY",
+      "query": "hydrogens",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-001",
+      "category": "AH",
+      "sourceQuery": "chain",
+      "kind": "QUERY",
+      "query": "chain",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-002",
+      "category": "AH",
+      "sourceQuery": "resi",
+      "kind": "QUERY",
+      "query": "resi",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-003",
+      "category": "AH",
+      "sourceQuery": "name",
+      "kind": "QUERY",
+      "query": "name",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-004",
+      "category": "AH",
+      "sourceQuery": "elem",
+      "kind": "QUERY",
+      "query": "elem",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-005",
+      "category": "AH",
+      "sourceQuery": "within 4 of",
+      "kind": "QUERY",
+      "query": "within 4 of",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-006",
+      "category": "AH",
+      "sourceQuery": "all within of organic",
+      "kind": "QUERY",
+      "query": "all within of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-007",
+      "category": "AH",
+      "sourceQuery": "byres",
+      "kind": "QUERY",
+      "query": "byres",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-008",
+      "category": "AH",
+      "sourceQuery": "neighbor",
+      "kind": "QUERY",
+      "query": "neighbor",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-009",
+      "category": "AH",
+      "sourceQuery": "extend",
+      "kind": "QUERY",
+      "query": "extend",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-010",
+      "category": "AH",
+      "sourceQuery": "all and",
+      "kind": "QUERY",
+      "query": "all and",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-011",
+      "category": "AH",
+      "sourceQuery": "or all",
+      "kind": "QUERY",
+      "query": "or all",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-012",
+      "category": "AH",
+      "sourceQuery": "not",
+      "kind": "QUERY",
+      "query": "not",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-013",
+      "category": "AH",
+      "sourceQuery": "((chain A)",
+      "kind": "QUERY",
+      "query": "((chain A)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-014",
+      "category": "AH",
+      "sourceQuery": "chain A))",
+      "kind": "QUERY",
+      "query": "chain A))",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-015",
+      "category": "AH",
+      "sourceQuery": "resi abc---",
+      "kind": "QUERY",
+      "query": "resi abc---",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-016",
+      "category": "AH",
+      "sourceQuery": "b <",
+      "kind": "QUERY",
+      "query": "b <",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-017",
+      "category": "AH",
+      "sourceQuery": "q >",
+      "kind": "QUERY",
+      "query": "q >",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-018",
+      "category": "AH",
+      "sourceQuery": "unknown_selector_xyz",
+      "kind": "QUERY",
+      "query": "unknown_selector_xyz",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AH-019",
+      "category": "AH",
+      "sourceQuery": "chain A and and name CA",
+      "kind": "QUERY",
+      "query": "chain A and and name CA",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AI-001",
+      "category": "AI",
+      "sourceQuery": "all within -1 of organic",
+      "kind": "QUERY",
+      "query": "all within -1 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AI-002",
+      "category": "AI",
+      "sourceQuery": "all within NaN of organic",
+      "kind": "QUERY",
+      "query": "all within NaN of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AI-003",
+      "category": "AI",
+      "sourceQuery": "all within Infinity of organic",
+      "kind": "QUERY",
+      "query": "all within Infinity of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AI-004",
+      "category": "AI",
+      "sourceQuery": "all within abc of organic",
+      "kind": "QUERY",
+      "query": "all within abc of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AI-005",
+      "category": "AI",
+      "sourceQuery": "organic expand -2",
+      "kind": "QUERY",
+      "query": "organic expand -2",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AI-006",
+      "category": "AI",
+      "sourceQuery": "resi 4--9",
+      "kind": "QUERY",
+      "query": "resi 4--9",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AJ-001",
+      "category": "AJ",
+      "sourceQuery": "chain A",
+      "kind": "QUERY",
+      "query": "chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AJ-002",
+      "category": "AJ",
+      "sourceQuery": "chain    A",
+      "kind": "QUERY",
+      "query": "chain    A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AJ-003",
+      "category": "AJ",
+      "sourceQuery": "chain A",
+      "kind": "QUERY",
+      "query": "chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AJ-004",
+      "category": "AJ",
+      "sourceQuery": "chain A",
+      "kind": "QUERY",
+      "query": "chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AJ-005",
+      "category": "AJ",
+      "sourceQuery": "(chain A)",
+      "kind": "QUERY",
+      "query": "(chain A)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AJ-006",
+      "category": "AJ",
+      "sourceQuery": "( chain A )",
+      "kind": "QUERY",
+      "query": "( chain A )",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AJ-007",
+      "category": "AJ",
+      "sourceQuery": "polymer.protein and chain A",
+      "kind": "QUERY",
+      "query": "polymer.protein and chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AJ-008",
+      "category": "AJ",
+      "sourceQuery": "polymer.protein    and    chain A",
+      "kind": "QUERY",
+      "query": "polymer.protein    and    chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AK-001",
+      "category": "AK",
+      "sourceQuery": "chain A",
+      "kind": "QUERY",
+      "query": "chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AK-002",
+      "category": "AK",
+      "sourceQuery": "CHAIN A",
+      "kind": "QUERY",
+      "query": "CHAIN A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AK-003",
+      "category": "AK",
+      "sourceQuery": "Chain A",
+      "kind": "QUERY",
+      "query": "Chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AL-001",
+      "category": "AL",
+      "sourceQuery": "byres (polymer.protein within 4.0 of organic)",
+      "kind": "QUERY",
+      "query": "byres (polymer.protein within 4.0 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AL-002",
+      "category": "AL",
+      "sourceQuery": "byres ((polymer.protein and chain <A>) within 4.0 of organic)",
+      "kind": "QUERY",
+      "query": "byres ((polymer.protein and chain A) within 4.0 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AL-003",
+      "category": "AL",
+      "sourceQuery": "byres ((polymer.protein and not resn GLY) within 4.0 of organic)",
+      "kind": "QUERY",
+      "query": "byres ((polymer.protein and not resn GLY) within 4.0 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AL-004",
+      "category": "AL",
+      "sourceQuery": "byres (polymer.protein within 4.0 of (organic and elem O+N))",
+      "kind": "QUERY",
+      "query": "byres (polymer.protein within 4.0 of (organic and elem O+N))",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AL-005",
+      "category": "AL",
+      "sourceQuery": "(byres (polymer.protein within 4.0 of organic)) and name CA",
+      "kind": "QUERY",
+      "query": "(byres (polymer.protein within 4.0 of organic)) and name CA",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AM-001",
+      "category": "AM",
+      "sourceQuery": "polymer.protein and backbone",
+      "kind": "QUERY",
+      "query": "polymer.protein and backbone",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AM-002",
+      "category": "AM",
+      "sourceQuery": "polymer.protein and sidechain",
+      "kind": "QUERY",
+      "query": "polymer.protein and sidechain",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AM-003",
+      "category": "AM",
+      "sourceQuery": "(polymer.protein and backbone) or (polymer.protein and sidechain)",
+      "kind": "QUERY",
+      "query": "(polymer.protein and backbone) or (polymer.protein and sidechain)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AN-001",
+      "category": "AN",
+      "sourceQuery": "organic",
+      "kind": "QUERY",
+      "query": "organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AN-002",
+      "category": "AN",
+      "sourceQuery": "organic and elem C",
+      "kind": "QUERY",
+      "query": "organic and elem C",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AN-003",
+      "category": "AN",
+      "sourceQuery": "organic and elem N",
+      "kind": "QUERY",
+      "query": "organic and elem N",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AN-004",
+      "category": "AN",
+      "sourceQuery": "organic and elem O",
+      "kind": "QUERY",
+      "query": "organic and elem O",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AN-005",
+      "category": "AN",
+      "sourceQuery": "organic and donors",
+      "kind": "QUERY",
+      "query": "organic and donors",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AN-006",
+      "category": "AN",
+      "sourceQuery": "organic and acceptors",
+      "kind": "QUERY",
+      "query": "organic and acceptors",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AN-007",
+      "category": "AN",
+      "sourceQuery": "neighbor organic",
+      "kind": "QUERY",
+      "query": "neighbor organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AN-008",
+      "category": "AN",
+      "sourceQuery": "bymolecule organic",
+      "kind": "QUERY",
+      "query": "bymolecule organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AN-009",
+      "category": "AN",
+      "sourceQuery": "byring organic",
+      "kind": "QUERY",
+      "query": "byring organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AN-010",
+      "category": "AN",
+      "sourceQuery": "polymer.protein within 3 of organic",
+      "kind": "QUERY",
+      "query": "polymer.protein within 3 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AN-011",
+      "category": "AN",
+      "sourceQuery": "polymer.protein within 4 of organic",
+      "kind": "QUERY",
+      "query": "polymer.protein within 4 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AN-012",
+      "category": "AN",
+      "sourceQuery": "polymer.protein within 5 of organic",
+      "kind": "QUERY",
+      "query": "polymer.protein within 5 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AN-013",
+      "category": "AN",
+      "sourceQuery": "byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "query": "byres (polymer.protein within 4 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AO-001",
+      "category": "AO",
+      "sourceQuery": "solvent",
+      "kind": "QUERY",
+      "query": "solvent",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AO-002",
+      "category": "AO",
+      "sourceQuery": "solvent and elem O",
+      "kind": "QUERY",
+      "query": "solvent and elem O",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AO-003",
+      "category": "AO",
+      "sourceQuery": "solvent within 3.5 of organic",
+      "kind": "QUERY",
+      "query": "solvent within 3.5 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AO-004",
+      "category": "AO",
+      "sourceQuery": "byres (solvent within 3.5 of organic)",
+      "kind": "QUERY",
+      "query": "byres (solvent within 3.5 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AP-001",
+      "category": "AP",
+      "sourceQuery": "metals",
+      "kind": "QUERY",
+      "query": "metals",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AP-002",
+      "category": "AP",
+      "sourceQuery": "inorganic",
+      "kind": "QUERY",
+      "query": "inorganic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AP-003",
+      "category": "AP",
+      "sourceQuery": "metals within 4 of organic",
+      "kind": "QUERY",
+      "query": "metals within 4 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AP-004",
+      "category": "AP",
+      "sourceQuery": "polymer.protein within 3 of metals",
+      "kind": "QUERY",
+      "query": "polymer.protein within 3 of metals",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AP-005",
+      "category": "AP",
+      "sourceQuery": "byres (polymer.protein within 3 of metals)",
+      "kind": "QUERY",
+      "query": "byres (polymer.protein within 3 of metals)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AQ-001",
+      "category": "AQ",
+      "sourceQuery": "model <4DJW> and chain A",
+      "kind": "QUERY",
+      "query": "model mini-protein.pdb and chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AQ-002",
+      "category": "AQ",
+      "sourceQuery": "model <1CRN> and chain A",
+      "kind": "QUERY",
+      "query": "model mini-protein.pdb and chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AQ-003",
+      "category": "AQ",
+      "sourceQuery": "chain A",
+      "kind": "QUERY",
+      "query": "chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AQ-004",
+      "category": "AQ",
+      "sourceQuery": "model <4DJW> and resi 45",
+      "kind": "QUERY",
+      "query": "model mini-protein.pdb and resi 45",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AQ-005",
+      "category": "AQ",
+      "sourceQuery": "model <1CRN> and resi 45",
+      "kind": "QUERY",
+      "query": "model mini-protein.pdb and resi 45",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AR-001",
+      "category": "AR",
+      "sourceQuery": "select testsel, chain A",
+      "kind": "QUERY",
+      "query": "select testsel, chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AR-002",
+      "category": "AR",
+      "sourceQuery": "enabled",
+      "kind": "QUERY",
+      "query": "enabled",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AR-003",
+      "category": "AR",
+      "sourceQuery": "visible",
+      "kind": "QUERY",
+      "query": "visible",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AS-001",
+      "category": "AS",
+      "sourceQuery": "select pocket, byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "query": "select pocket, byres (polymer.protein within 4 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AS-002",
+      "category": "AS",
+      "sourceQuery": "show sticks, pocket",
+      "kind": "QUERY",
+      "query": "show sticks, pocket",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AS-003",
+      "category": "AS",
+      "sourceQuery": "show surface, pocket",
+      "kind": "QUERY",
+      "query": "show surface, pocket",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AS-004",
+      "category": "AS",
+      "sourceQuery": "show mesh, pocket",
+      "kind": "QUERY",
+      "query": "show mesh, pocket",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AS-005",
+      "category": "AS",
+      "sourceQuery": "hide sticks, pocket",
+      "kind": "QUERY",
+      "query": "hide sticks, pocket",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AS-006",
+      "category": "AS",
+      "sourceQuery": "hide surface, pocket",
+      "kind": "QUERY",
+      "query": "hide surface, pocket",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AS-007",
+      "category": "AS",
+      "sourceQuery": "hide mesh, pocket",
+      "kind": "QUERY",
+      "query": "hide mesh, pocket",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AT-001",
+      "category": "AT",
+      "sourceQuery": "select residue45, resi 45",
+      "kind": "QUERY",
+      "query": "select residue45, resi 45",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AT-002",
+      "category": "AT",
+      "sourceQuery": "color magenta, residue45",
+      "kind": "QUERY",
+      "query": "color magenta, residue45",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AT-003",
+      "category": "AT",
+      "sourceQuery": "none",
+      "kind": "QUERY",
+      "query": "none",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AT-004",
+      "category": "AT",
+      "sourceQuery": "select residue45, resi 45",
+      "kind": "QUERY",
+      "query": "select residue45, resi 45",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AU-001",
+      "category": "AU",
+      "sourceQuery": "name CA",
+      "kind": "QUERY",
+      "query": "name CA",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AU-002",
+      "category": "AU",
+      "sourceQuery": "resi 45",
+      "kind": "QUERY",
+      "query": "resi 45",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AU-003",
+      "category": "AU",
+      "sourceQuery": "chain A",
+      "kind": "QUERY",
+      "query": "chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AU-004",
+      "category": "AU",
+      "sourceQuery": "organic",
+      "kind": "QUERY",
+      "query": "organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AU-005",
+      "category": "AU",
+      "sourceQuery": "all",
+      "kind": "QUERY",
+      "query": "all",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-001-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-001-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-001-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-001-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-001-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-001-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-002-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-002-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-002-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-002-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-002-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-002-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-003-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-003-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-003-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-003-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-003-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-003-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-004-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-004-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-004-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-004-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-004-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-004-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-005-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-005-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-005-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-005-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-005-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-005-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-006-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-006-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-006-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-006-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-006-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-006-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-007-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-007-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-007-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-007-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-007-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-007-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-008-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-008-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-008-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-008-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-008-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-008-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-009-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-009-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-009-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-009-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-009-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-009-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-010-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-010-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-010-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-010-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-010-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-010-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-011-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-011-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-011-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-011-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-011-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-011-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-012-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-012-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-012-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-012-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-012-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-012-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-013-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-013-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-013-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-013-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-013-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-013-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-014-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-014-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-014-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-014-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-014-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-014-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-015-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-015-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-015-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-015-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-015-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-015-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-016-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-016-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-016-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-016-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-016-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-016-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-017-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-017-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-017-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-017-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-017-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-017-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-018-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-018-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-018-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-018-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-018-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-018-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-019-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-019-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-019-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-019-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-019-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-019-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-020-01",
+      "category": "AV",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-020-02",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-020-03",
+      "category": "AV",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-020-04",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-020-05",
+      "category": "AV",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AV-020-06",
+      "category": "AV",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-001-001",
+      "category": "AW",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-001-002",
+      "category": "AW",
+      "sourceQuery": "name CA",
+      "query": "name CA",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-001-003",
+      "category": "AW",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-001-004",
+      "category": "AW",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-001-005",
+      "category": "AW",
+      "sourceQuery": "solvent",
+      "query": "solvent",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-001-006",
+      "category": "AW",
+      "sourceQuery": "all",
+      "query": "all",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-001-007",
+      "category": "AW",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-001-008",
+      "category": "AW",
+      "sourceQuery": "byres (polymer.protein within 4 of organic)",
+      "query": "byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-002-001",
+      "category": "AW",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-002-002",
+      "category": "AW",
+      "sourceQuery": "name CA",
+      "query": "name CA",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-002-003",
+      "category": "AW",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-002-004",
+      "category": "AW",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-002-005",
+      "category": "AW",
+      "sourceQuery": "solvent",
+      "query": "solvent",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-002-006",
+      "category": "AW",
+      "sourceQuery": "all",
+      "query": "all",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-002-007",
+      "category": "AW",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-002-008",
+      "category": "AW",
+      "sourceQuery": "byres (polymer.protein within 4 of organic)",
+      "query": "byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-003-001",
+      "category": "AW",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-003-002",
+      "category": "AW",
+      "sourceQuery": "name CA",
+      "query": "name CA",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-003-003",
+      "category": "AW",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-003-004",
+      "category": "AW",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-003-005",
+      "category": "AW",
+      "sourceQuery": "solvent",
+      "query": "solvent",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-003-006",
+      "category": "AW",
+      "sourceQuery": "all",
+      "query": "all",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-003-007",
+      "category": "AW",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-003-008",
+      "category": "AW",
+      "sourceQuery": "byres (polymer.protein within 4 of organic)",
+      "query": "byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-004-001",
+      "category": "AW",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-004-002",
+      "category": "AW",
+      "sourceQuery": "name CA",
+      "query": "name CA",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-004-003",
+      "category": "AW",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-004-004",
+      "category": "AW",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-004-005",
+      "category": "AW",
+      "sourceQuery": "solvent",
+      "query": "solvent",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-004-006",
+      "category": "AW",
+      "sourceQuery": "all",
+      "query": "all",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-004-007",
+      "category": "AW",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-004-008",
+      "category": "AW",
+      "sourceQuery": "byres (polymer.protein within 4 of organic)",
+      "query": "byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-005-001",
+      "category": "AW",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-005-002",
+      "category": "AW",
+      "sourceQuery": "name CA",
+      "query": "name CA",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-005-003",
+      "category": "AW",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-005-004",
+      "category": "AW",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-005-005",
+      "category": "AW",
+      "sourceQuery": "solvent",
+      "query": "solvent",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-005-006",
+      "category": "AW",
+      "sourceQuery": "all",
+      "query": "all",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-005-007",
+      "category": "AW",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-005-008",
+      "category": "AW",
+      "sourceQuery": "byres (polymer.protein within 4 of organic)",
+      "query": "byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-006-001",
+      "category": "AW",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-006-002",
+      "category": "AW",
+      "sourceQuery": "name CA",
+      "query": "name CA",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-006-003",
+      "category": "AW",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-006-004",
+      "category": "AW",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-006-005",
+      "category": "AW",
+      "sourceQuery": "solvent",
+      "query": "solvent",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-006-006",
+      "category": "AW",
+      "sourceQuery": "all",
+      "query": "all",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-006-007",
+      "category": "AW",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-006-008",
+      "category": "AW",
+      "sourceQuery": "byres (polymer.protein within 4 of organic)",
+      "query": "byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-007-001",
+      "category": "AW",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-007-002",
+      "category": "AW",
+      "sourceQuery": "name CA",
+      "query": "name CA",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-007-003",
+      "category": "AW",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-007-004",
+      "category": "AW",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-007-005",
+      "category": "AW",
+      "sourceQuery": "solvent",
+      "query": "solvent",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-007-006",
+      "category": "AW",
+      "sourceQuery": "all",
+      "query": "all",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-007-007",
+      "category": "AW",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-007-008",
+      "category": "AW",
+      "sourceQuery": "byres (polymer.protein within 4 of organic)",
+      "query": "byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-008-001",
+      "category": "AW",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-008-002",
+      "category": "AW",
+      "sourceQuery": "name CA",
+      "query": "name CA",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-008-003",
+      "category": "AW",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-008-004",
+      "category": "AW",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-008-005",
+      "category": "AW",
+      "sourceQuery": "solvent",
+      "query": "solvent",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-008-006",
+      "category": "AW",
+      "sourceQuery": "all",
+      "query": "all",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-008-007",
+      "category": "AW",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-008-008",
+      "category": "AW",
+      "sourceQuery": "byres (polymer.protein within 4 of organic)",
+      "query": "byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-009-001",
+      "category": "AW",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-009-002",
+      "category": "AW",
+      "sourceQuery": "name CA",
+      "query": "name CA",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-009-003",
+      "category": "AW",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-009-004",
+      "category": "AW",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-009-005",
+      "category": "AW",
+      "sourceQuery": "solvent",
+      "query": "solvent",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-009-006",
+      "category": "AW",
+      "sourceQuery": "all",
+      "query": "all",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-009-007",
+      "category": "AW",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-009-008",
+      "category": "AW",
+      "sourceQuery": "byres (polymer.protein within 4 of organic)",
+      "query": "byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-010-001",
+      "category": "AW",
+      "sourceQuery": "chain A",
+      "query": "chain A",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-010-002",
+      "category": "AW",
+      "sourceQuery": "name CA",
+      "query": "name CA",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-010-003",
+      "category": "AW",
+      "sourceQuery": "resi 45",
+      "query": "resi 45",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-010-004",
+      "category": "AW",
+      "sourceQuery": "organic",
+      "query": "organic",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-010-005",
+      "category": "AW",
+      "sourceQuery": "solvent",
+      "query": "solvent",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-010-006",
+      "category": "AW",
+      "sourceQuery": "all",
+      "query": "all",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-010-007",
+      "category": "AW",
+      "sourceQuery": "none",
+      "query": "none",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AW-010-008",
+      "category": "AW",
+      "sourceQuery": "byres (polymer.protein within 4 of organic)",
+      "query": "byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AX-001",
+      "category": "AX",
+      "sourceQuery": "select lig_test, organic; show sticks, lig_test",
+      "kind": "QUERY",
+      "query": "select lig_test, organic; show sticks, lig_test",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AX-002",
+      "category": "AX",
+      "sourceQuery": "select pocket, byres (polymer.protein within 4.0 of organic); show sticks, pocket; color yellow, pocket",
+      "kind": "QUERY",
+      "query": "select pocket, byres (polymer.protein within 4.0 of organic); show sticks, pocket; color yellow, pocket",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AX-003",
+      "category": "AX",
+      "sourceQuery": "select a, chain A; show spheres, a; hide spheres, a; show sticks, a",
+      "kind": "QUERY",
+      "query": "select a, chain A; show spheres, a; hide spheres, a; show sticks, a",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AY-001",
+      "category": "AY",
+      "sourceQuery": "select a, chain A; BADCOMMAND; color red, a",
+      "kind": "QUERY",
+      "query": "select a, chain A; BADCOMMAND; color red, a",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AZ-001",
+      "category": "AZ",
+      "sourceQuery": "model mini-protein.pdb and polymer.protein and chain A and (resn ALA or resn GLY or resn SER or resn THR) and not name H* and not solvent",
+      "kind": "QUERY",
+      "query": "model mini-protein.pdb and polymer.protein and chain A and (resn ALA or resn GLY or resn SER or resn THR) and not name H* and not solvent",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AZ-002",
+      "category": "AZ",
+      "sourceQuery": "((polymer.protein and chain A) or (organic and elem O)) and not solvent",
+      "kind": "QUERY",
+      "query": "((polymer.protein and chain A) or (organic and elem O)) and not solvent",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "AZ-003",
+      "category": "AZ",
+      "sourceQuery": "not (not (not (not (not (not chain A)))))",
+      "kind": "QUERY",
+      "query": "not (not (not (not (not (not chain A)))))",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "B-001",
+      "category": "B",
+      "sourceQuery": "model <OBJECT_4DJW>",
+      "kind": "QUERY",
+      "query": "model mini-protein.pdb",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "B-002",
+      "category": "B",
+      "sourceQuery": "model <OBJECT_1CRN>",
+      "kind": "QUERY",
+      "query": "model mini-protein.pdb",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "B-003",
+      "category": "B",
+      "sourceQuery": "model <OBJECT_4DJW> or model <OBJECT_1CRN>",
+      "kind": "QUERY",
+      "query": "model mini-protein.pdb or model mini-protein.pdb",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "B-004",
+      "category": "B",
+      "sourceQuery": "model <OBJECT_4DJW> and model <OBJECT_1CRN>",
+      "kind": "QUERY",
+      "query": "model mini-protein.pdb and model mini-protein.pdb",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "B-005",
+      "category": "B",
+      "sourceQuery": "not model <OBJECT_4DJW>",
+      "kind": "QUERY",
+      "query": "not model mini-protein.pdb",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "B-006",
+      "category": "B",
+      "sourceQuery": "byobject (model <OBJECT_4DJW> and name CA)",
+      "kind": "QUERY",
+      "query": "byobject (model mini-protein.pdb and name CA)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BA-001",
+      "category": "BA",
+      "sourceQuery": "select pocket, byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "query": "select pocket, byres (polymer.protein within 4 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BA-002",
+      "category": "BA",
+      "sourceQuery": "rotate",
+      "kind": "QUERY",
+      "query": "rotate 15",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BA-003",
+      "category": "BA",
+      "sourceQuery": "pan",
+      "kind": "QUERY",
+      "query": "pan 1",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BA-004",
+      "category": "BA",
+      "sourceQuery": "zoom",
+      "kind": "QUERY",
+      "query": "zoom 1",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BA-005",
+      "category": "BA",
+      "sourceQuery": "Fit",
+      "kind": "QUERY",
+      "query": "fit",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BA-006",
+      "category": "BA",
+      "sourceQuery": "Center",
+      "kind": "QUERY",
+      "query": "center",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BA-007",
+      "category": "BA",
+      "sourceQuery": "Orient",
+      "kind": "QUERY",
+      "query": "orient",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BA-008",
+      "category": "BA",
+      "sourceQuery": "Perspective",
+      "kind": "QUERY",
+      "query": "perspective",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BA-009",
+      "category": "BA",
+      "sourceQuery": "Orthographic",
+      "kind": "QUERY",
+      "query": "orthographic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BB-001",
+      "category": "BB",
+      "sourceQuery": "select pocket, byres (polymer.protein within 4 of organic)",
+      "kind": "QUERY",
+      "query": "select pocket, byres (polymer.protein within 4 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BB-002",
+      "category": "BB",
+      "sourceQuery": "Cartoon",
+      "kind": "QUERY",
+      "query": "show cartoon, all",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BB-003",
+      "category": "BB",
+      "sourceQuery": "Sticks",
+      "kind": "QUERY",
+      "query": "show sticks, all",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BB-004",
+      "category": "BB",
+      "sourceQuery": "Surface",
+      "kind": "QUERY",
+      "query": "show surface, all",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BB-005",
+      "category": "BB",
+      "sourceQuery": "Mesh",
+      "kind": "QUERY",
+      "query": "show mesh, all",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BB-006",
+      "category": "BB",
+      "sourceQuery": "VDW / Spheres",
+      "kind": "QUERY",
+      "query": "show spheres, all",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BB-007",
+      "category": "BB",
+      "sourceQuery": "Lines",
+      "kind": "QUERY",
+      "query": "show lines, all",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BB-008",
+      "category": "BB",
+      "sourceQuery": "Ball-and-Stick",
+      "kind": "QUERY",
+      "query": "show sticks, all",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BC-001",
+      "category": "BC",
+      "sourceQuery": "select edit_target, <KNOWN_EDITABLE_ATOM_OR_RESIDUE>",
+      "kind": "QUERY",
+      "query": "select edit_target, index 2",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BC-002",
+      "category": "BC",
+      "sourceQuery": "perform supported delete/remove edit",
+      "kind": "QUERY",
+      "query": "remove index 2",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BC-003",
+      "category": "BC",
+      "sourceQuery": "inspect/re-evaluate edit_target",
+      "kind": "QUERY",
+      "query": "edit_test",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BC-004",
+      "category": "BC",
+      "sourceQuery": "Undo",
+      "kind": "QUERY",
+      "query": "undo",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BC-005",
+      "category": "BC",
+      "sourceQuery": "inspect/re-evaluate edit_target",
+      "kind": "QUERY",
+      "query": "edit_test",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BC-006",
+      "category": "BC",
+      "sourceQuery": "Redo",
+      "kind": "QUERY",
+      "query": "redo",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BC-007",
+      "category": "BC",
+      "sourceQuery": "inspect/re-evaluate edit_target",
+      "kind": "QUERY",
+      "query": "edit_test",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BD-001",
+      "category": "BD",
+      "sourceQuery": "create named selection one",
+      "kind": "QUERY",
+      "query": "select one, chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BD-002",
+      "category": "BD",
+      "sourceQuery": "create named selection two",
+      "kind": "QUERY",
+      "query": "select two, organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BD-003",
+      "category": "BD",
+      "sourceQuery": "save session",
+      "kind": "QUERY",
+      "query": "save",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BD-004",
+      "category": "BD",
+      "sourceQuery": "clear/remove/change current selection state",
+      "kind": "QUERY",
+      "query": "none",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BD-005",
+      "category": "BD",
+      "sourceQuery": "load/restore session",
+      "kind": "QUERY",
+      "query": "open",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BD-006",
+      "category": "BD",
+      "sourceQuery": "re-evaluate named selection one",
+      "kind": "QUERY",
+      "query": "one",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BD-007",
+      "category": "BD",
+      "sourceQuery": "re-evaluate named selection two",
+      "kind": "QUERY",
+      "query": "two",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BE-001",
+      "category": "BE",
+      "sourceQuery": "polymer.nucleic",
+      "kind": "QUERY",
+      "query": "polymer.nucleic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BE-002",
+      "category": "BE",
+      "sourceQuery": "polymer.protein",
+      "kind": "QUERY",
+      "query": "polymer.protein",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BE-003",
+      "category": "BE",
+      "sourceQuery": "guide",
+      "kind": "QUERY",
+      "query": "guide",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BE-004",
+      "category": "BE",
+      "sourceQuery": "backbone",
+      "kind": "QUERY",
+      "query": "backbone",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BE-005",
+      "category": "BE",
+      "sourceQuery": "sidechain",
+      "kind": "QUERY",
+      "query": "sidechain",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BE-006",
+      "category": "BE",
+      "sourceQuery": "chain A",
+      "kind": "QUERY",
+      "query": "chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BE-007",
+      "category": "BE",
+      "sourceQuery": "resn DA+DT+DG+DC",
+      "kind": "QUERY",
+      "query": "resn DA+DT+DG+DC",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "BE-008",
+      "category": "BE",
+      "sourceQuery": "appropriate RNA residue-name selector",
+      "kind": "QUERY",
+      "query": "resn A+U",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "C-001",
+      "category": "C",
+      "sourceQuery": "chain <VALID_CHAIN_A>",
+      "kind": "QUERY",
+      "query": "chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "C-002",
+      "category": "C",
+      "sourceQuery": "not chain <VALID_CHAIN_A>",
+      "kind": "QUERY",
+      "query": "not chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "C-003",
+      "category": "C",
+      "sourceQuery": "chain <VALID_CHAIN_A> or chain <VALID_CHAIN_B>",
+      "kind": "QUERY",
+      "query": "chain A or chain B",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "C-004",
+      "category": "C",
+      "sourceQuery": "chain <VALID_CHAIN_A> and polymer.protein",
+      "kind": "QUERY",
+      "query": "chain A and polymer.protein",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "C-005",
+      "category": "C",
+      "sourceQuery": "chain ZZZ",
+      "kind": "QUERY",
+      "query": "chain ZZZ",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "C-006",
+      "category": "C",
+      "sourceQuery": "chain A",
+      "kind": "QUERY",
+      "query": "chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "C-007",
+      "category": "C",
+      "sourceQuery": "chain a",
+      "kind": "QUERY",
+      "query": "chain a",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "D-001",
+      "category": "D",
+      "sourceQuery": "resn ALA",
+      "kind": "QUERY",
+      "query": "resn ALA",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "D-002",
+      "category": "D",
+      "sourceQuery": "resn GLY",
+      "kind": "QUERY",
+      "query": "resn GLY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "D-003",
+      "category": "D",
+      "sourceQuery": "resn TYR",
+      "kind": "QUERY",
+      "query": "resn TYR",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "D-004",
+      "category": "D",
+      "sourceQuery": "resn ASP",
+      "kind": "QUERY",
+      "query": "resn ASP",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "D-005",
+      "category": "D",
+      "sourceQuery": "resn ALA+GLY",
+      "kind": "QUERY",
+      "query": "resn ALA+GLY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "D-006",
+      "category": "D",
+      "sourceQuery": "polymer.protein and resn TYR",
+      "kind": "QUERY",
+      "query": "polymer.protein and resn TYR",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "D-007",
+      "category": "D",
+      "sourceQuery": "chain <VALID_CHAIN> and resn ASP",
+      "kind": "QUERY",
+      "query": "chain A and resn ASP",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "D-008",
+      "category": "D",
+      "sourceQuery": "resn <ACTUAL_LIGAND_RESNAME>",
+      "kind": "QUERY",
+      "query": "resn LIG",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "E-001",
+      "category": "E",
+      "sourceQuery": "resi 45",
+      "kind": "QUERY",
+      "query": "resi 45",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "E-002",
+      "category": "E",
+      "sourceQuery": "resi 45+46",
+      "kind": "QUERY",
+      "query": "resi 45+46",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "E-003",
+      "category": "E",
+      "sourceQuery": "resi 40-50",
+      "kind": "QUERY",
+      "query": "resi 40-50",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "E-004",
+      "category": "E",
+      "sourceQuery": "chain <VALID_CHAIN> and resi 45",
+      "kind": "QUERY",
+      "query": "chain A and resi 45",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "E-005",
+      "category": "E",
+      "sourceQuery": "chain <VALID_CHAIN> and resi 40-50",
+      "kind": "QUERY",
+      "query": "chain A and resi 40-50",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "E-006",
+      "category": "E",
+      "sourceQuery": "resi <INSERTION_CODE_RESIDUE>",
+      "kind": "QUERY",
+      "query": "resi 1",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "E-007",
+      "category": "E",
+      "sourceQuery": "resi HETOM",
+      "kind": "QUERY",
+      "query": "resi HETOM",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "F-001",
+      "category": "F",
+      "sourceQuery": "name CA",
+      "kind": "QUERY",
+      "query": "name CA",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "F-002",
+      "category": "F",
+      "sourceQuery": "name N",
+      "kind": "QUERY",
+      "query": "name N",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "F-003",
+      "category": "F",
+      "sourceQuery": "name C",
+      "kind": "QUERY",
+      "query": "name C",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "F-004",
+      "category": "F",
+      "sourceQuery": "name O",
+      "kind": "QUERY",
+      "query": "name O",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "F-005",
+      "category": "F",
+      "sourceQuery": "name CA+N+C+O",
+      "kind": "QUERY",
+      "query": "name CA+N+C+O",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "F-006",
+      "category": "F",
+      "sourceQuery": "polymer.protein and name CA",
+      "kind": "QUERY",
+      "query": "polymer.protein and name CA",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "F-007",
+      "category": "F",
+      "sourceQuery": "chain <VALID_CHAIN> and name CA",
+      "kind": "QUERY",
+      "query": "chain A and name CA",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "F-008",
+      "category": "F",
+      "sourceQuery": "resi 45 and name CA",
+      "kind": "QUERY",
+      "query": "resi 45 and name CA",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "G-001",
+      "category": "G",
+      "sourceQuery": "elem C",
+      "kind": "QUERY",
+      "query": "elem C",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "G-002",
+      "category": "G",
+      "sourceQuery": "elem N",
+      "kind": "QUERY",
+      "query": "elem N",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "G-003",
+      "category": "G",
+      "sourceQuery": "elem O",
+      "kind": "QUERY",
+      "query": "elem O",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "G-004",
+      "category": "G",
+      "sourceQuery": "elem S",
+      "kind": "QUERY",
+      "query": "elem S",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "G-005",
+      "category": "G",
+      "sourceQuery": "elem P",
+      "kind": "QUERY",
+      "query": "elem P",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "G-006",
+      "category": "G",
+      "sourceQuery": "organic and elem C",
+      "kind": "QUERY",
+      "query": "organic and elem C",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "G-007",
+      "category": "G",
+      "sourceQuery": "polymer.protein and elem N",
+      "kind": "QUERY",
+      "query": "polymer.protein and elem N",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "G-008",
+      "category": "G",
+      "sourceQuery": "solvent and elem O",
+      "kind": "QUERY",
+      "query": "solvent and elem O",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "G-009",
+      "category": "G",
+      "sourceQuery": "metals and elem Zn",
+      "kind": "QUERY",
+      "query": "metals and elem Zn",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "H-001",
+      "category": "H",
+      "sourceQuery": "polymer.protein and chain <VALID_CHAIN>",
+      "kind": "QUERY",
+      "query": "polymer.protein and chain A",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "H-002",
+      "category": "H",
+      "sourceQuery": "polymer.protein or organic",
+      "kind": "QUERY",
+      "query": "polymer.protein or organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "H-003",
+      "category": "H",
+      "sourceQuery": "not solvent",
+      "kind": "QUERY",
+      "query": "not solvent",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "H-004",
+      "category": "H",
+      "sourceQuery": "not polymer",
+      "kind": "QUERY",
+      "query": "not polymer",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "H-005",
+      "category": "H",
+      "sourceQuery": "chain <VALID_CHAIN> and name CA",
+      "kind": "QUERY",
+      "query": "chain A and name CA",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "H-006",
+      "category": "H",
+      "sourceQuery": "chain <VALID_CHAIN> and (resn ALA or resn GLY)",
+      "kind": "QUERY",
+      "query": "chain A and (resn ALA or resn GLY)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "H-007",
+      "category": "H",
+      "sourceQuery": "(chain <VALID_CHAIN_A> or chain <VALID_CHAIN_B>) and name CA",
+      "kind": "QUERY",
+      "query": "(chain A or chain B) and name CA",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "H-008",
+      "category": "H",
+      "sourceQuery": "polymer.protein and not name CA",
+      "kind": "QUERY",
+      "query": "polymer.protein and not name CA",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "H-009",
+      "category": "H",
+      "sourceQuery": "organic and not elem C",
+      "kind": "QUERY",
+      "query": "organic and not elem C",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "H-010",
+      "category": "H",
+      "sourceQuery": "chain <VALID_CHAIN> and resn ALA or resn GLY",
+      "kind": "QUERY",
+      "query": "chain A and resn ALA or resn GLY",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "H-011",
+      "category": "H",
+      "sourceQuery": "chain <VALID_CHAIN> and (resn ALA or resn GLY)",
+      "kind": "QUERY",
+      "query": "chain A and (resn ALA or resn GLY)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "I-001",
+      "category": "I",
+      "sourceQuery": "first all",
+      "kind": "QUERY",
+      "query": "first all",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "I-002",
+      "category": "I",
+      "sourceQuery": "last all",
+      "kind": "QUERY",
+      "query": "last all",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "I-003",
+      "category": "I",
+      "sourceQuery": "first polymer.protein",
+      "kind": "QUERY",
+      "query": "first polymer.protein",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "I-004",
+      "category": "I",
+      "sourceQuery": "last polymer.protein",
+      "kind": "QUERY",
+      "query": "last polymer.protein",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "I-005",
+      "category": "I",
+      "sourceQuery": "first none",
+      "kind": "QUERY",
+      "query": "first none",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "I-006",
+      "category": "I",
+      "sourceQuery": "last none",
+      "kind": "QUERY",
+      "query": "last none",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "J-001",
+      "category": "J",
+      "sourceQuery": "organic",
+      "kind": "QUERY",
+      "query": "organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "J-002",
+      "category": "J",
+      "sourceQuery": "polymer.protein within 4.0 of organic",
+      "kind": "QUERY",
+      "query": "polymer.protein within 4.0 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "J-003",
+      "category": "J",
+      "sourceQuery": "byres (polymer.protein within 4.0 of organic)",
+      "kind": "QUERY",
+      "query": "byres (polymer.protein within 4.0 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "J-004",
+      "category": "J",
+      "sourceQuery": "byres (polymer.protein within 2.5 of organic)",
+      "kind": "QUERY",
+      "query": "byres (polymer.protein within 2.5 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "J-005",
+      "category": "J",
+      "sourceQuery": "byres (polymer.protein within 3.0 of organic)",
+      "kind": "QUERY",
+      "query": "byres (polymer.protein within 3.0 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "J-006",
+      "category": "J",
+      "sourceQuery": "byres (polymer.protein within 4.0 of organic)",
+      "kind": "QUERY",
+      "query": "byres (polymer.protein within 4.0 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "J-007",
+      "category": "J",
+      "sourceQuery": "byres (polymer.protein within 5.0 of organic)",
+      "kind": "QUERY",
+      "query": "byres (polymer.protein within 5.0 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "J-008",
+      "category": "J",
+      "sourceQuery": "byres (polymer.protein within 8.0 of organic)",
+      "kind": "QUERY",
+      "query": "byres (polymer.protein within 8.0 of organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "K-001",
+      "category": "K",
+      "sourceQuery": "bychain (resi 45)",
+      "kind": "QUERY",
+      "query": "bychain (resi 45)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "K-002",
+      "category": "K",
+      "sourceQuery": "byobject (resi 45)",
+      "kind": "QUERY",
+      "query": "byobject (resi 45)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "K-003",
+      "category": "K",
+      "sourceQuery": "bymolecule (organic)",
+      "kind": "QUERY",
+      "query": "bymolecule (organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "K-004",
+      "category": "K",
+      "sourceQuery": "bycalpha (resi 45)",
+      "kind": "QUERY",
+      "query": "bycalpha (resi 45)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "K-005",
+      "category": "K",
+      "sourceQuery": "bysegi (resi 45)",
+      "kind": "QUERY",
+      "query": "bysegi (resi 45)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "K-006",
+      "category": "K",
+      "sourceQuery": "byfragment (organic)",
+      "kind": "QUERY",
+      "query": "byfragment (organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "K-007",
+      "category": "K",
+      "sourceQuery": "byring (organic)",
+      "kind": "QUERY",
+      "query": "byring (organic)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "K-008",
+      "category": "K",
+      "sourceQuery": "byres (chain <A> or chain <B>)",
+      "kind": "QUERY",
+      "query": "byres (chain A or chain B)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "K-009",
+      "category": "K",
+      "sourceQuery": "(byres chain <A>) or chain <B>",
+      "kind": "QUERY",
+      "query": "(byres chain A) or chain B",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "L-001",
+      "category": "L",
+      "sourceQuery": "chain <A> and resi 45 and name CA",
+      "kind": "QUERY",
+      "query": "chain A and resi 45 and name CA",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "L-002",
+      "category": "L",
+      "sourceQuery": "neighbor (chain <A> and resi 45 and name CA)",
+      "kind": "QUERY",
+      "query": "neighbor (chain A and resi 45 and name CA)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "L-003",
+      "category": "L",
+      "sourceQuery": "neighbor organic",
+      "kind": "QUERY",
+      "query": "neighbor organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "M-001",
+      "category": "M",
+      "sourceQuery": "bound_to (chain <A> and resi 45 and name CA)",
+      "kind": "QUERY",
+      "query": "bound_to (chain A and resi 45 and name CA)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "M-002",
+      "category": "M",
+      "sourceQuery": "neighbor (chain <A> and resi 45 and name CA)",
+      "kind": "QUERY",
+      "query": "neighbor (chain A and resi 45 and name CA)",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "N-001",
+      "category": "N",
+      "sourceQuery": "(chain <A> and resi 45 and name CA) extend 1",
+      "kind": "QUERY",
+      "query": "(chain A and resi 45 and name CA) extend 1",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "N-002",
+      "category": "N",
+      "sourceQuery": "(chain <A> and resi 45 and name CA) extend 2",
+      "kind": "QUERY",
+      "query": "(chain A and resi 45 and name CA) extend 2",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "N-003",
+      "category": "N",
+      "sourceQuery": "(chain <A> and resi 45 and name CA) extend 3",
+      "kind": "QUERY",
+      "query": "(chain A and resi 45 and name CA) extend 3",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "O-001",
+      "category": "O",
+      "sourceQuery": "polymer.protein within 4.0 of organic",
+      "kind": "QUERY",
+      "query": "polymer.protein within 4.0 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "O-002",
+      "category": "O",
+      "sourceQuery": "all within 4.0 of organic",
+      "kind": "QUERY",
+      "query": "all within 4.0 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "O-003",
+      "category": "O",
+      "sourceQuery": "solvent within 4.0 of organic",
+      "kind": "QUERY",
+      "query": "solvent within 4.0 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "O-004",
+      "category": "O",
+      "sourceQuery": "metals within 5.0 of organic",
+      "kind": "QUERY",
+      "query": "metals within 5.0 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "O-005",
+      "category": "O",
+      "sourceQuery": "chain <A> within 4.0 of organic",
+      "kind": "QUERY",
+      "query": "chain A within 4.0 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "O-006",
+      "category": "O",
+      "sourceQuery": "all within 0 of organic",
+      "kind": "QUERY",
+      "query": "all within 0 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "O-007",
+      "category": "O",
+      "sourceQuery": "all within 0.1 of organic",
+      "kind": "QUERY",
+      "query": "all within 0.1 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "O-008",
+      "category": "O",
+      "sourceQuery": "all within 100 of organic",
+      "kind": "QUERY",
+      "query": "all within 100 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "P-001",
+      "category": "P",
+      "sourceQuery": "organic around 4.0",
+      "kind": "QUERY",
+      "query": "organic around 4.0",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "P-002",
+      "category": "P",
+      "sourceQuery": "all within 4.0 of organic",
+      "kind": "QUERY",
+      "query": "all within 4.0 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "P-003",
+      "category": "P",
+      "sourceQuery": "resi 45 around 3",
+      "kind": "QUERY",
+      "query": "resi 45 around 3",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "Q-001",
+      "category": "Q",
+      "sourceQuery": "all near_to 4.0 of organic",
+      "kind": "QUERY",
+      "query": "all near_to 4.0 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "Q-002",
+      "category": "Q",
+      "sourceQuery": "all within 4.0 of organic",
+      "kind": "QUERY",
+      "query": "all within 4.0 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "R-001",
+      "category": "R",
+      "sourceQuery": "all beyond 4.0 of organic",
+      "kind": "QUERY",
+      "query": "all beyond 4.0 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "R-002",
+      "category": "R",
+      "sourceQuery": "all beyond 8.0 of organic",
+      "kind": "QUERY",
+      "query": "all beyond 8.0 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "R-003",
+      "category": "R",
+      "sourceQuery": "all beyond 20.0 of organic",
+      "kind": "QUERY",
+      "query": "all beyond 20.0 of organic",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "S-001",
+      "category": "S",
+      "sourceQuery": "organic expand 2",
+      "kind": "QUERY",
+      "query": "organic expand 2",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "S-002",
+      "category": "S",
+      "sourceQuery": "organic expand 4",
+      "kind": "QUERY",
+      "query": "organic expand 4",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "S-003",
+      "category": "S",
+      "sourceQuery": "organic expand 6",
+      "kind": "QUERY",
+      "query": "organic expand 6",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "S-004",
+      "category": "S",
+      "sourceQuery": "organic extend 4",
+      "kind": "QUERY",
+      "query": "organic extend 4",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "T-001",
+      "category": "T",
+      "sourceQuery": "organic gap 1.0",
+      "kind": "QUERY",
+      "query": "organic gap 1.0",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "T-002",
+      "category": "T",
+      "sourceQuery": "organic gap 2.0",
+      "kind": "QUERY",
+      "query": "organic gap 2.0",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "U-001",
+      "category": "U",
+      "sourceQuery": "b < 100",
+      "kind": "QUERY",
+      "query": "b < 100",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "U-002",
+      "category": "U",
+      "sourceQuery": "b < 50",
+      "kind": "QUERY",
+      "query": "b < 50",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "U-003",
+      "category": "U",
+      "sourceQuery": "b >= 20",
+      "kind": "QUERY",
+      "query": "b >= 20",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "U-004",
+      "category": "U",
+      "sourceQuery": "polymer.protein and b > 30",
+      "kind": "QUERY",
+      "query": "polymer.protein and b > 30",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "U-005",
+      "category": "U",
+      "sourceQuery": "b < -999",
+      "kind": "QUERY",
+      "query": "b < -999",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "U-006",
+      "category": "U",
+      "sourceQuery": "b > 99999",
+      "kind": "QUERY",
+      "query": "b > 99999",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "V-001",
+      "category": "V",
+      "sourceQuery": "q < 1.0",
+      "kind": "QUERY",
+      "query": "q < 1.0",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "V-002",
+      "category": "V",
+      "sourceQuery": "q = 1.0",
+      "kind": "QUERY",
+      "query": "q = 1.0",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "V-003",
+      "category": "V",
+      "sourceQuery": "q > 0.5",
+      "kind": "QUERY",
+      "query": "q > 0.5",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "W-001",
+      "category": "W",
+      "sourceQuery": "ss H",
+      "kind": "QUERY",
+      "query": "ss H",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "W-002",
+      "category": "W",
+      "sourceQuery": "ss S",
+      "kind": "QUERY",
+      "query": "ss S",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "W-003",
+      "category": "W",
+      "sourceQuery": "ss L",
+      "kind": "QUERY",
+      "query": "ss L",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "W-004",
+      "category": "W",
+      "sourceQuery": "ss H+S",
+      "kind": "QUERY",
+      "query": "ss H+S",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "W-005",
+      "category": "W",
+      "sourceQuery": "polymer.protein and ss H",
+      "kind": "QUERY",
+      "query": "polymer.protein and ss H",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "X-001",
+      "category": "X",
+      "sourceQuery": "formal_charge = 1",
+      "kind": "QUERY",
+      "query": "formal_charge = 1",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "X-002",
+      "category": "X",
+      "sourceQuery": "formal_charge = -1",
+      "kind": "QUERY",
+      "query": "formal_charge = -1",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "X-003",
+      "category": "X",
+      "sourceQuery": "partial_charge < 0",
+      "kind": "QUERY",
+      "query": "partial_charge < 0",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "X-004",
+      "category": "X",
+      "sourceQuery": "partial_charge > 0",
+      "kind": "QUERY",
+      "query": "partial_charge > 0",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "Y-001",
+      "category": "Y",
+      "sourceQuery": "x < 0",
+      "kind": "QUERY",
+      "query": "x < 0",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "Y-002",
+      "category": "Y",
+      "sourceQuery": "x > 0",
+      "kind": "QUERY",
+      "query": "x > 0",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "Y-003",
+      "category": "Y",
+      "sourceQuery": "y < 0",
+      "kind": "QUERY",
+      "query": "y < 0",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "Y-004",
+      "category": "Y",
+      "sourceQuery": "z > 0",
+      "kind": "QUERY",
+      "query": "z > 0",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "Y-005",
+      "category": "Y",
+      "sourceQuery": "polymer.protein and x > 0",
+      "kind": "QUERY",
+      "query": "polymer.protein and x > 0",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "Z-001",
+      "category": "Z",
+      "sourceQuery": "state 1",
+      "kind": "QUERY",
+      "query": "state 1",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "Z-002",
+      "category": "Z",
+      "sourceQuery": "state 2",
+      "kind": "QUERY",
+      "query": "state 2",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "Z-003",
+      "category": "Z",
+      "sourceQuery": "present",
+      "kind": "QUERY",
+      "query": "present",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    },
+    {
+      "testId": "Z-004",
+      "category": "Z",
+      "sourceQuery": "present",
+      "kind": "QUERY",
+      "query": "present",
+      "fixture": "tests/fixtures/mini-protein.pdb"
+    }
+  ]
+}

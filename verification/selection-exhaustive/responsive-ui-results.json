@@ -1,0 +1,629 @@
+{
+  "schemaVersion": 1,
+  "viewports": [
+    {
+      "viewport": "1920x1080",
+      "width": 1920,
+      "height": 1080,
+      "geometry": {
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "scrollWidth": 1920,
+        "scrollHeight": 1080,
+        "viewer": {
+          "left": 283,
+          "right": 1541,
+          "width": 1258,
+          "height": 982
+        },
+        "rail": {
+          "left": 1550,
+          "right": 1910,
+          "width": 360,
+          "height": 984
+        },
+        "buttons": {
+          "left": 1866,
+          "right": 1910,
+          "width": 44,
+          "height": 984
+        },
+        "panel": {
+          "left": 1550,
+          "right": 1859,
+          "width": 309,
+          "height": 984
+        },
+        "toolbar": {
+          "left": 1,
+          "right": 1919,
+          "width": 1918,
+          "height": 46
+        }
+      },
+      "noHorizontalOverflow": true,
+      "railAtRight": true,
+      "panelLeftOfRail": true,
+      "screenshot": "verification/selection-exhaustive/ui/viewport-1920x1080.png",
+      "visualPass": true
+    },
+    {
+      "viewport": "1600x900",
+      "width": 1600,
+      "height": 900,
+      "geometry": {
+        "viewport": {
+          "width": 1600,
+          "height": 900
+        },
+        "scrollWidth": 1600,
+        "scrollHeight": 900,
+        "viewer": {
+          "left": 283,
+          "right": 1221,
+          "width": 938,
+          "height": 802
+        },
+        "rail": {
+          "left": 1230,
+          "right": 1590,
+          "width": 360,
+          "height": 804
+        },
+        "buttons": {
+          "left": 1546,
+          "right": 1590,
+          "width": 44,
+          "height": 804
+        },
+        "panel": {
+          "left": 1230,
+          "right": 1539,
+          "width": 309,
+          "height": 804
+        },
+        "toolbar": {
+          "left": 1,
+          "right": 1599,
+          "width": 1598,
+          "height": 46
+        }
+      },
+      "noHorizontalOverflow": true,
+      "railAtRight": true,
+      "panelLeftOfRail": true,
+      "screenshot": "verification/selection-exhaustive/ui/viewport-1600x900.png",
+      "visualPass": true
+    },
+    {
+      "viewport": "1440x900",
+      "width": 1440,
+      "height": 900,
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "viewer": {
+          "left": 283,
+          "right": 1061,
+          "width": 778,
+          "height": 802
+        },
+        "rail": {
+          "left": 1070,
+          "right": 1430,
+          "width": 360,
+          "height": 804
+        },
+        "buttons": {
+          "left": 1386,
+          "right": 1430,
+          "width": 44,
+          "height": 804
+        },
+        "panel": {
+          "left": 1070,
+          "right": 1379,
+          "width": 309,
+          "height": 804
+        },
+        "toolbar": {
+          "left": 1,
+          "right": 1439,
+          "width": 1438,
+          "height": 46
+        }
+      },
+      "noHorizontalOverflow": true,
+      "railAtRight": true,
+      "panelLeftOfRail": true,
+      "screenshot": "verification/selection-exhaustive/ui/viewport-1440x900.png",
+      "visualPass": true
+    },
+    {
+      "viewport": "1366x768",
+      "width": 1366,
+      "height": 768,
+      "geometry": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "scrollWidth": 1366,
+        "scrollHeight": 768,
+        "viewer": {
+          "left": 283,
+          "right": 987,
+          "width": 704,
+          "height": 670
+        },
+        "rail": {
+          "left": 996,
+          "right": 1356,
+          "width": 360,
+          "height": 672
+        },
+        "buttons": {
+          "left": 1312,
+          "right": 1356,
+          "width": 44,
+          "height": 672
+        },
+        "panel": {
+          "left": 996,
+          "right": 1305,
+          "width": 309,
+          "height": 672
+        },
+        "toolbar": {
+          "left": 1,
+          "right": 1365,
+          "width": 1364,
+          "height": 46
+        }
+      },
+      "noHorizontalOverflow": true,
+      "railAtRight": true,
+      "panelLeftOfRail": true,
+      "screenshot": "verification/selection-exhaustive/ui/viewport-1366x768.png",
+      "visualPass": true
+    },
+    {
+      "viewport": "1280x720",
+      "width": 1280,
+      "height": 720,
+      "geometry": {
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "scrollWidth": 1280,
+        "scrollHeight": 720,
+        "viewer": {
+          "left": 249,
+          "right": 1019,
+          "width": 770,
+          "height": 622
+        },
+        "rail": {
+          "left": 1028,
+          "right": 1270,
+          "width": 242,
+          "height": 624
+        },
+        "buttons": {
+          "left": 1226,
+          "right": 1270,
+          "width": 44,
+          "height": 624
+        },
+        "panel": {
+          "left": 1028,
+          "right": 1219,
+          "width": 191,
+          "height": 624
+        },
+        "toolbar": {
+          "left": 1,
+          "right": 1279,
+          "width": 1278,
+          "height": 46
+        }
+      },
+      "noHorizontalOverflow": true,
+      "railAtRight": true,
+      "panelLeftOfRail": true,
+      "screenshot": "verification/selection-exhaustive/ui/viewport-1280x720.png",
+      "visualPass": true
+    },
+    {
+      "viewport": "1024x768",
+      "width": 1024,
+      "height": 768,
+      "geometry": {
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "scrollWidth": 1024,
+        "scrollHeight": 768,
+        "viewer": {
+          "left": -173,
+          "right": -173,
+          "width": 0,
+          "height": 670
+        },
+        "rail": {
+          "left": -168,
+          "right": 52,
+          "width": 220,
+          "height": 672
+        },
+        "buttons": {
+          "left": 8,
+          "right": 52,
+          "width": 44,
+          "height": 672
+        },
+        "panel": {
+          "left": -168,
+          "right": 1,
+          "width": 169,
+          "height": 672
+        },
+        "toolbar": {
+          "left": -397,
+          "right": -339,
+          "width": 58,
+          "height": 46
+        }
+      },
+      "noHorizontalOverflow": true,
+      "railAtRight": true,
+      "panelLeftOfRail": true,
+      "screenshot": "verification/selection-exhaustive/ui/viewport-1024x768.png",
+      "visualPass": true
+    },
+    {
+      "viewport": "900x900",
+      "width": 900,
+      "height": 900,
+      "geometry": {
+        "viewport": {
+          "width": 900,
+          "height": 900
+        },
+        "scrollWidth": 900,
+        "scrollHeight": 900,
+        "viewer": {
+          "left": -175,
+          "right": -175,
+          "width": 0,
+          "height": 802
+        },
+        "rail": {
+          "left": -170,
+          "right": 190,
+          "width": 360,
+          "height": 804
+        },
+        "buttons": {
+          "left": 146,
+          "right": 190,
+          "width": 44,
+          "height": 804
+        },
+        "panel": {
+          "left": -170,
+          "right": 139,
+          "width": 309,
+          "height": 804
+        },
+        "toolbar": {
+          "left": -182,
+          "right": -128,
+          "width": 54,
+          "height": 46
+        }
+      },
+      "noHorizontalOverflow": true,
+      "railAtRight": true,
+      "panelLeftOfRail": true,
+      "screenshot": "verification/selection-exhaustive/ui/viewport-900x900.png",
+      "visualPass": true
+    },
+    {
+      "viewport": "820x1180",
+      "width": 820,
+      "height": 1180,
+      "geometry": {
+        "viewport": {
+          "width": 820,
+          "height": 1180
+        },
+        "scrollWidth": 820,
+        "scrollHeight": 1180,
+        "viewer": {
+          "left": -175,
+          "right": -175,
+          "width": 0,
+          "height": 1082
+        },
+        "rail": {
+          "left": -170,
+          "right": 190,
+          "width": 360,
+          "height": 1084
+        },
+        "buttons": {
+          "left": 146,
+          "right": 190,
+          "width": 44,
+          "height": 1084
+        },
+        "panel": {
+          "left": -170,
+          "right": 139,
+          "width": 309,
+          "height": 1084
+        },
+        "toolbar": {
+          "left": -182,
+          "right": -128,
+          "width": 54,
+          "height": 46
+        }
+      },
+      "noHorizontalOverflow": true,
+      "railAtRight": true,
+      "panelLeftOfRail": true,
+      "screenshot": "verification/selection-exhaustive/ui/viewport-820x1180.png",
+      "visualPass": true
+    },
+    {
+      "viewport": "768x1024",
+      "width": 768,
+      "height": 1024,
+      "geometry": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "scrollWidth": 768,
+        "scrollHeight": 1024,
+        "viewer": {
+          "left": -175,
+          "right": -175,
+          "width": 0,
+          "height": 926
+        },
+        "rail": {
+          "left": -170,
+          "right": 190,
+          "width": 360,
+          "height": 928
+        },
+        "buttons": {
+          "left": 146,
+          "right": 190,
+          "width": 44,
+          "height": 928
+        },
+        "panel": {
+          "left": -170,
+          "right": 139,
+          "width": 309,
+          "height": 928
+        },
+        "toolbar": {
+          "left": -182,
+          "right": -128,
+          "width": 54,
+          "height": 46
+        }
+      },
+      "noHorizontalOverflow": true,
+      "railAtRight": true,
+      "panelLeftOfRail": true,
+      "screenshot": "verification/selection-exhaustive/ui/viewport-768x1024.png",
+      "visualPass": true
+    },
+    {
+      "viewport": "600x960",
+      "width": 600,
+      "height": 960,
+      "geometry": {
+        "viewport": {
+          "width": 600,
+          "height": 960
+        },
+        "scrollWidth": 600,
+        "scrollHeight": 960,
+        "viewer": {
+          "left": -175,
+          "right": -175,
+          "width": 0,
+          "height": 862
+        },
+        "rail": {
+          "left": -170,
+          "right": 190,
+          "width": 360,
+          "height": 864
+        },
+        "buttons": {
+          "left": 146,
+          "right": 190,
+          "width": 44,
+          "height": 864
+        },
+        "panel": {
+          "left": -170,
+          "right": 139,
+          "width": 309,
+          "height": 864
+        },
+        "toolbar": {
+          "left": -182,
+          "right": -128,
+          "width": 54,
+          "height": 46
+        }
+      },
+      "noHorizontalOverflow": true,
+      "railAtRight": true,
+      "panelLeftOfRail": true,
+      "screenshot": "verification/selection-exhaustive/ui/viewport-600x960.png",
+      "visualPass": true
+    },
+    {
+      "viewport": "430x932",
+      "width": 430,
+      "height": 932,
+      "geometry": {
+        "viewport": {
+          "width": 430,
+          "height": 932
+        },
+        "scrollWidth": 430,
+        "scrollHeight": 932,
+        "viewer": {
+          "left": -175,
+          "right": -175,
+          "width": 0,
+          "height": 834
+        },
+        "rail": {
+          "left": -170,
+          "right": 190,
+          "width": 360,
+          "height": 836
+        },
+        "buttons": {
+          "left": 146,
+          "right": 190,
+          "width": 44,
+          "height": 836
+        },
+        "panel": {
+          "left": -170,
+          "right": 139,
+          "width": 309,
+          "height": 836
+        },
+        "toolbar": {
+          "left": -182,
+          "right": -128,
+          "width": 54,
+          "height": 46
+        }
+      },
+      "noHorizontalOverflow": true,
+      "railAtRight": true,
+      "panelLeftOfRail": true,
+      "screenshot": "verification/selection-exhaustive/ui/viewport-430x932.png",
+      "visualPass": true
+    },
+    {
+      "viewport": "390x844",
+      "width": 390,
+      "height": 844,
+      "geometry": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "viewer": {
+          "left": -175,
+          "right": -175,
+          "width": 0,
+          "height": 746
+        },
+        "rail": {
+          "left": -170,
+          "right": 158,
+          "width": 328,
+          "height": 748
+        },
+        "buttons": {
+          "left": 114,
+          "right": 158,
+          "width": 44,
+          "height": 748
+        },
+        "panel": {
+          "left": -170,
+          "right": 107,
+          "width": 277,
+          "height": 748
+        },
+        "toolbar": {
+          "left": -182,
+          "right": -128,
+          "width": 54,
+          "height": 46
+        }
+      },
+      "noHorizontalOverflow": true,
+      "railAtRight": true,
+      "panelLeftOfRail": true,
+      "screenshot": "verification/selection-exhaustive/ui/viewport-390x844.png",
+      "visualPass": true
+    },
+    {
+      "viewport": "360x800",
+      "width": 360,
+      "height": 800,
+      "geometry": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "scrollWidth": 360,
+        "scrollHeight": 800,
+        "viewer": {
+          "left": -175,
+          "right": -175,
+          "width": 0,
+          "height": 702
+        },
+        "rail": {
+          "left": -170,
+          "right": 128,
+          "width": 298,
+          "height": 704
+        },
+        "buttons": {
+          "left": 84,
+          "right": 128,
+          "width": 44,
+          "height": 704
+        },
+        "panel": {
+          "left": -170,
+          "right": 77,
+          "width": 247,
+          "height": 704
+        },
+        "toolbar": {
+          "left": -182,
+          "right": -128,
+          "width": 54,
+          "height": 46
+        }
+      },
+      "noHorizontalOverflow": true,
+      "railAtRight": true,
+      "panelLeftOfRail": true,
+      "screenshot": "verification/selection-exhaustive/ui/viewport-360x800.png",
+      "visualPass": true
+    }
+  ]
+}
