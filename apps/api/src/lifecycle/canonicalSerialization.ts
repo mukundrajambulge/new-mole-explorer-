@@ -33,7 +33,58 @@ const canonicalize = (value: unknown): CanonicalValue | undefined => {
 export const canonicalJson = (value: unknown): string => JSON.stringify(canonicalize(value));
 
 export const sha256Bytes = (value: Uint8Array): string => createHash("sha256").update(value).digest("hex");
-export const sha256Canonical = (value: unknown): string => sha256Bytes(Buffer.from(canonicalJson(value), "utf8"));
+
+/**
+ * Hash canonical JSON without first materializing a second canonical object
+ * and a full UTF-8 string. Large structures can contain hundreds of thousands
+ * of atoms, so the old `canonicalJson` -> Buffer path created multi-gigabyte
+ * transient allocations during scientific identity hashing.
+ */
+const updateCanonicalHash = (hash: ReturnType<typeof createHash>, value: unknown): void => {
+  if (value === undefined) {
+    hash.update("null");
+    return;
+  }
+  if (value === null || typeof value === "boolean" || typeof value === "string") {
+    hash.update(JSON.stringify(value));
+    return;
+  }
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) throw new TypeError("Canonical serialization accepts only finite numbers.");
+    hash.update(JSON.stringify(Object.is(value, -0) ? 0 : value));
+    return;
+  }
+  if (Array.isArray(value)) {
+    hash.update("[");
+    value.forEach((entry, index) => {
+      if (index > 0) hash.update(",");
+      updateCanonicalHash(hash, entry);
+    });
+    hash.update("]");
+    return;
+  }
+  if (typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    hash.update("{");
+    let first = true;
+    for (const key of Object.keys(record).sort()) {
+      if (record[key] === undefined) continue;
+      if (!first) hash.update(",");
+      first = false;
+      hash.update(JSON.stringify(key));
+      hash.update(":");
+      updateCanonicalHash(hash, record[key]);
+    }
+    hash.update("}");
+    return;
+  }
+  throw new TypeError(`Canonical serialization does not support ${typeof value}.`);
+};
+
+export const sha256Canonical = (value: unknown): string => {
+  const hash = createHash("sha256");
+  updateCanonicalHash(hash, value);
+  return hash.digest("hex");
+};
 
 export const scientificHashFor = (payload: unknown): string => sha256Canonical({ schemaVersion: 1, profile: SCIENTIFIC_HASH_PROFILE, payload });
-

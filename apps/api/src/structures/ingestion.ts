@@ -544,7 +544,9 @@ const parseMmcif = (content: string): ParsedSource => {
       ...(polymerType ? { polymerType } : {}),
     } satisfies AtomSeed;
     const modelNumber = parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.pdbx_PDB_model_num", "_atom_site.pdbx_model_num"]), 1);
-    modelAtoms.set(modelNumber, [...(modelAtoms.get(modelNumber) ?? []), atom]);
+    const model = modelAtoms.get(modelNumber);
+    if (model) model.push(atom);
+    else modelAtoms.set(modelNumber, [atom]);
   }
   const orderedModels = [...modelAtoms.entries()].sort(([a], [b]) => a - b);
   const atoms = orderedModels[0]?.[1] ?? [];
@@ -583,9 +585,29 @@ const parseMmcif = (content: string): ParsedSource => {
     if (span) atom.secondaryStructure = span.kind;
   }
 
-  const serialFor = (chain: string, residue: number, atomName: string, residueName?: string): number[] => atoms
-    .filter((atom) => atom.chain === chain && atom.residueNumber === residue && atom.atomName === atomName && (!residueName || atom.residueName === residueName))
-    .map((atom) => atom.serial);
+  const atomsByComponentAtom = new Map<string, AtomSeed[]>();
+  const atomsByResidueAtom = new Map<string, AtomSeed[]>();
+  const atomsByResidueComponentAtom = new Map<string, AtomSeed[]>();
+  const appendAtom = (map: Map<string, AtomSeed[]>, key: string, atom: AtomSeed) => {
+    const bucket = map.get(key);
+    if (bucket) bucket.push(atom);
+    else map.set(key, [atom]);
+  };
+  for (const atom of atoms) {
+    const componentKey = componentAtomKey(atom.residueName, atom.atomName);
+    const residueKey = `${atom.chain}\u0000${atom.residueNumber}\u0000${atom.atomName.trim()}`;
+    const residueComponentKey = `${atom.chain}\u0000${atom.residueNumber}\u0000${componentKey}`;
+    appendAtom(atomsByComponentAtom, componentKey, atom);
+    appendAtom(atomsByResidueAtom, residueKey, atom);
+    appendAtom(atomsByResidueComponentAtom, residueComponentKey, atom);
+  }
+  const serialFor = (chain: string, residue: number, atomName: string, residueName?: string): number[] => {
+    const key = residueName
+      ? `${chain}\u0000${residue}\u0000${componentAtomKey(residueName, atomName)}`
+      : `${chain}\u0000${residue}\u0000${atomName.trim()}`;
+    const candidates = residueName ? atomsByResidueComponentAtom.get(key) : atomsByResidueAtom.get(key);
+    return candidates?.map((atom) => atom.serial) ?? [];
+  };
   const bonds: BondSeed[] = [];
   for (const loop of loops) {
     if (loop.headers.some((header) => header.startsWith("_struct_conn."))) {
@@ -608,8 +630,8 @@ const parseMmcif = (content: string): ParsedSource => {
         const atomName1 = cifValue(row, loop.headers, ["_chem_comp_bond.atom_id_1"]);
         const atomName2 = cifValue(row, loop.headers, ["_chem_comp_bond.atom_id_2"]);
         if (!component || !atomName1 || !atomName2) continue;
-        for (const atom1 of atoms.filter((atom) => atom.residueName === component && atom.atomName === atomName1)) {
-          const atom2 = atoms.find((candidate) => candidate.chain === atom1.chain && candidate.residueNumber === atom1.residueNumber && candidate.residueName === component && candidate.atomName === atomName2);
+        for (const atom1 of atomsByComponentAtom.get(componentAtomKey(component, atomName1)) ?? []) {
+          const atom2 = atomsByResidueComponentAtom.get(`${atom1.chain}\u0000${atom1.residueNumber}\u0000${componentAtomKey(component, atomName2)}`)?.[0];
           if (atom2) bonds.push({ atom1Serial: atom1.serial, atom2Serial: atom2.serial, order: parseBondOrder(cifValue(row, loop.headers, ["_chem_comp_bond.value_order"])), source: "MMCIF_CHEM_COMP_BOND" });
         }
       }
@@ -692,11 +714,13 @@ const makeHierarchy = (atoms: CanonicalAtom[]): CanonicalHierarchy => {
 const summarize = (atoms: CanonicalAtom[]): { counts: CanonicalMolecularStructure["counts"]; bounds: CoordinateBounds } => {
   const residues = new Set(atoms.map((atom) => `${atom.chain}:${atom.residueNumber}:${atom.insertionCode ?? ""}`));
   const chains = new Set(atoms.map((atom) => atom.chain));
-  const coordinates = atoms.map(({ x, y, z }) => ({ x, y, z }));
-  const bounds = {
-    min: { x: Math.min(...coordinates.map((point) => point.x)), y: Math.min(...coordinates.map((point) => point.y)), z: Math.min(...coordinates.map((point) => point.z)) },
-    max: { x: Math.max(...coordinates.map((point) => point.x)), y: Math.max(...coordinates.map((point) => point.y)), z: Math.max(...coordinates.map((point) => point.z)) },
-  };
+  const bounds = atoms.reduce((current, atom) => ({
+    min: { x: Math.min(current.min.x, atom.x), y: Math.min(current.min.y, atom.y), z: Math.min(current.min.z, atom.z) },
+    max: { x: Math.max(current.max.x, atom.x), y: Math.max(current.max.y, atom.y), z: Math.max(current.max.z, atom.z) },
+  }), {
+    min: { x: Number.POSITIVE_INFINITY, y: Number.POSITIVE_INFINITY, z: Number.POSITIVE_INFINITY },
+    max: { x: Number.NEGATIVE_INFINITY, y: Number.NEGATIVE_INFINITY, z: Number.NEGATIVE_INFINITY },
+  });
   return {
     counts: {
       atoms: atoms.length,
