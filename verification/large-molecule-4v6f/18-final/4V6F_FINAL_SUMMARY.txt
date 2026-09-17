@@ -1,0 +1,68 @@
+LOCAL REPOSITORY:
+C:\Users\mukun\Desktop\molecular-workstation
+
+CAMPAIGN BRANCH:
+qa/final-large-molecule-4v6f-acceptance
+
+BASE SHA:
+a9c8667304cc07158fecbd935f3eb314d515c55d
+
+FINAL SHA:
+recorded after final campaign commit
+
+4V6F LOCAL SOURCE:
+C:\Users\mukun\Desktop\molecular-workstation\verification\large-molecule-4v6f\01-source\4v6f.cif
+
+SOURCE SHA256:
+a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f
+
+OLD 25 MB BLOCKER:
+RESOLVED
+
+4V6F IMPORT:
+FAIL — canonical identity blocked; source scan completed
+
+4V6F PARSE:
+DEGRADED — source-scan identity only
+
+4V6F FIRST RENDER:
+NOT RUN — canonical import blocked
+
+4V6F INTERACTIVE:
+NOT RUN — canonical import blocked
+
+PARSED ATOMS / RESIDUES / CHAINS:
+307345 / 26941 / 5467, source-scan only
+
+SELECTION:
+491 applicable A→BE definitions classified; 0 executed canonically on 4V6F
+
+STANDARD REGRESSION:
+147/147 E2E PASS; 215 unit tests PASS; responsive defect fixed
+
+MEMORY:
+CONCERN — canonical attempts reached approximately 1.5–2.6 GiB
+
+PYMOL ORACLE:
+BLOCKED_ENVIRONMENT
+
+UNRESOLVED P0:
+NONE
+
+UNRESOLVED P1:
+LM-IMP-001
+
+LOCK FILE:
+NOT CREATED
+
+READY TO LOCK LARGE-MOLECULE SUPPORT:
+NO
+
+READY TO LOCK SELECTION SUBSYSTEM:
+NO — 4V6F canonical replay is blocked
+
+READY TO MERGE MAIN:
+NO — USER APPROVAL REQUIRED
+
+READY TO BEGIN DOCKING:
+NO — USER APPROVAL REQUIRED

@@ -440,7 +440,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
 
 @media (max-width: 1080px) {
   body { min-width: 860px; }
-  .app-shell { grid-template-columns: 60px minmax(0, 1fr); }
+  .app-shell { grid-template-columns: minmax(0, 1fr); }
   .nav-rail { padding-left: 7px; padding-right: 7px; }
   .nav-item { width: 40px; height: 40px; }
   .brand-mark { width: 36px; height: 36px; }
@@ -456,7 +456,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
 
 @media (max-width: 920px) {
   body { min-width: 0; }
-  .app-shell { grid-template-columns: 56px minmax(0, 1fr); }
+  .app-shell { grid-template-columns: minmax(0, 1fr); }
   .side-column { display: none; }
   /* Hidden side columns must not leave the canvas auto-placed in the zero-width first track. */
   .workspace-grid { grid-template-columns: minmax(0, 1fr) var(--right-width); padding-left: 6px; padding-right: 6px; }

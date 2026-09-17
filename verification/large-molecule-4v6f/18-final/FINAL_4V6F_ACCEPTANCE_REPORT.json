@@ -1,0 +1,28 @@
+{
+  "campaign": "MOLEXPLORER_FINAL_4V6F_LARGE_MOLECULE",
+  "repository": "C:\\Users\\mukun\\Desktop\\molecular-workstation",
+  "branch": "qa/final-large-molecule-4v6f-acceptance",
+  "baseSha": "a9c8667304cc07158fecbd935f3eb314d515c55d",
+  "source": {
+    "pdbId": "4V6F",
+    "path": "verification/large-molecule-4v6f/01-source/4v6f.cif",
+    "bytes": 38137644,
+    "sha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f"
+  },
+  "old25MiBBlocker": "RESOLVED",
+  "canonicalImport": "FAIL_BLOCKED_LM-IMP-001",
+  "sourceScan": { "atoms": 307345, "residues": 26941, "chains": 5467, "proteinChains": 100, "nucleicChains": 14, "polymerChains": 114 },
+  "canonicalFirstRender": "NOT_RUN",
+  "canonicalInteractive": "NOT_RUN",
+  "standardRegression": { "e2ePassed": 147, "e2eFailed": 0, "unitPassed": 215, "responsiveDefect": "FIXED_LM-RESP-001" },
+  "selectionApplicability": { "definitions": 523, "applicable": 491, "notApplicable": 32, "canonicalExecuted": 0 },
+  "pymolOracle": "BLOCKED_ENVIRONMENT",
+  "driveStatus": "SEE_17_DRIVE_MANIFEST",
+  "unresolvedP0": [],
+  "unresolvedP1": ["LM-IMP-001"],
+  "lockFile": "NOT_CREATED",
+  "readyToLockLargeMoleculeSupport": false,
+  "readyToLockSelectionSubsystem": false,
+  "mergedToMain": false,
+  "dockingStarted": false
+}

@@ -1,0 +1,44 @@
+{
+  "localRepo": "C:\\Users\\mukun\\Desktop\\molecular-workstation",
+  "gitRoot": "C:\\Users\\mukun\\Desktop\\molecular-workstation",
+  "remoteName": "new-origin",
+  "remoteUrl": "https://github.com/mukundrajambulge/new-mole-explorer-.git",
+  "branch": "qa/final-large-molecule-4v6f-acceptance",
+  "baseSha": "a9c8667304cc07158fecbd935f3eb314d515c55d",
+  "headSha": "e0851f91706dff2cf015447cd5a4ecf2fe31d540",
+  "gitStatus": "clean tracked state; pre-existing untracked outputs/ preserved",
+  "node": "v24.14.1",
+  "npm": "11.11.0",
+  "os": "Microsoft Windows 11 Pro",
+  "browser": "Playwright-managed Chromium; executable resolution pending application boot",
+  "playwright": "1.62.1",
+  "largeFileFixCommits": [
+    {
+      "sha": "524810345075705d3edfcd5ee8af5ae1296c9283",
+      "subject": "fix: allow large structure ingestion beyond 25 MiB"
+    },
+    {
+      "sha": "e0851f91706dff2cf015447cd5a4ecf2fe31d540",
+      "subject": "fix: bound large mmCIF canonical ingestion"
+    }
+  ],
+  "selectionQaAncestry": {
+    "branch": "qa/exhaustive-selection-a-bf",
+    "commit": "a9c8667304cc07158fecbd935f3eb314d515c55d",
+    "executions": 523,
+    "screenshots": 536,
+    "classification": {
+      "PASS": 303,
+      "EMPTY_VALID": 185,
+      "IMPLEMENTED_WITH_LIMITATION": 5,
+      "INVALID_EXPECTED": 30
+    }
+  },
+  "importPolicy": {
+    "warningThresholdBytes": 26214400,
+    "maxStructureBytes": 536870912,
+    "multipartEnvelopeOverheadBytes": 1000000,
+    "old25MiBBlocker": "resolved"
+  },
+  "postFixImportRegression": "PASS"
+}

@@ -739,26 +739,69 @@ const summarize = (atoms: CanonicalAtom[]): { counts: CanonicalMolecularStructur
 const canonicalBondKey = (atom1: string, atom2: string) => [atom1, atom2].sort().join("|");
 
 /**
+ * Present large canonical payload collections lazily to the streaming hash
+ * walker. The target arrays/objects retain the same enumerable shape and
+ * ordering as their eager counterparts, but each derived value is created
+ * only while it is being hashed instead of duplicating the whole molecular
+ * graph in memory first.
+ */
+const lazyCanonicalArray = <T>(length: number, getValue: (index: number) => T): T[] => {
+  const target = new Array<T>(length).fill(undefined as T);
+  return new Proxy(target, {
+    get(source, property, receiver) {
+      if (typeof property === "string" && /^\d+$/.test(property)) return getValue(Number(property));
+      return Reflect.get(source, property, receiver);
+    },
+  });
+};
+
+const lazyCanonicalObject = <T>(keys: readonly string[], getValue: (key: string) => T): Record<string, T> => {
+  const target: Record<string, T> = {};
+  for (const key of keys) Object.defineProperty(target, key, { configurable: false, enumerable: true, get: () => getValue(key) });
+  return target;
+};
+
+/**
  * Stable scientific identity is intentionally independent of transport bytes.
  * Source-artifact identity remains byte-exact, while this profile hashes the
  * parsed molecular content using ordinal atom/state references instead of
  * source-hash-derived IDs.
  */
 const scientificPayloadFor = (atoms: readonly CanonicalAtom[], bonds: readonly CanonicalBond[], hierarchy: CanonicalHierarchy, coordinateStates: readonly CanonicalCoordinateState[], stateOrder: readonly string[], summary: { counts: CanonicalMolecularStructure["counts"]; bounds: CoordinateBounds }, parsed: ParsedSource, sourceChargeMap: Readonly<Record<string, number>>, hasCompleteSourceCharges: boolean, peptideSequenceChains: Readonly<Record<string, PeptideSequenceChain>>, chemistryRoles: { donorAtomIds: readonly string[]; acceptorAtomIds: readonly string[] } | undefined) => {
-  const atomIndex = new Map(atoms.map((atom, index) => [atom.stableId, index]));
-  const canonicalAtoms = atoms.map((value) => { const { stableId, ...atom } = value; void stableId; return atom; });
-  const canonicalBonds = bonds.map((value) => { const { id, atom1, atom2, ...bond } = value; void id; return { ...bond, atom1: atomIndex.get(atom1) ?? -1, atom2: atomIndex.get(atom2) ?? -1 }; });
+  const atomIndex = new Map<string, number>();
+  atoms.forEach((atom, index) => atomIndex.set(atom.stableId, index));
+  const canonicalAtoms = lazyCanonicalArray(atoms.length, (index) => {
+    const { stableId, ...atom } = atoms[index]!;
+    void stableId;
+    return atom;
+  });
+  const canonicalBonds = lazyCanonicalArray(bonds.length, (index) => {
+    const value = bonds[index]!;
+    const { id, atom1, atom2, ...bond } = value;
+    void id;
+    return { ...bond, atom1: atomIndex.get(atom1) ?? -1, atom2: atomIndex.get(atom2) ?? -1 };
+  });
+  const residueIds = Object.keys(hierarchy.residues);
   const canonicalHierarchy = {
     chainIds: hierarchy.chainIds,
-    chains: Object.fromEntries(hierarchy.chainIds.map((chainId) => [chainId, { ...hierarchy.chains[chainId], residueIds: [...hierarchy.chains[chainId]!.residueIds] }])),
-    residues: Object.fromEntries(Object.entries(hierarchy.residues).map(([residueId, residue]) => [residueId, { ...residue, atomIds: residue.atomIds.map((atomId) => atomIndex.get(atomId) ?? -1) }])),
+    chains: lazyCanonicalObject(hierarchy.chainIds, (chainId) => {
+      const chain = hierarchy.chains[chainId]!;
+      return { ...chain, residueIds: lazyCanonicalArray(chain.residueIds.length, (index) => chain.residueIds[index]!) };
+    }),
+    residues: lazyCanonicalObject(residueIds, (residueId) => {
+      const residue = hierarchy.residues[residueId]!;
+      return { ...residue, atomIds: lazyCanonicalArray(residue.atomIds.length, (index) => atomIndex.get(residue.atomIds[index]!) ?? -1) };
+    }),
   };
   const canonicalStates = coordinateStates.map((state) => ({
     ordinal: state.ordinal,
     sourceModelNumber: state.sourceModelNumber ?? null,
-    coordinates: atoms.map((atom) => state.coordinates[atom.stableId] ?? { x: atom.x, y: atom.y, z: atom.z }),
+    coordinates: lazyCanonicalArray(atoms.length, (index) => {
+      const atom = atoms[index]!;
+      return state.coordinates[atom.stableId] ?? { x: atom.x, y: atom.y, z: atom.z };
+    }),
   }));
-  const canonicalCharges = hasCompleteSourceCharges ? atoms.map((atom) => sourceChargeMap[atom.stableId] ?? null) : null;
+  const canonicalCharges = hasCompleteSourceCharges ? lazyCanonicalArray(atoms.length, (index) => sourceChargeMap[atoms[index]!.stableId] ?? null) : null;
   return {
     atoms: canonicalAtoms,
     bonds: canonicalBonds,
@@ -766,12 +809,15 @@ const scientificPayloadFor = (atoms: readonly CanonicalAtom[], bonds: readonly C
     counts: summary.counts,
     bounds: summary.bounds,
     coordinateStates: canonicalStates,
-    stateOrder: stateOrder.map((_stateId, index) => index + 1),
+    stateOrder: lazyCanonicalArray(stateOrder.length, (index) => index + 1),
     unitCell: parsed.unitCell ?? null,
     polymerTypingSource: parsed.polymerTypingSource ?? null,
     partialChargeValues: canonicalCharges,
     chemistryRoles: chemistryRoles ? { donorAtomOrdinals: chemistryRoles.donorAtomIds.map((atomId) => atomIndex.get(atomId) ?? -1).filter((index) => index >= 0), acceptorAtomOrdinals: chemistryRoles.acceptorAtomIds.map((atomId) => atomIndex.get(atomId) ?? -1).filter((index) => index >= 0) } : null,
-    peptideSequenceChains: Object.fromEntries(Object.entries(peptideSequenceChains).map(([chainId, chain]) => [chainId, { ...chain, residueIds: chain.residueIds.map((_id, index) => index) }])),
+    peptideSequenceChains: lazyCanonicalObject(Object.keys(peptideSequenceChains), (chainId) => {
+      const chain = peptideSequenceChains[chainId]!;
+      return { ...chain, residueIds: lazyCanonicalArray(chain.residueIds.length, (index) => index) };
+    }),
   };
 };
 

@@ -1,0 +1,19 @@
+{
+  "pdbId": "4V6F",
+  "sourceUrl": "https://files.rcsb.org/download/4v6f.cif",
+  "downloadTimestampUtc": "2026-09-17T03:43:14.1948983Z",
+  "compressedBytes": null,
+  "uncompressedBytes": 38137644,
+  "sha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+  "format": "mmCIF",
+  "contentType": "chemical/x-cif",
+  "localPath": "C:\\Users\\mukun\\Desktop\\molecular-workstation\\verification\\large-molecule-4v6f\\01-source\\4v6f.cif",
+  "rcsbMetadata": {
+    "title": "Elongation complex of the 70S ribosome with three tRNAs and mRNA.",
+    "experimentalMethod": "X-RAY DIFFRACTION",
+    "resolutionAngstrom": [3.1],
+    "depositionDate": "2009-07-09T05:30:00+05:30",
+    "initialReleaseDate": "2014-07-09T05:30:00+05:30",
+    "depositedNonpolymerEntityInstanceCount": 5351
+  }
+}

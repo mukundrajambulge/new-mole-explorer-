@@ -1,0 +1,25 @@
+{
+  "id": "LM-IMP-001",
+  "status": "OPEN",
+  "severity": "P1",
+  "acceptanceImpact": "BLOCKS_FULL_4V6F_ACCEPTANCE",
+  "source": {
+    "path": "verification/large-molecule-4v6f/01-source/4v6f.cif",
+    "bytes": 38137644,
+    "atomRows": 307345,
+    "sha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f"
+  },
+  "canonicalAttempts": [
+    { "result": "TIMEOUT_OR_CANCELLED", "observation": ">20 minutes", "peakMemory": "approximately 0.8–1.15 GiB", "stage": "pre-parser-fixes" },
+    { "result": "TIMEOUT_OR_CANCELLED", "observation": ">20 minutes", "peakMemory": "approximately 1.5–2.6 GiB", "stage": "after parser append/index/reduce fixes" },
+    { "result": "TIMEOUT_OR_CANCELLED", "observation": ">20 minutes", "peakMemory": "approximately 1.5–2.1 GiB", "stage": "after streaming canonical hash helper" },
+    { "result": "TIMEOUT_OR_CANCELLED", "observation": "approximately 4 minutes before cancellation", "peakMemory": "approximately 1.5–1.85 GiB", "stage": "after lazy canonical payload views" }
+  ],
+  "resolvedRelatedIssues": [
+    "25 MiB exact-size rejection removed; 512 MiB ceiling is enforced",
+    "mmCIF model atom grouping no longer uses repeated array spreading",
+    "coordinate summary no longer spreads 307k values into Math.min/Math.max",
+    "chem_comp_bond linking now uses indexes instead of repeated atom filtering"
+  ],
+  "nextRequiredFix": "Bound or stream scientificPayloadFor/canonical identity construction so the 307345-atom structure does not duplicate the full graph in memory."
+}

@@ -1,0 +1,7 @@
+{
+  "requestedQueries": 100,
+  "canonicalQueriesExecuted": 0,
+  "sourceScanQueries": 12,
+  "status": "BLOCKED_CANONICAL_IMPORT",
+  "reason": "Canonical identity construction did not complete within the bounded observation window."
+}
