@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
-import { MAX_STRUCTURE_BYTES, StructureIngestionService } from "./ingestion.js";
+import { assertStructureSize, LARGE_STRUCTURE_WARNING_BYTES, MAX_STRUCTURE_BYTES, StructureIngestionService } from "./ingestion.js";
 
 const pdbFixture = `HEADER    TEST\nATOM      1  CA  ALA A   1       1.000   2.000   3.000  1.00 20.00           C\nHETATM    2  C1  LIG A 101       4.000   5.000   6.000  1.00 20.00           C\nHETATM    3  O   HOH A 201       7.000   8.000   9.000  1.00 20.00           O\nEND\n`;
 
@@ -412,11 +412,15 @@ ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
     expect(result.structure.coordinateStates?.[1]?.coordinates[result.structure.atoms[0]!.stableId]).toEqual({ x: 4, y: 5, z: 6 });
   });
 
-  it("enforces the exact upload boundary before parser publication", async () => {
+  it("keeps the former 25 MiB boundary open while retaining the safety ceiling", async () => {
     const service = new StructureIngestionService();
     await expect(service.ingestLocal("under-limit.pdb", Buffer.from(pdbFixture))).resolves.toBeTruthy();
-    await expect(service.ingestLocal("at-limit.pdb", Buffer.alloc(MAX_STRUCTURE_BYTES, 0x20))).rejects.toMatchObject({ code: "INVALID_INPUT" });
-    await expect(service.ingestLocal("over-limit.pdb", Buffer.concat([Buffer.from(pdbFixture), Buffer.alloc(MAX_STRUCTURE_BYTES)]))).rejects.toMatchObject({ code: "PAYLOAD_TOO_LARGE" });
+    expect(LARGE_STRUCTURE_WARNING_BYTES).toBe(25 * 1024 * 1024);
+    for (const byteLength of [24 * 1024 * 1024, LARGE_STRUCTURE_WARNING_BYTES, LARGE_STRUCTURE_WARNING_BYTES + 1, 50 * 1024 * 1024, 100 * 1024 * 1024]) {
+      expect(() => assertStructureSize(byteLength)).not.toThrow();
+    }
+    expect(() => assertStructureSize(MAX_STRUCTURE_BYTES + 1)).toThrowError(/512 MiB/);
+    expect(() => assertStructureSize(LARGE_STRUCTURE_WARNING_BYTES + 1)).not.toThrowError(/25 MB or smaller/);
   });
 
   it("separates exact acquired bytes from scientific identity", async () => {

@@ -24,9 +24,21 @@ import { inferCanonicalChemistryRoles } from "./chemistryRoles.js";
 import { scientificHashFor, sha256Bytes, SCIENTIFIC_HASH_PROFILE } from "../lifecycle/canonicalSerialization.js";
 import { SourceArtifactStore } from "../lifecycle/sourceArtifactStore.js";
 
-export const MAX_STRUCTURE_BYTES = 25 * 1024 * 1024;
+/**
+ * Keep a generous safety ceiling for buffered canonical ingestion while
+ * allowing genuinely large structures through the normal import path.
+ * 25 MiB is a warning threshold, not an ingestion rejection boundary.
+ */
+export const LARGE_STRUCTURE_WARNING_BYTES = 25 * 1024 * 1024;
+export const MAX_STRUCTURE_BYTES = 512 * 1024 * 1024;
 export const INGESTION_PARSER_PROFILE = "molecular-workstation-g1b-canonical-v1";
 const REMOTE_FETCH_TIMEOUT_MS = 10_000;
+
+export const assertStructureSize = (byteLength: number): void => {
+  if (byteLength > MAX_STRUCTURE_BYTES) {
+    throw new IngestionError("PAYLOAD_TOO_LARGE", "Structure files must be 512 MiB or smaller.");
+  }
+};
 
 const WATER_RESIDUES = new Set(["HOH", "WAT", "H2O", "DOD"]);
 const ION_ELEMENTS = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA", "ZN", "FE", "MN", "CU", "CO", "NI", "CL", "BR", "IOD"]);
@@ -829,7 +841,7 @@ export class StructureIngestionService {
   }
 
   private async ingest(kind: StructureSourceKind, filename: string, buffer: Buffer, uri?: string, provider?: RemoteStructureProvider, acquisition: { mediaType?: string; accession?: string; providerMetadata?: Readonly<Record<string, string>>; parentExportArtifactId?: string } = {}): Promise<StructureLoadResult> {
-    if (buffer.length > MAX_STRUCTURE_BYTES) throw new IngestionError("PAYLOAD_TOO_LARGE", "Structure files must be 25 MB or smaller.");
+    assertStructureSize(buffer.length);
     const safeFilename = basename(filename).replace(/[^A-Za-z0-9._-]/g, "_");
     // This is intentionally before Buffer decoding.  The SourceArtifact
     // digest is evidence for the received byte stream, not parser text.

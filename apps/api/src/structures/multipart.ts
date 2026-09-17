@@ -5,13 +5,13 @@ export type MultipartFile = { filename: string; contentType: string; data: Buffe
 
 const readBody = async (request: IncomingMessage): Promise<Buffer> => {
   const declaredLength = Number(request.headers["content-length"] ?? 0);
-  if (declaredLength > MAX_STRUCTURE_BYTES + 1_000_000) throw new IngestionError("PAYLOAD_TOO_LARGE", "Structure files must be 25 MB or smaller.");
+  if (declaredLength > MAX_STRUCTURE_BYTES + 1_000_000) throw new IngestionError("PAYLOAD_TOO_LARGE", "Structure upload exceeds the supported 512 MiB limit.");
   const chunks: Buffer[] = [];
   let size = 0;
   for await (const chunk of request) {
     const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
     size += buffer.length;
-    if (size > MAX_STRUCTURE_BYTES + 1_000_000) throw new IngestionError("PAYLOAD_TOO_LARGE", "Structure files must be 25 MB or smaller.");
+    if (size > MAX_STRUCTURE_BYTES + 1_000_000) throw new IngestionError("PAYLOAD_TOO_LARGE", "Structure upload exceeds the supported 512 MiB limit.");
     chunks.push(buffer);
   }
   return Buffer.concat(chunks);
