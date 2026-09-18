@@ -138,3 +138,37 @@ export type RerunContractV1 = Readonly<{
   newRequestDigest: DockingRequestDigest;
   scientificLineageChanges: readonly string[];
 }>;
+
+export const ORDINARY_V1_NON_OVERRIDABLE_OUTCOMES = ["INVALID", "AMBIGUOUS", "UNSUPPORTED", "RESOURCE_REJECTED"] as const;
+export type OrdinaryV1NonOverridableOutcome = (typeof ORDINARY_V1_NON_OVERRIDABLE_OUTCOMES)[number];
+
+export type NaturalLanguageDockingProposalV1 = Readonly<{
+  proposedDraft: DockingDraftRequestV1;
+  executable: false;
+  requiresPreflight: true;
+  requiresCapabilityAssessment: true;
+  requiresResourceAdmission: true;
+  requiresFreeze: true;
+  requiresExecutionAuthorization: true;
+}>;
+
+export type TransactionalDockingPublicationV1 = Readonly<{
+  operation: "FREEZE" | "START";
+  idempotencyBinding: IdempotencyBindingV1;
+  expectedRevision: string;
+  uniquenessGuard: string;
+  atomicPublicationRequired: true;
+}>;
+
+export type CancellationContractV1 = Readonly<{
+  jobId: OpaqueScientificId<"DockingJobId">;
+  cooperative: true;
+  idempotent: true;
+  durableEventType: "CANCELLATION_REQUESTED";
+}>;
+
+export type FutureCliAdapterContractV1 = Readonly<{
+  packagingNameAffectsScience: false;
+  canonicalRequestAuthority: "DockingRequestV1";
+  forceBypassAllowed: false;
+}>;

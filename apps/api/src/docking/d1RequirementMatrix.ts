@@ -28,16 +28,11 @@ const moduleFor = (requirementId: D1RequirementId): string => {
   return "implementation governance";
 };
 
-const fixtureFor = (requirementId: D1RequirementId): D1RequirementEvidence["fixture"] => {
-  if (requirementId === "ME-DCK-V1-REQ-0227") return "INT-FX-002";
-  if (requirementId === "ME-DCK-V1-REQ-0228" || requirementId === "ME-DCK-V1-REQ-0229") return "INT-FX-003";
-  if (requirementId === "ME-DCK-V1-REQ-0013") return "INT-FX-004";
-  return "INT-FX-001";
-};
+export const D1_FINAL_INTEGRATION_FIXTURES = ["INT-FX-001", "INT-FX-002", "INT-FX-003", "INT-FX-004"] as const;
 
 export const D1_REQUIREMENT_EVIDENCE: readonly D1RequirementEvidence[] = D1_REQUIREMENT_IDS.map((requirementId) => ({
   requirementId,
   acceptanceTestId: requirementId.replace("-REQ-", "-AT-"),
   targetModule: moduleFor(requirementId),
-  fixture: fixtureFor(requirementId),
+  fixture: "INT-FX-001",
 }));

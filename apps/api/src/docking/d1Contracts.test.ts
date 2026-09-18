@@ -8,6 +8,7 @@ import {
   DOCKING_WORKFLOW,
   EXECUTION_EVENT_TYPES,
   REQUEST_PREFLIGHT_STATUSES,
+  ORDINARY_V1_NON_OVERRIDABLE_OUTCOMES,
   SCIENTIFIC_PROFILE_IDS,
   SCIENTIFIC_RESULT_STATUSES,
   canonicalCborHex,
@@ -25,9 +26,10 @@ import {
   type SearchRegionRef,
 } from "@molecular/contracts";
 import { CommandDispatcher } from "../command/dispatcher.js";
+import { compileSafeCommand, isSafeCommandText } from "../command/compiler.js";
 import { RESERVED_FUTURE_COMMAND_FAMILIES, RESERVED_FUTURE_COMMAND_METADATA, resolveCommand } from "../command/registry.js";
 import { scientificDigest } from "./scientificSerialization.js";
-import { D1_REQUIREMENT_EVIDENCE, D1_REQUIREMENT_IDS } from "./d1RequirementMatrix.js";
+import { D1_FINAL_INTEGRATION_FIXTURES, D1_REQUIREMENT_EVIDENCE, D1_REQUIREMENT_IDS } from "./d1RequirementMatrix.js";
 
 const digest = <Tag extends string>(suffix: string) => sha256Digest<Tag>(`sha256:${suffix.padStart(64, "0").slice(-64)}`);
 
@@ -37,6 +39,8 @@ describe("PHD-V2 D1 normalized acceptance", () => {
     expect(new Set(D1_REQUIREMENT_IDS).size).toBe(40);
     expect(D1_REQUIREMENT_EVIDENCE).toHaveLength(40);
     expect(D1_REQUIREMENT_EVIDENCE.every((entry) => entry.acceptanceTestId === entry.requirementId.replace("-REQ-", "-AT-"))).toBe(true);
+    expect(D1_REQUIREMENT_EVIDENCE.every((entry) => entry.fixture === "INT-FX-001")).toBe(true);
+    expect(D1_FINAL_INTEGRATION_FIXTURES).toEqual(["INT-FX-001", "INT-FX-002", "INT-FX-003", "INT-FX-004"]);
   });
 
   describe("INT-FX-001 — canonical contract round trip", () => {
@@ -76,6 +80,7 @@ describe("PHD-V2 D1 normalized acceptance", () => {
 
     it("keeps the workflow Configure → Preflight → Freeze → Run and profiles typed/versioned", () => {
       expect(DOCKING_WORKFLOW).toEqual(["CONFIGURE", "PREFLIGHT", "FREEZE", "RUN"]);
+      expect(ORDINARY_V1_NON_OVERRIDABLE_OUTCOMES).toEqual(["INVALID", "AMBIGUOUS", "UNSUPPORTED", "RESOURCE_REJECTED"]);
       expect(SCIENTIFIC_PROFILE_IDS.scoring).toBe("ME_DOCKING_V1_VINA_CLASSIC_1_0");
       expect(SCIENTIFIC_PROFILE_IDS.numericalBackend).toBe("ME_DOCKING_V1_CPU_REFERENCE_NUMERIC_1_0");
       expect(SCIENTIFIC_PROFILE_IDS.campaignAggregation).toBe("ME_CAMP_AGG_STATE_SEPARATE_V1_1_0");
@@ -211,6 +216,17 @@ describe("PHD-V2 D1 normalized acceptance", () => {
       }
       expect(RESERVED_FUTURE_COMMAND_FAMILIES.hts).toContain("HTS.SCREEN.RESUME");
       expect(RESERVED_FUTURE_COMMAND_METADATA["HTS.SCREEN.RESUME"]).toMatchObject({ capabilityState: "UNAVAILABLE", executable: false });
+    });
+
+    it("retains bounded parser/input safety without a --force scientific bypass", () => {
+      expect(isSafeCommandText("python print('x')")).toBe(false);
+      expect(isSafeCommandText("show sticks, all")).toBe(true);
+      expect(compileSafeCommand("load /etc/passwd").diagnostics).toEqual([]);
+      const dispatcher = new CommandDispatcher();
+      const pathResult = dispatcher.dispatch({ rawCommand: "load /etc/passwd" });
+      expect(pathResult.status).toBe("FAILED");
+      expect(pathResult.diagnostics.some((entry) => entry.code === "EXTERNAL_IO_REJECTED")).toBe(true);
+      expect(resolveCommand("docking.run")).toMatchObject({ error: "UNKNOWN_COMMAND" });
     });
 
     it("keeps DOCKING.RUN non-executable through the dispatcher", () => {
