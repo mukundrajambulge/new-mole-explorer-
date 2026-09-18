@@ -829,3 +829,5 @@ export type PyMolInventoryEntry = {
   sourceCommit: string;
   notes?: readonly string[];
 };
+
+export * from "./docking/index.js";
