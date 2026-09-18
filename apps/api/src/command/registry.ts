@@ -3,10 +3,27 @@ import { COMMAND_REGISTRY_VERSION, COMMAND_SCHEMA_VERSION, SAFE_PYMOL_COMPAT_PRO
 import { PYMOL_INVENTORY, PYMOL_SOURCE_COMMIT } from "./pymolInventory.js";
 
 export const RESERVED_FUTURE_COMMAND_FAMILIES = Object.freeze({
-  docking: ["DOCKING.PREPARE_RECEPTOR", "DOCKING.PREPARE_LIGAND", "DOCKING.DEFINE_SEARCH_SPACE", "DOCKING.CONFIGURE", "DOCKING.RUN", "DOCKING.STATUS", "DOCKING.CANCEL", "DOCKING.RESULTS.GET", "DOCKING.RESULTS.EXPORT"],
-  hts: ["HTS.LIBRARY.DEFINE", "HTS.LIBRARY.IMPORT", "HTS.SCREEN.RUN", "HTS.SCREEN.STATUS", "HTS.SCREEN.CANCEL", "HTS.RESULTS.GET", "HTS.RESULTS.EXPORT"],
+  docking: [
+    "DOCKING.PREPARE_RECEPTOR", "DOCKING.PREPARE_LIGAND", "DOCKING.DEFINE_SEARCH_SPACE", "DOCKING.CONFIGURE",
+    "DOCKING.RUN", "DOCKING.STATUS", "DOCKING.CANCEL", "DOCKING.RESULTS.GET", "DOCKING.RESULTS.EXPORT",
+    "DOCKING.PREFLIGHT", "DOCKING.FREEZE", "DOCKING.RETRY", "DOCKING.RERUN", "DOCKING.REPLAY",
+  ],
+  hts: ["HTS.LIBRARY.DEFINE", "HTS.LIBRARY.IMPORT", "HTS.SCREEN.RUN", "HTS.SCREEN.STATUS", "HTS.SCREEN.CANCEL", "HTS.SCREEN.RESUME", "HTS.RESULTS.GET", "HTS.RESULTS.EXPORT"],
 } as const);
-const reservedFutureFamiliesJson = () => ({ docking: [...RESERVED_FUTURE_COMMAND_FAMILIES.docking], hts: [...RESERVED_FUTURE_COMMAND_FAMILIES.hts] });
+
+export const RESERVED_FUTURE_COMMAND_METADATA: Readonly<Record<string, { capabilityState: "UNAVAILABLE"; executable: false; implementationGate: string }>> = Object.freeze(
+  Object.fromEntries(
+    [...RESERVED_FUTURE_COMMAND_FAMILIES.docking, ...RESERVED_FUTURE_COMMAND_FAMILIES.hts].map((command) => [
+      command,
+      { capabilityState: "UNAVAILABLE" as const, executable: false as const, implementationGate: "NOT_PROMOTED" },
+    ]),
+  ),
+);
+
+const reservedFutureFamiliesJson = () => ({
+  docking: [...RESERVED_FUTURE_COMMAND_FAMILIES.docking],
+  hts: [...RESERVED_FUTURE_COMMAND_FAMILIES.hts],
+});
 
 const argument = (name: string, type: CommandArgumentSpec["type"], description: string, options: Partial<CommandArgumentSpec> = {}): CommandArgumentSpec => ({ name, type, description, ...options });
 const schema = (spec: Omit<CommandSpec, "registryVersion" | "schemaVersion" | "aliasesByProfile"> & { aliases?: readonly string[] }): CommandSpec => ({
@@ -144,6 +161,7 @@ export const commandInventorySummary = () => ({
   sourceKeywordCount: PYMOL_INVENTORY.length,
   validationErrors: [...validateCommandRegistry()],
   reservedFutureFamilies: reservedFutureFamiliesJson(),
+  reservedFutureCommandMetadata: RESERVED_FUTURE_COMMAND_METADATA,
 });
 
 export const commandSpecFor = (name: string): CommandSpec | undefined => {
@@ -161,6 +179,7 @@ export const jsonValueFrom = (value: unknown): JsonValue => {
 export const commandRegistryAsJson = (): JsonRecord => ({
   summary: commandInventorySummary(),
   reservedFutureFamilies: reservedFutureFamiliesJson(),
+  reservedFutureCommandMetadata: RESERVED_FUTURE_COMMAND_METADATA,
   commands: COMMAND_SPECS.map((spec) => ({
     canonicalName: spec.canonicalName,
     commandType: spec.commandType,

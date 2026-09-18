@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { COMMAND_SPECS, RESERVED_FUTURE_COMMAND_FAMILIES, commandInventorySummary, commandSpecFor, resolveCommand, validateCommandRegistry } from "./registry.js";
+import { COMMAND_SPECS, RESERVED_FUTURE_COMMAND_FAMILIES, RESERVED_FUTURE_COMMAND_METADATA, commandInventorySummary, commandSpecFor, resolveCommand, validateCommandRegistry } from "./registry.js";
 import { PYMOL_INVENTORY, PYMOL_SOURCE_COMMIT } from "./pymolInventory.js";
 
 describe("R10 versioned command registry", () => {
@@ -31,6 +31,13 @@ describe("R10 versioned command registry", () => {
 
   it("reserves future docking and HTS namespaces without admitting execution", () => {
     expect(RESERVED_FUTURE_COMMAND_FAMILIES.docking).toContain("DOCKING.RUN");
+    expect(RESERVED_FUTURE_COMMAND_FAMILIES.docking).toContain("DOCKING.PREFLIGHT");
+    expect(RESERVED_FUTURE_COMMAND_FAMILIES.docking).toContain("DOCKING.FREEZE");
+    expect(RESERVED_FUTURE_COMMAND_FAMILIES.docking).toContain("DOCKING.RETRY");
+    expect(RESERVED_FUTURE_COMMAND_FAMILIES.docking).toContain("DOCKING.RERUN");
+    expect(RESERVED_FUTURE_COMMAND_FAMILIES.docking).toContain("DOCKING.REPLAY");
+    expect(RESERVED_FUTURE_COMMAND_FAMILIES.hts).toContain("HTS.SCREEN.RESUME");
+    expect(RESERVED_FUTURE_COMMAND_METADATA["DOCKING.RUN"]).toEqual({ capabilityState: "UNAVAILABLE", executable: false, implementationGate: "NOT_PROMOTED" });
     expect(resolveCommand("docking.run")).toMatchObject({ error: "UNKNOWN_COMMAND" });
   });
 });
