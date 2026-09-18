@@ -1,0 +1,87 @@
+declare const opaqueIdentityBrand: unique symbol;
+
+export type OpaqueScientificId<Tag extends string> = string & { readonly [opaqueIdentityBrand]: Tag };
+export type Sha256Digest<Tag extends string> = `sha256:${string}` & { readonly [opaqueIdentityBrand]: `sha256:${Tag}` };
+
+const SHA256_EXTERNAL = /^sha256:[0-9a-f]{64}$/;
+
+export const scientificId = <Tag extends string>(value: string): OpaqueScientificId<Tag> => {
+  if (!value.trim()) throw new TypeError("Scientific identifiers must be non-empty.");
+  return value as OpaqueScientificId<Tag>;
+};
+
+export const sha256Digest = <Tag extends string>(value: string): Sha256Digest<Tag> => {
+  if (!SHA256_EXTERNAL.test(value)) throw new TypeError("Scientific digests must use sha256:<64 lowercase hexadecimal characters>.");
+  return value as Sha256Digest<Tag>;
+};
+
+export type SourceArtifactId = OpaqueScientificId<"SourceArtifactId">;
+export type MolecularIdentityId = OpaqueScientificId<"MolecularIdentityId">;
+export type ChemicalStateId = OpaqueScientificId<"ChemicalStateId">;
+export type CoordinateStateId = OpaqueScientificId<"CoordinateStateId">;
+export type PreparedReceptorStateId = OpaqueScientificId<"PreparedReceptorStateId">;
+export type PreparedLigandStateId = OpaqueScientificId<"PreparedLigandStateId">;
+export type LigandKinematicModelId = OpaqueScientificId<"LigandKinematicModelId">;
+export type SearchRegionId = OpaqueScientificId<"SearchRegionId">;
+export type DockingDraftRequestId = OpaqueScientificId<"DockingDraftRequestId">;
+export type DockingRequestId = OpaqueScientificId<"DockingRequestId">;
+export type DockingAttemptId = OpaqueScientificId<"DockingAttemptId">;
+export type ExecutionAttemptId = OpaqueScientificId<"ExecutionAttemptId">;
+export type SearchCandidateId = OpaqueScientificId<"SearchCandidateId">;
+export type PoseRecordId = OpaqueScientificId<"PoseRecordId">;
+export type DockingPoseSetId = OpaqueScientificId<"DockingPoseSetId">;
+export type StateDockingResultId = OpaqueScientificId<"StateDockingResultId">;
+export type CompoundDockingAggregateId = OpaqueScientificId<"CompoundDockingAggregateId">;
+export type CampaignManifestId = OpaqueScientificId<"CampaignManifestId">;
+export type CampaignUnitId = OpaqueScientificId<"CampaignUnitId">;
+export type CampaignResultId = OpaqueScientificId<"CampaignResultId">;
+export type ValidationRecordId = OpaqueScientificId<"ValidationRecordId">;
+export type ReplayManifestId = OpaqueScientificId<"ReplayManifestId">;
+export type ProvenanceRecordId = OpaqueScientificId<"ProvenanceRecordId">;
+export type FailureRecordId = OpaqueScientificId<"FailureRecordId">;
+export type BackendEquivalenceRecordId = OpaqueScientificId<"BackendEquivalenceRecordId">;
+
+export type ArtifactByteDigest = Sha256Digest<"ArtifactByteDigest">;
+export type MolecularIdentityDigest = Sha256Digest<"MolecularIdentityDigest">;
+export type ChemicalStateDigest = Sha256Digest<"ChemicalStateDigest">;
+export type CoordinateStateDigest = Sha256Digest<"CoordinateStateDigest">;
+export type PreparedReceptorDigest = Sha256Digest<"PreparedReceptorDigest">;
+export type PreparedLigandDigest = Sha256Digest<"PreparedLigandDigest">;
+export type LigandKinematicModelDigest = Sha256Digest<"LigandKinematicModelDigest">;
+export type SearchRegionDigest = Sha256Digest<"SearchRegionDigest">;
+export type ProfileDigest = Sha256Digest<"ProfileDigest">;
+export type ScoringProfileDigest = Sha256Digest<"ScoringProfileDigest">;
+export type SearchProfileDigest = Sha256Digest<"SearchProfileDigest">;
+export type RmsdProfileDigest = Sha256Digest<"RmsdProfileDigest">;
+export type PlausibilityProfileDigest = Sha256Digest<"PlausibilityProfileDigest">;
+export type TieProfileDigest = Sha256Digest<"TieProfileDigest">;
+export type ClusteringProfileDigest = Sha256Digest<"ClusteringProfileDigest">;
+export type FinalModeProfileDigest = Sha256Digest<"FinalModeProfileDigest">;
+export type NumericalBackendProfileDigest = Sha256Digest<"NumericalBackendProfileDigest">;
+export type ResourcePolicyProfileDigest = Sha256Digest<"ResourcePolicyProfileDigest">;
+export type CapabilityProfileDigest = Sha256Digest<"CapabilityProfileDigest">;
+export type ValidationProfileDigest = Sha256Digest<"ValidationProfileDigest">;
+export type ResultPolicyDigest = Sha256Digest<"ResultPolicyDigest">;
+export type ProvenancePolicyDigest = Sha256Digest<"ProvenancePolicyDigest">;
+export type CachePolicyDigest = Sha256Digest<"CachePolicyDigest">;
+export type PreflightReportDigest = Sha256Digest<"PreflightReportDigest">;
+export type DockingDraftDigest = Sha256Digest<"DockingDraftDigest">;
+export type DockingRequestDigest = Sha256Digest<"DockingRequestDigest">;
+export type SearchCandidateDigest = Sha256Digest<"SearchCandidateDigest">;
+export type PoseRecordDigest = Sha256Digest<"PoseRecordDigest">;
+export type DockingPoseSetDigest = Sha256Digest<"DockingPoseSetDigest">;
+export type StateDockingResultDigest = Sha256Digest<"StateDockingResultDigest">;
+export type CampaignManifestDigest = Sha256Digest<"CampaignManifestDigest">;
+export type CampaignUnitDigest = Sha256Digest<"CampaignUnitDigest">;
+export type CampaignResultDigest = Sha256Digest<"CampaignResultDigest">;
+export type ValidationRecordDigest = Sha256Digest<"ValidationRecordDigest">;
+export type ReplayManifestDigest = Sha256Digest<"ReplayManifestDigest">;
+export type ProvenanceRecordDigest = Sha256Digest<"ProvenanceRecordDigest">;
+export type FailureRecordDigest = Sha256Digest<"FailureRecordDigest">;
+export type BackendEquivalenceRecordDigest = Sha256Digest<"BackendEquivalenceRecordDigest">;
+export type DatasetDigest = Sha256Digest<"DatasetDigest">;
+export type ProtocolDigest = Sha256Digest<"ProtocolDigest">;
+export type BenchmarkDigest = Sha256Digest<"BenchmarkDigest">;
+export type ResultDigest = Sha256Digest<"ResultDigest">;
+export type EnvironmentDigest = Sha256Digest<"EnvironmentDigest">;
+export type BackendBuildDigest = Sha256Digest<"BackendBuildDigest">;
