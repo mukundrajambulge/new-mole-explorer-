@@ -33,7 +33,7 @@ export const SCIENTIFIC_PROFILE_IDS = Object.freeze({
 
 export type ScientificProfileId = (typeof SCIENTIFIC_PROFILE_IDS)[keyof typeof SCIENTIFIC_PROFILE_IDS];
 
-export type ProfileManifest<Id extends ScientificProfileId, Digest extends ProfileDigest = ProfileDigest> = Readonly<{
+export type ProfileManifest<Id extends ScientificProfileId, Digest extends string = ProfileDigest> = Readonly<{
   schemaVersion: 1;
   profileId: Id;
   semanticVersion: string;
