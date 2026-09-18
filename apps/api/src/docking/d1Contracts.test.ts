@@ -5,6 +5,7 @@ import {
   CAPABILITY_ASSESSMENT_STATUSES,
   COMMAND_JOB_STATES,
   DOCKING_CANONICALIZATION_PROFILE,
+  DOCKING_REPOSITORY_ARCHITECTURE_V1,
   DOCKING_WORKFLOW,
   EXECUTION_EVENT_TYPES,
   REQUEST_PREFLIGHT_STATUSES,
@@ -167,6 +168,7 @@ describe("PHD-V2 D1 normalized acceptance", () => {
     it("cannot synthesize a canonical numerical compound score in the V1 aggregate contract", () => {
       const aggregate: CompoundDockingAggregate = {
         compoundDockingAggregateId: scientificId<"CompoundDockingAggregateId">("aggregate:1"),
+        digest: digest<"CompoundDockingAggregateDigest">("30"),
         molecularIdentityDigest: digest<"MolecularIdentityDigest">("30"),
         statePolicy: "STATE_SEPARATE_NO_CANONICAL_SCORE_V1",
         stateResultDigests: [digest<"StateDockingResultDigest">("31"), digest<"StateDockingResultDigest">("32")],
@@ -216,6 +218,18 @@ describe("PHD-V2 D1 normalized acceptance", () => {
       }
       expect(RESERVED_FUTURE_COMMAND_FAMILIES.hts).toContain("HTS.SCREEN.RESUME");
       expect(RESERVED_FUTURE_COMMAND_METADATA["HTS.SCREEN.RESUME"]).toMatchObject({ capabilityState: "UNAVAILABLE", executable: false });
+    });
+
+    it("pins D1 repository architecture without creating the future native science kernel", () => {
+      expect(DOCKING_REPOSITORY_ARCHITECTURE_V1).toEqual({
+        contractsRoot: "packages/contracts/src/docking",
+        apiRoot: "apps/api/src/docking",
+        futureReferenceNativeRoot: "native/docking-reference",
+        viewerSerializationAuthority: false,
+        scientificCanonicalizationAuthority: "ME_CANONICAL_CBOR_V1_1_0",
+        currentGate: "D1",
+        nativeScienceKernelPresentInD1: false,
+      });
     });
 
     it("retains bounded parser/input safety without a --force scientific bypass", () => {

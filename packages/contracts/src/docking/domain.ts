@@ -13,13 +13,16 @@ import type {
   CampaignUnitId,
   ChemicalStateDigest,
   ChemicalStateId,
+  CompoundDockingAggregateDigest,
   CompoundDockingAggregateId,
   CoordinateStateDigest,
   CoordinateStateId,
   DatasetDigest,
+  DockingAttemptDigest,
   DockingAttemptId,
   DockingPoseSetDigest,
   DockingPoseSetId,
+  ExecutionAttemptDigest,
   ExecutionAttemptId,
   FailureRecordDigest,
   FailureRecordId,
@@ -28,6 +31,7 @@ import type {
   MolecularIdentityDigest,
   MolecularIdentityId,
   OpaqueScientificId,
+  PoseCoordinateDigest,
   PoseRecordDigest,
   PoseRecordId,
   PreparedLigandDigest,
@@ -133,6 +137,7 @@ export type PdbqtExecutionRepresentationRef = DerivedExecutionRepresentationRef 
 
 export type DockingAttempt = Readonly<{
   dockingAttemptId: DockingAttemptId;
+  digest: DockingAttemptDigest;
   requestDigest: import("./identity.js").DockingRequestDigest;
   receptorStateDigest: PreparedReceptorDigest;
   ligandStateDigest: PreparedLigandDigest;
@@ -140,6 +145,7 @@ export type DockingAttempt = Readonly<{
 
 export type ExecutionAttempt = Readonly<{
   executionAttemptId: ExecutionAttemptId;
+  digest: ExecutionAttemptDigest;
   dockingAttemptId: DockingAttemptId;
   ordinal: number;
   backendProfileDigest: import("./identity.js").NumericalBackendProfileDigest;
@@ -167,6 +173,7 @@ export type PoseRecord = Readonly<{
   sourceCandidateId: SearchCandidateId;
   preparedReceptorDigest: PreparedReceptorDigest;
   preparedLigandDigest: PreparedLigandDigest;
+  poseCoordinatesDigest: PoseCoordinateDigest;
   scoreBits: F64Bits;
   validityStatus: PoseValidityStatus;
   plausibilityStatus: PosePlausibilityStatus;
@@ -190,6 +197,7 @@ export type StateDockingResult = Readonly<{
 
 export type CompoundDockingAggregate = Readonly<{
   compoundDockingAggregateId: CompoundDockingAggregateId;
+  digest: CompoundDockingAggregateDigest;
   molecularIdentityDigest: MolecularIdentityDigest;
   statePolicy: "STATE_SEPARATE_NO_CANONICAL_SCORE_V1";
   stateResultDigests: readonly StateDockingResultDigest[];
