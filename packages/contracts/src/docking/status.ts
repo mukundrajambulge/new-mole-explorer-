@@ -97,11 +97,15 @@ export type ScientificWarningV1 = Readonly<{
   warningId: OpaqueScientificId<"ScientificWarningId">;
   code: ScientificCode;
   category: ScientificErrorCategory;
+  severity: "WARNING";
+  blocking: false;
+  retryable: false;
   stage: ScientificStage;
   objectRef?: string;
   humanMessage: string;
   scientificExplanation: string;
   claimImpact: string;
+  recoveryOptions: readonly string[];
   acknowledgementPolicy: "NONE" | "REQUIRED";
   acknowledgedByRef?: string;
   acknowledgedAt?: string;
