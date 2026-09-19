@@ -9,6 +9,8 @@ const loadFile = async (page: Page, file: string) => {
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(file);
   await expect(page.getByTitle(file.split(/[\\/]/).pop()!)).toBeVisible();
+  await expect(page.getByTestId("molecular-viewer"))
+    .toHaveAttribute("data-testid-lifecycle", "ready", { timeout: 30_000 });
 };
 
 const runCommand = async (page: Page, value: string) => {
@@ -73,7 +75,12 @@ test("R07-B2 rejects self-bond and cross-object topology without partial success
   await page.getByRole("button", { name: "File", exact: true }).click();
   await page.getByRole("button", { name: "Add Structure", exact: true }).click();
   await (await chooserPromise).setFiles(smallMolecule);
-  await expect(viewer).toHaveAttribute("data-renderer-model-count", "2");
+  await expect(page.getByTitle("g1c-small-molecule.pdb").first())
+    .toBeVisible({ timeout: 30_000 });
+  await expect(viewer)
+    .toHaveAttribute("data-testid-lifecycle", "ready", { timeout: 30_000 });
+  await expect(viewer)
+    .toHaveAttribute("data-renderer-model-count", "2", { timeout: 30_000 });
   const cross = await runCommand(page, "bond object r07-b2-topology.pdb and id 1, object g1c-small-molecule.pdb and id 1");
   await expect(cross).toContainText("CROSS_OBJECT_TOPOLOGY_UNSUPPORTED");
   await expect(viewer).toHaveAttribute("data-renderer-model-count", "2");
