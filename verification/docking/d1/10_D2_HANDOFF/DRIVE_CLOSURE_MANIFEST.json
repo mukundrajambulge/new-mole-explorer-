@@ -1,0 +1,31 @@
+{
+  "folder": {
+    "name": "MOLEXPLORER_DOCKING_D1_ACCEPTED_26227a1",
+    "id": "1NyXoTOZIgJdHkgE1DQJSKZ4I8VyiBxiw",
+    "url": "https://drive.google.com/drive/folders/1NyXoTOZIgJdHkgE1DQJSKZ4I8VyiBxiw"
+  },
+  "acceptedSha": "26227a10416657d0c2518bd0b751a38693627d5b",
+  "acceptedTag": "mole-explorer-docking-d1-accepted-2026-09-19",
+  "readback": "verified by Drive folder listing and raw fetch for every uploaded file",
+  "files": [
+    {"path":"00_BASELINE/D1_BASELINE_INTEGRITY_REPAIR.md","sha256":"27f481a4dd2856f94b7e75c1936ffc54587b70e061167b349dfe7be1c100d80a","driveId":"1RLufLdJX8AGOST1HhhuLs2T9mBYcziMQ","url":"https://drive.google.com/file/d/1RLufLdJX8AGOST1HhhuLs2T9mBYcziMQ/view?usp=drivesdk","readback":"verified"},
+    {"path":"00_BASELINE/D1_TRANSPLANT_CONFLICT_REPORT.md","sha256":"743300315fe6e577d28274b77a2a2f4f99db9b392c9246f6486ec1e9158c81ba","driveId":"1R-XhSVxUP1L9jy8kP9ETakr1D6kns2tH","url":"https://drive.google.com/file/d/1R-XhSVxUP1L9jy8kP9ETakr1D6kns2tH/view?usp=drivesdk","readback":"verified"},
+    {"path":"01_REQUIREMENTS/D1_REQUIREMENT_MATRIX.md","sha256":"46b166fb9377261276775d832103375660f40331ea9dc08de94d3d4d4162af5b","driveId":"1ooy9gUWAjvcZB6CedH-Y-niJxuMppAPG","url":"https://drive.google.com/file/d/1ooy9gUWAjvcZB6CedH-Y-niJxuMppAPG/view?usp=drivesdk","readback":"verified"},
+    {"path":"02_IMPLEMENTATION_INDEX/D1_IMPLEMENTATION_INDEX.md","sha256":"9f52eacea6077c6cef1e6b9566226d2738471b40e6580b0581514d60558e9e75","driveId":"11vBtCas-L1Jx53ISMgVFCivcZ7MDSExz","url":"https://drive.google.com/file/d/11vBtCas-L1Jx53ISMgVFCivcZ7MDSExz/view?usp=drivesdk","readback":"verified"},
+    {"path":"02_IMPLEMENTATION_INDEX/D1_IMPLEMENTATION_INDEX.json","sha256":"094c0bc6935662909c56a5579ade17efe0f0d4a74ff70ccf6a6a14835cc61f1f","driveId":"1tPzz_Xxq-S6avtsklBcq7UiNKtsntS2A","url":"https://drive.google.com/file/d/1tPzz_Xxq-S6avtsklBcq7UiNKtsntS2A/view?usp=drivesdk","readback":"verified"},
+    {"path":"03_FIXTURES/D1_FIXTURE_ACCEPTANCE.md","sha256":"c77319c2d527597356e0506aa87b2b12c2f981e746ab4aef9c698b24a4284fcf","driveId":"1mWTAPEUn_L4UnuuzK4ndEbyjuLgDVpUT","url":"https://drive.google.com/file/d/1mWTAPEUn_L4UnuuzK4ndEbyjuLgDVpUT/view?usp=drivesdk","readback":"verified"},
+    {"path":"04_UNIT/D1_UNIT_REPORT.md","sha256":"d0571f75d8baba092020792d5acecf18f28350323bee38af3f3c9562eaffad5a","driveId":"1ri6NPK1vB49jFn3clB1LzYnzmaGQ_STq","url":"https://drive.google.com/file/d/1ri6NPK1vB49jFn3clB1LzYnzmaGQ_STq/view?usp=drivesdk","readback":"verified"},
+    {"path":"04_UNIT/D1_UNIT_REPORT.json","sha256":"915b91a6e02bab3bb6f6872470b41c2a439fbf872a4bd21e03826ec7706afc52","driveId":"1jJJp55lGoVLvfOUxvIq0728gw31TPGXp","url":"https://drive.google.com/file/d/1jJJp55lGoVLvfOUxvIq0728gw31TPGXp/view?usp=drivesdk","readback":"verified"},
+    {"path":"05_UPSTREAM_REGRESSION/UPSTREAM_REGRESSION_REPORT.md","sha256":"aba50414d306cc28ee78342b692b5a1d191b0ace319c09fa17a5865b0a618b6a","driveId":"1EME6GZv9vEI2WCRnGbUEKiq1Y8X366Ss","url":"https://drive.google.com/file/d/1EME6GZv9vEI2WCRnGbUEKiq1Y8X366Ss/view?usp=drivesdk","readback":"verified"},
+    {"path":"06_E2E/LOCAL_E2E_REPORT.md","sha256":"99679bdb89b56623f8ea3a0cd8d02c37ec02b524b72a6a7feb1cdb91b38ba773","driveId":"1VqiViBTTq7K1LaHfw7JXSbqufjectlM6","url":"https://drive.google.com/file/d/1VqiViBTTq7K1LaHfw7JXSbqufjectlM6/view?usp=drivesdk","readback":"verified"},
+    {"path":"06_E2E/LOCAL_E2E_REPORT.json","sha256":"3f4b3325017c79855c6fe304e1a1139e0ddd39a2bbc84e45aa7b9fac192fd4b6","driveId":"1evEB33wsN8-IhSk1eVp_py_qJnlu6Huh","url":"https://drive.google.com/file/d/1evEB33wsN8-IhSk1eVp_py_qJnlu6Huh/view?usp=drivesdk","readback":"verified"},
+    {"path":"07_CI/CI_REPORT.md","sha256":"08882628d48985affb4d48d4207f4478b96a5f246a3ef6dc8f87a73a031de6f4","driveId":"1umseR4cdCVFJXhqNVAlXD-ScQt1etPwl","url":"https://drive.google.com/file/d/1umseR4cdCVFJXhqNVAlXD-ScQt1etPwl/view?usp=drivesdk","readback":"verified"},
+    {"path":"07_CI/CI_REPORT.json","sha256":"692b209a596b9b6503fbe50521de407cebcd416c4de24b4ed52ad6fd9a7b7b2a","driveId":"1COwjwOsvgD-rrHXLN46_vWHs5CBgDPp1","url":"https://drive.google.com/file/d/1COwjwOsvgD-rrHXLN46_vWHs5CBgDPp1/view?usp=drivesdk","readback":"verified"},
+    {"path":"08_SCOPE_AUDIT/D1_SCOPE_NEGATIVE_AUDIT.md","sha256":"c321862418f63dd6fa75b2926a527e1ef9fff34eb04ecb483966425f368bc12a","driveId":"1Ndb9DlsW6MqbHV7wem6cMXdhTSgjdWYR","url":"https://drive.google.com/file/d/1Ndb9DlsW6MqbHV7wem6cMXdhTSgjdWYR/view?usp=drivesdk","readback":"verified"},
+    {"path":"08_SCOPE_AUDIT/D1_SEALED_BASELINE_DIFF.md","sha256":"ba36494a3b5f635c7fd1b74f23a23241d996edfe33053ffd2cb8a2710c078fa0","driveId":"1kQIKTwvB9aJZrxdGpTinCTtpqV-pN8uU","url":"https://drive.google.com/file/d/1kQIKTwvB9aJZrxdGpTinCTtpqV-pN8uU/view?usp=drivesdk","readback":"verified"},
+    {"path":"08_SCOPE_AUDIT/D1_SEALED_BASELINE_DIFF.json","sha256":"7de9a8ccaf3c5b469b27218513311850c5685a3a8c619e121bb42b29413a6371","driveId":"1E1p1gQiGaUt6dLsZJc1DGRn_u1c6qpnM","url":"https://drive.google.com/file/d/1E1p1gQiGaUt6dLsZJc1DGRn_u1c6qpnM/view?usp=drivesdk","readback":"verified"},
+    {"path":"09_CLOSURE/D1_CLOSURE.md","sha256":"8e70cd78b5fff58e501914822a01f6e0229f3dc9fddb661b260852e83e27d786","driveId":"1t_NNjQKFuiivVMMHgWphr6TT-SJINRGG","url":"https://drive.google.com/file/d/1t_NNjQKFuiivVMMHgWphr6TT-SJINRGG/view?usp=drivesdk","readback":"verified"},
+    {"path":"09_CLOSURE/D1_CLOSURE.json","sha256":"c55a81d16a6f252ba502dc5849a62c250b18c4052ca2dba1194a0c53ff1e62ef","driveId":"1K0TXKwpY50SBFxzzP_paM9SMtuUrxlG8","url":"https://drive.google.com/file/d/1K0TXKwpY50SBFxzzP_paM9SMtuUrxlG8/view?usp=drivesdk","readback":"verified"},
+    {"path":"10_D2_HANDOFF/D2_BOOTSTRAP_PROMPT.md","sha256":"95cb1ad42c7ec8af91dc801020fdda08805be1cfc3a1156c92cbb42c9501c41b","driveId":"1nmYg5si3EHolRF3xgjA7Lct8bp3SL_Kj","url":"https://drive.google.com/file/d/1nmYg5si3EHolRF3xgjA7Lct8bp3SL_Kj/view?usp=drivesdk","readback":"verified"}
+  ]
+}
