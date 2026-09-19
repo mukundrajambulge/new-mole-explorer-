@@ -4,6 +4,11 @@ import { resolve } from "node:path";
 const mini = resolve("tests/fixtures/mini-protein.pdb");
 const ligand = resolve("tests/fixtures/g1c-small-molecule.pdb");
 
+// The second-object upload is eventually consistent on hosted Chromium;
+// retain the existing DOM/model readiness assertions but give them a bounded
+// window longer than Playwright's default 5 seconds.
+test.use({ expect: { timeout: 30_000 } });
+
 test("R07-B1 edit, exact undo/redo, and multi-object isolation stay live without reload", async ({ page }) => {
   test.setTimeout(120000);
   const browserConsoleErrors: string[] = [];

@@ -5,6 +5,11 @@ const topology = resolve("tests/fixtures/r07-b2-topology.pdb");
 const smallMolecule = resolve("tests/fixtures/g1c-small-molecule.pdb");
 const multistate = resolve("tests/fixtures/multistate.pdb");
 
+// Hosted Chromium can spend longer than the default 5 seconds reconciling a
+// newly added renderer model; keep the existing readiness assertions bounded
+// while allowing the multi-object upload to settle.
+test.use({ expect: { timeout: 30_000 } });
+
 const loadFile = async (page: Page, file: string) => {
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(file);

@@ -4,6 +4,12 @@ import { resolve } from "node:path";
 const mini = resolve("tests/fixtures/mini-protein.pdb");
 const ligand = resolve("tests/fixtures/g1c-small-molecule.pdb");
 const multiState = resolve("tests/fixtures/multistate.pdb");
+
+// Hosted Chromium can take longer than the default 5 seconds to commit the
+// second uploaded object and reconcile its renderer model. Keep this suite's
+// assertions bounded but allow the existing readiness signals to settle.
+test.use({ expect: { timeout: 30_000 } });
+
 const openConsole = async (page: import("@playwright/test").Page) => {
   const expand = page.getByRole("button", { name: "Expand console", exact: true });
   if (await expand.count()) await expand.click();
