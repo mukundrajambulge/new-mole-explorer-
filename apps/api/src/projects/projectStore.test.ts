@@ -29,4 +29,19 @@ describe("G1B project lifecycle", () => {
     tempRoots.push(root);
     await expect(new ProjectStore(root).open("project_00000000-0000-0000-0000-000000000000")).rejects.toMatchObject({ code: "PROJECT_NOT_FOUND", status: 404 });
   });
+
+  it("serializes concurrent saves so exactly one stale writer wins", async () => {
+    const root = await mkdtemp(join(tmpdir(), "molecular-workstation-g1b-concurrent-"));
+    tempRoots.push(root);
+    const store = new ProjectStore(root);
+    const created = await store.create("Concurrent");
+    const requests = ["first", "second"].map((name) => store.save(created.id, { name, structure: null, presentation: DEFAULT_PROJECT_PRESENTATION, expectedRevision: created.revision }));
+    const results = await Promise.allSettled(requests);
+    expect(results.filter((result) => result.status === "fulfilled")).toHaveLength(1);
+    const rejected = results.find((result): result is PromiseRejectedResult => result.status === "rejected");
+    expect(rejected?.reason).toMatchObject({ code: "REVISION_CONFLICT", status: 409 });
+    const opened = await store.open(created.id);
+    expect(opened.revision).toBe(2);
+    expect(["first", "second"]).toContain(opened.name);
+  });
 });

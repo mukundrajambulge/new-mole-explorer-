@@ -11,6 +11,7 @@ import { measurementStatus, type MeasurementObject } from "../interaction/measur
 import { boundsForCoordinates, CameraController, paddedClippingSlab, principalOrientationQuaternion, type Coordinate3, type ClippingSlab } from "./cameraController";
 import { buildDotSurfacePoints, type SurfacePoint } from "./surfaceGenerator";
 import { SurfaceGeometryCache, SurfaceRequestCoordinator, surfaceRequestFor } from "./surfaceProfiles";
+import { RenderGeneration } from "./renderGeneration";
 import { puttyProfileFor, puttyRadiusForResidue, puttyResidueRadii } from "./putty";
 import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
 
@@ -116,6 +117,7 @@ export class ThreeDMolViewerAdapter {
   private activeSurfaceGeometryKey: string | null = null;
   private readonly surfaceCache = new SurfaceGeometryCache<readonly SurfacePoint[]>();
   private readonly surfaceCoordinator = new SurfaceRequestCoordinator();
+  private readonly renderGeneration = new RenderGeneration();
   private measurements: readonly MeasurementObject[] = [];
   private gestureFrame: number | null = null;
   private gesture: { mode: "rotate" | "pan" | "zoom"; x: number; y: number } | null = null;
@@ -173,6 +175,7 @@ export class ThreeDMolViewerAdapter {
 
   load(result: StructureLoadResult, projection: RenderProjection): void {
     this.ensureMounted();
+    this.renderGeneration.next();
     this.structure = result.structure;
     this.performance.sceneRebuilds += 1;
     this.rendererGeneration += 1;
@@ -291,11 +294,47 @@ export class ThreeDMolViewerAdapter {
   endGesture(): void { if (this.gestureFrame !== null) window.cancelAnimationFrame(this.gestureFrame); this.gestureFrame = null; this.pendingGestureDelta = { x: 0, y: 0 }; this.gesture = null; }
 
   destroy(): void {
+    this.clear();
     if (this.container && mountedAdapters.get(this.container) === this) mountedAdapters.delete(this.container);
     this.resizeObserver?.disconnect(); this.resizeObserver = null;
     if (this.viewer) { this.viewer.clear(); this.viewer = null; }
     this.cameraController = null;
     this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceKinds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
+  }
+  clear(): void {
+    this.renderGeneration.invalidate();
+    this.surfaceCoordinator.invalidate();
+    if (this.viewer) {
+      this.viewer.removeAllModels();
+      this.viewer.removeAllSurfaces();
+      this.viewer.removeAllShapes();
+      this.viewer.removeAllLabels();
+    }
+    this.measurementShapes = [];
+    this.interactionShapes = [];
+    this.analysisShapes = [];
+    this.analysisOverlays = [];
+    this.dotSurfaceShapes = [];
+    this.surfaceIds = [];
+    this.surfaceKinds = [];
+    this.surfaceCache.clear();
+    this.activeSurfaceKey = null;
+    this.activeSurfaceGeometryKey = null;
+    this.surfaceCoordinator.invalidate();
+    this.measurements = [];
+    this.hasModel = false;
+    this.structure = null;
+    this.projection = null;
+    this.cameraState = DEFAULT_CAMERA;
+    this.cameraPivot = null;
+    this.baselineView = null;
+    this.baselinePivot = null;
+    this.autoSlab = paddedClippingSlab(null);
+    this.lastCameraAction = "NONE";
+    this.diagnostics = emptyRenderProjectionDiagnostics();
+    this.container?.setAttribute("data-renderer-model-count", "0");
+    this.writeDiagnostics(this.diagnostics);
+    this.render();
   }
   getDiagnostics(): RenderProjectionDiagnostics { return this.diagnostics; }
 
@@ -458,6 +497,7 @@ export class ThreeDMolViewerAdapter {
     this.activeSurfaceKey = nextKey;
     this.activeSurfaceGeometryKey = geometryKey;
     const generation = this.surfaceCoordinator.begin();
+    const renderGeneration = this.renderGeneration.current;
     this.container?.setAttribute("data-surface-generation", String(generation));
     this.container?.setAttribute("data-surface-state", "generating");
     const structure = this.structure;
@@ -476,7 +516,7 @@ export class ThreeDMolViewerAdapter {
         if (!cached) this.performance.surfaceGenerations += 1;
         this.surfaceCache.set(cacheRequest, points);
         this.container?.setAttribute("data-renderer-surface-point-count", String(points.length));
-        if (!this.surfaceCoordinator.isCurrent(generation)) continue;
+        if (!this.surfaceCoordinator.isCurrent(generation) || !this.renderGeneration.isCurrent(renderGeneration) || !this.hasModel) continue;
         const displayPoints = boundedDisplayPoints(points, 1600);
         const pointBatches = new Map<string, SurfacePoint[]>();
         for (const point of displayPoints) {
@@ -502,7 +542,7 @@ export class ThreeDMolViewerAdapter {
       if (directive.primitive === "mesh") {
         const meshStyle = surfaceStyleFor(projection, structure, projection.representationState.parameters.meshOpacity, true);
         const result = this.viewer.addSurface("VDW", meshStyle, target, contributors, undefined, (surfaceId: number) => {
-          if (!this.surfaceCoordinator.isCurrent(generation) || this.activeSurfaceKey !== nextKey) {
+          if (!this.surfaceCoordinator.isCurrent(generation) || !this.renderGeneration.isCurrent(renderGeneration) || !this.hasModel || this.activeSurfaceKey !== nextKey) {
             this.viewer?.removeSurface(surfaceId);
             return;
           }
@@ -521,7 +561,7 @@ export class ThreeDMolViewerAdapter {
       const surfaceType = kind === "SAS" ? "SAS" : kind === "SES" ? "SES" : "VDW";
       const opacity = projection.representationState.parameters.surfaceOpacity;
       const result = this.viewer.addSurface(surfaceType, surfaceStyleFor(projection, structure, opacity), target, contributors, undefined, (surfaceId: number) => {
-        if (!this.surfaceCoordinator.isCurrent(generation) || this.activeSurfaceKey !== nextKey) {
+        if (!this.surfaceCoordinator.isCurrent(generation) || !this.renderGeneration.isCurrent(renderGeneration) || !this.hasModel || this.activeSurfaceKey !== nextKey) {
           this.viewer?.removeSurface(surfaceId);
           return;
         }
@@ -533,7 +573,7 @@ export class ThreeDMolViewerAdapter {
         this.container?.setAttribute("data-surface-state", "ready");
           this.render();
       });
-      if (typeof result === "number" && this.surfaceCoordinator.isCurrent(generation)) { this.surfaceIds.push(result); this.surfaceKinds.push("surface"); }
+      if (typeof result === "number" && this.surfaceCoordinator.isCurrent(generation) && this.renderGeneration.isCurrent(renderGeneration) && this.hasModel) { this.surfaceIds.push(result); this.surfaceKinds.push("surface"); }
     }
   }
 
@@ -635,6 +675,7 @@ export class ThreeDMolViewerAdapter {
     this.container.dataset.rendererSurfaceCacheKey = diagnostics.surfaceCacheKey ?? "";
     this.container.dataset.rendererCanonicalBondSource = diagnostics.stickCylinderContributors > 0 || diagnostics.lineContributors > 0 ? "canonical" : "none";
     this.container.dataset.rendererModelLoads = String(this.modelLoadCount);
+    this.container.dataset.rendererModelCount = this.hasModel ? "1" : "0";
     this.container.dataset.rendererViewerCreations = String(this.performance.viewerCreations);
     this.container.dataset.rendererSceneRebuilds = String(this.performance.sceneRebuilds);
     this.container.dataset.rendererRenderCalls = String(this.performance.renderCalls);

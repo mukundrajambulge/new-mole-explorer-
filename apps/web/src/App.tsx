@@ -11,7 +11,10 @@ import { StatusBar } from "./components/StatusBar";
 import { StructurePanel } from "./components/StructurePanel";
 import { ACTION_IDS, ACTION_REGISTRY, type ActionId, type ActionDefinition } from "./domain/registry";
 import { ApiClientError, apiClient } from "./lib/apiClient";
-import { applyRepresentationToSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setInteractionState, setLabelState, setProjectionStyle, setRepresentationParameters, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
+import { isApiCancellation } from "./lib/apiRequest";
+import { persistProjectSnapshot } from "./lib/projectPersistence";
+import { LatestImportCoordinator, type ImportOperation } from "./lifecycle/importCoordinator";
+import { applyRepresentationToSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setInteractionState, setLabelState, setProjectionStyle, setRepresentationParameters, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
 import { applyPresentationAction, type PresentationComponent } from "./rendering/presentationActions";
 import { STYLE_DEFINITIONS, representationCapabilityFor, representationStyleForCommand } from "./rendering/styleProfiles";
 import { resolveSelection, parseRepresentationCommand, type SelectionResult } from "./interaction/selectionResolver";
@@ -60,10 +63,22 @@ export const App = () => {
   const commandSequence = useRef(0);
   const measurementAccumulatorRef = useRef(new MeasurementAccumulator());
   const measurementSequenceRef = useRef(0);
+  const importCoordinatorRef = useRef(new LatestImportCoordinator());
+  const componentAbortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const importCoordinator = importCoordinatorRef.current;
+    componentAbortRef.current = controller;
+    return () => {
+      controller.abort();
+      importCoordinator.cancel();
+    };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
-    apiClient.health().then(() => mounted && setApiStatus("connected")).catch(() => mounted && setApiStatus("offline"));
+    apiClient.health({ signal: componentAbortRef.current?.signal }).then(() => { if (mounted) setApiStatus("connected"); }).catch((error) => { if (!isApiCancellation(error) && mounted) setApiStatus("offline"); });
     return () => { mounted = false; };
   }, []);
 
@@ -84,11 +99,13 @@ export const App = () => {
     window.setTimeout(() => setNotice((current) => current?.id === capability.id ? null : current), 4600);
   };
 
-  const runLoad = async (loader: () => Promise<StructureLoadResult>) => {
+  const runLoad = async (loader: (signal: AbortSignal) => Promise<StructureLoadResult>) => {
+    const operation: ImportOperation = importCoordinatorRef.current.begin();
     setLoadState("loading");
     setLoadError(null);
     try {
-      const result = await loader();
+      const result = await loader(operation.signal);
+      if (!importCoordinatorRef.current.isCurrent(operation)) return;
       setStructure(result);
       setProjection(createDefaultRenderProjection(result.structure));
       setTargetStyles({ protein: "cartoon", ligand: "ball-and-stick", water: "spheres", ions: "spheres", other: "sticks" });
@@ -100,25 +117,30 @@ export const App = () => {
       commandSequence.current += 1;
       setCameraCommand({ actionId: ACTION_IDS.CANVAS_FOCUS, sequence: commandSequence.current });
     } catch (error) {
+      if (!importCoordinatorRef.current.isCurrent(operation) || isApiCancellation(error)) return;
       setLoadState("error");
       setLoadError(error instanceof ApiClientError ? error.message : "The structure could not be loaded. The current structure was kept.");
+    } finally {
+      importCoordinatorRef.current.finish(operation);
     }
   };
 
   const importFile = (file: File) => {
     if (!isAdmittedFile(file)) {
+      importCoordinatorRef.current.cancel();
       setLoadState("error");
       setLoadError("Only PDB and mmCIF files are admitted in G1C. The current structure was kept.");
       return;
     }
-    void runLoad(() => apiClient.uploadStructure(file));
+    void runLoad((signal) => apiClient.uploadStructure(file, { signal }));
   };
 
-  const fetchRcsb = (pdbId: string) => void runLoad(() => apiClient.fetchRcsb(pdbId));
+  const fetchRcsb = (pdbId: string) => void runLoad((signal) => apiClient.fetchRcsb(pdbId, { signal }));
 
   const createProject = async () => {
+    importCoordinatorRef.current.cancel();
     try {
-      const created = await apiClient.createProject();
+      const created = await apiClient.createProject(undefined, { signal: componentAbortRef.current?.signal });
       setProject(created);
       setStructure(null);
       setProjection(createDefaultRenderProjection());
@@ -137,8 +159,9 @@ export const App = () => {
   const openProject = async () => {
     const id = window.prompt("Project ID to open");
     if (!id) return;
+    importCoordinatorRef.current.cancel();
     try {
-      const opened = await apiClient.openProject(id.trim());
+      const opened = await apiClient.openProject(id.trim(), { signal: componentAbortRef.current?.signal });
       setProject(opened);
       setStructure(opened.structure);
       setProjection(opened.structure ? fromProjectPresentation(opened.presentation, opened.structure.structure) : createDefaultRenderProjection());
@@ -156,8 +179,7 @@ export const App = () => {
 
   const saveProject = async () => {
     try {
-      const target = project ?? await apiClient.createProject();
-      const saved = await apiClient.saveProject(target.id, { name: target.name, structure, presentation: toProjectPresentation(projection), expectedRevision: project ? project.revision : target.revision });
+      const saved = await persistProjectSnapshot({ project, structure, projection, signal: componentAbortRef.current?.signal });
       setProject(saved);
       setLoadError(null);
       setLoadState("idle");

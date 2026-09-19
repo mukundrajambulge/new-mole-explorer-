@@ -14,6 +14,7 @@ import type {
   StructureLoadResult,
   StructureSourceKind,
 } from "@molecular/contracts";
+import { BoundedTtlLruStore, type BoundedTtlLruStoreOptions } from "../cache/boundedTtlLruStore.js";
 
 export const MAX_STRUCTURE_BYTES = 25 * 1024 * 1024;
 export const INGESTION_PARSER_PROFILE = "molecular-workstation-g1b-canonical-v1";
@@ -24,9 +25,9 @@ const ION_RESIDUES = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA
 
 export class IngestionError extends Error {
   constructor(
-    public readonly code: "UNSUPPORTED_FORMAT" | "INVALID_INPUT" | "REMOTE_FETCH_FAILED" | "REMOTE_NOT_FOUND" | "PAYLOAD_TOO_LARGE" | "PROJECT_NOT_FOUND" | "PROJECT_INVALID",
+    public readonly code: "UNSUPPORTED_FORMAT" | "INVALID_INPUT" | "REMOTE_FETCH_FAILED" | "REMOTE_NOT_FOUND" | "REMOTE_RESPONSE_TOO_LARGE" | "PAYLOAD_TOO_LARGE" | "PROJECT_NOT_FOUND" | "PROJECT_INVALID" | "REVISION_CONFLICT",
     message: string,
-    public readonly status = code === "PAYLOAD_TOO_LARGE" ? 413 : code === "REMOTE_NOT_FOUND" || code === "PROJECT_NOT_FOUND" ? 404 : 400,
+    public readonly status = code === "PAYLOAD_TOO_LARGE" ? 413 : code === "REMOTE_RESPONSE_TOO_LARGE" || code === "REMOTE_FETCH_FAILED" ? 502 : code === "REVISION_CONFLICT" ? 409 : code === "REMOTE_NOT_FOUND" || code === "PROJECT_NOT_FOUND" ? 404 : 400,
   ) {
     super(message);
     this.name = "IngestionError";
@@ -386,26 +387,79 @@ const summarize = (atoms: CanonicalAtom[]): { counts: CanonicalMolecularStructur
 const canonicalBondKey = (atom1: string, atom2: string) => [atom1, atom2].sort().join("|");
 
 export class StructureIngestionService {
-  private readonly structures = new Map<string, CanonicalMolecularStructure>();
+  private readonly sourceCache: BoundedTtlLruStore<string, Buffer>;
+  private readonly parsedCache: BoundedTtlLruStore<string, StructureLoadResult>;
+  private readonly rcsbCache: BoundedTtlLruStore<string, StructureLoadResult>;
+  private readonly rcsbInflight = new Map<string, Promise<StructureLoadResult>>();
+
+  constructor(options: { sourceCache?: BoundedTtlLruStoreOptions<Buffer>; parsedCache?: BoundedTtlLruStoreOptions<StructureLoadResult>; localCache?: BoundedTtlLruStoreOptions<StructureLoadResult>; rcsbCache?: BoundedTtlLruStoreOptions<StructureLoadResult> } = {}) {
+    const positiveEnvNumber = (name: string, fallback: number) => {
+      const value = Number(process.env[name]);
+      return Number.isFinite(value) && value > 0 ? value : fallback;
+    };
+    const defaultOptions = (prefix: string): BoundedTtlLruStoreOptions<StructureLoadResult> => ({
+      maxEntries: positiveEnvNumber(`MOLECULAR_${prefix}_CACHE_ENTRIES`, 8),
+      maxBytes: positiveEnvNumber(`MOLECULAR_${prefix}_CACHE_BYTES`, 128 * 1024 * 1024),
+      ttlMs: positiveEnvNumber(`MOLECULAR_${prefix}_CACHE_TTL_MS`, 15 * 60 * 1000),
+      sizeOf: (value) => Buffer.byteLength(value.renderSource.content, "utf8") + value.structure.atoms.length * 192 + value.structure.bonds.length * 96,
+    });
+    const sourceOptions: BoundedTtlLruStoreOptions<Buffer> = {
+      maxEntries: positiveEnvNumber("MOLECULAR_SOURCE_CACHE_ENTRIES", 8),
+      maxBytes: positiveEnvNumber("MOLECULAR_SOURCE_CACHE_BYTES", 128 * 1024 * 1024),
+      ttlMs: positiveEnvNumber("MOLECULAR_SOURCE_CACHE_TTL_MS", 15 * 60 * 1000),
+      sizeOf: (value) => value.byteLength,
+    };
+    this.sourceCache = new BoundedTtlLruStore(options.sourceCache ?? sourceOptions);
+    this.parsedCache = new BoundedTtlLruStore(options.parsedCache ?? options.localCache ?? defaultOptions("PARSED"));
+    this.rcsbCache = new BoundedTtlLruStore(options.rcsbCache ?? defaultOptions("RCSB"));
+  }
 
   async ingestLocal(filename: string, buffer: Buffer): Promise<StructureLoadResult> {
-    return this.ingest("LOCAL_FILE", filename, buffer);
+    const hash = createHash("sha256").update(buffer).digest("hex");
+    const source = this.sourceCache.get(hash) ?? Buffer.from(buffer);
+    this.sourceCache.set(hash, source);
+    const cacheKey = `${filename.toLowerCase()}:${hash}`;
+    const cached = this.parsedCache.get(cacheKey);
+    if (cached) return cached;
+    const result = await this.ingest("LOCAL_FILE", filename, source);
+    this.parsedCache.set(cacheKey, result);
+    return result;
   }
 
   async ingestRcsb(pdbId: string): Promise<StructureLoadResult> {
     const normalizedId = pdbId.trim().toUpperCase();
     if (!/^[A-Z0-9]{4}$/.test(normalizedId)) throw new IngestionError("INVALID_INPUT", "Enter a valid four-character PDB ID.");
+    const cached = this.rcsbCache.get(normalizedId);
+    if (cached) return cached;
+    const inflight = this.rcsbInflight.get(normalizedId);
+    if (inflight) return inflight;
     const uri = `https://files.rcsb.org/download/${normalizedId}.cif`;
-    let response: Response;
+    const request = this.ingestRcsbRemote(normalizedId, uri);
+    this.rcsbInflight.set(normalizedId, request);
     try {
-      response = await fetch(uri, { signal: AbortSignal.timeout(20_000), headers: { accept: "text/plain" } });
-    } catch {
-      throw new IngestionError("REMOTE_FETCH_FAILED", "RCSB could not be reached. Check the network and try again.", 502);
+      const result = await request;
+      this.rcsbCache.set(normalizedId, result);
+      return result;
+    } finally {
+      this.rcsbInflight.delete(normalizedId);
     }
-    if (response.status === 404) throw new IngestionError("REMOTE_NOT_FOUND", `RCSB could not find structure ${normalizedId}.`, 404);
-    if (!response.ok) throw new IngestionError("REMOTE_FETCH_FAILED", `RCSB returned HTTP ${response.status}.`, 502);
-    const content = await response.text();
-    return this.ingest("RCSB", `${normalizedId}.cif`, Buffer.from(content, "utf8"), uri);
+  }
+
+  private async ingestRcsbRemote(normalizedId: string, uri: string): Promise<StructureLoadResult> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20_000);
+    try {
+      const response = await fetch(uri, { signal: controller.signal, headers: { accept: "text/plain" } });
+      if (response.status === 404) throw new IngestionError("REMOTE_NOT_FOUND", `RCSB could not find structure ${normalizedId}.`, 404);
+      if (!response.ok) throw new IngestionError("REMOTE_FETCH_FAILED", `RCSB returned HTTP ${response.status}.`, 502);
+      const buffer = await readRemoteResponse(response, MAX_STRUCTURE_BYTES, () => controller.abort());
+      return this.ingest("RCSB", `${normalizedId}.cif`, buffer, uri);
+    } catch (error) {
+      if (error instanceof IngestionError) throw error;
+      throw new IngestionError("REMOTE_FETCH_FAILED", "RCSB could not be reached. Check the network and try again.", 502);
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
 
   private async ingest(kind: StructureSourceKind, filename: string, buffer: Buffer, uri?: string): Promise<StructureLoadResult> {
@@ -458,7 +512,42 @@ export class StructureIngestionService {
       ...(parsed.secondaryStructureSource ? { secondaryStructureDataset: { datasetId: `${hash.slice(0, 16)}:secondary-structure`, molecularRevision: scientificHash, assignmentSource: parsed.secondaryStructureSource, profileVersion: "pdb-mmcif-structural-records-v1" } } : {}),
       ...summary,
     };
-    this.structures.set(structure.id, structure);
     return { structure, renderSource: { format: parsed.format, content } };
   }
 }
+
+const readRemoteResponse = async (response: Response, maxBytes: number, abort: () => void): Promise<Buffer> => {
+  const declaredLength = Number(response.headers.get("content-length") ?? 0);
+  if (declaredLength > maxBytes) {
+    abort();
+    throw new IngestionError("REMOTE_RESPONSE_TOO_LARGE", `RCSB response exceeds the ${maxBytes} byte limit.`, 502);
+  }
+  if (!response.body) {
+    const buffer = Buffer.from(await response.arrayBuffer());
+    if (buffer.length > maxBytes) {
+      abort();
+      throw new IngestionError("REMOTE_RESPONSE_TOO_LARGE", `RCSB response exceeds the ${maxBytes} byte limit.`, 502);
+    }
+    return buffer;
+  }
+  const reader = response.body.getReader();
+  const chunks: Buffer[] = [];
+  let size = 0;
+  try {
+    while (true) {
+      const next = await reader.read();
+      if (next.done) break;
+      const chunk = Buffer.from(next.value);
+      size += chunk.length;
+      if (size > maxBytes) {
+        abort();
+        await reader.cancel();
+        throw new IngestionError("REMOTE_RESPONSE_TOO_LARGE", `RCSB response exceeds the ${maxBytes} byte limit.`, 502);
+      }
+      chunks.push(chunk);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  return Buffer.concat(chunks);
+};

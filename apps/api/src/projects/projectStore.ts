@@ -20,6 +20,7 @@ const safeProjectId = (id: string): string => {
 
 export class ProjectStore {
   private readonly rootDir: string;
+  private readonly saveTails = new Map<string, Promise<void>>();
 
   constructor(rootDir = process.env.MOLECULAR_DATA_DIR ?? join(process.cwd(), ".molecular-data")) {
     this.rootDir = rootDir;
@@ -52,19 +53,35 @@ export class ProjectStore {
   }
 
   async save(id: string, request: ProjectSaveRequest): Promise<ProjectRecord> {
-    const current = await this.open(id);
-    if (!request.presentation || request.presentation.schemaVersion !== 1 || !request.presentation.layerVisibility || !request.presentation.camera) throw new IngestionError("PROJECT_INVALID", "The project presentation state is invalid.");
-    if (request.expectedRevision !== undefined && request.expectedRevision !== current.revision) throw new IngestionError("PROJECT_INVALID", "The project changed before it could be saved; reload it before saving again.", 409);
-    const project: ProjectRecord = {
-      ...current,
-      name: request.name?.trim() || current.name,
-      revision: current.revision + 1,
-      updatedAt: new Date().toISOString(),
-      structure: request.structure,
-      presentation: request.presentation,
-    };
-    await this.write(project);
-    return project;
+    return this.withProjectLock(id, async () => {
+      const current = await this.open(id);
+      if (!request.presentation || request.presentation.schemaVersion !== 1 || !request.presentation.layerVisibility || !request.presentation.camera) throw new IngestionError("PROJECT_INVALID", "The project presentation state is invalid.");
+      if (request.expectedRevision !== undefined && request.expectedRevision !== current.revision) throw new IngestionError("REVISION_CONFLICT", "The project changed before it could be saved; reload it before saving again.");
+      const project: ProjectRecord = {
+        ...current,
+        name: request.name?.trim() || current.name,
+        revision: current.revision + 1,
+        updatedAt: new Date().toISOString(),
+        structure: request.structure,
+        presentation: request.presentation,
+      };
+      await this.write(project);
+      return project;
+    });
+  }
+
+  private async withProjectLock<T>(id: string, operation: () => Promise<T>): Promise<T> {
+    const previous = this.saveTails.get(id) ?? Promise.resolve();
+    let release!: () => void;
+    const current = new Promise<void>((resolve) => { release = resolve; });
+    this.saveTails.set(id, current);
+    await previous;
+    try {
+      return await operation();
+    } finally {
+      release();
+      if (this.saveTails.get(id) === current) this.saveTails.delete(id);
+    }
   }
 
   private async write(project: ProjectRecord): Promise<void> {

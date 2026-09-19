@@ -46,6 +46,13 @@ describe("VIS-01 structure ingestion", () => {
     expect(result.structure.counts).toMatchObject({ atoms: 2, polymerAtoms: 1, waterAtoms: 1 });
   });
 
+  it("reuses bounded source and parsed local-ingestion entries", async () => {
+    const service = new StructureIngestionService();
+    const first = await service.ingestLocal("sample.pdb", Buffer.from(pdbFixture));
+    const second = await service.ingestLocal("sample.pdb", Buffer.from(pdbFixture));
+    expect(second).toBe(first);
+  });
+
   it("rejects unadmitted formats without creating a structure", async () => {
     await expect(new StructureIngestionService().ingestLocal("sample.sdf", Buffer.from("not admitted"))).rejects.toMatchObject({ code: "UNSUPPORTED_FORMAT" });
   });
@@ -59,6 +66,24 @@ describe("VIS-01 structure ingestion", () => {
     const result = await new StructureIngestionService().ingestRcsb("1abc");
     expect(result.structure.source).toMatchObject({ kind: "RCSB", uri: "https://files.rcsb.org/download/1ABC.cif", originalFilename: "1ABC.cif" });
     expect(fetchMock).toHaveBeenCalledOnce();
+    vi.unstubAllGlobals();
+  });
+
+  it("coalesces repeated RCSB reads through the bounded cache", async () => {
+    const fetchMock = vi.fn(async () => new Response(cifFixture, { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const service = new StructureIngestionService();
+    await service.ingestRcsb("1abc");
+    await service.ingestRcsb("1ABC");
+    expect(fetchMock).toHaveBeenCalledOnce();
+    vi.unstubAllGlobals();
+  });
+
+  it("aborts an oversized remote response while streaming", async () => {
+    const oversized = new Uint8Array(25 * 1024 * 1024 + 1);
+    const fetchMock = vi.fn(async () => new Response(new ReadableStream({ start(controller) { controller.enqueue(oversized); controller.close(); } }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(new StructureIngestionService().ingestRcsb("1abc")).rejects.toMatchObject({ code: "REMOTE_RESPONSE_TOO_LARGE", status: 502 });
     vi.unstubAllGlobals();
   });
 

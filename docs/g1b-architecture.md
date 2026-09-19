@@ -73,3 +73,11 @@ Background presets are Black, White, Dark Gray, Light Gray, Navy, Deep Blue, and
 | selection, editing, measurement, docking | Coming Soon/Unavailable | explicit notices; no substitute behavior |
 
 Project files are written below `.molecular-data/` (or `MOLECULAR_DATA_DIR`) and use temporary-file-plus-rename replacement. This is local durable storage for the current greenfield app, not a multi-user production database.
+
+## Runtime transport and bounded caches
+
+The API binds to `127.0.0.1` by default. `API_HOST` may explicitly select another bind address, and `API_CORS_ORIGINS` is a comma-separated allowlist whose default contains only the local landing/workstation origins. Unexpected browser origins receive `403 CORS_ORIGIN_REJECTED`.
+
+JSON request bodies default to a 32 MiB streaming limit through `MOLECULAR_MAX_JSON_BODY_BYTES`. Structure and remote RCSB responses are capped by `MAX_STRUCTURE_BYTES` while streaming. Source bytes, parsed local results, and RCSB results use separate bounded TTL/LRU caches. Each cache defaults to 8 entries, 128 MiB, and a 15-minute TTL; configure them with the corresponding `MOLECULAR_SOURCE_CACHE_*`, `MOLECULAR_PARSED_CACHE_*`, and `MOLECULAR_RCSB_CACHE_*` variables.
+
+Import operations are latest-request-wins and abort superseded requests. Renderer loads and surface callbacks carry a generation token, and an empty workspace clears all viewer-owned models, surfaces, labels, shapes, measurements, and cached geometry before rendering the empty scene.

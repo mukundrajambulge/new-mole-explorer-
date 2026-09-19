@@ -129,10 +129,11 @@ export const MolecularCanvas = ({
   }, [consoleExpanded, structure, viewerBottomInset]);
 
   useEffect(() => {
-    if (!structure || !adapterRef.current) return;
+    if (!adapterRef.current) return;
     try {
       setViewerError(null);
-      adapterRef.current.load(structure, projectionRef.current);
+      if (structure) adapterRef.current.load(structure, projectionRef.current);
+      else adapterRef.current.clear();
     } catch (loadError) {
       setViewerError(loadError instanceof Error ? loadError.message : "The structure could not be rendered.");
     }
