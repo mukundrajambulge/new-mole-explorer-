@@ -26,6 +26,8 @@ The release branch is `seal/pre-docking-pymol-core-2026-09-19`. The immutable pr
 - API health, web shell, `/molstudio`, responsive shell, 1CRN/4DJW, multi-object, and frozen 4V6F focused smoke: passed.
 - Six-case compact selection fingerprint subset: exact match against the accepted lock.
 
+The local clean-checkout E2E run is 147/147. The two push-triggered hosted workflows completed with 146/147 and the same R07-B2 second-object readiness race (`data-renderer-model-count` expected 2, received 1). The browser session is signed out, so no authenticated retry was attempted; the failure is documented and reproducible as a hosted timing limitation rather than left unexplained.
+
 ## Preservation and boundaries
 
 - Unrelated dirty work remains in the original worktree; see [USER_WORK_PRESERVATION_AUDIT.md](USER_WORK_PRESERVATION_AUDIT.md).

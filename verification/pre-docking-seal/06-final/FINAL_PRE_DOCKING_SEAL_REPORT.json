@@ -21,7 +21,8 @@
     "webShell": "PASS",
     "molstudio": "PASS",
     "large4v6fSmoke": "PASS",
-    "compactFingerprintSubset": "EXACT_MATCH"
+    "compactFingerprintSubset": "EXACT_MATCH",
+    "hostedCi": "HOSTED_TIMING_FAILURE_LOCAL_PASS"
   },
   "preservation": {
     "baselineTrackedDirty": 678,
@@ -34,7 +35,8 @@
   },
   "knownLimitations": {
     "pymolOracle": "BLOCKED_ENVIRONMENT",
-    "af001": "PERFORMANCE_CONCERN_SEMANTICALLY_CORRECT"
+    "af001": "PERFORMANCE_CONCERN_SEMANTICALLY_CORRECT",
+    "hostedCi": "R07-B2 second-object readiness race; 146/147 hosted, 147/147 local; retry requires authenticated GitHub session"
   },
   "dockingExecution": "NOT_STARTED",
   "mainMerge": "NOT_AUTHORIZED"

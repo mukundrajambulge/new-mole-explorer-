@@ -24,6 +24,15 @@ The validation worktree was separate from the user's dirty source worktree. Test
 | `npm run verify:selection-matrix` | PASS | 87 rows; 85 implementation-verified, 1 missing dependency, 1 intentional unsupported; oracle summary 51 pass, 35 equivalent, 1 pending. |
 | `npm run verify:r10` | PASS | No errors. |
 
+## Hosted CI result
+
+The push-triggered GitHub workflow was allowed to finish on both relevant refs:
+
+- Tested tag SHA `28a8dca64a4711ca4b9e00e13e19601e56404709`: run `35423013895`, failure after 58m 6s; 146 passed and one R07-B2 test failed at `tests/e2e/r07-b2-topology-edit.spec.ts:76` because the second object had not yet raised `data-renderer-model-count` from 1 to 2 within 5 seconds.
+- Documentation-bearing seal branch `af5793363e5e23cb461e3429c2ac157440b78795`: run `35423079246`, failure after 1h 0m 4s; the same single R07-B2 readiness assertion failed, with 146 passed.
+
+The identical narrow readiness race is not reproduced locally: the separate clean validation worktree passed 147/147, including R07-B2 and the adjacent R07 multi-object tests. GitHub’s available browser session is signed out, so no authentication or automatic CI retry was attempted. This is recorded as a hosted-environment timing limitation, not an unexplained source failure.
+
 ## Runtime smoke
 
 - API health: HTTP 200, `{ "service": "molecular-api", "status": "ok", "gate": "G1C" }`.

@@ -43,7 +43,30 @@
       "oracleEquivalent": 35,
       "oraclePending": 1
     },
-    "r10": "PASS"
+    "r10": "PASS",
+    "hostedCi": {
+      "status": "HOSTED_TIMING_FAILURE_LOCAL_PASS",
+      "runs": [
+        {
+          "id": 35423013895,
+          "headSha": "28a8dca64a4711ca4b9e00e13e19601e56404709",
+          "duration": "58m 6s",
+          "passed": 146,
+          "failed": 1,
+          "failure": "tests/e2e/r07-b2-topology-edit.spec.ts:76 expected data-renderer-model-count=2, received 1"
+        },
+        {
+          "id": 35423079246,
+          "headSha": "af5793363e5e23cb461e3429c2ac157440b78795",
+          "duration": "1h 0m 4s",
+          "passed": 146,
+          "failed": 1,
+          "failure": "tests/e2e/r07-b2-topology-edit.spec.ts:76 expected data-renderer-model-count=2, received 1"
+        }
+      ],
+      "localCleanRun": "147/147",
+      "retry": "NOT_ATTEMPTED_GITHUB_SESSION_SIGNED_OUT"
+    }
   },
   "runtimeSmoke": {
     "apiHealth": { "status": 200, "service": "molecular-api", "health": "ok", "gate": "G1C" },
