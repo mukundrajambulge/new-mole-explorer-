@@ -14,19 +14,24 @@ test("R07-B1 edit, exact undo/redo, and multi-object isolation stay live without
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(mini);
   await expect(page.getByTitle("mini-protein.pdb").first()).toBeVisible();
+  const viewer = page.getByTestId("molecular-viewer");
+  await expect(viewer).toHaveAttribute("data-testid-lifecycle", "ready", { timeout: 30_000 });
 
   const chooserPromise = page.waitForEvent("filechooser");
   await page.getByRole("button", { name: "File", exact: true }).click();
   await page.getByRole("button", { name: "Add Structure", exact: true }).click();
   await (await chooserPromise).setFiles(ligand);
+  await expect(page.getByTitle("g1c-small-molecule.pdb").first())
+    .toBeVisible({ timeout: 30_000 });
 
   const panel = page.getByTestId("objects-selections-panel");
-  await expect(panel.locator("[data-object-id]")).toHaveCount(2);
+  await expect(panel.locator("[data-object-id]"))
+    .toHaveCount(2, { timeout: 30_000 });
   const miniRow = panel.locator("[data-object-id]").filter({ hasText: "mini-protein.pdb" });
   const ligandRow = panel.locator("[data-object-id]").filter({ hasText: "g1c-small-molecule.pdb" });
-  const viewer = page.getByTestId("molecular-viewer");
   await expect(viewer).toHaveCount(1);
-  await expect(viewer).toHaveAttribute("data-renderer-model-count", "2");
+  await expect(viewer).toHaveAttribute("data-testid-lifecycle", "ready", { timeout: 30_000 });
+  await expect(viewer).toHaveAttribute("data-renderer-model-count", "2", { timeout: 30_000 });
   const initialRendererGeneration = await viewer.getAttribute("data-renderer-generation");
 
   // Adding an object focuses it; explicitly focus A so the edit target is unambiguous.
