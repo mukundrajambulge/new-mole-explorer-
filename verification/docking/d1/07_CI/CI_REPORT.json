@@ -1,0 +1,31 @@
+{
+  "candidateSha": "26227a10416657d0c2518bd0b751a38693627d5b",
+  "runId": "35470596791",
+  "runUrl": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/35470596791",
+  "jobId": "105970732184",
+  "jobUrl": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/35470596791/job/105970732184",
+  "result": "success",
+  "acceptedTag": "mole-explorer-docking-d1-accepted-2026-09-19",
+  "steps": {
+    "checkout": "success",
+    "nodeSetup": "success",
+    "npmCi": "success",
+    "playwrightInstall": "success",
+    "lint": "success",
+    "typecheck": "success",
+    "unit": "success",
+    "build": "success",
+    "e2e": "success"
+  },
+  "local": {
+    "d1UnitPassed": 14,
+    "fullUnitPassed": 229,
+    "selectionMatrixRows": 87,
+    "r10": "passed",
+    "e2ePassed": 147,
+    "e2eFailed": 0,
+    "e2eSkipped": 0,
+    "e2eDuration": "54.8m"
+  },
+  "previousFailures": ["35457932892", "35464378760"]
+}

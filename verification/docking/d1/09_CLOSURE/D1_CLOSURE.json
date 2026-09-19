@@ -1,0 +1,38 @@
+{
+  "sealedBaseline": "28a8dca64a4711ca4b9e00e13e19601e56404709",
+  "acceptedSha": "26227a10416657d0c2518bd0b751a38693627d5b",
+  "acceptedTag": "mole-explorer-docking-d1-accepted-2026-09-19",
+  "hostedCi": {
+    "runId": "35470596791",
+    "url": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/35470596791",
+    "result": "success"
+  },
+  "requirements": {"covered": 40, "total": 40},
+  "tests": {
+    "d1UnitPassed": 14,
+    "fullUnitPassed": 229,
+    "localE2ePassed": 147,
+    "localE2eFailed": 0,
+    "selectionMatrix": "passed",
+    "r10": "passed",
+    "lint": "passed",
+    "typecheck": "passed",
+    "build": "passed"
+  },
+  "scope": {
+    "dockingRunExecutable": false,
+    "d2Started": false,
+    "scientificEnginesImplemented": false
+  },
+  "closureEvidence": [
+    "00_BASELINE/D1_BASELINE_INTEGRITY_REPAIR.md",
+    "01_REQUIREMENTS/D1_REQUIREMENT_MATRIX.md",
+    "02_IMPLEMENTATION_INDEX/D1_IMPLEMENTATION_INDEX.md",
+    "03_FIXTURES/D1_FIXTURE_ACCEPTANCE.md",
+    "04_UNIT/D1_UNIT_REPORT.md",
+    "05_UPSTREAM_REGRESSION/UPSTREAM_REGRESSION_REPORT.md",
+    "06_E2E/LOCAL_E2E_REPORT.md",
+    "07_CI/CI_REPORT.md",
+    "08_SCOPE_AUDIT/D1_SCOPE_NEGATIVE_AUDIT.md"
+  ]
+}

@@ -1,9 +1,9 @@
 {
   "command": "npm run test:e2e -- --reporter=github",
-  "candidate": "47f1a99325cdfb7a48c1a35ec2a18e143abc88fe",
+  "candidate": "26227a10416657d0c2518bd0b751a38693627d5b",
   "passed": 147,
   "failed": 0,
   "skipped": 0,
-  "duration": "40.4m",
+  "duration": "54.8m",
   "serverReuse": false
 }

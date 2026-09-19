@@ -1,6 +1,6 @@
 {
   "sealedBaseline": "28a8dca64a4711ca4b9e00e13e19601e56404709",
-  "candidateAtIndexCreation": "47f1a99325cdfb7a48c1a35ec2a18e143abc88fe",
+  "candidateAtIndexCreation": "26227a10416657d0c2518bd0b751a38693627d5b",
   "coverage": {"covered": 40, "total": 40},
   "requirements": [
     {"id":"ME-DCK-V1-REQ-0013","source":"packages/contracts/src/docking/canonical.ts","test":"d1Contracts.test.ts / INT-FX-001","fixture":"INT-FX-001"},

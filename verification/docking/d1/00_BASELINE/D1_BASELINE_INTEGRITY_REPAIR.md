@@ -18,12 +18,12 @@ The six reviewed D1 commits were cherry-picked one at a time, in their required
 order, onto the sealed baseline. The historical branch and candidate were not
 rewritten or force-pushed.
 
-Current repaired candidate before final acceptance gates:
+Final repaired candidate after local and hosted acceptance gates:
 
-`47f1a99325cdfb7a48c1a35ec2a18e143abc88fe`
+`26227a10416657d0c2518bd0b751a38693627d5b`
 
-This is a candidate SHA, not an accepted SHA, until all local, hosted, and
-closure-evidence gates pass.
+This SHA is accepted by local gates, hosted run `35470596791`, and the
+annotated tag `mole-explorer-docking-d1-accepted-2026-09-19`.
 
 ## Result
 

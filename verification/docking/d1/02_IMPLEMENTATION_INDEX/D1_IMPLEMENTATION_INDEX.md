@@ -1,7 +1,8 @@
 # D1 Implementation Index
 
 - Sealed baseline: `28a8dca64a4711ca4b9e00e13e19601e56404709`
-- Repaired candidate at index creation: `47f1a99325cdfb7a48c1a35ec2a18e143abc88fe`
+- Accepted repaired candidate: `26227a10416657d0c2518bd0b751a38693627d5b`
+- Accepted tag: `mole-explorer-docking-d1-accepted-2026-09-19`
 - Requirement coverage: 40 / 40
 
 | Requirement | Source file / symbol | Test | Fixture | Evidence |

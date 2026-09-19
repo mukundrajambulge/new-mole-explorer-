@@ -1,7 +1,7 @@
 # D1 Unit Report
 
 - Command: `npx vitest run apps/api/src/docking/d1Contracts.test.ts --reporter=verbose`
-- Candidate at execution: `47f1a99325cdfb7a48c1a35ec2a18e143abc88fe`
+- Candidate at execution: `26227a10416657d0c2518bd0b751a38693627d5b`
 - Test files: 1 passed
 - Tests: 14 passed, 0 failed, 0 skipped
 - Duration: 1.54s

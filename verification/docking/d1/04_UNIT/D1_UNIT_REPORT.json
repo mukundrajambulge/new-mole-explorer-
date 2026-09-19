@@ -1,6 +1,6 @@
 {
   "command": "npx vitest run apps/api/src/docking/d1Contracts.test.ts --reporter=verbose",
-  "candidate": "47f1a99325cdfb7a48c1a35ec2a18e143abc88fe",
+  "candidate": "26227a10416657d0c2518bd0b751a38693627d5b",
   "testFiles": 1,
   "passed": 14,
   "failed": 0,
