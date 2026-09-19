@@ -151,12 +151,16 @@ export const App = () => {
   // SelectionResult.  Including every stable AtomUID in this dirty-state
   // fingerprint made large compact selections needlessly stringify hundreds
   // of thousands of IDs after every console command.
+  const activeSelectionResultId = activeSelection?.resultId;
+  const activeSelectionMembershipHash = activeSelection?.membershipHash;
+  const activeSelectionCount = activeSelection?.count;
+  const activeSelectionMolecularRevision = activeSelection?.molecularRevision;
   const workspaceFingerprint = useMemo(() => {
-    const activeSelectionFingerprint = activeSelection
-      ? { resultId: activeSelection.resultId, membershipHash: activeSelection.membershipHash, count: activeSelection.count, molecularRevision: activeSelection.molecularRevision }
+    const activeSelectionFingerprint = activeSelectionResultId !== undefined
+      ? { resultId: activeSelectionResultId, membershipHash: activeSelectionMembershipHash, count: activeSelectionCount, molecularRevision: activeSelectionMolecularRevision }
       : null;
     return JSON.stringify({ workspaceObjects, workspaceGroups, activeObjectId, globalFrameIndex, coordinateFramePolicy, activeSelection: activeSelectionFingerprint, namedSelections, measurements, analysisResults, fittingResults, sceneCollection, projection, biologicalData });
-  }, [activeObjectId, activeSelection?.count, activeSelection?.membershipHash, activeSelection?.molecularRevision, activeSelection?.resultId, analysisResults, biologicalData, coordinateFramePolicy, fittingResults, globalFrameIndex, measurements, namedSelections, projection, sceneCollection, workspaceGroups, workspaceObjects]);
+  }, [activeObjectId, activeSelectionCount, activeSelectionMembershipHash, activeSelectionMolecularRevision, activeSelectionResultId, analysisResults, biologicalData, coordinateFramePolicy, fittingResults, globalFrameIndex, measurements, namedSelections, projection, sceneCollection, workspaceGroups, workspaceObjects]);
 
   useEffect(() => {
     if (!project) return;
