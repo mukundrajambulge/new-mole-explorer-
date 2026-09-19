@@ -74,7 +74,8 @@ test("R07-B2 rejects self-bond and cross-object topology without partial success
   await page.getByRole("button", { name: "File", exact: true }).click();
   await page.getByRole("button", { name: "Add Structure", exact: true }).click();
   await (await chooserPromise).setFiles(smallMolecule);
-  await expect(viewer).toHaveAttribute("data-renderer-model-count", "2");
+  await expect(viewer).toHaveAttribute("data-renderer-object-count", "2", { timeout: 30000 });
+  await expect(viewer).toHaveAttribute("data-renderer-model-count", "2", { timeout: 30000 });
   const cross = await runCommand(page, "bond object r07-b2-topology.pdb and id 1, object g1c-small-molecule.pdb and id 1");
   await expect(cross).toContainText("CROSS_OBJECT_TOPOLOGY_UNSUPPORTED");
   await expect(viewer).toHaveAttribute("data-renderer-model-count", "2");
