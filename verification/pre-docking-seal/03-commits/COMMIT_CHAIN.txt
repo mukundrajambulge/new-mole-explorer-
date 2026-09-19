@@ -1,0 +1,8 @@
+PRE-SEAL HEAD  1b44780c214e83c4d864bb94ecd49132d59b09c3
+SCOPED CORE   0184d44f0f9814a83e4d32d809f9230c447ced3d  fix(core): seal large-molecule ingestion and selection
+FOLLOW-UP     385d9cf0345c62303f233c9b264dc0c8cde202b8  fix(selection): remove unused compact profile constants
+FOLLOW-UP     bb551741d4e4ca942f91ec5e9a88ecdbd0a99298  fix(ui): stabilize workspace fingerprint memo
+FOLLOW-UP     f9f86cc364069453ed81416b1083bac344c2aa88  fix(ui): isolate scalar selection fingerprint dependencies
+TESTED SHA    28a8dca64a4711ca4b9e00e13e19601e56404709  fix(ui): preserve coarse viewer lifecycle contract
+
+All commits were created with explicit path lists. Unrelated dirty work was not staged.

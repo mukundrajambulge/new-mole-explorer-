@@ -45,3 +45,15 @@ verification/pre-docking-seal/01-classification/WORKTREE_FILE_CLASSIFICATION.csv
 verification/pre-docking-seal/01-classification/WORKTREE_FILE_CLASSIFICATION.json
 verification/pre-docking-seal/02-patches/ACCEPTED_SET_PROVENANCE_AUDIT.md
 verification/pre-docking-seal/ACCEPTED_COMMIT_FILESET.txt
+verification/pre-docking-seal/03-commits/STAGED_DIFF.patch
+verification/pre-docking-seal/03-commits/STAGED_FILE_LIST.txt
+verification/pre-docking-seal/03-commits/COMMIT_CHAIN.txt
+verification/pre-docking-seal/04-clean-regression/CLEAN_SHA_REGRESSION_REPORT.md
+verification/pre-docking-seal/04-clean-regression/CLEAN_SHA_REGRESSION_REPORT.json
+verification/pre-docking-seal/05-checkpoint/PRE_DOCKING_BASELINE.md
+verification/pre-docking-seal/05-checkpoint/PRE_DOCKING_BASELINE.json
+verification/pre-docking-seal/05-checkpoint/UPSTREAM_CORE_FREEZE_BOUNDARY.md
+verification/pre-docking-seal/05-checkpoint/DOCKING_D1_START_CONTRACT.md
+verification/pre-docking-seal/06-final/USER_WORK_PRESERVATION_AUDIT.md
+verification/pre-docking-seal/06-final/FINAL_PRE_DOCKING_SEAL_REPORT.md
+verification/pre-docking-seal/06-final/FINAL_PRE_DOCKING_SEAL_REPORT.json

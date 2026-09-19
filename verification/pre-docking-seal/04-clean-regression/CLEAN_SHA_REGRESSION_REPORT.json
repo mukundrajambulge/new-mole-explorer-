@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "sourceSha": "28a8dca64a4711ca4b9e00e13e19601e56404709",
+  "validationWorktree": "C:\\Users\\mukun\\Desktop\\molecular-workstation-pre-docking-validation-5",
+  "initialPorcelain": "",
+  "remote": {
+    "name": "new-origin",
+    "url": "https://github.com/mukundrajambulge/new-mole-explorer-.git"
+  },
+  "runtime": {
+    "node": "v24.14.1",
+    "npm": "11.11.0",
+    "install": "npm ci",
+    "packageLock": true
+  },
+  "gates": {
+    "npmCi": "PASS",
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "unit": {
+      "status": "PASS",
+      "webFiles": 31,
+      "webTests": 150,
+      "apiFiles": 10,
+      "apiTests": 65,
+      "totalTests": 215
+    },
+    "build": "PASS",
+    "e2e": {
+      "status": "PASS",
+      "passed": 147,
+      "total": 147,
+      "responsive": ["1440x900", "1366x768", "900x900", "430x932"],
+      "coverage": ["1CRN", "4DJW", "multi-object", "R07", "R08", "R09", "R10", "A-BF exhaustive replay"]
+    },
+    "selectionMatrix": {
+      "status": "PASS",
+      "rows": 87,
+      "implementationVerified": 85,
+      "missingDependency": 1,
+      "intentionalUnsupported": 1,
+      "oraclePass": 51,
+      "oracleEquivalent": 35,
+      "oraclePending": 1
+    },
+    "r10": "PASS"
+  },
+  "runtimeSmoke": {
+    "apiHealth": { "status": 200, "service": "molecular-api", "health": "ok", "gate": "G1C" },
+    "webRootStatus": 200,
+    "molstudioStatus": 200
+  },
+  "largeStructureSmoke": {
+    "fixturePath": "C:\\Users\\mukun\\Desktop\\molecular-workstation\\verification\\large-molecule-4v6f\\01-source\\4v6f.cif",
+    "fixtureSha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+    "canonicalRevision": "20b7c8468b598ce6272d83709eba7454505881b43d5083c85df50735e801d913",
+    "transport": "compact-canonical-v1",
+    "counts": { "atoms": 307345, "bonds": 318270, "residues": 26941, "chains": 5467 },
+    "lifecycle": "ready",
+    "coarseViewerState": "loaded",
+    "renderer": { "modelCount": 1, "atomCount": 307345, "progressiveStage": "full", "generation": 1, "canvasCount": 1, "objectRenderReady": true },
+    "cameraChecks": ["VIEW.RESET", "CANVAS.ZOOM", "CANVAS.FOCUS", "VIEW.CENTER"],
+    "fixtureCommitted": false
+  },
+  "selectionFingerprintSubset": {
+    "fixtureSha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+    "cases": ["A-001", "A-019", "AF-001", "X-003", "Z-004", "LMX-SP-006"],
+    "allExact": true,
+    "comparison": "status, classification, selected count, and ordered membership hash"
+  },
+  "knownLimitations": [
+    "PyMOL oracle remains BLOCKED_ENVIRONMENT.",
+    "AF-001 remains a documented performance concern with correct empty-valid semantics.",
+    "Existing compact-selection chemistry-property limitations remain explicit."
+  ],
+  "notes": [
+    "The validation checkout's tracked 4V6F copy has SHA 7aab1288… and was not used for the accepted smoke.",
+    "The accepted user-owned frozen 4V6F copy with SHA a48b6f… was used explicitly and was not staged or committed."
+  ]
+}

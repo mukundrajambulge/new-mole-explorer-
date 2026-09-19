@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "status": "SEALED_PRE_DOCKING",
+  "testedSourceSha": "28a8dca64a4711ca4b9e00e13e19601e56404709",
+  "sealBranch": "seal/pre-docking-pymol-core-2026-09-19",
+  "tag": "mole-explorer-pre-docking-core-2026-09-19",
+  "remote": "https://github.com/mukundrajambulge/new-mole-explorer-.git",
+  "commits": [
+    "0184d44f0f9814a83e4d32d809f9230c447ced3d",
+    "385d9cf0345c62303f233c9b264dc0c8cde202b8",
+    "bb551741d4e4ca942f91ec5e9a88ecdbd0a99298",
+    "f9f86cc364069453ed81416b1083bac344c2aa88",
+    "28a8dca64a4711ca4b9e00e13e19601e56404709"
+  ],
+  "verification": {
+    "unitApi": "215/215",
+    "e2e": "147/147",
+    "selectionMatrix": "PASS",
+    "r10": "PASS",
+    "apiHealth": "PASS",
+    "webShell": "PASS",
+    "molstudio": "PASS",
+    "large4v6fSmoke": "PASS",
+    "compactFingerprintSubset": "EXACT_MATCH"
+  },
+  "preservation": {
+    "baselineTrackedDirty": 678,
+    "sealedTrackedPaths": 17,
+    "unrelatedTrackedPathsStillDirty": 661,
+    "preExistingUntracked": 1277,
+    "missingUntracked": 0,
+    "authorizedUntrackedHashChanges": 3,
+    "fixtureCommitted": false
+  },
+  "knownLimitations": {
+    "pymolOracle": "BLOCKED_ENVIRONMENT",
+    "af001": "PERFORMANCE_CONCERN_SEMANTICALLY_CORRECT"
+  },
+  "dockingExecution": "NOT_STARTED",
+  "mainMerge": "NOT_AUTHORIZED"
+}
