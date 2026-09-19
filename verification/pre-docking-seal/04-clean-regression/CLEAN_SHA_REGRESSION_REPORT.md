@@ -28,10 +28,11 @@ The validation worktree was separate from the user's dirty source worktree. Test
 
 The push-triggered GitHub workflow was allowed to finish on both relevant refs:
 
-- Tested tag SHA `28a8dca64a4711ca4b9e00e13e19601e56404709`: run `35423013895`, failure after 58m 6s; 146 passed and one R07-B2 test failed at `tests/e2e/r07-b2-topology-edit.spec.ts:76` because the second object had not yet raised `data-renderer-model-count` from 1 to 2 within 5 seconds.
+- Tested tag SHA `28a8dca64a4711ca4b9e00e13e19601e56404709`: run `35423013895`, failure after 58m 6s; 145 passed and two multi-object readiness assertions failed: R07-B1 expected two object rows, and R07-B2 expected `data-renderer-model-count=2` but received 1.
 - Documentation-bearing seal branch `af5793363e5e23cb461e3429c2ac157440b78795`: run `35423079246`, failure after 1h 0m 4s; the same single R07-B2 readiness assertion failed, with 146 passed.
+- Final documentation-bearing seal branch `ea0ae302bcf5404fd17b5f0ff1f84153e231b067e9`: run `35425965534`, failure after 58m 18s; 144 passed and three multi-object readiness assertions failed in `multi-object-state`, R07-B1, and R07-B2.
 
-The identical narrow readiness race is not reproduced locally: the separate clean validation worktree passed 147/147, including R07-B2 and the adjacent R07 multi-object tests. GitHub’s available browser session is signed out, so no authentication or automatic CI retry was attempted. This is recorded as a hosted-environment timing limitation, not an unexplained source failure.
+The narrow multi-object readiness race is not reproduced locally: the separate clean validation worktree passed 147/147, including the affected multi-object, R07-B1, and R07-B2 tests. GitHub’s available browser session is signed out, so no authentication or automatic CI retry was attempted. This is recorded as a hosted-environment timing limitation, not an unexplained source failure.
 
 ## Runtime smoke
 

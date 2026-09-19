@@ -51,9 +51,9 @@
           "id": 35423013895,
           "headSha": "28a8dca64a4711ca4b9e00e13e19601e56404709",
           "duration": "58m 6s",
-          "passed": 146,
-          "failed": 1,
-          "failure": "tests/e2e/r07-b2-topology-edit.spec.ts:76 expected data-renderer-model-count=2, received 1"
+          "passed": 145,
+          "failed": 2,
+          "failure": "tests/e2e/r07-b1-edit-history.spec.ts:24 expected two object rows, received 1; tests/e2e/r07-b2-topology-edit.spec.ts:76 expected data-renderer-model-count=2, received 1"
         },
         {
           "id": 35423079246,
@@ -62,6 +62,14 @@
           "passed": 146,
           "failed": 1,
           "failure": "tests/e2e/r07-b2-topology-edit.spec.ts:76 expected data-renderer-model-count=2, received 1"
+        },
+        {
+          "id": 35425965534,
+          "headSha": "ea0ae302bcf5404fd17b5f0ff1f84153e231b067e9",
+          "duration": "58m 18s",
+          "passed": 144,
+          "failed": 3,
+          "failure": "tests/e2e/multi-object-state.spec.ts:231 expected two objects, received 1; tests/e2e/r07-b1-edit-history.spec.ts:24 expected two object rows, received 1; tests/e2e/r07-b2-topology-edit.spec.ts:76 expected data-renderer-model-count=2, received 1"
         }
       ],
       "localCleanRun": "147/147",
