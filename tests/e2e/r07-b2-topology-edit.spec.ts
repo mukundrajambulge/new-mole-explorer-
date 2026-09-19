@@ -65,6 +65,7 @@ test("R07-B2 rejects self-bond and cross-object topology without partial success
   test.setTimeout(120000);
   await loadFile(page, topology);
   const viewer = page.getByTestId("molecular-viewer");
+  await expect(viewer).toHaveAttribute("data-testid-lifecycle", "ready", { timeout: 15000 });
   const initialRevision = await viewer.getAttribute("data-scientific-revision");
   const self = await runCommand(page, "bond id 1, id 1");
   await expect(self).toContainText("SELF_BOND");
