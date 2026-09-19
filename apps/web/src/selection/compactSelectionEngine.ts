@@ -20,8 +20,6 @@ export type CompactSelectionEvaluation = {
 
 type CompactOptions = Pick<SelectionEvaluationOptions, "named" | "groups" | "presentation" | "coordinateStateId" | "stateOrdinal">;
 
-const PROFILE_CHEMISTRY = { id: "canonical-chemistry-roles", version: "1", fingerprint: "canonical-chemistry-roles-v1" } as const;
-const PROFILE_VDW = { id: "canonical-vdw-radius", version: "1", fingerprint: "canonical-vdw-radius-v1" } as const;
 const backboneNames = new Set(["N", "CA", "C", "O", "OXT"]);
 const metalElements = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA", "ZN", "FE", "MN", "CU", "CO", "NI"]);
 const proteinResidueNames = new Set(["ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"]);
