@@ -2,6 +2,7 @@ import type { CanonicalAtom, CanonicalMolecularStructure, CanonicalUnitCell } fr
 import { vdwRadiusForElementStrict, VDW_RADIUS_PROFILE } from "../science/vdwRadii";
 import { canonicalChemistryRolesDatasetComplete, canonicalFragmentDatasetComplete, canonicalPartialChargeDatasetComplete } from "../science/datasetValidity";
 import { beyondSurfaceGapBoundary, withinSpatialBoundary } from "./spatialPolicy";
+import { evaluateCompactSelection } from "./compactSelectionEngine";
 
 export type SelectionStatus =
   | "VALID_NONEMPTY"
@@ -1009,6 +1010,24 @@ export const bindSelectionPlan = (query: string, ast: SelectionAst, normalizedAs
 
 export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecularStructure, options: SelectionEvaluationOptions = {}): SelectionResult => {
   const trimmed = query.trim(); const parsed = parseSelection(trimmed); const source = options.source ?? { kind: "query", rawQuery: trimmed };
+  const compact = structure.compact?.schemaVersion === "compact-canonical-v1" ? structure.compact : null;
+  const compactResult = (status: SelectionStatus, diagnostics: readonly SelectionDiagnostic[], astText: string, ids: readonly string[], evaluation?: ReturnType<typeof evaluateCompactSelection>): SelectionResult => {
+    const stableAtomIds = [...new Set(ids)]; const membershipHash = hash(stableAtomIds.join("\u0000"));
+    const needsCoordinates = evaluation?.needsCoordinates ?? false; const coordinateObjectIds = evaluation?.coordinateObjectIds ?? [];
+    const coordinateContext = needsCoordinates ? { structureId: structure.id, revision: structure.scientificHash, stateId: options.coordinateStateId ?? "active", framePolicy: options.coordinateFrame ?? "LOCAL_SCIENTIFIC", objectIds: coordinateObjectIds.length ? coordinateObjectIds : [structure.id], stateScopes: [{ objectId: structure.id, stateId: options.coordinateStateId ?? structure.stateOrder?.[0] ?? `${structure.id}:state:1`, ordinal: options.stateOrdinal ?? 1 }] } : null;
+    return { schemaVersion: 2, resultId: hash(`${trimmed}\u0000${structure.id}\u0000${structure.scientificHash}\u0000${stableAtomIds.join("\u0000")}`), source, query: trimmed, grammarVersion: GRAMMAR_VERSION, normalizedAst: astText, normalizedAstHash: hash(astText), profile: PROFILE, molecularIdentity: { structureId: structure.id, molecularRevision: structure.scientificHash }, structureId: structure.id, molecularRevision: structure.scientificHash, objectScope: { kind: "structure", objectId: structure.id }, universeFingerprint: hash(compact?.atomStableIds.join("\u0000") ?? ""), coordinateContext, topologyRevision: evaluation?.needsTopology ? "compact-canonical-topology" : null, namespaceRevision: `compact:${structure.scientificHash}`, scientificProfiles: [], presentationContext: evaluation?.needsPresentation && options.presentation ? { revision: options.presentation.revision } : null, stableAtomIds, membershipHash, count: stableAtomIds.length, status, diagnostics, dependencyVector: { needsCoordinates, needsTopology: evaluation?.needsTopology ?? false, needsNamespaces: true, needsPresentation: evaluation?.needsPresentation ?? false }, boundPlan: null };
+  };
+  if (compact) {
+    if (options.expectedRevision && options.expectedRevision !== structure.scientificHash) return compactResult("STALE_REVISION", [{ code: "STALE_REVISION", message: "The selection context revision is stale; the active structure was not changed." }], "", []);
+    const gated = trimmed.match(/\b(pbc|symmetry|arbitrary)\b/i);
+    if (gated) return compactResult("UNSUPPORTED_OPERATOR_OR_PROFILE", [{ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: `Selection operator \`${gated[1]}\` is gated until its validated scientific profile is available.` }], "", []);
+    if (!trimmed || !parsed.ast) {
+      const diagnostics = parsed.diagnostics.length ? parsed.diagnostics : [{ code: "SYNTAX_ERROR" as const, message: "A selection expression is required." }];
+      const parseStatus: SelectionStatus = diagnostics.some((diagnostic) => diagnostic.code === "UNKNOWN_PROPERTY") ? "UNKNOWN_PROPERTY" : "SYNTAX_ERROR";
+      return compactResult(parseStatus, diagnostics, "", []);
+    }
+    const ast = normalize(parsed.ast); const normalized = serialize(ast); const evaluation = evaluateCompactSelection(structure, ast, options); if (evaluation) return compactResult(evaluation.status, evaluation.diagnostics, normalized, evaluation.stableAtomIds, evaluation);
+  }
   const emptyContext = { ...contextFor(structure, trimmed, options.named, [...parsed.diagnostics], options.presentation, options.coordinateFrame, options.groups), coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal };
   if (options.expectedRevision && options.expectedRevision !== structure.scientificHash) return baseResult(trimmed, structure, source, "STALE_REVISION", [{ code: "STALE_REVISION", message: "The selection context revision is stale; the active structure was not changed." }], "", [], emptyContext);
   const gated = trimmed.match(/\b(pbc|symmetry|arbitrary)\b/i);

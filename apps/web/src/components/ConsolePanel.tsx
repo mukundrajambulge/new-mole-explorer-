@@ -33,7 +33,9 @@ export const ConsolePanel = ({ expanded, onToggle, structure, namedSelections = 
     submitQuery();
   };
   const commandHistory = entries.filter((entry) => entry.command !== "renderer status").map((entry) => entry.command);
-  const structureSuggestions = structure ? ["all", "none", "polymer", "ligand", "water", "ions", ...[...new Set(structure.structure.atoms.map((atom) => atom.chain).filter(Boolean))].map((chain) => `chain ${chain}`), ...[...new Set(structure.structure.atoms.map((atom) => atom.residueNumber))].slice(0, 3).map((resi) => `resi ${resi}`), ...structure.structure.atoms.slice(0, 3).map((atom) => `name ${atom.atomName}`), ...namedSelections.map((selection) => `%${selection.name}`)] : [];
+  const structureSuggestions = structure
+    ? ["all", "none", "polymer", "ligand", "water", "ions", ...(structure.structure.compact ? ["name CA", "chain A", "resi 1"] : [...new Set(structure.structure.atoms.map((atom) => atom.chain).filter(Boolean))].map((chain) => `chain ${chain}`)), ...(structure.structure.compact ? [] : [...new Set(structure.structure.atoms.map((atom) => atom.residueNumber))].slice(0, 3).map((resi) => `resi ${resi}`)), ...(structure.structure.compact ? [] : structure.structure.atoms.slice(0, 3).map((atom) => `name ${atom.atomName}`)), ...namedSelections.map((selection) => `%${selection.name}`)]
+    : [];
   const suggestions = /^(select|center|zoom|label)\s+/i.test(query) ? [...new Set([...commandSuggestions(query), ...structureSuggestions])] : commandSuggestions(query);
   const onInputKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") { event.preventDefault(); submitQuery(); return; }

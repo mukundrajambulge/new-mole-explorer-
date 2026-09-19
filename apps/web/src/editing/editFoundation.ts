@@ -13,6 +13,7 @@ import type {
 } from "@molecular/contracts";
 import type { SelectionResult } from "../selection/selectionEngine";
 import type { PickResult } from "../interaction/picking";
+import { hydrateCompactLoadResult } from "../structures/compactCanonical";
 
 export type ScientificDomain = "TOPOLOGY" | "COORDINATES" | "CHEMISTRY" | "IDENTITY" | "NAMESPACE" | "PRESENTATION";
 
@@ -288,6 +289,7 @@ const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 const deepFreeze = <T>(value: T): T => {
   if (value && typeof value === "object" && !Object.isFrozen(value)) {
     Object.freeze(value);
+    if ("schemaVersion" in (value as object) && (value as { schemaVersion?: unknown }).schemaVersion === "compact-canonical-v1") return value;
     for (const child of Object.values(value as Record<string, unknown>)) deepFreeze(child);
   }
   return value;
@@ -296,7 +298,7 @@ const deepFreeze = <T>(value: T): T => {
 const coordinateFor = (state: CanonicalCoordinateState, atom: CanonicalAtom): Coordinate3D => state.coordinates[atom.stableId] ?? { x: atom.x, y: atom.y, z: atom.z };
 
 const stateForStructure = (structure: CanonicalMolecularStructure): CanonicalCoordinateState[] => {
-  if (structure.coordinateStates?.length) return structure.coordinateStates.map(clone).sort((left, right) => left.ordinal - right.ordinal);
+  if (structure.coordinateStates?.length) return structure.coordinateStates.map((state) => ({ ...state, coordinates: clone(state.coordinates) })).sort((left, right) => left.ordinal - right.ordinal);
   return [{
     id: `${structure.id}:state:1`,
     ordinal: 1,
@@ -501,7 +503,7 @@ const makeTransactionId = (command: CanonicalEditCommand): string => `transactio
 
 const fail = (code: EditFailureCode, message: string, command: ScientificEditCommand, transactionId: string): EditFailure => ({ ok: false, outcome: "REJECTED", code, message, transactionId, objectId: command.objectId, baseRevisionId: command.baseRevisionId, invalidationManifest: EMPTY_INVALIDATION });
 
-const freezeLoadResult = (loadResult: StructureLoadResult): StructureLoadResult => deepFreeze(clone(loadResult));
+const freezeLoadResult = (loadResult: StructureLoadResult): StructureLoadResult => deepFreeze(hydrateCompactLoadResult(clone(loadResult)));
 
 const lineageFor = (parent: CanonicalMolecularStructure, child: CanonicalMolecularStructure): EntityLineageRecord[] => [
   ...parent.atoms.map((atom) => ({ entityKind: "ATOM" as const, sourceId: atom.stableId, resultId: child.atoms.some((candidate) => candidate.stableId === atom.stableId) ? atom.stableId : undefined, outcome: child.atoms.some((candidate) => candidate.stableId === atom.stableId) ? "PRESERVED" as const : "RETIRED" as const })),
@@ -1414,17 +1416,18 @@ export class ScientificHistoryService {
   registerRoot(objectId: string, loadResult: StructureLoadResult, currentStateId?: string): ScientificRevision {
     if (!objectId.trim()) throw new Error("A scientific history root requires an ObjectID.");
     const structure = freezeLoadResult(loadResult);
-    const states = stateForStructure(structure.structure);
-    const stateOrder = stateOrderFor(structure.structure, states);
+    const compact = structure.structure.compact?.schemaVersion === "compact-canonical-v1" ? structure.structure.compact : undefined;
+    const states = compact ? [] : stateForStructure(structure.structure);
+    const stateOrder = compact ? [...compact.stateOrder] : stateOrderFor(structure.structure, states);
     const revisionId = structure.structure.scientificHash || `r07-root-${deterministicScientificContentHash(structure.structure)}`;
-    const identityId = identityIdFor(structure.structure);
+    const identityId = compact ? `identity:${structure.structure.id}:${revisionId}` : identityIdFor(structure.structure);
     const transactionId = `transaction:root:${stableHash({ objectId, revisionId })}`;
     const revision: ScientificRevision = deepFreeze({
       schemaVersion: 1,
       revisionId,
       objectId,
       molecularIdentityId: identityId,
-      scientificContentHash: deterministicScientificContentHash(structure.structure),
+      scientificContentHash: compact ? revisionId : deterministicScientificContentHash(structure.structure),
       loadResult: structure,
       parentRevisionId: null,
       parentRevisionIds: [],

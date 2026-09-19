@@ -1,4 +1,5 @@
 import type { BootstrapResponse, CanonicalCommand, CommandJob, CommandResult, HealthResponse, JsonRecord, ProjectRecord, ProjectSaveRequest, StructureError, StructureLoadResult } from "@molecular/contracts";
+import { hydrateCompactLoadResult } from "../structures/compactCanonical";
 
 export type SessionRevisionSummary = { sessionRevisionId: string; parentSessionRevisionIds: readonly string[]; savedAt: string; revisionType: "USER_CHECKPOINT" | "RECOVERY" | "AUTOSAVE" | "MIGRATION"; name: string };
 
@@ -23,7 +24,9 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
     }
     throw new ApiClientError(response.status, detail, `API request failed: ${response.status}`);
   }
-  return (await response.json()) as T;
+  const payload = (await response.json()) as T;
+  if (payload && typeof payload === "object" && "structure" in payload && (payload as { structure?: unknown }).structure) return hydrateCompactLoadResult(payload as unknown as StructureLoadResult) as T;
+  return payload;
 };
 
 export const apiClient = {

@@ -1,6 +1,7 @@
 import type { CanonicalAtom, CanonicalBond, CanonicalCoordinateState, CanonicalHierarchy, CanonicalMolecularStructure, SessionObjectRecord, StructureLoadResult } from "@molecular/contracts";
 import { canonicalChemistryRolesDatasetComplete, canonicalFragmentDatasetComplete } from "../science/datasetValidity";
 import { createDefaultRenderProjection, type RenderProjection } from "../rendering/renderProjection";
+import { hydrateCompactLoadResult } from "../structures/compactCanonical";
 
 export type WorkspaceLineageOperation = "LOAD" | "COPY" | "CREATE_FROM_SELECTION" | "SPLIT_STATE" | "JOIN_STATES";
 
@@ -93,7 +94,7 @@ const shortHash = (value: string): string => {
 };
 
 const cloneProjection = (projection: RenderProjection): RenderProjection => JSON.parse(JSON.stringify(projection)) as RenderProjection;
-const cloneLoadResult = (loadResult: StructureLoadResult): StructureLoadResult => JSON.parse(JSON.stringify(loadResult)) as StructureLoadResult;
+const cloneLoadResult = (loadResult: StructureLoadResult): StructureLoadResult => hydrateCompactLoadResult(JSON.parse(JSON.stringify(loadResult)) as StructureLoadResult);
 
 const objectIdFor = (structureId: string, existingIds: readonly string[]): string => {
   const baseId = `object:${structureId}`;

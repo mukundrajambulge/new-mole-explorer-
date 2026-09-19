@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "sealStatus": "SEALED_INTERNAL_PASS_WITH_LIMITATIONS",
+  "generatedAt": "2026-09-18",
+  "campaign": "MOLEXPLORER FINAL EXHAUSTIVE 4V6F LARGE-MOLECULE SELECTION QUERY A→BF",
+  "repository": {
+    "path": "C:\\Users\\mukun\\Desktop\\molecular-workstation",
+    "branch": "fix/lm-imp-001-canonical-large-ingestion",
+    "startingHead": "1b44780c214e83c4d864bb94ecd49132d59b09c3",
+    "currentHead": "1b44780c214e83c4d864bb94ecd49132d59b09c3",
+    "worktreeDirty": true,
+    "baselineStatusEntries": 684,
+    "currentStatusEntries": 686,
+    "preExistingPathsPreserved": true,
+    "campaignDeltaEntries": 2,
+    "commitCreated": false,
+    "pushOrMergePerformed": false,
+    "dockingPerformed": false
+  },
+  "fixture": {
+    "sourcePath": "verification/large-molecule-4v6f/01-source/4v6f.cif",
+    "sourceSha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+    "canonicalRevision": "20b7c8468b598ce6272d83709eba7454505881b43d5083c85df50735e801d913",
+    "canonicalStorage": "compact-canonical-v1",
+    "counts": {
+      "atoms": 307345,
+      "residues": 26941,
+      "chains": 5467,
+      "polymerAtoms": 301988,
+      "ligandAtoms": 0,
+      "waters": 6,
+      "ions": 5351
+    }
+  },
+  "resultReconciliation": {
+    "aToBfExpected": 523,
+    "aToBfExecuted": 523,
+    "lmxExpected": 9,
+    "lmxExecuted": 9,
+    "totalExpected": 532,
+    "totalExecuted": 532,
+    "missingTestIds": 0,
+    "duplicateTestIds": 0,
+    "unexpectedTestIds": 0,
+    "queryCorpusHash": "0f5a81931dbe5960f97da323eb1adab734f2da5dffe9805f885e6966346e65c0",
+    "classificationCounts": {
+      "PASS": 251,
+      "EMPTY_VALID": 243,
+      "IMPLEMENTED_WITH_LIMITATION": 9,
+      "INVALID_EXPECTED": 29
+    },
+    "membershipHashes": {
+      "recorded": 509,
+      "expectedResolvedSelections": 509,
+      "schema": "sha256-ordered-canonical-stable-ids-v1"
+    }
+  },
+  "visualEvidence": {
+    "localScreenshots": 532,
+    "nonZeroScreenshots": 532,
+    "uniqueScreenshots": 532,
+    "matchingRecords": 532,
+    "visuallyReviewed": 532,
+    "contactSheets": 34,
+    "recoveryPreRunCaptures": 33,
+    "status": "PASS"
+  },
+  "driveHierarchy": {
+    "root": "https://drive.google.com/drive/folders/1uU1K6LIyd91op3fbnoUsL9RjXmDCktu6",
+    "childFolder": "12_FULL_SELECTION_A_BF_4V6F",
+    "childFolderId": "1AvwXMcQDwVq7hDfVMVj0Ye5qGGUkaBxC",
+    "categoryFoldersExpected": 66,
+    "categoryFoldersFound": 66,
+    "primaryEvidenceExpected": 532,
+    "primaryEvidenceFound": 532,
+    "primaryEvidenceReadbackVerified": 532,
+    "hashMatches": 532,
+    "placementMismatches": 0,
+    "filenameMismatches": 0,
+    "sizeMismatches": 0,
+    "readbackErrors": 0,
+    "extras": {
+      "total": 6,
+      "misroutingTrace": 1,
+      "baselineOrCorpusSupport": 5,
+      "trace": "Z-004__present__PASS__MISROUTED_TRACE.png moved and renamed into 28_Z_STATE"
+    },
+    "finalReportFolderBeforePackage": 0,
+    "hierarchyStatus": "PASS"
+  },
+  "performance": {
+    "semanticMedianMs": 252,
+    "semanticP95Ms": 1097,
+    "semanticMaximumMs": 29813,
+    "maximumQuery": {
+      "testId": "AF-001",
+      "category": "AF",
+      "query": "model mini-protein.pdb like model mini-protein.pdb",
+      "durationMs": 29813,
+      "selectedAtoms": 0,
+      "classification": "EMPTY_VALID",
+      "priorUiDurationMs": 24077,
+      "priorUiViewerState": "ready"
+    },
+    "maxQueryRetest": {
+      "testId": "AF-001",
+      "runs": [11251, 11783, 11056],
+      "medianMs": 11251,
+      "maximumMs": 11783,
+      "selectedAtomsEachRun": 0,
+      "membershipHashEachRun": "811c9dc5",
+      "scientificCorrectness": "CORRECT_EMPTY_VALID",
+      "uiResponsiveness": "PRIOR_UI_REPLAY_READY; THIS_RETEST_MEASURED_SEMANTIC_PATH_ONLY",
+      "classification": "PERFORMANCE_CONCERN"
+    },
+    "tailReview": {
+      "slowestRowsReviewed": 20,
+      "classification": "PERFORMANCE_CONCERN",
+      "scientificDefect": false
+    },
+    "scopeNote": "The historical 523-case campaign was not rerun; only the exact historical maximum AF-001 was retested three times."
+  },
+  "lock": {
+    "path": "verification/large-molecule-4v6f/20-selection-a-bf-4v6f/41-final/4V6F_SELECTION_SUBSYSTEM_LOCK.json",
+    "locked": true,
+    "acceptance": "PASS_WITH_LIMITATIONS",
+    "driveReadbackComplete": true,
+    "pymolOracleStatus": "BLOCKED_ENVIRONMENT",
+    "unresolvedP0": 0,
+    "unresolvedP1": 0,
+    "knownLimitationCount": 9
+  },
+  "oracleAndRegressions": {
+    "pymol": "BLOCKED_ENVIRONMENT",
+    "selectionEngineTests": "21/21 PASS",
+    "realStructureWorkspace": "PASS",
+    "unresolvedP0": 0,
+    "unresolvedP1": 0,
+    "p1Evidence": "NONE OBSERVED"
+  },
+  "reproducibility": {
+    "fingerprintPath": "verification/large-molecule-4v6f/20-selection-a-bf-4v6f/41-final/4V6F_SELECTION_REPRODUCIBILITY_FINGERPRINT.json",
+    "scopedCommitPlanPath": "verification/large-molecule-4v6f/20-selection-a-bf-4v6f/41-final/4V6F_SELECTION_SCOPED_COMMIT_PLAN.md",
+    "baselinePreservationConfirmed": true
+  },
+  "finalReportPackage": {
+    "status": "PASS",
+    "folder": "65_FINAL_REPORT",
+    "folderId": "1rPkEWAi3Ce_QZ8BWyl2T28tFlDJUUnUZ",
+    "packageAuditPath": "verification/large-molecule-4v6f/20-selection-a-bf-4v6f/41-final/4V6F_FINAL_EVIDENCE_READBACK_SUMMARY.json",
+    "expectedFileCount": 18,
+    "observedFileCount": 18,
+    "missingFiles": 0,
+    "unexpectedFiles": 0,
+    "sizeMismatches": 0,
+    "packageAuditDriveFileId": "1P8TElzffaY7t6CFtIYpqKaQI-mq-hoBp"
+  },
+  "acceptance": "PASS_WITH_LIMITATIONS"
+}

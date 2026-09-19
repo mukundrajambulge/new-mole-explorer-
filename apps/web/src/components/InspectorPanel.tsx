@@ -50,7 +50,7 @@ export const InspectorPanel = ({ collapsed, onToggle, onAction, structure, proje
   if (collapsed) return null;
   const currentCapability = representationCapabilityFor(projection.representation, structure?.structure ?? null);
   const selectedStyleValue = selectValueForStyle(projection.representation);
-  const labelAtoms = structure?.structure.atoms.filter((atom) => atom.isPolymer ? projection.showProtein : atom.isLigand ? projection.showLigand : atom.isWater ? projection.showWater : atom.isIon ? projection.showIons : projection.showOther) ?? [];
+  const labelAtoms = structure?.structure.compact ? [] : structure?.structure.atoms.filter((atom) => atom.isPolymer ? projection.showProtein : atom.isLigand ? projection.showLigand : atom.isWater ? projection.showWater : atom.isIon ? projection.showIons : projection.showOther) ?? [];
   const labelPlan = labelPlanForState(projection.labels, labelAtoms);
   const styleOptions = STYLE_DEFINITIONS.map((definition) => representationCapabilityFor(definition.id, structure?.structure ?? null));
   const activeStyles = new Set<RepresentationStyle>([projection.representation, ...Object.values(targetStyles)]);

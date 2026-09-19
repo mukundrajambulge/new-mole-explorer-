@@ -5,7 +5,7 @@ import { ConsolePanel, type ConsoleCommandResult } from "./components/ConsolePan
 import { ContextToolbar } from "./components/ContextToolbar";
 import { InspectorPanel } from "./components/InspectorPanel";
 import { MenuBar, RIBBON_CATEGORIES, type RibbonCategory } from "./components/MenuBar";
-import { MolecularCanvas } from "./components/MolecularCanvas";
+import { MolecularCanvas, type ViewerLifecycle } from "./components/MolecularCanvas";
 import { StatusBar } from "./components/StatusBar";
 import { ScientificOperationsPanel, StructurePanel } from "./components/StructurePanel";
 import { ScenePanel } from "./components/ScenePanel";
@@ -42,6 +42,11 @@ import { buildSessionDraft, restoreSession } from "./lifecycle/sessionCodec";
 import { exportStructure, type ExportArtifact, type ExportFormat, type ExportLossPolicy, type ExportStateScope } from "./lifecycle/export";
 import { SceneStore } from "./lifecycle/scenes";
 import { detectBiologicalFormat, isMultiFrameXyz, pairTopologyWithTrajectory, parseBiologicalData, type BiologicalData, type BiologicalFormat, BiologicalAdapterError } from "./biological/adapters";
+
+const markLargeIngestionLifecycle = (stage: string): void => {
+  performance.mark(`molecular:ingestion:${stage}`);
+  if (typeof console !== "undefined") console.info("MOLECULAR_INGESTION_STAGE", stage);
+};
 
 const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_SELECT]: "Select",
@@ -110,6 +115,7 @@ export const App = () => {
   const [projection, setProjection] = useState<RenderProjection>(createDefaultRenderProjection());
   const [loadState, setLoadState] = useState<"idle" | "loading" | "error">("idle");
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [renderLifecycle, setRenderLifecycle] = useState<ViewerLifecycle>("empty");
   const [measurementMode, setMeasurementModeState] = useState<MeasurementKind | null>(null);
   const [measurementSlots, setMeasurementSlots] = useState<readonly string[]>([]);
   const [measurements, setMeasurements] = useState<readonly MeasurementObject[]>([]);
@@ -141,7 +147,14 @@ export const App = () => {
   const alignmentOverlays = useMemo(() => overlaysForAlignment(fittingResults), [fittingResults]);
   const viewerWorkspaceObjects = useMemo(() => workspaceObjects.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object), [activeObjectId, projection, workspaceObjects]);
   const activeHistoryState = activeObjectId ? historyServiceRef.current.historyState(activeObjectId) : null;
-  const workspaceFingerprint = useMemo(() => JSON.stringify({ workspaceObjects, workspaceGroups, activeObjectId, globalFrameIndex, coordinateFramePolicy, activeSelection, namedSelections, measurements, analysisResults, fittingResults, sceneCollection, projection, biologicalData }), [activeObjectId, activeSelection, analysisResults, biologicalData, coordinateFramePolicy, fittingResults, globalFrameIndex, measurements, namedSelections, projection, sceneCollection, workspaceGroups, workspaceObjects]);
+  // Selection membership is already content-addressed by the immutable
+  // SelectionResult.  Including every stable AtomUID in this dirty-state
+  // fingerprint made large compact selections needlessly stringify hundreds
+  // of thousands of IDs after every console command.
+  const activeSelectionFingerprint = activeSelection
+    ? { resultId: activeSelection.resultId, membershipHash: activeSelection.membershipHash, count: activeSelection.count, molecularRevision: activeSelection.molecularRevision }
+    : null;
+  const workspaceFingerprint = useMemo(() => JSON.stringify({ workspaceObjects, workspaceGroups, activeObjectId, globalFrameIndex, coordinateFramePolicy, activeSelection: activeSelectionFingerprint, namedSelections, measurements, analysisResults, fittingResults, sceneCollection, projection, biologicalData }), [activeObjectId, activeSelectionFingerprint, analysisResults, biologicalData, coordinateFramePolicy, fittingResults, globalFrameIndex, measurements, namedSelections, projection, sceneCollection, workspaceGroups, workspaceObjects]);
 
   useEffect(() => {
     if (!project) return;
@@ -180,6 +193,23 @@ export const App = () => {
     for (const object of viewerWorkspaceObjects) {
       if (!object.enabled) continue;
       const canonical = structureForWorkspaceObjectState(object);
+      // Large canonical loads keep their semantic columns in the compact
+      // representation.  Do not force the legacy atom-object graph merely to
+      // prepare selection presentation context; the renderer already has the
+      // same visibility policy available from compact flags.
+      if (canonical.compact?.schemaVersion === "compact-canonical-v1") {
+        const compact = canonical.compact;
+        for (let index = 0; index < compact.atomCount; index += 1) {
+          const flags = compact.flags[index] ?? 0;
+          const visible = (flags & 1) ? object.projection.showProtein
+            : (flags & 2) ? object.projection.showLigand
+              : (flags & 4) ? object.projection.showWater
+                : (flags & 8) ? object.projection.showIons
+                  : object.projection.showOther;
+          if (visible) visibleStableAtomIds.push(multiObject ? workspaceScopedStableAtomId(object.objectId, compact.atomStableIds[index]!) : compact.atomStableIds[index]!);
+        }
+        continue;
+      }
       const diagnostics = buildRenderProjectionDiagnostics(canonical, object.projection);
       const canonicalAtoms = new Map(canonical.atoms.map((atom) => [atom.stableId, atom]));
       const projectedAtomIds = new Set(diagnostics.directives.flatMap((directive) => directive.targetStableAtomIds));
@@ -271,17 +301,21 @@ export const App = () => {
   };
 
   const runLoad = useCallback(async (loader: () => Promise<StructureLoadResult>, mode: "replace" | "add" = "replace") => {
+    markLargeIngestionLifecycle("LOAD_START");
     setLoadState("loading");
     setLoadError(null);
     try {
       const result = await loader();
+      markLargeIngestionLifecycle("API_RESULT_RECEIVED");
       const workspaceObject = createWorkspaceObject(result, mode === "add" ? workspaceObjectsRef.current.map((object) => object.objectId) : []);
+      markLargeIngestionLifecycle("WORKSPACE_OBJECT_CREATED");
       const collisionNote = mode === "add" && workspaceObjectsRef.current.some((object) => object.displayName.toLowerCase() === workspaceObject.displayName.toLowerCase())
         ? `NAME_COLLISION: ${workspaceObject.displayName} is already present; the new object retained a distinct durable identity ${workspaceObject.objectId}.`
         : null;
       const nextWorkspace = mode === "add" ? [...workspaceObjectsRef.current, workspaceObject] : [workspaceObject];
       if (mode === "replace") resetScientificHistory();
       registerScientificRoot(workspaceObject);
+      markLargeIngestionLifecycle("HISTORY_ROOT_REGISTERED");
       workspaceObjectsRef.current = nextWorkspace;
       setWorkspaceObjects(nextWorkspace);
        if (mode === "replace") { workspaceGroupsRef.current = []; setWorkspaceGroups([]); setCoordinateFramePolicy(null); sceneStoreRef.current = new SceneStore(); setSceneCollection(sceneStoreRef.current.value); }
@@ -302,7 +336,9 @@ export const App = () => {
       setLoadState("idle");
       commandSequence.current += 1;
       setCameraCommand({ actionId: ACTION_IDS.CANVAS_FOCUS, sequence: commandSequence.current });
+      markLargeIngestionLifecycle("LOAD_COMMITTED");
     } catch (error) {
+      console.error("STRUCTURE_LOAD_FAILED", error);
       setLoadState("error");
       setLoadError(error instanceof ApiClientError ? error.message : "The structure could not be loaded. The current structure was kept.");
     }
@@ -1742,7 +1778,7 @@ export const App = () => {
   const inspectorStructure = inspectorObject ? structureForWorkspaceObjectState(inspectorObject) : structure?.structure;
   const inspectorAtomId = projection.interaction.pickedAtomId ?? projection.interaction.selectedAtomIds[0];
   const inspectorCanonicalAtomId = inspectorAtomId?.includes("::") ? inspectorAtomId.slice(inspectorAtomId.indexOf("::") + 2) : inspectorAtomId;
-  const selectedAtom = inspectorStructure?.atoms.find((atom) => atom.stableId === inspectorCanonicalAtomId) ?? null;
+  const selectedAtom = inspectorCanonicalAtomId ? inspectorStructure?.atoms.find((atom) => atom.stableId === inspectorCanonicalAtomId) ?? null : null;
 
   return (
     <div className="app-shell">
@@ -1751,13 +1787,13 @@ export const App = () => {
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
          <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={openImportDialog} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
         <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${activeRailPanel ? "workspace-grid--right-expanded" : ""}`}>
-          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} onAlignmentCommand={runConsoleCommand} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} showOperations={false} />
-            {biologicalData ? <BiologicalDataViewer data={biologicalData} onImport={openImportDialog} /> : <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={openImportDialog} onFileDrop={importFile} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearSelection} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} alignmentOverlays={alignmentOverlays} />}
+          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} onAlignmentCommand={runConsoleCommand} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} showOperations={false} renderReady={renderLifecycle === "ready"} />
+            {biologicalData ? <BiologicalDataViewer data={biologicalData} onImport={openImportDialog} /> : <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={openImportDialog} onFileDrop={importFile} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearSelection} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} alignmentOverlays={alignmentOverlays} onRenderLifecycle={setRenderLifecycle} />}
           <ScientificToolRail activePanel={activeRailPanel} onPanelChange={setActiveRailPanel}>
             {activeRailPanel === "Display" || activeRailPanel === "Color" ? <InspectorPanel collapsed={false} onToggle={() => setActiveRailPanel(null)} onAction={handleAction} structure={structure} projection={projection} activeSelectionCount={activeSelection?.count ?? 0} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} /> : activeRailPanel === "Select" ? <ScientificSelectionPanel activeSelection={activeSelection} canSelect={Boolean(structure)} onAction={handleAction} onClearSelection={clearSelection} /> : activeRailPanel === "Measure" || activeRailPanel === "Analyze" ? <ScientificOperationsPanel mode={activeRailPanel === "Measure" ? "measure" : "analyze"} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} structure={structure} onAction={handleAction} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} /> : activeRailPanel === "Ligand" ? <ScientificLigandPanel structure={structure} activeSelection={activeSelection} onAction={handleAction} onCommand={runLigandContextCommand} /> : activeRailPanel === "Edit" ? <ScientificEditPanel selectionCount={activeSelection?.count ?? 0} objectName={editTargetObject?.displayName ?? activeWorkspaceObject?.displayName} selectionReady={editSelectionReady} canUndo={activeHistoryState?.canUndo ?? false} canRedo={activeHistoryState?.canRedo ?? false} onAction={handleAction} onBondOrder={handleBondOrderAction} /> : activeRailPanel === "Session" ? <ScenePanel collection={sceneCollection} onStore={(name) => storeScene(name)} onRecall={(sceneId) => recallScene(sceneId)} onUpdate={(sceneId) => updateScene(sceneId)} onRename={(sceneId, name) => renameScene(sceneId, name)} onDelete={(sceneId) => deleteScene(sceneId)} onStep={(direction) => stepScene(direction)} /> : <section className="rail-transition-panel" aria-live="polite"><h2>{activeRailPanel}</h2><p>This tool is being moved into the scientific rail. Its current working controls remain available in Objects &amp; Selections while the transition is verified.</p></section>}
           </ScientificToolRail>
         </div>
-        <StatusBar apiStatus={apiStatus} structure={structure} project={project} dirty={dirty} selectedAtomCount={projection.interaction.selectedAtomIds.length} scientificRevision={activeHistoryState?.currentRevisionId ?? null} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} activeObjectName={activeWorkspaceObject?.displayName} activeObjectId={activeWorkspaceObject?.objectId} activeObjectEnabled={activeWorkspaceObject?.enabled} />
+        <StatusBar apiStatus={apiStatus} structure={structure} project={project} dirty={dirty} selectedAtomCount={projection.interaction.selectedAtomIds.length} scientificRevision={activeHistoryState?.currentRevisionId ?? null} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} activeObjectName={activeWorkspaceObject?.displayName} activeObjectId={activeWorkspaceObject?.objectId} activeObjectEnabled={activeWorkspaceObject?.enabled} renderReady={renderLifecycle === "ready"} />
         {notice && <CapabilityNotice capability={notice} onClose={() => setNotice(null)} />}
         <div className="console-layer"><ConsolePanel expanded={consoleExpanded} onToggle={() => setConsoleExpanded((value) => !value)} structure={structure} namedSelections={namedSelections} onCommand={runConsoleCommand} /></div>
         {exportOpen && <ExportPanel object={activeWorkspaceObject} selection={activeSelection} format={exportFormat} stateScope={exportStateScope} lossPolicy={exportLossPolicy} artifact={exportArtifact} error={exportError} onClose={() => setExportOpen(false)} onFormat={setExportFormat} onStateScope={setExportStateScope} onLossPolicy={setExportLossPolicy} onExport={() => { void runExport(); }} onDownload={downloadExport} onReimport={reimportExport} />}

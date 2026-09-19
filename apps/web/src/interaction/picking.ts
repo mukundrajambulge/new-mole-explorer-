@@ -71,6 +71,21 @@ export class ReverseIdentityMap {
     this.generation = generation;
     for (const entry of entries) {
       const coordinateContext = coordinateContextFor(entry.structure, entry.objectId, entry.stateId ?? "active");
+      if (entry.structure.compact?.schemaVersion === "compact-canonical-v1") {
+        entry.structure.compact.atomStableIds.forEach((stableAtomId) => {
+          const ref: StableAtomRef = { structureId: entry.structure.id, objectId: entry.objectId, stableAtomId, molecularRevision: entry.structure.scientificHash, coordinateContext };
+          this.byObjectAndStableId.set(`${entry.objectId}\u0000${stableAtomId}`, ref);
+          if (this.ambiguousStableIds.has(stableAtomId)) return;
+          if (!this.byStableId.has(stableAtomId)) this.byStableId.set(stableAtomId, ref);
+          else { this.byStableId.delete(stableAtomId); this.ambiguousStableIds.add(stableAtomId); }
+        });
+        entry.structure.compact.bonds.ids.forEach((bondId, bondIndex) => {
+          const atom1Ordinal = entry.structure.compact!.bonds.atom1Ordinals[bondIndex]!;
+          const atom2Ordinal = entry.structure.compact!.bonds.atom2Ordinals[bondIndex]!;
+          this.bondByObjectAndId.set(`${entry.objectId}\u0000${bondId}`, { structureId: entry.structure.id, objectId: entry.objectId, bondId, endpoints: [entry.structure.compact!.atomStableIds[atom1Ordinal]!, entry.structure.compact!.atomStableIds[atom2Ordinal]!], molecularRevision: entry.structure.scientificHash, coordinateContext });
+        });
+        continue;
+      }
       entry.structure.atoms.forEach((atom) => {
         const ref: StableAtomRef = { structureId: entry.structure.id, objectId: entry.objectId, stableAtomId: atom.stableId, molecularRevision: entry.structure.scientificHash, coordinateContext };
         this.byObjectAndStableId.set(`${entry.objectId}\u0000${atom.stableId}`, ref);

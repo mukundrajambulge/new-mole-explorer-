@@ -11,6 +11,7 @@ import type { WorkspaceObject } from "../workspace/workspaceModel";
 import { Icon } from "./Icon";
 
 type CameraCommand = { actionId: ActionId; sequence: number };
+export type ViewerLifecycle = "empty" | "loading" | "canonical-ready" | "rendering" | "ready" | "error";
 
 type MolecularCanvasProps = {
   structure: StructureLoadResult | null;
@@ -32,6 +33,7 @@ type MolecularCanvasProps = {
   measurementMode: MeasurementKind | null;
   analysisOverlays: readonly AnalysisOverlay[];
   alignmentOverlays: readonly AlignmentOverlay[];
+  onRenderLifecycle?: (state: ViewerLifecycle) => void;
 };
 
 const toolIcon = (activeTool: string) => {
@@ -61,6 +63,7 @@ export const MolecularCanvas = ({
   measurementMode,
   analysisOverlays,
   alignmentOverlays,
+  onRenderLifecycle,
 }: MolecularCanvasProps) => {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -68,17 +71,26 @@ export const MolecularCanvas = ({
   const projectionRef = useRef(projection);
   const [dragActive, setDragActive] = useState(false);
   const [viewerError, setViewerError] = useState<string | null>(null);
+  const [viewerLifecycle, setViewerLifecycle] = useState<ViewerLifecycle>(structure ? "canonical-ready" : "empty");
   const pickRef = useRef(onPick);
   const hoverRef = useRef(onHover);
   const pointerGestureRef = useRef(false);
+  const renderLoadInProgressRef = useRef(false);
   pickRef.current = onPick;
   hoverRef.current = onHover;
   projectionRef.current = projection;
   const workspaceObjectsForLoadRef = useRef(workspaceObjects);
   workspaceObjectsForLoadRef.current = workspaceObjects;
+  const compactStructure = structure?.structure.compact?.schemaVersion === "compact-canonical-v1" ? structure.structure.compact : null;
   // State and enable/disable changes are reconciled in-place by the adapter;
   // only object/model-layout changes require a scene rebuild.
   const workspaceKey = workspaceObjects.map((object) => `${object.objectId}:${object.loadResult.structure.id}:${object.allStates}`).join("|");
+
+  useEffect(() => {
+    const nextState: ViewerLifecycle = structure ? "canonical-ready" : loading ? "loading" : "empty";
+    setViewerLifecycle(nextState);
+    onRenderLifecycle?.(nextState);
+  }, [structure, loading, onRenderLifecycle]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -138,25 +150,61 @@ export const MolecularCanvas = ({
 
   useEffect(() => {
     if (!structure || !adapterRef.current) return;
+    const activeAdapter = adapterRef.current;
+    let cancelled = false;
     try {
+      performance.mark("molecular:render:LOAD_START");
+      console.info("MOLECULAR_RENDER_STAGE", "LOAD_START");
+      renderLoadInProgressRef.current = true;
+      setViewerLifecycle("rendering");
+      onRenderLifecycle?.("rendering");
       setViewerError(null);
       const objects = workspaceObjectsForLoadRef.current.length ? workspaceObjectsForLoadRef.current : [{ objectId: `object:${structure.structure.id}`, displayName: structure.structure.name, loadResult: structure, enabled: true, projection: projectionRef.current, stateOrder: structure.structure.stateOrder ?? [], currentStateId: structure.structure.stateOrder?.[0] ?? `${structure.structure.id}:state:1`, allStates: false, lineage: { operation: "LOAD" as const, parentObjectIds: [], parentStructureIds: [structure.structure.id] } }];
-      if (objects.length) {
-        // A scientific revision changes the canonical payload but not the
-        // mounted viewer/model layout. Let the adapter reconcile those atoms
-        // in place; a real object-layout change is handled by its guarded
-        // setWorkspaceObjects path.
-        if (adapterRef.current.isWorkspaceMode()) adapterRef.current.setWorkspaceObjects(objects, projectionRef.current, objects.find((object) => object.projection === projectionRef.current)?.objectId);
-        else adapterRef.current.loadWorkspace(objects);
-      }
-      else adapterRef.current.load(structure, projectionRef.current);
+      const loadScene = async () => {
+        // Let React paint the canonical-ready/rendering state before 3Dmol
+        // receives the large model and enters its synchronous model builder.
+        await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
+        if (cancelled) return;
+        if (objects.length) {
+          // A scientific revision changes the canonical payload but not the
+          // mounted viewer/model layout. Let the adapter reconcile those atoms
+          // in place; a real object-layout change is handled by its guarded
+          // setWorkspaceObjects path.
+          if (activeAdapter.isWorkspaceMode()) await activeAdapter.setWorkspaceObjects(objects, projectionRef.current, objects.find((object) => object.projection === projectionRef.current)?.objectId);
+          else await activeAdapter.loadWorkspace(objects);
+        } else {
+          await activeAdapter.load(structure, projectionRef.current);
+        }
+      };
+      void loadScene().then(() => {
+        renderLoadInProgressRef.current = false;
+        if (cancelled) return;
+        performance.mark("molecular:render:LOAD_END");
+        console.info("MOLECULAR_RENDER_STAGE", "LOAD_END");
+        setViewerLifecycle("ready");
+        onRenderLifecycle?.("ready");
+      }).catch((loadError) => {
+        renderLoadInProgressRef.current = false;
+        if (cancelled) return;
+        performance.mark("molecular:render:LOAD_FAIL");
+        console.error("MOLECULAR_RENDER_STAGE", "LOAD_FAIL", loadError);
+        setViewerLifecycle("error");
+        onRenderLifecycle?.("error");
+        setViewerError(loadError instanceof Error ? loadError.message : "The structure could not be rendered.");
+      });
     } catch (loadError) {
+      performance.mark("molecular:render:LOAD_FAIL");
+      console.error("MOLECULAR_RENDER_STAGE", "LOAD_FAIL", loadError);
+      setViewerLifecycle("error");
+      onRenderLifecycle?.("error");
       setViewerError(loadError instanceof Error ? loadError.message : "The structure could not be rendered.");
     }
-  }, [structure, workspaceKey]);
+    return () => { cancelled = true; };
+  }, [structure, workspaceKey, onRenderLifecycle]);
 
   useEffect(() => {
     if (!adapterRef.current) return;
+    if (renderLoadInProgressRef.current) return;
     try {
       if (workspaceObjects.length > 0 || adapterRef.current.isWorkspaceMode()) adapterRef.current.setWorkspaceObjects(workspaceObjects, projection, workspaceObjects.find((object) => object.projection === projection)?.objectId);
       else adapterRef.current.setProjection(projection);
@@ -235,7 +283,7 @@ export const MolecularCanvas = ({
         onPointerUp={endPointerGesture}
         onPointerCancel={endPointerGesture}
       >
-        <div ref={hostRef} className="viewer-host" data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} data-camera-projection={projection.camera.projectionMode} data-global-frame-index={globalFrameIndex} data-renderer-object-count={workspaceObjects.length || (structure ? 1 : 0)} data-selection-membership-hash={activeSelectionMembershipHash} data-scientific-revision={structure?.structure.scientificHash ?? ""} data-canonical-atom-count={structure?.structure.counts.atoms ?? ""} data-canonical-bond-count={structure?.structure.bonds.length ?? ""} data-canonical-atom-ids={structure?.structure.atoms.map((atom) => atom.stableId).join("|") ?? ""} data-canonical-bond-orders={structure?.structure.bonds.map((bond) => `${bond.atom1}:${bond.atom2}:${bond.order}`).join("|") ?? ""} />
+        <div ref={hostRef} className="viewer-host" data-testid="molecular-viewer" data-viewer-state={viewerLifecycle} data-testid-lifecycle={viewerLifecycle} data-projection={projection.representation} data-camera-projection={projection.camera.projectionMode} data-global-frame-index={globalFrameIndex} data-renderer-object-count={workspaceObjects.length || (structure ? 1 : 0)} data-selection-membership-hash={activeSelectionMembershipHash} data-scientific-revision={structure?.structure.scientificHash ?? ""} data-canonical-storage={compactStructure ? compactStructure.schemaVersion : "object"} data-canonical-atom-count={structure?.structure.counts.atoms ?? ""} data-canonical-bond-count={compactStructure?.bonds.ids.length ?? structure?.structure.bonds.length ?? ""} data-canonical-atom-ids={compactStructure ? `compact:${compactStructure.atomCount}:${compactStructure.atomStableIds[0] ?? ""}:${compactStructure.atomStableIds[compactStructure.atomStableIds.length - 1] ?? ""}` : structure?.structure.atoms.map((atom) => atom.stableId).join("|") ?? ""} data-canonical-bond-orders={compactStructure ? `compact:${compactStructure.bonds.ids.length}:${compactStructure.bonds.orders[0] ?? ""}:${compactStructure.bonds.orders[compactStructure.bonds.orders.length - 1] ?? ""}` : structure?.structure.bonds.map((bond) => `${bond.atom1}:${bond.atom2}:${bond.order}`).join("|") ?? ""} />
         {!structure && !loading && (
           <div className="empty-viewer-state">
             <div className="empty-viewer-card">

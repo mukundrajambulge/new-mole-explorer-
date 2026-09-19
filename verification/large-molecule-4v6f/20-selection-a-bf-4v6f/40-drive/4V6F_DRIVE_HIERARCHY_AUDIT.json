@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "auditedAt": "2026-09-18T16:57:22.736Z",
+  "childFolderId": "1AvwXMcQDwVq7hDfVMVj0Ye5qGGUkaBxC",
+  "expectedCategoryFolderCount": 66,
+  "actualCategoryFolderCount": 66,
+  "foldersWithMissingPrimary": [],
+  "totalDriveItemsInCategoryFolders": 538,
+  "extras": [
+    {
+      "id": "1iDEzkpagNbc7lTiWNigMWWmfStZa5Ass",
+      "title": "Z-004__present__PASS__MISROUTED_TRACE.png",
+      "size": "813770",
+      "folder": "28_Z_STATE",
+      "folder_id": "1-oH5ykPxbmkCXEvoDRPcPnUC6NFs60nD"
+    },
+    {
+      "id": "1IBnEELaFQuAY1locdoi_VIV8irl-GCFx",
+      "title": "LARGE_SELECTION_CORPUS_AUDIT.json",
+      "size": "8961",
+      "folder": "02_CORPUS",
+      "folder_id": "1iCGBWyNl8KfBcctwwyEIG9X0XfeIMuut"
+    },
+    {
+      "id": "1lrbrOjBJV1sEuHQ3yRzLTzPblTojl2Lx",
+      "title": "LARGE_SELECTION_REPLAY_MANIFEST.csv",
+      "size": "135665",
+      "folder": "02_CORPUS",
+      "folder_id": "1iCGBWyNl8KfBcctwwyEIG9X0XfeIMuut"
+    },
+    {
+      "id": "1jIVW6zDn4_ldbgXbs7kLG1w2m1OUDOID",
+      "title": "LARGE_SELECTION_REPLAY_MANIFEST.json",
+      "size": "307018",
+      "folder": "02_CORPUS",
+      "folder_id": "1iCGBWyNl8KfBcctwwyEIG9X0XfeIMuut"
+    },
+    {
+      "id": "1lrUibA9hHlV9Wp4JiqDOQp5pYD2-Hz02",
+      "title": "WORKTREE_BASELINE.json",
+      "size": "115269",
+      "folder": "01_BASELINE",
+      "folder_id": "11INWe3sbq9DxpFHof6swKfqY-G7GjcLI"
+    },
+    {
+      "id": "1mF6Tf5FzY2VhKBCgAp44LC18X-UIJkcX",
+      "title": "WORKTREE_BASELINE.txt",
+      "size": "105526",
+      "folder": "01_BASELINE",
+      "folder_id": "11INWe3sbq9DxpFHof6swKfqY-G7GjcLI"
+    }
+  ],
+  "finalReportFolderItemCount": 0,
+  "notes": [
+    "All manifest-linked primary screenshot files were found in their expected category folders.",
+    "Non-primary extras are preserved baseline/corpus support files and the renamed Z-004 misrouting trace.",
+    "65_FINAL_REPORT is reserved for the final closure package."
+  ]
+}

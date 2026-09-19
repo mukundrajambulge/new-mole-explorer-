@@ -23,6 +23,8 @@ import type {
 import { inferCanonicalChemistryRoles } from "./chemistryRoles.js";
 import { scientificHashFor, sha256Bytes, SCIENTIFIC_HASH_PROFILE } from "../lifecycle/canonicalSerialization.js";
 import { SourceArtifactStore } from "../lifecycle/sourceArtifactStore.js";
+import { profileMark, profileSync } from "./ingestionProfiler.js";
+import { compactCanonicalFor } from "./compactCanonical.js";
 
 /**
  * Keep a generous safety ceiling for buffered canonical ingestion while
@@ -389,6 +391,7 @@ const parsePdbqt = (content: string): ParsedSource => {
 };
 
 const tokenizeCif = (content: string): string[] => {
+  profileMark("CIF_TOKENIZE", "START", { contentBytes: Buffer.byteLength(content, "utf8") });
   const tokens: string[] = [];
   let token = "";
   let quote = "";
@@ -426,13 +429,14 @@ const tokenizeCif = (content: string): string[] => {
     token += character;
   }
   if (token) tokens.push(token);
+  profileMark("CIF_TOKENIZE", "END", { tokenCount: tokens.length });
   return tokens;
 };
 
 type CifLoop = { headers: string[]; rows: string[][] };
 
-const readCifLoops = (content: string): CifLoop[] => {
-  const tokens = tokenizeCif(content);
+const readCifLoops = (tokens: string[]): CifLoop[] => {
+  profileMark("CIF_LOOP_RETENTION", "START");
   const loops: CifLoop[] = [];
   let cursor = 0;
   while (cursor < tokens.length) {
@@ -456,6 +460,7 @@ const readCifLoops = (content: string): CifLoop[] => {
     }
     loops.push({ headers, rows });
   }
+  profileMark("CIF_LOOP_RETENTION", "END", { loopCount: loops.length, retainedRows: loops.reduce((count, loop) => count + loop.rows.length, 0), retainedTokens: tokens.length });
   return loops;
 };
 
@@ -492,14 +497,19 @@ const classifyEntityPolymerType = (value: string | undefined): CanonicalPolymerT
   return undefined;
 };
 
+
 const parseMmcif = (content: string): ParsedSource => {
-  const loops = readCifLoops(content);
   const cifTokens = tokenizeCif(content);
+  const loops = readCifLoops(cifTokens);
   const unitCell = makeUnitCell({ a: cifScalar(cifTokens, "_cell.length_a"), b: cifScalar(cifTokens, "_cell.length_b"), c: cifScalar(cifTokens, "_cell.length_c"), alpha: cifScalar(cifTokens, "_cell.angle_alpha"), beta: cifScalar(cifTokens, "_cell.angle_beta"), gamma: cifScalar(cifTokens, "_cell.angle_gamma"), spaceGroup: cifScalar(cifTokens, "_symmetry.space_group_name_H-M") ?? cifScalar(cifTokens, "_space_group.name_H-M_alt"), zValue: cifScalar(cifTokens, "_cell.Z_PDB") }, "MMCIF_CELL");
+  // Loop rows retain the individual token strings they reference; release the
+  // top-level token index before the atom graph is built.
+  cifTokens.length = 0;
   const atomLoop = loops.find((loop) => loop.headers.some((header) => header.startsWith("_atom_site.")));
   if (!atomLoop) throw new IngestionError("INVALID_INPUT", "No _atom_site loop was found in the mmCIF input.");
   const polymerEntityTypes = new Map<string, CanonicalPolymerType>();
   let hasPolymerEntityLoop = false;
+  profileMark("POLYMER_TYPING", "START");
   for (const loop of loops) {
     if (!loop.headers.includes("_entity_poly.type")) continue;
     hasPolymerEntityLoop = true;
@@ -509,7 +519,9 @@ const parseMmcif = (content: string): ParsedSource => {
       if (entityId && polymerType) polymerEntityTypes.set(entityId, polymerType);
     }
   }
+  profileMark("POLYMER_TYPING", "END", { entityCount: polymerEntityTypes.size, hasPolymerEntityLoop });
   const modelAtoms = new Map<number, AtomSeed[]>();
+  profileMark("ATOM_ROWS_EXTRACT", "START", { atomLoopRows: atomLoop.rows.length });
   for (const [rowIndex, row] of atomLoop.rows.entries()) {
     const xValue = cifValue(row, atomLoop.headers, ["_atom_site.Cartn_x"]);
     const yValue = cifValue(row, atomLoop.headers, ["_atom_site.Cartn_y"]);
@@ -541,7 +553,7 @@ const parseMmcif = (content: string): ParsedSource => {
       altLoc: cifValue(row, atomLoop.headers, ["_atom_site.label_alt_id", "_atom_site.pdbx_PDB_alt_id"]),
       formalCharge: parseOptionalNumber(cifValue(row, atomLoop.headers, ["_atom_site.pdbx_formal_charge"])),
       ...classifyAtom(record, residueName, element),
-      ...(polymerType ? { polymerType } : {}),
+      ...(polymerType ? { polymerType, isPolymer: true, isLigand: false } : {}),
     } satisfies AtomSeed;
     const modelNumber = parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.pdbx_PDB_model_num", "_atom_site.pdbx_model_num"]), 1);
     const model = modelAtoms.get(modelNumber);
@@ -550,6 +562,7 @@ const parseMmcif = (content: string): ParsedSource => {
   }
   const orderedModels = [...modelAtoms.entries()].sort(([a], [b]) => a - b);
   const atoms = orderedModels[0]?.[1] ?? [];
+  profileMark("ATOM_ROWS_EXTRACT", "END", { atomCount: atoms.length, modelCount: orderedModels.length });
   if (atoms.length === 0) throw new IngestionError("INVALID_INPUT", "No _atom_site rows with coordinates were found in the mmCIF input.");
   for (const [, candidateAtoms] of orderedModels) {
     if (candidateAtoms.length !== atoms.length || candidateAtoms.some((atom, index) => atomCorrespondenceKey(atom) !== atomCorrespondenceKey(atoms[index]!))) {
@@ -690,10 +703,20 @@ const formatEvidenceFor = (filename: string, content: string): { format: Structu
 
 const parseSource = (filename: string, content: string): ParsedSource => {
   const format = formatFromFilename(filename);
-  return format === "pdb" ? parsePdb(content) : format === "pqr" ? parsePqr(content) : format === "sdf" ? parseSdf(content) : format === "xyz" ? parseXyz(content) : format === "mol2" ? parseMol2(content) : format === "pdbqt" ? parsePdbqt(content) : parseMmcif(content);
+  profileMark("ATOM_ROWS_EXTRACT", "START", { format });
+  try {
+    const parsed = format === "pdb" ? parsePdb(content) : format === "pqr" ? parsePqr(content) : format === "sdf" ? parseSdf(content) : format === "xyz" ? parseXyz(content) : format === "mol2" ? parseMol2(content) : format === "pdbqt" ? parsePdbqt(content) : parseMmcif(content);
+    profileMark("ATOM_ROWS_EXTRACT", "END", { format, atomCount: parsed.atoms.length, bondSeedCount: parsed.bonds.length });
+    return parsed;
+  } catch (error) {
+    profileMark("ATOM_ROWS_EXTRACT", "FAIL", { format, error: error instanceof Error ? error.message : String(error) });
+    throw error;
+  }
 };
 
 const makeHierarchy = (atoms: CanonicalAtom[]): CanonicalHierarchy => {
+  profileMark("CHAIN_GROUPING", "START", { atomCount: atoms.length });
+  profileMark("RESIDUE_GROUPING", "START", { atomCount: atoms.length });
   const chains: Record<string, CanonicalChain> = {};
   const residues: Record<string, CanonicalResidue> = {};
   for (const atom of atoms) {
@@ -708,6 +731,8 @@ const makeHierarchy = (atoms: CanonicalAtom[]): CanonicalHierarchy => {
       residues[residueId].isPolymer ||= atom.isPolymer;
       if (!residues[residueId].secondaryStructure && atom.secondaryStructure) residues[residueId].secondaryStructure = atom.secondaryStructure;
   }
+  profileMark("RESIDUE_GROUPING", "END", { residueCount: Object.keys(residues).length });
+  profileMark("CHAIN_GROUPING", "END", { chainCount: Object.keys(chains).length });
   return { chainIds: Object.keys(chains), chains, residues };
 };
 
@@ -913,12 +938,17 @@ export class StructureIngestionService {
   private async ingest(kind: StructureSourceKind, filename: string, buffer: Buffer, uri?: string, provider?: RemoteStructureProvider, acquisition: { mediaType?: string; accession?: string; providerMetadata?: Readonly<Record<string, string>>; parentExportArtifactId?: string } = {}): Promise<StructureLoadResult> {
     assertStructureSize(buffer.length);
     const safeFilename = basename(filename).replace(/[^A-Za-z0-9._-]/g, "_");
+    profileMark("FILE_READ_DECODE", "START", { filename: safeFilename, bytes: buffer.length });
     // This is intentionally before Buffer decoding.  The SourceArtifact
     // digest is evidence for the received byte stream, not parser text.
     const hash = sha256Bytes(buffer);
     const content = buffer.toString("utf8");
     if (!content.trim()) throw new IngestionError("INVALID_INPUT", "The structure input is empty.");
+    profileMark("FILE_READ_DECODE", "END", { filename: safeFilename, contentChars: content.length });
+    profileMark("FORMAT_EVIDENCE", "START");
     const formatEvidence = formatEvidenceFor(safeFilename, content);
+    profileMark("FORMAT_EVIDENCE", "END", { format: formatEvidence.format, evidenceCount: formatEvidence.evidence.length });
+    profileMark("SOURCE_ARTIFACT_SEAL", "START");
     const sourceArtifact = await this.sourceArtifacts.seal({
       acquisitionKind: kind === "RCSB" ? "REMOTE_HTTP" : "LOCAL_UPLOAD",
       originalFilename: safeFilename,
@@ -932,8 +962,11 @@ export class StructureIngestionService {
       ...(acquisition.providerMetadata ? { providerMetadata: acquisition.providerMetadata } : {}),
       ...(acquisition.parentExportArtifactId ? { parentExportArtifactId: acquisition.parentExportArtifactId, acquisitionKind: "DERIVED_EXPORT" as const } : {}),
     }, buffer);
+    profileMark("SOURCE_ARTIFACT_SEAL", "END", { sourceArtifactId: sourceArtifact.sourceArtifactId });
     const parsed = parseSource(safeFilename, content);
     const atomIdsBySerial = new Map<number, string[]>();
+    profileMark("ATOM_NORMALIZATION", "START", { atomCount: parsed.atoms.length });
+    profileMark("ATOM_IDENTITY", "START", { atomCount: parsed.atoms.length });
     const atoms: CanonicalAtom[] = parsed.atoms.map((atom, index) => {
       const stableId = `${hash.slice(0, 16)}:atom:${index + 1}`;
       const ids = atomIdsBySerial.get(atom.serial) ?? [];
@@ -941,7 +974,10 @@ export class StructureIngestionService {
       atomIdsBySerial.set(atom.serial, ids);
       return { ...atom, stableId };
     });
+    profileMark("ATOM_IDENTITY", "END", { atomCount: atoms.length, combinedWith: "ATOM_NORMALIZATION" });
+    profileMark("ATOM_NORMALIZATION", "END", { atomCount: atoms.length });
     const bondsByKey = new Map<string, CanonicalBond>();
+    profileMark("BOND_GRAPH", "START", { bondSeedCount: parsed.bonds.length });
     for (const bond of parsed.bonds) {
       const atom1 = atomIdsBySerial.get(bond.atom1Serial)?.[0];
       const atom2 = atomIdsBySerial.get(bond.atom2Serial)?.[0];
@@ -949,7 +985,9 @@ export class StructureIngestionService {
       const key = canonicalBondKey(atom1, atom2);
       if (!bondsByKey.has(key)) bondsByKey.set(key, { id: `${hash.slice(0, 16)}:bond:${bondsByKey.size + 1}`, atom1, atom2, order: bond.order, source: bond.source });
     }
-    const summary = summarize(atoms);
+    const bonds = [...bondsByKey.values()];
+    profileMark("BOND_GRAPH", "END", { bondCount: bonds.length });
+    const summary = profileSync("SECONDARY_INDEXES", () => summarize(atoms), { atomCount: atoms.length });
     const source = {
       kind,
       originalFilename: safeFilename,
@@ -968,8 +1006,7 @@ export class StructureIngestionService {
       scientificHashProfile: SCIENTIFIC_HASH_PROFILE,
     } as const;
     const hierarchy = makeHierarchy(atoms);
-    const bonds = [...bondsByKey.values()];
-    const peptideSequenceChains = peptideSequenceChainsFor(hierarchy);
+    const peptideSequenceChains = profileSync("SECONDARY_INDEXES", () => peptideSequenceChainsFor(hierarchy), { chainCount: hierarchy.chainIds.length });
     const coordinateStates: CanonicalCoordinateState[] = (parsed.coordinateStates ?? [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }]).map((state, index) => {
       const coordinates = Object.fromEntries(state.coordinates.map((coordinate) => {
         const atom = atoms[coordinate.sourceIndex];
@@ -1000,30 +1037,50 @@ export class StructureIngestionService {
       units: "e",
       provenance: parsed.format === "pqr" ? "Copied from source PQR charge field; no charge inference performed" : parsed.format === "pdbqt" ? "Copied from source PDBQT partial-charge field; no charge inference performed" : parsed.format === "mol2" ? "Copied from source MOL2 atom charge field; no charge inference performed" : "Copied from source _chem_comp_atom.partial_charge; no charge inference performed",
     } : undefined;
-    const chemistryRoles = inferCanonicalChemistryRoles(atoms, bonds);
-    const scientificPayload = scientificPayloadFor(atoms, bonds, hierarchy, coordinateStates, stateOrder, summary, parsed, sourceChargeMap, hasCompleteSourceCharges, peptideSequenceChains, chemistryRoles);
-    const scientificHash = scientificHashFor(scientificPayload);
-    const structure: CanonicalMolecularStructure = {
+    const chemistryRoles = profileSync("POLYMER_TYPING", () => inferCanonicalChemistryRoles(atoms, bonds), { atomCount: atoms.length, bondCount: bonds.length });
+    let scientificHash: string;
+    {
+      const scientificPayload = scientificPayloadFor(atoms, bonds, hierarchy, coordinateStates, stateOrder, summary, parsed, sourceChargeMap, hasCompleteSourceCharges, peptideSequenceChains, chemistryRoles);
+      scientificHash = profileSync("CANONICAL_HASH", () => scientificHashFor(scientificPayload), { atomCount: atoms.length, bondCount: bonds.length, residueCount: Object.keys(hierarchy.residues).length });
+    }
+    const useCompactWire = buffer.length >= LARGE_STRUCTURE_WARNING_BYTES;
+    const compact = useCompactWire
+      ? profileSync("COMPACT_CANONICAL_PAYLOAD", () => compactCanonicalFor(atoms, bonds, hierarchy, coordinateStates, stateOrder, chemistryRoles), { atomCount: atoms.length, bondCount: bonds.length, chainCount: hierarchy.chainIds.length })
+      : undefined;
+    if (compact) {
+      // The compact payload is now the transport/render source of truth. Drop
+      // the temporary object graph before the response is prepared so the API
+      // does not retain two complete representations of the same molecule.
+      atoms.length = 0;
+      bonds.length = 0;
+      coordinateStates.length = 0;
+      stateOrder.length = 0;
+      for (const key of Object.keys(hierarchy.chains)) delete hierarchy.chains[key];
+      for (const key of Object.keys(hierarchy.residues)) delete hierarchy.residues[key];
+      hierarchy.chainIds.length = 0;
+    }
+    const structure: CanonicalMolecularStructure = profileSync("CANONICAL_OBJECT_CONSTRUCTION", () => ({
       id: `structure_${hash.slice(0, 16)}`,
       name: safeFilename.replace(/\.(pdb|pqr|sdf|mol|xyz|mol2|pdbqt|cif|mmcif)$/i, ""),
       format: parsed.format,
       source,
-      atoms,
-      bonds,
-      hierarchy,
+      atoms: compact ? [] : atoms,
+      bonds: compact ? [] : bonds,
+      hierarchy: compact ? { chainIds: [], chains: {}, residues: {} } : hierarchy,
       scientificHash,
       scientificHashProfile: SCIENTIFIC_HASH_PROFILE,
-      coordinateStates,
-      stateOrder,
+      coordinateStates: compact ? [] : coordinateStates,
+      stateOrder: compact ? compact.stateOrder : stateOrder,
       ...(parsed.unitCell ? { unitCell: parsed.unitCell } : {}),
       ...(parsed.polymerTypingSource ? { polymerTypingSource: parsed.polymerTypingSource } : {}),
       ...(parsed.secondaryStructureSource ? { secondaryStructureDataset: { datasetId: `${hash.slice(0, 16)}:secondary-structure`, molecularRevision: scientificHash, assignmentSource: parsed.secondaryStructureSource, profileVersion: "pdb-mmcif-structural-records-v1" } } : {}),
       ...(partialChargeDataset ? { partialChargeDataset: { ...partialChargeDataset, molecularRevision: scientificHash } } : {}),
       ...(chemistryRoles ? { chemistryDataset: { datasetId: `${hash.slice(0, 16)}:chemistry-roles`, molecularRevision: scientificHash, profileVersion: "canonical-chemistry-roles-v1" as const, donorAtomIds: chemistryRoles.donorAtomIds, acceptorAtomIds: chemistryRoles.acceptorAtomIds, provenance: chemistryRoles.provenance } } : {}),
       peptideSequenceDataset: { datasetId: `${hash.slice(0, 16)}:peptide-sequence`, molecularRevision: scientificHash, assignmentSource: "canonical polymer residue names mapped to one-letter amino-acid codes", profileVersion: "canonical-peptide-sequence-v1", chains: peptideSequenceChains },
+      ...(compact ? { compact } : {}),
       ...summary,
-    };
+    }), { atomCount: atoms.length, bondCount: bonds.length, chainCount: hierarchy.chainIds.length });
     this.structures.set(structure.id, structure);
-    return { structure, renderSource: { format: parsed.format, content }, sourceArtifact };
+    return { structure, renderSource: { format: parsed.format, content: compact ? "" : content }, sourceArtifact };
   }
 }

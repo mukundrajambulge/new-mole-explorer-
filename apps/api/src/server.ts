@@ -6,12 +6,18 @@ import { parseMultipartFile } from "./structures/multipart.js";
 import { ProjectStore } from "./projects/projectStore.js";
 import { SourceArtifactStore } from "./lifecycle/sourceArtifactStore.js";
 import { CommandDispatcher } from "./command/dispatcher.js";
+import { profileMark, profileTransport } from "./structures/ingestionProfiler.js";
 
 const port = Number(process.env.API_PORT ?? 8100);
 
 const sendJson = (response: ServerResponse, status: number, body: unknown) => {
   response.writeHead(status, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
-  response.end(JSON.stringify(body));
+  profileTransport("START", { status });
+  profileMark("SERIALIZATION", "START", { status });
+  const serialized = JSON.stringify(body);
+  profileMark("SERIALIZATION", "END", { status, serializedBytes: Buffer.byteLength(serialized, "utf8") });
+  profileTransport("END", { status, serializedBytes: Buffer.byteLength(serialized, "utf8") });
+  response.end(serialized);
 };
 
 const health: HealthResponse = { service: "molecular-api", status: "ok", gate: "G1C", timestamp: new Date().toISOString() };

@@ -1,5 +1,5 @@
 import { createViewer, Vector2, type AtomSelectionSpec, type AtomSpec, type AtomStyleSpec, type GLShape, type GLViewer, type SurfaceStyleSpec } from "3dmol";
-import type { CanonicalMolecularStructure, StructureLoadResult } from "@molecular/contracts";
+import { COMPACT_ATOM_FLAG_ION, COMPACT_ATOM_FLAG_LIGAND, COMPACT_ATOM_FLAG_POLYMER, COMPACT_ATOM_FLAG_WATER, type CanonicalMolecularStructure, type StructureLoadResult } from "@molecular/contracts";
 import { colorRegistry } from "./colorRegistry";
 import { resolveAtomColor, resolveProjectedAtomColor } from "./colorSchemes";
 import { DEFAULT_CAMERA, type CameraState, type RenderProjection } from "./renderProjection";
@@ -15,6 +15,7 @@ import { puttyProfileFor, puttyRadiusForResidue, puttyResidueRadii } from "./put
 import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
 import type { AlignmentOverlay } from "../analysis/alignmentPresentation";
 import { stateForObject, structureForWorkspaceObjectState, workspaceScopedStableAtomId, type WorkspaceObject } from "../workspace/workspaceModel";
+import { compactAtomSpecContext, compactAtomSpecs, isCompactStructure } from "../structures/compactCanonical";
 
 const diagnosticTypeForStyle = (style: string): RepresentationType => style === "ribbon" ? "RIBBON" : style === "putty" || style === "trace" || style === "cartoon" ? "CARTOON" : style === "nonbonded-crosses" ? "NONBONDED" : style === "nonbonded-spheres" ? "NB_SPHERES" : style === "line" ? "LINES" : style === "stick" || style === "licorice" || style === "ball-and-stick" ? "STICKS" : "SPHERES";
 
@@ -41,6 +42,71 @@ const cameraProjectionChanged = (previous: RenderProjection | null | undefined, 
 const labelsProjectionChanged = (previous: RenderProjection | null | undefined, next: RenderProjection): boolean => !previous || previous.labels !== next.labels;
 const interactionProjectionChanged = (previous: RenderProjection | null | undefined, next: RenderProjection): boolean => !previous || previous.interaction !== next.interaction;
 const isSurfacePrimitive = (primitive: RenderProjectionDiagnostics["directives"][number]["primitive"]): boolean => primitive === "surface" || primitive === "mesh" || primitive === "dots";
+
+type CompactCategory = "polymer" | "ligand" | "water" | "ion" | "other";
+
+const compactCategoryForFlags = (flags: number): CompactCategory => {
+  if (flags & COMPACT_ATOM_FLAG_POLYMER) return "polymer";
+  if (flags & COMPACT_ATOM_FLAG_LIGAND) return "ligand";
+  if (flags & COMPACT_ATOM_FLAG_WATER) return "water";
+  if (flags & COMPACT_ATOM_FLAG_ION) return "ion";
+  return "other";
+};
+
+const compactCategoryVisible = (category: CompactCategory, projection: RenderProjection): boolean => category === "polymer" ? projection.showProtein : category === "ligand" ? projection.showLigand : category === "water" ? projection.showWater : category === "ion" ? projection.showIons : projection.showOther;
+
+const compactAtomCategory = (atom: AtomSpec): CompactCategory | null => {
+  const category = atom.properties?.canonicalCategory;
+  return category === "polymer" || category === "ligand" || category === "water" || category === "ion" || category === "other" ? category : null;
+};
+
+const compactStyleFor = (representation: RenderProjection["representation"], projection: RenderProjection, profile: "default" | "water" = "default"): AtomStyleSpec => {
+  const parameters = projection.representationState.parameters;
+  const explicitColor = projection.color.mode === "element" ? undefined : colorRegistry.cssColor(projection.color);
+  const color = explicitColor ? { color: explicitColor } : {};
+  if (profile === "water") return { sphere: { scale: 0.18, opacity: parameters.sphereOpacity, ...color } } as AtomStyleSpec;
+  if (representation === "lines" || representation === "line") return { line: { linewidth: parameters.lineWidth, opacity: parameters.lineOpacity, ...color } } as AtomStyleSpec;
+  if (representation === "sticks" || representation === "stick" || representation === "licorice") return { stick: { radius: representation === "licorice" ? 0.23 : parameters.stickRadius, opacity: parameters.stickOpacity, ...color } } as AtomStyleSpec;
+  if (representation === "spheres" || representation === "space-filling") return { sphere: { scale: parameters.sphereScale, opacity: parameters.sphereOpacity, ...color } } as AtomStyleSpec;
+  if (representation === "ball-and-stick") return { stick: { radius: parameters.stickRadius, opacity: parameters.stickOpacity, ...color }, sphere: { scale: 0.28, opacity: parameters.sphereOpacity, ...color } } as AtomStyleSpec;
+  if (representation === "nonbonded-crosses") return { cross: { scale: 0.35, radius: 0.12, opacity: parameters.nonbondedOpacity, ...color } } as AtomStyleSpec;
+  if (representation === "nonbonded-spheres") return { sphere: { scale: 0.15, opacity: parameters.sphereOpacity, ...color } } as AtomStyleSpec;
+  const cartoonStyle = representation === "ribbon" ? "oval" : representation === "trace" ? "trace" : undefined;
+  return { cartoon: { ...(cartoonStyle ? { style: cartoonStyle } : {}), arrows: true, thickness: parameters.cartoonThickness, opacity: representation === "ribbon" ? parameters.ribbonOpacity : parameters.cartoonOpacity, ...color } } as AtomStyleSpec;
+};
+
+const compactDiagnosticsFor = (structure: CanonicalMolecularStructure, projection: RenderProjection): RenderProjectionDiagnostics => {
+  const compact = structure.compact!;
+  const diagnostics = emptyRenderProjectionDiagnostics(projection.representationState.presentationRevision, projection);
+  let polymer = 0; let ligand = 0; let water = 0; let ion = 0; let other = 0;
+  for (const flags of compact.flags) {
+    const category = compactCategoryForFlags(flags);
+    if (category === "polymer") polymer += 1;
+    else if (category === "ligand") ligand += 1;
+    else if (category === "water") water += 1;
+    else if (category === "ion") ion += 1;
+    else other += 1;
+  }
+  const visibleAtoms = (projection.showProtein ? polymer : 0) + (projection.showLigand ? ligand : 0) + (projection.showWater ? water : 0) + (projection.showIons ? ion : 0) + (projection.showOther ? other : 0);
+  const isCartoon = projection.representation === "cartoon" || projection.representation === "ribbon" || projection.representation === "trace" || projection.representation === "putty";
+  const isLine = projection.representation === "lines" || projection.representation === "line";
+  const isStick = projection.representation === "sticks" || projection.representation === "stick" || projection.representation === "licorice" || projection.representation === "ball-and-stick";
+  const isSphere = projection.representation === "spheres" || projection.representation === "space-filling" || projection.representation === "nonbonded-spheres";
+  const activeType = diagnosticTypeForStyle(projection.representation);
+  diagnostics.structureId = structure.id;
+  diagnostics.sphereContributors = isSphere ? visibleAtoms : 0;
+  diagnostics.stickCylinderContributors = isStick ? compact.bonds.ids.length : 0;
+  diagnostics.lineContributors = isLine ? compact.bonds.ids.length : 0;
+  diagnostics.cartoonContributors = isCartoon && projection.showProtein ? polymer : 0;
+  diagnostics.ribbonContributors = projection.representation === "ribbon" && projection.showProtein ? polymer : 0;
+  diagnostics.traceContributors = projection.representation === "trace" && projection.showProtein ? polymer : 0;
+  diagnostics.puttyContributors = projection.representation === "putty" && projection.showProtein ? polymer : 0;
+  diagnostics.crossContributors = projection.representation === "nonbonded-crosses" ? visibleAtoms : 0;
+  diagnostics.waterSphereContributors = projection.showWater ? water : 0;
+  diagnostics.ionSphereContributors = projection.showIons ? ion : 0;
+  diagnostics.representation[activeType] = { ...diagnostics.representation[activeType], active: visibleAtoms > 0, atomContributors: visibleAtoms, bondContributors: isLine || isStick ? compact.bonds.ids.length : 0 };
+  return diagnostics;
+};
 
 const styleFor = (representation: StyleRepresentation, projection: RenderProjection, structure: CanonicalMolecularStructure, profile: StyleProfile = "default", thicknessOverride?: number): AtomStyleSpec => {
   const explicitColor = colorRegistry.cssColor(projection.color);
@@ -158,6 +224,8 @@ export class ThreeDMolViewerAdapter {
   private container: HTMLElement | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private hasModel = false;
+  private progressiveLoadGeneration = 0;
+  private progressiveLoad: Promise<void> | null = null;
   private primaryModel: ReturnType<GLViewer["addModel"]> | null = null;
   private structure: CanonicalMolecularStructure | null = null;
   private projection: RenderProjection | null = null;
@@ -166,6 +234,8 @@ export class ThreeDMolViewerAdapter {
   private cameraState: CameraState = DEFAULT_CAMERA;
   private diagnostics: RenderProjectionDiagnostics = emptyRenderProjectionDiagnostics();
   private modelLoadCount = 0;
+  private rendererAtomCount = 0;
+  private progressiveStage = "idle";
   private rendererGeneration = 0;
   private readonly reverseIdentityMap = new ReverseIdentityMap();
   private interactionHandlers: ViewerInteractionHandlers = {};
@@ -235,6 +305,8 @@ export class ThreeDMolViewerAdapter {
     this.analysisShapes.forEach((shape) => this.viewer?.removeShape(shape));
     this.analysisShapes = [];
     if (!this.viewer || !this.structure) return;
+    if (this.analysisOverlays.length === 0) return;
+    if (isCompactStructure(this.structure)) return;
     const atomMap = new Map(this.structure.atoms.map((atom) => [atom.stableId, atom]));
     const shapes = new Map<AnalysisOverlay["kind"], GLShape>();
     for (const overlay of this.analysisOverlays) {
@@ -290,8 +362,10 @@ export class ThreeDMolViewerAdapter {
     this.render();
   }
 
-  load(result: StructureLoadResult, projection: RenderProjection, objectId?: string): void {
+  load(result: StructureLoadResult, projection: RenderProjection, objectId?: string): Promise<void> {
     this.ensureMounted();
+    const generation = ++this.progressiveLoadGeneration;
+    this.progressiveLoad = null;
     this.structure = result.structure;
     this.performance.sceneRebuilds += 1;
     this.rendererGeneration += 1;
@@ -328,7 +402,12 @@ export class ThreeDMolViewerAdapter {
     this.projection = null;
     const renderModel = this.viewer!.addModel();
     this.primaryModel = renderModel;
-    renderModel.addAtoms(this.atomSpecsFor(result.structure, objectId));
+    const compactContext = compactAtomSpecContext(result.structure, objectId);
+    const previewAtomCount = compactContext ? Math.min(compactContext.atomCount, 12_000) : 0;
+    this.rendererAtomCount = compactContext ? previewAtomCount : result.structure.atoms.length;
+    this.progressiveStage = compactContext && compactContext.atomCount > previewAtomCount ? "preview" : "full";
+    if (compactContext) renderModel.addAtoms(compactContext.specsForRange(0, previewAtomCount));
+    else renderModel.addAtoms(this.atomSpecsFor(result.structure, objectId));
     this.modelLoadCount += 1;
     this.hasModel = true;
     this.bindPicking();
@@ -346,14 +425,25 @@ export class ThreeDMolViewerAdapter {
       this.frameToCanonicalBounds(true);
     }
     this.render();
+    if (!compactContext || compactContext.atomCount <= previewAtomCount) return Promise.resolve();
+    const progressive = this.appendCompactAtomsProgressively(renderModel, compactContext, previewAtomCount, generation).then(() => {
+      if (generation !== this.progressiveLoadGeneration || !this.viewer) return;
+      if (this.workspaceObjects.length && this.primaryModel) this.renderPrimaryWorkspaceModel(true);
+      else if (this.projection) this.applyProjection(this.projection);
+      this.frameToCanonicalBounds(true);
+      this.bindPicking();
+      this.render();
+    });
+    this.progressiveLoad = progressive;
+    return progressive;
   }
 
   /** Reconcile several canonical objects into the one mounted 3Dmol viewer. */
-  loadWorkspace(objects: readonly WorkspaceObject[]): void {
+  loadWorkspace(objects: readonly WorkspaceObject[]): Promise<void> {
     const primary = objects[0];
-    if (!primary) return;
+    if (!primary) return Promise.resolve();
     this.primaryObjectEnabled = primary.enabled;
-    this.load(this.renderLoadResultForState(primary), primary.projection, primary.objectId);
+    const loadPromise = this.load(this.renderLoadResultForState(primary), primary.projection, primary.objectId);
     this.workspaceObjects = objects;
     this.primaryObjectEnabled = primary.enabled;
     this.reverseIdentityMap.buildMany(objects.map((object) => ({ structure: this.renderLoadResultForState(object).structure, objectId: object.objectId, stateId: stateForObject(object)?.id })), this.rendererGeneration);
@@ -379,17 +469,29 @@ export class ThreeDMolViewerAdapter {
     this.baselinePivot = null;
     this.frameToCanonicalBounds(true);
     this.render();
+    return loadPromise.then(() => {
+      if (!this.viewer || !this.primaryModel) return;
+      this.renderPrimaryWorkspaceModel(true);
+      this.renderAuxiliaryModels();
+      this.applyWorkspaceSurfaces(objects);
+      this.bindWorkspacePicking();
+      this.frameToCanonicalBounds(true);
+      this.writeWorkspaceProjectionState();
+      this.render();
+    });
   }
 
   /** Update object-scoped presentation without reloading canonical models. */
-  setWorkspaceObjects(objects: readonly WorkspaceObject[], interactionProjection?: RenderProjection, interactionObjectId?: string): void {
+  setWorkspaceObjects(objects: readonly WorkspaceObject[], interactionProjection?: RenderProjection, interactionObjectId?: string): Promise<void> {
+    if (this.progressiveLoad) {
+      return this.progressiveLoad.then(() => this.setWorkspaceObjects(objects, interactionProjection, interactionObjectId)).then(() => undefined);
+    }
     const effectiveObjects = interactionProjection
       ? objects.map((object, index) => (object.objectId === interactionObjectId || (!interactionObjectId && objects.length === 1 && index === 0)) ? { ...object, projection: interactionProjection } : object)
       : objects;
     const previousObjects = this.workspaceObjects;
     if (this.viewer && this.hasModel && !this.sameWorkspaceModelLayout(previousObjects, effectiveObjects)) {
-      this.loadWorkspace(effectiveObjects);
-      return;
+      return this.loadWorkspace(effectiveObjects);
     }
     const scientificRevisionChanged = previousObjects.length === effectiveObjects.length && previousObjects.some((previous, index) => previous.loadResult.structure.scientificHash !== effectiveObjects[index]?.loadResult.structure.scientificHash);
     const modelStateChanged = scientificRevisionChanged || previousObjects.length !== effectiveObjects.length || effectiveObjects.some((object, index) => previousObjects[index]?.currentStateId !== object.currentStateId);
@@ -424,7 +526,7 @@ export class ThreeDMolViewerAdapter {
     if (objectSceneChanged || modelStateChanged) { this.baselineView = null; this.baselinePivot = null; }
     const interactionCameraChanged = interactionProjection ? cameraProjectionChanged(previousProjection, interactionProjection) : false;
     const interactionBackgroundChanged = interactionProjection ? !previousProjection || previousProjection.background !== interactionProjection.background : false;
-    if (!this.viewer || !this.hasModel) return;
+    if (!this.viewer || !this.hasModel) return Promise.resolve();
     if (interactionProjection) {
       this.projection = interactionProjection;
       if (interactionBackgroundChanged) this.viewer.setBackgroundColor(interactionProjection.background.color, 1);
@@ -447,7 +549,7 @@ export class ThreeDMolViewerAdapter {
       // Keep the diagnostics bound to the same authoritative object that was
       // just installed. Camera-only updates still refresh camera metadata, but
       // do not rebuild model styles or surface geometry.
-      this.diagnostics = buildRenderProjectionDiagnostics(this.renderLoadResultForState(effectiveObjects[0]).structure, effectiveObjects[0].projection);
+      this.diagnostics = this.projectionDiagnosticsFor(this.renderLoadResultForState(effectiveObjects[0]).structure, effectiveObjects[0].projection);
       this.writeDiagnostics(this.diagnostics);
     }
     if (objectSceneChanged || modelStateChanged) this.applyWorkspaceSurfaces(effectiveObjects);
@@ -462,6 +564,7 @@ export class ThreeDMolViewerAdapter {
       this.projectInteractionHighlights(this.projection);
     }
     if (objectSceneChanged || interactionCameraChanged || interactionBackgroundChanged || objectLabelsChanged || objectInteractionChanged || modelStateChanged) this.render();
+    return Promise.resolve();
   }
 
   setProjection(projection: RenderProjection, options: { preserveView?: boolean } = {}): void {
@@ -576,15 +679,91 @@ export class ThreeDMolViewerAdapter {
   }
 
   destroy(): void {
+    this.progressiveLoadGeneration += 1;
+    this.progressiveLoad = null;
     if (this.container && mountedAdapters.get(this.container) === this) mountedAdapters.delete(this.container);
     this.resizeObserver?.disconnect(); this.resizeObserver = null;
     if (this.viewer) { this.viewer.clear(); this.viewer = null; }
     this.cameraController = null;
-    this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.alignmentShapes = []; this.alignmentOverlays = []; this.auxiliaryModels = []; this.workspaceObjects = []; this.workspaceSurfaceHandles.clear(); this.workspaceSurfaceRebuilds.clear(); this.styledModels.clear(); this.surfaceFallbackModels.clear(); this.surfaceReadyModels.clear(); this.primaryModel = null; this.primaryObjectEnabled = true; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceKinds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.cameraPan = { x: 0, y: 0 }; this.cameraTargetMetadata = { atoms: 0, models: 0, objects: 0, mode: "none" }; this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
+    this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.alignmentShapes = []; this.alignmentOverlays = []; this.auxiliaryModels = []; this.workspaceObjects = []; this.workspaceSurfaceHandles.clear(); this.workspaceSurfaceRebuilds.clear(); this.styledModels.clear(); this.surfaceFallbackModels.clear(); this.surfaceReadyModels.clear(); this.primaryModel = null; this.primaryObjectEnabled = true; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceKinds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.rendererAtomCount = 0; this.progressiveStage = "idle"; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.cameraPan = { x: 0, y: 0 }; this.cameraTargetMetadata = { atoms: 0, models: 0, objects: 0, mode: "none" }; this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
   }
   getDiagnostics(): RenderProjectionDiagnostics { return this.diagnostics; }
 
   private ensureMounted(): void { if (!this.viewer) throw new Error("3Dmol viewer adapter is not mounted."); }
+  private appendCompactAtomsProgressively(model: ViewerModel, context: NonNullable<ReturnType<typeof compactAtomSpecContext>>, start: number, generation: number): Promise<void> {
+    if (start >= context.atomCount) return Promise.resolve();
+    return new Promise((resolve) => {
+      window.setTimeout(() => {
+        if (generation !== this.progressiveLoadGeneration || !this.viewer) { resolve(); return; }
+        // 3Dmol's cartoon and bond bookkeeping are substantially cheaper when
+        // the authoritative model is installed in one call. The preview is
+        // deliberately replaced after the browser has painted it, so users
+        // get a real early frame without duplicating every atom across many
+        // renderer append operations.
+        model.removeAtoms(model.selectedAtoms({}));
+        model.addAtoms(context.specsForRange(0, context.atomCount));
+        this.rendererAtomCount = context.atomCount;
+        this.progressiveStage = "full";
+        this.progressiveLoad = null;
+        resolve();
+      }, 0);
+    });
+  }
+  private projectionDiagnosticsFor(structure: CanonicalMolecularStructure, projection: RenderProjection): RenderProjectionDiagnostics {
+    return isCompactStructure(structure) ? compactDiagnosticsFor(structure, projection) : buildRenderProjectionDiagnostics(structure, projection);
+  }
+
+  private compactModelSelection(category: CompactCategory | "visible", projection: RenderProjection): AtomSelectionSpec {
+    return { predicate: (atom) => {
+      const atomCategory = compactAtomCategory(atom);
+      return Boolean(atomCategory && (category === "visible" || atomCategory === category) && compactCategoryVisible(atomCategory, projection));
+    } };
+  }
+
+  private applyCompactModelStyle(model: ViewerModel, structure: CanonicalMolecularStructure, projection: RenderProjection, forceReset = false): void {
+    if (!isCompactStructure(structure)) return;
+    if (forceReset) model.setStyle({}, {});
+    const polymerRepresentation = projection.representation === "cartoon" || projection.representation === "ribbon" || projection.representation === "trace" || projection.representation === "putty" ? projection.representation : projection.representation;
+    if (projection.showProtein) model.setStyle(this.compactModelSelection("polymer", projection), compactStyleFor(polymerRepresentation, projection), true);
+    if (projection.showLigand) model.setStyle(this.compactModelSelection("ligand", projection), compactStyleFor(projection.representation === "cartoon" || projection.representation === "ribbon" || projection.representation === "trace" || projection.representation === "putty" ? "ball-and-stick" : projection.representation, projection), true);
+    if (projection.showWater) model.setStyle(this.compactModelSelection("water", projection), compactStyleFor("spheres", projection, "water"), true);
+    if (projection.showIons) model.setStyle(this.compactModelSelection("ion", projection), compactStyleFor("spheres", projection), true);
+    if (projection.showOther) model.setStyle(this.compactModelSelection("other", projection), compactStyleFor(projection.representation === "cartoon" || projection.representation === "ribbon" || projection.representation === "trace" || projection.representation === "putty" ? "sticks" : projection.representation, projection), true);
+    this.styledModels.add(model);
+    this.surfaceFallbackModels.delete(model);
+    this.surfaceReadyModels.delete(model);
+  }
+
+  private compactCameraTargetForEntry(entry: CameraSceneEntry, selectedIds: ReadonlySet<string>, preferSelection: boolean): { visibleAtoms: number; selectedAtoms: number; visibleBounds: { min: Coordinate3; max: Coordinate3 } | null; selectedBounds: { min: Coordinate3; max: Coordinate3 } | null } | null {
+    if (!isCompactStructure(entry.structure)) return null;
+    const compact = entry.structure.compact!;
+    let visibleAtoms = 0; let selectedAtoms = 0;
+    let visibleBounds: { min: Coordinate3; max: Coordinate3 } | null = null;
+    let selectedBounds: { min: Coordinate3; max: Coordinate3 } | null = null;
+    const add = (current: { min: Coordinate3; max: Coordinate3 } | null, point: Coordinate3) => current ? { min: { x: Math.min(current.min.x, point.x), y: Math.min(current.min.y, point.y), z: Math.min(current.min.z, point.z) }, max: { x: Math.max(current.max.x, point.x), y: Math.max(current.max.y, point.y), z: Math.max(current.max.z, point.z) } } : { min: { ...point }, max: { ...point } };
+    for (let index = 0; index < compact.atomCount; index += 1) {
+      const category = compactCategoryForFlags(compact.flags[index] ?? 0);
+      if (!compactCategoryVisible(category, entry.projection)) continue;
+      const point = { x: compact.x[index]!, y: compact.y[index]!, z: compact.z[index]! };
+      visibleAtoms += 1;
+      visibleBounds = add(visibleBounds, point);
+      const stableId = compact.atomStableIds[index]!;
+      const scopedId = this.workspaceObjects.length > 1 ? workspaceScopedStableAtomId(entry.objectId, stableId) : stableId;
+      if (preferSelection && (selectedIds.has(scopedId) || selectedIds.has(stableId))) {
+        selectedAtoms += 1;
+        selectedBounds = add(selectedBounds, point);
+      }
+    }
+    return { visibleAtoms, selectedAtoms, visibleBounds, selectedBounds };
+  }
+
+  private compactCameraAtoms(bounds: { min: Coordinate3; max: Coordinate3 }, structure: CanonicalMolecularStructure): CanonicalMolecularStructure["atoms"] {
+    const points = [
+      [bounds.min.x, bounds.min.y, bounds.min.z], [bounds.min.x, bounds.min.y, bounds.max.z], [bounds.min.x, bounds.max.y, bounds.min.z], [bounds.min.x, bounds.max.y, bounds.max.z],
+      [bounds.max.x, bounds.min.y, bounds.min.z], [bounds.max.x, bounds.min.y, bounds.max.z], [bounds.max.x, bounds.max.y, bounds.min.z], [bounds.max.x, bounds.max.y, bounds.max.z],
+    ];
+    return points.map(([x, y, z], index) => ({ stableId: `${structure.id}:camera:${index}`, serial: index + 1, atomName: "CA", element: "C", residueName: "CAM", residueNumber: index + 1, chain: "_", x, y, z, recordType: "ATOM", isPolymer: true, isLigand: false, isWater: false, isIon: false }));
+  }
   private writeWorkspaceProjectionState(): void {
     if (!this.container) return;
     const state = Object.fromEntries(this.workspaceObjects.map((object) => [object.objectId, {
@@ -599,6 +778,8 @@ export class ThreeDMolViewerAdapter {
     this.container.dataset.rendererObjectProjection = JSON.stringify(state);
   }
   private atomSpecsFor(structure: CanonicalMolecularStructure, objectId?: string): AtomSpec[] {
+    const compactSpecs = compactAtomSpecs(structure, objectId);
+    if (compactSpecs) return compactSpecs;
     const indexByStableId = new Map(structure.atoms.map((atom, index) => [atom.stableId, index]));
     const adjacency = new Map<string, Array<{ index: number; order: number }>>();
     structure.bonds.forEach((bond) => {
@@ -614,6 +795,11 @@ export class ThreeDMolViewerAdapter {
   private renderLoadResultForState(object: WorkspaceObject): StructureLoadResult {
     const state = stateForObject(object);
     if (!state) return object.loadResult;
+    // The large compact path already stores its real canonical coordinates in
+    // the compact state arrays. The common 4V6F single-state path can render
+    // directly without cloning 307k atom objects just to reapply the same
+    // coordinates; multi-state edits still use the legacy materialized path.
+    if (isCompactStructure(object.loadResult.structure) && object.stateOrder.length <= 1) return object.loadResult;
     return { ...object.loadResult, structure: { ...object.loadResult.structure, atoms: object.loadResult.structure.atoms.map((atom) => ({ ...atom, ...(state.coordinates[atom.stableId] ?? {}) })) } };
   }
 
@@ -642,7 +828,11 @@ export class ThreeDMolViewerAdapter {
   private renderWorkspaceModel(model: ReturnType<GLViewer["addModel"]>, object: WorkspaceObject, forceReset = false): void {
     const structure = structureForWorkspaceObjectState(object);
     if (!object.enabled) { model.setStyle({}, { cartoon: { hidden: true }, stick: { hidden: true }, sphere: { hidden: true }, line: { hidden: true } }); this.styledModels.delete(model); this.surfaceFallbackModels.delete(model); this.surfaceReadyModels.delete(model); return; }
-    const diagnostics = buildRenderProjectionDiagnostics(structure, object.projection);
+    if (isCompactStructure(structure)) {
+      this.applyCompactModelStyle(model, structure, object.projection, forceReset);
+      return;
+    }
+    const diagnostics = this.projectionDiagnosticsFor(structure, object.projection);
     const surfaceOnly = diagnostics.directives.length > 0 && diagnostics.directives.every((directive) => isSurfacePrimitive(directive.primitive));
     if (surfaceOnly) {
       // Keep the prior atom presentation while native 3Dmol generates the
@@ -696,7 +886,11 @@ export class ThreeDMolViewerAdapter {
     this.styledModels.delete(model);
     this.surfaceReadyModels.add(model);
   }
-  private canonicalSelection(predicate: (atom: CanonicalMolecularStructure["atoms"][number]) => boolean): AtomSelectionSpec { const indices = new Set(this.structure!.atoms.map((atom, index) => predicate(atom) ? index : -1).filter((index) => index >= 0)); return { predicate: (atom) => atom.index !== undefined && indices.has(atom.index) }; }
+  private canonicalSelection(predicate: (atom: CanonicalMolecularStructure["atoms"][number]) => boolean): AtomSelectionSpec {
+    if (isCompactStructure(this.structure)) return { predicate: () => true };
+    const indices = new Set(this.structure!.atoms.map((atom, index) => predicate(atom) ? index : -1).filter((index) => index >= 0));
+    return { predicate: (atom) => atom.index !== undefined && indices.has(atom.index) };
+  }
 
   private validView(view: number[] | null | undefined): view is number[] { return Array.isArray(view) && view.length >= 8 && view.slice(0, 8).every((value) => Number.isFinite(value)); }
 
@@ -721,7 +915,7 @@ export class ThreeDMolViewerAdapter {
   }
 
   private renderedAtomsForEntry(entry: CameraSceneEntry): CanonicalMolecularStructure["atoms"] {
-    const diagnostics = buildRenderProjectionDiagnostics(entry.structure, entry.projection);
+    const diagnostics = this.projectionDiagnosticsFor(entry.structure, entry.projection);
     const directiveIds = new Set(diagnostics.directives.flatMap((directive) => directive.targetStableAtomIds));
     const atoms = entry.structure.atoms.filter((atom) => this.categoryVisible(atom, entry.projection) && (directiveIds.size === 0 || directiveIds.has(atom.stableId)));
     return atoms.length > 0 ? atoms : entry.structure.atoms.filter((atom) => this.categoryVisible(atom, entry.projection));
@@ -740,6 +934,38 @@ export class ThreeDMolViewerAdapter {
       const object = this.workspaceObjects.find((candidate) => candidate.objectId === entry.objectId);
       return !object || object.enabled;
     });
+    if (entries.length > 0 && entries.every((entry) => isCompactStructure(entry.structure))) {
+      const selectedIds = preferSelection ? new Set(this.projection?.interaction.selectedAtomIds ?? []) : new Set<string>();
+      const targets = entries.map((entry) => ({ entry, target: this.compactCameraTargetForEntry(entry, selectedIds, preferSelection) })).filter((value): value is { entry: CameraSceneEntry; target: NonNullable<ReturnType<ThreeDMolViewerAdapter["compactCameraTargetForEntry"]>> } => Boolean(value.target));
+      const visibleCount = targets.reduce((count, value) => count + value.target.visibleAtoms, 0);
+      const selectedCount = targets.reduce((count, value) => count + value.target.selectedAtoms, 0);
+      const useSelection = preferSelection && selectedCount > 0 && !(entries.length > 1 && selectedCount >= visibleCount);
+      const chosen = targets.filter(({ target }) => Boolean(useSelection ? target.selectedBounds : target.visibleBounds));
+      if (!chosen.length) return null;
+      let combined: { min: Coordinate3; max: Coordinate3 } | null = null;
+      for (const { target } of chosen) {
+        const bounds = (useSelection ? target.selectedBounds : target.visibleBounds)!;
+        combined = combined ? { min: { x: Math.min(combined.min.x, bounds.min.x), y: Math.min(combined.min.y, bounds.min.y), z: Math.min(combined.min.z, bounds.min.z) }, max: { x: Math.max(combined.max.x, bounds.max.x), y: Math.max(combined.max.y, bounds.max.y), z: Math.max(combined.max.z, bounds.max.z) } } : { min: { ...bounds.min }, max: { ...bounds.max } };
+      }
+      if (!combined) return null;
+      const selectedEntryIds = new Set(chosen.map(({ entry }) => entry.objectId));
+      const projectionByObjectId = new Map(entries.map((entry) => [entry.objectId, entry.projection]));
+      const selection: AtomSelectionSpec = {
+        model: chosen.map(({ entry }) => entry.model),
+        predicate: (atom) => {
+          const stableId = typeof atom.properties?.canonicalStableId === "string" ? atom.properties.canonicalStableId : "";
+          const objectId = typeof atom.properties?.canonicalObjectId === "string" ? atom.properties.canonicalObjectId : entries.length === 1 ? entries[0]!.objectId : "";
+          if (!selectedEntryIds.has(objectId)) return false;
+          const projection = projectionByObjectId.get(objectId) ?? entries[0]!.projection;
+          const category = compactAtomCategory(atom);
+          if (!category || !compactCategoryVisible(category, projection)) return false;
+          if (!useSelection) return true;
+          return selectedIds.has(this.workspaceObjects.length > 1 ? workspaceScopedStableAtomId(objectId, stableId) : stableId) || selectedIds.has(stableId);
+        },
+      };
+      this.cameraTargetMetadata = { atoms: useSelection ? selectedCount : visibleCount, models: chosen.length, objects: new Set(chosen.map(({ entry }) => entry.objectId)).size, mode: useSelection ? "selection" : "workspace-visible" };
+      return { atoms: this.compactCameraAtoms(combined, chosen[0]!.entry.structure), selection, center: { x: (combined.min.x + combined.max.x) / 2, y: (combined.min.y + combined.max.y) / 2, z: (combined.min.z + combined.max.z) / 2 } };
+    }
     const entryAtoms = entries.map((entry) => ({ entry, atoms: this.renderedAtomsForEntry(entry) })).filter(({ atoms }) => atoms.length > 0);
     const selectedIds = preferSelection ? new Set(this.projection?.interaction.selectedAtomIds ?? []) : new Set<string>();
     const selectedAtoms = selectedIds.size > 0
@@ -773,6 +999,15 @@ export class ThreeDMolViewerAdapter {
 
   private recalculateAutoClipping(): void {
     if (!this.viewer || !this.structure || this.cameraState.clippingMode !== "auto") return;
+    if (this.cameraSceneEntries().length > 0 && this.cameraSceneEntries().every((entry) => isCompactStructure(entry.structure))) {
+      const target = this.boundsForCameraTarget(false);
+      if (!target) { this.autoSlab = paddedClippingSlab(null); this.viewer.setSlab(this.autoSlab.near, this.autoSlab.far); return; }
+      const pivot = this.cameraPivot ?? target.center;
+      const relative = target.atoms.map((atom) => ({ x: atom.x - pivot.x, y: atom.y - pivot.y, z: atom.z - pivot.z }));
+      this.autoSlab = paddedClippingSlab(boundsForCoordinates(relative));
+      this.viewer.setSlab(this.autoSlab.near, this.autoSlab.far);
+      return;
+    }
     const atoms = this.renderedAtoms();
     if (atoms.length === 0) { this.autoSlab = paddedClippingSlab(null); this.viewer.setSlab(this.autoSlab.near, this.autoSlab.far); return; }
     const pivot = this.cameraPivot ?? boundsForCoordinates(atoms)?.center ?? { x: 0, y: 0, z: 0 };
@@ -816,7 +1051,21 @@ export class ThreeDMolViewerAdapter {
 
   private applyProjection(projection: RenderProjection): void {
     this.performance.projectionRebuilds += 1;
-    const viewer = this.viewer!; const structure = this.structure!; const diagnostics = buildRenderProjectionDiagnostics(structure, projection); this.diagnostics = diagnostics; this.writeDiagnostics(diagnostics);
+    const viewer = this.viewer!; const structure = this.structure!;
+    if (isCompactStructure(structure)) {
+      const diagnostics = compactDiagnosticsFor(structure, projection);
+      this.diagnostics = diagnostics;
+      this.writeDiagnostics(diagnostics);
+      if (!this.primaryObjectEnabled) viewer.setStyle({}, { cartoon: { hidden: true }, stick: { hidden: true }, sphere: { hidden: true }, line: { hidden: true } });
+      else if (this.primaryModel) this.applyCompactModelStyle(this.primaryModel, structure, projection, true);
+      this.projectLabels(projection);
+      this.projectMeasurementShapes();
+      this.renderAuxiliaryModels(true);
+      this.projectInteractionHighlights(projection);
+      this.bindWorkspacePicking();
+      return;
+    }
+    const diagnostics = buildRenderProjectionDiagnostics(structure, projection); this.diagnostics = diagnostics; this.writeDiagnostics(diagnostics);
     const surfaceOnly = diagnostics.directives.length > 0 && diagnostics.directives.every((directive) => isSurfacePrimitive(directive.primitive));
     const preservePriorGeometry = surfaceOnly && this.primaryModel !== null && (this.styledModels.has(this.primaryModel) || this.surfaceReadyModels.has(this.primaryModel));
     if (!preservePriorGeometry) {
@@ -915,6 +1164,13 @@ export class ThreeDMolViewerAdapter {
   }
 
   private selectionForModel(structure: CanonicalMolecularStructure, model: ReturnType<GLViewer["addModel"]>, stableIds?: readonly string[]): AtomSelectionSpec {
+    if (isCompactStructure(structure)) {
+      const ids = stableIds ? new Set(stableIds) : null;
+      return { model, predicate: (atom) => {
+        const stableId = typeof atom.properties?.canonicalStableId === "string" ? atom.properties.canonicalStableId : "";
+        return ids ? ids.has(stableId) : true;
+      } };
+    }
     const indices = stableIds ? new Set(structure.atoms.map((atom, index) => stableIds.includes(atom.stableId) ? index : -1).filter((index) => index >= 0)) : null;
     return { model, predicate: (atom) => atom.index !== undefined && (indices ? indices.has(atom.index) : true) };
   }
@@ -937,7 +1193,7 @@ export class ThreeDMolViewerAdapter {
     let readyCount = 0;
     for (const entry of entries) {
       if (!entry.object.enabled) continue;
-      const diagnostics = buildRenderProjectionDiagnostics(entry.structure, entry.projection);
+      const diagnostics = this.projectionDiagnosticsFor(entry.structure, entry.projection);
       const surfaceDirectives = diagnostics.directives.filter((directive) => directive.primitive === "surface" || directive.primitive === "mesh" || directive.primitive === "dots");
       const state = stateForObject(entry.object);
       const coordinateContext = `${entry.structure.id}:coordinates:${state?.coordinateHash ?? entry.structure.scientificHash}`;
@@ -1176,6 +1432,54 @@ export class ThreeDMolViewerAdapter {
     }
   }
 
+  private projectCompactInteractionHighlights(projection: RenderProjection): void {
+    if (!this.viewer || !this.structure || !isCompactStructure(this.structure)) return;
+    const selectedIds = new Set(projection.interaction.selectedAtomIds);
+    const indicatorIds = [projection.interaction.hoveredAtomId, projection.interaction.pickedAtomId, ...projection.interaction.measurementPickAtomIds].filter((value): value is string => Boolean(value));
+    const entries = this.workspaceObjects.length
+      ? [
+        ...(this.workspaceObjects[0] && this.primaryModel ? [{ model: this.primaryModel, object: this.workspaceObjects[0], structure: structureForWorkspaceObjectState(this.workspaceObjects[0]) }] : []),
+        ...this.auxiliaryModels.map(({ model, object }) => ({ model, object, structure: structureForWorkspaceObjectState(object) })),
+      ]
+      : (this.primaryModel ? [{ model: this.primaryModel, object: null, structure: this.structure }] : []);
+    const matchedSelectionIds = new Set<string>();
+    const markerPoints: Array<{ id: string; point: Coordinate3 }> = [];
+    for (const entry of entries) {
+      if (!entry.structure.compact || (entry.object && !entry.object.enabled)) continue;
+      const objectId = entry.object?.objectId ?? "";
+      const localSelected = new Set<string>();
+      for (const selectedId of selectedIds) {
+        if (objectId && selectedId.startsWith(`${objectId}::`)) localSelected.add(selectedId.slice(objectId.length + 2));
+        else if (!selectedId.includes("::")) localSelected.add(selectedId);
+      }
+      const matchedLocalIds = new Set<string>();
+      for (const stableId of entry.structure.compact.atomStableIds) if (localSelected.has(stableId)) matchedLocalIds.add(stableId);
+      for (const localId of matchedLocalIds) matchedSelectionIds.add(objectId && this.workspaceObjects.length > 1 ? workspaceScopedStableAtomId(objectId, localId) : localId);
+      if (matchedLocalIds.size) {
+        entry.model.setStyle({}, selectionDeemphasisStyleFor(entry.object?.projection ?? projection), true);
+        entry.model.setStyle({ predicate: (atom) => typeof atom.properties?.canonicalStableId === "string" && matchedLocalIds.has(atom.properties.canonicalStableId) }, selectionOverlayStyle(entry.object?.projection ?? projection), true);
+      }
+      for (const indicatorId of indicatorIds) {
+        const localId = objectId && indicatorId.startsWith(`${objectId}::`) ? indicatorId.slice(objectId.length + 2) : indicatorId;
+        const ordinal = entry.structure.compact.atomStableIds.indexOf(localId);
+        if (ordinal >= 0) markerPoints.push({ id: indicatorId, point: { x: entry.structure.compact.x[ordinal]!, y: entry.structure.compact.y[ordinal]!, z: entry.structure.compact.z[ordinal]! } });
+      }
+    }
+    for (const marker of markerPoints) {
+      const color = marker.id === projection.interaction.pickedAtomId ? "#e5ae32" : projection.interaction.measurementPickAtomIds.includes(marker.id) ? "#f5c451" : "#31d8c4";
+      this.interactionShapes.push(this.viewer.addSphere({ center: marker.point, radius: color === "#e5ae32" ? 0.28 : 0.23, color, wireframe: true, opacity: 0.86 }));
+    }
+    this.projectSurfaceSelectionEmphasis(matchedSelectionIds.size > 0);
+    if (this.container) {
+      this.container.dataset.selectionIndicator = matchedSelectionIds.size ? "visible" : "none";
+      this.container.dataset.selectionHighlightedAtomCount = String(matchedSelectionIds.size);
+      this.container.dataset.selectionHighlightLimit = "none";
+      this.container.dataset.selectionHighlightMode = matchedSelectionIds.size === 1 ? "atom-halo-overlay" : matchedSelectionIds.size ? "representation-overlay" : "none";
+      this.container.dataset.selectionDeemphasis = matchedSelectionIds.size ? "active" : "none";
+      this.container.dataset.selectionDeemphasisOpacity = matchedSelectionIds.size ? "0.46" : "1";
+    }
+  }
+
   private projectInteractionHighlights(projection: RenderProjection): void {
     if (!this.viewer || !this.structure) return;
     this.interactionShapes.forEach((shape) => this.viewer?.removeShape(shape));
@@ -1183,6 +1487,10 @@ export class ThreeDMolViewerAdapter {
     const hoverId = projection.interaction.hoveredAtomId;
     const pickedId = projection.interaction.pickedAtomId;
     const selectedIds = new Set(projection.interaction.selectedAtomIds);
+    if (isCompactStructure(this.structure)) {
+      this.projectCompactInteractionHighlights(projection);
+      return;
+    }
     const selectionEntries = this.workspaceObjects.length
       ? [
         ...(this.workspaceObjects[0] && this.primaryModel ? [{ model: this.primaryModel, object: this.workspaceObjects[0], structure: structureForWorkspaceObjectState(this.workspaceObjects[0]) }] : []),
@@ -1292,6 +1600,14 @@ export class ThreeDMolViewerAdapter {
   private projectLabels(projection: RenderProjection): void {
     if (!this.viewer || !this.structure) return;
     this.viewer.removeAllLabels();
+    if (projection.labels.mode === "off" || !projection.labels.expression) {
+      if (this.container) { this.container.dataset.labelEligibleCount = "0"; this.container.dataset.labelCount = "0"; delete this.container.dataset.labelDiagnostic; }
+      return;
+    }
+    if (isCompactStructure(this.structure)) {
+      if (this.container) { this.container.dataset.labelEligibleCount = "0"; this.container.dataset.labelCount = "0"; this.container.dataset.labelDiagnostic = "COMPACT_LABELS_DEFERRED"; }
+      return;
+    }
     const visible = this.structure.atoms.filter((atom) => atom.isPolymer ? projection.showProtein : atom.isLigand ? projection.showLigand : atom.isWater ? projection.showWater : atom.isIon ? projection.showIons : projection.showOther);
     const plan = labelPlanForState(projection.labels, visible);
     if (this.container) {
@@ -1362,6 +1678,8 @@ export class ThreeDMolViewerAdapter {
     this.container.dataset.rendererSurfaceCacheKey = diagnostics.surfaceCacheKey ?? "";
     this.container.dataset.rendererCanonicalBondSource = diagnostics.stickCylinderContributors > 0 || diagnostics.lineContributors > 0 ? "canonical" : "none";
     this.container.dataset.rendererModelLoads = String(this.modelLoadCount);
+    this.container.dataset.rendererAtomCount = String(this.rendererAtomCount);
+    this.container.dataset.progressiveRenderStage = this.progressiveStage;
     this.container.dataset.rendererViewerCreations = String(this.performance.viewerCreations);
     this.container.dataset.rendererSceneRebuilds = String(this.performance.sceneRebuilds);
     this.container.dataset.rendererProjectionRebuilds = String(this.performance.projectionRebuilds);
@@ -1395,7 +1713,8 @@ export class ThreeDMolViewerAdapter {
     if (diagnostics.representation.RIBBON.diagnostic) this.container.dataset.rendererRibbonDiagnostic = diagnostics.representation.RIBBON.diagnostic; else delete this.container.dataset.rendererRibbonDiagnostic;
     if (diagnostics.representation.CARTOON.diagnostic) this.container.dataset.rendererPuttyDiagnostic = diagnostics.representation.CARTOON.diagnostic; else delete this.container.dataset.rendererPuttyDiagnostic;
     if (diagnostics.colorDiagnostic) this.container.dataset.colorDiagnostic = diagnostics.colorDiagnostic; else delete this.container.dataset.colorDiagnostic;
-    if ((this.projection?.representation === "lines" || this.projection?.representation === "sticks") && this.structure?.bonds.length === 0) this.container.dataset.rendererBondDiagnostic = "No authoritative bond geometry is available for this target."; else delete this.container.dataset.rendererBondDiagnostic;
+    const bondCount = this.structure?.compact?.schemaVersion === "compact-canonical-v1" ? this.structure.compact.bonds.ids.length : this.structure?.bonds.length ?? 0;
+    if ((this.projection?.representation === "lines" || this.projection?.representation === "sticks") && bondCount === 0) this.container.dataset.rendererBondDiagnostic = "No authoritative bond geometry is available for this target."; else delete this.container.dataset.rendererBondDiagnostic;
   }
   private writeCameraDiagnostics(): void {
     if (!this.container) return;

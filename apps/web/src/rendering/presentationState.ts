@@ -1,4 +1,4 @@
-import type { CanonicalMolecularStructure, ProjectPresentationState } from "@molecular/contracts";
+import { COMPACT_ATOM_FLAG_ION, COMPACT_ATOM_FLAG_LIGAND, COMPACT_ATOM_FLAG_POLYMER, COMPACT_ATOM_FLAG_WATER, type CanonicalMolecularStructure, type ProjectPresentationState } from "@molecular/contracts";
 import { COLOR_SCHEME_DEFINITIONS, type ColorSchemeId } from "./colorSchemes";
 import type { StyleProfileId } from "./styleProfiles";
 import { DEFAULT_LABEL_STATE, type LabelState } from "../interaction/labels";
@@ -134,7 +134,7 @@ const atomMaskForStyle = (atom: CanonicalMolecularStructure["atoms"][number], st
 };
 
 export const createRepresentationState = (structure: CanonicalMolecularStructure | null, style: RepresentationStyle = "cartoon"): RepresentationState => {
-  const bondedAtomIds = new Set(structure?.bonds.flatMap((bond) => [bond.atom1, bond.atom2]) ?? []);
+  const bondedAtomIds = new Set(structure?.compact ? [] : structure?.bonds.flatMap((bond) => [bond.atom1, bond.atom2]) ?? []);
   const defaultMaskFor = (atom: CanonicalMolecularStructure["atoms"][number]) => style === "cartoon" || style === "ribbon" || style === "trace" || style === "putty"
     ? atom.isLigand && !bondedAtomIds.has(atom.stableId) ? REPRESENTATION_MASKS.SPHERES : atomMaskForStyle(atom, style)
     : atomMaskForStyle(atom, style);
@@ -144,8 +144,8 @@ export const createRepresentationState = (structure: CanonicalMolecularStructure
   return {
   presentationRevision: 1,
   objectEnabled: structure ? { [structure.id]: true } : {},
-  atomRepMasks: structure ? Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, defaultMaskFor(atom)])) : {},
-  atomRepStyles: structure ? Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, defaultStyleFor(atom)])) : {},
+  atomRepMasks: structure?.compact ? {} : structure ? Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, defaultMaskFor(atom)])) : {},
+  atomRepStyles: structure?.compact ? {} : structure ? Object.fromEntries(structure.atoms.map((atom) => [atom.stableId, defaultStyleFor(atom)])) : {},
   directives: [],
   parameters: DEFAULT_REPRESENTATION_PARAMETERS,
   };
@@ -170,7 +170,7 @@ export const createDefaultRenderProjection = (structure: CanonicalMolecularStruc
 export const setProjectionStyle = (projection: RenderProjection, structure: CanonicalMolecularStructure | null, style: RepresentationStyle): RenderProjection => ({
   ...projection,
   representation: style,
-  colorDiagnostic: style === "putty" && structure && !structure.atoms.some((atom) => atom.bFactor !== undefined && atom.bFactor !== null) ? "PUTTY_PROPERTY_UNAVAILABLE" : null,
+  colorDiagnostic: style === "putty" && structure && (structure.compact ? !structure.compact.bFactors.some((value, index) => (structure.compact!.flags[index]! & COMPACT_ATOM_FLAG_POLYMER) !== 0 && value !== null && value !== undefined) : !structure.atoms.some((atom) => atom.bFactor !== undefined && atom.bFactor !== null)) ? "PUTTY_PROPERTY_UNAVAILABLE" : null,
   representationState: structure ? { ...createRepresentationState(structure, style), presentationRevision: projection.representationState.presentationRevision + 1, parameters: projection.representationState.parameters } : projection.representationState,
 });
 
@@ -185,7 +185,9 @@ export const applyRepresentationToSelection = (projection: RenderProjection, ope
 });
 
 export const setCategoryRepresentation = (projection: RenderProjection, structure: CanonicalMolecularStructure, category: "protein" | "ligand" | "water" | "ions" | "other", mask: RepresentationMask, style?: RepresentationStyle): RenderProjection => {
-  const target = structure.atoms.filter((atom) => category === "protein" ? atom.isPolymer : category === "ligand" ? atom.isLigand : category === "water" ? atom.isWater : category === "ions" ? atom.isIon : !atom.isPolymer && !atom.isLigand && !atom.isWater && !atom.isIon).map((atom) => atom.stableId);
+  const target = structure.compact?.schemaVersion === "compact-canonical-v1"
+    ? structure.compact.atomStableIds.filter((_, index) => { const flags = structure.compact!.flags[index] ?? 0; return category === "protein" ? Boolean(flags & COMPACT_ATOM_FLAG_POLYMER) : category === "ligand" ? Boolean(flags & COMPACT_ATOM_FLAG_LIGAND) : category === "water" ? Boolean(flags & COMPACT_ATOM_FLAG_WATER) : category === "ions" ? Boolean(flags & COMPACT_ATOM_FLAG_ION) : !(flags & (COMPACT_ATOM_FLAG_POLYMER | COMPACT_ATOM_FLAG_LIGAND | COMPACT_ATOM_FLAG_WATER | COMPACT_ATOM_FLAG_ION)); })
+    : structure.atoms.filter((atom) => category === "protein" ? atom.isPolymer : category === "ligand" ? atom.isLigand : category === "water" ? atom.isWater : category === "ions" ? atom.isIon : !atom.isPolymer && !atom.isLigand && !atom.isWater && !atom.isIon).map((atom) => atom.stableId);
   return { ...projection, representationState: applyRepresentationOperation(projection.representationState, "SHOW_AS", mask, target, style) };
 };
 

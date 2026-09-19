@@ -1,0 +1,1597 @@
+{
+  "schemaVersion": 1,
+  "semantic": {
+    "completedCases": 532,
+    "elapsedMs": 387281,
+    "count": 532,
+    "minQueryMs": 0,
+    "medianQueryMs": 252,
+    "p90QueryMs": 759,
+    "p95QueryMs": 1097,
+    "p99QueryMs": 10890,
+    "maxQueryMs": 29813
+  },
+  "ui": {
+    "completedCases": 532,
+    "screenshotCount": 532,
+    "count": 532,
+    "minQueryMs": 2,
+    "medianQueryMs": 14173,
+    "p90QueryMs": 37328,
+    "p95QueryMs": 127027,
+    "p99QueryMs": 137649,
+    "maxQueryMs": 317056
+  },
+  "classificationCounts": {
+    "PASS": 251,
+    "EMPTY_VALID": 243,
+    "IMPLEMENTED_WITH_LIMITATION": 9,
+    "INVALID_EXPECTED": 29
+  },
+  "uiClassificationCounts": {
+    "PASS": 211,
+    "EMPTY_VALID": 265,
+    "PERFORMANCE_TIMEOUT": 35,
+    "IMPLEMENTED_WITH_LIMITATION": 8,
+    "BLOCKED": 13
+  },
+  "categoryTable": {
+    "A": {
+      "expected": 20,
+      "executed": 20,
+      "resultCounts": {
+        "PASS": 15,
+        "EMPTY_VALID": 3,
+        "IMPLEMENTED_WITH_LIMITATION": 2
+      },
+      "performance": {
+        "count": 20,
+        "minQueryMs": 113,
+        "medianQueryMs": 346,
+        "p90QueryMs": 1166,
+        "p95QueryMs": 2118,
+        "p99QueryMs": 2118,
+        "maxQueryMs": 3153
+      }
+    },
+    "B": {
+      "expected": 6,
+      "executed": 6,
+      "resultCounts": {
+        "EMPTY_VALID": 5,
+        "PASS": 1
+      },
+      "performance": {
+        "count": 6,
+        "minQueryMs": 9796,
+        "medianQueryMs": 10043,
+        "p90QueryMs": 19258,
+        "p95QueryMs": 19258,
+        "p99QueryMs": 19258,
+        "maxQueryMs": 20153
+      }
+    },
+    "C": {
+      "expected": 7,
+      "executed": 7,
+      "resultCounts": {
+        "PASS": 5,
+        "EMPTY_VALID": 2
+      },
+      "performance": {
+        "count": 7,
+        "minQueryMs": 353,
+        "medianQueryMs": 438,
+        "p90QueryMs": 730,
+        "p95QueryMs": 730,
+        "p99QueryMs": 730,
+        "maxQueryMs": 759
+      }
+    },
+    "D": {
+      "expected": 8,
+      "executed": 8,
+      "resultCounts": {
+        "PASS": 5,
+        "EMPTY_VALID": 3
+      },
+      "performance": {
+        "count": 8,
+        "minQueryMs": 482,
+        "medianQueryMs": 524,
+        "p90QueryMs": 642,
+        "p95QueryMs": 642,
+        "p99QueryMs": 642,
+        "maxQueryMs": 882
+      }
+    },
+    "E": {
+      "expected": 7,
+      "executed": 7,
+      "resultCounts": {
+        "PASS": 5,
+        "INVALID_EXPECTED": 2
+      },
+      "performance": {
+        "count": 7,
+        "minQueryMs": 220,
+        "medianQueryMs": 241,
+        "p90QueryMs": 582,
+        "p95QueryMs": 582,
+        "p99QueryMs": 582,
+        "maxQueryMs": 820
+      }
+    },
+    "F": {
+      "expected": 8,
+      "executed": 8,
+      "resultCounts": {
+        "PASS": 6,
+        "EMPTY_VALID": 2
+      },
+      "performance": {
+        "count": 8,
+        "minQueryMs": 392,
+        "medianQueryMs": 502,
+        "p90QueryMs": 772,
+        "p95QueryMs": 772,
+        "p99QueryMs": 772,
+        "maxQueryMs": 1335
+      }
+    },
+    "G": {
+      "expected": 9,
+      "executed": 9,
+      "resultCounts": {
+        "PASS": 8,
+        "EMPTY_VALID": 1
+      },
+      "performance": {
+        "count": 9,
+        "minQueryMs": 357,
+        "medianQueryMs": 412,
+        "p90QueryMs": 482,
+        "p95QueryMs": 482,
+        "p99QueryMs": 482,
+        "maxQueryMs": 787
+      }
+    },
+    "H": {
+      "expected": 11,
+      "executed": 11,
+      "resultCounts": {
+        "EMPTY_VALID": 6,
+        "PASS": 5
+      },
+      "performance": {
+        "count": 11,
+        "minQueryMs": 271,
+        "medianQueryMs": 596,
+        "p90QueryMs": 1151,
+        "p95QueryMs": 1151,
+        "p99QueryMs": 1151,
+        "maxQueryMs": 1594
+      }
+    },
+    "I": {
+      "expected": 6,
+      "executed": 6,
+      "resultCounts": {
+        "PASS": 4,
+        "EMPTY_VALID": 2
+      },
+      "performance": {
+        "count": 6,
+        "minQueryMs": 201,
+        "medianQueryMs": 223,
+        "p90QueryMs": 252,
+        "p95QueryMs": 252,
+        "p99QueryMs": 252,
+        "maxQueryMs": 269
+      }
+    },
+    "J": {
+      "expected": 8,
+      "executed": 8,
+      "resultCounts": {
+        "EMPTY_VALID": 8
+      },
+      "performance": {
+        "count": 8,
+        "minQueryMs": 176,
+        "medianQueryMs": 212,
+        "p90QueryMs": 275,
+        "p95QueryMs": 275,
+        "p99QueryMs": 275,
+        "maxQueryMs": 289
+      }
+    },
+    "K": {
+      "expected": 9,
+      "executed": 9,
+      "resultCounts": {
+        "PASS": 5,
+        "EMPTY_VALID": 3,
+        "IMPLEMENTED_WITH_LIMITATION": 1
+      },
+      "performance": {
+        "count": 9,
+        "minQueryMs": 203,
+        "medianQueryMs": 412,
+        "p90QueryMs": 1004,
+        "p95QueryMs": 1004,
+        "p99QueryMs": 1004,
+        "maxQueryMs": 1005
+      }
+    },
+    "L": {
+      "expected": 3,
+      "executed": 3,
+      "resultCounts": {
+        "EMPTY_VALID": 3
+      },
+      "performance": {
+        "count": 3,
+        "minQueryMs": 136,
+        "medianQueryMs": 725,
+        "p90QueryMs": 725,
+        "p95QueryMs": 725,
+        "p99QueryMs": 725,
+        "maxQueryMs": 788
+      }
+    },
+    "M": {
+      "expected": 2,
+      "executed": 2,
+      "resultCounts": {
+        "EMPTY_VALID": 2
+      },
+      "performance": {
+        "count": 2,
+        "minQueryMs": 691,
+        "medianQueryMs": 691,
+        "p90QueryMs": 691,
+        "p95QueryMs": 691,
+        "p99QueryMs": 691,
+        "maxQueryMs": 826
+      }
+    },
+    "N": {
+      "expected": 3,
+      "executed": 3,
+      "resultCounts": {
+        "EMPTY_VALID": 3
+      },
+      "performance": {
+        "count": 3,
+        "minQueryMs": 687,
+        "medianQueryMs": 702,
+        "p90QueryMs": 702,
+        "p95QueryMs": 702,
+        "p99QueryMs": 702,
+        "maxQueryMs": 718
+      }
+    },
+    "O": {
+      "expected": 8,
+      "executed": 8,
+      "resultCounts": {
+        "EMPTY_VALID": 8
+      },
+      "performance": {
+        "count": 8,
+        "minQueryMs": 160,
+        "medianQueryMs": 193,
+        "p90QueryMs": 209,
+        "p95QueryMs": 209,
+        "p99QueryMs": 209,
+        "maxQueryMs": 354
+      }
+    },
+    "P": {
+      "expected": 3,
+      "executed": 3,
+      "resultCounts": {
+        "INVALID_EXPECTED": 2,
+        "EMPTY_VALID": 1
+      },
+      "performance": {
+        "count": 3,
+        "minQueryMs": 65,
+        "medianQueryMs": 78,
+        "p90QueryMs": 78,
+        "p95QueryMs": 78,
+        "p99QueryMs": 78,
+        "maxQueryMs": 206
+      }
+    },
+    "Q": {
+      "expected": 2,
+      "executed": 2,
+      "resultCounts": {
+        "EMPTY_VALID": 2
+      },
+      "performance": {
+        "count": 2,
+        "minQueryMs": 189,
+        "medianQueryMs": 189,
+        "p90QueryMs": 189,
+        "p95QueryMs": 189,
+        "p99QueryMs": 189,
+        "maxQueryMs": 201
+      }
+    },
+    "R": {
+      "expected": 3,
+      "executed": 3,
+      "resultCounts": {
+        "PASS": 3
+      },
+      "performance": {
+        "count": 3,
+        "minQueryMs": 557,
+        "medianQueryMs": 558,
+        "p90QueryMs": 558,
+        "p95QueryMs": 558,
+        "p99QueryMs": 558,
+        "maxQueryMs": 568
+      }
+    },
+    "S": {
+      "expected": 4,
+      "executed": 4,
+      "resultCounts": {
+        "EMPTY_VALID": 4
+      },
+      "performance": {
+        "count": 4,
+        "minQueryMs": 192,
+        "medianQueryMs": 210,
+        "p90QueryMs": 229,
+        "p95QueryMs": 229,
+        "p99QueryMs": 229,
+        "maxQueryMs": 253
+      }
+    },
+    "T": {
+      "expected": 2,
+      "executed": 2,
+      "resultCounts": {
+        "PASS": 2
+      },
+      "performance": {
+        "count": 2,
+        "minQueryMs": 568,
+        "medianQueryMs": 568,
+        "p90QueryMs": 568,
+        "p95QueryMs": 568,
+        "p99QueryMs": 568,
+        "maxQueryMs": 580
+      }
+    },
+    "U": {
+      "expected": 6,
+      "executed": 6,
+      "resultCounts": {
+        "PASS": 4,
+        "EMPTY_VALID": 2
+      },
+      "performance": {
+        "count": 6,
+        "minQueryMs": 180,
+        "medianQueryMs": 380,
+        "p90QueryMs": 620,
+        "p95QueryMs": 620,
+        "p99QueryMs": 620,
+        "maxQueryMs": 705
+      }
+    },
+    "V": {
+      "expected": 3,
+      "executed": 3,
+      "resultCounts": {
+        "EMPTY_VALID": 1,
+        "PASS": 2
+      },
+      "performance": {
+        "count": 3,
+        "minQueryMs": 169,
+        "medianQueryMs": 543,
+        "p90QueryMs": 543,
+        "p95QueryMs": 543,
+        "p99QueryMs": 543,
+        "maxQueryMs": 583
+      }
+    },
+    "W": {
+      "expected": 5,
+      "executed": 5,
+      "resultCounts": {
+        "PASS": 3,
+        "EMPTY_VALID": 2
+      },
+      "performance": {
+        "count": 5,
+        "minQueryMs": 599,
+        "medianQueryMs": 690,
+        "p90QueryMs": 722,
+        "p95QueryMs": 722,
+        "p99QueryMs": 722,
+        "maxQueryMs": 770
+      }
+    },
+    "X": {
+      "expected": 4,
+      "executed": 4,
+      "resultCounts": {
+        "IMPLEMENTED_WITH_LIMITATION": 4
+      },
+      "performance": {
+        "count": 4,
+        "minQueryMs": 160,
+        "medianQueryMs": 164,
+        "p90QueryMs": 252,
+        "p95QueryMs": 252,
+        "p99QueryMs": 252,
+        "maxQueryMs": 266
+      }
+    },
+    "Y": {
+      "expected": 5,
+      "executed": 5,
+      "resultCounts": {
+        "PASS": 5
+      },
+      "performance": {
+        "count": 5,
+        "minQueryMs": 170,
+        "medianQueryMs": 391,
+        "p90QueryMs": 419,
+        "p95QueryMs": 419,
+        "p99QueryMs": 419,
+        "maxQueryMs": 499
+      }
+    },
+    "Z": {
+      "expected": 4,
+      "executed": 4,
+      "resultCounts": {
+        "PASS": 4
+      },
+      "performance": {
+        "count": 4,
+        "minQueryMs": 0,
+        "medianQueryMs": 0,
+        "p90QueryMs": 519,
+        "p95QueryMs": 519,
+        "p99QueryMs": 519,
+        "maxQueryMs": 521
+      }
+    },
+    "AA": {
+      "expected": 4,
+      "executed": 4,
+      "resultCounts": {
+        "PASS": 4
+      },
+      "performance": {
+        "count": 4,
+        "minQueryMs": 0,
+        "medianQueryMs": 1,
+        "p90QueryMs": 941,
+        "p95QueryMs": 941,
+        "p99QueryMs": 941,
+        "maxQueryMs": 1141
+      }
+    },
+    "AB": {
+      "expected": 5,
+      "executed": 5,
+      "resultCounts": {
+        "PASS": 5
+      },
+      "performance": {
+        "count": 5,
+        "minQueryMs": 0,
+        "medianQueryMs": 0,
+        "p90QueryMs": 443,
+        "p95QueryMs": 443,
+        "p99QueryMs": 443,
+        "maxQueryMs": 478
+      }
+    },
+    "AC": {
+      "expected": 5,
+      "executed": 5,
+      "resultCounts": {
+        "EMPTY_VALID": 5
+      },
+      "performance": {
+        "count": 5,
+        "minQueryMs": 141,
+        "medianQueryMs": 171,
+        "p90QueryMs": 237,
+        "p95QueryMs": 237,
+        "p99QueryMs": 237,
+        "maxQueryMs": 302
+      }
+    },
+    "AD": {
+      "expected": 6,
+      "executed": 6,
+      "resultCounts": {
+        "EMPTY_VALID": 5,
+        "PASS": 1
+      },
+      "performance": {
+        "count": 6,
+        "minQueryMs": 136,
+        "medianQueryMs": 153,
+        "p90QueryMs": 1023,
+        "p95QueryMs": 1023,
+        "p99QueryMs": 1023,
+        "maxQueryMs": 2288
+      }
+    },
+    "AE": {
+      "expected": 1,
+      "executed": 1,
+      "resultCounts": {
+        "EMPTY_VALID": 1
+      },
+      "performance": {
+        "count": 1,
+        "minQueryMs": 22997,
+        "medianQueryMs": 22997,
+        "p90QueryMs": 22997,
+        "p95QueryMs": 22997,
+        "p99QueryMs": 22997,
+        "maxQueryMs": 22997
+      }
+    },
+    "AF": {
+      "expected": 1,
+      "executed": 1,
+      "resultCounts": {
+        "EMPTY_VALID": 1
+      },
+      "performance": {
+        "count": 1,
+        "minQueryMs": 29813,
+        "medianQueryMs": 29813,
+        "p90QueryMs": 29813,
+        "p95QueryMs": 29813,
+        "p99QueryMs": 29813,
+        "maxQueryMs": 29813
+      }
+    },
+    "AG": {
+      "expected": 9,
+      "executed": 9,
+      "resultCounts": {
+        "EMPTY_VALID": 7,
+        "PASS": 2
+      },
+      "performance": {
+        "count": 9,
+        "minQueryMs": 177,
+        "medianQueryMs": 543,
+        "p90QueryMs": 3311,
+        "p95QueryMs": 3311,
+        "p99QueryMs": 3311,
+        "maxQueryMs": 10096
+      }
+    },
+    "AH": {
+      "expected": 19,
+      "executed": 19,
+      "resultCounts": {
+        "INVALID_EXPECTED": 19
+      },
+      "performance": {
+        "count": 19,
+        "minQueryMs": 99,
+        "medianQueryMs": 138,
+        "p90QueryMs": 203,
+        "p95QueryMs": 214,
+        "p99QueryMs": 214,
+        "maxQueryMs": 393
+      }
+    },
+    "AI": {
+      "expected": 6,
+      "executed": 6,
+      "resultCounts": {
+        "INVALID_EXPECTED": 5,
+        "EMPTY_VALID": 1
+      },
+      "performance": {
+        "count": 6,
+        "minQueryMs": 123,
+        "medianQueryMs": 145,
+        "p90QueryMs": 190,
+        "p95QueryMs": 190,
+        "p99QueryMs": 190,
+        "maxQueryMs": 655
+      }
+    },
+    "AJ": {
+      "expected": 8,
+      "executed": 8,
+      "resultCounts": {
+        "PASS": 6,
+        "EMPTY_VALID": 2
+      },
+      "performance": {
+        "count": 8,
+        "minQueryMs": 362,
+        "medianQueryMs": 458,
+        "p90QueryMs": 550,
+        "p95QueryMs": 550,
+        "p99QueryMs": 550,
+        "maxQueryMs": 564
+      }
+    },
+    "AK": {
+      "expected": 3,
+      "executed": 3,
+      "resultCounts": {
+        "PASS": 3
+      },
+      "performance": {
+        "count": 3,
+        "minQueryMs": 421,
+        "medianQueryMs": 519,
+        "p90QueryMs": 519,
+        "p95QueryMs": 519,
+        "p99QueryMs": 519,
+        "maxQueryMs": 832
+      }
+    },
+    "AL": {
+      "expected": 5,
+      "executed": 5,
+      "resultCounts": {
+        "EMPTY_VALID": 5
+      },
+      "performance": {
+        "count": 5,
+        "minQueryMs": 259,
+        "medianQueryMs": 546,
+        "p90QueryMs": 645,
+        "p95QueryMs": 645,
+        "p99QueryMs": 645,
+        "maxQueryMs": 738
+      }
+    },
+    "AM": {
+      "expected": 3,
+      "executed": 3,
+      "resultCounts": {
+        "PASS": 3
+      },
+      "performance": {
+        "count": 3,
+        "minQueryMs": 298,
+        "medianQueryMs": 300,
+        "p90QueryMs": 300,
+        "p95QueryMs": 300,
+        "p99QueryMs": 300,
+        "maxQueryMs": 424
+      }
+    },
+    "AN": {
+      "expected": 13,
+      "executed": 13,
+      "resultCounts": {
+        "EMPTY_VALID": 11,
+        "IMPLEMENTED_WITH_LIMITATION": 2
+      },
+      "performance": {
+        "count": 13,
+        "minQueryMs": 173,
+        "medianQueryMs": 243,
+        "p90QueryMs": 479,
+        "p95QueryMs": 482,
+        "p99QueryMs": 482,
+        "maxQueryMs": 500
+      }
+    },
+    "AO": {
+      "expected": 4,
+      "executed": 4,
+      "resultCounts": {
+        "PASS": 2,
+        "EMPTY_VALID": 2
+      },
+      "performance": {
+        "count": 4,
+        "minQueryMs": 129,
+        "medianQueryMs": 182,
+        "p90QueryMs": 197,
+        "p95QueryMs": 197,
+        "p99QueryMs": 197,
+        "maxQueryMs": 454
+      }
+    },
+    "AP": {
+      "expected": 5,
+      "executed": 5,
+      "resultCounts": {
+        "PASS": 4,
+        "EMPTY_VALID": 1
+      },
+      "performance": {
+        "count": 5,
+        "minQueryMs": 140,
+        "medianQueryMs": 175,
+        "p90QueryMs": 611,
+        "p95QueryMs": 611,
+        "p99QueryMs": 611,
+        "maxQueryMs": 661
+      }
+    },
+    "AQ": {
+      "expected": 5,
+      "executed": 5,
+      "resultCounts": {
+        "EMPTY_VALID": 4,
+        "PASS": 1
+      },
+      "performance": {
+        "count": 5,
+        "minQueryMs": 458,
+        "medianQueryMs": 10206,
+        "p90QueryMs": 10890,
+        "p95QueryMs": 10890,
+        "p99QueryMs": 10890,
+        "maxQueryMs": 11858
+      }
+    },
+    "AR": {
+      "expected": 3,
+      "executed": 3,
+      "resultCounts": {
+        "PASS": 3
+      },
+      "performance": {
+        "count": 3,
+        "minQueryMs": 437,
+        "medianQueryMs": 653,
+        "p90QueryMs": 653,
+        "p95QueryMs": 653,
+        "p99QueryMs": 653,
+        "maxQueryMs": 711
+      }
+    },
+    "AS": {
+      "expected": 7,
+      "executed": 7,
+      "resultCounts": {
+        "EMPTY_VALID": 7
+      },
+      "performance": {
+        "count": 7,
+        "minQueryMs": 170,
+        "medianQueryMs": 181,
+        "p90QueryMs": 196,
+        "p95QueryMs": 196,
+        "p99QueryMs": 196,
+        "maxQueryMs": 221
+      }
+    },
+    "AT": {
+      "expected": 4,
+      "executed": 4,
+      "resultCounts": {
+        "PASS": 3,
+        "EMPTY_VALID": 1
+      },
+      "performance": {
+        "count": 4,
+        "minQueryMs": 164,
+        "medianQueryMs": 164,
+        "p90QueryMs": 298,
+        "p95QueryMs": 298,
+        "p99QueryMs": 298,
+        "maxQueryMs": 305
+      }
+    },
+    "AU": {
+      "expected": 5,
+      "executed": 5,
+      "resultCounts": {
+        "PASS": 4,
+        "EMPTY_VALID": 1
+      },
+      "performance": {
+        "count": 5,
+        "minQueryMs": 166,
+        "medianQueryMs": 421,
+        "p90QueryMs": 516,
+        "p95QueryMs": 516,
+        "p99QueryMs": 516,
+        "maxQueryMs": 615
+      }
+    },
+    "AV": {
+      "expected": 120,
+      "executed": 120,
+      "resultCounts": {
+        "PASS": 40,
+        "EMPTY_VALID": 80
+      },
+      "performance": {
+        "count": 120,
+        "minQueryMs": 109,
+        "medianQueryMs": 179,
+        "p90QueryMs": 445,
+        "p95QueryMs": 524,
+        "p99QueryMs": 696,
+        "maxQueryMs": 727
+      }
+    },
+    "AW": {
+      "expected": 80,
+      "executed": 80,
+      "resultCounts": {
+        "PASS": 50,
+        "EMPTY_VALID": 30
+      },
+      "performance": {
+        "count": 80,
+        "minQueryMs": 87,
+        "medianQueryMs": 217,
+        "p90QueryMs": 517,
+        "p95QueryMs": 603,
+        "p99QueryMs": 678,
+        "maxQueryMs": 686
+      }
+    },
+    "AX": {
+      "expected": 3,
+      "executed": 3,
+      "resultCounts": {
+        "EMPTY_VALID": 2,
+        "PASS": 1
+      },
+      "performance": {
+        "count": 3,
+        "minQueryMs": 229,
+        "medianQueryMs": 361,
+        "p90QueryMs": 361,
+        "p95QueryMs": 361,
+        "p99QueryMs": 361,
+        "maxQueryMs": 991
+      }
+    },
+    "AY": {
+      "expected": 1,
+      "executed": 1,
+      "resultCounts": {
+        "INVALID_EXPECTED": 1
+      },
+      "performance": {
+        "count": 1,
+        "minQueryMs": 639,
+        "medianQueryMs": 639,
+        "p90QueryMs": 639,
+        "p95QueryMs": 639,
+        "p99QueryMs": 639,
+        "maxQueryMs": 639
+      }
+    },
+    "AZ": {
+      "expected": 3,
+      "executed": 3,
+      "resultCounts": {
+        "EMPTY_VALID": 2,
+        "PASS": 1
+      },
+      "performance": {
+        "count": 3,
+        "minQueryMs": 637,
+        "medianQueryMs": 760,
+        "p90QueryMs": 760,
+        "p95QueryMs": 760,
+        "p99QueryMs": 760,
+        "maxQueryMs": 12633
+      }
+    },
+    "BA": {
+      "expected": 9,
+      "executed": 9,
+      "resultCounts": {
+        "EMPTY_VALID": 1,
+        "PASS": 8
+      },
+      "performance": {
+        "count": 9,
+        "minQueryMs": 0,
+        "medianQueryMs": 0,
+        "p90QueryMs": 0,
+        "p95QueryMs": 0,
+        "p99QueryMs": 0,
+        "maxQueryMs": 152
+      }
+    },
+    "BB": {
+      "expected": 8,
+      "executed": 8,
+      "resultCounts": {
+        "EMPTY_VALID": 1,
+        "PASS": 7
+      },
+      "performance": {
+        "count": 8,
+        "minQueryMs": 165,
+        "medianQueryMs": 575,
+        "p90QueryMs": 592,
+        "p95QueryMs": 592,
+        "p99QueryMs": 592,
+        "maxQueryMs": 651
+      }
+    },
+    "BC": {
+      "expected": 7,
+      "executed": 7,
+      "resultCounts": {
+        "PASS": 7
+      },
+      "performance": {
+        "count": 7,
+        "minQueryMs": 0,
+        "medianQueryMs": 0,
+        "p90QueryMs": 0,
+        "p95QueryMs": 0,
+        "p99QueryMs": 0,
+        "maxQueryMs": 174
+      }
+    },
+    "BD": {
+      "expected": 7,
+      "executed": 7,
+      "resultCounts": {
+        "PASS": 4,
+        "EMPTY_VALID": 3
+      },
+      "performance": {
+        "count": 7,
+        "minQueryMs": 0,
+        "medianQueryMs": 138,
+        "p90QueryMs": 202,
+        "p95QueryMs": 202,
+        "p99QueryMs": 202,
+        "maxQueryMs": 372
+      }
+    },
+    "BE": {
+      "expected": 8,
+      "executed": 8,
+      "resultCounts": {
+        "PASS": 6,
+        "EMPTY_VALID": 2
+      },
+      "performance": {
+        "count": 8,
+        "minQueryMs": 165,
+        "medianQueryMs": 367,
+        "p90QueryMs": 813,
+        "p95QueryMs": 813,
+        "p99QueryMs": 813,
+        "maxQueryMs": 1406
+      }
+    },
+    "BF": {
+      "expected": 0,
+      "executed": 0,
+      "resultCounts": {},
+      "performance": {
+        "count": 0,
+        "minQueryMs": null,
+        "medianQueryMs": null,
+        "p90QueryMs": null,
+        "p95QueryMs": null,
+        "p99QueryMs": null,
+        "maxQueryMs": null
+      }
+    },
+    "LMX": {
+      "expected": 9,
+      "executed": 9,
+      "resultCounts": {
+        "EMPTY_VALID": 5,
+        "PASS": 4
+      },
+      "performance": {
+        "count": 9,
+        "minQueryMs": 1046,
+        "medianQueryMs": 1085,
+        "p90QueryMs": 1513,
+        "p95QueryMs": 1513,
+        "p99QueryMs": 1513,
+        "maxQueryMs": 1532
+      }
+    }
+  },
+  "familyTable": {
+    "generic": {
+      "count": 20,
+      "minQueryMs": 113,
+      "medianQueryMs": 346,
+      "p90QueryMs": 1166,
+      "p95QueryMs": 2118,
+      "p99QueryMs": 2118,
+      "maxQueryMs": 3153
+    },
+    "identifiers": {
+      "count": 51,
+      "minQueryMs": 201,
+      "medianQueryMs": 466,
+      "p90QueryMs": 9796,
+      "p95QueryMs": 10043,
+      "p99QueryMs": 19258,
+      "maxQueryMs": 20153
+    },
+    "boolean": {
+      "count": 11,
+      "minQueryMs": 271,
+      "medianQueryMs": 596,
+      "p90QueryMs": 1151,
+      "p95QueryMs": 1151,
+      "p99QueryMs": 1151,
+      "maxQueryMs": 1594
+    },
+    "expansion": {
+      "count": 17,
+      "minQueryMs": 176,
+      "medianQueryMs": 259,
+      "p90QueryMs": 952,
+      "p95QueryMs": 1004,
+      "p99QueryMs": 1004,
+      "maxQueryMs": 1005
+    },
+    "topology": {
+      "count": 8,
+      "minQueryMs": 136,
+      "medianQueryMs": 702,
+      "p90QueryMs": 788,
+      "p95QueryMs": 788,
+      "p99QueryMs": 788,
+      "maxQueryMs": 826
+    },
+    "spatial": {
+      "count": 36,
+      "minQueryMs": 65,
+      "medianQueryMs": 354,
+      "p90QueryMs": 1085,
+      "p95QueryMs": 1421,
+      "p99QueryMs": 1513,
+      "maxQueryMs": 1532
+    },
+    "properties": {
+      "count": 23,
+      "minQueryMs": 160,
+      "medianQueryMs": 395,
+      "p90QueryMs": 690,
+      "p95QueryMs": 705,
+      "p99QueryMs": 722,
+      "maxQueryMs": 770
+    },
+    "namedSelections": {
+      "count": 13,
+      "minQueryMs": 136,
+      "medianQueryMs": 237,
+      "p90QueryMs": 2288,
+      "p95QueryMs": 22997,
+      "p99QueryMs": 22997,
+      "maxQueryMs": 29813
+    },
+    "validEmpty": {
+      "count": 9,
+      "minQueryMs": 177,
+      "medianQueryMs": 543,
+      "p90QueryMs": 3311,
+      "p95QueryMs": 3311,
+      "p99QueryMs": 3311,
+      "maxQueryMs": 10096
+    },
+    "invalidSafety": {
+      "count": 25,
+      "minQueryMs": 99,
+      "medianQueryMs": 141,
+      "p90QueryMs": 203,
+      "p95QueryMs": 214,
+      "p99QueryMs": 393,
+      "maxQueryMs": 655
+    },
+    "whitespaceCase": {
+      "count": 11,
+      "minQueryMs": 362,
+      "medianQueryMs": 478,
+      "p90QueryMs": 564,
+      "p95QueryMs": 564,
+      "p99QueryMs": 564,
+      "maxQueryMs": 832
+    },
+    "multiObject": {
+      "count": 5,
+      "minQueryMs": 458,
+      "medianQueryMs": 10206,
+      "p90QueryMs": 10890,
+      "p95QueryMs": 10890,
+      "p99QueryMs": 10890,
+      "maxQueryMs": 11858
+    },
+    "selectionVisibility": {
+      "count": 3,
+      "minQueryMs": 437,
+      "medianQueryMs": 653,
+      "p90QueryMs": 653,
+      "p95QueryMs": 653,
+      "p99QueryMs": 653,
+      "maxQueryMs": 711
+    },
+    "selectionRepresentation": {
+      "count": 19,
+      "minQueryMs": 0,
+      "medianQueryMs": 221,
+      "p90QueryMs": 651,
+      "p95QueryMs": 941,
+      "p99QueryMs": 941,
+      "maxQueryMs": 1141
+    },
+    "selectionColor": {
+      "count": 9,
+      "minQueryMs": 0,
+      "medianQueryMs": 164,
+      "p90QueryMs": 443,
+      "p95QueryMs": 443,
+      "p99QueryMs": 443,
+      "maxQueryMs": 478
+    },
+    "visualUx": {
+      "count": 5,
+      "minQueryMs": 166,
+      "medianQueryMs": 421,
+      "p90QueryMs": 516,
+      "p95QueryMs": 516,
+      "p99QueryMs": 516,
+      "maxQueryMs": 615
+    },
+    "reselectStress": {
+      "count": 120,
+      "minQueryMs": 109,
+      "medianQueryMs": 179,
+      "p90QueryMs": 445,
+      "p95QueryMs": 524,
+      "p99QueryMs": 696,
+      "maxQueryMs": 727
+    },
+    "queryStress": {
+      "count": 80,
+      "minQueryMs": 87,
+      "medianQueryMs": 217,
+      "p90QueryMs": 517,
+      "p95QueryMs": 603,
+      "p99QueryMs": 678,
+      "maxQueryMs": 686
+    },
+    "batch": {
+      "count": 4,
+      "minQueryMs": 229,
+      "medianQueryMs": 361,
+      "p90QueryMs": 639,
+      "p95QueryMs": 639,
+      "p99QueryMs": 639,
+      "maxQueryMs": 991
+    },
+    "cameraPersistence": {
+      "count": 9,
+      "minQueryMs": 0,
+      "medianQueryMs": 0,
+      "p90QueryMs": 0,
+      "p95QueryMs": 0,
+      "p99QueryMs": 0,
+      "maxQueryMs": 152
+    },
+    "editSession": {
+      "count": 14,
+      "minQueryMs": 0,
+      "medianQueryMs": 0,
+      "p90QueryMs": 174,
+      "p95QueryMs": 202,
+      "p99QueryMs": 202,
+      "maxQueryMs": 372
+    },
+    "nucleic": {
+      "count": 8,
+      "minQueryMs": 165,
+      "medianQueryMs": 367,
+      "p90QueryMs": 813,
+      "p95QueryMs": 813,
+      "p99QueryMs": 813,
+      "maxQueryMs": 1406
+    },
+    "pymol": {
+      "count": 0,
+      "minQueryMs": null,
+      "medianQueryMs": null,
+      "p90QueryMs": null,
+      "p95QueryMs": null,
+      "p99QueryMs": null,
+      "maxQueryMs": null
+    }
+  },
+  "maxQuery": {
+    "test_id": "AF-001",
+    "category": "AF",
+    "query": "model mini-protein.pdb like model mini-protein.pdb",
+    "duration_ms": 29813,
+    "operator_family": "namedSelections",
+    "selected_atoms": 0,
+    "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "classification": "EMPTY_VALID",
+    "ui_classification": "EMPTY_VALID",
+    "ui_duration_ms": 24077,
+    "ui_viewer_state": "ready",
+    "fixture": "4V6F.cif / compact-canonical-v1 / state 1",
+    "scientifically_correct": true,
+    "ui_remained_responsive": true,
+    "reproducible_retest": {
+      "schemaVersion": 1,
+      "test_id": "AF-001",
+      "category": "AF",
+      "query": "model mini-protein.pdb like model mini-protein.pdb",
+      "fixture": "4V6F canonical compact-canonical-v1",
+      "structure_sha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+      "canonical_revision": "20b7c8468b598ce6272d83709eba7454505881b43d5083c85df50735e801d913",
+      "selected_atoms": 0,
+      "membership_hash": "811c9dc5",
+      "expected_original_duration_ms": 29813,
+      "runs": [
+        {
+          "run": 1,
+          "duration_ms": 11251,
+          "status": "VALID_EMPTY",
+          "selected_atoms": 0,
+          "membership_hash": "811c9dc5",
+          "diagnostics": []
+        },
+        {
+          "run": 2,
+          "duration_ms": 11783,
+          "status": "VALID_EMPTY",
+          "selected_atoms": 0,
+          "membership_hash": "811c9dc5",
+          "diagnostics": []
+        },
+        {
+          "run": 3,
+          "duration_ms": 11056,
+          "status": "VALID_EMPTY",
+          "selected_atoms": 0,
+          "membership_hash": "811c9dc5",
+          "diagnostics": []
+        }
+      ],
+      "median_ms": 11251,
+      "maximum_ms": 11783,
+      "scientific_correctness": "CORRECT_EMPTY_VALID",
+      "ui_responsiveness": "PRIOR_UI_REPLAY_READY; THIS_RETEST_MEASURED_SEMANTIC_PATH_ONLY",
+      "classification": "PERFORMANCE_CONCERN",
+      "note": "Only AF-001 was rerun; the 523-query campaign was not repeated."
+    }
+  },
+  "slowest20": [
+    {
+      "test_id": "AF-001",
+      "category": "AF",
+      "query": "model mini-protein.pdb like model mini-protein.pdb",
+      "duration_ms": 29813,
+      "operator_family": "namedSelections",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 24077,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "AE-001",
+      "category": "AE",
+      "query": "model mini-protein.pdb in model mini-protein.pdb",
+      "duration_ms": 22997,
+      "operator_family": "namedSelections",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 24497,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "B-004",
+      "category": "B",
+      "query": "model mini-protein.pdb and model mini-protein.pdb",
+      "duration_ms": 20153,
+      "operator_family": "identifiers",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 23741,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "B-003",
+      "category": "B",
+      "query": "model mini-protein.pdb or model mini-protein.pdb",
+      "duration_ms": 19258,
+      "operator_family": "identifiers",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 23093,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "AZ-001",
+      "category": "AZ",
+      "query": "model mini-protein.pdb and polymer.protein and chain A and (resn ALA or resn GLY or resn SER or resn THR) and not name H* and not solvent",
+      "duration_ms": 12633,
+      "operator_family": "AZ",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 18839,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "AQ-005",
+      "category": "AQ",
+      "query": "model mini-protein.pdb and resi 45",
+      "duration_ms": 11858,
+      "operator_family": "multiObject",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 18553,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "AQ-004",
+      "category": "AQ",
+      "query": "model mini-protein.pdb and resi 45",
+      "duration_ms": 10890,
+      "operator_family": "multiObject",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 18173,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "B-005",
+      "category": "B",
+      "query": "not model mini-protein.pdb",
+      "duration_ms": 10803,
+      "operator_family": "identifiers",
+      "selected_atoms": 307345,
+      "membership_hash": "2816b54cf84936326134feb2e9c1f56d9718ffcd892f67fb6521ca848f8dac0e",
+      "classification": "PASS",
+      "ui_classification": "PASS",
+      "ui_duration_ms": 26007,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "AQ-001",
+      "category": "AQ",
+      "query": "model mini-protein.pdb and chain A",
+      "duration_ms": 10206,
+      "operator_family": "multiObject",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 20225,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "AG-006",
+      "category": "AG",
+      "query": "model does_not_exist",
+      "duration_ms": 10096,
+      "operator_family": "validEmpty",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 18130,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "B-006",
+      "category": "B",
+      "query": "byobject (model mini-protein.pdb and name CA)",
+      "duration_ms": 10043,
+      "operator_family": "identifiers",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 17512,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "B-001",
+      "category": "B",
+      "query": "model mini-protein.pdb",
+      "duration_ms": 9863,
+      "operator_family": "identifiers",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 17613,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "B-002",
+      "category": "B",
+      "query": "model mini-protein.pdb",
+      "duration_ms": 9796,
+      "operator_family": "identifiers",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 17676,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "AQ-002",
+      "category": "AQ",
+      "query": "model mini-protein.pdb and chain A",
+      "duration_ms": 9628,
+      "operator_family": "multiObject",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 19988,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "AG-004",
+      "category": "AG",
+      "query": "name DOESNOTEXIST",
+      "duration_ms": 3311,
+      "operator_family": "validEmpty",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 13732,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "A-018",
+      "category": "A",
+      "query": "bonded",
+      "duration_ms": 3153,
+      "operator_family": "generic",
+      "selected_atoms": 302869,
+      "membership_hash": "96366b05c789d0438bbe90cb6ce9fece1338bfca370a06f7e82c910c4f3cf819",
+      "classification": "PASS",
+      "ui_classification": "PASS",
+      "ui_duration_ms": 101133,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "AD-005",
+      "category": "AD",
+      "query": "not pocket_test",
+      "duration_ms": 2288,
+      "operator_family": "namedSelections",
+      "selected_atoms": 307345,
+      "membership_hash": "2816b54cf84936326134feb2e9c1f56d9718ffcd892f67fb6521ca848f8dac0e",
+      "classification": "PASS",
+      "ui_classification": "PASS",
+      "ui_duration_ms": 22319,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "A-003",
+      "category": "A",
+      "query": "enabled",
+      "duration_ms": 2118,
+      "operator_family": "generic",
+      "selected_atoms": 307345,
+      "membership_hash": "2816b54cf84936326134feb2e9c1f56d9718ffcd892f67fb6521ca848f8dac0e",
+      "classification": "PASS",
+      "ui_classification": "PASS",
+      "ui_duration_ms": 22249,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "H-011",
+      "category": "H",
+      "query": "chain A and (resn ALA or resn GLY)",
+      "duration_ms": 1594,
+      "operator_family": "boolean",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 14122,
+      "ui_viewer_state": "ready"
+    },
+    {
+      "test_id": "LMX-SP-007",
+      "category": "LMX",
+      "query": "polymer.nucleic within 3.0 of (polymer.protein and chain C and resi 1-5)",
+      "duration_ms": 1532,
+      "operator_family": "spatial",
+      "selected_atoms": 1,
+      "membership_hash": "9a14ab1b016ff630b7c57ee4ae079dc35f134a5f8b205a748de1e34c7a2b51a7",
+      "classification": "PASS",
+      "ui_classification": "PASS",
+      "ui_duration_ms": 17880,
+      "ui_viewer_state": "ready"
+    }
+  ],
+  "maxQueryRetest": {
+    "schemaVersion": 1,
+    "test_id": "AF-001",
+    "category": "AF",
+    "query": "model mini-protein.pdb like model mini-protein.pdb",
+    "fixture": "4V6F canonical compact-canonical-v1",
+    "structure_sha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+    "canonical_revision": "20b7c8468b598ce6272d83709eba7454505881b43d5083c85df50735e801d913",
+    "selected_atoms": 0,
+    "membership_hash": "811c9dc5",
+    "expected_original_duration_ms": 29813,
+    "runs": [
+      {
+        "run": 1,
+        "duration_ms": 11251,
+        "status": "VALID_EMPTY",
+        "selected_atoms": 0,
+        "membership_hash": "811c9dc5",
+        "diagnostics": []
+      },
+      {
+        "run": 2,
+        "duration_ms": 11783,
+        "status": "VALID_EMPTY",
+        "selected_atoms": 0,
+        "membership_hash": "811c9dc5",
+        "diagnostics": []
+      },
+      {
+        "run": 3,
+        "duration_ms": 11056,
+        "status": "VALID_EMPTY",
+        "selected_atoms": 0,
+        "membership_hash": "811c9dc5",
+        "diagnostics": []
+      }
+    ],
+    "median_ms": 11251,
+    "maximum_ms": 11783,
+    "scientific_correctness": "CORRECT_EMPTY_VALID",
+    "ui_responsiveness": "PRIOR_UI_REPLAY_READY; THIS_RETEST_MEASURED_SEMANTIC_PATH_ONLY",
+    "classification": "PERFORMANCE_CONCERN",
+    "note": "Only AF-001 was rerun; the 523-query campaign was not repeated."
+  },
+  "tailClassification": "PERFORMANCE_CONCERN",
+  "watchdogPolicy": {
+    "normalMs": 120000,
+    "spatialComplexMs": 300000
+  }
+}

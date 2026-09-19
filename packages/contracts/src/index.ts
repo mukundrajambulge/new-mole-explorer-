@@ -196,6 +196,79 @@ export type CanonicalCoordinateState = {
   coordinateHash: string;
 };
 
+/**
+ * Wire-efficient canonical representation for genuinely large structures.
+ * Ordinals are stable within the molecular revision; no atom, residue, chain,
+ * coordinate state, or bond is dropped. The web client can materialize the
+ * legacy object-shaped view on demand for features that still require it.
+ */
+export type CompactCanonicalStructure = {
+  schemaVersion: "compact-canonical-v1";
+  atomCount: number;
+  strings: string[];
+  atomStableIds: string[];
+  serials: number[];
+  atomNameIndices: number[];
+  elementIndices: number[];
+  residueNameIndices: number[];
+  residueNumbers: number[];
+  insertionCodeIndices: number[];
+  chainIndices: number[];
+  segmentIdIndices: number[];
+  x: number[];
+  y: number[];
+  z: number[];
+  recordTypes: Array<0 | 1>;
+  flags: number[];
+  polymerTypes: Array<0 | 1 | 2 | 3>;
+  formalCharges: Array<number | null>;
+  bFactors: Array<number | null>;
+  occupancies: Array<number | null>;
+  altLocIndices: number[];
+  secondaryStructures: Array<0 | 1 | 2 | 3>;
+  bonds: {
+    ids: string[];
+    atom1Ordinals: number[];
+    atom2Ordinals: number[];
+    orders: Array<0 | 1 | 2 | 3 | 4>;
+    sources: number[];
+  };
+  hierarchy: {
+    chainIds: string[];
+    chainNameIndices: number[];
+    chainResidueOffsets: number[];
+    chainResidueCounts: number[];
+    residueIds: string[];
+    residueNameIndices: number[];
+    residueNumbers: number[];
+    residueInsertionCodeIndices: number[];
+    residueChainOrdinals: number[];
+    residueAtomOffsets: number[];
+    residueAtomOrdinals: number[];
+    residuePolymerFlags: Array<0 | 1>;
+    residueSecondaryStructures: Array<0 | 1 | 2 | 3>;
+  };
+  coordinateStates: Array<{
+    id: string;
+    ordinal: number;
+    sourceModelNumber?: number;
+    x: number[];
+    y: number[];
+    z: number[];
+    coordinateHash: string;
+  }>;
+  stateOrder: string[];
+  chemistry?: {
+    donorAtomOrdinals: number[];
+    acceptorAtomOrdinals: number[];
+  };
+};
+
+export const COMPACT_ATOM_FLAG_POLYMER = 1;
+export const COMPACT_ATOM_FLAG_LIGAND = 2;
+export const COMPACT_ATOM_FLAG_WATER = 4;
+export const COMPACT_ATOM_FLAG_ION = 8;
+
 /** Source-backed crystallographic unit-cell parameters for bounded bycell selection. */
 export type CanonicalUnitCell = {
   a: number;
@@ -283,6 +356,8 @@ export type CanonicalMolecularStructure = {
   partialChargeDataset?: PartialChargeDataset;
   secondaryStructureDataset?: SecondaryStructureDataset;
   peptideSequenceDataset?: PeptideSequenceDataset;
+  /** Present for large-wire transport; the object-shaped fields remain the canonical semantic view after client hydration. */
+  compact?: CompactCanonicalStructure;
 };
 
 export type StructureLoadResult = {
