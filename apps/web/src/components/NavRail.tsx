@@ -10,6 +10,7 @@ const navItems: NavItem[] = [
   { label: "Laboratory", icon: "beaker", actionId: "WORKSPACE.LABORATORY" },
   { label: "Molecular", icon: "atom", actionId: "WORKSPACE.MOLECULAR" },
   { label: "Console", icon: "command", actionId: "WORKSPACE.CONSOLE" },
+  { label: "Docking", icon: "target", actionId: "WORKSPACE.DOCKING" },
 ];
 
 export const NavRail = ({ activeItem, onAction }: { activeItem: string; onAction: (actionId: ActionId) => void }) => (
@@ -38,9 +39,6 @@ export const NavRail = ({ activeItem, onAction }: { activeItem: string; onAction
       </button>
       <button className="nav-item" onClick={() => onAction("VIEW.THEME")} aria-label="Settings" title="Settings" data-action-id="VIEW.THEME">
         <Icon name="settings" size={19} />
-      </button>
-      <button className="nav-item" onClick={() => onAction("HELP.OPEN")} aria-label="Help" title="Help" data-action-id="HELP.OPEN">
-        <Icon name="help" size={19} />
       </button>
       <div className="user-dot" aria-label="Workspace local mode"><span /></div>
     </div>

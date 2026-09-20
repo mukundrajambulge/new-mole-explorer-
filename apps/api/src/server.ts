@@ -1,12 +1,14 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { join } from "node:path";
-import type { BootstrapResponse, CanonicalCommand, HealthResponse, ProjectSaveRequest } from "@molecular/contracts";
+import { f64Value, type BootstrapResponse, type CanonicalCommand, type D2SearchRegionV1, type HealthResponse, type ProjectSaveRequest } from "@molecular/contracts";
 import { IngestionError, StructureIngestionService } from "./structures/ingestion.js";
 import { parseMultipartFile } from "./structures/multipart.js";
 import { ProjectStore } from "./projects/projectStore.js";
 import { SourceArtifactStore } from "./lifecycle/sourceArtifactStore.js";
 import { CommandDispatcher } from "./command/dispatcher.js";
 import { profileMark, profileTransport } from "./structures/ingestionProfiler.js";
+import { D2PreparationService } from "./docking/d2PreparationService.js";
+import type { D2SearchRegionInput } from "./docking/d2Preparation.js";
 
 const port = Number(process.env.API_PORT ?? 8100);
 
@@ -48,6 +50,7 @@ const dataRoot = process.env.MOLECULAR_DATA_DIR ?? join(process.cwd(), ".molecul
 const ingestionService = new StructureIngestionService(new SourceArtifactStore(dataRoot));
 const projectStore = new ProjectStore(dataRoot);
 const commandDispatcher = new CommandDispatcher({ dataRoot });
+const d2PreparationService = new D2PreparationService();
 
 const readJson = async (request: IncomingMessage): Promise<Record<string, unknown>> => {
   const chunks: Buffer[] = [];
@@ -98,6 +101,37 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
     }
     if (request.method === "GET" && url.pathname === "/api/commands/history") {
       sendJson(response, 200, { records: commandDispatcher.history.list() });
+      return;
+    }
+    if (request.method === "POST" && url.pathname === "/api/docking/d2/adapt") {
+      const body = await readJson(request);
+      if (!body.structure || typeof body.structure !== "object") throw new IngestionError("INVALID_INPUT", "D2 adaptation requires a canonical structure.");
+      const result = d2PreparationService.adaptStructure(body.structure as never, body.sourceArtifact && typeof body.sourceArtifact === "object" ? body.sourceArtifact as never : undefined);
+      sendJson(response, 200, result);
+      return;
+    }
+    if (request.method === "POST" && url.pathname === "/api/docking/d2/search-region") {
+      const body = await readJson(request);
+      if (!body.input || typeof body.input !== "object") throw new IngestionError("INVALID_INPUT", "D2 SearchRegion commit requires an explicit preparation input.");
+      const result = d2PreparationService.sealSearchRegion(body.input as unknown as D2SearchRegionInput);
+      const value = result.value as D2SearchRegionV1 | undefined;
+      sendJson(response, 200, {
+        status: result.status,
+        diagnostics: result.diagnostics,
+        ...(result.provenance ? { provenance: result.provenance } : {}),
+        ...(value ? {
+          value,
+          presentation: {
+            center: value.center.map(f64Value),
+            size: value.fullExtents.map(f64Value),
+            min: value.min.map(f64Value),
+            max: value.max.map(f64Value),
+            units: value.units,
+            coordinateFrame: value.coordinateFrame,
+            digest: value.digest,
+          },
+        } : {}),
+      });
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/commands/batch") {

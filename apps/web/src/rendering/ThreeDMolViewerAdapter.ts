@@ -1,4 +1,5 @@
 import { createViewer, Vector2, type AtomSelectionSpec, type AtomSpec, type AtomStyleSpec, type GLShape, type GLViewer, type SurfaceStyleSpec } from "3dmol";
+import { isFiniteSearchRegionOverlay, type SearchRegionOverlay } from "./searchRegionOverlay";
 import { COMPACT_ATOM_FLAG_ION, COMPACT_ATOM_FLAG_LIGAND, COMPACT_ATOM_FLAG_POLYMER, COMPACT_ATOM_FLAG_WATER, type CanonicalMolecularStructure, type StructureLoadResult } from "@molecular/contracts";
 import { colorRegistry } from "./colorRegistry";
 import { resolveAtomColor, resolveProjectedAtomColor } from "./colorSchemes";
@@ -245,6 +246,8 @@ export class ThreeDMolViewerAdapter {
   private analysisOverlays: readonly AnalysisOverlay[] = [];
   private alignmentShapes: GLShape[] = [];
   private alignmentOverlays: readonly AlignmentOverlay[] = [];
+  private searchRegionShape: GLShape | null = null;
+  private searchRegionOverlay: SearchRegionOverlay | null = null;
   private dotSurfaceShapes: GLShape[] = [];
   private surfaceIds: number[] = [];
   private surfaceKinds: Array<"surface" | "mesh"> = [];
@@ -330,9 +333,36 @@ export class ThreeDMolViewerAdapter {
     this.projectAlignmentOverlays();
   }
 
+  setSearchRegionOverlay(overlay: SearchRegionOverlay | null): void {
+    this.searchRegionOverlay = isFiniteSearchRegionOverlay(overlay) ? overlay : null;
+    this.projectSearchRegionOverlay();
+  }
+
+  private projectSearchRegionOverlay(): void {
+    if (this.searchRegionShape) this.viewer?.removeShape(this.searchRegionShape);
+    this.searchRegionShape = null;
+    if (this.container) {
+      delete this.container.dataset.searchRegionOverlay;
+      delete this.container.dataset.searchRegionDigest;
+      delete this.container.dataset.searchRegionCoordinateFrame;
+    }
+    if (!this.viewer || !this.structure || !this.searchRegionOverlay) return;
+    const [x, y, z] = this.searchRegionOverlay.center;
+    const [w, h, d] = this.searchRegionOverlay.size;
+    this.searchRegionShape = this.viewer.addShape({ color: this.searchRegionOverlay.kind === "COMMITTED" ? "#45dec2" : "#e5ae32", linewidth: 2.0, opacity: 0.72, wireframe: true });
+    this.searchRegionShape.addBox({ center: { x, y, z }, dimensions: { w, h, d } });
+    if (this.container) {
+      this.container.dataset.searchRegionOverlay = this.searchRegionOverlay.kind;
+      this.container.dataset.searchRegionDigest = this.searchRegionOverlay.digest ?? "";
+      this.container.dataset.searchRegionCoordinateFrame = this.searchRegionOverlay.coordinateFrame;
+    }
+    this.render();
+  }
+
   private projectAlignmentOverlays(): void {
     this.alignmentShapes.forEach((shape) => this.viewer?.removeShape(shape));
     this.alignmentShapes = [];
+    this.searchRegionShape = null;
     if (!this.viewer || !this.structure) return;
     const structureFor = (objectId: string, stateId: string): CanonicalMolecularStructure | null => {
       if (!this.workspaceObjects.length) return this.structure;
@@ -412,6 +442,7 @@ export class ThreeDMolViewerAdapter {
     this.hasModel = true;
     this.bindPicking();
     this.setProjection(projection, { preserveView: false });
+    this.projectSearchRegionOverlay();
     if (projection.camera.view && this.validView(projection.camera.view)) {
       this.viewer!.setView(projection.camera.view);
       this.baselineView = [...(projection.camera.defaultView && this.validView(projection.camera.defaultView) ? projection.camera.defaultView : projection.camera.view)];
@@ -477,6 +508,7 @@ export class ThreeDMolViewerAdapter {
       this.bindWorkspacePicking();
       this.frameToCanonicalBounds(true);
       this.writeWorkspaceProjectionState();
+      this.projectSearchRegionOverlay();
       this.render();
     });
   }
