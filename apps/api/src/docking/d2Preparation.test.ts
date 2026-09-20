@@ -62,7 +62,7 @@ const adaptedFixture = () => {
   const graph = value.graph!;
   const selectedComponentId = graph.components[0]!.componentId;
   const formalCharges = Object.fromEntries(graph.atoms.map((atom) => [atom.atomUid, 0])) as Record<D2AtomUID, number | null>;
-  const chemicalPayload = { schemaVersion: 1 as const, semanticSchemaId: "D2_CHEMICAL_STATE_V1" as const, molecularIdentityDigest: identity.digest, resolution: "EXPLICIT_SUBMITTED" as const, formalCharges, stereo: [], selectedComponentIds: [selectedComponentId], sourceEvidenceRefs: [value.sourceArtifactDigest] };
+  const chemicalPayload = { schemaVersion: 1 as const, semanticSchemaId: "D2_CHEMICAL_STATE_V1" as const, molecularIdentityDigest: identity.digest, resolution: "EXPLICIT_SUBMITTED" as const, protonationStatus: "NOT_APPLICABLE" as const, tautomerStatus: "NOT_APPLICABLE" as const, formalCharges, stereo: [], selectedComponentIds: [selectedComponentId], sourceEvidenceRefs: [value.sourceArtifactDigest] };
   const chemicalDigest = scientificDigest<"ChemicalStateDigest">("D2_CHEMICAL_STATE", "D2_CHEMICAL_STATE_V1", chemicalPayload);
   const chemical: D2ChemicalStateV1 = { ...chemicalPayload, stateId: "chemical:fixture", digest: chemicalDigest };
   const sourceCoordinates = value.coordinateStates[0]!;
@@ -155,6 +155,9 @@ describe("D2 representation and explicit-state sealing", () => {
     const stereo = { ...fixture.chemical, stereo: [{ atomUid: fixture.graph.atoms[0]!.atomUid, status: "UNKNOWN" as const }] };
     const stereoResult = sealPreparedLigandState({ molecularIdentity: fixture.identity, graphRevision: fixture.graph, chemicalState: stereo, coordinateState: fixture.coordinate, selectedComponentId: fixture.selectedComponentId, atomTyping: fixture.graph.atoms.map((atom) => ({ atomUid: atom.atomUid, typeId: "EXPLICIT", chargeModel: "EXPLICIT", evidenceRef: "fixture" })), kinematicModel: kinematicFor(fixture).value!, profileId: D2_LIGAND_PROFILE_ID });
     expect(stereoResult.status).toBe("AMBIGUOUS");
+    const tautomer = { ...fixture.chemical, tautomerStatus: "AMBIGUOUS" as const };
+    const tautomerResult = sealPreparedLigandState({ molecularIdentity: fixture.identity, graphRevision: fixture.graph, chemicalState: tautomer, coordinateState: fixture.coordinate, selectedComponentId: fixture.selectedComponentId, atomTyping: fixture.graph.atoms.map((atom) => ({ atomUid: atom.atomUid, typeId: "EXPLICIT", chargeModel: "EXPLICIT", evidenceRef: "fixture" })), kinematicModel: kinematicFor(fixture).value!, profileId: D2_LIGAND_PROFILE_ID });
+    expect(tautomerResult.status).toBe("AMBIGUOUS");
   });
 
   it("seals a ligand state only with one explicit component, finite 3D, typing, and kinematics", () => {

@@ -107,6 +107,7 @@ export type D2MolecularIdentityV1 = Readonly<{
 
 export type D2StereoStatus = "KNOWN" | "DERIVED" | "UNSPECIFIED" | "UNKNOWN" | "CONTRADICTORY";
 export type D2StateResolution = "EXPLICIT_SUBMITTED" | "EXPLICIT_DERIVED_PROFILE" | "GENERATED_PROFILE" | "AMBIGUOUS" | "UNKNOWN";
+export type D2ChemicalResolution = "EXPLICIT" | "GENERATED_PROFILE" | "AMBIGUOUS" | "UNKNOWN" | "NOT_APPLICABLE";
 
 export type D2ChemicalStateV1 = Readonly<{
   schemaVersion: typeof D2_SCHEMA_VERSION;
@@ -114,6 +115,8 @@ export type D2ChemicalStateV1 = Readonly<{
   stateId: string;
   molecularIdentityDigest: MolecularIdentityDigest;
   resolution: D2StateResolution;
+  protonationStatus: D2ChemicalResolution;
+  tautomerStatus: D2ChemicalResolution;
   targetPH?: number;
   protonationProfileId?: string;
   tautomerStateId?: string;
@@ -129,6 +132,7 @@ export type D2CoordinateStateV1 = Readonly<{
   semanticSchemaId: "D2_COORDINATE_STATE_V1";
   stateId: string;
   chemicalStateDigest: ChemicalStateDigest;
+  sourceModelNumber?: number;
   coordinateFrame: D2CoordinateFrameId;
   coordinateUnits: "ANGSTROM";
   dimensionality: 3;

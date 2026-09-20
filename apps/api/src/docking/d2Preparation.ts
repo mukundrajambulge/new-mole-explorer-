@@ -75,6 +75,10 @@ const validateExplicitChemicalState = (state: D2ChemicalStateV1, selectedAtomUid
   if (state.resolution === "GENERATED_PROFILE") diagnostics.push(d2Error("UNSUPPORTED_AUTOMATIC_CHEMICAL_STATE", "The D2 core profile cannot automatically generate protonation or tautomer states."));
   if (state.resolution === "AMBIGUOUS" || state.resolution === "UNKNOWN") diagnostics.push(d2Error("AMBIGUOUS_CHEMICAL_STATE", "An explicit resolved ChemicalState is required before ordinary-V1 sealing."));
   if (state.resolution === "GENERATED_PROFILE" && (!state.targetPH || !state.protonationProfileId)) diagnostics.push(d2Error("INVALID_GENERATED_STATE_PROFILE", "Generated protonation requires explicit target_pH and a named profile."));
+  if (state.protonationStatus === "GENERATED_PROFILE") diagnostics.push(d2Error("UNSUPPORTED_AUTOMATIC_PROTONATION", "Automatic receptor/ligand protonation is outside the D2 core profile."));
+  if (state.protonationStatus === "AMBIGUOUS" || state.protonationStatus === "UNKNOWN") diagnostics.push(d2Error("AMBIGUOUS_PROTONATION_STATE", "Protonation state must be explicit or explicitly declared not applicable."));
+  if (state.tautomerStatus === "GENERATED_PROFILE") diagnostics.push(d2Error("UNSUPPORTED_AUTOMATIC_TAUTOMER", "Automatic tautomer enumeration is outside the D2 core profile."));
+  if (state.tautomerStatus === "AMBIGUOUS" || state.tautomerStatus === "UNKNOWN") diagnostics.push(d2Error("AMBIGUOUS_TAUTOMER_STATE", "Tautomer state must be explicit or explicitly declared not applicable."));
   for (const stereo of state.stereo) {
     if (!selectedAtomUids.has(stereo.atomUid)) continue;
     if (stereo.status === "UNSPECIFIED" || stereo.status === "UNKNOWN" || stereo.status === "CONTRADICTORY") diagnostics.push(d2Error("AMBIGUOUS_STEREOCHEMISTRY", `Stereo status ${stereo.status} for AtomUID ${stereo.atomUid} is unresolved.`, `stereo.${stereo.atomUid}`));
@@ -111,6 +115,7 @@ export const sealPreparedReceptorState = (input: D2PreparedReceptorInput): D2Sea
   if (!input.assembly.assemblyId.trim()) diagnostics.push(d2Error("INVALID_ASSEMBLY_SELECTION", "Receptor assembly selection must be explicit and non-empty.", "assembly.assemblyId"));
   if (!isSha256(input.assembly.membershipDigest)) diagnostics.push(d2Error("INVALID_ASSEMBLY_MEMBERSHIP_DIGEST", "Assembly membership must carry a canonical digest."));
   if (!Number.isSafeInteger(input.modelNumber) || input.modelNumber < 1) diagnostics.push(d2Error("INVALID_MODEL_SELECTION", "Receptor model selection must be an explicit positive integer.", "modelNumber"));
+  if (input.coordinateState.sourceModelNumber !== undefined && input.coordinateState.sourceModelNumber !== input.modelNumber) diagnostics.push(d2Error("INVALID_MODEL_SELECTION", "Prepared receptor model selection does not match the selected CoordinateState source model.", "modelNumber"));
   if (!input.chainIds.length || input.chainIds.some((chainId) => !chainId.trim()) || unique(input.chainIds).length !== input.chainIds.length) diagnostics.push(d2Error("INVALID_CHAIN_SELECTION", "Receptor chain/operator membership must be explicit, non-empty, and duplicate-free.", "chainIds"));
   if (input.altlocResolution.status === "AMBIGUOUS") diagnostics.push(d2Error("AMBIGUOUS_ALTLOC_SELECTION", "Ambiguous alternate-location selection blocks receptor sealing.", "altlocResolution"));
   if (input.altlocResolution.policy === "COHERENT_MAX_OCCUPANCY_V1" && input.altlocResolution.status !== "UNIQUE") diagnostics.push(d2Error("AMBIGUOUS_ALTLOC_SELECTION", "Coherent maximum-occupancy selection is admissible only when unique.", "altlocResolution"));
