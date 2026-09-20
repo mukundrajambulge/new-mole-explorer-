@@ -16,6 +16,7 @@ import { adaptCanonicalStructure, adaptSmilesIdentity, mapPdbqtKinematicEvidence
 import { assessOrdinaryV1Capability, sealLigandKinematicModel, sealPreparedLigandState, sealPreparedReceptorState, sealSearchRegion, isPoseAdmissibleInSearchRegion } from "./d2Preparation.js";
 import { scientificDigest } from "./scientificSerialization.js";
 import { D2_D2_GATED_ACCEPTANCE_TEST_IDS, D2_FIXTURE_FAMILIES, D2_IMPLEMENTATION_REQUIREMENT_IDS, D2_LATER_GATE_BOUNDARY_ACCEPTANCE_TEST_IDS, D2_PRODUCTION_ACCEPTANCE_TEST_IDS } from "./d2RequirementMatrix.js";
+import { assertD2FixtureCatalog, D2_FIXTURE_CATALOG } from "./d2FixtureCatalog.js";
 
 const sourceSha = "a".repeat(64);
 const provenanceDigest = sha256Digest<"ProvenanceRecordDigest">(`sha256:${"b".repeat(64)}`);
@@ -96,6 +97,11 @@ describe("D2 representation and explicit-state sealing", () => {
     expect(D2_PRODUCTION_ACCEPTANCE_TEST_IDS).toContain("ME-DCK-V1-AT-0281");
     expect(D2_LATER_GATE_BOUNDARY_ACCEPTANCE_TEST_IDS).toContain("ME-DCK-V1-AT-0256");
     expect(D2_FIXTURE_FAMILIES.d2Integration).toEqual(["INT-FX-005", "INT-FX-006", "INT-FX-007", "INT-FX-008", "INT-FX-009", "INT-FX-010"]);
+    expect(() => assertD2FixtureCatalog()).not.toThrow();
+    expect(D2_FIXTURE_CATALOG.representation).toHaveLength(10);
+    expect(D2_FIXTURE_CATALOG.receptor).toHaveLength(30);
+    expect(D2_FIXTURE_CATALOG.ligand).toHaveLength(35);
+    expect(D2_FIXTURE_CATALOG.site).toHaveLength(30);
   });
 
   it("adapts a source graph with non-positional AtomUIDs and explicit correspondence", () => {
