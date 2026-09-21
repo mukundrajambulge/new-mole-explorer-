@@ -261,6 +261,7 @@ export class ThreeDMolViewerAdapter {
   private readonly styledModels = new Set<ViewerModel>();
   private readonly surfaceFallbackModels = new Set<ViewerModel>();
   private readonly surfaceReadyModels = new Set<ViewerModel>();
+  private readonly compactAtomOrdinalCache = new WeakMap<CanonicalMolecularStructure, ReadonlyMap<string, number>>();
   private workspaceSurfaceGeneration = 0;
   private measurements: readonly MeasurementObject[] = [];
   private auxiliaryModels: Array<{ model: ReturnType<GLViewer["addModel"]>; object: WorkspaceObject }> = [];
@@ -277,7 +278,7 @@ export class ThreeDMolViewerAdapter {
   /** 3Dmol keeps screen panning in `lookingAt`, outside getView(). */
   private cameraPan = { x: 0, y: 0 };
   private cameraTargetMetadata = { atoms: 0, models: 0, objects: 0, mode: "none" };
-  private performance = { viewerCreations: 0, sceneRebuilds: 0, projectionRebuilds: 0, renderCalls: 0, surfaceCacheHits: 0, surfaceCacheMisses: 0, surfaceGenerations: 0, meshGenerations: 0, dotGenerations: 0, staleSurfaceResults: 0 };
+  private performance = { viewerCreations: 0, sceneRebuilds: 0, projectionRebuilds: 0, renderCalls: 0, surfaceCacheHits: 0, surfaceCacheMisses: 0, surfaceGenerations: 0, meshGenerations: 0, dotGenerations: 0, staleSurfaceResults: 0, workspaceDiagnosticsRecomputations: 0, workspaceStyleRebuilds: 0, compactInteractionScans: 0, compactStableIdMapBuilds: 0 };
 
   mount(container: HTMLElement): void {
     if (this.viewer && this.container === container) return;
@@ -531,6 +532,7 @@ export class ThreeDMolViewerAdapter {
     const objectSceneChanged = modelStateChanged || objectVisibilityChanged || effectiveObjects.some((object, index) => sceneProjectionChanged(previousObjects[index]?.projection, object.projection));
     const objectLabelsChanged = effectiveObjects.some((object, index) => labelsProjectionChanged(previousObjects[index]?.projection, object.projection));
     const objectInteractionChanged = effectiveObjects.some((object, index) => interactionProjectionChanged(previousObjects[index]?.projection, object.projection));
+    const objectSelectionChanged = effectiveObjects.some((object, index) => previousObjects[index]?.projection.interaction.selectedAtomIds !== object.projection.interaction.selectedAtomIds);
     if (this.viewer && this.hasModel && effectiveObjects[0]) {
       const primaryChanged = scientificRevisionChanged || previousObjects[0]?.currentStateId !== effectiveObjects[0].currentStateId;
       if (primaryChanged && this.primaryModel) this.replaceModelAtoms(this.primaryModel, effectiveObjects[0]);
@@ -568,19 +570,23 @@ export class ThreeDMolViewerAdapter {
         this.viewer.setProjection(interactionProjection.camera.projectionMode);
         this.viewer.setCameraParameters({ fov: interactionProjection.camera.fov, orthographic: interactionProjection.camera.projectionMode === "orthographic" });
         this.applyClipping();
+        // Camera-only workspace updates do not rebuild the scene diagnostics,
+        // but the host attributes are also the observable camera contract.
+        this.writeDiagnostics(this.diagnostics);
       }
     }
-    if (objectSceneChanged || objectInteractionChanged) {
+    if (objectSceneChanged || objectSelectionChanged) {
       // Clear any prior selection overlay before projecting the next one.
       // This is a model-style reset; canonical atoms, surfaces, and camera
       // state remain intact.
       this.renderPrimaryWorkspaceModel(true);
       this.renderAuxiliaryModels(true);
     }
-    if (objectSceneChanged || effectiveObjects[0]) {
+    if (objectSceneChanged) {
       // Keep the diagnostics bound to the same authoritative object that was
       // just installed. Camera-only updates still refresh camera metadata, but
       // do not rebuild model styles or surface geometry.
+      this.performance.workspaceDiagnosticsRecomputations += 1;
       this.diagnostics = this.projectionDiagnosticsFor(this.renderLoadResultForState(effectiveObjects[0]).structure, effectiveObjects[0].projection);
       this.writeDiagnostics(this.diagnostics);
     }
@@ -591,11 +597,15 @@ export class ThreeDMolViewerAdapter {
     this.container?.setAttribute("data-renderer-model-count", String(this.auxiliaryModels.length + 1));
     if (this.projection && objectLabelsChanged) {
       this.projectLabels(this.projection);
+      this.writeDiagnostics(this.diagnostics);
     }
-    if (this.projection && (objectInteractionChanged || objectSceneChanged)) {
+    if (this.projection && (objectInteractionChanged || objectSelectionChanged || objectSceneChanged)) {
       this.projectInteractionHighlights(this.projection);
+      // Interaction overlays update independently of scene diagnostics; keep
+      // the host's selected/picked/hovered attributes in sync as well.
+      this.writeDiagnostics(this.diagnostics);
     }
-    if (objectSceneChanged || interactionCameraChanged || interactionBackgroundChanged || objectLabelsChanged || objectInteractionChanged || modelStateChanged) this.render();
+    if (objectSceneChanged || interactionCameraChanged || interactionBackgroundChanged || objectLabelsChanged || objectInteractionChanged || objectSelectionChanged || modelStateChanged) this.render();
     return Promise.resolve();
   }
 
@@ -796,6 +806,18 @@ export class ThreeDMolViewerAdapter {
     ];
     return points.map(([x, y, z], index) => ({ stableId: `${structure.id}:camera:${index}`, serial: index + 1, atomName: "CA", element: "C", residueName: "CAM", residueNumber: index + 1, chain: "_", x, y, z, recordType: "ATOM", isPolymer: true, isLigand: false, isWater: false, isIon: false }));
   }
+
+  private compactAtomOrdinalMapFor(structure: CanonicalMolecularStructure): ReadonlyMap<string, number> {
+    const cached = this.compactAtomOrdinalCache.get(structure);
+    if (cached) return cached;
+    const compact = structure.compact;
+    if (!compact) return new Map();
+    const ordinals = new Map<string, number>();
+    compact.atomStableIds.forEach((stableId, index) => ordinals.set(stableId, index));
+    this.compactAtomOrdinalCache.set(structure, ordinals);
+    this.performance.compactStableIdMapBuilds += 1;
+    return ordinals;
+  }
   private writeWorkspaceProjectionState(): void {
     if (!this.container) return;
     const state = Object.fromEntries(this.workspaceObjects.map((object) => [object.objectId, {
@@ -858,6 +880,7 @@ export class ThreeDMolViewerAdapter {
   }
 
   private renderWorkspaceModel(model: ReturnType<GLViewer["addModel"]>, object: WorkspaceObject, forceReset = false): void {
+    this.performance.workspaceStyleRebuilds += 1;
     const structure = structureForWorkspaceObjectState(object);
     if (!object.enabled) { model.setStyle({}, { cartoon: { hidden: true }, stick: { hidden: true }, sphere: { hidden: true }, line: { hidden: true } }); this.styledModels.delete(model); this.surfaceFallbackModels.delete(model); this.surfaceReadyModels.delete(model); return; }
     if (isCompactStructure(structure)) {
@@ -1485,7 +1508,10 @@ export class ThreeDMolViewerAdapter {
         else if (!selectedId.includes("::")) localSelected.add(selectedId);
       }
       const matchedLocalIds = new Set<string>();
-      for (const stableId of entry.structure.compact.atomStableIds) if (localSelected.has(stableId)) matchedLocalIds.add(stableId);
+      if (localSelected.size > 0) {
+        this.performance.compactInteractionScans += 1;
+        for (const stableId of entry.structure.compact.atomStableIds) if (localSelected.has(stableId)) matchedLocalIds.add(stableId);
+      }
       for (const localId of matchedLocalIds) matchedSelectionIds.add(objectId && this.workspaceObjects.length > 1 ? workspaceScopedStableAtomId(objectId, localId) : localId);
       if (matchedLocalIds.size) {
         entry.model.setStyle({}, selectionDeemphasisStyleFor(entry.object?.projection ?? projection), true);
@@ -1493,7 +1519,7 @@ export class ThreeDMolViewerAdapter {
       }
       for (const indicatorId of indicatorIds) {
         const localId = objectId && indicatorId.startsWith(`${objectId}::`) ? indicatorId.slice(objectId.length + 2) : indicatorId;
-        const ordinal = entry.structure.compact.atomStableIds.indexOf(localId);
+        const ordinal = this.compactAtomOrdinalMapFor(entry.structure).get(localId) ?? -1;
         if (ordinal >= 0) markerPoints.push({ id: indicatorId, point: { x: entry.structure.compact.x[ordinal]!, y: entry.structure.compact.y[ordinal]!, z: entry.structure.compact.z[ordinal]! } });
       }
     }
@@ -1722,6 +1748,10 @@ export class ThreeDMolViewerAdapter {
     this.container.dataset.rendererMeshGenerations = String(this.performance.meshGenerations);
     this.container.dataset.rendererDotGenerations = String(this.performance.dotGenerations);
     this.container.dataset.rendererStaleSurfaceResults = String(this.performance.staleSurfaceResults);
+    this.container.dataset.rendererWorkspaceDiagnosticsRecomputations = String(this.performance.workspaceDiagnosticsRecomputations);
+    this.container.dataset.rendererWorkspaceStyleRebuilds = String(this.performance.workspaceStyleRebuilds);
+    this.container.dataset.rendererCompactInteractionScans = String(this.performance.compactInteractionScans);
+    this.container.dataset.rendererCompactStableIdMapBuilds = String(this.performance.compactStableIdMapBuilds);
     this.container.dataset.rendererGeneration = String(this.rendererGeneration);
     this.container.dataset.cameraProjection = this.cameraState.projectionMode;
     this.container.dataset.cameraClippingMode = this.cameraState.clippingMode;

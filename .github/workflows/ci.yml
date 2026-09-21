@@ -2,15 +2,32 @@ name: molecular-workstation-ci
 
 on:
   push:
+    branches:
+      - '**'
   pull_request:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+    inputs:
+      full_acceptance:
+        description: Run the serialized full browser acceptance suite
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: molecular-workstation-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
+
+permissions:
+  contents: read
 
 jobs:
-  verify:
+  fast:
+    name: Fast verification
     runs-on: ubuntu-latest
-    # The expanded R07/R08 browser matrix runs the full 110-test E2E suite.
-    # The real 3D viewer/manual-gate cases are intentionally serialized and
-    # require more than the prior 30-minute budget on hosted runners.
-    timeout-minutes: 90
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,6 +40,37 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+
+  full_acceptance:
+    name: Full browser acceptance
+    needs: fast
+    if: >-
+      needs.fast.result == 'success' &&
+      (
+        (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')) ||
+        (github.event_name == 'workflow_dispatch' && inputs.full_acceptance == true)
+      )
+    runs-on: ubuntu-latest
+    # The serialized 3Dmol/manual-gate suite is intentionally isolated from
+    # feature-branch feedback; it is still required on promotion branches and
+    # can be requested explicitly from any ref through workflow_dispatch.
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
       # Emit Playwright failure annotations so hosted-only assertions remain
       # diagnosable from the public check without requiring log access.
       - run: npm run test:e2e -- --reporter=github
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-artifacts
+          path: |
+            test-results
+            playwright-report
+          if-no-files-found: ignore
