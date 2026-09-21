@@ -5,7 +5,8 @@ P0-PERF STATUS: PASS — WORKSTATION CONSOLIDATED / PERFORMANCE BASELINE SEALED
 Closure date: 2026-09-21
 Canonical worktree: `C:\Users\mukun\.codex\worktrees\molecular-workstation-p0-perf`
 Branch: `codex/p0-perf-consolidation`
-Commit: `f773b7fcf0a6f16b23f9abc760fa9d2292b63061`
+Implementation commit: `f773b7fcf0a6f16b23f9abc760fa9d2292b63061`
+Closure documentation commit: `11fd59707112113af7f1b87fb3a7832e47e22b42`
 Accepted tag: `mole-explorer-p0-perf-accepted-2026-09-21`
 Drive closure folder: `1efS0XnacsfWZzKI9ygatZNlZsMg80hxl`
 

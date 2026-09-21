@@ -3,7 +3,8 @@
   "status": "P0-PERF STATUS: PASS — WORKSTATION CONSOLIDATED / PERFORMANCE BASELINE SEALED",
   "closureDate": "2026-09-21",
   "branch": "codex/p0-perf-consolidation",
-  "commit": "f773b7fcf0a6f16b23f9abc760fa9d2292b63061",
+  "implementationCommit": "f773b7fcf0a6f16b23f9abc760fa9d2292b63061",
+  "closureDocumentationCommit": "11fd59707112113af7f1b87fb3a7832e47e22b42",
   "acceptedTag": "mole-explorer-p0-perf-accepted-2026-09-21",
   "driveFolderId": "1efS0XnacsfWZzKI9ygatZNlZsMg80hxl",
   "baselines": {
