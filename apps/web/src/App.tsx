@@ -16,6 +16,9 @@ import { ScientificSelectionPanel } from "./components/ScientificSelectionPanel"
 import { ScientificLigandPanel } from "./components/ScientificLigandPanel";
 import { BiologicalDataViewer } from "./components/BiologicalDataViewer";
 import { ImportDialog } from "./components/ImportDialog";
+import { NavRail } from "./components/NavRail";
+import { DockingWorkspace } from "./docking/DockingWorkspace";
+import type { SearchRegionOverlay } from "./rendering/searchRegionOverlay";
 import { ACTION_IDS, ACTION_REGISTRY, type ActionId, type ActionDefinition } from "./domain/registry";
 import { ApiClientError, apiClient } from "./lib/apiClient";
 import { applyRepresentationToSelection, clearColorForSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setComponentColor, setInteractionState, setLabelState, setProjectionStyle, setRepresentationColorForSelection, setRepresentationParameters, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
@@ -85,6 +88,7 @@ const initialRibbonCategory = (): RibbonCategory => {
 };
 
 export const App = () => {
+  const [activeWorkspace, setActiveWorkspace] = useState<"MOLECULAR" | "DOCKING">("MOLECULAR");
   const [activeTool, setActiveTool] = useState("Select");
   const [activeRibbon, setActiveRibbon] = useState<RibbonCategory>(initialRibbonCategory);
   const [ribbonCollapsed, setRibbonCollapsed] = useState(true);
@@ -1621,6 +1625,15 @@ export const App = () => {
 
   const handleActionInternal = (actionId: ActionId) => {
     const capability = ACTION_REGISTRY[actionId];
+    if (actionId === ACTION_IDS.WORKSPACE_MOLECULAR) {
+      setActiveWorkspace("MOLECULAR");
+      return;
+    }
+    if (actionId === ACTION_IDS.WORKSPACE_DOCKING) {
+      setActiveWorkspace("DOCKING");
+      setActiveRailPanel(null);
+      return;
+    }
     if (actionId === ACTION_IDS.HELP_OPEN) {
       showNotice({ ...capability, description: "Use File → Import for coordinate and typed biological data, the right rail for working tools, and the Command Console for the documented safe command subset. See the Complete User Guide for every current action." });
       return;
@@ -1785,20 +1798,24 @@ export const App = () => {
   const inspectorAtomId = projection.interaction.pickedAtomId ?? projection.interaction.selectedAtomIds[0];
   const inspectorCanonicalAtomId = inspectorAtomId?.includes("::") ? inspectorAtomId.slice(inspectorAtomId.indexOf("::") + 2) : inspectorAtomId;
   const selectedAtom = inspectorCanonicalAtomId ? inspectorStructure?.atoms.find((atom) => atom.stableId === inspectorCanonicalAtomId) ?? null : null;
+  const renderMolecularCanvas = (searchRegionOverlay: SearchRegionOverlay | null = null) => <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={openImportDialog} onFileDrop={importFile} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearSelection} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} alignmentOverlays={alignmentOverlays} searchRegionOverlay={searchRegionOverlay} onRenderLifecycle={setRenderLifecycle} />;
 
   return (
     <div className="app-shell">
       <input id="structure-file" ref={fileInputRef} className="visually-hidden-input" type="file" accept=".pdb,.cif,.mmcif,.pqr,.sdf,.mol,.xyz,.mol2,.pdbqt,.fasta,.fa,.fna,.faa,.fastq,.fq,.gb,.gbk,.genbank,.embl,.emb,.dx,.mrc,.map,.ccp4,.dcd,.xtc,.trr,.gro,.psf,.prmtop,.prm7,.smi,.smiles,text/plain" onChange={(event) => { const file = event.target.files?.[0]; if (file) importFile(file); event.target.value = ""; }} />
+      <NavRail activeItem={activeWorkspace === "DOCKING" ? "Docking" : "Molecular"} onAction={handleAction} />
       <main className="app-main">
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
-         <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={openImportDialog} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
-        <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${activeRailPanel ? "workspace-grid--right-expanded" : ""}`}>
-          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} onAlignmentCommand={runConsoleCommand} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} showOperations={false} renderReady={renderLifecycle === "ready"} />
-            {biologicalData ? <BiologicalDataViewer data={biologicalData} onImport={openImportDialog} /> : <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={openImportDialog} onFileDrop={importFile} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearSelection} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} alignmentOverlays={alignmentOverlays} onRenderLifecycle={setRenderLifecycle} />}
-          <ScientificToolRail activePanel={activeRailPanel} onPanelChange={setActiveRailPanel}>
+        {activeWorkspace === "DOCKING" ? <DockingWorkspace structure={structure} onImport={openImportDialog} onOpenMolecular={() => setActiveWorkspace("MOLECULAR")} renderViewer={(overlay) => renderMolecularCanvas(overlay)} /> : <>
+          <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={openImportDialog} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
+          <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${activeRailPanel ? "workspace-grid--right-expanded" : ""}`}>
+            <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} onAlignmentCommand={runConsoleCommand} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} showOperations={false} renderReady={renderLifecycle === "ready"} />
+              {biologicalData ? <BiologicalDataViewer data={biologicalData} onImport={openImportDialog} /> : renderMolecularCanvas()}
+            <ScientificToolRail activePanel={activeRailPanel} onPanelChange={setActiveRailPanel}>
             {activeRailPanel === "Display" || activeRailPanel === "Color" ? <InspectorPanel collapsed={false} onToggle={() => setActiveRailPanel(null)} onAction={handleAction} structure={structure} projection={projection} activeSelectionCount={activeSelection?.count ?? 0} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} /> : activeRailPanel === "Select" ? <ScientificSelectionPanel activeSelection={activeSelection} canSelect={Boolean(structure)} onAction={handleAction} onClearSelection={clearSelection} /> : activeRailPanel === "Measure" || activeRailPanel === "Analyze" ? <ScientificOperationsPanel mode={activeRailPanel === "Measure" ? "measure" : "analyze"} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} structure={structure} onAction={handleAction} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} /> : activeRailPanel === "Ligand" ? <ScientificLigandPanel structure={structure} activeSelection={activeSelection} onAction={handleAction} onCommand={runLigandContextCommand} /> : activeRailPanel === "Edit" ? <ScientificEditPanel selectionCount={activeSelection?.count ?? 0} objectName={editTargetObject?.displayName ?? activeWorkspaceObject?.displayName} selectionReady={editSelectionReady} canUndo={activeHistoryState?.canUndo ?? false} canRedo={activeHistoryState?.canRedo ?? false} onAction={handleAction} onBondOrder={handleBondOrderAction} /> : activeRailPanel === "Session" ? <ScenePanel collection={sceneCollection} onStore={(name) => storeScene(name)} onRecall={(sceneId) => recallScene(sceneId)} onUpdate={(sceneId) => updateScene(sceneId)} onRename={(sceneId, name) => renameScene(sceneId, name)} onDelete={(sceneId) => deleteScene(sceneId)} onStep={(direction) => stepScene(direction)} /> : <section className="rail-transition-panel" aria-live="polite"><h2>{activeRailPanel}</h2><p>This tool is being moved into the scientific rail. Its current working controls remain available in Objects &amp; Selections while the transition is verified.</p></section>}
-          </ScientificToolRail>
-        </div>
+            </ScientificToolRail>
+          </div>
+        </>}
         <StatusBar apiStatus={apiStatus} structure={structure} project={project} dirty={dirty} selectedAtomCount={projection.interaction.selectedAtomIds.length} scientificRevision={activeHistoryState?.currentRevisionId ?? null} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} activeObjectName={activeWorkspaceObject?.displayName} activeObjectId={activeWorkspaceObject?.objectId} activeObjectEnabled={activeWorkspaceObject?.enabled} renderReady={renderLifecycle === "ready"} />
         {notice && <CapabilityNotice capability={notice} onClose={() => setNotice(null)} />}
         <div className="console-layer"><ConsolePanel expanded={consoleExpanded} onToggle={() => setConsoleExpanded((value) => !value)} structure={structure} namedSelections={namedSelections} onCommand={runConsoleCommand} /></div>

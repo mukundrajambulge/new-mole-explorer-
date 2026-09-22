@@ -9,6 +9,7 @@ import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
 import type { AlignmentOverlay } from "../analysis/alignmentPresentation";
 import type { WorkspaceObject } from "../workspace/workspaceModel";
 import { Icon } from "./Icon";
+import type { SearchRegionOverlay } from "../rendering/searchRegionOverlay";
 
 type CameraCommand = { actionId: ActionId; sequence: number };
 export type ViewerLifecycle = "empty" | "loading" | "canonical-ready" | "rendering" | "ready" | "error";
@@ -33,6 +34,7 @@ type MolecularCanvasProps = {
   measurementMode: MeasurementKind | null;
   analysisOverlays: readonly AnalysisOverlay[];
   alignmentOverlays: readonly AlignmentOverlay[];
+  searchRegionOverlay?: SearchRegionOverlay | null;
   onRenderLifecycle?: (state: ViewerLifecycle) => void;
 };
 
@@ -63,6 +65,7 @@ export const MolecularCanvas = ({
   measurementMode,
   analysisOverlays,
   alignmentOverlays,
+  searchRegionOverlay = null,
   onRenderLifecycle,
 }: MolecularCanvasProps) => {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -224,6 +227,10 @@ export const MolecularCanvas = ({
   useEffect(() => {
     adapterRef.current?.setAlignmentOverlays(alignmentOverlays);
   }, [alignmentOverlays]);
+
+  useEffect(() => {
+    adapterRef.current?.setSearchRegionOverlay(searchRegionOverlay);
+  }, [searchRegionOverlay]);
 
   useEffect(() => {
     const adapter = adapterRef.current;

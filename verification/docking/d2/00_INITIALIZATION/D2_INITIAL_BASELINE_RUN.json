@@ -1,0 +1,18 @@
+{
+  "commit": "26227a10416657d0c2518bd0b751a38693627d5b",
+  "worktree": "C:\\Users\\mukun\\.codex\\worktrees\\molecular-workstation-d2-explicit-state-site\\molecular-workstation",
+  "commands": {
+    "npm test -- --run": {"status": "PASS", "webTests": 150, "apiTests": 79, "totalTests": 229, "failed": 0},
+    "npm run typecheck": {"status": "PASS"},
+    "npm run lint": {"status": "PASS"},
+    "npm run build": {"status": "PASS"}
+  },
+  "d1AcceptedEvidence": {
+    "contractGateTests": 14,
+    "localE2ePassed": 147
+  },
+  "environmentObservations": {
+    "npmAuditAdvisories": {"moderate": 3, "high": 1, "critical": 1},
+    "viteWarnings": ["bundled 3dmol eval warning", "large chunk advisory"]
+  }
+}

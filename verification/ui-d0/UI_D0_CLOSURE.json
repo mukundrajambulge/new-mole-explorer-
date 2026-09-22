@@ -1,0 +1,41 @@
+{
+  "schema": "mole-explorer-ui-d0-closure-v1",
+  "repository": "mukundrajambulge/new-mole-explorer-",
+  "branch": "feature/docking-ui-d0-workspace",
+  "acceptedD2Tag": "mole-explorer-docking-d2-accepted-2026-09-20",
+  "acceptedD2Sha": "ba2ffb4eb28a00ee945086b24f39bf639ca2250c",
+  "implementationCommit": "5bf7c0d9b6d11d195fb8008ee6d763bd603007cd",
+  "finalTag": "mole-explorer-docking-ui-d0-accepted-2026-09-20",
+  "finalTagSha": "RECORDED_AFTER_CLOSURE_COMMIT",
+  "drive": {
+    "folderId": "1LAAKOrzxsB8zaAVakbyjtcbBjOzmxhSV",
+    "closureMarkdownId": "1m9TIONQXCvFEYnwqo7_0PpgpJP6HcH36",
+    "closureJsonId": "1CfdANqPqqRVkKknqm-wmDugYQbRboojJ",
+    "scopeAuditId": "1RFNAHpQso3963RkUqm7Js46wBrZHny3g",
+    "readback": "VERIFIED_FOR_ALL_THREE_FILES"
+  },
+  "verification": {
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "build": "PASS",
+    "webUnitTests": { "files": 34, "tests": 156, "status": "PASS" },
+    "apiUnitTests": { "files": 12, "tests": 90, "status": "PASS" },
+    "selectionMatrix": "PASS",
+    "r10Verification": "PASS",
+    "uiD0Playwright": { "tests": 3, "status": "PASS" },
+    "fullPlaywright": { "tests": 150, "status": "PASS" }
+  },
+  "runtime": {
+    "api": "http://localhost:18110",
+    "web": "http://127.0.0.1:3102"
+  },
+  "scope": {
+    "dockingExecution": "UNAVAILABLE",
+    "searchOptimization": "ABSENT",
+    "poseGeneration": "ABSENT",
+    "scoring": "ABSENT",
+    "workerGpuHts": "ABSENT",
+    "fakeJobsOrResults": "ABSENT",
+    "secondViewer": "ABSENT"
+  }
+}

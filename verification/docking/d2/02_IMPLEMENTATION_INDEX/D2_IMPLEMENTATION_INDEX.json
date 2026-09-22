@@ -1,0 +1,17 @@
+{
+  "baseTag": "mole-explorer-docking-d1-accepted-2026-09-19",
+  "baseSha": "26227a10416657d0c2518bd0b751a38693627d5b",
+  "branch": "feature/docking-d2-explicit-state-site",
+  "implementationRequirementIds": ["ME-DCK-V1-REQ-0281"],
+  "d2GatedAcceptanceCount": 84,
+  "modules": {
+    "contracts": ["packages/contracts/src/docking/d2.ts"],
+    "validation": ["apps/api/src/docking/d2Validation.ts"],
+    "adapters": ["apps/api/src/docking/d2Adapters.ts"],
+    "receptorLigandSite": ["apps/api/src/docking/d2Preparation.ts"],
+    "service": ["apps/api/src/docking/d2PreparationService.ts"],
+    "fixtures": ["apps/api/src/docking/d2FixtureCatalog.ts", "apps/api/src/docking/d2RequirementMatrix.ts"]
+  },
+  "fixtureCounts": {"REP-FX": 10, "REC-FX": 30, "LIG-FX": 35, "SITE-FX": 30, "INT-FX": 10},
+  "outOfScope": ["automatic chemical-state generation", "automatic 2D-to-3D/conformer generation", "scorer", "search", "optimizer", "RMSD", "clustering", "native CPU kernel", "GPU", "HTS", "DOCKING.RUN"]
+}

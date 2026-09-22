@@ -1,7 +1,31 @@
-import type { BootstrapResponse, CanonicalCommand, CommandJob, CommandResult, HealthResponse, JsonRecord, ProjectRecord, ProjectSaveRequest, StructureError, StructureLoadResult } from "@molecular/contracts";
+import type { BootstrapResponse, CanonicalCommand, CommandJob, CommandResult, D2SearchRegionV1, D2ValidationStatus, HealthResponse, JsonRecord, ProjectRecord, ProjectSaveRequest, StructureError, StructureLoadResult } from "@molecular/contracts";
 import { hydrateCompactLoadResult } from "../structures/compactCanonical";
 
 export type SessionRevisionSummary = { sessionRevisionId: string; parentSessionRevisionIds: readonly string[]; savedAt: string; revisionType: "USER_CHECKPOINT" | "RECOVERY" | "AUTOSAVE" | "MIGRATION"; name: string };
+
+export type D2AdaptationResponse = {
+  status: D2ValidationStatus;
+  diagnostics: readonly { code: string; severity: "ERROR" | "WARNING"; blocking: boolean; message: string; path?: string; objectRef?: string }[];
+  value?: {
+    sourceFormat: string;
+    sourceArtifactId: string;
+    sourceArtifactDigest: string;
+    identity?: { identityId: string; graphRevisionDigest: string; digest: string };
+    graph?: { revisionId: string; atoms: readonly unknown[]; bonds: readonly unknown[]; components: readonly { componentId: string; role: string; atomUids: readonly string[] }[]; digest: string };
+    chemicalState?: { stateId: string; resolution: string; protonationStatus: string; tautomerStatus: string; digest: string };
+    coordinateStates: readonly { stateId: string; coordinateFrame: string; digest: string }[];
+    authoritativeForMolecularIdentity: boolean;
+    executionRepresentation?: { format: string; authoritativeForMolecularIdentity: false; artifactByteDigest: string };
+    diagnostics: readonly string[];
+  };
+};
+
+export type D2SearchRegionResponse = {
+  status: D2ValidationStatus;
+  diagnostics: readonly { code: string; severity: "ERROR" | "WARNING"; blocking: boolean; message: string; path?: string; objectRef?: string }[];
+  value?: D2SearchRegionV1;
+  presentation?: { center: readonly number[]; size: readonly number[]; min: readonly number[]; max: readonly number[]; units: "ANGSTROM"; coordinateFrame: string; digest: string };
+};
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
@@ -76,4 +100,14 @@ export const apiClient = {
   cancelCommandJob: (jobId: string) => request<CommandJob>(`/commands/jobs/${encodeURIComponent(jobId)}/cancel`, { method: "POST" }),
   retryCommandJob: (jobId: string) => request<CommandJob>(`/commands/jobs/${encodeURIComponent(jobId)}/retry`, { method: "POST" }),
   replayCommand: (actionRecordId: string) => request<CommandResult>(`/commands/history/${encodeURIComponent(actionRecordId)}/replay`, { method: "POST" }),
+  d2AdaptStructure: (body: { structure: StructureLoadResult["structure"]; sourceArtifact?: StructureLoadResult["sourceArtifact"] }) => request<D2AdaptationResponse>("/docking/d2/adapt", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  }),
+  d2CommitSearchRegion: (input: unknown) => request<D2SearchRegionResponse>("/docking/d2/search-region", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ input }),
+  }),
 };
