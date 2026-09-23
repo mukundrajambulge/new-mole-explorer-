@@ -16,15 +16,13 @@ const ribbonItems: Partial<Record<Exclude<RibbonCategory, "Color" | "Display">, 
     { label: "Import", icon: "upload", actionId: "FILE.IMPORT" },
     { label: "Add Structure", icon: "plus", actionId: "STRUCTURE.ADD" },
     { label: "Fetch", icon: "cloudDownload", actionId: "STRUCTURE.FETCH_RCSB", dividerAfter: true },
-    { label: "Export", icon: "download", actionId: "FILE.EXPORT", capability: "Coming Soon" },
+    { label: "Export", icon: "download", actionId: "FILE.EXPORT" },
   ],
-  Edit: [{ label: "Delete atom", icon: "trash", actionId: "EDIT.ATOM_DELETE", capability: "Unavailable" }, { label: "Create bond", icon: "plus", actionId: "EDIT.BOND_CREATE", capability: "Unavailable" }],
   Select: [{ label: "Select", icon: "pointer", actionId: "CANVAS.SELECT" }, { label: "Evaluate", icon: "command", actionId: "SELECTION.EVALUATE" }],
   Measure: [{ label: "Distance", icon: "ruler", actionId: "MEASURE.DISTANCE" }, { label: "Angle", icon: "move3d", actionId: "MEASURE.ANGLE" }, { label: "Dihedral", icon: "rotate", actionId: "MEASURE.DIHEDRAL" }, { label: "Clear picks", icon: "trash", actionId: "MEASURE.CLEAR" }],
   Analyze: [{ label: "Selection", icon: "command", actionId: "SELECTION.EVALUATE" }],
-  Dock: [{ label: "Configure", icon: "settings", actionId: "DOCKING.CONFIGURE", capability: "Coming Soon" }, { label: "Run", icon: "activity", actionId: "DOCKING.RUN", capability: "Unavailable" }],
   View: [{ label: "Pan", icon: "hand", actionId: "CANVAS.PAN" }, { label: "Rotate", icon: "rotate", actionId: "CANVAS.ROTATE" }, { label: "Zoom", icon: "zoom", actionId: "CANVAS.ZOOM" }, { label: "Focus", icon: "target", actionId: "CANVAS.FOCUS" }, { label: "Center", icon: "target", actionId: "VIEW.CENTER" }, { label: "Reset View", icon: "plus", actionId: "VIEW.RESET" }, { label: "Projection", icon: "layers", actionId: "VIEW.PROJECTION" }, { label: "Clipping", icon: "layers", actionId: "VIEW.CAMERA", capability: "Coming Soon" }, { label: "Background", icon: "circleUser", actionId: "VIEW.CAMERA", capability: "Coming Soon" }, { label: "Axes", icon: "target", actionId: "VIEW.CAMERA", capability: "Coming Soon" }],
-  Help: [{ label: "G1C help", icon: "help", actionId: "HELP.OPEN" }],
+  Help: [{ label: "Help", icon: "help", actionId: "HELP.OPEN" }],
 };
 
 const displayIconFor = (id: string): IconName => id.includes("surface") || id === "dots" || id === "mesh" || id === "dot-surface" ? "waves" : id === "cartoon" || id === "trace" || id === "putty" ? "activity" : id === "ribbon" ? "layers" : id.includes("sphere") || id === "space-filling" ? "circleUser" : id === "ball-and-stick" ? "shapes" : id === "licorice" ? "sparkles" : id.includes("nonbonded") ? "plus" : id === "line" ? "minus" : "pencil";
@@ -42,10 +40,11 @@ export const ContextToolbar = ({ activeTool, activeCategory, collapsed, represen
   const actionForItem = (item: RibbonItem) => { if (item.actionId === "FILE.IMPORT" && onImport) onImport(); else if (item.actionId === "STRUCTURE.FETCH_RCSB") { setShowRcsb(true); window.setTimeout(() => rcsbInputRef.current?.focus(), 0); } else if (item.style) onStyleChange(item.style); else onAction(item.actionId); };
   const submitRcsb = (event: React.FormEvent<HTMLFormElement>) => { event.preventDefault(); const normalized = pdbId.trim().toUpperCase(); if (normalized) onFetchRcsb(normalized, "replace"); };
   const addRcsb = () => { const normalized = pdbId.trim().toUpperCase(); if (normalized) onFetchRcsb(normalized, "add"); };
+  if (collapsed) return null;
   return (
-    <section className={`context-toolbar ${collapsed ? "context-toolbar--collapsed" : ""}`} aria-label="Contextual toolbar" data-ribbon-category={activeCategory}>
-      <div className="ribbon-heading"><div><span className="eyebrow">PRESENTATION RIBBON</span><strong>{activeCategory}</strong></div><button className="icon-button ribbon-toggle" type="button" onClick={onToggleCollapsed} aria-label={collapsed ? "Expand ribbon" : "Collapse ribbon"} title={collapsed ? "Expand ribbon" : "Collapse ribbon"}><Icon name={collapsed ? "panelLeftOpen" : "panelLeftClose"} size={15} /></button></div>
-      {!collapsed && <div className="ribbon-scroll">
+    <section className="context-toolbar" aria-label="Contextual toolbar" data-ribbon-category={activeCategory}>
+      <div className="ribbon-heading"><div><strong>{activeCategory}</strong></div><button className="icon-button ribbon-toggle" type="button" onClick={onToggleCollapsed} aria-label={collapsed ? "Expand menu tools" : "Collapse menu tools"} title={collapsed ? "Expand menu tools" : "Collapse menu tools"}><Icon name={collapsed ? "panelLeftOpen" : "panelLeftClose"} size={15} /></button></div>
+      <div className="ribbon-scroll">
         {activeCategory === "Color" ? <div className="ribbon-color-controls" role="group" aria-label="Color controls">
           <label className="ribbon-select-label">Scheme<select aria-label="Ribbon color scheme" value={colorMode} onChange={(event) => onColorMode(event.target.value as ColorMode)}>{COLOR_SCHEMES.map((scheme) => <option key={scheme.id} value={scheme.id}>{scheme.name}</option>)}</select></label>
           <div className="ribbon-color-gallery" role="group" aria-label="Quick color schemes">{quickColorSchemes.map(([mode, label]) => <button key={mode} className={`ribbon-color-button ${colorMode === mode ? "ribbon-color-button--active" : ""}`} type="button" onClick={() => onColorMode(mode)} aria-pressed={colorMode === mode} data-color-mode={mode}>{label}</button>)}</div>
@@ -55,10 +54,10 @@ export const ContextToolbar = ({ activeTool, activeCategory, collapsed, represen
           {items.map((item) => {
           const active = item.style ? styleProfileFor(representation) === styleProfileFor(item.style) : activeTool === item.label;
           const resolved = item.style ? representationCapabilityFor(item.style) : null;
-          return <div className={`toolbar-group ${item.dividerAfter ? "toolbar-group--divider" : ""}`} key={`${activeCategory}-${item.label}`}><button className={`tool-button ${active ? "tool-button--active" : ""} ${item.capability ? "tool-button--capability" : ""}`} type="button" onClick={() => actionForItem(item)} aria-label={item.label} title={item.capability ? `${item.label} — ${item.capability}` : item.label} data-action-id={item.actionId} data-style-profile={item.style ?? ""} data-capability-state={item.capability ?? resolved?.capability ?? "SUPPORTED"} data-representation-status={item.representationStatus ?? resolved?.status ?? ""}><Icon name={item.icon} size={20} /><span>{item.label}</span>{(item.capability || item.representationStatus === "VALID_EMPTY") && <small>{item.capability ?? item.representationStatus}</small>}</button></div>;
+          return <div className={`toolbar-group ${item.dividerAfter ? "toolbar-group--divider" : ""}`} key={`${activeCategory}-${item.label}`}><button className={`tool-button ${active ? "tool-button--active" : ""} ${item.capability ? "tool-button--capability" : ""}`} type="button" onClick={() => actionForItem(item)} aria-label={item.label} title={item.capability ? `${item.label} — ${item.capability}` : item.label} data-action-id={item.actionId} data-style-profile={item.style ?? ""} data-capability-state={item.capability ?? resolved?.capability ?? "SUPPORTED"} data-representation-status={item.representationStatus ?? resolved?.status ?? ""} disabled={Boolean(item.capability)} aria-disabled={Boolean(item.capability)}><Icon name={item.icon} size={20} /><span>{item.label}</span>{(item.capability || item.representationStatus === "VALID_EMPTY") && <small>{item.capability ?? item.representationStatus}</small>}</button></div>;
           })}
         </>}
-      </div>}
+      </div>
     </section>
   );
 };

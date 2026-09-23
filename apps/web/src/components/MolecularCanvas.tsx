@@ -6,10 +6,13 @@ import { ThreeDMolViewerAdapter } from "../rendering/ThreeDMolViewerAdapter";
 import type { PickResult } from "../interaction/picking";
 import type { MeasurementKind, MeasurementObject } from "../interaction/measurements";
 import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
+import type { AlignmentOverlay } from "../analysis/alignmentPresentation";
 import type { WorkspaceObject } from "../workspace/workspaceModel";
 import { Icon } from "./Icon";
+import type { SearchRegionOverlay } from "../rendering/searchRegionOverlay";
 
 type CameraCommand = { actionId: ActionId; sequence: number };
+export type ViewerLifecycle = "empty" | "loading" | "canonical-ready" | "rendering" | "ready" | "error";
 
 type MolecularCanvasProps = {
   structure: StructureLoadResult | null;
@@ -24,13 +27,15 @@ type MolecularCanvasProps = {
   onAction: (actionId: ActionId) => void;
   onImport: () => void;
   onFileDrop: (file: File) => void;
-  consoleExpanded: boolean;
   onPick: (result: PickResult) => void;
   onHover: (result: PickResult | null) => void;
   onBackgroundPick: () => void;
   measurements: readonly MeasurementObject[];
   measurementMode: MeasurementKind | null;
   analysisOverlays: readonly AnalysisOverlay[];
+  alignmentOverlays: readonly AlignmentOverlay[];
+  searchRegionOverlay?: SearchRegionOverlay | null;
+  onRenderLifecycle?: (state: ViewerLifecycle) => void;
 };
 
 const toolIcon = (activeTool: string) => {
@@ -53,13 +58,15 @@ export const MolecularCanvas = ({
   onAction,
   onImport,
   onFileDrop,
-  consoleExpanded,
   onPick,
   onHover,
   onBackgroundPick,
   measurements,
   measurementMode,
   analysisOverlays,
+  alignmentOverlays,
+  searchRegionOverlay = null,
+  onRenderLifecycle,
 }: MolecularCanvasProps) => {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -67,18 +74,26 @@ export const MolecularCanvas = ({
   const projectionRef = useRef(projection);
   const [dragActive, setDragActive] = useState(false);
   const [viewerError, setViewerError] = useState<string | null>(null);
-  const [viewerBottomInset, setViewerBottomInset] = useState(0);
+  const [viewerLifecycle, setViewerLifecycle] = useState<ViewerLifecycle>(structure ? "canonical-ready" : "empty");
   const pickRef = useRef(onPick);
   const hoverRef = useRef(onHover);
   const pointerGestureRef = useRef(false);
+  const renderLoadInProgressRef = useRef(false);
   pickRef.current = onPick;
   hoverRef.current = onHover;
   projectionRef.current = projection;
   const workspaceObjectsForLoadRef = useRef(workspaceObjects);
   workspaceObjectsForLoadRef.current = workspaceObjects;
+  const compactStructure = structure?.structure.compact?.schemaVersion === "compact-canonical-v1" ? structure.structure.compact : null;
   // State and enable/disable changes are reconciled in-place by the adapter;
   // only object/model-layout changes require a scene rebuild.
   const workspaceKey = workspaceObjects.map((object) => `${object.objectId}:${object.loadResult.structure.id}:${object.allStates}`).join("|");
+
+  useEffect(() => {
+    const nextState: ViewerLifecycle = structure ? "canonical-ready" : loading ? "loading" : "empty";
+    setViewerLifecycle(nextState);
+    onRenderLifecycle?.(nextState);
+  }, [structure, loading, onRenderLifecycle]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -105,15 +120,11 @@ export const MolecularCanvas = ({
     const host = hostRef.current;
     if (!adapter || !host) return undefined;
     const updateViewport = () => {
-      const canvasRect = canvasRef.current?.getBoundingClientRect();
       const hostRect = host.getBoundingClientRect();
       const width = hostRect.width;
       const height = hostRect.height;
       const visible = { top: 0, bottom: height, left: 0, right: width };
       const occluder = document.querySelector<HTMLElement>(".console-layer")?.getBoundingClientRect();
-      let bottomInset = 0;
-      if (canvasRect && occluder && occluder.left < canvasRect.right && occluder.right > canvasRect.left && occluder.top < canvasRect.bottom && occluder.bottom > canvasRect.top) bottomInset = Math.max(0, Math.min(canvasRect.height, canvasRect.bottom - occluder.top));
-      setViewerBottomInset((current) => Math.abs(current - bottomInset) < 1 ? current : bottomInset);
       if (occluder && occluder.left < hostRect.right && occluder.right > hostRect.left && occluder.top < hostRect.bottom && occluder.bottom > hostRect.top) {
         const left = Math.max(0, occluder.left - hostRect.left);
         const right = Math.min(width, occluder.right - hostRect.left);
@@ -133,29 +144,72 @@ export const MolecularCanvas = ({
     observer.observe(host);
     const consoleLayer = document.querySelector<HTMLElement>(".console-layer");
     if (consoleLayer) observer.observe(consoleLayer);
-    window.addEventListener("resize", updateViewport);
+      window.addEventListener("resize", updateViewport);
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", updateViewport);
     };
-  }, [consoleExpanded, structure, viewerBottomInset]);
+  }, [structure]);
 
   useEffect(() => {
     if (!structure || !adapterRef.current) return;
+    const activeAdapter = adapterRef.current;
+    let cancelled = false;
     try {
+      performance.mark("molecular:render:LOAD_START");
+      console.info("MOLECULAR_RENDER_STAGE", "LOAD_START");
+      renderLoadInProgressRef.current = true;
+      setViewerLifecycle("rendering");
+      onRenderLifecycle?.("rendering");
       setViewerError(null);
       const objects = workspaceObjectsForLoadRef.current.length ? workspaceObjectsForLoadRef.current : [{ objectId: `object:${structure.structure.id}`, displayName: structure.structure.name, loadResult: structure, enabled: true, projection: projectionRef.current, stateOrder: structure.structure.stateOrder ?? [], currentStateId: structure.structure.stateOrder?.[0] ?? `${structure.structure.id}:state:1`, allStates: false, lineage: { operation: "LOAD" as const, parentObjectIds: [], parentStructureIds: [structure.structure.id] } }];
-      if (objects.length > 1 || objects.some((object) => object.stateOrder.length > 1 || object.allStates)) adapterRef.current.loadWorkspace(objects);
-      else adapterRef.current.load(structure, projectionRef.current);
+      const loadScene = async () => {
+        // Let React paint the canonical-ready/rendering state before 3Dmol
+        // receives the large model and enters its synchronous model builder.
+        await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
+        if (cancelled) return;
+        if (objects.length) {
+          // A scientific revision changes the canonical payload but not the
+          // mounted viewer/model layout. Let the adapter reconcile those atoms
+          // in place; a real object-layout change is handled by its guarded
+          // setWorkspaceObjects path.
+          if (activeAdapter.isWorkspaceMode()) await activeAdapter.setWorkspaceObjects(objects, projectionRef.current, objects.find((object) => object.projection === projectionRef.current)?.objectId);
+          else await activeAdapter.loadWorkspace(objects);
+        } else {
+          await activeAdapter.load(structure, projectionRef.current);
+        }
+      };
+      void loadScene().then(() => {
+        renderLoadInProgressRef.current = false;
+        if (cancelled) return;
+        performance.mark("molecular:render:LOAD_END");
+        console.info("MOLECULAR_RENDER_STAGE", "LOAD_END");
+        setViewerLifecycle("ready");
+        onRenderLifecycle?.("ready");
+      }).catch((loadError) => {
+        renderLoadInProgressRef.current = false;
+        if (cancelled) return;
+        performance.mark("molecular:render:LOAD_FAIL");
+        console.error("MOLECULAR_RENDER_STAGE", "LOAD_FAIL", loadError);
+        setViewerLifecycle("error");
+        onRenderLifecycle?.("error");
+        setViewerError(loadError instanceof Error ? loadError.message : "The structure could not be rendered.");
+      });
     } catch (loadError) {
+      performance.mark("molecular:render:LOAD_FAIL");
+      console.error("MOLECULAR_RENDER_STAGE", "LOAD_FAIL", loadError);
+      setViewerLifecycle("error");
+      onRenderLifecycle?.("error");
       setViewerError(loadError instanceof Error ? loadError.message : "The structure could not be rendered.");
     }
-  }, [structure, workspaceKey]);
+    return () => { cancelled = true; };
+  }, [structure, workspaceKey, onRenderLifecycle]);
 
   useEffect(() => {
     if (!adapterRef.current) return;
+    if (renderLoadInProgressRef.current) return;
     try {
-      if (workspaceObjects.length > 1 || workspaceObjects.some((object) => object.stateOrder.length > 1 || object.allStates || !object.enabled) || adapterRef.current.isWorkspaceMode()) adapterRef.current.setWorkspaceObjects(workspaceObjects, projection);
+      if (workspaceObjects.length > 0 || adapterRef.current.isWorkspaceMode()) adapterRef.current.setWorkspaceObjects(workspaceObjects, projection, workspaceObjects.find((object) => object.projection === projection)?.objectId);
       else adapterRef.current.setProjection(projection);
     } catch (projectionError) {
       setViewerError(projectionError instanceof Error ? projectionError.message : "The display projection could not be applied.");
@@ -171,12 +225,21 @@ export const MolecularCanvas = ({
   }, [analysisOverlays]);
 
   useEffect(() => {
+    adapterRef.current?.setAlignmentOverlays(alignmentOverlays);
+  }, [alignmentOverlays]);
+
+  useEffect(() => {
+    adapterRef.current?.setSearchRegionOverlay(searchRegionOverlay);
+  }, [searchRegionOverlay]);
+
+  useEffect(() => {
     const adapter = adapterRef.current;
     if (!adapter || !cameraCommand) return;
     if (cameraCommand.actionId === "CANVAS.ROTATE") adapter.rotate();
     if (cameraCommand.actionId === "CANVAS.PAN") adapter.pan();
     if (cameraCommand.actionId === "CANVAS.ZOOM") adapter.zoom();
     if (cameraCommand.actionId === "CANVAS.FOCUS" || cameraCommand.actionId === "VIEW.FIT") adapter.focus();
+    if (cameraCommand.actionId === "VIEW.FOCUS_SELECTION") adapter.focusSelection();
     if (cameraCommand.actionId === "VIEW.CENTER") adapter.center();
     if (cameraCommand.actionId === "VIEW.ORIENT") adapter.orient();
     if (cameraCommand.actionId === "VIEW.RESET") adapter.resetView();
@@ -213,10 +276,11 @@ export const MolecularCanvas = ({
 
   return (
     <section className="canvas-stage" aria-label="Molecular render projection">
-      <div className="canvas-status"><span className="live-dot" />3DMOL.JS <span className="canvas-status-separator">/</span> RENDER PROJECTION</div>
+      <div className="canvas-status"><span className="live-dot" />MOLECULAR VIEW</div>
       <div
         ref={canvasRef}
         className="molecular-canvas"
+        data-testid="molecular-canvas"
         onDragEnter={(event) => { event.preventDefault(); setDragActive(true); }}
         onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = "copy"; setDragActive(true); }}
         onDragLeave={(event) => { if (event.currentTarget === event.target) setDragActive(false); }}
@@ -226,20 +290,20 @@ export const MolecularCanvas = ({
         onPointerUp={endPointerGesture}
         onPointerCancel={endPointerGesture}
       >
-        <div ref={hostRef} className="viewer-host" style={{ bottom: `${viewerBottomInset}px` }} data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-projection={projection.representation} data-global-frame-index={globalFrameIndex} data-renderer-object-count={workspaceObjects.length || (structure ? 1 : 0)} data-selection-membership-hash={activeSelectionMembershipHash} />
+        <div ref={hostRef} className="viewer-host" data-testid="molecular-viewer" data-viewer-state={structure ? "loaded" : "empty"} data-testid-lifecycle={viewerLifecycle} data-projection={projection.representation} data-camera-projection={projection.camera.projectionMode} data-global-frame-index={globalFrameIndex} data-renderer-object-count={workspaceObjects.length || (structure ? 1 : 0)} data-selection-membership-hash={activeSelectionMembershipHash} data-scientific-revision={structure?.structure.scientificHash ?? ""} data-canonical-storage={compactStructure ? compactStructure.schemaVersion : "object"} data-canonical-atom-count={structure?.structure.counts.atoms ?? ""} data-canonical-bond-count={compactStructure?.bonds.ids.length ?? structure?.structure.bonds.length ?? ""} data-canonical-atom-ids={compactStructure ? `compact:${compactStructure.atomCount}:${compactStructure.atomStableIds[0] ?? ""}:${compactStructure.atomStableIds[compactStructure.atomStableIds.length - 1] ?? ""}` : structure?.structure.atoms.map((atom) => atom.stableId).join("|") ?? ""} data-canonical-bond-orders={compactStructure ? `compact:${compactStructure.bonds.ids.length}:${compactStructure.bonds.orders[0] ?? ""}:${compactStructure.bonds.orders[compactStructure.bonds.orders.length - 1] ?? ""}` : structure?.structure.bonds.map((bond) => `${bond.atom1}:${bond.atom2}:${bond.order}`).join("|") ?? ""} />
         {!structure && !loading && (
           <div className="empty-viewer-state">
             <div className="empty-viewer-card">
               <span className="empty-viewer-icon"><Icon name="atom" size={28} /></span>
               <strong>No structure loaded</strong>
-              <span>Drop a PDB or mmCIF file here, or import one from the toolbar.</span>
+              <span>Drop a PDB, mmCIF/CIF, PQR, SDF/MOL, XYZ, MOL2, or PDBQT file here, or import one from the toolbar.</span>
               <button className="empty-viewer-action" type="button" onClick={onImport}><Icon name="upload" size={14} /> Import structure</button>
             </div>
           </div>
         )}
         {loading && <div className="viewer-message viewer-message--loading"><Icon name="loader" size={18} /> Loading structure…</div>}
         {(error || viewerError) && <div className="viewer-message viewer-message--error"><Icon name="circleHelp" size={17} /> {error ?? viewerError}</div>}
-        {dragActive && <div className="drop-overlay"><Icon name="upload" size={24} /><strong>Drop PDB or mmCIF</strong><span>Backend validation will keep the current structure safe.</span></div>}
+        {dragActive && <div className="drop-overlay"><Icon name="upload" size={24} /><strong>Drop a supported coordinate file</strong><span>Backend validation will keep the current structure safe.</span></div>}
         <div className="canvas-axis-readout" aria-label="Orientation axes"><span className="axis-readout-y">Y</span><span className="axis-readout-x">X</span><span className="axis-readout-z">Z</span></div>
         <button className="canvas-reset" onClick={() => onAction("VIEW.RESET")} aria-label="Reset view" data-action-id="VIEW.RESET"><Icon name="plus" size={16} /></button>
         <div className="canvas-tool-readout"><span className="tool-readout-icon"><Icon name={toolIcon(activeTool)} size={13} /></span>{measurementMode ? `MEASURE ${measurementMode}` : activeTool.toUpperCase()}</div>

@@ -280,7 +280,9 @@ describe("canonical selection engine", () => {
     const renamed = workspaceForName("renamed-engine.pdb");
     expect(resolveSelection("object engine.pdb", original).count).toBe(6);
     expect(resolveSelection("object renamed-engine.pdb", renamed).count).toBe(6);
-    expect(resolveSelection("object engine.pdb", renamed).count).toBe(0);
+    const staleName = evaluateSelectionQuery("object engine.pdb", renamed);
+    expect(staleName.status).toBe("OBJECT_NOT_FOUND");
+    expect(staleName.stableAtomIds).toEqual([]);
   });
 
   it("binds an explicit plan and keeps stable identity fields distinct", () => {

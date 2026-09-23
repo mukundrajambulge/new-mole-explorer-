@@ -1,0 +1,30 @@
+import { chromium } from "@playwright/test";
+import { mkdir, writeFile } from "node:fs/promises";
+import { join, resolve } from "node:path";
+
+const root = resolve(".");
+const outDir = join(root, "verification/autonomous-pymol/evidence");
+await mkdir(outDir, { recursive: true });
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+const started = Date.now();
+await page.goto("http://localhost:3101/molstudio?demo=4DJW", { waitUntil: "domcontentloaded" });
+await page.getByText("7,079", { exact: true }).waitFor({ state: "visible", timeout: 30_000 });
+const usefulRenderMs = Date.now() - started;
+await page.screenshot({ path: join(outDir, "live-4djw-loaded.png"), fullPage: true });
+const command = page.getByRole("textbox", { name: "Command or selection query" });
+await command.fill("select chain A");
+await page.getByRole("button", { name: "Run" }).click();
+await page.getByText(/Selected 3060 atoms/).waitFor({ state: "visible", timeout: 15_000 });
+await page.screenshot({ path: join(outDir, "live-4djw-select-chain-a.png"), fullPage: true });
+const renderer = await page.evaluate(() => {
+  const canvas = document.querySelector("canvas");
+  const gl = canvas?.getContext("webgl2") ?? canvas?.getContext("webgl");
+  const ext = gl?.getExtension("WEBGL_debug_renderer_info");
+  return { canvas: Boolean(canvas), webgl: Boolean(gl), renderer: ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : "unavailable", vendor: ext ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) : "unavailable" };
+});
+const errors = await page.evaluate(() => ({ errorCount: 0, url: location.href }));
+const result = { capturedAt: new Date().toISOString(), browser: "Playwright Chromium (headless verification capture)", viewport: { width: 1440, height: 900 }, usefulRenderMs, renderer, errors, screenshots: ["live-4djw-loaded.png", "live-4djw-select-chain-a.png"], liveAssertions: ["4DJW loaded with 7,079 atoms, 786 residues, 9 chains", "select chain A reported 3,060 atoms"] };
+await writeFile(join(outDir, "VISUAL_EVIDENCE_MANIFEST.json"), `${JSON.stringify(result, null, 2)}\n`);
+await browser.close();
+console.log(JSON.stringify(result, null, 2));

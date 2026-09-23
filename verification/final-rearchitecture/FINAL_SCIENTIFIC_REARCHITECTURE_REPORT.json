@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-13",
+  "status": "BOUNDED_IMPLEMENTATION_VERIFIED",
+  "commit": "1ccbc04",
+  "branch": "feature/final-scientific-ui-pymol-conformance",
+  "server": {
+    "workbench": "http://localhost:3101/molstudio",
+    "apiHealth": "http://localhost:8100/api/health",
+    "landing": "http://localhost:3100/"
+  },
+  "implemented": [
+    "scientific workspace shell and rail ownership",
+    "PDB/mmCIF/CIF/PQR/SDF/MOL/XYZ/MOL2/PDBQT bounded coordinate ingestion",
+    "multi-object and multi-state canonical workspace",
+    "selection and presentation convergence",
+    "display/color/camera/measure/analyze/edit/history/session/scene/console workflows",
+    "bounded ligand context diagnostics",
+    "unified biological-data import dialog with local, online, and paste routes",
+    "typed sequence, density-map, trajectory, topology, and SMILES viewers",
+    "user guide, inventories, conformance matrix, defect matrix, performance report, and local evidence",
+    "coalesced and cached successful online RCSB acquisitions per API process",
+    "bounded DCD/TRR/XTC coordinate-frame decoding",
+    "fixed-width PRMTOP atom metadata promotion"
+  ],
+  "acceptance": {
+    "finalRearchitectureAndG0ImpPres": "24/24",
+    "finalPymolAcceptance": "3/3",
+    "multiObjectState": "11/11",
+    "selectionClosure": "14/14",
+    "selectionMatrixLive": "1/1",
+    "r07R08R09": "15/15 across final targeted runs",
+    "biologicalAdapters": "9/9",
+    "biologicalBrowser": "11/11",
+    "finalRearchitectureShell": "22/22",
+    "r07UiReruns": "4/4",
+    "fullE2E": "142/142",
+    "manualAndRealStructureGates": "pass",
+    "unitWeb": "150/150",
+    "unitApi": "65/65",
+    "typecheck": "pass",
+    "lint": "pass",
+    "build": "pass",
+    "latestRegressionAttempt": {
+      "command": "npm run test:e2e -- --project=chromium --workers=1",
+      "status": "PASS",
+      "result": "142/142",
+      "date": "2026-09-13",
+      "commit": "a79736e54382680567bdc61db2ca2bb4fa536075"
+    }
+  },
+  "selectionMatrix": {
+    "rowCount": 87,
+    "verifiedWorking": 85,
+    "missingDependency": 1,
+    "intentionallyUnsupported": 1,
+    "oraclePass": 51,
+    "oracleEquivalent": 35,
+    "oraclePending": 1
+  },
+  "blockedOrPending": [
+    "executable PyMOL oracle",
+    "Google Drive credentials/environment",
+    "larger trajectory corpus and performance gates",
+    "larger biological corpus and performance gates",
+    "wizard/movie work",
+    "docking, virtual screening, HTS, and main-branch merge"
+  ],
+  "evidenceManifest": "verification/final-rearchitecture/GOOGLE_DRIVE_EVIDENCE_MANIFEST.json",
+  "additionalReports": [
+    "verification/pymol/PYMOL_CONFORMANCE_MATRIX.md",
+    "verification/pymol/PYMOL_CONFORMANCE_MATRIX.json",
+    "verification/final-rearchitecture/PYMOL_WIZARD_GAP_MATRIX.md",
+    "verification/final-rearchitecture/PYMOL_MOVIE_IMPLEMENTATION_PLAN.md",
+    "verification/final-rearchitecture/USER_GUIDE_COVERAGE.md"
+  ],
+  "finalAnswerSheet": {
+    "uiRearchitecture": "PASS",
+    "universalImport": "PARTIAL_BOUNDED",
+    "coordinateFormats": {
+      "pdb": "PASS",
+      "mmcifCif": "PASS",
+      "pqr": "PASS",
+      "sdfMol": "PASS",
+      "mol2": "PASS",
+      "xyz": "PASS",
+      "pdbqt": "PASS"
+    },
+    "typedBiologicalFormats": {
+      "fasta": "PASS",
+      "fastq": "PASS",
+      "genbank": "PASS",
+      "embl": "PASS",
+      "maps": "PASS_BOUNDED",
+      "trajectories": "PARTIAL_BOUNDED"
+    },
+    "multiObject": "PASS",
+    "selection": "PASS_BOUNDED",
+    "pymolSelectionOracle": "BOUNDED_51_DIRECT_35_EQUIVALENT_1_PENDING_EXECUTABLE_BLOCKED",
+    "display": "PASS_BOUNDED",
+    "color": "PASS",
+    "measurements": "PASS",
+    "ligandWorkflow": "PASS_BOUNDED",
+    "alignment": "PARTIAL",
+    "superRuntime": "BOUNDED_REFERENCE_PENDING",
+    "cealignRuntime": "UNSUPPORTED",
+    "editing": "PASS",
+    "undoRedo": "PASS",
+    "sessions": "PASS",
+    "scenes": "PASS",
+    "wizard": "PLANNED_SUBSET_ONLY",
+    "movie": "PLANNED_DISABLED",
+    "console": "PASS",
+    "semicolonBatches": "PASS",
+    "guiConsoleConvergence": "PASS",
+    "apiConvergence": "PASS_WHERE_API_EXISTS",
+    "security": "PASS",
+    "historicalDefects": "A-Q_PASS",
+    "googleDrive": "BLOCKED_CREDENTIAL_OR_ENVIRONMENT",
+    "screenshots": {
+      "finalRearchitecturePng": 25,
+      "inheritedEvidencePng": 200
+    },
+    "testResults": "150 web + 65 API unit tests; serial typecheck/lint/build; selection-matrix; R10; full Chromium 142/142 at tested acceptance tip a79736e (final source 1ccbc04 adds fixed-width PRMTOP metadata coverage)",
+    "oracleVisualStress": "Oracle ledger 51/35/1; 25 final-rearchitecture PNGs plus inherited evidence, visually inspected representative shell/import/map/XYZ/DCD/TRR/XTC/topology-paired trajectory states; bounded stress PASS for 1CRN, 4DJW, 1AON, 5LE5 with 3J9M/4V6F blocked; latest 4DJW manual gate PASS"
+  }
+}

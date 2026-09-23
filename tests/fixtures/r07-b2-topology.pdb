@@ -1,0 +1,9 @@
+HEADER    R07 B2 TOPOLOGY EDIT FIXTURE
+HETATM    1  C1  EDT A 101       0.000   0.000   0.000  1.00  5.00           C
+HETATM    2  C2  EDT A 101       1.400   0.000   0.000  1.00  5.00           C
+HETATM    3  C3  EDT A 101       2.800   0.000   0.000  1.00  5.00           C
+HETATM    4  O1  EDT A 101       4.200   0.000   0.000  1.00  5.00           O
+CONECT    1    2
+CONECT    2    1    3
+CONECT    3    2
+END

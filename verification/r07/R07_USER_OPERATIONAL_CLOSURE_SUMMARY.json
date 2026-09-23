@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "gate": "R07_USER_OPERATIONAL_CLOSURE",
+  "status": "COMPLETE_PENDING_USER_MANUAL_APPROVAL",
+  "repository": "https://github.com/mukundrajambulge/new-mole-explorer-.",
+  "repositoryRoot": "C:\\Users\\mukun\\Desktop\\molecular-workstation",
+  "branch": "fix/r07-user-operational-closure",
+  "baseBranch": "integration/r07-b1-b3",
+  "baseSha": "aa6100a0b5f474433d7ec1355495a39655f0fd06",
+  "implementationSha": "45d27abe0bbd5c4b91c115811ffdab7667ee7d2b",
+  "scope": {
+    "r08Started": false,
+    "mainMerged": false,
+    "alignmentOrRmsdStarted": false,
+    "dockingStarted": false,
+    "canonicalIdentityBypass": false,
+    "historicalReportsRewritten": false
+  },
+  "acceptance": {
+    "objectsAndIsolation": "PASS",
+    "activeObjectAndDiagnostics": "PASS",
+    "historyRootUndoRedoUi": "PASS",
+    "b2DeleteBondAndOrderUi": "PASS",
+    "b3AddRefillRemoveAttachReplaceUi": "PASS",
+    "pickedAtomChemistry": "PASS",
+    "pickedBondUi": "BLOCKED_ADAPTER_HAS_NO_BOND_CALLBACK",
+    "multiStateChemistry": "PASS",
+    "realCanvasPointerPicking": "PASS",
+    "real4DJWAnd1CRN": "PASS"
+  },
+  "verification": {
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "unitWeb": { "tests": 116, "status": "PASS" },
+    "unitApi": { "tests": 22, "status": "PASS" },
+    "unitTotal": 138,
+    "build": "PASS",
+    "focusedOperational": { "testsPerRun": 10, "runs": 3, "passed": 30, "status": "PASS" },
+    "playwrightListed": { "files": 18, "tests": 100, "status": "PASS" },
+    "completeE2E": { "tests": 100, "passed": 100, "status": "PASS" },
+    "pymolOracle": "ORACLE_PENDING"
+  },
+  "realStructures": {
+    "4DJW": { "objectName": "4DJW.cif", "atoms": 7079, "residues": 786, "chains": 9, "status": "PASS" },
+    "1CRN": { "objectName": "1CRN.cif", "atoms": 327, "residues": 46, "chains": 1, "status": "PASS" }
+  },
+  "evidenceDirectory": "verification/evidence/r07-operational-closure",
+  "evidenceCount": 17,
+  "ci": {
+    "workflow": "molecular-workstation-ci",
+    "implementationRunId": "33969915186",
+    "implementationRunUrl": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/33969915186",
+    "implementationRunHeadSha": "45d27abe0bbd5c4b91c115811ffdab7667ee7d2b",
+    "implementationRunStatus": "PASS",
+    "finalTipRun": "33975610086",
+    "finalTipHeadSha": "bd8cc04dd873968205b5f647e146ca5da653a14b",
+    "finalTipRunStatus": "PASS"
+  },
+  "manualValidation": {
+    "codexBrowser": "PASS",
+    "localUrl": "http://localhost:3101/molstudio",
+    "manualApprovalRequired": true,
+    "readyToMergeMain": false
+  }
+}

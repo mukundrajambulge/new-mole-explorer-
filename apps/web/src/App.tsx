@@ -1,14 +1,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ProjectRecord, StructureLoadResult } from "@molecular/contracts";
+import type { BondOrder, ProjectRecord, StructureLoadResult } from "@molecular/contracts";
 import { CapabilityNotice } from "./components/CapabilityNotice";
 import { ConsolePanel, type ConsoleCommandResult } from "./components/ConsolePanel";
 import { ContextToolbar } from "./components/ContextToolbar";
 import { InspectorPanel } from "./components/InspectorPanel";
 import { MenuBar, RIBBON_CATEGORIES, type RibbonCategory } from "./components/MenuBar";
-import { MolecularCanvas } from "./components/MolecularCanvas";
-import { NavRail } from "./components/NavRail";
+import { MolecularCanvas, type ViewerLifecycle } from "./components/MolecularCanvas";
 import { StatusBar } from "./components/StatusBar";
-import { StructurePanel } from "./components/StructurePanel";
+import { ScientificOperationsPanel, StructurePanel } from "./components/StructurePanel";
+import { ScenePanel } from "./components/ScenePanel";
+import { ExportPanel } from "./components/ExportPanel";
+import { ScientificToolRail, type ScientificToolPanel } from "./components/ScientificToolRail";
+import { ScientificEditPanel } from "./components/ScientificEditPanel";
+import { ScientificSelectionPanel } from "./components/ScientificSelectionPanel";
+import { ScientificLigandPanel } from "./components/ScientificLigandPanel";
+import { BiologicalDataViewer } from "./components/BiologicalDataViewer";
+import { ImportDialog } from "./components/ImportDialog";
+import { NavRail } from "./components/NavRail";
+import { DockingWorkspace } from "./docking/DockingWorkspace";
+import type { SearchRegionOverlay } from "./rendering/searchRegionOverlay";
 import { ACTION_IDS, ACTION_REGISTRY, type ActionId, type ActionDefinition } from "./domain/registry";
 import { ApiClientError, apiClient } from "./lib/apiClient";
 import { applyRepresentationToSelection, clearColorForSelection, createDefaultRenderProjection, DEFAULT_CAMERA, fromProjectPresentation, maskForStyle, setCameraState, setCategoryRepresentation, setColorForSelection, setComponentColor, setInteractionState, setLabelState, setProjectionStyle, setRepresentationColorForSelection, setRepresentationParameters, toProjectPresentation, type BackgroundPreset, type ColorMode, type RenderProjection, type RepresentationParameters, type RepresentationStyle } from "./rendering/renderProjection";
@@ -19,11 +29,27 @@ import { STYLE_DEFINITIONS, representationCapabilityFor, representationStyleForC
 import { combineSelections, evaluateSelectionQuery, NamedSelectionStore, resolveSelection, parseRepresentationCommand, requireValidSelection, SelectionResolutionError, selectionForStableIds, type CoordinateFramePolicy, type SelectionPresentationContext, type SelectionResult } from "./interaction/selectionResolver";
 import { LabelExpressionError, labelExpressionForMode, labelPlanForState, parseSafeLabelExpression, resolveSafeLabel, type LabelMode } from "./interaction/labels";
 import { MeasurementAccumulator, createMeasurementObject, measurementCardinality, type MeasurementKind, type MeasurementObject } from "./interaction/measurements";
-import type { PickResult } from "./interaction/picking";
+import { coordinateContextFor, type PickResult } from "./interaction/picking";
 import { colorRegistry } from "./rendering/colorRegistry";
 import { analyzeStructure, overlaysForAnalysis, type StructuralAnalysisKind, type StructuralAnalysisResult } from "./analysis/structuralAnalysis";
+import { overlaysForAlignment } from "./analysis/alignmentPresentation";
+import { applyFittingResult, applyIntraFittingResults, runAlign, runCEAlign, runFit, runIntraFit, runIntraRms, runIntraRmsCur, runPairFit, runRms, runRmsCur, runSuper, type FittingAnalysis } from "./analysis/pymolFitting";
+import { createDefaultAlignmentRequest, markAlignmentResultStale, type AlignmentOperationKind, type AlignmentRequest, type AlignmentWorkflowOptions, type MappingMode } from "./analysis/alignment";
 import { commandHelp, isRecognizedCommandVerb, parseCommand } from "./commands/commandRegistry";
+import { unsafeConsoleDiagnostic } from "./commands/safeBoundary";
+import { dispatchUiCommand } from "./commands/uiDispatcher";
+import { tokenizeCommandBatch } from "./commands/batchTokenizer";
 import { copyWorkspaceObject, createWorkspaceGroup, createWorkspaceObject, createWorkspaceObjectFromSelection, cycleWorkspaceObjectState, joinWorkspaceObjectStates, renameWorkspaceObject, resolveGlobalFrameState, setWorkspaceObjectAllStates, setWorkspaceObjectEnabled, setWorkspaceObjectState, splitWorkspaceObjectStates, structureForWorkspaceObjectState, updateWorkspaceGroup, workspaceScopedStableAtomId, workspaceSelectionStructure, type WorkspaceGroup, type WorkspaceObject } from "./workspace/workspaceModel";
+import { createAddBondCommand, createAddHydrogensCommand, createAttachAtomCommand, createCoordinateEditCommand, createDeleteAtomsCommand, createDeleteBondCommand, createRefillHydrogensCommand, createRemoveHydrogensCommand, createReplaceAtomCommand, createReplaceBondSemanticsCommand, ScientificHistoryService, type ScientificRevision } from "./editing/editFoundation";
+import { buildSessionDraft, restoreSession } from "./lifecycle/sessionCodec";
+import { exportStructure, type ExportArtifact, type ExportFormat, type ExportLossPolicy, type ExportStateScope } from "./lifecycle/export";
+import { SceneStore } from "./lifecycle/scenes";
+import { detectBiologicalFormat, isMultiFrameXyz, pairTopologyWithTrajectory, parseBiologicalData, type BiologicalData, type BiologicalFormat, BiologicalAdapterError } from "./biological/adapters";
+
+const markLargeIngestionLifecycle = (stage: string): void => {
+  performance.mark(`molecular:ingestion:${stage}`);
+  if (typeof console !== "undefined") console.info("MOLECULAR_INGESTION_STAGE", stage);
+};
 
 const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_SELECT]: "Select",
@@ -33,24 +59,58 @@ const canvasTools: Record<string, string> = {
   [ACTION_IDS.CANVAS_FOCUS]: "Focus",
 };
 
-const isAdmittedFile = (file: File) => /\.(pdb|cif|mmcif)$/i.test(file.name);
+const isAdmittedFile = (file: File) => /\.(pdb|cif|mmcif|pqr|sdf|mol|xyz|mol2|pdbqt|fasta|fa|fna|faa|fastq|fq|gb|gbk|genbank|embl|emb|dx|mrc|map|ccp4|dcd|xtc|trr|gro|psf|prmtop|prm7|smi|smiles)$/i.test(file.name);
+const isCoordinateFile = (file: File) => /\.(pdb|cif|mmcif|pqr|sdf|mol|xyz|mol2|pdbqt)$/i.test(file.name);
+const splitCommandArguments = (value: string): string[] => {
+  const parts: string[] = [];
+  let start = 0;
+  let quote = "";
+  let braces = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    const char = value[index];
+    if (quote) { if (char === "\\") index += 1; else if (char === quote) quote = ""; continue; }
+    if (char === "\"" || char === "'") { quote = char; continue; }
+    if (char === "{") braces += 1;
+    else if (char === "}") braces = Math.max(0, braces - 1);
+    else if (char === "," && braces === 0) { parts.push(value.slice(start, index).trim()); start = index + 1; }
+  }
+  parts.push(value.slice(start).trim());
+  return parts.filter(Boolean);
+};
+const supportedEditBondOrders: readonly Exclude<BondOrder, "UNKNOWN">[] = ["SINGLE", "DOUBLE", "TRIPLE", "AROMATIC"];
+const parseEditBondOrder = (value: string | undefined): Exclude<BondOrder, "UNKNOWN"> | null => {
+  const normalized = value?.trim().toUpperCase();
+  return supportedEditBondOrders.includes(normalized as Exclude<BondOrder, "UNKNOWN">) ? normalized as Exclude<BondOrder, "UNKNOWN"> : null;
+};
 const initialRibbonCategory = (): RibbonCategory => {
   const saved = window.sessionStorage.getItem("molecular-workstation.ribbon") as RibbonCategory | null;
   return saved && RIBBON_CATEGORIES.includes(saved) ? saved : "Display";
 };
 
 export const App = () => {
-  const [activeNav, setActiveNav] = useState("Home");
+  const [activeWorkspace, setActiveWorkspace] = useState<"MOLECULAR" | "DOCKING">("MOLECULAR");
   const [activeTool, setActiveTool] = useState("Select");
   const [activeRibbon, setActiveRibbon] = useState<RibbonCategory>(initialRibbonCategory);
-  const [ribbonCollapsed, setRibbonCollapsed] = useState(false);
+  const [ribbonCollapsed, setRibbonCollapsed] = useState(true);
   const [leftCollapsed, setLeftCollapsed] = useState(false);
-  const [rightCollapsed, setRightCollapsed] = useState(false);
-  const [consoleExpanded, setConsoleExpanded] = useState(true);
+  const [activeRailPanel, setActiveRailPanel] = useState<ScientificToolPanel | null>(null);
+  const [consoleExpanded, setConsoleExpanded] = useState(false);
   const [notice, setNotice] = useState<ActionDefinition | null>(null);
   const [apiStatus, setApiStatus] = useState<"checking" | "connected" | "offline">("checking");
   const [project, setProject] = useState<ProjectRecord | null>(null);
+  const [dirty, setDirty] = useState(false);
+  const [sceneCollection, setSceneCollection] = useState<{ schemaVersion: 1; scenes: readonly import("@molecular/contracts").SceneRecord[]; currentSceneId: string | null }>({ schemaVersion: 1, scenes: [], currentSceneId: null });
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportFormat, setExportFormat] = useState<ExportFormat>("PDB");
+  const [exportStateScope, setExportStateScope] = useState<ExportStateScope>("CURRENT_RESOLVED");
+  const [exportLossPolicy, setExportLossPolicy] = useState<ExportLossPolicy>("ALLOW_WITH_MANIFEST");
+  const [exportArtifact, setExportArtifact] = useState<ExportArtifact | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
   const [structure, setStructure] = useState<StructureLoadResult | null>(null);
+  const [biologicalData, setBiologicalData] = useState<BiologicalData | null>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [biologicalImportBusy, setBiologicalImportBusy] = useState(false);
+  const [biologicalImportError, setBiologicalImportError] = useState<string | null>(null);
   const [workspaceObjects, setWorkspaceObjects] = useState<WorkspaceObject[]>([]);
   const [workspaceGroups, setWorkspaceGroups] = useState<WorkspaceGroup[]>([]);
   const [activeObjectId, setActiveObjectId] = useState<string | null>(null);
@@ -59,10 +119,12 @@ export const App = () => {
   const [projection, setProjection] = useState<RenderProjection>(createDefaultRenderProjection());
   const [loadState, setLoadState] = useState<"idle" | "loading" | "error">("idle");
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [renderLifecycle, setRenderLifecycle] = useState<ViewerLifecycle>("empty");
   const [measurementMode, setMeasurementModeState] = useState<MeasurementKind | null>(null);
   const [measurementSlots, setMeasurementSlots] = useState<readonly string[]>([]);
   const [measurements, setMeasurements] = useState<readonly MeasurementObject[]>([]);
   const [analysisResults, setAnalysisResults] = useState<readonly StructuralAnalysisResult[]>([]);
+  const [fittingResults, setFittingResults] = useState<readonly (FittingAnalysis & { applyStatus: "ANALYZED" | "APPLIED" | "STALE" })[]>([]);
   const [namedSelections, setNamedSelections] = useState<readonly { name: string; count: number }[]>([]);
   const [activeSelection, setActiveSelectionState] = useState<SelectionResult | null>(null);
   const [targetStyles, setTargetStyles] = useState<Record<"protein" | "ligand" | "water" | "ions" | "other", RepresentationStyle>>({ protein: "cartoon", ligand: "ball-and-stick", water: "spheres", ions: "spheres", other: "sticks" });
@@ -74,11 +136,41 @@ export const App = () => {
   const demoLoadStartedRef = useRef(false);
   const namedSelectionsRef = useRef<NamedSelectionStore | null>(null);
   const activeSelectionResultRef = useRef<SelectionResult | null>(null);
+  const activePickResultRef = useRef<PickResult | null>(null);
   const workspaceObjectsRef = useRef<WorkspaceObject[]>([]);
   const workspaceGroupsRef = useRef<WorkspaceGroup[]>([]);
   const pendingImportModeRef = useRef<"replace" | "add">("replace");
+  const historyServiceRef = useRef(new ScientificHistoryService());
+  const sceneStoreRef = useRef(new SceneStore());
+  const savedFingerprintRef = useRef<string | null>(null);
+  // The active object's presentation is authoritative in `projection`.
+  // Workspace objects keep durable snapshots for inactive objects and are
+  // updated by explicit workspace actions; the active overlay below feeds the
+  // viewer without an effect that writes derived state back into the store.
   const analysisOverlays = useMemo(() => overlaysForAnalysis(analysisResults), [analysisResults]);
+  const alignmentOverlays = useMemo(() => overlaysForAlignment(fittingResults), [fittingResults]);
   const viewerWorkspaceObjects = useMemo(() => workspaceObjects.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object), [activeObjectId, projection, workspaceObjects]);
+  const activeHistoryState = activeObjectId ? historyServiceRef.current.historyState(activeObjectId) : null;
+  // Selection membership is already content-addressed by the immutable
+  // SelectionResult.  Including every stable AtomUID in this dirty-state
+  // fingerprint made large compact selections needlessly stringify hundreds
+  // of thousands of IDs after every console command.
+  const activeSelectionResultId = activeSelection?.resultId;
+  const activeSelectionMembershipHash = activeSelection?.membershipHash;
+  const activeSelectionCount = activeSelection?.count;
+  const activeSelectionMolecularRevision = activeSelection?.molecularRevision;
+  const workspaceFingerprint = useMemo(() => {
+    const activeSelectionFingerprint = activeSelectionResultId !== undefined
+      ? { resultId: activeSelectionResultId, membershipHash: activeSelectionMembershipHash, count: activeSelectionCount, molecularRevision: activeSelectionMolecularRevision }
+      : null;
+    return JSON.stringify({ workspaceObjects, workspaceGroups, activeObjectId, globalFrameIndex, coordinateFramePolicy, activeSelection: activeSelectionFingerprint, namedSelections, measurements, analysisResults, fittingResults, sceneCollection, projection, biologicalData });
+  }, [activeObjectId, activeSelectionCount, activeSelectionMembershipHash, activeSelectionMolecularRevision, activeSelectionResultId, analysisResults, biologicalData, coordinateFramePolicy, fittingResults, globalFrameIndex, measurements, namedSelections, projection, sceneCollection, workspaceGroups, workspaceObjects]);
+
+  useEffect(() => {
+    if (!project) return;
+    if (savedFingerprintRef.current === null) { savedFingerprintRef.current = workspaceFingerprint; return; }
+    if (savedFingerprintRef.current !== workspaceFingerprint) setDirty(true);
+  }, [project, workspaceFingerprint]);
 
   const presentationSelectionContext = (): SelectionPresentationContext | undefined => {
     if (!viewerWorkspaceObjects.length) return undefined;
@@ -111,6 +203,23 @@ export const App = () => {
     for (const object of viewerWorkspaceObjects) {
       if (!object.enabled) continue;
       const canonical = structureForWorkspaceObjectState(object);
+      // Large canonical loads keep their semantic columns in the compact
+      // representation.  Do not force the legacy atom-object graph merely to
+      // prepare selection presentation context; the renderer already has the
+      // same visibility policy available from compact flags.
+      if (canonical.compact?.schemaVersion === "compact-canonical-v1") {
+        const compact = canonical.compact;
+        for (let index = 0; index < compact.atomCount; index += 1) {
+          const flags = compact.flags[index] ?? 0;
+          const visible = (flags & 1) ? object.projection.showProtein
+            : (flags & 2) ? object.projection.showLigand
+              : (flags & 4) ? object.projection.showWater
+                : (flags & 8) ? object.projection.showIons
+                  : object.projection.showOther;
+          if (visible) visibleStableAtomIds.push(multiObject ? workspaceScopedStableAtomId(object.objectId, compact.atomStableIds[index]!) : compact.atomStableIds[index]!);
+        }
+        continue;
+      }
       const diagnostics = buildRenderProjectionDiagnostics(canonical, object.projection);
       const canonicalAtoms = new Map(canonical.atoms.map((atom) => [atom.stableId, atom]));
       const projectedAtomIds = new Set(diagnostics.directives.flatMap((directive) => directive.targetStableAtomIds));
@@ -153,11 +262,30 @@ export const App = () => {
     return { visibleStableAtomIds, representationTokensByStableAtomId, colorTokensByStableAtomId, representationColorTokensByStableAtomId, labelTokensByStableAtomId, revision };
   };
 
-  const setActiveSelection = (result: SelectionResult | null) => {
+  const setActiveSelection = (result: SelectionResult | null, pickResult: PickResult | null = null, focus = Boolean(result?.count)) => {
     activeSelectionResultRef.current = result;
+    activePickResultRef.current = pickResult;
     setActiveSelectionState(result);
     setProjection((current) => setInteractionState(current, { selectedAtomIds: result?.stableAtomIds ?? [], pickedAtomId: null, measurementPickAtomIds: [] }));
+    if (focus && result?.count) {
+      commandSequence.current += 1;
+      setCameraCommand({ actionId: ACTION_IDS.VIEW_FOCUS_SELECTION, sequence: commandSequence.current });
+    }
   };
+
+  const clearSelection = useCallback(() => {
+    activePickResultRef.current = null;
+    setActiveSelection(null);
+    setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] }));
+  }, []);
+
+  const resetScientificHistory = useCallback(() => {
+    historyServiceRef.current = new ScientificHistoryService();
+  }, []);
+
+  const registerScientificRoot = useCallback((object: WorkspaceObject) => {
+    historyServiceRef.current.registerRoot(object.objectId, object.loadResult, object.currentStateId);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -166,26 +294,16 @@ export const App = () => {
   }, []);
 
   useEffect(() => {
-    if (!activeObjectId) return;
-    const current = workspaceObjectsRef.current;
-    const active = current.find((object) => object.objectId === activeObjectId);
-    if (!active || active.projection === projection) return;
-    const next = current.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object);
-    workspaceObjectsRef.current = next;
-    setWorkspaceObjects(next);
-  }, [activeObjectId, projection]);
-
-  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       measurementAccumulatorRef.current.clear();
       setMeasurementSlots([]);
       setMeasurementModeState(null);
-      setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, measurementPickAtomIds: [] }));
+      clearSelection();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [clearSelection]);
 
   const showNotice = (capability: ActionDefinition) => {
     setNotice(capability);
@@ -193,17 +311,28 @@ export const App = () => {
   };
 
   const runLoad = useCallback(async (loader: () => Promise<StructureLoadResult>, mode: "replace" | "add" = "replace") => {
+    markLargeIngestionLifecycle("LOAD_START");
     setLoadState("loading");
     setLoadError(null);
     try {
       const result = await loader();
+      markLargeIngestionLifecycle("API_RESULT_RECEIVED");
       const workspaceObject = createWorkspaceObject(result, mode === "add" ? workspaceObjectsRef.current.map((object) => object.objectId) : []);
+      markLargeIngestionLifecycle("WORKSPACE_OBJECT_CREATED");
+      const collisionNote = mode === "add" && workspaceObjectsRef.current.some((object) => object.displayName.toLowerCase() === workspaceObject.displayName.toLowerCase())
+        ? `NAME_COLLISION: ${workspaceObject.displayName} is already present; the new object retained a distinct durable identity ${workspaceObject.objectId}.`
+        : null;
       const nextWorkspace = mode === "add" ? [...workspaceObjectsRef.current, workspaceObject] : [workspaceObject];
+      if (mode === "replace") resetScientificHistory();
+      registerScientificRoot(workspaceObject);
+      markLargeIngestionLifecycle("HISTORY_ROOT_REGISTERED");
       workspaceObjectsRef.current = nextWorkspace;
       setWorkspaceObjects(nextWorkspace);
-       if (mode === "replace") { workspaceGroupsRef.current = []; setWorkspaceGroups([]); setCoordinateFramePolicy(null); }
+       if (mode === "replace") { workspaceGroupsRef.current = []; setWorkspaceGroups([]); setCoordinateFramePolicy(null); sceneStoreRef.current = new SceneStore(); setSceneCollection(sceneStoreRef.current.value); }
       setActiveObjectId(workspaceObject.objectId);
       setStructure(result);
+      setBiologicalData(null);
+      setBiologicalImportError(null);
       namedSelectionsRef.current = new NamedSelectionStore(result.structure);
       setProjection(createDefaultRenderProjection(result.structure));
       setTargetStyles({ protein: "cartoon", ligand: "ball-and-stick", water: "spheres", ions: "spheres", other: "sticks" });
@@ -213,26 +342,144 @@ export const App = () => {
       setAnalysisResults([]);
       setActiveSelection(null);
       setNamedSelections([]);
+      setLoadError(collisionNote);
       setLoadState("idle");
       commandSequence.current += 1;
       setCameraCommand({ actionId: ACTION_IDS.CANVAS_FOCUS, sequence: commandSequence.current });
+      markLargeIngestionLifecycle("LOAD_COMMITTED");
     } catch (error) {
+      console.error("STRUCTURE_LOAD_FAILED", error);
       setLoadState("error");
       setLoadError(error instanceof ApiClientError ? error.message : "The structure could not be loaded. The current structure was kept.");
     }
-  }, []);
+  }, [registerScientificRoot, resetScientificHistory]);
+
+  const fetchRcsb = (pdbId: string, mode: "replace" | "add" = "replace") => void runLoad(() => apiClient.fetchRcsb(pdbId), mode);
+
+  const commitBiologicalData = (data: BiologicalData) => {
+    const pairedData = biologicalData && ((biologicalData.kind === "TOPOLOGY" && data.kind === "TRAJECTORY") || (biologicalData.kind === "TRAJECTORY" && data.kind === "TOPOLOGY"))
+      ? biologicalData.kind === "TOPOLOGY" ? pairTopologyWithTrajectory(biologicalData, data as Extract<BiologicalData, { kind: "TRAJECTORY" }>) : pairTopologyWithTrajectory(data as Extract<BiologicalData, { kind: "TOPOLOGY" }>, biologicalData)
+      : data;
+    resetScientificHistory();
+    workspaceObjectsRef.current = [];
+    setWorkspaceObjects([]);
+    workspaceGroupsRef.current = [];
+    setWorkspaceGroups([]);
+    setActiveObjectId(null);
+    setCoordinateFramePolicy(null);
+    setStructure(null);
+    setBiologicalData(pairedData);
+    measurementAccumulatorRef.current.clear();
+    setMeasurementSlots([]);
+    setMeasurements([]);
+    setAnalysisResults([]);
+    setFittingResults([]);
+    setActiveSelection(null);
+    setNamedSelections([]);
+    setProjection(createDefaultRenderProjection());
+    setTargetStyles({ protein: "cartoon", ligand: "ball-and-stick", water: "spheres", ions: "spheres", other: "sticks" });
+    setLoadError(null);
+    setLoadState("idle");
+    setBiologicalImportError(null);
+    if (project) setDirty(true);
+  };
+
+  const importBiologicalText = (filename: string, format: BiologicalFormat | undefined, text: string | ArrayBuffer) => {
+    setBiologicalImportBusy(true);
+    setBiologicalImportError(null);
+    try {
+      const parseFilename = filename;
+      const detected = format ?? detectBiologicalFormat(parseFilename, typeof text === "string" ? text : "");
+      if (!detected) throw new BiologicalAdapterError(`No biological adapter recognizes ${filename}.`, "UNSUPPORTED_FORMAT");
+      const data = parseBiologicalData(parseFilename, text, detected);
+      commitBiologicalData(data);
+      setImportDialogOpen(false);
+    } catch (error) {
+      const message = error instanceof BiologicalAdapterError ? error.message : error instanceof Error ? error.message : "The biological dataset could not be parsed.";
+      setBiologicalImportError(message);
+      setLoadError(message);
+      setLoadState("error");
+    } finally {
+      setBiologicalImportBusy(false);
+    }
+  };
+
+  const importBiologicalFile = async (file: File) => {
+    try {
+      const extension = file.name.toLowerCase().split(".").pop() ?? "";
+      const binary = ["mrc", "map", "ccp4", "dcd", "xtc", "trr"].includes(extension);
+      const content = binary ? await file.arrayBuffer() : await file.text();
+      const trajectoryXyz = extension === "xyz" && typeof content === "string" && isMultiFrameXyz(content);
+      importBiologicalText(file.name, trajectoryXyz ? "xyz-trajectory" : undefined, content);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "The biological file could not be read.";
+      setBiologicalImportError(message);
+      setLoadError(message);
+      setLoadState("error");
+    }
+  };
 
   const importFile = (file: File, mode: "replace" | "add" = pendingImportModeRef.current) => {
     pendingImportModeRef.current = "replace";
     if (!isAdmittedFile(file)) {
       setLoadState("error");
-      setLoadError("Only PDB and mmCIF files are admitted in G1C. The current structure was kept.");
+      setLoadError("Choose an admitted biological data file: PDB, mmCIF/CIF, PQR, SDF/MOL, XYZ, MOL2, PDBQT, FASTA, FASTQ, GenBank, EMBL, DX, MRC/CCP4, GRO, DCD, XTC, TRR, PSF, PRMTOP, or SMILES. The current dataset was kept.");
+      return;
+    }
+    if (mode === "add" && !isCoordinateFile(file)) {
+      setLoadState("error");
+      setLoadError("Add Structure accepts coordinate-bearing files only. Use File → Import for sequence, map, trajectory, topology, or SMILES data; the current workspace was kept.");
+      return;
+    }
+    if (!isCoordinateFile(file) || /\.xyz$/i.test(file.name)) {
+      if (/\.xyz$/i.test(file.name)) {
+        void file.text().then((content) => {
+          if (isMultiFrameXyz(content)) importBiologicalText(file.name, "xyz-trajectory", content);
+          else void runLoad(() => apiClient.uploadStructure(file), mode);
+        }).catch((error) => { setLoadState("error"); setLoadError(error instanceof Error ? error.message : "The biological file could not be read."); });
+      } else void importBiologicalFile(file);
       return;
     }
     void runLoad(() => apiClient.uploadStructure(file), mode);
   };
 
-  const fetchRcsb = (pdbId: string, mode: "replace" | "add" = "replace") => void runLoad(() => apiClient.fetchRcsb(pdbId), mode);
+  const importOnlineBiologicalData = async (provider: "RCSB" | "PubChem" | "UniProt", accession: string) => {
+    setBiologicalImportBusy(true);
+    setBiologicalImportError(null);
+    try {
+      const normalized = accession.trim();
+      if (provider === "RCSB") {
+        if (!/^[A-Z0-9]{4}$/i.test(normalized)) throw new BiologicalAdapterError("RCSB PDB IDs must contain exactly four letters or digits.", "INVALID_INPUT");
+        setImportDialogOpen(false);
+        fetchRcsb(normalized.toUpperCase());
+        return;
+      }
+      if (!/^[A-Za-z0-9_.-]{2,40}$/.test(normalized)) throw new BiologicalAdapterError("Online accession contains unsupported characters.", "INVALID_INPUT");
+      if (provider === "UniProt") {
+        const response = await fetch(`https://rest.uniprot.org/uniprotkb/${encodeURIComponent(normalized)}.fasta`, { headers: { accept: "text/plain" } });
+        if (!response.ok) throw new BiologicalAdapterError(`UniProt did not return ${normalized} (${response.status}).`, "PARSE_FAILED");
+        importBiologicalText(`${normalized}.fasta`, "fasta", await response.text());
+      } else {
+        const response = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(normalized)}/property/CanonicalSMILES,Title/JSON`, { headers: { accept: "application/json" } });
+        if (!response.ok) throw new BiologicalAdapterError(`PubChem did not return ${normalized} (${response.status}).`, "PARSE_FAILED");
+        const payload = await response.json() as { PropertyTable?: { Properties?: Array<{ ConnectivitySMILES?: string; CanonicalSMILES?: string; IUPACName?: string; Title?: string }> } };
+        const property = payload.PropertyTable?.Properties?.[0]; const notation = property?.ConnectivitySMILES ?? property?.CanonicalSMILES;
+        if (!notation) throw new BiologicalAdapterError(`PubChem returned no canonical SMILES for ${normalized}.`, "PARSE_FAILED");
+        importBiologicalText(`${property?.Title ?? normalized}.smi`, "smiles", `${property?.Title ?? normalized}\t${notation}`);
+      }
+    } catch (error) {
+      const message = error instanceof BiologicalAdapterError ? error.message : error instanceof Error ? error.message : "The online biological dataset could not be fetched.";
+      setBiologicalImportError(message);
+    } finally {
+      setBiologicalImportBusy(false);
+    }
+  };
+
+  const openImportDialog = () => {
+    setBiologicalImportError(null);
+    setRibbonCollapsed(true);
+    setImportDialogOpen(true);
+  };
 
   const activateWorkspaceObject = (objectId: string) => {
     const current = workspaceObjectsRef.current.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object);
@@ -248,10 +495,30 @@ export const App = () => {
     setActiveSelection(null);
   };
 
-  const toggleWorkspaceObject = (objectId: string) => {
-    const next = workspaceObjectsRef.current.map((object) => object.objectId === objectId ? setWorkspaceObjectEnabled(object, !object.enabled) : object);
+  const clearInteractionForObject = (objectId: string) => {
+    const selection = activeSelectionResultRef.current;
+    const pick = activePickResultRef.current;
+    const selectionTouchesObject = Boolean(selection?.stableAtomIds.some((stableId) => stableId.startsWith(`${objectId}::`)) || (workspaceObjectsRef.current.length === 1 && activeObjectId === objectId && selection?.stableAtomIds.length));
+    const pickObjectId = pick?.pickKind === "ATOM" ? pick.atomRef.objectId : pick?.pickKind === "BOND" ? pick.bondRef.objectId : undefined;
+    if (!selectionTouchesObject && pickObjectId !== objectId) return;
+    activeSelectionResultRef.current = null;
+    activePickResultRef.current = null;
+    setActiveSelectionState(null);
+    setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] }));
+  };
+
+  const setWorkspaceObjectEnabledById = (objectId: string, enabled: boolean) => {
+    const target = workspaceObjectsRef.current.find((object) => object.objectId === objectId);
+    if (!target || target.enabled === enabled) return;
+    if (!enabled) clearInteractionForObject(objectId);
+    const next = workspaceObjectsRef.current.map((object) => object.objectId === objectId ? setWorkspaceObjectEnabled(object, enabled) : object);
     workspaceObjectsRef.current = next;
     setWorkspaceObjects(next);
+  };
+
+  const toggleWorkspaceObject = (objectId: string) => {
+    const target = workspaceObjectsRef.current.find((object) => object.objectId === objectId);
+    if (target) setWorkspaceObjectEnabledById(objectId, !target.enabled);
   };
 
   const cycleObjectState = (objectId: string, direction: -1 | 1) => {
@@ -266,6 +533,114 @@ export const App = () => {
     const next = workspaceObjectsRef.current.map((object) => object.objectId === objectId ? renameWorkspaceObject(object, displayName) : object);
     workspaceObjectsRef.current = next;
     setWorkspaceObjects(next);
+  };
+
+  const updateSceneCollection = (store: SceneStore) => {
+    const next = store.value;
+    sceneStoreRef.current = store;
+    setSceneCollection(next);
+    setDirty(true);
+  };
+
+  const storeScene = (name: string) => {
+    const store = new SceneStore(sceneCollection);
+    const result = store.store({ name, objects: viewerWorkspaceObjects, activeObjectId, scientificRevisionIdFor: (object) => historyServiceRef.current.currentRevision(object.objectId)?.revisionId ?? object.loadResult.structure.scientificHash, selectionRefs: activeSelection ? [activeSelection.resultId] : [], resultRefs: [...measurements.map((entry) => entry.id), ...analysisResults.map((entry) => `analysis:${entry.kind}`), ...fittingResults.map((entry) => entry.result.resultId)], provenance: { producer: "molecular-workstation", gate: "R09", rendererNeutral: true } });
+    if (!result.ok) return result;
+    updateSceneCollection(store);
+    return result;
+  };
+
+  const updateScene = (sceneId: string) => {
+    const store = new SceneStore(sceneCollection);
+    const result = store.update(sceneId, { objects: viewerWorkspaceObjects, activeObjectId, scientificRevisionIdFor: (object) => historyServiceRef.current.currentRevision(object.objectId)?.revisionId ?? object.loadResult.structure.scientificHash, selectionRefs: activeSelection ? [activeSelection.resultId] : [], resultRefs: [...measurements.map((entry) => entry.id), ...analysisResults.map((entry) => `analysis:${entry.kind}`), ...fittingResults.map((entry) => entry.result.resultId)] });
+    if (!result.ok) return result;
+    updateSceneCollection(store);
+    return result;
+  };
+
+  const recallScene = (sceneId: string) => {
+    const store = new SceneStore(sceneCollection);
+    const result = store.recall(sceneId, viewerWorkspaceObjects, (object) => historyServiceRef.current.currentRevision(object.objectId)?.revisionId ?? object.loadResult.structure.scientificHash);
+    if (!result.ok) return result;
+    const nextObjects = workspaceObjectsRef.current.map((object) => {
+      const reference = result.value.scene.objectRefs.find((candidate) => candidate.objectId === object.objectId);
+      return result.value.presentationByObjectId[object.objectId] ? { ...object, projection: result.value.presentationByObjectId[object.objectId], ...(reference ? { currentStateId: reference.stateId, allStates: false } : {}) } : object;
+    });
+    workspaceObjectsRef.current = nextObjects;
+    setWorkspaceObjects(nextObjects);
+    const active = nextObjects.find((object) => object.objectId === result.value.activeObjectId) ?? nextObjects[0];
+    if (active) { setActiveObjectId(active.objectId); setStructure(active.loadResult); setProjection(active.projection); }
+    updateSceneCollection(store);
+    return result;
+  };
+
+  const renameScene = (sceneId: string, name: string) => {
+    const store = new SceneStore(sceneCollection);
+    const result = store.rename(sceneId, name);
+    if (result.ok) updateSceneCollection(store);
+    return result;
+  };
+
+  const deleteScene = (sceneId: string) => {
+    const store = new SceneStore(sceneCollection);
+    const result = store.delete(sceneId);
+    if (result.ok) updateSceneCollection(store);
+    return result;
+  };
+
+  const stepScene = (direction: -1 | 1) => {
+    const store = new SceneStore(sceneCollection);
+    const result = store.step(direction);
+    if (!result.ok) return result;
+    const recalled = store.recall(result.value.sceneId, viewerWorkspaceObjects, (object) => historyServiceRef.current.currentRevision(object.objectId)?.revisionId ?? object.loadResult.structure.scientificHash);
+    if (!recalled.ok) return recalled;
+    const nextObjects = workspaceObjectsRef.current.map((object) => {
+      const reference = recalled.value.scene.objectRefs.find((candidate) => candidate.objectId === object.objectId);
+      return recalled.value.presentationByObjectId[object.objectId] ? { ...object, projection: recalled.value.presentationByObjectId[object.objectId], ...(reference ? { currentStateId: reference.stateId, allStates: false } : {}) } : object;
+    });
+    workspaceObjectsRef.current = nextObjects;
+    setWorkspaceObjects(nextObjects);
+    const active = nextObjects.find((object) => object.objectId === recalled.value.activeObjectId) ?? nextObjects[0];
+    if (active) { setActiveObjectId(active.objectId); setStructure(active.loadResult); setProjection(active.projection); }
+    updateSceneCollection(store);
+    return recalled;
+  };
+
+  const runExport = async () => {
+    const object = workspaceObjectsRef.current.find((candidate) => candidate.objectId === activeObjectId) ?? workspaceObjectsRef.current[0];
+    if (!object) { setExportError("Load a structure before exporting."); return; }
+    const selectedIds = activeSelection?.stableAtomIds.flatMap((stableId) => stableId.startsWith(`${object.objectId}::`) ? [stableId.slice(object.objectId.length + 2)] : stableId.includes("::") ? [] : [stableId]) ?? [];
+    setExportError(null);
+    try {
+      const artifact = await exportStructure({ object, ...(selectedIds.length ? { selection: { objectId: object.objectId, stableAtomIds: selectedIds, sourceRevisionId: historyServiceRef.current.currentRevision(object.objectId)?.revisionId ?? object.loadResult.structure.scientificHash } } : {}), stateScope: exportStateScope, format: exportFormat, lossPolicy: exportLossPolicy, scientificRevisionId: historyServiceRef.current.currentRevision(object.objectId)?.revisionId ?? object.loadResult.structure.scientificHash, ...(exportArtifact ? { parentExportArtifactId: exportArtifact.exportArtifactId } : {}) });
+      setExportArtifact(artifact);
+    } catch (error) {
+      setExportArtifact(null);
+      setExportError(error instanceof Error ? error.message : "The export could not be created.");
+    }
+  };
+
+  const downloadExport = () => {
+    if (!exportArtifact) return;
+    const exactBytes = new Uint8Array(exportArtifact.bytes.byteLength);
+    exactBytes.set(exportArtifact.bytes);
+    const blob = new Blob([exactBytes.buffer as ArrayBuffer], { type: exportArtifact.format === "PDB" ? "chemical/x-pdb" : "chemical/x-mmcif" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${activeWorkspaceObject?.displayName.replace(/\.(pdb|cif|mmcif)$/i, "") || "molecule"}.${exportArtifact.format === "PDB" ? "pdb" : "cif"}`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const reimportExport = () => {
+    if (!exportArtifact) return;
+    const exactBytes = new Uint8Array(exportArtifact.bytes.byteLength);
+    exactBytes.set(exportArtifact.bytes);
+    const filename = `${activeWorkspaceObject?.displayName.replace(/\.(pdb|cif|mmcif)$/i, "") || "molecule"}.${exportArtifact.format === "PDB" ? "pdb" : "cif"}`;
+    const file = new File([exactBytes.buffer as ArrayBuffer], filename, { type: exportArtifact.format === "PDB" ? "chemical/x-pdb" : "chemical/x-mmcif" });
+    setExportOpen(false);
+    void runLoad(() => apiClient.uploadStructure(file, exportArtifact.exportArtifactId), "add");
   };
 
   const toggleObjectAllStates = (objectId: string) => {
@@ -286,6 +661,11 @@ export const App = () => {
     try {
       const created = await apiClient.createProject();
       setProject(created);
+      savedFingerprintRef.current = null;
+      setDirty(false);
+      sceneStoreRef.current = new SceneStore();
+      setSceneCollection(sceneStoreRef.current.value);
+      resetScientificHistory();
       workspaceObjectsRef.current = [];
       setWorkspaceObjects([]);
       workspaceGroupsRef.current = [];
@@ -293,6 +673,9 @@ export const App = () => {
       setActiveObjectId(null);
       setCoordinateFramePolicy(null);
       setStructure(null);
+      setBiologicalData(null);
+      setBiologicalImportError(null);
+      setImportDialogOpen(false);
       setProjection(createDefaultRenderProjection());
       measurementAccumulatorRef.current.clear();
       setMeasurementSlots([]);
@@ -309,27 +692,42 @@ export const App = () => {
   };
 
   const openProject = async () => {
-    const id = window.prompt("Project ID to open");
+    const id = window.prompt("Project ID to open (optional @SessionRevisionID)");
     if (!id) return;
     try {
-      const opened = await apiClient.openProject(id.trim());
-      setProject(opened);
-      const openedWorkspace = opened.structure ? [createWorkspaceObject(opened.structure)] : [];
+      const [projectId, revisionId] = id.trim().split("@", 2);
+      const opened = revisionId ? await apiClient.openProjectRevision(projectId!, revisionId) : await apiClient.openProject(projectId!);
+      let restored;
+      if (opened.session) restored = restoreSession(opened.session);
+      const openedWorkspace = restored?.objects ?? (opened.structure ? [createWorkspaceObject(opened.structure)] : []);
+      resetScientificHistory();
+      openedWorkspace.forEach((object) => registerScientificRoot(object));
+      const openedGroups = restored && opened.session ? opened.session.workspaceGroups.map((group) => ({ groupId: String(group.groupId ?? "group:restored"), name: String(group.name ?? "Restored group"), objectIds: Array.isArray(group.objectIds) ? group.objectIds.map(String) : [], open: group.open !== false })) : [];
       workspaceObjectsRef.current = openedWorkspace;
       setWorkspaceObjects(openedWorkspace);
-      workspaceGroupsRef.current = [];
-      setWorkspaceGroups([]);
-      setActiveObjectId(openedWorkspace[0]?.objectId ?? null);
-      setCoordinateFramePolicy(null);
-      setStructure(opened.structure);
-      namedSelectionsRef.current = opened.structure ? new NamedSelectionStore(opened.structure.structure) : null;
-      setProjection(opened.structure ? fromProjectPresentation(opened.presentation, opened.structure.structure) : createDefaultRenderProjection());
+      workspaceGroupsRef.current = openedGroups;
+      setWorkspaceGroups(openedGroups);
+      const openedActiveObjectId = restored?.activeObjectId ?? openedWorkspace[0]?.objectId ?? null;
+      setActiveObjectId(openedActiveObjectId);
+      setCoordinateFramePolicy((restored?.coordinateFramePolicy as CoordinateFramePolicy | null | undefined) ?? null);
+      const active = openedWorkspace.find((object) => object.objectId === openedActiveObjectId) ?? openedWorkspace[0];
+      setStructure(active?.loadResult ?? null);
+      namedSelectionsRef.current = restored?.namedSelectionStore ?? (active ? new NamedSelectionStore(active.loadResult.structure) : null);
+      setProjection(active?.projection ?? (opened.structure ? fromProjectPresentation(opened.presentation, opened.structure.structure) : createDefaultRenderProjection()));
+      setGlobalFrameIndex(restored?.globalFrameIndex ?? 0);
       measurementAccumulatorRef.current.clear();
       setMeasurementSlots([]);
-      setMeasurements([]);
-      setAnalysisResults([]);
-      setActiveSelection(null);
-      setNamedSelections([]);
+      setMeasurements(restored?.measurements ?? []);
+      setAnalysisResults(restored?.analysisResults ?? []);
+      setFittingResults(restored?.fittingResults ?? []);
+      activeSelectionResultRef.current = restored?.activeSelection ?? null;
+      setActiveSelectionState(restored?.activeSelection ?? null);
+      setNamedSelections(restored?.namedSelections ?? []);
+      sceneStoreRef.current = new SceneStore(opened.session?.sceneCollection);
+      setSceneCollection(sceneStoreRef.current.value);
+      setProject(opened);
+      savedFingerprintRef.current = null;
+      setDirty(false);
       setLoadError(null);
       setLoadState("idle");
     } catch (error) {
@@ -341,8 +739,12 @@ export const App = () => {
   const saveProject = async () => {
     try {
       const target = project ?? await apiClient.createProject();
-      const saved = await apiClient.saveProject(target.id, { name: target.name, structure, presentation: toProjectPresentation(projection), expectedRevision: project ? project.revision : target.revision });
+      const workspaceForSave = workspaceObjectsRef.current.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object);
+      const draft = buildSessionDraft({ project: target, workspaceObjects: workspaceForSave, workspaceGroups: workspaceGroupsRef.current, activeObjectId, globalFrameIndex, coordinateFramePolicy, activeSelection: activeSelectionResultRef.current, namedSelectionStore: namedSelectionsRef.current, measurements, analysisResults, fittingResults, sceneStore: sceneStoreRef.current, history: historyServiceRef.current, projection });
+      const saved = await apiClient.saveProject(target.id, { name: target.name, structure: structure ?? null, presentation: toProjectPresentation(projection), session: draft, expectedRevision: project ? project.revision : target.revision });
       setProject(saved);
+      savedFingerprintRef.current = workspaceFingerprint;
+      setDirty(false);
       setLoadError(null);
       setLoadState("idle");
     } catch (error) {
@@ -399,10 +801,18 @@ export const App = () => {
   };
 
   const handlePick = (pick: PickResult) => {
-    if (pick.pickKind !== "ATOM" || !structure) return;
-    const pickedObject = workspaceObjectsRef.current.find((object) => object.objectId === pick.atomRef.objectId);
+    if (!structure || pick.pickKind === "BACKGROUND") return;
+    const pickedObjectId = pick.pickKind === "ATOM" ? pick.atomRef.objectId : pick.bondRef.objectId;
+    const pickedObject = workspaceObjectsRef.current.find((object) => object.objectId === pickedObjectId || object.loadResult.structure.id === pick.structureId);
+    if (!pickedObject) return;
+    if (!pickedObject.enabled) {
+      clearInteractionForObject(pickedObject.objectId);
+      const capability = ACTION_REGISTRY[ACTION_IDS.CANVAS_SELECT];
+      showNotice({ ...capability, state: "SUPPORTED_WITH_LIMITATIONS", description: `Object ${pickedObject.displayName} is OFF; enable it before picking or editing.` });
+      return;
+    }
     const targetStructure = pickedObject ? { ...pickedObject.loadResult, structure: structureForWorkspaceObjectState(pickedObject) } : structure;
-    const stableAtomId = pick.atomRef.stableAtomId;
+    const stableAtomId = pick.pickKind === "ATOM" ? pick.atomRef.stableAtomId : "";
     if (pickedObject && pickedObject.objectId !== activeObjectId) {
       const current = workspaceObjectsRef.current.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object);
       workspaceObjectsRef.current = current;
@@ -414,11 +824,17 @@ export const App = () => {
       setNamedSelections([]);
     }
     if (!measurementMode) {
-      setActiveSelection(selectionForStableIds([stableAtomId], targetStructure.structure));
+      if (pick.pickKind === "BOND") {
+        setActiveSelection(selectionForStableIds([...pick.bondRef.endpoints], targetStructure.structure), pick);
+        setProjection((current) => setInteractionState(current, { pickedAtomId: pick.bondRef.endpoints[0] ?? null, selectedAtomIds: pick.bondRef.endpoints, measurementPickAtomIds: [] }));
+        return;
+      }
+      setActiveSelection(selectionForStableIds([stableAtomId], targetStructure.structure), pick);
       const projectedId = pickedObject ? workspaceScopedStableAtomId(pickedObject.objectId, stableAtomId) : stableAtomId;
       setProjection((current) => setInteractionState(current, { pickedAtomId: stableAtomId, selectedAtomIds: [projectedId], measurementPickAtomIds: [] }));
       return;
     }
+    if (pick.pickKind !== "ATOM") return;
     let slots: readonly string[];
     try {
       slots = measurementAccumulatorRef.current.add(stableAtomId, measurementMode, pickedObject?.objectId);
@@ -451,18 +867,77 @@ export const App = () => {
     return setInteractionState(current, { hoveredAtomId: pick?.pickKind === "ATOM" ? object ? workspaceScopedStableAtomId(object.objectId, pick.atomRef.stableAtomId) : pick.atomRef.stableAtomId : null });
   });
   const clearMeasurementPicks = () => { measurementAccumulatorRef.current.clear(); setMeasurementSlots([]); setProjection((current) => setInteractionState(current, { pickedAtomId: null, measurementPickAtomIds: [] })); };
-  const clearTransientInteraction = () => setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, measurementPickAtomIds: [] }));
-  const clearSelection = () => { setActiveSelection(null); setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] })); };
   const updateMeasurementVisibility = (id: string, visible: boolean) => setMeasurements((current) => current.map((measurement) => measurement.id === id ? { ...measurement, presentation: { ...measurement.presentation, visible }, status: visible ? "CURRENT" : "HIDDEN" } : measurement));
   const deleteMeasurement = (id: string) => setMeasurements((current) => current.filter((measurement) => measurement.id !== id));
 
   const runAnalysis = (kind: StructuralAnalysisKind) => {
     if (!structure) {
-      showNotice({ id: ACTION_IDS.ANALYSIS_CONTACTS, group: "ANALYSIS", state: "SUPPORTED_WITH_LIMITATIONS", label: "Analysis requires a structure", description: "Load a PDB or mmCIF structure before running this diagnostic." });
+      showNotice({ id: ACTION_IDS.ANALYSIS_CONTACTS, group: "ANALYSIS", state: "SUPPORTED_WITH_LIMITATIONS", label: "Analysis requires a structure", description: "Load an admitted coordinate structure before running this diagnostic." });
       return;
     }
     const result = analyzeStructure(structure.structure, kind);
     setAnalysisResults((current) => [...current.filter((entry) => entry.kind !== kind), result]);
+  };
+
+  type LocalAlignmentSelection = { object: WorkspaceObject; selection: SelectionResult };
+  const localizeAlignmentSelection = (result: SelectionResult): LocalAlignmentSelection | ConsoleCommandResult => {
+    const groups = new Map<string, string[]>();
+    for (const stableId of result.stableAtomIds) {
+      const separator = stableId.indexOf("::");
+      const objectId = separator >= 0 ? stableId.slice(0, separator) : activeObjectId;
+      const atomId = separator >= 0 ? stableId.slice(separator + 2) : stableId;
+      if (objectId) groups.set(objectId, [...(groups.get(objectId) ?? []), atomId]);
+    }
+    if (groups.size !== 1) return { category: "ANALYSIS", status: groups.size > 1 ? "AMBIGUOUS_MAPPING: each mobile and target selection must resolve to exactly one workspace object." : "NO_CORRESPONDENCE: selection did not resolve to a loaded workspace object." };
+    const objectId = [...groups.keys()][0]!; const object = workspaceObjectsRef.current.find((candidate) => candidate.objectId === objectId);
+    if (!object) return { category: "ANALYSIS", status: `OBJECT_NOT_FOUND: ${objectId} is not loaded.` };
+    const atomIds = groups.get(objectId)!; return { object, selection: selectionForStableIds(atomIds, object.loadResult.structure) };
+  };
+
+  const alignmentRequestFor = (operationKind: AlignmentOperationKind, mobileQuery: string, targetQuery: string | null, options?: AlignmentWorkflowOptions): AlignmentRequest | ConsoleCommandResult => {
+    const context = commandSelectionContext(); if (!context.structure) return { category: "ANALYSIS", status: "INVALID_INPUT: load a structure before running structural alignment." };
+    if (!targetQuery?.trim()) return { category: "ANALYSIS", status: "CARDINALITY_ERROR: alignment commands require `mobile selection, target selection`." };
+    try {
+      const mobile = localizeAlignmentSelection(requireValidSelection(evaluateSelectionQuery(mobileQuery, context.structure, selectionOptionsFor(context)))); if ("category" in mobile) return mobile;
+      const target = localizeAlignmentSelection(requireValidSelection(evaluateSelectionQuery(targetQuery, context.structure, selectionOptionsFor(context)))); if ("category" in target) return target;
+      const sourceRevision = historyServiceRef.current.currentRevision(mobile.object.objectId); const targetRevision = historyServiceRef.current.currentRevision(target.object.objectId); if (!sourceRevision || !targetRevision) return { category: "ANALYSIS", status: "HISTORY_UNAVAILABLE: both alignment objects require retained scientific revisions." };
+      const isExplicit = operationKind === "PAIR_FIT"; const sameLength = mobile.selection.stableAtomIds.length === target.selection.stableAtomIds.length;
+      const explicitPairs = isExplicit && sameLength ? mobile.selection.stableAtomIds.map((sourceAtomUid, index) => ({ sourceAtomUid, targetAtomUid: target.selection.stableAtomIds[index]! })) : undefined;
+      const sourceStateId = options?.sourceStateId ?? mobile.object.currentStateId;
+      const targetStateId = options?.targetStateId ?? target.object.currentStateId;
+      const defaultMapping: MappingMode = isExplicit ? "EXPLICIT" : operationKind === "ALIGN" || operationKind === "SUPER" ? "SEQUENCE_GUIDED" : "SOURCE_IDENTITY_STRICT";
+      const mappingMode = options?.mappingMode ?? defaultMapping;
+      const transformRequested = options ? options.transformMode === "FIT_AND_APPLY" : operationKind === "FIT" || operationKind === "PAIR_FIT" || operationKind === "ALIGN" || operationKind === "SUPER";
+      const alignmentObjectRequested = options?.alignmentObjectRequested ?? (operationKind === "ALIGN" || operationKind === "SUPER");
+      const compatibilityProfile = isExplicit ? "PYMOL_INDEX_ORDER" : mappingMode === "INDEX_ORDER" ? "PYMOL_INDEX_ORDER" : options ? `MOLEXPLORER_R08_UI_${mappingMode}` : "MOLEXPLORER_NATIVE_FIXED_CORRESPONDENCE_V1";
+      return createDefaultAlignmentRequest({ operationKind, sourceObjectId: mobile.object.objectId, targetObjectId: target.object.objectId, sourceRevisionId: sourceRevision.revisionId, targetRevisionId: targetRevision.revisionId, sourceStructure: mobile.object.loadResult.structure, targetStructure: target.object.loadResult.structure, sourceStateId, targetStateId, sourceSelection: mobile.selection, targetSelection: target.selection, sourceCoordinateContext: coordinateContextFor(mobile.object.loadResult.structure, mobile.object.objectId, sourceStateId), targetCoordinateContext: coordinateContextFor(target.object.loadResult.structure, target.object.objectId, targetStateId), mappingMode, compatibilityProfile, explicitPairs, refinementProfile: options ? { cycles: options.refinementCycles, cutoffAngstrom: 2, minCorePairs: 3 } : undefined, transformRequested, alignmentObjectRequested });
+    } catch (error) { return commandError(error, "ANALYSIS"); }
+  };
+
+  const storeFittingAnalysis = (analysis: FittingAnalysis, applyStatus: "ANALYZED" | "APPLIED" = "ANALYZED") => setFittingResults((current) => [{ ...analysis, applyStatus }, ...current.filter((entry) => entry.result.resultId !== analysis.result.resultId)].slice(0, 8));
+
+  const runAlignmentCommand = (verb: "rms_cur" | "rms" | "fit" | "pair_fit" | "align" | "super" | "cealign" | "intra_rms_cur" | "intra_rms" | "intra_fit", mobileQuery: string, targetQuery: string | null, options?: AlignmentWorkflowOptions): ConsoleCommandResult => {
+    if (verb === "cealign") { const unsupported = runCEAlign(); return { category: "ANALYSIS", status: `${unsupported.error.code}: ${unsupported.error.message}` }; }
+    if (verb === "intra_rms_cur" || verb === "intra_rms" || verb === "intra_fit") {
+      const request = alignmentRequestFor("RMS", mobileQuery, mobileQuery, options); if ("category" in request) return request;
+      const intra = verb === "intra_rms_cur" ? runIntraRmsCur(request) : verb === "intra_rms" ? runIntraRms(request) : runIntraFit(request); if (!intra.ok) return { category: "ANALYSIS", status: `${intra.error?.code ?? "FAILED"}: ${intra.error?.message ?? "intra analysis failed."}` };
+      const statuses = intra.value.states.map((state) => `${state.result.sourceCoordinateContext.stateId}=${state.numericValue?.toFixed(4) ?? "n/a"}`).join(", ");
+      if (verb === "intra_fit") {
+        const revision = historyServiceRef.current.currentRevision(request.sourceObjectId); if (!revision) return { category: "ANALYSIS", status: "HISTORY_UNAVAILABLE: no retained mobile revision; no state was changed." };
+        const applied = applyIntraFittingResults(historyServiceRef.current, revision, request, intra.value); if (!applied.ok) return { category: "ANALYSIS", status: applied.error };
+        applyScientificRevisionToWorkspace(applied.transaction.revision);
+      }
+      return { category: "ANALYSIS", status: `${verb} · reference ${intra.value.referenceStateId} · ${statuses || "no state produced a valid result"}${intra.value.stateErrors.length ? ` · ${intra.value.stateErrors.length} state(s) rejected structurally` : ""}${verb === "intra_fit" ? " · APPLIED via R07 history" : ""}` };
+    }
+    const operation = verb === "rms_cur" ? "RMS_CUR" : verb === "rms" ? "RMS" : verb === "fit" ? "FIT" : verb === "pair_fit" ? "PAIR_FIT" : verb === "align" ? "ALIGN" : "SUPER";
+    const request = alignmentRequestFor(operation, mobileQuery, targetQuery, options); if ("category" in request) return request;
+    const fitting = verb === "rms_cur" ? runRmsCur(request) : verb === "rms" ? runRms(request) : verb === "fit" ? runFit(request) : verb === "pair_fit" ? runPairFit(request) : verb === "align" ? runAlign(request) : runSuper(request);
+    if (!fitting.ok) return { category: "ANALYSIS", status: `${fitting.error?.code ?? "FAILED"}: ${fitting.error?.message ?? "alignment failed structurally; no transform was applied."}` };
+    const shouldApply = (verb === "fit" || verb === "pair_fit" || verb === "align" || verb === "super") && request.transformRequested;
+    if (!shouldApply) { storeFittingAnalysis(fitting.value); return { category: "ANALYSIS", status: `${verb} · current RMSD ${fitting.value.result.currentRmsd?.toFixed(4) ?? "n/a"} Å · fitted RMSD ${fitting.value.numericValue?.toFixed(4) ?? "n/a"} Å · ${fitting.value.result.resultDisposition}`, count: fitting.value.result.retainedPairCount }; }
+    const revision = historyServiceRef.current.currentRevision(request.sourceObjectId); if (!revision) return { category: "ANALYSIS", status: "HISTORY_UNAVAILABLE: mobile object has no retained revision; no transform was applied." };
+    const applied = applyFittingResult(historyServiceRef.current, revision, request, fitting.value); if (!applied.ok) { storeFittingAnalysis(fitting.value); return { category: "ANALYSIS", status: `${applied.error} no transform was applied.` }; }
+    applyScientificRevisionToWorkspace(applied.transaction.revision); storeFittingAnalysis(fitting.value, "APPLIED"); return { category: "ANALYSIS", status: `${verb} · ${fitting.value.result.retainedPairCount} pairs · RMSD ${fitting.value.numericValue?.toFixed(4) ?? "n/a"} Å · APPLIED via R07 history ${applied.transaction.baseRevisionId} → ${applied.transaction.resultRevisionId}`, count: fitting.value.result.retainedPairCount };
   };
 
   const commandError = (error: unknown, category: ConsoleCommandResult["category"]): ConsoleCommandResult => {
@@ -480,7 +955,11 @@ export const App = () => {
 
   const workspaceObjectCandidates = (name: string) => {
     const normalized = name.trim().replace(/^['"]|['"]$/g, "").toLowerCase();
-    return workspaceObjectsRef.current.filter((object) => [object.objectId, object.displayName, object.loadResult.structure.id, object.loadResult.structure.name].some((value) => value.toLowerCase() === normalized));
+    const stem = (value: string) => value.replace(/\.(?:pdb|cif|mmcif|pqr|sdf|mol|xyz|mol2|pdbqt)$/i, "");
+    return workspaceObjectsRef.current.filter((object) => [object.objectId, object.displayName, object.loadResult.structure.id, object.loadResult.structure.name, object.loadResult.structure.source.originalFilename].some((value) => {
+      const lower = value.toLowerCase();
+      return lower === normalized || stem(lower) === normalized;
+    }));
   };
 
   const resolveWorkspaceObject = (name: string) => {
@@ -508,10 +987,225 @@ export const App = () => {
   const ambiguousObjectStatus = (name: string) => `Object reference ${name} is ambiguous; use a durable ObjectID (object:<structure-id>[:suffix]) and no object state changed.`;
 
   const appendWorkspaceObject = (object: WorkspaceObject) => {
+    registerScientificRoot(object);
     const next = [...workspaceObjectsRef.current, object];
     workspaceObjectsRef.current = next;
     setWorkspaceObjects(next);
     return next;
+  };
+
+  const applyScientificRevisionToWorkspace = (revision: ScientificRevision): void => {
+    activePickResultRef.current = null;
+    const currentObjects = workspaceObjectsRef.current;
+    const target = currentObjects.find((object) => object.objectId === revision.objectId);
+    if (!target) return;
+    const nextStateOrder = [...revision.stateOrder];
+    const nextStateId = nextStateOrder.includes(target.currentStateId) ? target.currentStateId : revision.currentStateId;
+    const nextTarget = { ...target, loadResult: revision.loadResult, stateOrder: nextStateOrder, currentStateId: nextStateId };
+    const nextObjects = currentObjects.map((object) => object.objectId === revision.objectId ? nextTarget : object);
+    workspaceObjectsRef.current = nextObjects;
+    setWorkspaceObjects(nextObjects);
+    if (revision.objectId !== activeObjectId) {
+      return;
+    }
+
+    const survivingIds = activeSelectionResultRef.current?.structureId === revision.loadResult.structure.id
+      ? activeSelectionResultRef.current.stableAtomIds.filter((stableId) => revision.loadResult.structure.atoms.some((atom) => atom.stableId === stableId))
+      : [];
+    const reboundSelection = survivingIds.length ? selectionForStableIds(survivingIds, revision.loadResult.structure) : null;
+    activeSelectionResultRef.current = reboundSelection;
+    setActiveSelectionState(reboundSelection);
+    const projectedSelectionIds = nextObjects.length > 1 ? survivingIds.map((stableId) => workspaceScopedStableAtomId(revision.objectId, stableId)) : survivingIds;
+    const baseProjection = revision.objectId === activeObjectId ? projection : nextTarget.projection;
+    const nextProjection = setInteractionState(baseProjection, { selectedAtomIds: projectedSelectionIds, pickedAtomId: survivingIds[0] ?? null, hoveredAtomId: null, measurementPickAtomIds: [] });
+    const oldNamedSnapshots = namedSelectionsRef.current?.list() ?? [];
+    const reboundNamedSelections = new NamedSelectionStore(revision.loadResult.structure);
+    for (const snapshot of oldNamedSnapshots) {
+      const ids = snapshot.stableAtomIds.filter((stableId) => revision.loadResult.structure.atoms.some((atom) => atom.stableId === stableId));
+      try { reboundNamedSelections.createSnapshot(snapshot.name, selectionForStableIds(ids, revision.loadResult.structure)); } catch { /* stale names remain safely unavailable in the new revision */ }
+    }
+    namedSelectionsRef.current = reboundNamedSelections;
+    setNamedSelections(reboundNamedSelections.list().map((selection) => ({ name: selection.name, count: selection.stableAtomIds.length })));
+    setStructure(nextTarget.loadResult);
+    setProjection(nextProjection);
+    setMeasurements((current) => current.map((measurement) => measurement.objectId === revision.objectId ? { ...measurement, status: "STALE" } : measurement));
+    setAnalysisResults((current) => current.map((result) => result.status === "STALE" ? result : { ...result, status: "STALE", diagnostic: `STALE after scientific revision ${revision.revisionId}. Re-run this analysis on the restored revision.` }));
+    setFittingResults((current) => current.map((entry) => entry.applyStatus === "STALE" ? entry : { ...entry, applyStatus: "STALE" as const, result: markAlignmentResultStale(entry.result) }));
+  };
+
+  const runHistoryAction = (actionId: typeof ACTION_IDS.HISTORY_UNDO | typeof ACTION_IDS.HISTORY_REDO): ConsoleCommandResult => {
+    if (!activeObjectId) return { category: "HISTORY", status: "HISTORY_UNAVAILABLE: no active workspace object is loaded." };
+    const result = actionId === ACTION_IDS.HISTORY_UNDO ? historyServiceRef.current.undo(activeObjectId) : historyServiceRef.current.redo(activeObjectId);
+    if (!result.ok) return { category: "HISTORY", status: `${result.code}: ${result.message}` };
+    applyScientificRevisionToWorkspace(result.revision);
+    return { category: "HISTORY", status: `${result.operation} restored exact scientific revision ${result.toRevisionId} · parent ${result.revision.parentRevisionId ?? "none"}.` };
+  };
+
+  const runDeterministicCoordinateEdit = (): ConsoleCommandResult => {
+    if (!activeObjectId) return { category: "EDIT", status: "INVALID_EDIT_INPUT: load a structure before running the B1 integration edit." };
+    const object = workspaceObjectsRef.current.find((candidate) => candidate.objectId === activeObjectId);
+    const current = historyServiceRef.current.currentRevision(activeObjectId);
+    const selection = activeSelectionResultRef.current;
+    if (!object || !current) return { category: "EDIT", status: "HISTORY_UNAVAILABLE: the active object has no scientific revision history." };
+    if (!object.enabled) return { category: "EDIT", status: `OBJECT_DISABLED: ${object.displayName} is OFF; enable the object before editing.` };
+    const workspaceStructure = workspaceSelectionStructure(workspaceObjectsRef.current);
+    if (!selection || !workspaceStructure || selection.structureId !== workspaceStructure.id || selection.molecularRevision !== workspaceStructure.scientificHash) return { category: "EDIT", status: "INVALID_SELECTION: select one canonical atom in the active object before running edit_test." };
+    const workspaceScoped = workspaceStructure.id === "workspace";
+    const scopedPrefix = `${activeObjectId}::`;
+    const selectedObjectIds = workspaceScoped ? selection.stableAtomIds.filter((stableId) => stableId.startsWith(scopedPrefix)) : selection.stableAtomIds;
+    if (selection.stableAtomIds.length !== 1 || selectedObjectIds.length !== 1) return { category: "EDIT", status: "AMBIGUOUS_TARGET: edit_test requires exactly one selected canonical atom in the active object." };
+    const canonicalStableId = workspaceScoped ? selectedObjectIds[0].slice(scopedPrefix.length) : selectedObjectIds[0];
+    const canonicalSelection = selectionForStableIds([canonicalStableId], object.loadResult.structure);
+    const atom = object.loadResult.structure.atoms.find((candidate) => candidate.stableId === canonicalStableId);
+    if (!atom) return { category: "EDIT", status: "TARGET_NOT_FOUND: the selected stable AtomUID is not present in the active revision." };
+    const command = createCoordinateEditCommand({
+      objectId: activeObjectId,
+      baseRevisionId: current.revisionId,
+      selectionResult: canonicalSelection,
+      stateScope: { kind: "COORDINATE_STATE_ID", stateId: object.currentStateId },
+      coordinates: { [atom.stableId]: { x: atom.x + 0.25, y: atom.y - 0.125, z: atom.z + 0.5 } },
+      origin: { channel: "CONSOLE", actionId: "EDIT.TEST_COORDINATE", rawCommand: "edit_test" },
+      provenance: { producerId: "molecular-workstation.r07.integration", producerVersion: "1" },
+    });
+    const result = historyServiceRef.current.execute(command);
+    if (!result.ok) return { category: "EDIT", status: `${result.code}: ${result.message}` };
+    applyScientificRevisionToWorkspace(result.revision);
+    return { category: "EDIT", status: `COMMITTED coordinate test edit · ${result.baseRevisionId} → ${result.resultRevisionId}`, count: 1 };
+  };
+
+  type CanonicalEditTargetContext = { object: WorkspaceObject; selection: SelectionResult; atomIds: string[] };
+  const localizeEditSelection = (result: SelectionResult): CanonicalEditTargetContext | ConsoleCommandResult => {
+    const groups = new Map<string, string[]>();
+    for (const stableId of result.stableAtomIds) {
+      const separator = stableId.indexOf("::");
+      const objectId = separator >= 0 ? stableId.slice(0, separator) : activeObjectId;
+      const atomId = separator >= 0 ? stableId.slice(separator + 2) : stableId;
+      if (!objectId) continue;
+      groups.set(objectId, [...(groups.get(objectId) ?? []), atomId]);
+    }
+    if (groups.size > 1) return { category: "EDIT", status: "CROSS_OBJECT_TOPOLOGY_UNSUPPORTED: topology edits require one workspace object; no object changed." };
+    const objectId = [...groups.keys()][0] ?? activeObjectId;
+    const object = objectId ? workspaceObjectsRef.current.find((candidate) => candidate.objectId === objectId) : undefined;
+    if (!object) return { category: "EDIT", status: "HISTORY_UNAVAILABLE: the selection does not resolve to a loaded workspace object." };
+    if (!object.enabled) return { category: "EDIT", status: `OBJECT_DISABLED: ${object.displayName} is OFF; enable the object before editing.` };
+    const atomIds = groups.get(object.objectId) ?? [];
+    const selection = selectionForStableIds(atomIds, object.loadResult.structure);
+    return { object, selection, atomIds };
+  };
+
+  const editSelectionFromQuery = (query: string): CanonicalEditTargetContext | ConsoleCommandResult => {
+    const context = commandSelectionContext();
+    if (!context.structure) return { category: "EDIT", status: "INVALID_EDIT_INPUT: load a structure before editing." };
+    try {
+      return localizeEditSelection(evaluateSelectionQuery(query.trim(), context.structure, selectionOptionsFor(context)));
+    } catch (error) {
+      return commandError(error, "EDIT");
+    }
+  };
+
+  const executeTopologyEdit = (operation: "EDIT_DELETE_ATOMS" | "EDIT_ADD_BOND" | "EDIT_DELETE_BOND" | "EDIT_REPLACE_BOND_SEMANTICS", target: CanonicalEditTargetContext, order?: Exclude<BondOrder, "UNKNOWN">): ConsoleCommandResult => {
+    const current = historyServiceRef.current.currentRevision(target.object.objectId);
+    if (!current) return { category: "EDIT", status: "HISTORY_UNAVAILABLE: the target object has no scientific revision history." };
+    const origin = { channel: "UI" as const, actionId: operation };
+    const command = operation === "EDIT_DELETE_ATOMS"
+      ? createDeleteAtomsCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, origin, provenance: { producerId: "molecular-workstation.r07.ui", producerVersion: "2" } })
+      : operation === "EDIT_ADD_BOND"
+        ? createAddBondCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, order: order ?? "SINGLE", origin, provenance: { producerId: "molecular-workstation.r07.ui", producerVersion: "2" } })
+        : operation === "EDIT_DELETE_BOND"
+          ? createDeleteBondCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, origin, provenance: { producerId: "molecular-workstation.r07.ui", producerVersion: "2" } })
+          : createReplaceBondSemanticsCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, order: order ?? "SINGLE", origin, provenance: { producerId: "molecular-workstation.r07.ui", producerVersion: "2" } });
+    const result = historyServiceRef.current.execute(command);
+    if (!result.ok) return { category: "EDIT", status: `${result.code}: ${result.message}` };
+    applyScientificRevisionToWorkspace(result.revision);
+    setActiveSelection(null);
+    const description = operation === "EDIT_DELETE_ATOMS" ? `deleted ${target.atomIds.length} atom${target.atomIds.length === 1 ? "" : "s"}` : operation === "EDIT_ADD_BOND" ? `created ${order ?? "SINGLE"} bond` : operation === "EDIT_DELETE_BOND" ? "deleted canonical bond" : `replaced bond order with ${order ?? "SINGLE"}`;
+    return { category: "EDIT", status: `COMMITTED ${description} · ${result.baseRevisionId} → ${result.resultRevisionId}`, count: target.atomIds.length };
+  };
+
+  const runTopologyCommand = (verb: "remove" | "bond" | "unbond" | "set_bond", parsedArgument: string, parsedTarget: string | null): ConsoleCommandResult => {
+    const parts = splitCommandArguments([parsedArgument, parsedTarget ?? ""].filter(Boolean).join(", "));
+    if (verb === "remove") {
+      if (parsedTarget) return { category: "EDIT", status: "remove accepts one canonical selection expression; no topology changed." };
+      const target = editSelectionFromQuery(parsedArgument);
+      if ("category" in target) return target;
+      return executeTopologyEdit("EDIT_DELETE_ATOMS", target);
+    }
+    const expected = verb === "bond" ? [2, 3] : verb === "unbond" ? [2] : [4];
+    const validArity = expected.length === 2 ? (parts.length === expected[0] || parts.length === expected[1]) : parts.length === expected[0];
+    if (!validArity) return { category: "EDIT", status: verb === "bond" ? "bond requires `bond <selection1>, <selection2>[, single|double|triple|aromatic]`." : verb === "unbond" ? "unbond requires `unbond <selection1>, <selection2>`." : "set_bond requires `set_bond order, <single|double|triple|aromatic>, <selection1>, <selection2>`." };
+    const offset = verb === "set_bond" ? 2 : 0;
+    const order = verb === "bond" ? parseEditBondOrder(parts[2]) ?? (parts.length === 2 ? "SINGLE" : null) : verb === "set_bond" ? parseEditBondOrder(parts[1]) : undefined;
+    if ((verb === "bond" || verb === "set_bond") && !order) return { category: "EDIT", status: "UNSUPPORTED_BOND_ORDER: supported values are SINGLE, DOUBLE, TRIPLE, and AROMATIC." };
+    const left = editSelectionFromQuery(parts[offset]);
+    if ("category" in left) return left;
+    const right = editSelectionFromQuery(parts[offset + 1]);
+    if ("category" in right) return right;
+    if (left.atomIds.length !== 1 || right.atomIds.length !== 1) return { category: "EDIT", status: "AMBIGUOUS_TARGET: bond operations require two exact singleton endpoint selections." };
+    if (left.object.objectId !== right.object.objectId) return { category: "EDIT", status: "CROSS_OBJECT_TOPOLOGY_UNSUPPORTED: bond endpoints must belong to one canonical object; no topology changed." };
+    const selection = combineSelections(left.selection, right.selection, "add");
+    return executeTopologyEdit(verb === "bond" ? "EDIT_ADD_BOND" : verb === "unbond" ? "EDIT_DELETE_BOND" : "EDIT_REPLACE_BOND_SEMANTICS", { object: left.object, selection, atomIds: [left.atomIds[0]!, right.atomIds[0]!] }, order ?? undefined);
+  };
+
+  const runTopologyAction = (actionId: typeof ACTION_IDS.EDIT_ATOM_DELETE | typeof ACTION_IDS.EDIT_BOND_CREATE | typeof ACTION_IDS.EDIT_BOND_DELETE, order?: Exclude<BondOrder, "UNKNOWN">): ConsoleCommandResult => {
+    const result = activeSelectionResultRef.current ? localizeEditSelection(activeSelectionResultRef.current) : { category: "EDIT" as const, status: "INVALID_SELECTION: select the exact canonical atom target(s) before editing." };
+    if ("category" in result) return result;
+    const operation = actionId === ACTION_IDS.EDIT_ATOM_DELETE ? "EDIT_DELETE_ATOMS" : actionId === ACTION_IDS.EDIT_BOND_CREATE ? "EDIT_ADD_BOND" : "EDIT_DELETE_BOND";
+    if (operation !== "EDIT_DELETE_ATOMS" && result.atomIds.length !== 2) return { category: "EDIT", status: "AMBIGUOUS_TARGET: bond editing requires exactly two selected endpoint atoms." };
+    return executeTopologyEdit(operation, result, order);
+  };
+
+  const runBondOrderAction = (order: Exclude<BondOrder, "UNKNOWN">): ConsoleCommandResult => {
+    const result = activeSelectionResultRef.current ? localizeEditSelection(activeSelectionResultRef.current) : { category: "EDIT" as const, status: "INVALID_SELECTION: select exactly two canonical endpoint atoms before changing bond order." };
+    if ("category" in result) return result;
+    if (result.atomIds.length !== 2) return { category: "EDIT", status: "AMBIGUOUS_TARGET: bond order editing requires exactly two selected endpoint atoms." };
+    return executeTopologyEdit("EDIT_REPLACE_BOND_SEMANTICS", result, order);
+  };
+
+  type ChemistryEditOperation = "EDIT_ADD_HYDROGENS" | "EDIT_REFILL_HYDROGENS" | "EDIT_REMOVE_HYDROGENS" | "EDIT_ADD_ATOM_AND_BOND" | "EDIT_REPLACE_ATOM";
+  const executeChemistryEdit = (operation: ChemistryEditOperation, target: CanonicalEditTargetContext, element?: string): ConsoleCommandResult => {
+    const current = historyServiceRef.current.currentRevision(target.object.objectId);
+    if (!current) return { category: "EDIT", status: "HISTORY_UNAVAILABLE: the target object has no scientific revision history." };
+    const pick = activePickResultRef.current;
+    const command = operation === "EDIT_ADD_HYDROGENS"
+      ? createAddHydrogensCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, pickResult: pick ?? undefined, origin: { channel: "UI", actionId: ACTION_IDS.EDIT_HYDROGEN_ADD }, provenance: { producerId: "molecular-workstation.r07.b3.ui", producerVersion: "1" } })
+      : operation === "EDIT_REFILL_HYDROGENS"
+        ? createRefillHydrogensCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, bondIds: pick?.pickKind === "BOND" ? [pick.bondRef.bondId] : undefined, pickResult: pick ?? undefined, origin: { channel: "UI", actionId: ACTION_IDS.EDIT_HYDROGEN_REFILL }, provenance: { producerId: "molecular-workstation.r07.b3.ui", producerVersion: "1" } })
+        : operation === "EDIT_REMOVE_HYDROGENS"
+          ? createRemoveHydrogensCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, origin: { channel: "UI", actionId: ACTION_IDS.EDIT_HYDROGEN_REMOVE }, provenance: { producerId: "molecular-workstation.r07.b3.ui", producerVersion: "1" } })
+          : operation === "EDIT_ADD_ATOM_AND_BOND"
+            ? createAttachAtomCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, pickResult: pick ?? undefined, element: element ?? "H", bondOrder: "SINGLE", valence: 1, geometry: "deterministic-local-frame", origin: { channel: "UI", actionId: ACTION_IDS.EDIT_ATOM_ATTACH }, provenance: { producerId: "molecular-workstation.r07.b3.ui", producerVersion: "1" } })
+            : createReplaceAtomCommand({ objectId: target.object.objectId, baseRevisionId: current.revisionId, selectionResult: target.selection, atomIds: target.atomIds, pickResult: pick ?? undefined, element: element ?? "N", hFill: true, origin: { channel: "UI", actionId: ACTION_IDS.EDIT_ATOM_REPLACE }, provenance: { producerId: "molecular-workstation.r07.b3.ui", producerVersion: "1" } });
+    const result = historyServiceRef.current.execute(command);
+    if (!result.ok) return { category: "EDIT", status: `${result.code}: ${result.message}` };
+    applyScientificRevisionToWorkspace(result.revision);
+    clearSelection();
+    return { category: "EDIT", status: `COMMITTED ${operation.replace("EDIT_", "").toLowerCase().replaceAll("_", " ")} · ${result.baseRevisionId} → ${result.resultRevisionId}`, count: result.revision.loadResult.structure.atoms.length };
+  };
+
+  const chemistrySelectionFromQuery = (query: string | null, fallbackMessage: string): CanonicalEditTargetContext | ConsoleCommandResult => {
+    if (query?.trim()) return editSelectionFromQuery(query);
+    const result = activeSelectionResultRef.current ? localizeEditSelection(activeSelectionResultRef.current) : { category: "EDIT" as const, status: `INVALID_SELECTION: ${fallbackMessage}` };
+    return result;
+  };
+
+  const runChemistryCommand = (verb: "h_add" | "h_fill" | "h_remove" | "attach" | "replace", parsedArgument: string, parsedTarget: string | null): ConsoleCommandResult => {
+    if (verb === "attach" || verb === "replace") {
+      const element = parsedArgument.trim().toUpperCase();
+      if (!element || !parsedTarget) return { category: "EDIT", status: `${verb} requires '${verb} <element>, <exact parent selection>'; no chemistry changed.` };
+      const target = chemistrySelectionFromQuery(parsedTarget, "select one exact parent AtomUID before attaching or replacing an atom.");
+      if ("category" in target) return target;
+      return executeChemistryEdit(verb === "attach" ? "EDIT_ADD_ATOM_AND_BOND" : "EDIT_REPLACE_ATOM", target, element);
+    }
+    const target = chemistrySelectionFromQuery(parsedArgument, `${verb} requires an exact canonical atom/bond selection.`);
+    if ("category" in target) return target;
+    return executeChemistryEdit(verb === "h_add" ? "EDIT_ADD_HYDROGENS" : verb === "h_fill" ? "EDIT_REFILL_HYDROGENS" : "EDIT_REMOVE_HYDROGENS", target);
+  };
+
+  const runChemistryAction = (actionId: typeof ACTION_IDS.EDIT_HYDROGEN_ADD | typeof ACTION_IDS.EDIT_HYDROGEN_REFILL | typeof ACTION_IDS.EDIT_HYDROGEN_REMOVE | typeof ACTION_IDS.EDIT_ATOM_ATTACH | typeof ACTION_IDS.EDIT_ATOM_REPLACE): ConsoleCommandResult => {
+    const result = chemistrySelectionFromQuery(null, "select the exact canonical target before editing.");
+    if ("category" in result) return result;
+    const operation = actionId === ACTION_IDS.EDIT_HYDROGEN_ADD ? "EDIT_ADD_HYDROGENS" : actionId === ACTION_IDS.EDIT_HYDROGEN_REFILL ? "EDIT_REFILL_HYDROGENS" : actionId === ACTION_IDS.EDIT_HYDROGEN_REMOVE ? "EDIT_REMOVE_HYDROGENS" : actionId === ACTION_IDS.EDIT_ATOM_ATTACH ? "EDIT_ADD_ATOM_AND_BOND" : "EDIT_REPLACE_ATOM";
+    return executeChemistryEdit(operation, result, operation === "EDIT_ADD_ATOM_AND_BOND" ? "H" : operation === "EDIT_REPLACE_ATOM" ? "N" : undefined);
   };
 
   const resolveWorkspaceGroup = (name: string) => {
@@ -525,9 +1219,18 @@ export const App = () => {
     setWorkspaceGroups(groups);
   };
 
-  const runConsoleCommand = (input: string): ConsoleCommandResult => {
+  const runConsoleCommandInternal = (input: string, alignmentOptions?: AlignmentWorkflowOptions): ConsoleCommandResult => {
     const trimmed = input.trim();
+    const unsafe = unsafeConsoleDiagnostic(trimmed);
+    if (unsafe) return { category: "CAPABILITY", status: unsafe };
     const head = trimmed.match(/^([^\s]+)/)?.[1] ?? "";
+
+    if (/^(?:focus|center|zoom)\s+(?:selected|selection)$/i.test(trimmed)) {
+      if (!activeSelectionResultRef.current?.count) return { category: "PRESENTATION", status: "No non-empty active selection exists; the view was not changed." };
+      commandSequence.current += 1;
+      setCameraCommand({ actionId: ACTION_IDS.VIEW_FOCUS_SELECTION, sequence: commandSequence.current });
+      return { category: "PRESENTATION", status: "Focused the active selection; scientific state was unchanged." };
+    }
 
     // A registered verb owns command syntax.  Everything else is deliberately
     // handed to the canonical selection parser as a bare selection query.
@@ -550,6 +1253,17 @@ export const App = () => {
     const parsed = parsedResult.command;
     if (!parsed) return { category: "CAPABILITY", status: "Command was not parsed and no state was changed." };
     if (parsed.verb === "help") return { category: "SYSTEM", status: commandHelp(parsed.argument).map((definition) => `${definition.synopsis} — ${definition.description}`).join(" · ") || "No command matches that help topic." };
+    if (parsed.verb === "history") {
+      if (!activeObjectId) return { category: "HISTORY", status: "HISTORY_UNAVAILABLE: no active workspace object is loaded." };
+      const history = historyServiceRef.current.historyState(activeObjectId);
+      return { category: "HISTORY", status: history ? JSON.stringify(history) : "HISTORY_UNAVAILABLE: no retained history is available for the active object." };
+    }
+    if (parsed.verb === "undo") return runHistoryAction(ACTION_IDS.HISTORY_UNDO);
+    if (parsed.verb === "redo") return runHistoryAction(ACTION_IDS.HISTORY_REDO);
+    if (parsed.verb === "edit_test") return runDeterministicCoordinateEdit();
+    if (["rms_cur", "rms", "fit", "pair_fit", "align", "super", "cealign", "intra_rms_cur", "intra_rms", "intra_fit"].includes(parsed.verb)) return runAlignmentCommand(parsed.verb as "rms_cur" | "rms" | "fit" | "pair_fit" | "align" | "super" | "cealign" | "intra_rms_cur" | "intra_rms" | "intra_fit", parsed.argument, parsed.target, alignmentOptions);
+    if (parsed.verb === "remove" || parsed.verb === "bond" || parsed.verb === "unbond" || parsed.verb === "set_bond") return runTopologyCommand(parsed.verb, parsed.argument, parsed.target);
+    if (parsed.verb === "h_add" || parsed.verb === "h_fill" || parsed.verb === "h_remove" || parsed.verb === "attach" || parsed.verb === "replace") return runChemistryCommand(parsed.verb, parsed.argument, parsed.target);
     if (parsed.verb === "coordinate_frame") {
       const value = parsed.argument.trim().toLowerCase();
       const policy = value === "local_scientific" ? "LOCAL_SCIENTIFIC" : value === "effective_world" ? "EFFECTIVE_WORLD" : null;
@@ -591,7 +1305,7 @@ export const App = () => {
         const target = requireValidSelection(evaluateSelectionQuery(query, context.structure, selectionOptionsFor(context)));
         const currentSelection = activeSelectionResultRef.current;
         const result = operation === "replace" || !currentSelection ? target : combineSelections(currentSelection, target, operation);
-        setActiveSelection(result);
+        setActiveSelection(result, null, operation === "replace" || !currentSelection);
         setProjection((current) => setInteractionState(current, { selectedAtomIds: result.stableAtomIds, pickedAtomId: result.stableAtomIds[0] ?? null, measurementPickAtomIds: [] }));
         return { category: "SELECTION", status: `Selected ${result.count} atoms · ${operation} · revision ${result.molecularRevision.slice(0, 10)}…` };
       } catch (error) {
@@ -605,9 +1319,7 @@ export const App = () => {
       const target = resolved.object;
       if (!target) return { category: "OBJECT", status: `Object ${parsed.argument} does not exist; no object state changed.` };
       const enabled = parsed.verb === "enable";
-      const next = workspaceObjectsRef.current.map((object) => object.objectId === target.objectId ? setWorkspaceObjectEnabled(object, enabled) : object);
-      workspaceObjectsRef.current = next;
-      setWorkspaceObjects(next);
+      setWorkspaceObjectEnabledById(target.objectId, enabled);
       return { category: "OBJECT", status: `${enabled ? "Enabled" : "Disabled"} object ${target.displayName}; canonical structure preserved.` };
     }
     if (parsed.verb === "state") {
@@ -732,6 +1444,7 @@ export const App = () => {
         if (!resolved.object) return { category: "OBJECT", status: `Object ${parsed.argument} does not exist; split_states made no changes.` };
         const split = splitWorkspaceObjectStates(resolved.object, parsed.target, workspaceObjectsRef.current.map((object) => object.objectId));
         if (!split.ok) return { category: "OBJECT", status: split.message };
+        split.value.forEach((object) => registerScientificRoot(object));
         const next = [...workspaceObjectsRef.current, ...split.value];
         workspaceObjectsRef.current = next;
         setWorkspaceObjects(next);
@@ -865,6 +1578,26 @@ export const App = () => {
     return { category: "CAPABILITY", status: "Command is not implemented in the current bounded presentation/interaction gate." };
   };
 
+  const uiCommandLedgerRef = useRef<readonly ReturnType<typeof dispatchUiCommand>["command"][]>([]);
+  const runConsoleCommand = (input: string, alignmentOptions?: AlignmentWorkflowOptions): ConsoleCommandResult => {
+    const batch = tokenizeCommandBatch(input);
+    if (batch.error) return { category: "CAPABILITY", status: `${batch.error.message} (characters ${batch.error.start + 1}–${batch.error.end})`, diagnostics: [{ message: batch.error.message, span: { start: batch.error.start, end: batch.error.end } }] };
+    if (batch.commands.length === 0) return { category: "CAPABILITY", status: "A command is required." };
+    const results: ConsoleCommandResult[] = [];
+    for (const commandText of batch.commands) {
+      const unsafe = unsafeConsoleDiagnostic(commandText);
+      const result = unsafe ? runConsoleCommandInternal(commandText, alignmentOptions) : dispatchUiCommand(commandText, (command) => {
+        uiCommandLedgerRef.current = [...uiCommandLedgerRef.current.slice(-255), command];
+        return runConsoleCommandInternal(commandText, alignmentOptions);
+      }, "CONSOLE").result;
+      results.push(result);
+      if (result.category === "CAPABILITY" && /(?:Unknown command|requires|not implemented|unavailable|not parsed|not admitted|rejected)/i.test(result.status)) break;
+    }
+    if (results.length === 1) return results[0]!;
+    const last = results[results.length - 1]!;
+    return { category: last.category, status: `Batch executed ${results.length}/${batch.commands.length} command${batch.commands.length === 1 ? "" : "s"}: ${results.map((result, index) => `${index + 1}. ${result.status}`).join(" | ")}`, count: last.count };
+  };
+
   const handleNamedSelectionAction = (name: string, action: "A" | "S" | "H" | "L" | "C") => {
     if (!structure) return;
     const snapshot = namedSelectionsRef.current?.get(name);
@@ -873,7 +1606,7 @@ export const App = () => {
     if (action === "A" || action === "S") {
       const currentSelection = activeSelectionResultRef.current;
       const result = action === "S" || !currentSelection ? target : combineSelections(currentSelection, target, "add");
-      setActiveSelection(result);
+      setActiveSelection(result, null, action === "A");
       setProjection((current) => setInteractionState(current, { selectedAtomIds: result.stableAtomIds, pickedAtomId: result.stableAtomIds[0] ?? null, measurementPickAtomIds: [] }));
     } else if (action === "H") {
       setProjection((current) => applyRepresentationToSelection(current, "HIDE", (1 << 10) - 1, target.stableAtomIds));
@@ -890,12 +1623,39 @@ export const App = () => {
     window.sessionStorage.setItem("molecular-workstation.ribbon", category);
   };
 
-  const handleAction = (actionId: ActionId) => {
+  const handleActionInternal = (actionId: ActionId) => {
     const capability = ACTION_REGISTRY[actionId];
-    if (actionId.startsWith("WORKSPACE.")) {
-      const workspaceName = actionId.replace("WORKSPACE.", "").toLowerCase();
-      const labels: Record<string, string> = { home: "Home", projects: "Projects", analysis: "Analysis", laboratory: "Laboratory", molecular: "Molecular", console: "Console" };
-      if (capability.state === "SUPPORTED") setActiveNav(labels[workspaceName] ?? "Home");
+    if (actionId === ACTION_IDS.WORKSPACE_MOLECULAR) {
+      setActiveWorkspace("MOLECULAR");
+      return;
+    }
+    if (actionId === ACTION_IDS.WORKSPACE_DOCKING) {
+      setActiveWorkspace("DOCKING");
+      setActiveRailPanel(null);
+      return;
+    }
+    if (actionId === ACTION_IDS.HELP_OPEN) {
+      showNotice({ ...capability, description: "Use File → Import for coordinate and typed biological data, the right rail for working tools, and the Command Console for the documented safe command subset. See the Complete User Guide for every current action." });
+      return;
+    }
+    if (actionId === ACTION_IDS.VIEW_PROJECTION && capability.state === "SUPPORTED") {
+      setCameraProjection(projection.camera.projectionMode === "perspective" ? "orthographic" : "perspective");
+      return;
+    }
+    if (actionId === ACTION_IDS.HISTORY_UNDO || actionId === ACTION_IDS.HISTORY_REDO) {
+      const result = runHistoryAction(actionId);
+      setNotice({ ...capability, state: result.status.startsWith("UNDO") || result.status.startsWith("REDO") || result.status.startsWith("HISTORY") ? "SUPPORTED_WITH_LIMITATIONS" : capability.state, description: result.status });
+      return;
+    }
+    if (actionId === ACTION_IDS.EDIT_ATOM_DELETE || actionId === ACTION_IDS.EDIT_BOND_CREATE || actionId === ACTION_IDS.EDIT_BOND_DELETE) {
+      const result = runTopologyAction(actionId);
+      setNotice({ ...capability, state: result.status.startsWith("COMMITTED") ? "SUPPORTED" : "SUPPORTED_WITH_LIMITATIONS", description: result.status });
+      return;
+    }
+    if (actionId === ACTION_IDS.EDIT_HYDROGEN_ADD || actionId === ACTION_IDS.EDIT_HYDROGEN_REFILL || actionId === ACTION_IDS.EDIT_HYDROGEN_REMOVE || actionId === ACTION_IDS.EDIT_ATOM_ATTACH || actionId === ACTION_IDS.EDIT_ATOM_REPLACE) {
+      const result = runChemistryAction(actionId);
+      setNotice({ ...capability, state: result.status.startsWith("COMMITTED") ? "SUPPORTED" : "SUPPORTED_WITH_LIMITATIONS", description: result.status });
+      return;
     }
     if (canvasTools[actionId] && capability.state === "SUPPORTED") {
       setActiveTool(canvasTools[actionId]);
@@ -921,7 +1681,6 @@ export const App = () => {
       return;
     }
     if (actionId === ACTION_IDS.SELECTION_EVALUATE || actionId === ACTION_IDS.SELECTION_CREATE_NAMED) {
-      setActiveNav("Console");
       setConsoleExpanded(true);
       return;
     }
@@ -933,8 +1692,18 @@ export const App = () => {
       applyStyle("van-der-waals-surface");
       return;
     }
-    if (actionId === ACTION_IDS.FILE_OPEN || actionId === ACTION_IDS.FILE_IMPORT || actionId === ACTION_IDS.STRUCTURE_IMPORT) {
+    if (actionId === ACTION_IDS.FILE_IMPORT) {
+      openImportDialog();
+      return;
+    }
+    if (actionId === ACTION_IDS.FILE_OPEN || actionId === ACTION_IDS.STRUCTURE_IMPORT) {
       fileInputRef.current?.click();
+      return;
+    }
+    if (actionId === ACTION_IDS.FILE_EXPORT || actionId === ACTION_IDS.STRUCTURE_EXPORT) {
+      setExportArtifact(null);
+      setExportError(null);
+      setExportOpen(true);
       return;
     }
     if (actionId === ACTION_IDS.FILE_SAVE || actionId === ACTION_IDS.PROJECT_SAVE) {
@@ -965,7 +1734,7 @@ export const App = () => {
       commandSequence.current += 1;
       setCameraCommand({ actionId: ACTION_IDS.VIEW_RESET, sequence: commandSequence.current });
     }
-    const cameraActions = [ACTION_IDS.VIEW_FIT, ACTION_IDS.VIEW_CENTER, ACTION_IDS.VIEW_ORIENT, ACTION_IDS.VIEW_ORIGIN] as ActionId[];
+    const cameraActions = [ACTION_IDS.VIEW_FIT, ACTION_IDS.VIEW_FOCUS_SELECTION, ACTION_IDS.VIEW_CENTER, ACTION_IDS.VIEW_ORIENT, ACTION_IDS.VIEW_ORIGIN] as ActionId[];
     if (cameraActions.includes(actionId) && capability.state === "SUPPORTED") {
       commandSequence.current += 1;
       setCameraCommand({ actionId, sequence: commandSequence.current });
@@ -978,26 +1747,80 @@ export const App = () => {
     if (capability.state !== "SUPPORTED" && !implementedMeasurement) showNotice(capability);
   };
 
+  const uiCommandTextForAction: Partial<Record<string, string>> = {
+    [ACTION_IDS.HISTORY_UNDO]: "undo",
+    [ACTION_IDS.HISTORY_REDO]: "redo",
+    [ACTION_IDS.SELECTION_EVALUATE]: "select all",
+    [ACTION_IDS.REPRESENTATION_SET_STYLE]: "show_as sticks, all",
+    [ACTION_IDS.VIEW_FIT]: "zoom all",
+    [ACTION_IDS.VIEW_CENTER]: "center all",
+    [ACTION_IDS.VIEW_FOCUS_SELECTION]: "center selected",
+    [ACTION_IDS.MEASURE_DISTANCE]: "measure distance",
+    [ACTION_IDS.MEASURE_ANGLE]: "measure angle",
+    [ACTION_IDS.MEASURE_DIHEDRAL]: "measure dihedral",
+    [ACTION_IDS.MEASURE_CLEAR]: "measure clear",
+  };
+  const handleAction = (actionId: ActionId) => {
+    const commandText = uiCommandTextForAction[actionId];
+    if (!commandText) {
+      handleActionInternal(actionId);
+      return;
+    }
+    dispatchUiCommand(commandText, (command) => {
+      uiCommandLedgerRef.current = [...uiCommandLedgerRef.current.slice(-255), command];
+      return runConsoleCommandInternal(commandText);
+    }, "GUI");
+  };
+
+  const runLigandContextCommand = (command: string) => {
+    setConsoleExpanded(true);
+    const result = runConsoleCommand(command);
+    if (result.category === "CAPABILITY") showNotice({ id: ACTION_IDS.SELECTION_EVALUATE, group: "SELECTION", state: "SUPPORTED_WITH_LIMITATIONS", label: "Ligand context unavailable", description: result.status });
+  };
+
   const updateCustomColor = (hex: string) => setProjection((current) => ({ ...current, color: { ...current.color, mode: "custom", customHex: hex }, colorDiagnostic: null }));
   const updateNamedColor = (colorId: string) => setProjection((current) => ({ ...current, color: { ...current.color, mode: "named", colorId }, colorDiagnostic: null }));
   const updateComponentColor = (category: "protein" | "ligand" | "water" | "ions" | "other", mode: "inherit" | "element" | "chain" | "custom", customHex?: string) => setProjection((current) => setComponentColor(current, category, mode, customHex ?? current.color.componentColors[category]?.customHex ?? "#d7e0ea"));
-  const selectedAtom = structure?.structure.atoms.find((atom) => atom.stableId === (projection.interaction.pickedAtomId ?? projection.interaction.selectedAtomIds[0])) ?? null;
+  const handleBondOrderAction = (order: Exclude<BondOrder, "UNKNOWN">) => {
+    const result = runBondOrderAction(order);
+    const capability = ACTION_REGISTRY[ACTION_IDS.EDIT_BOND_ORDER_SET];
+    setNotice({ ...capability, state: result.status.startsWith("COMMITTED") ? "SUPPORTED" : "SUPPORTED_WITH_LIMITATIONS", description: result.status });
+  };
+  const activeWorkspaceObject = workspaceObjects.find((object) => object.objectId === activeObjectId);
+  const editTargetObject = (() => {
+    if (!activeSelection) return activeWorkspaceObject;
+    const targetObjectIds = new Set(activeSelection.stableAtomIds.map((stableId) => stableId.includes("::") ? stableId.slice(0, stableId.indexOf("::")) : activeObjectId).filter((objectId): objectId is string => Boolean(objectId)));
+    return targetObjectIds.size === 1 ? workspaceObjects.find((object) => object.objectId === [...targetObjectIds][0]) : undefined;
+  })();
+  const editSelectionReady = Boolean(activeSelection && editTargetObject?.enabled);
+  const inspectorObject = editTargetObject ?? activeWorkspaceObject;
+  const inspectorStructure = inspectorObject ? structureForWorkspaceObjectState(inspectorObject) : structure?.structure;
+  const inspectorAtomId = projection.interaction.pickedAtomId ?? projection.interaction.selectedAtomIds[0];
+  const inspectorCanonicalAtomId = inspectorAtomId?.includes("::") ? inspectorAtomId.slice(inspectorAtomId.indexOf("::") + 2) : inspectorAtomId;
+  const selectedAtom = inspectorCanonicalAtomId ? inspectorStructure?.atoms.find((atom) => atom.stableId === inspectorCanonicalAtomId) ?? null : null;
+  const renderMolecularCanvas = (searchRegionOverlay: SearchRegionOverlay | null = null) => <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={openImportDialog} onFileDrop={importFile} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearSelection} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} alignmentOverlays={alignmentOverlays} searchRegionOverlay={searchRegionOverlay} onRenderLifecycle={setRenderLifecycle} />;
 
   return (
     <div className="app-shell">
-      <input id="structure-file" ref={fileInputRef} className="visually-hidden-input" type="file" accept=".pdb,.cif,.mmcif,text/plain" onChange={(event) => { const file = event.target.files?.[0]; if (file) importFile(file); event.target.value = ""; }} />
-      <NavRail activeItem={activeNav} onAction={handleAction} />
+      <input id="structure-file" ref={fileInputRef} className="visually-hidden-input" type="file" accept=".pdb,.cif,.mmcif,.pqr,.sdf,.mol,.xyz,.mol2,.pdbqt,.fasta,.fa,.fna,.faa,.fastq,.fq,.gb,.gbk,.genbank,.embl,.emb,.dx,.mrc,.map,.ccp4,.dcd,.xtc,.trr,.gro,.psf,.prmtop,.prm7,.smi,.smiles,text/plain" onChange={(event) => { const file = event.target.files?.[0]; if (file) importFile(file); event.target.value = ""; }} />
+      <NavRail activeItem={activeWorkspace === "DOCKING" ? "Docking" : "Molecular"} onAction={handleAction} />
       <main className="app-main">
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
-        <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
-        <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${rightCollapsed ? "workspace-grid--right-collapsed" : ""}`}>
-          <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} />
-          <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={() => { pendingImportModeRef.current = "replace"; fileInputRef.current?.click(); }} onFileDrop={importFile} consoleExpanded={consoleExpanded} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearTransientInteraction} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} />
-          <InspectorPanel collapsed={rightCollapsed} onToggle={() => setRightCollapsed((value) => !value)} onAction={handleAction} structure={structure} projection={projection} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} />
-        </div>
-        <StatusBar apiStatus={apiStatus} structure={structure} project={project} selectedAtomCount={projection.interaction.selectedAtomIds.length} />
+        {activeWorkspace === "DOCKING" ? <DockingWorkspace structure={structure} onImport={openImportDialog} onOpenMolecular={() => setActiveWorkspace("MOLECULAR")} renderViewer={(overlay) => renderMolecularCanvas(overlay)} /> : <>
+          <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={openImportDialog} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
+          <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${activeRailPanel ? "workspace-grid--right-expanded" : ""}`}>
+            <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} onAlignmentCommand={runConsoleCommand} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} showOperations={false} renderReady={renderLifecycle === "ready"} />
+              {biologicalData ? <BiologicalDataViewer data={biologicalData} onImport={openImportDialog} /> : renderMolecularCanvas()}
+            <ScientificToolRail activePanel={activeRailPanel} onPanelChange={setActiveRailPanel}>
+            {activeRailPanel === "Display" || activeRailPanel === "Color" ? <InspectorPanel collapsed={false} onToggle={() => setActiveRailPanel(null)} onAction={handleAction} structure={structure} projection={projection} activeSelectionCount={activeSelection?.count ?? 0} onColorMode={setColorMode} onStyleChange={applyStyle} onTargetStyle={onTargetStyle} targetStyles={targetStyles} onNamedColor={updateNamedColor} onCustomColor={updateCustomColor} onComponentColor={updateComponentColor} onBackgroundPreset={setBackgroundPreset} onBackgroundColor={(color) => setProjection((current) => ({ ...current, background: { preset: "Custom", color } }))} onLabelMode={setLabelMode} onLabelExpression={setLabelExpression} onLabelClear={() => setLabelMode("off")} onCameraProjection={setCameraProjection} onCameraSettings={setCameraSettings} onRepresentationSettings={setRepresentationSettings} /> : activeRailPanel === "Select" ? <ScientificSelectionPanel activeSelection={activeSelection} canSelect={Boolean(structure)} onAction={handleAction} onClearSelection={clearSelection} /> : activeRailPanel === "Measure" || activeRailPanel === "Analyze" ? <ScientificOperationsPanel mode={activeRailPanel === "Measure" ? "measure" : "analyze"} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} structure={structure} onAction={handleAction} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} /> : activeRailPanel === "Ligand" ? <ScientificLigandPanel structure={structure} activeSelection={activeSelection} onAction={handleAction} onCommand={runLigandContextCommand} /> : activeRailPanel === "Edit" ? <ScientificEditPanel selectionCount={activeSelection?.count ?? 0} objectName={editTargetObject?.displayName ?? activeWorkspaceObject?.displayName} selectionReady={editSelectionReady} canUndo={activeHistoryState?.canUndo ?? false} canRedo={activeHistoryState?.canRedo ?? false} onAction={handleAction} onBondOrder={handleBondOrderAction} /> : activeRailPanel === "Session" ? <ScenePanel collection={sceneCollection} onStore={(name) => storeScene(name)} onRecall={(sceneId) => recallScene(sceneId)} onUpdate={(sceneId) => updateScene(sceneId)} onRename={(sceneId, name) => renameScene(sceneId, name)} onDelete={(sceneId) => deleteScene(sceneId)} onStep={(direction) => stepScene(direction)} /> : <section className="rail-transition-panel" aria-live="polite"><h2>{activeRailPanel}</h2><p>This tool is being moved into the scientific rail. Its current working controls remain available in Objects &amp; Selections while the transition is verified.</p></section>}
+            </ScientificToolRail>
+          </div>
+        </>}
+        <StatusBar apiStatus={apiStatus} structure={structure} project={project} dirty={dirty} selectedAtomCount={projection.interaction.selectedAtomIds.length} scientificRevision={activeHistoryState?.currentRevisionId ?? null} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} activeObjectName={activeWorkspaceObject?.displayName} activeObjectId={activeWorkspaceObject?.objectId} activeObjectEnabled={activeWorkspaceObject?.enabled} renderReady={renderLifecycle === "ready"} />
         {notice && <CapabilityNotice capability={notice} onClose={() => setNotice(null)} />}
         <div className="console-layer"><ConsolePanel expanded={consoleExpanded} onToggle={() => setConsoleExpanded((value) => !value)} structure={structure} namedSelections={namedSelections} onCommand={runConsoleCommand} /></div>
+        {exportOpen && <ExportPanel object={activeWorkspaceObject} selection={activeSelection} format={exportFormat} stateScope={exportStateScope} lossPolicy={exportLossPolicy} artifact={exportArtifact} error={exportError} onClose={() => setExportOpen(false)} onFormat={setExportFormat} onStateScope={setExportStateScope} onLossPolicy={setExportLossPolicy} onExport={() => { void runExport(); }} onDownload={downloadExport} onReimport={reimportExport} />}
+         {importDialogOpen && <ImportDialog onClose={() => setImportDialogOpen(false)} onFile={importFile} onPaste={importBiologicalText} onOnline={importOnlineBiologicalData} busy={biologicalImportBusy} error={biologicalImportError} />}
       </main>
     </div>
   );

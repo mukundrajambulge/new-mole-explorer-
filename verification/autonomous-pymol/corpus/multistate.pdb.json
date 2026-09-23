@@ -1,0 +1,35 @@
+{
+  "caseId": "LOCAL-multistate.pdb",
+  "source": "LOCAL_FIXTURE",
+  "pdbId": "",
+  "inputFormat": "pdb",
+  "bytes": 716,
+  "sha256": "4a8b1452be1d59e633a91ccac86e034038fe502cea60cefc8317a41bee084389",
+  "collectedAt": "2026-09-09T10:33:40.752Z",
+  "status": "PASS",
+  "format": "pdb",
+  "counts": {
+    "atoms": 4,
+    "residues": 1,
+    "chains": 1,
+    "polymerAtoms": 4,
+    "ligandAtoms": 0,
+    "waterAtoms": 0,
+    "ionAtoms": 0,
+    "otherAtoms": 0
+  },
+  "bondCount": 0,
+  "stateCount": 2,
+  "features": {
+    "multiState": true,
+    "unitCell": false,
+    "secondaryStructure": false,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": false,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

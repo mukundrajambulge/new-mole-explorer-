@@ -1,0 +1,29 @@
+{
+  "pdbId": "4V6F",
+  "sourceBytes": 38137644,
+  "sourceSha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+  "atomRows": 307345,
+  "statesModels": 1,
+  "parsedIdentity": {
+    "atoms": 307345,
+    "residues": 26941,
+    "chains": 5467,
+    "polymerAtoms": 301988,
+    "proteinAtoms": 95280,
+    "nucleicAtoms": 206708,
+    "organicAtoms": 0,
+    "inorganicAtoms": 5351,
+    "hetatmAtoms": 5531,
+    "solventAtoms": 6,
+    "metals": 5351,
+    "hydrogens": 0,
+    "backbone": 197622,
+    "sidechain": 104366,
+    "guide": 21574,
+    "bondCount": null,
+    "membershipHash": "9995b6d7acc8eaab70000a8949a72ef96070d799b7c7304e29e50f2b5285c68d"
+  },
+  "method": "LIGHTWEIGHT_SOURCE_SCAN",
+  "canonicalServiceStatus": "BLOCKED_CANONICAL_IDENTITY_TIMEOUT_OVER_20_MINUTES",
+  "elapsedMs": 1735
+}

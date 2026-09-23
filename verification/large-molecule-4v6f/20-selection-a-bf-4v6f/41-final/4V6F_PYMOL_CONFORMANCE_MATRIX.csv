@@ -1,0 +1,2 @@
+fixture,source_sha256,pinned_source,status
+C:\Users\mukun\Desktop\molecular-workstation\verification\large-molecule-4v6f\01-source\4v6f.cif,a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f,schrodinger/pymol-open-source@5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69,BLOCKED_ENVIRONMENT

@@ -1,0 +1,35 @@
+{
+  "caseId": "LOCAL-g1c-secondary-formal.pdb",
+  "source": "LOCAL_FIXTURE",
+  "pdbId": "",
+  "inputFormat": "pdb",
+  "bytes": 479,
+  "sha256": "c1db60f2456f4819b5a6769e6e9438c4c93db6d6d4e06850b5c9a4cfa933ce12",
+  "collectedAt": "2026-09-09T10:33:40.761Z",
+  "status": "PASS",
+  "format": "pdb",
+  "counts": {
+    "atoms": 4,
+    "residues": 4,
+    "chains": 2,
+    "polymerAtoms": 4,
+    "ligandAtoms": 0,
+    "waterAtoms": 0,
+    "ionAtoms": 0,
+    "otherAtoms": 0
+  },
+  "bondCount": 0,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": false,
+    "secondaryStructure": true,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": false,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

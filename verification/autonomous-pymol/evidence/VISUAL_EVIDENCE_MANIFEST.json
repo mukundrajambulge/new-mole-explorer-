@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-09T11:00:08.7761665Z",
+  "captureMethod": "Real app visual evidence plus current CUA observations",
+  "currentCuaObservations": [
+    "4DJW.cif loaded in real app: 7,079 atoms, 786 residues, 9 chains",
+    "select chain A reported 3,060 atoms",
+    "3Dmol.js adapter ready; docking capability visibly unavailable in G1C"
+  ],
+  "browser": "Codex In-app Browser / current CUA session; Playwright Chromium metadata unavailable because the bounded headless capture did not complete under the active API stress load",
+  "files": [
+    {
+      "file": "prior-01-app-loaded.png",
+      "bytes": 352908,
+      "sha256": "d4f52bbc5a9701a17e1e27a5143ea53a6336177d94dc95d3c9697533fa596615",
+      "provenance": "Prior final-pymol-acceptance evidence captured from the real Molexplorer app; copied into this campaign evidence set."
+    },
+    {
+      "file": "prior-02-4djw-cartoon.png",
+      "bytes": 144633,
+      "sha256": "a365161ded88e7119306a82181b2f740a071aa205d7cfad579af0e021e24d341",
+      "provenance": "Prior final-pymol-acceptance evidence captured from the real Molexplorer app; copied into this campaign evidence set."
+    },
+    {
+      "file": "prior-03-ligand-custom-color.png",
+      "bytes": 96435,
+      "sha256": "8efe36fe8736cc732edfd06654b66055c46a3c7a0b5f5a9cd7f08de593c5898b",
+      "provenance": "Prior final-pymol-acceptance evidence captured from the real Molexplorer app; copied into this campaign evidence set."
+    },
+    {
+      "file": "prior-06-vdw-surface.png",
+      "bytes": 283252,
+      "sha256": "da0bf2ddd722aa6d8e55c1b61a94a1b2d415b40a45131247370bc760f98773f6",
+      "provenance": "Prior final-pymol-acceptance evidence captured from the real Molexplorer app; copied into this campaign evidence set."
+    },
+    {
+      "file": "prior-07-mesh.png",
+      "bytes": 117971,
+      "sha256": "75ef35b1125123b2db18387b76dde990918a55d12d441aefa6fc719f1db23eb1",
+      "provenance": "Prior final-pymol-acceptance evidence captured from the real Molexplorer app; copied into this campaign evidence set."
+    },
+    {
+      "file": "prior-08-residue-selection-focus.png",
+      "bytes": 479201,
+      "sha256": "b564281d74d811f1dc155848f599b6761262249f52fed3a8a9068d685039f5c2",
+      "provenance": "Prior final-pymol-acceptance evidence captured from the real Molexplorer app; copied into this campaign evidence set."
+    },
+    {
+      "file": "prior-14-orthographic.png",
+      "bytes": 495884,
+      "sha256": "d96e131b6a4fe0536e0f841a79eba4e3a8ca274db28cb04f06a84f2b40b71328",
+      "provenance": "Prior final-pymol-acceptance evidence captured from the real Molexplorer app; copied into this campaign evidence set."
+    },
+    {
+      "file": "prior-15-perspective.png",
+      "bytes": 585791,
+      "sha256": "f947bd590a22b42dd0a4b6a69733cc89b30ec8334e40a90f26e77eb2e2791ccb",
+      "provenance": "Prior final-pymol-acceptance evidence captured from the real Molexplorer app; copied into this campaign evidence set."
+    },
+    {
+      "file": "prior-18-measurement.png",
+      "bytes": 90259,
+      "sha256": "330cdcc5e711af714ca3728723de874b30afadffb350f2ef8a6114f1ac1fdb06",
+      "provenance": "Prior final-pymol-acceptance evidence captured from the real Molexplorer app; copied into this campaign evidence set."
+    },
+    {
+      "file": "prior-32-final-cross-feature-workspace.png",
+      "bytes": 314135,
+      "sha256": "ecd0704c518872690a7d8a767fd7e05c22b7ef9ac5716a277119ffd607e1e721",
+      "provenance": "Prior final-pymol-acceptance evidence captured from the real Molexplorer app; copied into this campaign evidence set."
+    }
+  ]
+}

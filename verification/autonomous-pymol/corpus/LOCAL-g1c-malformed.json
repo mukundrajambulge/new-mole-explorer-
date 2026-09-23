@@ -1,0 +1,12 @@
+{
+  "caseId": "LOCAL-g1c-malformed.pdb",
+  "source": "LOCAL_FIXTURE",
+  "pdbId": "",
+  "inputFormat": "pdb",
+  "bytes": 86,
+  "sha256": "2cf782fd16c3b67fcb15ba3e580e48c277d8be3962d32a010443f8ce8aefd40f",
+  "collectedAt": "2026-09-09T10:46:45.860Z",
+  "status": "BLOCKED",
+  "blockedReason": "Invalid x coordinate value in structure input.",
+  "errorCode": "INVALID_INPUT"
+}

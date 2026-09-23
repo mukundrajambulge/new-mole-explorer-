@@ -10,7 +10,7 @@ describe("G1B action registry", () => {
   });
 
   it("keeps unavailable science-owned actions explicit while admitting bounded measurements", () => {
-    expect(ACTION_REGISTRY["EDIT.ATOM_DELETE"].state).toBe("UNAVAILABLE");
+    expect(ACTION_REGISTRY["EDIT.ATOM_DELETE"].state).toBe("SUPPORTED");
     expect(ACTION_REGISTRY["DOCKING.RUN"].state).toBe("UNAVAILABLE");
     expect(ACTION_REGISTRY["MEASURE.DISTANCE"].state).toBe("SUPPORTED");
   });

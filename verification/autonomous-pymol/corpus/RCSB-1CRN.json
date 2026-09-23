@@ -1,0 +1,35 @@
+{
+  "caseId": "RCSB-1CRN",
+  "source": "RCSB",
+  "pdbId": "1CRN",
+  "inputFormat": "mmcif",
+  "bytes": 69506,
+  "sha256": "23787562c427d7c1abe5420e86d5f1d0a6c7007dec1e8ce85645a6d69c32e8ba",
+  "collectedAt": "2026-09-09T10:33:52.625Z",
+  "status": "PASS",
+  "format": "mmcif",
+  "counts": {
+    "atoms": 327,
+    "residues": 46,
+    "chains": 1,
+    "polymerAtoms": 327,
+    "ligandAtoms": 0,
+    "waterAtoms": 0,
+    "ionAtoms": 0,
+    "otherAtoms": 0
+  },
+  "bondCount": 292,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": true,
+    "secondaryStructure": true,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": false,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

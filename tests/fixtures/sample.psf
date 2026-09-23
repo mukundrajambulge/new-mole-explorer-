@@ -1,0 +1,9 @@
+PSF
+
+       3 !NATOM
+       1 SEG 1 ALA N  N  0.0 14.0 0
+       2 SEG 1 ALA CA C  0.0 12.0 0
+       3 SEG 1 ALA C  C  0.0 12.0 0
+
+       2 !NBOND: bonds
+       1       2       2       3

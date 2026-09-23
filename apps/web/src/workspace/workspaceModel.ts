@@ -1,6 +1,7 @@
-import type { CanonicalAtom, CanonicalBond, CanonicalCoordinateState, CanonicalHierarchy, CanonicalMolecularStructure, StructureLoadResult } from "@molecular/contracts";
+import type { CanonicalAtom, CanonicalBond, CanonicalCoordinateState, CanonicalHierarchy, CanonicalMolecularStructure, SessionObjectRecord, StructureLoadResult } from "@molecular/contracts";
 import { canonicalChemistryRolesDatasetComplete, canonicalFragmentDatasetComplete } from "../science/datasetValidity";
 import { createDefaultRenderProjection, type RenderProjection } from "../rendering/renderProjection";
+import { hydrateCompactLoadResult } from "../structures/compactCanonical";
 
 export type WorkspaceLineageOperation = "LOAD" | "COPY" | "CREATE_FROM_SELECTION" | "SPLIT_STATE" | "JOIN_STATES";
 
@@ -93,7 +94,7 @@ const shortHash = (value: string): string => {
 };
 
 const cloneProjection = (projection: RenderProjection): RenderProjection => JSON.parse(JSON.stringify(projection)) as RenderProjection;
-const cloneLoadResult = (loadResult: StructureLoadResult): StructureLoadResult => JSON.parse(JSON.stringify(loadResult)) as StructureLoadResult;
+const cloneLoadResult = (loadResult: StructureLoadResult): StructureLoadResult => hydrateCompactLoadResult(JSON.parse(JSON.stringify(loadResult)) as StructureLoadResult);
 
 const objectIdFor = (structureId: string, existingIds: readonly string[]): string => {
   const baseId = `object:${structureId}`;
@@ -280,6 +281,27 @@ export const createWorkspaceObject = (loadResult: StructureLoadResult, existingI
   };
 };
 
+/** Restore persisted workspace identity exactly; display names never rebind scientific objects. */
+export const restoreWorkspaceObject = (record: SessionObjectRecord): WorkspaceObject => {
+  const states = coordinateStatesFor(record.loadResult.structure);
+  const available = new Set(states.map((state) => state.id));
+  const stateOrder = record.stateOrder.filter((stateId) => available.has(stateId));
+  const safeStateOrder = stateOrder.length ? [...stateOrder] : states.map((state) => state.id);
+  const projection = record.projection && typeof record.projection === "object" ? record.projection as unknown as RenderProjection : createDefaultRenderProjection(record.loadResult.structure);
+  const lineage = record.lineage && typeof record.lineage === "object" ? record.lineage as unknown as WorkspaceLineage : { operation: "LOAD" as const, parentObjectIds: [], parentStructureIds: [record.loadResult.structure.id] };
+  return {
+    objectId: record.objectId,
+    displayName: record.displayName,
+    loadResult: cloneLoadResult(record.loadResult),
+    enabled: record.enabled,
+    projection: cloneProjection(projection),
+    stateOrder: safeStateOrder,
+    currentStateId: safeStateOrder.includes(record.currentStateId) ? record.currentStateId : safeStateOrder[0]!,
+    allStates: record.allStates && safeStateOrder.length > 1,
+    lineage,
+  };
+};
+
 const withLineage = (object: WorkspaceObject, lineage: WorkspaceLineage): WorkspaceObject => ({ ...object, lineage });
 
 export const copyWorkspaceObject = (source: WorkspaceObject, displayName: string, existingIds: readonly string[]): WorkspaceObject => {
@@ -355,7 +377,7 @@ export const splitWorkspaceObjectStates = (source: WorkspaceObject, selector: st
     const state = states.find((candidate) => candidate.id === stateId);
     if (!state) continue;
     const ordinal = state.ordinal;
-    const namePrefix = selector?.trim().toLowerCase().startsWith("prefix ") ? selector.trim().slice("prefix ".length).trim() : source.displayName.replace(/\.(pdb|cif|mmcif)$/i, "");
+    const namePrefix = selector?.trim().toLowerCase().startsWith("prefix ") ? selector.trim().slice("prefix ".length).trim() : source.displayName.replace(/\.(pdb|cif|mmcif|pqr|sdf|mol|xyz|mol2|pdbqt)$/i, "");
     const displayName = `${namePrefix || source.displayName}_state_${ordinal}`;
     const provisionalStructureId = `derived_${shortHash(`split|${source.objectId}|${state.id}|${displayName}`)}`;
     const objectId = objectIdFor(provisionalStructureId, occupiedIds);
@@ -515,13 +537,16 @@ export const workspaceSelectionStructure = (objects: readonly WorkspaceObject[])
   const bounds = points.reduce((current, atom) => ({ min: { x: Math.min(current.min.x, atom.x), y: Math.min(current.min.y, atom.y), z: Math.min(current.min.z, atom.z) }, max: { x: Math.max(current.max.x, atom.x), y: Math.max(current.max.y, atom.y), z: Math.max(current.max.z, atom.z) } }), { min: { x: points[0]!.x, y: points[0]!.y, z: points[0]!.z }, max: { x: points[0]!.x, y: points[0]!.y, z: points[0]!.z } });
   const typingComplete = scoped.every((object) => Boolean(object.loadResult.structure.polymerTypingSource) && object.loadResult.structure.atoms.filter((atom) => atom.isPolymer).every((atom) => atom.polymerType !== undefined));
   const polymerTypingSource = typingComplete ? scoped.map((object) => `${object.objectId}: ${object.loadResult.structure.polymerTypingSource}`).join("; ") : undefined;
-  const peptideSequenceDataset = workspacePeptideSequenceDatasetFor(scoped);
-  const chemistryDataset = workspaceChemistryDatasetFor(scoped);
-  const fragmentDataset = workspaceFragmentDatasetFor(scoped);
+  // A single object remains in its canonical ID namespace.  The derived
+  // workspace datasets below intentionally scope IDs only when combining
+  // multiple independent objects.
+  const peptideSequenceDataset = namespaceIds ? workspacePeptideSequenceDatasetFor(scoped) : first.peptideSequenceDataset;
+  const chemistryDataset = namespaceIds ? workspaceChemistryDatasetFor(scoped) : first.chemistryDataset;
+  const fragmentDataset = namespaceIds ? workspaceFragmentDatasetFor(scoped) : first.fragmentDataset;
   const firstWithoutTyping = { ...first };
   delete firstWithoutTyping.polymerTypingSource;
-  delete firstWithoutTyping.peptideSequenceDataset;
   if (namespaceIds) {
+    delete firstWithoutTyping.peptideSequenceDataset;
     delete firstWithoutTyping.unitCell;
     delete firstWithoutTyping.chemistryDataset;
     delete firstWithoutTyping.fragmentDataset;

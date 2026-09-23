@@ -2,7 +2,7 @@ import type { CanonicalAtom, CanonicalMolecularStructure } from "@molecular/cont
 import { vdwRadiusForElement } from "../rendering/surfaceGenerator";
 
 export type StructuralAnalysisKind = "H_BONDS" | "CONTACTS" | "CLASH";
-export type AnalysisStatus = "READY" | "VALID_EMPTY";
+export type AnalysisStatus = "READY" | "VALID_EMPTY" | "STALE";
 
 export type StructuralAnalysisItem = {
   id: string;
@@ -88,4 +88,4 @@ export const analyzeStructure = (structure: CanonicalMolecularStructure, kind: S
   return resultFor(structure, kind, "analysis.clash.heavy-atom-vdw-overlap-0.4A.nonbonded.v1", items, items.length ? `${items.length} non-bonded pairs exceed 0.4 Å VDW overlap.` : "No non-bonded heavy-atom pairs exceed 0.4 Å VDW overlap.");
 };
 
-export const overlaysForAnalysis = (results: readonly StructuralAnalysisResult[]): AnalysisOverlay[] => results.flatMap((result) => result.items.map((item) => ({ ...item, kind: result.kind })));
+export const overlaysForAnalysis = (results: readonly StructuralAnalysisResult[]): AnalysisOverlay[] => results.filter((result) => result.status !== "STALE").flatMap((result) => result.items.map((item) => ({ ...item, kind: result.kind })));

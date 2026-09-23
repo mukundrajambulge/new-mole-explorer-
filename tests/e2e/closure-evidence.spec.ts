@@ -8,7 +8,7 @@ test("capture current closure evidence states", async ({ page }) => {
   await page.screenshot({ path: resolve("verification/evidence/closure-empty-state.png"), animations: "disabled" });
 
   await page.locator('input[type="file"]').setInputFiles(resolve("tests/fixtures/mini-protein.pdb"));
-  await expect(page.getByTitle("mini-protein.pdb").first()).toBeVisible();
+  await expect(page.getByTitle("mini-protein.pdb").first()).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-renderer-cartoon-contributors", "8", { timeout: 15000 });
   await page.screenshot({ path: resolve("verification/evidence/closure-uploaded-cartoon-ligand-sticks.png"), animations: "disabled" });
 

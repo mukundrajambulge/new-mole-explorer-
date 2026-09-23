@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "campaign": "MOLEXPLORER FINAL EXHAUSTIVE 4V6F LARGE-MOLECULE SELECTION QUERY A→BF",
+  "generatedAt": "2026-09-18T17:09:29.985Z",
+  "structureSha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+  "canonicalRevision": "20b7c8468b598ce6272d83709eba7454505881b43d5083c85df50735e801d913",
+  "queryCorpus": {
+    "hash": "0f5a81931dbe5960f97da323eb1adab734f2da5dffe9805f885e6966346e65c0",
+    "aToBfCases": 523,
+    "lmxCases": 9,
+    "previousExpectedDefinitions": 523,
+    "additionalLmxCases": 9,
+    "testCount": 532
+  },
+  "testCount": 532,
+  "resultSummary": {
+    "PASS": 251,
+    "EMPTY_VALID": 243,
+    "IMPLEMENTED_WITH_LIMITATION": 9,
+    "INVALID_EXPECTED": 29
+  },
+  "screenshotCount": {
+    "expected": 532,
+    "captured": 532,
+    "visuallyReviewed": 532,
+    "contactSheets": 34
+  },
+  "membershipHashCount": 509,
+  "performance": {
+    "medianQueryMs": 252,
+    "p95QueryMs": 1097,
+    "maximumQueryMs": 29813,
+    "maximumQuery": {
+      "test_id": "AF-001",
+      "category": "AF",
+      "query": "model mini-protein.pdb like model mini-protein.pdb",
+      "duration_ms": 29813,
+      "operator_family": "namedSelections",
+      "selected_atoms": 0,
+      "membership_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "EMPTY_VALID",
+      "ui_classification": "EMPTY_VALID",
+      "ui_duration_ms": 24077,
+      "ui_viewer_state": "ready",
+      "fixture": "4V6F.cif / compact-canonical-v1 / state 1",
+      "scientifically_correct": true,
+      "ui_remained_responsive": true,
+      "reproducible_retest": {
+        "schemaVersion": 1,
+        "test_id": "AF-001",
+        "category": "AF",
+        "query": "model mini-protein.pdb like model mini-protein.pdb",
+        "fixture": "4V6F canonical compact-canonical-v1",
+        "structure_sha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+        "canonical_revision": "20b7c8468b598ce6272d83709eba7454505881b43d5083c85df50735e801d913",
+        "selected_atoms": 0,
+        "membership_hash": "811c9dc5",
+        "expected_original_duration_ms": 29813,
+        "runs": [
+          {
+            "run": 1,
+            "duration_ms": 11251,
+            "status": "VALID_EMPTY",
+            "selected_atoms": 0,
+            "membership_hash": "811c9dc5",
+            "diagnostics": []
+          },
+          {
+            "run": 2,
+            "duration_ms": 11783,
+            "status": "VALID_EMPTY",
+            "selected_atoms": 0,
+            "membership_hash": "811c9dc5",
+            "diagnostics": []
+          },
+          {
+            "run": 3,
+            "duration_ms": 11056,
+            "status": "VALID_EMPTY",
+            "selected_atoms": 0,
+            "membership_hash": "811c9dc5",
+            "diagnostics": []
+          }
+        ],
+        "median_ms": 11251,
+        "maximum_ms": 11783,
+        "scientific_correctness": "CORRECT_EMPTY_VALID",
+        "ui_responsiveness": "PRIOR_UI_REPLAY_READY; THIS_RETEST_MEASURED_SEMANTIC_PATH_ONLY",
+        "classification": "PERFORMANCE_CONCERN",
+        "note": "Only AF-001 was rerun; the 523-query campaign was not repeated."
+      }
+    },
+    "maximumQueryRetest": {
+      "schemaVersion": 1,
+      "test_id": "AF-001",
+      "category": "AF",
+      "query": "model mini-protein.pdb like model mini-protein.pdb",
+      "fixture": "4V6F canonical compact-canonical-v1",
+      "structure_sha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+      "canonical_revision": "20b7c8468b598ce6272d83709eba7454505881b43d5083c85df50735e801d913",
+      "selected_atoms": 0,
+      "membership_hash": "811c9dc5",
+      "expected_original_duration_ms": 29813,
+      "runs": [
+        {
+          "run": 1,
+          "duration_ms": 11251,
+          "status": "VALID_EMPTY",
+          "selected_atoms": 0,
+          "membership_hash": "811c9dc5",
+          "diagnostics": []
+        },
+        {
+          "run": 2,
+          "duration_ms": 11783,
+          "status": "VALID_EMPTY",
+          "selected_atoms": 0,
+          "membership_hash": "811c9dc5",
+          "diagnostics": []
+        },
+        {
+          "run": 3,
+          "duration_ms": 11056,
+          "status": "VALID_EMPTY",
+          "selected_atoms": 0,
+          "membership_hash": "811c9dc5",
+          "diagnostics": []
+        }
+      ],
+      "median_ms": 11251,
+      "maximum_ms": 11783,
+      "scientific_correctness": "CORRECT_EMPTY_VALID",
+      "ui_responsiveness": "PRIOR_UI_REPLAY_READY; THIS_RETEST_MEASURED_SEMANTIC_PATH_ONLY",
+      "classification": "PERFORMANCE_CONCERN",
+      "note": "Only AF-001 was rerun; the 523-query campaign was not repeated."
+    },
+    "tailClassification": "PERFORMANCE_CONCERN"
+  },
+  "driveVerification": {
+    "expectedRows": 532,
+    "uploadedRows": 532,
+    "readbackVerifiedRows": 532,
+    "pendingRows": 0,
+    "root": "https://drive.google.com/drive/folders/1uU1K6LIyd91op3fbnoUsL9RjXmDCktu6",
+    "child": "12_FULL_SELECTION_A_BF_4V6F"
+  },
+  "knownLimitations": [
+    {
+      "test_id": "A-019",
+      "query": "donors",
+      "status": "MISSING_DEPENDENCY",
+      "notes": "Complete revision-matched canonical chemistry-role data is unavailable for this compact selection context."
+    },
+    {
+      "test_id": "A-020",
+      "query": "acceptors",
+      "status": "MISSING_DEPENDENCY",
+      "notes": "Complete revision-matched canonical chemistry-role data is unavailable for this compact selection context."
+    },
+    {
+      "test_id": "AN-005",
+      "query": "organic and donors",
+      "status": "MISSING_DEPENDENCY",
+      "notes": "Complete revision-matched canonical chemistry-role data is unavailable for this compact selection context."
+    },
+    {
+      "test_id": "AN-006",
+      "query": "organic and acceptors",
+      "status": "MISSING_DEPENDENCY",
+      "notes": "Complete revision-matched canonical chemistry-role data is unavailable for this compact selection context."
+    },
+    {
+      "test_id": "K-005",
+      "query": "bysegi (resi 45)",
+      "status": "UNSUPPORTED_OPERATOR_OR_PROFILE",
+      "notes": "Segment identity is not present in the current canonical structure."
+    },
+    {
+      "test_id": "X-001",
+      "query": "formal_charge = 1",
+      "status": "MISSING_DEPENDENCY",
+      "notes": "Canonical formal_charge data is unavailable for this selection context."
+    },
+    {
+      "test_id": "X-002",
+      "query": "formal_charge = -1",
+      "status": "MISSING_DEPENDENCY",
+      "notes": "Canonical formal_charge data is unavailable for this selection context."
+    },
+    {
+      "test_id": "X-003",
+      "query": "partial_charge < 0",
+      "status": "MISSING_DEPENDENCY",
+      "notes": "Complete revision-matched canonical partial_charge data is unavailable for this selection context."
+    },
+    {
+      "test_id": "X-004",
+      "query": "partial_charge > 0",
+      "status": "MISSING_DEPENDENCY",
+      "notes": "Complete revision-matched canonical partial_charge data is unavailable for this selection context."
+    }
+  ],
+  "pymolOracleStatus": "BLOCKED_ENVIRONMENT",
+  "unresolved": {
+    "p0": 0,
+    "p1": 0,
+    "p1Evidence": "NONE OBSERVED"
+  },
+  "acceptance": "PASS_WITH_LIMITATIONS",
+  "criteria": {
+    "sourceShaMatchesReport": true,
+    "semanticCasesComplete": true,
+    "visualEvidenceComplete": true,
+    "visualEvidenceUnique": true,
+    "testIdsComplete": true,
+    "membershipHashesComplete": true,
+    "driveManifestComplete": true,
+    "driveReadbackComplete": true,
+    "noUnresolvedP1": true,
+    "regressionsPass": true,
+    "reportReadiness": true
+  }
+}

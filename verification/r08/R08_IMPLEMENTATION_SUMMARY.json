@@ -1,0 +1,93 @@
+{
+  "status": "PASS",
+  "statusDetail": "Bounded R08 implementation complete; PyMOL executable conformance remains pending.",
+  "base": {
+    "branch": "fix/manual-gate-03b-selection-focus-presentation",
+    "sha": "845291e0194904bdba91b8729991060578d90de4"
+  },
+  "r07": {
+    "manualApproval": "DEFERRED_BY_USER",
+    "finalUserApproval": "PENDING",
+    "technicalStatus": "GREEN"
+  },
+  "r08": {
+    "branch": "feature/r08-structural-analysis",
+    "implementationTip": "09b137bbe73bb1baf880ee4c38f9e275c6e1db59",
+    "candidateTip": "09b137bbe73bb1baf880ee4c38f9e275c6e1db59",
+    "mainMerged": false,
+    "r09Started": false
+  },
+  "phases": {
+    "a1": { "status": "PASS", "acceptance": "18/18" },
+    "a2": { "status": "PASS", "acceptance": "12/12" },
+    "a3": { "status": "PASS", "acceptance": "10/10" }
+  },
+  "acceptance": {
+    "atR08": "40/40 PASS",
+    "visR08": {
+      "VIS-R08-01": "PASS",
+      "VIS-R08-02": "PASS",
+      "VIS-R08-03": "BOUNDED_PASS",
+      "VIS-R08-04": "BOUNDED_PASS",
+      "VIS-R08-05": "PASS",
+      "VIS-R08-06": "PASS",
+      "VIS-R08-07": "PASS",
+      "VIS-R08-08": "PASS",
+      "VIS-R08-09": "PASS",
+      "VIS-R08-10": "PASS"
+    }
+  },
+  "commands": {
+    "rms_cur": "IMPLEMENTED_UNVERIFIED",
+    "rms": "IMPLEMENTED_UNVERIFIED",
+    "fit": "IMPLEMENTED_UNVERIFIED",
+    "pair_fit": "IMPLEMENTED_UNVERIFIED",
+    "align": "IMPLEMENTED_UNVERIFIED",
+    "super": "IMPLEMENTED_UNVERIFIED",
+    "cealign": "UNSUPPORTED",
+    "intra_rms_cur": "IMPLEMENTED_UNVERIFIED",
+    "intra_rms": "IMPLEMENTED_UNVERIFIED",
+    "intra_fit": "IMPLEMENTED_UNVERIFIED",
+    "get_raw_alignment": "SUPPORTED"
+  },
+  "verification": {
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "unit": { "status": "PASS", "web": "128/128", "api": "22/22", "total": "150/150" },
+    "build": "PASS",
+    "r08Focused": "5/5 PASS x 3 consecutive runs",
+    "fullE2E": "110/110 PASS",
+    "r07Regression": "PASS",
+    "gate01Regression": "PASS",
+    "gate02Regression": "PASS",
+    "gate03bRegression": "PASS",
+    "browserValidation": "PASS",
+    "githubCi": {
+      "status": "PASS",
+      "runId": 34041518667,
+      "runUrl": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34041518667",
+      "sha": "09b137bbe73bb1baf880ee4c38f9e275c6e1db59"
+    }
+  },
+  "pymol": {
+    "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+    "oracle": "ORACLE_PENDING",
+    "verifiedConformance": false
+  },
+  "evidence": {
+    "directory": "verification/evidence/r08",
+    "screenshots": 16
+  },
+  "knownLimitations": [
+    "No executable pinned PyMOL runtime was available.",
+    "cealign is explicitly unsupported.",
+    "align and super remain unverified against executable PyMOL.",
+    "Effective-world transform hook exists; current workspace object transforms are identity.",
+    "Pair/residual overlays are bounded presentation graphics; immutable alignment results/objects remain authoritative.",
+    "No executable pinned PyMOL runtime was available, so implemented PyMOL-family commands remain IMPLEMENTED_UNVERIFIED.",
+    "An independent NumPy Kabsch sanity check was run; no Biopython runtime was available."
+  ],
+  "readyForR09": false,
+  "readyToMergeMain": false,
+  "userR08Retest": "READY"
+}

@@ -8,3 +8,7 @@ playwright-report/
 test-results/
 *.local
 .molecular-data/
+
+# Autonomous PyMOL campaign raw RCSB downloads remain local evidence; manifests/checksums are tracked
+verification/autonomous-pymol/corpus/*.cif
+verification/autonomous-pymol/evidence/bulk/

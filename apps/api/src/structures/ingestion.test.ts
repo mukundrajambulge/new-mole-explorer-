@@ -1,9 +1,54 @@
 import { describe, expect, it, vi } from "vitest";
-import { StructureIngestionService } from "./ingestion.js";
+import { readFileSync } from "node:fs";
+import { assertStructureSize, LARGE_STRUCTURE_WARNING_BYTES, MAX_STRUCTURE_BYTES, StructureIngestionService } from "./ingestion.js";
 
 const pdbFixture = `HEADER    TEST\nATOM      1  CA  ALA A   1       1.000   2.000   3.000  1.00 20.00           C\nHETATM    2  C1  LIG A 101       4.000   5.000   6.000  1.00 20.00           C\nHETATM    3  O   HOH A 201       7.000   8.000   9.000  1.00 20.00           O\nEND\n`;
 
 const cifFixture = `data_test\nloop_\n_atom_site.group_PDB\n_atom_site.id\n_atom_site.type_symbol\n_atom_site.label_atom_id\n_atom_site.label_comp_id\n_atom_site.label_asym_id\n_atom_site.label_seq_id\n_atom_site.Cartn_x\n_atom_site.Cartn_y\n_atom_site.Cartn_z\nATOM 1 C CA ALA A 1 1.0 2.0 3.0\nHETATM 2 O O HOH A 2 4.0 5.0 6.0\n`;
+
+const pqrFixture = `ATOM      1  N   ALA A   1      -1.100   2.000   3.000 -0.3000 1.5500
+ATOM      2  CA  ALA A   1       0.000   2.000   3.000  0.1000 1.7000
+HETATM    3  O   HOH A   2       1.000   2.000   3.000 -0.8000 1.5200
+`;
+
+const sdfFixture = `ethanol
+  Molexplorer
+
+  3  2  0  0  0  0            999 V2000
+    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.5000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    2.1000    1.1000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+  1  2  1  0
+  2  3  1  0
+M  END
+$$$$
+`;
+
+const xyzFixture = `3
+water-like coordinates
+O 0.000 0.000 0.000
+H 0.758 0.000 0.504
+H -0.758 0.000 0.504
+`;
+
+const mol2Fixture = `@<TRIPOS>MOLECULE
+ethanol
+3 2 1 0 0
+SMALL
+NO_CHARGES
+@<TRIPOS>ATOM
+1 C1 0.000 0.000 0.000 C.3 1 ETH 0.120
+2 C2 1.500 0.000 0.000 C.3 1 ETH -0.050
+3 O3 2.100 1.100 0.000 O.3 1 ETH -0.070
+@<TRIPOS>BOND
+1 1 2 1
+2 2 3 1
+`;
+
+const pdbqtFixture = `HETATM    1  C1  LIG A   1       0.000   0.000   0.000  1.00  0.00    -0.120 C
+HETATM    2  O1  LIG A   1       1.200   0.000   0.000  1.00  0.00    -0.300 O
+ENDMDL
+`;
 
 const partialChargeCifFixture = `data_charges
 loop_
@@ -67,10 +112,88 @@ describe("VIS-01 structure ingestion", () => {
     expect(result.renderSource.content).toBe(pdbFixture);
   });
 
+  it("promotes the bounded pinned-PyMOL chemistry role dataset only when canonical topology is available", async () => {
+    const result = await new StructureIngestionService().ingestLocal("mini-protein.pdb", readFileSync(new URL("../../../../tests/fixtures/mini-protein.pdb", import.meta.url)));
+    const dataset = result.structure.chemistryDataset;
+    expect(dataset).toMatchObject({
+      profileVersion: "canonical-chemistry-roles-v1",
+      provenance: expect.stringContaining("5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69"),
+    });
+    expect(dataset?.molecularRevision).toBe(result.structure.scientificHash);
+    expect(dataset?.donorAtomIds).toHaveLength(7);
+    expect(dataset?.acceptorAtomIds).toHaveLength(4);
+    expect(dataset?.donorAtomIds.map((id) => result.structure.atoms.find((atom) => atom.stableId === id)?.serial)).toEqual([1, 4, 5, 8, 10, 11, 12]);
+    expect(dataset?.acceptorAtomIds.map((id) => result.structure.atoms.find((atom) => atom.stableId === id)?.serial)).toEqual([4, 8, 10, 11]);
+  });
+
+  it("fails closed for chemistry roles when a non-solvent atom has no canonical bond topology", async () => {
+    const result = await new StructureIngestionService().ingestLocal("sample.pdb", Buffer.from(pdbFixture));
+    expect(result.structure.chemistryDataset).toBeUndefined();
+  });
+
   it("parses the admitted mmCIF atom site loop", async () => {
     const result = await new StructureIngestionService().ingestLocal("sample.mmcif", Buffer.from(cifFixture));
     expect(result.structure.format).toBe("mmcif");
     expect(result.structure.counts).toMatchObject({ atoms: 2, polymerAtoms: 1, waterAtoms: 1 });
+  });
+
+  it("parses PQR coordinates and preserves complete source-declared charges", async () => {
+    const result = await new StructureIngestionService().ingestLocal("charged.pqr", Buffer.from(pqrFixture));
+    expect(result.structure.format).toBe("pqr");
+    expect(result.structure.counts).toMatchObject({ atoms: 3, polymerAtoms: 2, waterAtoms: 1 });
+    expect(result.structure.atoms.map((atom) => [atom.x, atom.y, atom.z])).toEqual([[-1.1, 2, 3], [0, 2, 3], [1, 2, 3]]);
+    expect(result.structure.partialChargeDataset).toMatchObject({
+      chargeModel: "source-declared PQR atomic charge",
+      profileVersion: "pqr-atomic-charge-v1",
+      provenance: "Copied from source PQR charge field; no charge inference performed",
+    });
+    expect(result.structure.partialChargeDataset?.atomChargeMap[result.structure.atoms[0]!.stableId]).toBe(-0.3);
+    expect(result.structure.partialChargeDataset?.atomChargeMap[result.structure.atoms[2]!.stableId]).toBe(-0.8);
+  });
+
+  it("parses a single MDL V2000 SDF molecule with source bond orders", async () => {
+    const result = await new StructureIngestionService().ingestLocal("ethanol.sdf", Buffer.from(sdfFixture));
+    expect(result.structure.format).toBe("sdf");
+    expect(result.structure.counts).toMatchObject({ atoms: 3, ligandAtoms: 3 });
+    expect(result.structure.atoms.map((atom) => atom.element)).toEqual(["C", "C", "O"]);
+    expect(result.structure.bonds.map((bond) => bond.order)).toEqual(["SINGLE", "SINGLE"]);
+  });
+
+  it("fails closed for multi-record SDF until multi-object import is admitted", async () => {
+    await expect(new StructureIngestionService().ingestLocal("many.sdf", Buffer.from(`${sdfFixture}${sdfFixture}`))).rejects.toMatchObject({ code: "INVALID_INPUT" });
+  });
+
+  it("parses a bounded XYZ coordinate frame without inferring bonds", async () => {
+    const result = await new StructureIngestionService().ingestLocal("water.xyz", Buffer.from(xyzFixture));
+    expect(result.structure.format).toBe("xyz");
+    expect(result.structure.counts).toMatchObject({ atoms: 3, ligandAtoms: 3 });
+    expect(result.structure.atoms.map((atom) => [atom.element, atom.x, atom.y, atom.z])).toEqual([["O", 0, 0, 0], ["H", 0.758, 0, 0.504], ["H", -0.758, 0, 0.504]]);
+    expect(result.structure.bonds).toEqual([]);
+    expect(result.structure.source.formatEvidence).toContainEqual({ kind: "CONTENT_SIGNATURE", value: "XYZ atom-count coordinate frame" });
+  });
+
+  it("rejects XYZ files with a second coordinate frame", async () => {
+    await expect(new StructureIngestionService().ingestLocal("many.xyz", Buffer.from(`${xyzFixture}1\nsecond frame\nH 0 0 0\n`))).rejects.toMatchObject({ code: "INVALID_INPUT" });
+  });
+
+  it("parses one MOL2 molecule with declared bonds and complete atom charges", async () => {
+    const result = await new StructureIngestionService().ingestLocal("ethanol.mol2", Buffer.from(mol2Fixture));
+    expect(result.structure.format).toBe("mol2");
+    expect(result.structure.counts).toMatchObject({ atoms: 3, ligandAtoms: 3 });
+    expect(result.structure.atoms.map((atom) => atom.element)).toEqual(["C", "C", "O"]);
+    expect(result.structure.bonds.map((bond) => bond.order)).toEqual(["SINGLE", "SINGLE"]);
+    expect(result.structure.partialChargeDataset).toMatchObject({ chargeModel: "source-declared MOL2 atom charge", profileVersion: "mol2-atomic-charge-v1" });
+    expect(result.structure.source.formatEvidence).toContainEqual({ kind: "CONTENT_SIGNATURE", value: "SYBYL MOL2 TRIPOS sections" });
+  });
+
+  it("parses PDBQT coordinates and preserves complete source partial charges", async () => {
+    const result = await new StructureIngestionService().ingestLocal("ligand.pdbqt", Buffer.from(pdbqtFixture));
+    expect(result.structure.format).toBe("pdbqt");
+    expect(result.structure.counts).toMatchObject({ atoms: 2, ligandAtoms: 2 });
+    expect(result.structure.atoms.map((atom) => [atom.element, atom.x, atom.y, atom.z])).toEqual([["C", 0, 0, 0], ["O", 1.2, 0, 0]]);
+    expect(result.structure.bonds).toEqual([]);
+    expect(result.structure.partialChargeDataset).toMatchObject({ chargeModel: "source-declared PDBQT partial charge", profileVersion: "pdbqt-atomic-charge-v1" });
+    expect(result.structure.source.formatEvidence).toContainEqual({ kind: "CONTENT_SIGNATURE", value: "PDBQT charged atom records" });
   });
 
   it("promotes complete source-declared mmCIF partial charges without inference", async () => {
@@ -142,7 +265,7 @@ ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
   });
 
   it("rejects unadmitted formats without creating a structure", async () => {
-    await expect(new StructureIngestionService().ingestLocal("sample.sdf", Buffer.from("not admitted"))).rejects.toMatchObject({ code: "UNSUPPORTED_FORMAT" });
+    await expect(new StructureIngestionService().ingestLocal("sample.foo", Buffer.from("not admitted"))).rejects.toMatchObject({ code: "UNSUPPORTED_FORMAT" });
   });
 
   it("fetches mmCIF from the official RCSB download endpoint", async () => {
@@ -287,5 +410,66 @@ ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
     expect(result.structure.stateOrder).toEqual(result.structure.coordinateStates?.map((state) => state.id));
     expect(result.structure.coordinateStates?.map((state) => state.sourceModelNumber)).toEqual([1, 7]);
     expect(result.structure.coordinateStates?.[1]?.coordinates[result.structure.atoms[0]!.stableId]).toEqual({ x: 4, y: 5, z: 6 });
+  });
+
+  it("keeps the former 25 MiB boundary open while retaining the safety ceiling", async () => {
+    const service = new StructureIngestionService();
+    await expect(service.ingestLocal("under-limit.pdb", Buffer.from(pdbFixture))).resolves.toBeTruthy();
+    expect(LARGE_STRUCTURE_WARNING_BYTES).toBe(25 * 1024 * 1024);
+    for (const byteLength of [24 * 1024 * 1024, LARGE_STRUCTURE_WARNING_BYTES, LARGE_STRUCTURE_WARNING_BYTES + 1, 50 * 1024 * 1024, 100 * 1024 * 1024]) {
+      expect(() => assertStructureSize(byteLength)).not.toThrow();
+    }
+    expect(() => assertStructureSize(MAX_STRUCTURE_BYTES + 1)).toThrowError(/512 MiB/);
+    expect(() => assertStructureSize(LARGE_STRUCTURE_WARNING_BYTES + 1)).not.toThrowError(/25 MB or smaller/);
+  });
+
+  it("separates exact acquired bytes from scientific identity", async () => {
+    const lf = await new StructureIngestionService().ingestLocal("line-endings.pdb", Buffer.from(pdbFixture));
+    const crlf = await new StructureIngestionService().ingestLocal("line-endings.pdb", Buffer.from(pdbFixture.replaceAll("\n", "\r\n")));
+    expect(lf.sourceArtifact?.sha256).not.toBe(crlf.sourceArtifact?.sha256);
+    expect(lf.sourceArtifact?.byteLength).not.toBe(crlf.sourceArtifact?.byteLength);
+    expect(lf.structure.scientificHash).toBe(crlf.structure.scientificHash);
+    expect(lf.structure.source.scientificHashProfile).toBe("molexplorer-scientific-canonical-json-v1");
+  });
+
+  it("rejects format-policy mismatches before parser publication", async () => {
+    await expect(new StructureIngestionService().ingestLocal("wrong.pdb", Buffer.from(cifFixture))).rejects.toMatchObject({ code: "FORMAT_MISMATCH" });
+    await expect(new StructureIngestionService().ingestLocal("wrong.xyz", Buffer.from(pdbFixture))).rejects.toMatchObject({ code: "FORMAT_MISMATCH" });
+  });
+
+  it("acquires remote response bytes through arrayBuffer without text re-encoding", async () => {
+    const bytes = Buffer.from(cifFixture.replace("data_test", "data_remote"), "utf8");
+    const response = { status: 200, ok: true, headers: new Headers({ "content-type": "chemical/x-mmcif", etag: "r09-test" }), arrayBuffer: async () => bytes, text: () => { throw new Error("remote text path must not be used"); } } as unknown as Response;
+    vi.stubGlobal("fetch", vi.fn(async () => response));
+    const result = await new StructureIngestionService().ingestRcsb("1abc");
+    expect(result.sourceArtifact?.sha256).toBe((await import("../lifecycle/canonicalSerialization.js")).sha256Bytes(bytes));
+    expect(result.sourceArtifact?.providerMetadata).toMatchObject({ etag: "r09-test" });
+    vi.unstubAllGlobals();
+  });
+
+  it("coalesces concurrent and repeated RCSB acquisitions within one API process", async () => {
+    const fetchMock = vi.fn(async (input: string | URL | Request) => {
+      expect(String(input)).toBe("https://files.rcsb.org/download/1ABC.cif");
+      return new Response(cifFixture, { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const service = new StructureIngestionService();
+    const [first, second] = await Promise.all([service.ingestRcsb("1abc"), service.ingestRcsb("1ABC")]);
+    const third = await service.ingestRcsb("1abc");
+    expect(first.structure.scientificHash).toBe(second.structure.scientificHash);
+    expect(second.structure.scientificHash).toBe(third.structure.scientificHash);
+    expect(fetchMock).toHaveBeenCalledOnce();
+    vi.unstubAllGlobals();
+  });
+
+  it("records export-to-source reimport lineage", async () => {
+    const result = await new StructureIngestionService().ingestLocal("reimport.pdb", Buffer.from(pdbFixture), { parentExportArtifactId: "export_abc" });
+    expect(result.sourceArtifact).toMatchObject({ acquisitionKind: "DERIVED_EXPORT", parentExportArtifactId: "export_abc" });
+    expect(result.structure.source.acquisitionKind).toBe("DERIVED_EXPORT");
+  });
+
+  it("securely rejects foreign PyMOL session containers without deserialization", async () => {
+    await expect(new StructureIngestionService().ingestLocal("foreign.pse", Buffer.from("not pickle"))).rejects.toMatchObject({ code: "SECURITY_REJECTED" });
+    await expect(new StructureIngestionService().ingestLocal("foreign.pze", Buffer.from("not pickle"))).rejects.toMatchObject({ code: "SECURITY_REJECTED" });
   });
 });

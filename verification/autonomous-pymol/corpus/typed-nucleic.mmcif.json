@@ -1,0 +1,35 @@
+{
+  "caseId": "LOCAL-typed-nucleic.mmcif",
+  "source": "LOCAL_FIXTURE",
+  "pdbId": "",
+  "inputFormat": "mmcif",
+  "bytes": 473,
+  "sha256": "7abe51f434710ce4d5b21c0cdf11dd0d30d6e0e81a77c35291708f123ac09ff9",
+  "collectedAt": "2026-09-09T10:33:40.789Z",
+  "status": "PASS",
+  "format": "mmcif",
+  "counts": {
+    "atoms": 4,
+    "residues": 2,
+    "chains": 2,
+    "polymerAtoms": 4,
+    "ligandAtoms": 0,
+    "waterAtoms": 0,
+    "ionAtoms": 0,
+    "otherAtoms": 0
+  },
+  "bondCount": 0,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": false,
+    "secondaryStructure": false,
+    "partialCharge": false,
+    "polymerTyping": true,
+    "chemistryRoles": false,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

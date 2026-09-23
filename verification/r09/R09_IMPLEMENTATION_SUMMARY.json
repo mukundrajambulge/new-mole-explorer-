@@ -1,0 +1,54 @@
+{
+  "status": "PASS",
+  "base": {
+    "branch": "feature/r08-structural-analysis",
+    "sha": "09b137bbe73bb1baf880ee4c38f9e275c6e1db59",
+    "r07ManualApproval": "DEFERRED",
+    "r08ManualApproval": "DEFERRED",
+    "r08Metadata": "RECONCILED"
+  },
+  "branch": "feature/r09-native-lifecycle",
+  "finalSha": "ce663e8038d1f3ab7ad91833f9f95f6b7b830714",
+  "bundles": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "E": "PASS",
+    "F": "DEFERRED"
+  },
+  "acceptance": { "passed": 32, "total": 32 },
+  "tests": {
+    "unit": { "web": { "passed": 132, "total": 132 }, "api": { "passed": 34, "total": 34 }, "total": { "passed": 166, "total": 166 } },
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "build": "PASS",
+    "fullE2E": { "passed": 113, "total": 113 },
+    "focusedR09": { "passed": 3, "total": 3 },
+    "r07Regression": "PASS",
+    "r08Regression": "PASS"
+  },
+  "capabilities": {
+    "pdbWriter": "SUPPORTED_WITH_LIMITATIONS",
+    "mmcifWriter": "SUPPORTED_WITH_LIMITATIONS",
+    "psePze": "UNAVAILABLE",
+    "pymolOracle": "ORACLE_PENDING",
+    "verifiedPymolConformance": false
+  },
+  "githubCi": {
+    "runId": 34052212260,
+    "status": "PASS",
+    "url": "https://github.com/mukundrajambulge/new-mole-explorer-/actions/runs/34052212260"
+  },
+  "manualCodexBrowserValidation": "PASS",
+  "userRetest": "READY",
+  "readyForR10": false,
+  "readyToMergeMain": false,
+  "knownLimitations": [
+    "Foreign PSE/PZE compatibility is unavailable and is securely rejected.",
+    "PyMOL R09 oracle/conformance is pending.",
+    "R09 restore does not fabricate fine-grained R07 undo/redo history.",
+    "Typed PDB/mmCIF export reports semantic loss explicitly for out-of-scope fields.",
+    "R07 Gate 03B, R08, and R09 manual approvals remain deferred."
+  ]
+}

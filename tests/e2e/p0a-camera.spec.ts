@@ -8,7 +8,8 @@ test("P0-A keeps the loaded scene visible across camera modes and safe camera ac
   await page.locator('input[type="file"]').setInputFiles(fixture);
   await expect(page.locator('[title="mini-protein.pdb"]')).toBeVisible({ timeout: 15000 });
   const viewer = page.getByTestId("molecular-viewer");
-  const panel = page.getByLabel("Projection & Display panel");
+  await page.getByRole("button", { name: "Display panel" }).click();
+  const panel = page.getByTestId("projection-display-panel");
   await expect(viewer).toHaveAttribute("data-camera-clipping-mode", "auto");
   await expect(viewer).toHaveAttribute("data-camera-projection", "perspective");
   const initialLoads = await viewer.getAttribute("data-renderer-model-loads");

@@ -1,0 +1,2806 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-09T11:39:10.148Z",
+  "applicationMatrix": "verification/selection/selection-operator-matrix.json",
+  "pinnedOracleResults": "verification/selection/pymol-oracle-results.json",
+  "oracleExecutable": "BLOCKED",
+  "oracleBlocker": "No pymol/pymol.exe executable or importable pymol module is installed in the campaign environment.",
+  "classificationPolicy": {
+    "ORACLE_VERIFIED": "direct pinned PyMOL row status PASS",
+    "ORACLE_EQUIVALENT": "application alias or documented spelling map with matching membership",
+    "ORACLE_PENDING": "no executable result or generated negative control"
+  },
+  "rows": [
+    {
+      "caseId": "Q-001-POSITIVE",
+      "query": "all",
+      "class": "positive",
+      "appStatus": "PASS (`select all`)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 12,
+        "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
+        "error": null
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-002-POSITIVE",
+      "query": "*",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-003-POSITIVE",
+      "query": "everything",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": {
+        "status": "ORACLE_EQUIVALENT",
+        "count": 12,
+        "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a",
+        "error": null
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-004-POSITIVE",
+      "query": "none",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "error": null
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-005-POSITIVE",
+      "query": "enabled",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-006-POSITIVE",
+      "query": "present",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-007-POSITIVE",
+      "query": "visible",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": {
+        "status": "ORACLE_EQUIVALENT",
+        "count": 11,
+        "membershipHash": "a026ddea65f6845646345536441d3f8808c6687abe353b1e881499c01896ea58",
+        "error": null
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-008-POSITIVE",
+      "query": "name",
+      "class": "positive",
+      "appStatus": "PASS indirectly",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-009-POSITIVE",
+      "query": "%name",
+      "class": "positive",
+      "appStatus": "PASS via named-selection E2E",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-010-POSITIVE",
+      "query": "?name",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-011-POSITIVE",
+      "query": "bare named selection",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-012-POSITIVE",
+      "query": "object-name resolution",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-013-POSITIVE",
+      "query": "group-name resolution",
+      "class": "positive",
+      "appStatus": "PASS (multi-object-state.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-014-POSITIVE",
+      "query": "ambiguity handling",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-015-POSITIVE",
+      "query": "not",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-016-POSITIVE",
+      "query": "!",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-017-POSITIVE",
+      "query": "and",
+      "class": "positive",
+      "appStatus": "PASS",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-018-POSITIVE",
+      "query": "&",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-019-POSITIVE",
+      "query": "or",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-020-POSITIVE",
+      "query": "|",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-021-POSITIVE",
+      "query": "parentheses",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-022-POSITIVE",
+      "query": "implicit adjacency",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-023-POSITIVE",
+      "query": "first",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-024-POSITIVE",
+      "query": "last",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-025-POSITIVE",
+      "query": "model",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-026-POSITIVE",
+      "query": "object",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-027-POSITIVE",
+      "query": "chain",
+      "class": "positive",
+      "appStatus": "PASS indirectly",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-028-POSITIVE",
+      "query": "segi",
+      "class": "positive",
+      "appStatus": "PASS (edge-identity E2E; segment-identity E2E; unannotated mini diagnostic)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-029-POSITIVE",
+      "query": "resn",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-030-POSITIVE",
+      "query": "resi",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-031-POSITIVE",
+      "query": "alt",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts; edge-identity E2E; segment-identity E2E)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-032-POSITIVE",
+      "query": "index",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-033-POSITIVE",
+      "query": "id",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-034-POSITIVE",
+      "query": "rank",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-035-POSITIVE",
+      "query": "label",
+      "class": "positive",
+      "appStatus": "PASS (selection-closure E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-036-POSITIVE",
+      "query": "pepseq",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-037-POSITIVE",
+      "query": "S1 in S2",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-038-POSITIVE",
+      "query": "S1 like S2",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-039-POSITIVE",
+      "query": "byobject",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-040-POSITIVE",
+      "query": "bysegi",
+      "class": "positive",
+      "appStatus": "PASS (edge-identity E2E; segment-identity E2E; unannotated mini diagnostic)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-041-POSITIVE",
+      "query": "bychain",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-042-POSITIVE",
+      "query": "byres",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-043-POSITIVE",
+      "query": "bycalpha",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-044-POSITIVE",
+      "query": "bymolecule",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-045-POSITIVE",
+      "query": "byfragment",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-046-POSITIVE",
+      "query": "byring",
+      "class": "positive",
+      "appStatus": "PASS (ring-topology E2E)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-047-POSITIVE",
+      "query": "bycell",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts diagnostic; bycell E2E)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-048-POSITIVE",
+      "query": "neighbor",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-049-POSITIVE",
+      "query": "bound_to",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-050-POSITIVE",
+      "query": "extend",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-051-POSITIVE",
+      "query": "within",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts; multi-object-state.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-052-POSITIVE",
+      "query": "around",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-053-POSITIVE",
+      "query": "expand",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-054-POSITIVE",
+      "query": "near_to",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-055-POSITIVE",
+      "query": "beyond",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-056-POSITIVE",
+      "query": "gap",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-057-POSITIVE",
+      "query": "formal_charge",
+      "class": "positive",
+      "appStatus": "PASS (typed-properties E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-058-POSITIVE",
+      "query": "partial_charge",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts; source-partial-charge E2E)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-059-POSITIVE",
+      "query": "b",
+      "class": "positive",
+      "appStatus": "PASS (typed-properties E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-060-POSITIVE",
+      "query": "q` / `occupancy",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-061-POSITIVE",
+      "query": "ss",
+      "class": "positive",
+      "appStatus": "PASS (typed-properties E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-062-POSITIVE",
+      "query": "elem",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-063-POSITIVE",
+      "query": "x`, `y`, `z",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-064-POSITIVE",
+      "query": "state",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-065-POSITIVE",
+      "query": "arbitrary property",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-066-POSITIVE",
+      "query": "=",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts; typed-properties E2E)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-067-POSITIVE",
+      "query": "!=",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts; typed-properties E2E)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-068-POSITIVE",
+      "query": "<`, `<=`, `>`, `>=",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts; typed-properties E2E)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-069-POSITIVE",
+      "query": "hydrogens` / `hydro",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-070-POSITIVE",
+      "query": "hetatm",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 4,
+        "membershipHash": "dd5e06b4c99dfe1c7671e215dfd1e6cd69b462b517753447c427f6c929fb42fb",
+        "error": null
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-071-POSITIVE",
+      "query": "organic",
+      "class": "positive",
+      "appStatus": "PASS indirectly",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 2,
+        "membershipHash": "f1a7a9815562e93a9cc9321e9842cdda93caf16003517d83b5f7344643f588ab",
+        "error": null
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-072-POSITIVE",
+      "query": "inorganic",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 1,
+        "membershipHash": "fd35d6fe72936e087801f9ec4812f8a4316605b1e82396341d78c0b6a27384e9",
+        "error": null
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-073-POSITIVE",
+      "query": "solvent",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-074-POSITIVE",
+      "query": "polymer",
+      "class": "positive",
+      "appStatus": "PASS indirectly",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-075-POSITIVE",
+      "query": "polymer.protein` / `protein",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts; typed mmCIF E2E)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-076-POSITIVE",
+      "query": "polymer.nucleic",
+      "class": "positive",
+      "appStatus": "PASS (typed mmCIF E2E; untyped PDB structured diagnostic)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "error": null
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-077-POSITIVE",
+      "query": "backbone",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-078-POSITIVE",
+      "query": "sidechain",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts; sidechain-identity E2E)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": {
+        "status": "ORACLE_EQUIVALENT",
+        "count": 1,
+        "membershipHash": "70acd71525919eda2e7c85edd074c6fab360064368296a90ecfec741ee47c2529",
+        "error": null
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-079-POSITIVE",
+      "query": "guide",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-080-POSITIVE",
+      "query": "metals",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-081-POSITIVE",
+      "query": "bonded",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-082-POSITIVE",
+      "query": "donors",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-083-POSITIVE",
+      "query": "acceptors",
+      "class": "positive",
+      "appStatus": "PASS (selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_PASS",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-084-POSITIVE",
+      "query": "rep",
+      "class": "positive",
+      "appStatus": "PASS (selection-closure E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-085-POSITIVE",
+      "query": "color",
+      "class": "positive",
+      "appStatus": "PASS (`select color red` after `color red, all`; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-086-POSITIVE",
+      "query": "cartoon_color",
+      "class": "positive",
+      "appStatus": "PASS (selection-closure E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-087-POSITIVE",
+      "query": "ribbon_color",
+      "class": "positive",
+      "appStatus": "PASS (selection-closure E2E; selection-matrix-live.spec.ts)",
+      "oracleStatus": "ORACLE_EQUIVALENT",
+      "oracleObserved": null,
+      "gap": null
+    },
+    {
+      "caseId": "Q-001-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-002-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-003-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-004-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-005-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-006-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-007-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-008-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-009-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-010-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-011-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-012-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-013-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-014-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-015-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-016-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-017-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-018-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-019-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-020-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-021-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-022-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-023-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-024-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-025-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-026-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-027-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-028-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-029-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-030-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-031-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-032-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-033-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-034-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-035-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-036-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-037-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-038-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-039-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-040-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-041-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-042-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-043-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-044-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-045-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-046-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-047-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-048-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-049-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-050-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-051-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-052-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-053-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-054-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-055-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-056-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-057-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-058-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-059-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-060-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-061-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-062-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-063-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-064-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-065-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-066-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-067-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-068-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-069-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-070-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-071-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-072-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-073-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-074-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-075-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-076-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-077-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-078-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-079-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-080-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-081-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-082-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-083-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-084-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-085-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-086-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-087-ZERO",
+      "query": "none",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 0,
+        "membershipHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gap": null
+    },
+    {
+      "caseId": "Q-001-INVALID",
+      "query": "(all",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-002-INVALID",
+      "query": "(*",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-003-INVALID",
+      "query": "(everything",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-004-INVALID",
+      "query": "(none",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-005-INVALID",
+      "query": "(enabled",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-006-INVALID",
+      "query": "(present",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-007-INVALID",
+      "query": "(visible",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-008-INVALID",
+      "query": "(name",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-009-INVALID",
+      "query": "(%name",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-010-INVALID",
+      "query": "(?name",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-011-INVALID",
+      "query": "(bare named selection",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-012-INVALID",
+      "query": "(object-name resolution",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-013-INVALID",
+      "query": "(group-name resolution",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-014-INVALID",
+      "query": "(ambiguity handling",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-015-INVALID",
+      "query": "(not",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-016-INVALID",
+      "query": "(!",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-017-INVALID",
+      "query": "(and",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-018-INVALID",
+      "query": "(&",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-019-INVALID",
+      "query": "(or",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-020-INVALID",
+      "query": "(|",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-021-INVALID",
+      "query": "(parentheses",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-022-INVALID",
+      "query": "(implicit adjacency",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-023-INVALID",
+      "query": "(first",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-024-INVALID",
+      "query": "(last",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-025-INVALID",
+      "query": "(model",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-026-INVALID",
+      "query": "(object",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-027-INVALID",
+      "query": "(chain",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-028-INVALID",
+      "query": "(segi",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-029-INVALID",
+      "query": "(resn",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-030-INVALID",
+      "query": "(resi",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-031-INVALID",
+      "query": "(alt",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-032-INVALID",
+      "query": "(index",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-033-INVALID",
+      "query": "(id",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-034-INVALID",
+      "query": "(rank",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-035-INVALID",
+      "query": "(label",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-036-INVALID",
+      "query": "(pepseq",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-037-INVALID",
+      "query": "(S1 in S2",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-038-INVALID",
+      "query": "(S1 like S2",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-039-INVALID",
+      "query": "(byobject",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-040-INVALID",
+      "query": "(bysegi",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-041-INVALID",
+      "query": "(bychain",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-042-INVALID",
+      "query": "(byres",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-043-INVALID",
+      "query": "(bycalpha",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-044-INVALID",
+      "query": "(bymolecule",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-045-INVALID",
+      "query": "(byfragment",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-046-INVALID",
+      "query": "(byring",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-047-INVALID",
+      "query": "(bycell",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-048-INVALID",
+      "query": "(neighbor",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-049-INVALID",
+      "query": "(bound_to",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-050-INVALID",
+      "query": "(extend",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-051-INVALID",
+      "query": "(within",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-052-INVALID",
+      "query": "(around",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-053-INVALID",
+      "query": "(expand",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-054-INVALID",
+      "query": "(near_to",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-055-INVALID",
+      "query": "(beyond",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-056-INVALID",
+      "query": "(gap",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-057-INVALID",
+      "query": "(formal_charge",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-058-INVALID",
+      "query": "(partial_charge",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-059-INVALID",
+      "query": "(b",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-060-INVALID",
+      "query": "(q` / `occupancy",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-061-INVALID",
+      "query": "(ss",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-062-INVALID",
+      "query": "(elem",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-063-INVALID",
+      "query": "(x`, `y`, `z",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-064-INVALID",
+      "query": "(state",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-065-INVALID",
+      "query": "(arbitrary property",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-066-INVALID",
+      "query": "(=",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-067-INVALID",
+      "query": "(!=",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-068-INVALID",
+      "query": "(<`, `<=`, `>`, `>=",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-069-INVALID",
+      "query": "(hydrogens` / `hydro",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-070-INVALID",
+      "query": "(hetatm",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-071-INVALID",
+      "query": "(organic",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-072-INVALID",
+      "query": "(inorganic",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-073-INVALID",
+      "query": "(solvent",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-074-INVALID",
+      "query": "(polymer",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-075-INVALID",
+      "query": "(polymer.protein` / `protein",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-076-INVALID",
+      "query": "(polymer.nucleic",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-077-INVALID",
+      "query": "(backbone",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-078-INVALID",
+      "query": "(sidechain",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-079-INVALID",
+      "query": "(guide",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-080-INVALID",
+      "query": "(metals",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-081-INVALID",
+      "query": "(bonded",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-082-INVALID",
+      "query": "(donors",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-083-INVALID",
+      "query": "(acceptors",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-084-INVALID",
+      "query": "(rep",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-085-INVALID",
+      "query": "(color",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-086-INVALID",
+      "query": "(cartoon_color",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-087-INVALID",
+      "query": "(ribbon_color",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-EDGE-001",
+      "query": "name CA and resi 9999",
+      "class": "zero-result",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-EDGE-002",
+      "query": "chain",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-EDGE-003",
+      "query": "resi not-a-number",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-EDGE-004",
+      "query": "byres (name CA",
+      "class": "invalid",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_PENDING",
+      "oracleObserved": null,
+      "gap": "EXECUTABLE_ORACLE_REQUIRED"
+    },
+    {
+      "caseId": "Q-EDGE-005",
+      "query": "all",
+      "class": "positive",
+      "appStatus": "GENERATED_CASE",
+      "oracleStatus": "ORACLE_VERIFIED",
+      "oracleObserved": {
+        "status": "ORACLE_PASS",
+        "count": 12,
+        "membershipHash": "fc7e7625bf321633767f5894d09fe7d8fc167a1edb5810c32e49d56c122aaa3a"
+      },
+      "gap": null
+    }
+  ]
+}

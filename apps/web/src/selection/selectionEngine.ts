@@ -2,6 +2,7 @@ import type { CanonicalAtom, CanonicalMolecularStructure, CanonicalUnitCell } fr
 import { vdwRadiusForElementStrict, VDW_RADIUS_PROFILE } from "../science/vdwRadii";
 import { canonicalChemistryRolesDatasetComplete, canonicalFragmentDatasetComplete, canonicalPartialChargeDatasetComplete } from "../science/datasetValidity";
 import { beyondSurfaceGapBoundary, withinSpatialBoundary } from "./spatialPolicy";
+import { evaluateCompactSelection } from "./compactSelectionEngine";
 
 export type SelectionStatus =
   | "VALID_NONEMPTY"
@@ -360,8 +361,15 @@ const wildcardMatch = (value: string, pattern: string): boolean => {
   const escaped = [...pattern].map((char) => char === "*" ? ".*" : char === "?" ? "." : char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("");
   return new RegExp(`^${escaped}$`, "i").test(value);
 };
+const workspaceNameMatch = (value: string, pattern: string): boolean => {
+  const stem = (candidate: string) => candidate.replace(/\.(?:pdb|cif|mmcif|pqr|sdf|mol|xyz|mol2|pdbqt)$/i, "");
+  return wildcardMatch(value, pattern) || wildcardMatch(stem(value), pattern) || wildcardMatch(value, stem(pattern));
+};
 const residueParts = (value: string): { number: number; insertion: string } | null => { const match = value.match(/^(-?\d+)([A-Za-z]?)$/); return match ? { number: Number(match[1]), insertion: match[2].toUpperCase() } : null; };
-const residueIdFor = (atom: CanonicalAtom): string => `${atom.workspaceObjectId ? `${atom.workspaceObjectId}::` : ""}chain:${atom.chain}:residue:${atom.residueNumber}:${atom.insertionCode ?? ""}`;
+const residueIdFor = (atom: CanonicalAtom): string => {
+  const scoped = atom.workspaceObjectId && atom.stableId.startsWith(`${atom.workspaceObjectId}::`);
+  return `${scoped ? `${atom.workspaceObjectId}::` : ""}chain:${atom.chain}:residue:${atom.residueNumber}:${atom.insertionCode ?? ""}`;
+};
 const peptideSelectionAtomIdsFor = (value: string, structure: CanonicalMolecularStructure, context: EvalContext): Set<string> => {
   const cached = context.peptideSelectionMatches.get(value);
   if (cached) return cached;
@@ -630,16 +638,24 @@ const predicateMatches = (atom: CanonicalAtom, property: SelectionProperty, oper
     if (atom.workspaceObjectId) {
       let matchingObjects = context.objectMatches.get(value);
       if (!matchingObjects) {
-        matchingObjects = new Set(structure.atoms.filter((candidate) => candidate.workspaceObjectId && (wildcardMatch(candidate.workspaceObjectId, value) || wildcardMatch(candidate.workspaceObjectId.replace(/^object:/i, ""), value) || wildcardMatch(candidate.workspaceObjectName ?? "", value))).map((candidate) => candidate.workspaceObjectId!));
+        matchingObjects = new Set(structure.atoms.filter((candidate) => candidate.workspaceObjectId && (wildcardMatch(candidate.workspaceObjectId, value) || wildcardMatch(candidate.workspaceObjectId.replace(/^object:/i, ""), value) || workspaceNameMatch(candidate.workspaceObjectName ?? "", value))).map((candidate) => candidate.workspaceObjectId!));
         context.objectMatches.set(value, matchingObjects);
+      }
+      if (property === "object" && matchingObjects.size === 0) {
+        const loadedNames = [...new Set(structure.atoms.map((candidate) => candidate.workspaceObjectName).filter((name): name is string => Boolean(name)))];
+        if (!context.diagnostics.some((diagnostic) => diagnostic.code === "OBJECT_NOT_FOUND" && diagnostic.message.includes(value))) context.diagnostics.push({ code: "OBJECT_NOT_FOUND", message: `No loaded object matches "${value}". Loaded objects: ${loadedNames.join(", ") || "none"}.` });
+        return false;
       }
       const exactObjectId = wildcardMatch(atom.workspaceObjectId, value) || wildcardMatch(atom.workspaceObjectId.replace(/^object:/i, ""), value);
       if (matchingObjects.size > 1 && !exactObjectId) {
         if (!context.diagnostics.some((diagnostic) => diagnostic.code === "AMBIGUOUS_NAME")) context.diagnostics.push({ code: "AMBIGUOUS_NAME", message: `Object name \`${value}\` resolves to multiple workspace objects; use a durable ObjectID.` });
         return false;
       }
-      matches = exactObjectId || wildcardMatch(atom.workspaceObjectName ?? "", value);
-    } else matches = wildcardMatch(structure.id, value) || wildcardMatch(structure.name, value) || wildcardMatch(structure.source.originalFilename, value);
+      matches = exactObjectId || workspaceNameMatch(atom.workspaceObjectName ?? "", value);
+    } else {
+      matches = wildcardMatch(structure.id, value) || wildcardMatch(structure.name, value) || wildcardMatch(structure.source.originalFilename, value);
+      if (property === "object" && !matches && !context.diagnostics.some((diagnostic) => diagnostic.code === "OBJECT_NOT_FOUND" && diagnostic.message.includes(value))) context.diagnostics.push({ code: "OBJECT_NOT_FOUND", message: `No loaded object matches "${value}". Loaded objects: ${structure.source.originalFilename || structure.name || structure.id}.` });
+    }
   }
   else if (["b", "q", "occupancy", "formal_charge", "partial_charge", "x", "y", "z", "state"].includes(property)) {
     context.needsCoordinates = true;
@@ -691,7 +707,7 @@ const evaluateAst = (ast: SelectionAst, structure: CanonicalMolecularStructure, 
     const named = context.named?.get(ast.name);
     if (named) return new Set(named.stableAtomIds.filter((id) => context.universe.has(id)));
     const normalizedName = ast.name.toLowerCase();
-    const objectIds = [...new Set(structure.atoms.filter((atom) => atom.workspaceObjectId && (atom.workspaceObjectId.toLowerCase() === normalizedName || atom.workspaceObjectId.replace(/^object:/i, "").toLowerCase() === normalizedName || atom.workspaceObjectName?.toLowerCase() === normalizedName)).map((atom) => atom.workspaceObjectId!))];
+    const objectIds = [...new Set(structure.atoms.filter((atom) => atom.workspaceObjectId && (atom.workspaceObjectId.toLowerCase() === normalizedName || atom.workspaceObjectId.replace(/^object:/i, "").toLowerCase() === normalizedName || workspaceNameMatch(atom.workspaceObjectName ?? "", ast.name))).map((atom) => atom.workspaceObjectId!))];
     const matchingGroups = (context.groups ?? []).filter((group) => group.groupId.toLowerCase() === normalizedName || group.name.toLowerCase() === normalizedName);
     if (objectIds.length + matchingGroups.length > 1) {
       context.diagnostics.push({ code: "AMBIGUOUS_NAME", message: `Workspace name \`${ast.name}\` resolves to multiple objects or groups; use a durable ID or explicit named-selection syntax.` });
@@ -994,6 +1010,24 @@ export const bindSelectionPlan = (query: string, ast: SelectionAst, normalizedAs
 
 export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecularStructure, options: SelectionEvaluationOptions = {}): SelectionResult => {
   const trimmed = query.trim(); const parsed = parseSelection(trimmed); const source = options.source ?? { kind: "query", rawQuery: trimmed };
+  const compact = structure.compact?.schemaVersion === "compact-canonical-v1" ? structure.compact : null;
+  const compactResult = (status: SelectionStatus, diagnostics: readonly SelectionDiagnostic[], astText: string, ids: readonly string[], evaluation?: ReturnType<typeof evaluateCompactSelection>): SelectionResult => {
+    const stableAtomIds = [...new Set(ids)]; const membershipHash = hash(stableAtomIds.join("\u0000"));
+    const needsCoordinates = evaluation?.needsCoordinates ?? false; const coordinateObjectIds = evaluation?.coordinateObjectIds ?? [];
+    const coordinateContext = needsCoordinates ? { structureId: structure.id, revision: structure.scientificHash, stateId: options.coordinateStateId ?? "active", framePolicy: options.coordinateFrame ?? "LOCAL_SCIENTIFIC", objectIds: coordinateObjectIds.length ? coordinateObjectIds : [structure.id], stateScopes: [{ objectId: structure.id, stateId: options.coordinateStateId ?? structure.stateOrder?.[0] ?? `${structure.id}:state:1`, ordinal: options.stateOrdinal ?? 1 }] } : null;
+    return { schemaVersion: 2, resultId: hash(`${trimmed}\u0000${structure.id}\u0000${structure.scientificHash}\u0000${stableAtomIds.join("\u0000")}`), source, query: trimmed, grammarVersion: GRAMMAR_VERSION, normalizedAst: astText, normalizedAstHash: hash(astText), profile: PROFILE, molecularIdentity: { structureId: structure.id, molecularRevision: structure.scientificHash }, structureId: structure.id, molecularRevision: structure.scientificHash, objectScope: { kind: "structure", objectId: structure.id }, universeFingerprint: hash(compact?.atomStableIds.join("\u0000") ?? ""), coordinateContext, topologyRevision: evaluation?.needsTopology ? "compact-canonical-topology" : null, namespaceRevision: `compact:${structure.scientificHash}`, scientificProfiles: [], presentationContext: evaluation?.needsPresentation && options.presentation ? { revision: options.presentation.revision } : null, stableAtomIds, membershipHash, count: stableAtomIds.length, status, diagnostics, dependencyVector: { needsCoordinates, needsTopology: evaluation?.needsTopology ?? false, needsNamespaces: true, needsPresentation: evaluation?.needsPresentation ?? false }, boundPlan: null };
+  };
+  if (compact) {
+    if (options.expectedRevision && options.expectedRevision !== structure.scientificHash) return compactResult("STALE_REVISION", [{ code: "STALE_REVISION", message: "The selection context revision is stale; the active structure was not changed." }], "", []);
+    const gated = trimmed.match(/\b(pbc|symmetry|arbitrary)\b/i);
+    if (gated) return compactResult("UNSUPPORTED_OPERATOR_OR_PROFILE", [{ code: "UNSUPPORTED_OPERATOR_OR_PROFILE", message: `Selection operator \`${gated[1]}\` is gated until its validated scientific profile is available.` }], "", []);
+    if (!trimmed || !parsed.ast) {
+      const diagnostics = parsed.diagnostics.length ? parsed.diagnostics : [{ code: "SYNTAX_ERROR" as const, message: "A selection expression is required." }];
+      const parseStatus: SelectionStatus = diagnostics.some((diagnostic) => diagnostic.code === "UNKNOWN_PROPERTY") ? "UNKNOWN_PROPERTY" : "SYNTAX_ERROR";
+      return compactResult(parseStatus, diagnostics, "", []);
+    }
+    const ast = normalize(parsed.ast); const normalized = serialize(ast); const evaluation = evaluateCompactSelection(structure, ast, options); if (evaluation) return compactResult(evaluation.status, evaluation.diagnostics, normalized, evaluation.stableAtomIds, evaluation);
+  }
   const emptyContext = { ...contextFor(structure, trimmed, options.named, [...parsed.diagnostics], options.presentation, options.coordinateFrame, options.groups), coordinateStateId: options.coordinateStateId, stateOrdinal: options.stateOrdinal };
   if (options.expectedRevision && options.expectedRevision !== structure.scientificHash) return baseResult(trimmed, structure, source, "STALE_REVISION", [{ code: "STALE_REVISION", message: "The selection context revision is stale; the active structure was not changed." }], "", [], emptyContext);
   const gated = trimmed.match(/\b(pbc|symmetry|arbitrary)\b/i);
@@ -1021,6 +1055,7 @@ export const evaluateSelectionQuery = (query: string, structure: CanonicalMolecu
   let status: SelectionStatus = ids.size > 0 ? "VALID_NONEMPTY" : "VALID_EMPTY";
   if (context.diagnostics.some((diagnostic) => diagnostic.code === "UNSUPPORTED_OPERATOR_OR_PROFILE")) status = "UNSUPPORTED_OPERATOR_OR_PROFILE";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "UNKNOWN_PROPERTY")) status = "UNKNOWN_PROPERTY";
+  else if (context.diagnostics.some((diagnostic) => diagnostic.code === "OBJECT_NOT_FOUND")) status = "OBJECT_NOT_FOUND";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "UNKNOWN_NAME")) status = "UNKNOWN_NAME";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "AMBIGUOUS_NAME")) status = "AMBIGUOUS_NAME";
   else if (context.diagnostics.some((diagnostic) => diagnostic.code === "INVALID_VALUE")) status = "INVALID_VALUE";
@@ -1063,6 +1098,12 @@ export class NamedSelectionStore {
   updateSnapshot(name: string, result: SelectionResult): NamedSelectionSnapshot {
     if (!this.snapshots.has(name)) throw new SelectionResolutionError(`Named selection \`${name}\` does not exist.`);
     return this.createSnapshot(name, result);
+  }
+  /** Restore an immutable persisted snapshot without re-evaluating its query. */
+  restoreSnapshot(snapshot: NamedSelectionSnapshot): void {
+    if (!snapshot.name || snapshot.immutable !== true) throw new SelectionResolutionError("Persisted named selection snapshot is not immutable.");
+    this.snapshots.set(snapshot.name, { ...snapshot, stableAtomIds: [...snapshot.stableAtomIds], selectionResult: { ...snapshot.selectionResult, stableAtomIds: [...snapshot.selectionResult.stableAtomIds] } });
+    this.revision += 1;
   }
   rename(name: string, nextName: string): NamedSelectionSnapshot {
     if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(nextName)) throw new SelectionResolutionError("Named selections must use an identifier such as active_site.");

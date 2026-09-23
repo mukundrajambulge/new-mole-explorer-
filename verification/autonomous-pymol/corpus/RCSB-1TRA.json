@@ -1,0 +1,35 @@
+{
+  "caseId": "RCSB-1TRA",
+  "source": "RCSB",
+  "pdbId": "1TRA",
+  "inputFormat": "mmcif",
+  "bytes": 280184,
+  "sha256": "70604c102dc431eaf8b36bdc57e9ad65240ff879d0f545c76e5af4980bdbdb42",
+  "collectedAt": "2026-09-09T10:45:52.478Z",
+  "status": "PASS",
+  "format": "mmcif",
+  "counts": {
+    "atoms": 1767,
+    "residues": 82,
+    "chains": 7,
+    "polymerAtoms": 1329,
+    "ligandAtoms": 323,
+    "waterAtoms": 110,
+    "ionAtoms": 5,
+    "otherAtoms": 0
+  },
+  "bondCount": 103,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": true,
+    "secondaryStructure": false,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": false,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

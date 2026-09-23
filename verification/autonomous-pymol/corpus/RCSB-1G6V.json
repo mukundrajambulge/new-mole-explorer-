@@ -1,0 +1,35 @@
+{
+  "caseId": "RCSB-1G6V",
+  "source": "RCSB",
+  "pdbId": "1G6V",
+  "inputFormat": "mmcif",
+  "bytes": 347554,
+  "sha256": "85259c996fea2228a91c6412c1be5fb8388c89404573ab35ea8a0978c03793ac",
+  "collectedAt": "2026-09-09T10:46:04.501Z",
+  "status": "PASS",
+  "format": "mmcif",
+  "counts": {
+    "atoms": 2989,
+    "residues": 383,
+    "chains": 3,
+    "polymerAtoms": 2988,
+    "ligandAtoms": 0,
+    "waterAtoms": 0,
+    "ionAtoms": 1,
+    "otherAtoms": 0
+  },
+  "bondCount": 2693,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": true,
+    "secondaryStructure": true,
+    "partialCharge": false,
+    "polymerTyping": true,
+    "chemistryRoles": false,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

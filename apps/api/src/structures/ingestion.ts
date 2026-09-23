@@ -18,11 +18,29 @@ import type {
   StructureLoadResult,
   StructureSourceKind,
   RemoteStructureProvider,
+  FormatEvidence,
 } from "@molecular/contracts";
+import { inferCanonicalChemistryRoles } from "./chemistryRoles.js";
+import { scientificHashFor, sha256Bytes, SCIENTIFIC_HASH_PROFILE } from "../lifecycle/canonicalSerialization.js";
+import { SourceArtifactStore } from "../lifecycle/sourceArtifactStore.js";
+import { profileMark, profileSync } from "./ingestionProfiler.js";
+import { compactCanonicalFor } from "./compactCanonical.js";
 
-export const MAX_STRUCTURE_BYTES = 25 * 1024 * 1024;
+/**
+ * Keep a generous safety ceiling for buffered canonical ingestion while
+ * allowing genuinely large structures through the normal import path.
+ * 25 MiB is a warning threshold, not an ingestion rejection boundary.
+ */
+export const LARGE_STRUCTURE_WARNING_BYTES = 25 * 1024 * 1024;
+export const MAX_STRUCTURE_BYTES = 512 * 1024 * 1024;
 export const INGESTION_PARSER_PROFILE = "molecular-workstation-g1b-canonical-v1";
 const REMOTE_FETCH_TIMEOUT_MS = 10_000;
+
+export const assertStructureSize = (byteLength: number): void => {
+  if (byteLength > MAX_STRUCTURE_BYTES) {
+    throw new IngestionError("PAYLOAD_TOO_LARGE", "Structure files must be 512 MiB or smaller.");
+  }
+};
 
 const WATER_RESIDUES = new Set(["HOH", "WAT", "H2O", "DOD"]);
 const ION_ELEMENTS = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA", "ZN", "FE", "MN", "CU", "CO", "NI", "CL", "BR", "IOD"]);
@@ -30,9 +48,9 @@ const ION_RESIDUES = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA
 
 export class IngestionError extends Error {
   constructor(
-    public readonly code: "UNSUPPORTED_FORMAT" | "INVALID_INPUT" | "REMOTE_FETCH_FAILED" | "REMOTE_NOT_FOUND" | "PAYLOAD_TOO_LARGE" | "PROJECT_NOT_FOUND" | "PROJECT_INVALID",
+    public readonly code: "UNSUPPORTED_FORMAT" | "FORMAT_MISMATCH" | "INVALID_INPUT" | "PARSE_FAILED" | "REMOTE_FETCH_FAILED" | "REMOTE_NOT_FOUND" | "PAYLOAD_TOO_LARGE" | "PROJECT_NOT_FOUND" | "PROJECT_INVALID" | "IMPORT_POLICY_CONFLICT" | "NAME_COLLISION" | "REVISION_CONFLICT" | "UNSUPPORTED_STATE_SCOPE" | "EXPORT_WOULD_LOSE_SEMANTICS" | "WRITER_FAILED" | "INTEGRITY_MISMATCH" | "SCHEMA_UNSUPPORTED" | "MIGRATION_FAILED" | "MISSING_DEPENDENCY" | "STALE_REFERENCE" | "SESSION_RESTORE_FAILED" | "SCENE_RESTORE_FAILED" | "SECURITY_REJECTED",
     message: string,
-    public readonly status = code === "PAYLOAD_TOO_LARGE" ? 413 : code === "REMOTE_NOT_FOUND" || code === "PROJECT_NOT_FOUND" ? 404 : 400,
+    public readonly status = code === "PAYLOAD_TOO_LARGE" ? 413 : code === "REMOTE_NOT_FOUND" || code === "PROJECT_NOT_FOUND" ? 404 : code === "REVISION_CONFLICT" || code === "NAME_COLLISION" ? 409 : code === "REMOTE_FETCH_FAILED" ? 502 : 400,
   ) {
     super(message);
     this.name = "IngestionError";
@@ -43,7 +61,7 @@ type AtomSeed = Omit<CanonicalAtom, "stableId">;
 type BondSeed = { atom1Serial: number; atom2Serial: number; order: BondOrder; source: CanonicalBond["source"] };
 type SecondarySpan = { kind: Exclude<SecondaryStructureKind, "LOOP">; chain: string; start: number; end: number };
 type CoordinateSeed = { sourceIndex: number; x: number; y: number; z: number };
-type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[]; coordinateStates?: Array<{ sourceModelNumber: number; coordinates: CoordinateSeed[] }>; secondaryStructureSource?: string; polymerTypingSource?: string; unitCell?: CanonicalUnitCell; partialChargeValues?: Record<string, number> };
+type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[]; coordinateStates?: Array<{ sourceModelNumber: number; coordinates: CoordinateSeed[] }>; secondaryStructureSource?: string; polymerTypingSource?: string; unitCell?: CanonicalUnitCell; partialChargeValues?: Record<string, number>; partialChargeBySourceIndex?: Record<number, number> };
 
 const parseNumber = (value: string, label: string): number => {
   const parsed = Number(value.replace(/\(.+\)$/, ""));
@@ -207,7 +225,173 @@ const parsePdb = (content: string): ParsedSource => {
   return { format: "pdb", atoms, bonds, coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }], ...(secondarySpans.length ? { secondaryStructureSource: "PDB HELIX/SHEET records" } : {}), ...(unitCell ? { unitCell } : {}) };
 };
 
+/**
+ * PQR retains PDB atom identity while storing coordinates, charge, and radius
+ * as whitespace-delimited fields.  Radius is source metadata and is not used
+ * to mutate the application VDW model.
+ */
+const parsePqr = (content: string): ParsedSource => {
+  const atoms: AtomSeed[] = [];
+  const partialChargeBySourceIndex: Record<number, number> = {};
+  for (const line of content.split(/\r?\n/)) {
+    if (!/^(ATOM|HETATM)\s/.test(line)) continue;
+    const fields = line.trim().split(/\s+/);
+    if (fields.length < 10) throw new IngestionError("INVALID_INPUT", "PQR atom records require identity, XYZ coordinates, charge, and radius.");
+    const recordType = fields[0] as "ATOM" | "HETATM";
+    const serial = parseInteger(fields[1], atoms.length + 1);
+    const atomName = fields[2] || "X";
+    const residueName = fields[3] || "UNK";
+    // A chain ID is optional in PQR. The final five fields are always resi XYZ charge radius.
+    const coordinateStart = fields.length - 5;
+    const residueNumber = parseInteger(fields[coordinateStart - 1], 0);
+    const chain = coordinateStart > 5 ? (fields[coordinateStart - 2] || "_") : "_";
+    const x = parseNumber(fields[coordinateStart]!, "x coordinate");
+    const y = parseNumber(fields[coordinateStart + 1]!, "y coordinate");
+    const z = parseNumber(fields[coordinateStart + 2]!, "z coordinate");
+    const charge = parseNumber(fields[coordinateStart + 3]!, "PQR charge");
+    const radius = parseNumber(fields[coordinateStart + 4]!, "PQR radius");
+    if (radius <= 0) throw new IngestionError("INVALID_INPUT", "PQR atomic radii must be positive.");
+    const element = normalizeElement("", atomName);
+    atoms.push({ serial, atomName, element, residueName, residueNumber, chain, x, y, z, recordType, ...classifyAtom(recordType, residueName, element) });
+    partialChargeBySourceIndex[atoms.length - 1] = charge;
+  }
+  if (atoms.length === 0) throw new IngestionError("INVALID_INPUT", "No ATOM or HETATM records with coordinates were found in the PQR input.");
+  return { format: "pqr", atoms, bonds: [], coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }], partialChargeBySourceIndex };
+};
+
+/** Bounded MDL V2000 reader for one coordinate-bearing molecule per import. */
+const parseSdf = (content: string): ParsedSource => {
+  const records = content.split(/^\$\$\$\$\s*$/m).map((record) => record.trim()).filter(Boolean);
+  if (records.length !== 1) throw new IngestionError("INVALID_INPUT", "SDF import currently accepts exactly one molecule record. Split multi-record SDF files before importing.");
+  const lines = records[0]!.split(/\r?\n/);
+  if (lines.length < 4 || !/V2000\s*$/i.test(lines[3] ?? "")) throw new IngestionError("INVALID_INPUT", "Only coordinate-bearing MDL V2000 MOL/SDF records are admitted.");
+  const atomCount = parseInteger(lines[3]!.slice(0, 3).trim(), -1);
+  const bondCount = parseInteger(lines[3]!.slice(3, 6).trim(), -1);
+  if (atomCount < 1 || bondCount < 0 || lines.length < 4 + atomCount + bondCount) throw new IngestionError("INVALID_INPUT", "MOL/SDF counts or atom block are incomplete.");
+  const atoms: AtomSeed[] = [];
+  for (let index = 0; index < atomCount; index += 1) {
+    const line = lines[4 + index]!;
+    const x = parseNumber(line.slice(0, 10).trim(), "x coordinate");
+    const y = parseNumber(line.slice(10, 20).trim(), "y coordinate");
+    const z = parseNumber(line.slice(20, 30).trim(), "z coordinate");
+    const element = normalizeElement(line.slice(31, 34), "X");
+    if (element === "X") throw new IngestionError("INVALID_INPUT", "MOL/SDF atom records require an element symbol.");
+    atoms.push({ serial: index + 1, atomName: `${element}${index + 1}`, element, residueName: "MOL", residueNumber: 1, chain: "_", x, y, z, recordType: "HETATM", ...classifyAtom("HETATM", "MOL", element) });
+  }
+  const bonds: BondSeed[] = [];
+  for (let index = 0; index < bondCount; index += 1) {
+    const line = lines[4 + atomCount + index]!;
+    const atom1Serial = parseInteger(line.slice(0, 3).trim(), -1);
+    const atom2Serial = parseInteger(line.slice(3, 6).trim(), -1);
+    const orderCode = parseInteger(line.slice(6, 9).trim(), 0);
+    if (atom1Serial < 1 || atom1Serial > atomCount || atom2Serial < 1 || atom2Serial > atomCount || atom1Serial === atom2Serial) throw new IngestionError("INVALID_INPUT", "MOL/SDF bond records reference an invalid atom.");
+    bonds.push({ atom1Serial, atom2Serial, order: orderCode === 1 ? "SINGLE" : orderCode === 2 ? "DOUBLE" : orderCode === 3 ? "TRIPLE" : orderCode === 4 ? "AROMATIC" : "UNKNOWN", source: "UNKNOWN" });
+  }
+  return { format: "sdf", atoms, bonds, coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }] };
+};
+
+/** Bounded XYZ reader: one explicit coordinate frame, with no inferred bonds. */
+const parseXyz = (content: string): ParsedSource => {
+  const lines = content.replace(/^\uFEFF/, "").split(/\r?\n/);
+  const atomCount = Number.parseInt(lines[0]?.trim() ?? "", 10);
+  if (!Number.isInteger(atomCount) || atomCount < 1 || String(atomCount) !== (lines[0]?.trim() ?? "")) throw new IngestionError("INVALID_INPUT", "XYZ input must begin with a positive integer atom count.");
+  if (lines.length < atomCount + 2) throw new IngestionError("INVALID_INPUT", "XYZ atom block is incomplete.");
+  const trailing = lines.slice(atomCount + 2).filter((line) => line.trim());
+  if (trailing.length) throw new IngestionError("INVALID_INPUT", "XYZ import currently accepts exactly one coordinate frame.");
+  const atoms: AtomSeed[] = [];
+  for (let index = 0; index < atomCount; index += 1) {
+    const fields = lines[index + 2]?.trim().split(/\s+/) ?? [];
+    if (fields.length !== 4 || !/^[A-Za-z]{1,3}$/.test(fields[0] ?? "")) throw new IngestionError("INVALID_INPUT", `XYZ atom record ${index + 1} must contain an element and three coordinates.`);
+    const element = normalizeElement(fields[0]!, fields[0]!);
+    const x = parseNumber(fields[1]!, "x coordinate");
+    const y = parseNumber(fields[2]!, "y coordinate");
+    const z = parseNumber(fields[3]!, "z coordinate");
+    atoms.push({ serial: index + 1, atomName: element, element, residueName: "LIG", residueNumber: 1, chain: "_", x, y, z, recordType: "HETATM", ...classifyAtom("HETATM", "LIG", element) });
+  }
+  return { format: "xyz", atoms, bonds: [], coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }] };
+};
+
+/** Bounded SYBYL MOL2 reader for one molecule record with declared bonds. */
+const parseMol2 = (content: string): ParsedSource => {
+  const sectionMatches = [...content.matchAll(/^@<TRIPOS>([A-Z_]+)\s*$/gim)];
+  const moleculeSections = sectionMatches.filter((match) => match[1]?.toUpperCase() === "MOLECULE");
+  if (moleculeSections.length !== 1) throw new IngestionError("INVALID_INPUT", "MOL2 import currently accepts exactly one molecule record.");
+  const section = (name: string): string[] => {
+    const match = sectionMatches.find((candidate) => candidate[1]?.toUpperCase() === name);
+    if (!match || match.index === undefined) return [];
+    const start = match.index + match[0].length;
+    const next = sectionMatches.find((candidate) => candidate.index !== undefined && candidate.index > match.index);
+    return content.slice(start, next?.index ?? content.length).split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  };
+  const moleculeLines = section("MOLECULE");
+  const counts = moleculeLines[1]?.split(/\s+/) ?? [];
+  const declaredAtoms = parseInteger(counts[0], -1);
+  const declaredBonds = parseInteger(counts[1], -1);
+  if (declaredAtoms < 1 || declaredBonds < 0) throw new IngestionError("INVALID_INPUT", "MOL2 molecule counts are missing or invalid.");
+  const atomLines = section("ATOM");
+  const bondLines = section("BOND");
+  if (atomLines.length < declaredAtoms || bondLines.length < declaredBonds) throw new IngestionError("INVALID_INPUT", "MOL2 atom or bond sections are incomplete.");
+  const atomById = new Map<number, AtomSeed>();
+  const partialChargeBySourceIndex: Record<number, number> = {};
+  for (let index = 0; index < declaredAtoms; index += 1) {
+    const fields = atomLines[index]!.split(/\s+/);
+    if (fields.length < 6) throw new IngestionError("INVALID_INPUT", `MOL2 atom record ${index + 1} is incomplete.`);
+    const serial = parseInteger(fields[0], index + 1);
+    const atomName = fields[1] || "X";
+    const x = parseNumber(fields[2]!, "x coordinate");
+    const y = parseNumber(fields[3]!, "y coordinate");
+    const z = parseNumber(fields[4]!, "z coordinate");
+    const atomType = fields[5] || atomName;
+    const element = normalizeElement(atomType.split(".")[0] ?? "", atomName);
+    if (element === "X") throw new IngestionError("INVALID_INPUT", `MOL2 atom record ${index + 1} has no usable element.`);
+    const residueNumber = parseInteger(fields[6], 1);
+    const residueName = fields[7] || moleculeLines[0] || "MOL";
+    const atom: AtomSeed = { serial, atomName, element, residueName, residueNumber, chain: "_", x, y, z, recordType: "HETATM", ...classifyAtom("HETATM", residueName, element) };
+    atomById.set(serial, atom);
+    const charge = fields[8] === undefined ? undefined : parseOptionalNumber(fields[8]);
+    if (typeof charge === "number") partialChargeBySourceIndex[index] = charge;
+  }
+  const atoms = [...atomById.values()];
+  const bonds: BondSeed[] = [];
+  for (let index = 0; index < declaredBonds; index += 1) {
+    const fields = bondLines[index]!.split(/\s+/);
+    const atom1Serial = parseInteger(fields[1], -1);
+    const atom2Serial = parseInteger(fields[2], -1);
+    if (!atomById.has(atom1Serial) || !atomById.has(atom2Serial) || atom1Serial === atom2Serial) throw new IngestionError("INVALID_INPUT", `MOL2 bond record ${index + 1} references an invalid atom.`);
+    const type = (fields[3] ?? "").toLowerCase();
+    bonds.push({ atom1Serial, atom2Serial, order: type === "1" ? "SINGLE" : type === "2" ? "DOUBLE" : type === "3" ? "TRIPLE" : type === "ar" ? "AROMATIC" : type === "am" ? "AROMATIC" : "UNKNOWN", source: "UNKNOWN" });
+  }
+  return { format: "mol2", atoms, bonds, coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }], ...(Object.keys(partialChargeBySourceIndex).length ? { partialChargeBySourceIndex } : {}) };
+};
+
+/** PDBQT retains PDB coordinates while adding docking charge and atom-type fields. */
+const parsePdbqt = (content: string): ParsedSource => {
+  const atoms: AtomSeed[] = [];
+  const partialChargeBySourceIndex: Record<number, number> = {};
+  for (const line of content.split(/\r?\n/)) {
+    const record = line.slice(0, 6).trim();
+    if (record !== "ATOM" && record !== "HETATM") continue;
+    const atomName = line.slice(12, 16).trim() || "X";
+    const residueName = line.slice(17, 20).trim() || "UNK";
+    const chain = line.slice(21, 22).trim() || "_";
+    const residueNumber = parseInteger(line.slice(22, 26).trim(), 0);
+    const x = parseNumber(line.slice(30, 38).trim(), "x coordinate");
+    const y = parseNumber(line.slice(38, 46).trim(), "y coordinate");
+    const z = parseNumber(line.slice(46, 54).trim(), "z coordinate");
+    const atomType = line.slice(77, 79).trim() || line.slice(70).trim().split(/\s+/).at(-1) || atomName;
+    const element = normalizeElement(atomType, atomName);
+    const serial = parseInteger(line.slice(6, 11).trim(), atoms.length + 1);
+    const atom: AtomSeed = { serial, atomName, element, residueName, residueNumber, chain, x, y, z, recordType: record, bFactor: parseOptionalNumber(line.slice(60, 66)), occupancy: parseOptionalNumber(line.slice(54, 60)), ...classifyAtom(record, residueName, element) };
+    atoms.push(atom);
+    const charge = parseOptionalNumber(line.slice(70, 76));
+    if (typeof charge === "number") partialChargeBySourceIndex[atoms.length - 1] = charge;
+  }
+  if (atoms.length === 0) throw new IngestionError("INVALID_INPUT", "No ATOM or HETATM records with coordinates were found in the PDBQT input.");
+  return { format: "pdbqt", atoms, bonds: [], coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }], ...(Object.keys(partialChargeBySourceIndex).length ? { partialChargeBySourceIndex } : {}) };
+};
+
 const tokenizeCif = (content: string): string[] => {
+  profileMark("CIF_TOKENIZE", "START", { contentBytes: Buffer.byteLength(content, "utf8") });
   const tokens: string[] = [];
   let token = "";
   let quote = "";
@@ -245,13 +429,14 @@ const tokenizeCif = (content: string): string[] => {
     token += character;
   }
   if (token) tokens.push(token);
+  profileMark("CIF_TOKENIZE", "END", { tokenCount: tokens.length });
   return tokens;
 };
 
 type CifLoop = { headers: string[]; rows: string[][] };
 
-const readCifLoops = (content: string): CifLoop[] => {
-  const tokens = tokenizeCif(content);
+const readCifLoops = (tokens: string[]): CifLoop[] => {
+  profileMark("CIF_LOOP_RETENTION", "START");
   const loops: CifLoop[] = [];
   let cursor = 0;
   while (cursor < tokens.length) {
@@ -275,6 +460,7 @@ const readCifLoops = (content: string): CifLoop[] => {
     }
     loops.push({ headers, rows });
   }
+  profileMark("CIF_LOOP_RETENTION", "END", { loopCount: loops.length, retainedRows: loops.reduce((count, loop) => count + loop.rows.length, 0), retainedTokens: tokens.length });
   return loops;
 };
 
@@ -311,14 +497,19 @@ const classifyEntityPolymerType = (value: string | undefined): CanonicalPolymerT
   return undefined;
 };
 
+
 const parseMmcif = (content: string): ParsedSource => {
-  const loops = readCifLoops(content);
   const cifTokens = tokenizeCif(content);
+  const loops = readCifLoops(cifTokens);
   const unitCell = makeUnitCell({ a: cifScalar(cifTokens, "_cell.length_a"), b: cifScalar(cifTokens, "_cell.length_b"), c: cifScalar(cifTokens, "_cell.length_c"), alpha: cifScalar(cifTokens, "_cell.angle_alpha"), beta: cifScalar(cifTokens, "_cell.angle_beta"), gamma: cifScalar(cifTokens, "_cell.angle_gamma"), spaceGroup: cifScalar(cifTokens, "_symmetry.space_group_name_H-M") ?? cifScalar(cifTokens, "_space_group.name_H-M_alt"), zValue: cifScalar(cifTokens, "_cell.Z_PDB") }, "MMCIF_CELL");
+  // Loop rows retain the individual token strings they reference; release the
+  // top-level token index before the atom graph is built.
+  cifTokens.length = 0;
   const atomLoop = loops.find((loop) => loop.headers.some((header) => header.startsWith("_atom_site.")));
   if (!atomLoop) throw new IngestionError("INVALID_INPUT", "No _atom_site loop was found in the mmCIF input.");
   const polymerEntityTypes = new Map<string, CanonicalPolymerType>();
   let hasPolymerEntityLoop = false;
+  profileMark("POLYMER_TYPING", "START");
   for (const loop of loops) {
     if (!loop.headers.includes("_entity_poly.type")) continue;
     hasPolymerEntityLoop = true;
@@ -328,7 +519,9 @@ const parseMmcif = (content: string): ParsedSource => {
       if (entityId && polymerType) polymerEntityTypes.set(entityId, polymerType);
     }
   }
+  profileMark("POLYMER_TYPING", "END", { entityCount: polymerEntityTypes.size, hasPolymerEntityLoop });
   const modelAtoms = new Map<number, AtomSeed[]>();
+  profileMark("ATOM_ROWS_EXTRACT", "START", { atomLoopRows: atomLoop.rows.length });
   for (const [rowIndex, row] of atomLoop.rows.entries()) {
     const xValue = cifValue(row, atomLoop.headers, ["_atom_site.Cartn_x"]);
     const yValue = cifValue(row, atomLoop.headers, ["_atom_site.Cartn_y"]);
@@ -360,13 +553,16 @@ const parseMmcif = (content: string): ParsedSource => {
       altLoc: cifValue(row, atomLoop.headers, ["_atom_site.label_alt_id", "_atom_site.pdbx_PDB_alt_id"]),
       formalCharge: parseOptionalNumber(cifValue(row, atomLoop.headers, ["_atom_site.pdbx_formal_charge"])),
       ...classifyAtom(record, residueName, element),
-      ...(polymerType ? { polymerType } : {}),
+      ...(polymerType ? { polymerType, isPolymer: true, isLigand: false } : {}),
     } satisfies AtomSeed;
     const modelNumber = parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.pdbx_PDB_model_num", "_atom_site.pdbx_model_num"]), 1);
-    modelAtoms.set(modelNumber, [...(modelAtoms.get(modelNumber) ?? []), atom]);
+    const model = modelAtoms.get(modelNumber);
+    if (model) model.push(atom);
+    else modelAtoms.set(modelNumber, [atom]);
   }
   const orderedModels = [...modelAtoms.entries()].sort(([a], [b]) => a - b);
   const atoms = orderedModels[0]?.[1] ?? [];
+  profileMark("ATOM_ROWS_EXTRACT", "END", { atomCount: atoms.length, modelCount: orderedModels.length });
   if (atoms.length === 0) throw new IngestionError("INVALID_INPUT", "No _atom_site rows with coordinates were found in the mmCIF input.");
   for (const [, candidateAtoms] of orderedModels) {
     if (candidateAtoms.length !== atoms.length || candidateAtoms.some((atom, index) => atomCorrespondenceKey(atom) !== atomCorrespondenceKey(atoms[index]!))) {
@@ -402,9 +598,29 @@ const parseMmcif = (content: string): ParsedSource => {
     if (span) atom.secondaryStructure = span.kind;
   }
 
-  const serialFor = (chain: string, residue: number, atomName: string, residueName?: string): number[] => atoms
-    .filter((atom) => atom.chain === chain && atom.residueNumber === residue && atom.atomName === atomName && (!residueName || atom.residueName === residueName))
-    .map((atom) => atom.serial);
+  const atomsByComponentAtom = new Map<string, AtomSeed[]>();
+  const atomsByResidueAtom = new Map<string, AtomSeed[]>();
+  const atomsByResidueComponentAtom = new Map<string, AtomSeed[]>();
+  const appendAtom = (map: Map<string, AtomSeed[]>, key: string, atom: AtomSeed) => {
+    const bucket = map.get(key);
+    if (bucket) bucket.push(atom);
+    else map.set(key, [atom]);
+  };
+  for (const atom of atoms) {
+    const componentKey = componentAtomKey(atom.residueName, atom.atomName);
+    const residueKey = `${atom.chain}\u0000${atom.residueNumber}\u0000${atom.atomName.trim()}`;
+    const residueComponentKey = `${atom.chain}\u0000${atom.residueNumber}\u0000${componentKey}`;
+    appendAtom(atomsByComponentAtom, componentKey, atom);
+    appendAtom(atomsByResidueAtom, residueKey, atom);
+    appendAtom(atomsByResidueComponentAtom, residueComponentKey, atom);
+  }
+  const serialFor = (chain: string, residue: number, atomName: string, residueName?: string): number[] => {
+    const key = residueName
+      ? `${chain}\u0000${residue}\u0000${componentAtomKey(residueName, atomName)}`
+      : `${chain}\u0000${residue}\u0000${atomName.trim()}`;
+    const candidates = residueName ? atomsByResidueComponentAtom.get(key) : atomsByResidueAtom.get(key);
+    return candidates?.map((atom) => atom.serial) ?? [];
+  };
   const bonds: BondSeed[] = [];
   for (const loop of loops) {
     if (loop.headers.some((header) => header.startsWith("_struct_conn."))) {
@@ -427,8 +643,8 @@ const parseMmcif = (content: string): ParsedSource => {
         const atomName1 = cifValue(row, loop.headers, ["_chem_comp_bond.atom_id_1"]);
         const atomName2 = cifValue(row, loop.headers, ["_chem_comp_bond.atom_id_2"]);
         if (!component || !atomName1 || !atomName2) continue;
-        for (const atom1 of atoms.filter((atom) => atom.residueName === component && atom.atomName === atomName1)) {
-          const atom2 = atoms.find((candidate) => candidate.chain === atom1.chain && candidate.residueNumber === atom1.residueNumber && candidate.residueName === component && candidate.atomName === atomName2);
+        for (const atom1 of atomsByComponentAtom.get(componentAtomKey(component, atomName1)) ?? []) {
+          const atom2 = atomsByResidueComponentAtom.get(`${atom1.chain}\u0000${atom1.residueNumber}\u0000${componentAtomKey(component, atomName2)}`)?.[0];
           if (atom2) bonds.push({ atom1Serial: atom1.serial, atom2Serial: atom2.serial, order: parseBondOrder(cifValue(row, loop.headers, ["_chem_comp_bond.value_order"])), source: "MMCIF_CHEM_COMP_BOND" });
         }
       }
@@ -456,15 +672,51 @@ const formatFromFilename = (filename: string): StructureFormat => {
   const extension = filename.toLowerCase().split(".").pop();
   if (extension === "pdb") return "pdb";
   if (extension === "cif" || extension === "mmcif") return "mmcif";
-  throw new IngestionError("UNSUPPORTED_FORMAT", "Only .pdb, .cif, and .mmcif files are admitted in G1C.");
+  if (extension === "pqr") return "pqr";
+  if (extension === "sdf" || extension === "mol") return "sdf";
+  if (extension === "xyz") return "xyz";
+  if (extension === "mol2") return "mol2";
+  if (extension === "pdbqt") return "pdbqt";
+  throw new IngestionError("UNSUPPORTED_FORMAT", "This file is not an admitted coordinate format. Supported coordinate formats are PDB, mmCIF, PQR, SDF/MOL, XYZ, MOL2, and PDBQT.");
+};
+
+const formatEvidenceFor = (filename: string, content: string): { format: StructureFormat; evidence: FormatEvidence[] } => {
+  const extension = filename.toLowerCase().split(".").pop();
+  const filenameFormat: StructureFormat | undefined = extension === "pdb" ? "pdb" : extension === "cif" || extension === "mmcif" ? "mmcif" : extension === "pqr" ? "pqr" : extension === "sdf" || extension === "mol" ? "sdf" : extension === "xyz" ? "xyz" : extension === "mol2" ? "mol2" : extension === "pdbqt" ? "pdbqt" : undefined;
+  if (!filenameFormat) throw new IngestionError("UNSUPPORTED_FORMAT", "This file is not an admitted coordinate format. Supported coordinate formats are PDB, mmCIF, PQR, SDF/MOL, XYZ, MOL2, and PDBQT.");
+  const lines = content.split(/\r?\n/);
+  const hasPdbSignature = lines.some((line) => /^(HEADER|TITLE\s|ATOM\s{2}|HETATM|MODEL\s|CRYST1|CONECT|HELIX\s|SHEET\s)/.test(line));
+  const hasMmcifSignature = /^\s*data_[^\s]*/im.test(content) && /_atom_site\./i.test(content);
+  const hasPqrSignature = lines.some((line) => /^(ATOM|HETATM)\s+\d+\s+\S+\s+\S+(?:\s+\S+)?\s+-?\d+\s+-?\d/.test(line));
+  const hasSdfSignature = lines.length >= 4 && /V2000\s*$/i.test(lines[3] ?? "");
+  const declaredXyzAtoms = Number.parseInt(lines[0]?.trim() ?? "", 10);
+  const hasXyzSignature = filenameFormat === "xyz" && Number.isInteger(declaredXyzAtoms) && declaredXyzAtoms > 0 && lines.length >= declaredXyzAtoms + 2 && lines.slice(2, declaredXyzAtoms + 2).every((line) => /^[A-Za-z]{1,3}\s+[-+]?\d/.test(line.trim()));
+  const hasMol2Signature = content.split(/\r?\n/).some((line) => /^@<TRIPOS>(MOLECULE|ATOM|BOND)\s*$/i.test(line.trim()));
+  const hasPdbqtSignature = lines.some((line) => /^(ATOM|HETATM)\s/.test(line) && line.length >= 54 && line.slice(70).trim().length > 0);
+  const signature: FormatEvidence | undefined = hasMmcifSignature ? { kind: "CONTENT_SIGNATURE", value: "mmCIF data_ + _atom_site loop" } : filenameFormat === "sdf" && hasSdfSignature ? { kind: "CONTENT_SIGNATURE", value: "MDL V2000 molfile" } : filenameFormat === "xyz" && hasXyzSignature ? { kind: "CONTENT_SIGNATURE", value: "XYZ atom-count coordinate frame" } : filenameFormat === "pqr" && hasPqrSignature ? { kind: "CONTENT_SIGNATURE", value: "PQR whitespace atom records" } : filenameFormat === "mol2" && hasMol2Signature ? { kind: "CONTENT_SIGNATURE", value: "SYBYL MOL2 TRIPOS sections" } : filenameFormat === "pdbqt" && hasPdbqtSignature ? { kind: "CONTENT_SIGNATURE", value: "PDBQT charged atom records" } : hasPdbSignature ? { kind: "CONTENT_SIGNATURE", value: "PDB record columns" } : undefined;
+  const signatureFormat = signature?.value.startsWith("mmCIF") ? "mmcif" : signature?.value.startsWith("MDL") ? "sdf" : signature?.value.startsWith("XYZ") ? "xyz" : signature?.value.startsWith("PQR") ? "pqr" : signature?.value.startsWith("SYBYL") ? "mol2" : signature?.value.startsWith("PDBQT") ? "pdbqt" : signature?.value.startsWith("PDB") ? "pdb" : undefined;
+  if (signatureFormat && filenameFormat !== signatureFormat) {
+    throw new IngestionError("FORMAT_MISMATCH", `Filename extension declares ${filenameFormat}, but content evidence declares ${signatureFormat}.`);
+  }
+  return { format: filenameFormat, evidence: [{ kind: "FILENAME_EXTENSION", value: extension! }, ...(signature ? [signature] : [])] };
 };
 
 const parseSource = (filename: string, content: string): ParsedSource => {
   const format = formatFromFilename(filename);
-  return format === "pdb" ? parsePdb(content) : parseMmcif(content);
+  profileMark("ATOM_ROWS_EXTRACT", "START", { format });
+  try {
+    const parsed = format === "pdb" ? parsePdb(content) : format === "pqr" ? parsePqr(content) : format === "sdf" ? parseSdf(content) : format === "xyz" ? parseXyz(content) : format === "mol2" ? parseMol2(content) : format === "pdbqt" ? parsePdbqt(content) : parseMmcif(content);
+    profileMark("ATOM_ROWS_EXTRACT", "END", { format, atomCount: parsed.atoms.length, bondSeedCount: parsed.bonds.length });
+    return parsed;
+  } catch (error) {
+    profileMark("ATOM_ROWS_EXTRACT", "FAIL", { format, error: error instanceof Error ? error.message : String(error) });
+    throw error;
+  }
 };
 
 const makeHierarchy = (atoms: CanonicalAtom[]): CanonicalHierarchy => {
+  profileMark("CHAIN_GROUPING", "START", { atomCount: atoms.length });
+  profileMark("RESIDUE_GROUPING", "START", { atomCount: atoms.length });
   const chains: Record<string, CanonicalChain> = {};
   const residues: Record<string, CanonicalResidue> = {};
   for (const atom of atoms) {
@@ -479,17 +731,21 @@ const makeHierarchy = (atoms: CanonicalAtom[]): CanonicalHierarchy => {
       residues[residueId].isPolymer ||= atom.isPolymer;
       if (!residues[residueId].secondaryStructure && atom.secondaryStructure) residues[residueId].secondaryStructure = atom.secondaryStructure;
   }
+  profileMark("RESIDUE_GROUPING", "END", { residueCount: Object.keys(residues).length });
+  profileMark("CHAIN_GROUPING", "END", { chainCount: Object.keys(chains).length });
   return { chainIds: Object.keys(chains), chains, residues };
 };
 
 const summarize = (atoms: CanonicalAtom[]): { counts: CanonicalMolecularStructure["counts"]; bounds: CoordinateBounds } => {
   const residues = new Set(atoms.map((atom) => `${atom.chain}:${atom.residueNumber}:${atom.insertionCode ?? ""}`));
   const chains = new Set(atoms.map((atom) => atom.chain));
-  const coordinates = atoms.map(({ x, y, z }) => ({ x, y, z }));
-  const bounds = {
-    min: { x: Math.min(...coordinates.map((point) => point.x)), y: Math.min(...coordinates.map((point) => point.y)), z: Math.min(...coordinates.map((point) => point.z)) },
-    max: { x: Math.max(...coordinates.map((point) => point.x)), y: Math.max(...coordinates.map((point) => point.y)), z: Math.max(...coordinates.map((point) => point.z)) },
-  };
+  const bounds = atoms.reduce((current, atom) => ({
+    min: { x: Math.min(current.min.x, atom.x), y: Math.min(current.min.y, atom.y), z: Math.min(current.min.z, atom.z) },
+    max: { x: Math.max(current.max.x, atom.x), y: Math.max(current.max.y, atom.y), z: Math.max(current.max.z, atom.z) },
+  }), {
+    min: { x: Number.POSITIVE_INFINITY, y: Number.POSITIVE_INFINITY, z: Number.POSITIVE_INFINITY },
+    max: { x: Number.NEGATIVE_INFINITY, y: Number.NEGATIVE_INFINITY, z: Number.NEGATIVE_INFINITY },
+  });
   return {
     counts: {
       atoms: atoms.length,
@@ -506,6 +762,89 @@ const summarize = (atoms: CanonicalAtom[]): { counts: CanonicalMolecularStructur
 };
 
 const canonicalBondKey = (atom1: string, atom2: string) => [atom1, atom2].sort().join("|");
+
+/**
+ * Present large canonical payload collections lazily to the streaming hash
+ * walker. The target arrays/objects retain the same enumerable shape and
+ * ordering as their eager counterparts, but each derived value is created
+ * only while it is being hashed instead of duplicating the whole molecular
+ * graph in memory first.
+ */
+const lazyCanonicalArray = <T>(length: number, getValue: (index: number) => T): T[] => {
+  const target = new Array<T>(length).fill(undefined as T);
+  return new Proxy(target, {
+    get(source, property, receiver) {
+      if (typeof property === "string" && /^\d+$/.test(property)) return getValue(Number(property));
+      return Reflect.get(source, property, receiver);
+    },
+  });
+};
+
+const lazyCanonicalObject = <T>(keys: readonly string[], getValue: (key: string) => T): Record<string, T> => {
+  const target: Record<string, T> = {};
+  for (const key of keys) Object.defineProperty(target, key, { configurable: false, enumerable: true, get: () => getValue(key) });
+  return target;
+};
+
+/**
+ * Stable scientific identity is intentionally independent of transport bytes.
+ * Source-artifact identity remains byte-exact, while this profile hashes the
+ * parsed molecular content using ordinal atom/state references instead of
+ * source-hash-derived IDs.
+ */
+const scientificPayloadFor = (atoms: readonly CanonicalAtom[], bonds: readonly CanonicalBond[], hierarchy: CanonicalHierarchy, coordinateStates: readonly CanonicalCoordinateState[], stateOrder: readonly string[], summary: { counts: CanonicalMolecularStructure["counts"]; bounds: CoordinateBounds }, parsed: ParsedSource, sourceChargeMap: Readonly<Record<string, number>>, hasCompleteSourceCharges: boolean, peptideSequenceChains: Readonly<Record<string, PeptideSequenceChain>>, chemistryRoles: { donorAtomIds: readonly string[]; acceptorAtomIds: readonly string[] } | undefined) => {
+  const atomIndex = new Map<string, number>();
+  atoms.forEach((atom, index) => atomIndex.set(atom.stableId, index));
+  const canonicalAtoms = lazyCanonicalArray(atoms.length, (index) => {
+    const { stableId, ...atom } = atoms[index]!;
+    void stableId;
+    return atom;
+  });
+  const canonicalBonds = lazyCanonicalArray(bonds.length, (index) => {
+    const value = bonds[index]!;
+    const { id, atom1, atom2, ...bond } = value;
+    void id;
+    return { ...bond, atom1: atomIndex.get(atom1) ?? -1, atom2: atomIndex.get(atom2) ?? -1 };
+  });
+  const residueIds = Object.keys(hierarchy.residues);
+  const canonicalHierarchy = {
+    chainIds: hierarchy.chainIds,
+    chains: lazyCanonicalObject(hierarchy.chainIds, (chainId) => {
+      const chain = hierarchy.chains[chainId]!;
+      return { ...chain, residueIds: lazyCanonicalArray(chain.residueIds.length, (index) => chain.residueIds[index]!) };
+    }),
+    residues: lazyCanonicalObject(residueIds, (residueId) => {
+      const residue = hierarchy.residues[residueId]!;
+      return { ...residue, atomIds: lazyCanonicalArray(residue.atomIds.length, (index) => atomIndex.get(residue.atomIds[index]!) ?? -1) };
+    }),
+  };
+  const canonicalStates = coordinateStates.map((state) => ({
+    ordinal: state.ordinal,
+    sourceModelNumber: state.sourceModelNumber ?? null,
+    coordinates: lazyCanonicalArray(atoms.length, (index) => {
+      const atom = atoms[index]!;
+      return state.coordinates[atom.stableId] ?? { x: atom.x, y: atom.y, z: atom.z };
+    }),
+  }));
+  const canonicalCharges = hasCompleteSourceCharges ? lazyCanonicalArray(atoms.length, (index) => sourceChargeMap[atoms[index]!.stableId] ?? null) : null;
+  return {
+    atoms: canonicalAtoms,
+    bonds: canonicalBonds,
+    hierarchy: canonicalHierarchy,
+    counts: summary.counts,
+    bounds: summary.bounds,
+    coordinateStates: canonicalStates,
+    stateOrder: lazyCanonicalArray(stateOrder.length, (index) => index + 1),
+    unitCell: parsed.unitCell ?? null,
+    polymerTypingSource: parsed.polymerTypingSource ?? null,
+    partialChargeValues: canonicalCharges,
+    chemistryRoles: chemistryRoles ? { donorAtomOrdinals: chemistryRoles.donorAtomIds.map((atomId) => atomIndex.get(atomId) ?? -1).filter((index) => index >= 0), acceptorAtomOrdinals: chemistryRoles.acceptorAtomIds.map((atomId) => atomIndex.get(atomId) ?? -1).filter((index) => index >= 0) } : null,
+    peptideSequenceChains: lazyCanonicalObject(Object.keys(peptideSequenceChains), (chainId) => {
+      const chain = peptideSequenceChains[chainId]!;
+      return { ...chain, residueIds: lazyCanonicalArray(chain.residueIds.length, (index) => index) };
+    }),
+  };
+};
 
 const AMINO_ACID_ONE_LETTER: Readonly<Record<string, string>> = {
   ALA: "A", ARG: "R", ASN: "N", ASP: "D", CYS: "C", GLN: "Q", GLU: "E", GLY: "G",
@@ -526,14 +865,36 @@ const peptideSequenceChainsFor = (hierarchy: CanonicalHierarchy): Record<string,
 
 export class StructureIngestionService {
   private readonly structures = new Map<string, CanonicalMolecularStructure>();
+  /** Coalesce and retain successful online acquisitions for the lifetime of the API process. */
+  private readonly rcsbCache = new Map<string, StructureLoadResult>();
+  private readonly rcsbInflight = new Map<string, Promise<StructureLoadResult>>();
 
-  async ingestLocal(filename: string, buffer: Buffer): Promise<StructureLoadResult> {
-    return this.ingest("LOCAL_FILE", filename, buffer);
+  constructor(private readonly sourceArtifacts = new SourceArtifactStore()) {}
+
+  async ingestLocal(filename: string, buffer: Buffer, options: { parentExportArtifactId?: string } = {}): Promise<StructureLoadResult> {
+    if (/\.(pse|pze)$/i.test(filename)) throw new IngestionError("SECURITY_REJECTED", "Foreign PyMOL session files are not executable input in R09; no pickle or arbitrary deserialization path is available.");
+    return this.ingest("LOCAL_FILE", filename, buffer, undefined, undefined, options);
   }
 
   async ingestRcsb(pdbId: string): Promise<StructureLoadResult> {
     const normalizedId = pdbId.trim().toUpperCase();
     if (!/^[A-Z0-9]{4}$/.test(normalizedId)) throw new IngestionError("INVALID_INPUT", "Enter a valid four-character PDB ID.");
+    const cached = this.rcsbCache.get(normalizedId);
+    if (cached) return cached;
+    const inflight = this.rcsbInflight.get(normalizedId);
+    if (inflight) return inflight;
+    const request = this.ingestRcsbRemote(normalizedId);
+    this.rcsbInflight.set(normalizedId, request);
+    try {
+      const result = await request;
+      this.rcsbCache.set(normalizedId, result);
+      return result;
+    } finally {
+      this.rcsbInflight.delete(normalizedId);
+    }
+  }
+
+  private async ingestRcsbRemote(normalizedId: string): Promise<StructureLoadResult> {
     const sources: Array<{ provider: RemoteStructureProvider; uri: string }> = [
       { provider: "RCSB", uri: `https://files.rcsb.org/download/${normalizedId}.cif` },
       { provider: "PDBE", uri: `https://www.ebi.ac.uk/pdbe/entry-files/download/${normalizedId.toLowerCase()}.cif` },
@@ -555,8 +916,16 @@ export class StructureIngestionService {
       allResponsesNotFound = false;
       if (!response.ok) continue;
       try {
-        const content = await response.text();
-        return await this.ingest("RCSB", `${normalizedId}.cif`, Buffer.from(content, "utf8"), source.uri, source.provider);
+        const responseBytes = Buffer.from(await response.arrayBuffer());
+        const providerMetadata = Object.fromEntries(["etag", "last-modified", "content-length", "content-type"].flatMap((header) => {
+          const value = response.headers.get(header);
+          return value ? [[header, value] as const] : [];
+        }));
+        return await this.ingest("RCSB", `${normalizedId}.cif`, responseBytes, source.uri, source.provider, {
+          mediaType: response.headers.get("content-type")?.split(";", 1)[0]?.trim() || "chemical/x-mmcif",
+          accession: normalizedId,
+          providerMetadata,
+        });
       } catch (error) {
         if (error instanceof IngestionError) throw error;
         continue;
@@ -566,14 +935,38 @@ export class StructureIngestionService {
     throw new IngestionError("REMOTE_FETCH_FAILED", "RCSB/wwPDB could not be reached. Check the network and try again.", 502);
   }
 
-  private async ingest(kind: StructureSourceKind, filename: string, buffer: Buffer, uri?: string, provider?: RemoteStructureProvider): Promise<StructureLoadResult> {
-    if (buffer.length > MAX_STRUCTURE_BYTES) throw new IngestionError("PAYLOAD_TOO_LARGE", "Structure files must be 25 MB or smaller.");
+  private async ingest(kind: StructureSourceKind, filename: string, buffer: Buffer, uri?: string, provider?: RemoteStructureProvider, acquisition: { mediaType?: string; accession?: string; providerMetadata?: Readonly<Record<string, string>>; parentExportArtifactId?: string } = {}): Promise<StructureLoadResult> {
+    assertStructureSize(buffer.length);
     const safeFilename = basename(filename).replace(/[^A-Za-z0-9._-]/g, "_");
+    profileMark("FILE_READ_DECODE", "START", { filename: safeFilename, bytes: buffer.length });
+    // This is intentionally before Buffer decoding.  The SourceArtifact
+    // digest is evidence for the received byte stream, not parser text.
+    const hash = sha256Bytes(buffer);
     const content = buffer.toString("utf8");
     if (!content.trim()) throw new IngestionError("INVALID_INPUT", "The structure input is empty.");
+    profileMark("FILE_READ_DECODE", "END", { filename: safeFilename, contentChars: content.length });
+    profileMark("FORMAT_EVIDENCE", "START");
+    const formatEvidence = formatEvidenceFor(safeFilename, content);
+    profileMark("FORMAT_EVIDENCE", "END", { format: formatEvidence.format, evidenceCount: formatEvidence.evidence.length });
+    profileMark("SOURCE_ARTIFACT_SEAL", "START");
+    const sourceArtifact = await this.sourceArtifacts.seal({
+      acquisitionKind: kind === "RCSB" ? "REMOTE_HTTP" : "LOCAL_UPLOAD",
+      originalFilename: safeFilename,
+      mediaType: acquisition.mediaType ?? (formatEvidence.format === "pdb" ? "chemical/x-pdb" : formatEvidence.format === "pqr" ? "chemical/x-pqr" : formatEvidence.format === "sdf" ? "chemical/x-mdl-sdfile" : formatEvidence.format === "xyz" ? "chemical/x-xyz" : formatEvidence.format === "mol2" ? "chemical/x-mol2" : formatEvidence.format === "pdbqt" ? "chemical/x-pdbqt" : "chemical/x-mmcif"),
+      format: formatEvidence.format,
+      formatEvidence: formatEvidence.evidence,
+      parserProfile: INGESTION_PARSER_PROFILE,
+      ...(uri ? { sourceUri: uri } : {}),
+      ...(provider ? { provider } : {}),
+      ...(acquisition.accession ? { accession: acquisition.accession } : {}),
+      ...(acquisition.providerMetadata ? { providerMetadata: acquisition.providerMetadata } : {}),
+      ...(acquisition.parentExportArtifactId ? { parentExportArtifactId: acquisition.parentExportArtifactId, acquisitionKind: "DERIVED_EXPORT" as const } : {}),
+    }, buffer);
+    profileMark("SOURCE_ARTIFACT_SEAL", "END", { sourceArtifactId: sourceArtifact.sourceArtifactId });
     const parsed = parseSource(safeFilename, content);
-    const hash = createHash("sha256").update(buffer).digest("hex");
     const atomIdsBySerial = new Map<number, string[]>();
+    profileMark("ATOM_NORMALIZATION", "START", { atomCount: parsed.atoms.length });
+    profileMark("ATOM_IDENTITY", "START", { atomCount: parsed.atoms.length });
     const atoms: CanonicalAtom[] = parsed.atoms.map((atom, index) => {
       const stableId = `${hash.slice(0, 16)}:atom:${index + 1}`;
       const ids = atomIdsBySerial.get(atom.serial) ?? [];
@@ -581,7 +974,10 @@ export class StructureIngestionService {
       atomIdsBySerial.set(atom.serial, ids);
       return { ...atom, stableId };
     });
+    profileMark("ATOM_IDENTITY", "END", { atomCount: atoms.length, combinedWith: "ATOM_NORMALIZATION" });
+    profileMark("ATOM_NORMALIZATION", "END", { atomCount: atoms.length });
     const bondsByKey = new Map<string, CanonicalBond>();
+    profileMark("BOND_GRAPH", "START", { bondSeedCount: parsed.bonds.length });
     for (const bond of parsed.bonds) {
       const atom1 = atomIdsBySerial.get(bond.atom1Serial)?.[0];
       const atom2 = atomIdsBySerial.get(bond.atom2Serial)?.[0];
@@ -589,7 +985,9 @@ export class StructureIngestionService {
       const key = canonicalBondKey(atom1, atom2);
       if (!bondsByKey.has(key)) bondsByKey.set(key, { id: `${hash.slice(0, 16)}:bond:${bondsByKey.size + 1}`, atom1, atom2, order: bond.order, source: bond.source });
     }
-    const summary = summarize(atoms);
+    const bonds = [...bondsByKey.values()];
+    profileMark("BOND_GRAPH", "END", { bondCount: bonds.length });
+    const summary = profileSync("SECONDARY_INDEXES", () => summarize(atoms), { atomCount: atoms.length });
     const source = {
       kind,
       originalFilename: safeFilename,
@@ -600,10 +998,15 @@ export class StructureIngestionService {
       ...(provider ? { provider } : {}),
       ingestedAt: new Date().toISOString(),
       parserProfile: INGESTION_PARSER_PROFILE,
+      sourceArtifactId: sourceArtifact.sourceArtifactId,
+      acquisitionKind: sourceArtifact.acquisitionKind,
+      mediaType: sourceArtifact.mediaType,
+      formatEvidence: sourceArtifact.formatEvidence,
+      ...(sourceArtifact.providerMetadata ? { providerMetadata: sourceArtifact.providerMetadata } : {}),
+      scientificHashProfile: SCIENTIFIC_HASH_PROFILE,
     } as const;
     const hierarchy = makeHierarchy(atoms);
-    const bonds = [...bondsByKey.values()];
-    const peptideSequenceChains = peptideSequenceChainsFor(hierarchy);
+    const peptideSequenceChains = profileSync("SECONDARY_INDEXES", () => peptideSequenceChainsFor(hierarchy), { chainCount: hierarchy.chainIds.length });
     const coordinateStates: CanonicalCoordinateState[] = (parsed.coordinateStates ?? [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }]).map((state, index) => {
       const coordinates = Object.fromEntries(state.coordinates.map((coordinate) => {
         const atom = atoms[coordinate.sourceIndex];
@@ -613,43 +1016,71 @@ export class StructureIngestionService {
       return { id: `${hash.slice(0, 16)}:state:${state.sourceModelNumber}`, ordinal: index + 1, sourceModelNumber: state.sourceModelNumber, coordinates, coordinateHash };
     });
     const stateOrder = coordinateStates.map((state) => state.id);
-    const sourceChargeMap = parsed.partialChargeValues
+    const sourceChargeMap = parsed.partialChargeBySourceIndex
+      ? Object.fromEntries(atoms.flatMap((atom, sourceIndex) => {
+        const value = parsed.partialChargeBySourceIndex![sourceIndex];
+        return typeof value === "number" && Number.isFinite(value) ? [[atom.stableId, value] as const] : [];
+      }))
+      : parsed.partialChargeValues
       ? Object.fromEntries(atoms.flatMap((atom) => {
         const value = parsed.partialChargeValues![componentAtomKey(atom.residueName, atom.atomName)];
         return typeof value === "number" && Number.isFinite(value) ? [[atom.stableId, value] as const] : [];
       }))
       : {};
-    const hasCompleteSourceCharges = parsed.format === "mmcif" && atoms.length > 0 && Object.keys(sourceChargeMap).length === atoms.length;
+    const hasCompleteSourceCharges = (parsed.format === "mmcif" || parsed.format === "pqr" || parsed.format === "pdbqt" || parsed.format === "mol2") && atoms.length > 0 && Object.keys(sourceChargeMap).length === atoms.length;
     const partialChargeDataset = hasCompleteSourceCharges ? {
       datasetId: `${hash.slice(0, 16)}:partial-charge`,
       molecularRevision: "pending",
-      chargeModel: "source-declared mmCIF _chem_comp_atom.partial_charge",
-      profileVersion: "mmcif-chem-comp-partial-charge-v1",
+      chargeModel: parsed.format === "pqr" ? "source-declared PQR atomic charge" : parsed.format === "pdbqt" ? "source-declared PDBQT partial charge" : parsed.format === "mol2" ? "source-declared MOL2 atom charge" : "source-declared mmCIF _chem_comp_atom.partial_charge",
+      profileVersion: parsed.format === "pqr" ? "pqr-atomic-charge-v1" : parsed.format === "pdbqt" ? "pdbqt-atomic-charge-v1" : parsed.format === "mol2" ? "mol2-atomic-charge-v1" : "mmcif-chem-comp-partial-charge-v1",
       atomChargeMap: sourceChargeMap,
       units: "e",
-      provenance: "Copied from source _chem_comp_atom.partial_charge; no charge inference performed",
+      provenance: parsed.format === "pqr" ? "Copied from source PQR charge field; no charge inference performed" : parsed.format === "pdbqt" ? "Copied from source PDBQT partial-charge field; no charge inference performed" : parsed.format === "mol2" ? "Copied from source MOL2 atom charge field; no charge inference performed" : "Copied from source _chem_comp_atom.partial_charge; no charge inference performed",
     } : undefined;
-    const scientificPayload = { atoms, bonds, hierarchy, counts: summary.counts, bounds: summary.bounds, coordinateStates, stateOrder, unitCell: parsed.unitCell ?? null, polymerTypingSource: parsed.polymerTypingSource ?? null, partialChargeValues: hasCompleteSourceCharges ? sourceChargeMap : null, peptideSequenceChains };
-    const scientificHash = createHash("sha256").update(JSON.stringify(scientificPayload)).digest("hex");
-    const structure: CanonicalMolecularStructure = {
+    const chemistryRoles = profileSync("POLYMER_TYPING", () => inferCanonicalChemistryRoles(atoms, bonds), { atomCount: atoms.length, bondCount: bonds.length });
+    let scientificHash: string;
+    {
+      const scientificPayload = scientificPayloadFor(atoms, bonds, hierarchy, coordinateStates, stateOrder, summary, parsed, sourceChargeMap, hasCompleteSourceCharges, peptideSequenceChains, chemistryRoles);
+      scientificHash = profileSync("CANONICAL_HASH", () => scientificHashFor(scientificPayload), { atomCount: atoms.length, bondCount: bonds.length, residueCount: Object.keys(hierarchy.residues).length });
+    }
+    const useCompactWire = buffer.length >= LARGE_STRUCTURE_WARNING_BYTES;
+    const compact = useCompactWire
+      ? profileSync("COMPACT_CANONICAL_PAYLOAD", () => compactCanonicalFor(atoms, bonds, hierarchy, coordinateStates, stateOrder, chemistryRoles), { atomCount: atoms.length, bondCount: bonds.length, chainCount: hierarchy.chainIds.length })
+      : undefined;
+    if (compact) {
+      // The compact payload is now the transport/render source of truth. Drop
+      // the temporary object graph before the response is prepared so the API
+      // does not retain two complete representations of the same molecule.
+      atoms.length = 0;
+      bonds.length = 0;
+      coordinateStates.length = 0;
+      stateOrder.length = 0;
+      for (const key of Object.keys(hierarchy.chains)) delete hierarchy.chains[key];
+      for (const key of Object.keys(hierarchy.residues)) delete hierarchy.residues[key];
+      hierarchy.chainIds.length = 0;
+    }
+    const structure: CanonicalMolecularStructure = profileSync("CANONICAL_OBJECT_CONSTRUCTION", () => ({
       id: `structure_${hash.slice(0, 16)}`,
-      name: safeFilename.replace(/\.(pdb|cif|mmcif)$/i, ""),
+      name: safeFilename.replace(/\.(pdb|pqr|sdf|mol|xyz|mol2|pdbqt|cif|mmcif)$/i, ""),
       format: parsed.format,
       source,
-      atoms,
-      bonds,
-      hierarchy,
+      atoms: compact ? [] : atoms,
+      bonds: compact ? [] : bonds,
+      hierarchy: compact ? { chainIds: [], chains: {}, residues: {} } : hierarchy,
       scientificHash,
-      coordinateStates,
-      stateOrder,
+      scientificHashProfile: SCIENTIFIC_HASH_PROFILE,
+      coordinateStates: compact ? [] : coordinateStates,
+      stateOrder: compact ? compact.stateOrder : stateOrder,
       ...(parsed.unitCell ? { unitCell: parsed.unitCell } : {}),
       ...(parsed.polymerTypingSource ? { polymerTypingSource: parsed.polymerTypingSource } : {}),
       ...(parsed.secondaryStructureSource ? { secondaryStructureDataset: { datasetId: `${hash.slice(0, 16)}:secondary-structure`, molecularRevision: scientificHash, assignmentSource: parsed.secondaryStructureSource, profileVersion: "pdb-mmcif-structural-records-v1" } } : {}),
       ...(partialChargeDataset ? { partialChargeDataset: { ...partialChargeDataset, molecularRevision: scientificHash } } : {}),
+      ...(chemistryRoles ? { chemistryDataset: { datasetId: `${hash.slice(0, 16)}:chemistry-roles`, molecularRevision: scientificHash, profileVersion: "canonical-chemistry-roles-v1" as const, donorAtomIds: chemistryRoles.donorAtomIds, acceptorAtomIds: chemistryRoles.acceptorAtomIds, provenance: chemistryRoles.provenance } } : {}),
       peptideSequenceDataset: { datasetId: `${hash.slice(0, 16)}:peptide-sequence`, molecularRevision: scientificHash, assignmentSource: "canonical polymer residue names mapped to one-letter amino-acid codes", profileVersion: "canonical-peptide-sequence-v1", chains: peptideSequenceChains },
+      ...(compact ? { compact } : {}),
       ...summary,
-    };
+    }), { atomCount: atoms.length, bondCount: bonds.length, chainCount: hierarchy.chainIds.length });
     this.structures.set(structure.id, structure);
-    return { structure, renderSource: { format: parsed.format, content } };
+    return { structure, renderSource: { format: parsed.format, content: compact ? "" : content }, sourceArtifact };
   }
 }

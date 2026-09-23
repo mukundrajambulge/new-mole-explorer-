@@ -1,0 +1,35 @@
+{
+  "caseId": "RCSB-1C3W",
+  "source": "RCSB",
+  "pdbId": "1C3W",
+  "inputFormat": "mmcif",
+  "bytes": 281011,
+  "sha256": "460a1e18a378d4c48fa82d38fb56cec178ff3dfd271fcae73415e077a9162f44",
+  "collectedAt": "2026-09-09T10:33:52.293Z",
+  "status": "PASS",
+  "format": "mmcif",
+  "counts": {
+    "atoms": 2073,
+    "residues": 238,
+    "chains": 17,
+    "polymerAtoms": 1720,
+    "ligandAtoms": 330,
+    "waterAtoms": 23,
+    "ionAtoms": 0,
+    "otherAtoms": 0
+  },
+  "bondCount": 1863,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": true,
+    "secondaryStructure": true,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": true,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

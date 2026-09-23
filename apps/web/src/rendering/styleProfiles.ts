@@ -1,4 +1,4 @@
-import type { CanonicalMolecularStructure, CapabilityState } from "@molecular/contracts";
+import { COMPACT_ATOM_FLAG_POLYMER, type CanonicalMolecularStructure, type CapabilityState } from "@molecular/contracts";
 
 export type SurfaceKind = "VDW" | "SAS" | "SES";
 export type SurfaceProfile = {
@@ -65,14 +65,27 @@ export const surfaceProfileForStyle = (id: StyleProfileId | string): SurfaceProf
 export type ResolvedRepresentationCapability = StyleDefinition & { eligibleAtomCount: number | null; diagnostic?: string };
 export const representationCapabilityFor = (style: string, structure: CanonicalMolecularStructure | null = null): ResolvedRepresentationCapability => {
   const definition = styleDefinition(style);
+  if (definition.id === "putty" && structure?.compact?.schemaVersion === "compact-canonical-v1") {
+    const eligibleAtomCount = structure.compact.flags.reduce((count, flags) => count + ((flags & COMPACT_ATOM_FLAG_POLYMER) !== 0 ? 1 : 0), 0);
+    const hasBFactors = structure.compact.flags.some((flags, index) => (flags & COMPACT_ATOM_FLAG_POLYMER) !== 0 && structure.compact!.bFactors[index] !== null && structure.compact!.bFactors[index] !== undefined);
+    if (!hasBFactors) return { ...definition, status: "INSUFFICIENT_DATA", capability: "UNAVAILABLE", maySelect: false, eligibleAtomCount, diagnostic: "Putty unavailable: canonical source B-factor values are required." };
+    return { ...definition, eligibleAtomCount };
+  }
   if (definition.id === "putty" && structure && !structure.atoms.some((atom) => atom.isPolymer && atom.bFactor !== undefined && atom.bFactor !== null)) return { ...definition, status: "INSUFFICIENT_DATA", capability: "UNAVAILABLE", maySelect: false, eligibleAtomCount: structure.atoms.filter((atom) => atom.isPolymer).length, diagnostic: "Putty unavailable: canonical source B-factor values are required." };
   if (definition.id === "nonbonded-crosses" || definition.id === "nonbonded-spheres") {
+    if (structure?.compact?.schemaVersion === "compact-canonical-v1") {
+      const bonded = new Set<number>();
+      structure.compact.bonds.atom1Ordinals.forEach((ordinal, index) => { bonded.add(ordinal); bonded.add(structure.compact!.bonds.atom2Ordinals[index]!); });
+      const eligibleAtomCount = structure.compact.atomCount - bonded.size;
+      if (eligibleAtomCount === 0) return { ...definition, status: "VALID_EMPTY", eligibleAtomCount, diagnostic: "Valid empty result: 0 eligible non-bonded atoms in this structure." };
+      return { ...definition, eligibleAtomCount };
+    }
     const bondedIds = new Set(structure?.bonds.flatMap((bond) => [bond.atom1, bond.atom2]) ?? []);
     const eligibleAtomCount = structure ? structure.atoms.filter((atom) => !bondedIds.has(atom.stableId)).length : null;
     if (eligibleAtomCount === 0) return { ...definition, status: "VALID_EMPTY", eligibleAtomCount, diagnostic: "Valid empty result: 0 eligible non-bonded atoms in this structure." };
     return { ...definition, eligibleAtomCount };
   }
-  return { ...definition, eligibleAtomCount: structure ? structure.atoms.length : null };
+  return { ...definition, eligibleAtomCount: structure?.compact?.schemaVersion === "compact-canonical-v1" ? structure.compact.atomCount : structure ? structure.atoms.length : null };
 };
 export const representationCapabilitiesForTarget = (target: RepresentationTarget, structure: CanonicalMolecularStructure | null = null): ResolvedRepresentationCapability[] => STYLE_DEFINITIONS.filter((definition) => definition.eligibleTargetTypes.includes(target)).map((definition) => representationCapabilityFor(definition.id, structure));
 export const representationStyleForCommand = (representation: string): StyleProfileId | null => ({ LINES: "line", STICKS: "stick", SPHERES: "space-filling", CARTOON: "cartoon", RIBBON: "ribbon", NONBONDED: "nonbonded-crosses", NB_SPHERES: "nonbonded-spheres", BALL_AND_STICK: "ball-and-stick", SURFACE: "van-der-waals-surface", MESH: "mesh", DOTS: "dots" }[representation] as StyleProfileId | undefined) ?? null;

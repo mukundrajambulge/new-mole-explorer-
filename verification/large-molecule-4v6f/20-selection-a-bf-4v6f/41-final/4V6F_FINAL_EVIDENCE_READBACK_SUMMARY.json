@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "status": "FINAL_PACKAGE_VERIFIED",
+  "folder": "65_FINAL_REPORT",
+  "folderId": "1rPkEWAi3Ce_QZ8BWyl2T28tFlDJUUnUZ",
+  "verifiedAt": "2026-09-18",
+  "verificationMethod": "Drive folder listing readback; every expected filename was present with the recorded Drive ID and matching byte size.",
+  "expectedFileCount": 18,
+  "observedFileCount": 18,
+  "missingFiles": [],
+  "unexpectedFiles": [],
+  "sizeMismatches": [],
+  "files": [
+    {"file":"FINAL_4V6F_SELECTION_A_BF_REPORT.md","driveFileId":"1I9clLPWNEoDCl34JZuR1ae1M4kC1N0zM","localSizeBytes":4414,"driveSizeBytes":4414,"localSha256":"f958f08832cec8aa3d7cdb54ab252b8133dc0eafcbee5aeca346537973ac930f","status":"VERIFIED"},
+    {"file":"FINAL_4V6F_SELECTION_A_BF_REPORT.json","driveFileId":"1slHhn8mCPed-Tpd1yLLjIbyHBEs6oQ8B","localSizeBytes":71226,"driveSizeBytes":71226,"localSha256":"4fa817386b2b03066f03f46f0c85d5fd1a364a5d8def48618b78885d194fb58c","status":"VERIFIED"},
+    {"file":"4V6F_SELECTION_SUBSYSTEM_LOCK.json","driveFileId":"1SePawYmI56ZfdffX-avoBpTo2tWHnR0C","localSizeBytes":7629,"driveSizeBytes":7629,"localSha256":"d26c0a09ed0895977788057336245bb38ff9a8a2ddcac31de41befe67ba304bb","status":"VERIFIED"},
+    {"file":"4V6F_SELECTION_TEST_ID_AUDIT.json","driveFileId":"1jYdQLmouui9MD_YFgrlDNoUURq7Z3HKJ","localSizeBytes":130341,"driveSizeBytes":130341,"localSha256":"a0bdfcfd9629541540dc41b9a1b8a393dfaf3218d97e063ca480a1bd52553bd0","status":"VERIFIED"},
+    {"file":"4V6F_SELECTION_PERFORMANCE_SUMMARY.json","driveFileId":"1aHru0j2i3wzEskFRIJ4TYRengHvsnxjw","localSizeBytes":38549,"driveSizeBytes":38549,"localSha256":"32dfacb0b03f361c831446443bdebc29c2c1b28fa2b0dd7190abf311572563d8","status":"VERIFIED"},
+    {"file":"4V6F_SELECTION_DEFECT_MATRIX.md","driveFileId":"1lJ4LEv8S0jHeVQrmpcOoaOCBk8Dy2y_X","localSizeBytes":1972,"driveSizeBytes":1972,"localSha256":"217b3d53c1f353a595776f788981519ff2386a0fff2c76bfb678ccac6ae827d4","status":"VERIFIED"},
+    {"file":"4V6F_PYMOL_CONFORMANCE_MATRIX.md","driveFileId":"1sugL4i8DNbs9pWc2wdML1xp1OZr2s1Lh","localSizeBytes":321,"driveSizeBytes":321,"localSha256":"eb4e5f0769acc8e72815381c449bc5ea75c688a0f3927ebc0339355c143e359d","status":"VERIFIED"},
+    {"file":"4V6F_PYMOL_CONFORMANCE_MATRIX.json","driveFileId":"1qJyrLBTpEuP7NHUs5mosHyTaDh1ZzOS3","localSizeBytes":462,"driveSizeBytes":462,"localSha256":"d1fe355a2f991e041e62d146121afa3e05348f763e0cca4d1ed4906e21510849","status":"VERIFIED"},
+    {"file":"4V6F_PYMOL_CONFORMANCE_MATRIX.csv","driveFileId":"19Itgy9WUBe1kLH-efq2JIKEIY1Q8bj8n","localSizeBytes":296,"driveSizeBytes":296,"localSha256":"cd998adcd31284fd40ea53dc9a61aff593350175c0c54154e5f2fe04390205da","status":"VERIFIED"},
+    {"file":"4V6F_SELECTION_TAIL_REVIEW.md","driveFileId":"1zHG0jiPld8IZIGnbTSE05pc1KgjcZzoH","localSizeBytes":1729,"driveSizeBytes":1729,"localSha256":"423444ec04fe65ccd8edca1ed3054c115002fa3f75b24b5fe660987599221243","status":"VERIFIED"},
+    {"file":"4V6F_SELECTION_TAIL_REVIEW.json","driveFileId":"18aNX3VZTPS3M3GA3pVodHUPVxWbE8jwP","localSizeBytes":11894,"driveSizeBytes":11894,"localSha256":"17a06f18d54eb9724ceda7ce4d229d145c99f58750243201153904eb93ecb20a","status":"VERIFIED"},
+    {"file":"4V6F_SELECTION_DRIVE_READBACK_AUDIT.json","driveFileId":"1DZEbzYUgVcRMcNhtEIAteEvaPDlcfLR_","localSizeBytes":550558,"driveSizeBytes":550558,"localSha256":"2ea0d3822e756662508df86dccea4cf961ede67354b5a603ab3709f850d1d08c","status":"VERIFIED"},
+    {"file":"4V6F_DRIVE_HIERARCHY_AUDIT.json","driveFileId":"11JIHbVqLUjMFP3oO2-8H0kC5uf1SKjns","localSizeBytes":1944,"driveSizeBytes":1944,"localSha256":"f6639e71be980948739a99352ed15881b17ef784e7c025e4bcde0e5fc0a00b80","status":"VERIFIED"},
+    {"file":"FINAL_4V6F_SELECTION_SEAL_AUDIT.md","driveFileId":"1VRmubZUNQb2F_aU7FuuBd_MtJZu31dYE","localSizeBytes":2552,"driveSizeBytes":2552,"localSha256":"8ef3a4406046f97d858743212621e13fccd781af46599ffa960a7ccada74a897","status":"VERIFIED_FINAL_VERSION"},
+    {"file":"FINAL_4V6F_SELECTION_SEAL_AUDIT.json","driveFileId":"1BsRD6CIP3Quck17_URkD2f8y-ycPopFY","localSizeBytes":5498,"driveSizeBytes":5498,"localSha256":"f3245d0fba4d7ee4ca314e5f192069a680fc66c1d8365c88fdc440144d0a3525","status":"VERIFIED_FINAL_VERSION"},
+    {"file":"4V6F_SELECTION_REPRODUCIBILITY_FINGERPRINT.json","driveFileId":"1flLS4o1ecdj2tW-3dVrMYrRiVD13ipcD","localSizeBytes":221638,"driveSizeBytes":221638,"localSha256":"e54858f9cb91aeb05b5b0309d454ba0e7603ffb70cca3b80a2bc430cf021287c","status":"VERIFIED_FINAL_VERSION"},
+    {"file":"4V6F_SELECTION_SCOPED_COMMIT_PLAN.md","driveFileId":"134Sv4ex2mic4Sv96d_as6_ctNMaIHKyl","localSizeBytes":4218,"driveSizeBytes":4218,"localSha256":"64ae7ec6396a52f0ba1f0384e6174bc5db31f8a890779c10f4b63f8d95441b81","status":"VERIFIED"},
+    {"file":"4V6F_FINAL_EVIDENCE_READBACK_SUMMARY.json","driveFileId":"1P8TElzffaY7t6CFtIYpqKaQI-mq-hoBp","localSizeBytes":null,"driveSizeBytes":null,"localSha256":null,"status":"VERIFIED_SELF_AUDIT_METADATA"}
+  ]
+}

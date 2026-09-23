@@ -1,0 +1,29 @@
+{
+  "name": "IMPORT",
+  "SHA": "1ccbc04",
+  "tests": [
+    "AT-FSR-B-001",
+    "AT-FSR-B-002",
+    "AT-FSR-G-001",
+    "AT-FSR-J-001",
+    "AT-FSR-J-002",
+    "AT-FSR-J-003",
+    "AT-FSR-J-004",
+    "AT-FSR-J-005",
+    "AT-FSR-J-006",
+    "AT-FSR-J-007",
+    "AT-FSR-J-008",
+    "AT-FSR-J-009",
+    "AT-FSR-J-010",
+    "AT-FSR-J-011"
+  ],
+  "evidence": [
+    "FILE_FORMAT_SUPPORT_MATRIX.md",
+    "BIOLOGICAL_DATA.lock.json"
+  ],
+  "date": "2026-09-13",
+  "knownLimitations": [
+    "DCD/TRR/XTC decode bounded frames; PSF/PRMTOP pairing requires matching atom counts."
+  ],
+  "status": "LOCKED"
+}

@@ -1,0 +1,32 @@
+{
+  "issue": "LM-IMP-001",
+  "status": "CLOSED",
+  "branch": "fix/lm-imp-001-canonical-large-ingestion",
+  "startingHead": "1b44780c214e83c4d864bb94ecd49132d59b09c3",
+  "source": {"id": "4V6F", "sha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f"},
+  "acceptance": {
+    "canonicalCompletion": "PASS",
+    "actualVisibleGeometry": "PASS",
+    "fitCameraZoom": "PASS",
+    "classification": "PASS",
+    "selection": "PASS",
+    "boundedMemory": "PASS",
+    "regression": "PASS"
+  },
+  "canonical": {"atoms": 307345, "bonds": 318270, "residues": 26941, "chains": 5467, "states": 1, "storage": "compact-canonical-v1"},
+  "classification": {"polymer": 301988, "ligand": 0, "water": 6, "ions": 5351, "other": 0, "polymerHetatmRows": 174},
+  "browser": {"readyElapsedMs": 46565, "rendererModels": 1, "rendererAtoms": 307345, "canvasCount": 1, "renderStage": "full", "errors": 0},
+  "selectionCamera": {"elapsedMs": 122726, "pickedAtoms": 1, "indicator": "visible", "actions": ["RESET", "ZOOM", "FIT", "CENTER"], "allStayedReady": true, "errors": 0},
+  "regression": {"unitTests": 215, "typecheck": true, "build": true, "lint": true},
+  "evidence": {
+    "identity": "../02-identity-audit/LM_IMP_001_IDENTITY_AUDIT.md",
+    "memory": "../03-memory/LM_IMP_001_MEMORY_REPORT.md",
+    "algorithm": "../04-algorithm/LM_IMP_001_ALGORITHM_AUDIT.md",
+    "progressive": "../05-progressive-render/LM_IMP_001_PROGRESSIVE_RENDER_REPORT.md",
+    "ui": "../06-ui-state/LM_IMP_001_UI_STATE_REPORT.md",
+    "retest": "../07-4v6f-retest/LM_IMP_001_4V6F_RETEST_REPORT.md",
+    "selectionCamera": "../08-selection-smoke/LM_IMP_001_SELECTION_CAMERA_SMOKE.json",
+    "regression": "../09-regression/LM_IMP_001_REGRESSION_REPORT.md",
+    "screenshot": "../08-selection-smoke/LM_IMP_001_SELECTION_CAMERA_SMOKE_4V6F.png"
+  }
+}

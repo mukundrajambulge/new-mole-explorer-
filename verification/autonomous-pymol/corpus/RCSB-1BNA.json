@@ -1,0 +1,35 @@
+{
+  "caseId": "RCSB-1BNA",
+  "source": "RCSB",
+  "pdbId": "1BNA",
+  "inputFormat": "mmcif",
+  "bytes": 100712,
+  "sha256": "76d550f32963de46f4f3c63caacb530f91a24f333fbc4312766d240b14e8cf30",
+  "collectedAt": "2026-09-09T10:33:52.118Z",
+  "status": "PASS",
+  "format": "mmcif",
+  "counts": {
+    "atoms": 566,
+    "residues": 26,
+    "chains": 4,
+    "polymerAtoms": 486,
+    "ligandAtoms": 0,
+    "waterAtoms": 80,
+    "ionAtoms": 0,
+    "otherAtoms": 0
+  },
+  "bondCount": 554,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": true,
+    "secondaryStructure": false,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": false,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

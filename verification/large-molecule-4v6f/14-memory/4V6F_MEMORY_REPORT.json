@@ -1,0 +1,33 @@
+{
+  "sourceBytes": 38137644,
+  "canonicalMemoryObservations": [
+    {
+      "stage": "pre-parser-fixes",
+      "observation": ">20 minutes",
+      "peakMemory": "approximately 0.8–1.15 GiB",
+      "result": "TIMEOUT_OR_CANCELLED"
+    },
+    {
+      "stage": "after parser append/index/reduce fixes",
+      "observation": ">20 minutes",
+      "peakMemory": "approximately 1.5–2.6 GiB",
+      "result": "TIMEOUT_OR_CANCELLED"
+    },
+    {
+      "stage": "after streaming canonical hash helper",
+      "observation": ">20 minutes",
+      "peakMemory": "approximately 1.5–2.1 GiB",
+      "result": "TIMEOUT_OR_CANCELLED"
+    },
+    {
+      "stage": "after lazy canonical payload views",
+      "observation": "approximately 4 minutes before cancellation",
+      "peakMemory": "approximately 1.5–1.85 GiB",
+      "result": "TIMEOUT_OR_CANCELLED"
+    }
+  ],
+  "browserMemory": "NOT_MEASURED_FOR_4V6F_CANONICAL_MODEL",
+  "sourceScanMemory": "NOT_INSTRUMENTED",
+  "status": "CONCERN_BLOCKING_ACCEPTANCE",
+  "requiredRemediation": "Avoid duplicating the full atom/state/hierarchy graph in scientificPayloadFor and stream or bound canonical identity materialization."
+}

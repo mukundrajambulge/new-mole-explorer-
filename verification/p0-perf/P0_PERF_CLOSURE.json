@@ -1,0 +1,37 @@
+{
+  "title": "MOLE EXPLORER — P0-PERF WORKSTATION CONSOLIDATION & PERFORMANCE CLOSURE",
+  "status": "P0-PERF STATUS: PASS — WORKSTATION CONSOLIDATED / PERFORMANCE BASELINE SEALED",
+  "closureDate": "2026-09-21",
+  "branch": "codex/p0-perf-consolidation",
+  "implementationCommit": "f773b7fcf0a6f16b23f9abc760fa9d2292b63061",
+  "closureDocumentationCommit": "11fd59707112113af7f1b87fb3a7832e47e22b42",
+  "acceptedTag": "mole-explorer-p0-perf-accepted-2026-09-21",
+  "driveFolderId": "1efS0XnacsfWZzKI9ygatZNlZsMg80hxl",
+  "baselines": {
+    "d1": "26227a10416657d0c2518bd0b751a38693627d5b",
+    "d2": "ba2ffb4eb28a00ee945086b24f39bf639ca2250c",
+    "uiD0": "d63c2126bb27d6513166e5f90375c213c314fa0c"
+  },
+  "performance": {
+    "fixture": "4V6F",
+    "baselineSeconds": 24.92,
+    "p0Seconds": 17.60,
+    "scientificHash": "20b7c8468b598ce6272d83709eba7454505881b43d5083c85df50735e801d913",
+    "postRunRssApproxBytes": 1230000000
+  },
+  "verification": {
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "unitTests": { "web": 156, "api": 90, "status": "PASS" },
+    "build": "PASS",
+    "browserFullRun": { "passed": 145, "total": 150 },
+    "browserRemediationRerun": { "passed": 5, "total": 5 },
+    "uniqueBrowserCases": "150/150 PASS",
+    "rendererProbe": "PASS"
+  },
+  "services": {
+    "api": "http://localhost:8100",
+    "web": "http://127.0.0.1:3106/"
+  },
+  "d3Implemented": false
+}

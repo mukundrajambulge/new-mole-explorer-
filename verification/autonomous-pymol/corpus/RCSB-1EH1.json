@@ -1,0 +1,35 @@
+{
+  "caseId": "RCSB-1EH1",
+  "source": "RCSB",
+  "pdbId": "1EH1",
+  "inputFormat": "mmcif",
+  "bytes": 194168,
+  "sha256": "32689f50f3c5a4d971c0a61cce25016f29cb2b77bfc98c025958e45f0de22f41",
+  "collectedAt": "2026-09-09T10:33:52.212Z",
+  "status": "PASS",
+  "format": "mmcif",
+  "counts": {
+    "atoms": 1566,
+    "residues": 186,
+    "chains": 2,
+    "polymerAtoms": 1478,
+    "ligandAtoms": 0,
+    "waterAtoms": 88,
+    "ionAtoms": 0,
+    "otherAtoms": 0
+  },
+  "bondCount": 1313,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": true,
+    "secondaryStructure": true,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": true,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

@@ -1,0 +1,35 @@
+{
+  "caseId": "LOCAL-mini-protein.pdb",
+  "source": "LOCAL_FIXTURE",
+  "pdbId": "",
+  "inputFormat": "pdb",
+  "bytes": 1190,
+  "sha256": "30e7eff33d94fb3b39f57a8a6f3e344da776ce1d237eb9ea56c6a44d543e268a",
+  "collectedAt": "2026-09-09T10:33:40.750Z",
+  "status": "PASS",
+  "format": "pdb",
+  "counts": {
+    "atoms": 12,
+    "residues": 5,
+    "chains": 2,
+    "polymerAtoms": 8,
+    "ligandAtoms": 2,
+    "waterAtoms": 1,
+    "ionAtoms": 1,
+    "otherAtoms": 0
+  },
+  "bondCount": 8,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": false,
+    "secondaryStructure": false,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": true,
+    "insertionCodes": false,
+    "alternateLocations": false,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

@@ -1,0 +1,30 @@
+{
+  "primary": {
+    "id": "4V6F",
+    "path": "01-source/4v6f.cif",
+    "sha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+    "status": "OFFICIAL_SOURCE_PRESENT"
+  },
+  "standard": {
+    "ids": [
+      "4DJW",
+      "1CRN"
+    ],
+    "repositoryPaths": [
+      "tests/fixtures/4djw.pdb",
+      "tests/fixtures/1crn.pdb"
+    ],
+    "status": "NOT_FOUND_IN_REPOSITORY",
+    "priorEvidence": [
+      "verification/final-rearchitecture/evidence/SLICE_H_4DJW_LOADED.png",
+      "verification/final-rearchitecture/evidence/SLICE_H_1CRN_HIDDEN.png"
+    ]
+  },
+  "small": {
+    "id": "mini-protein",
+    "path": "tests/fixtures/mini-protein.pdb",
+    "status": "PRESENT_STANDARD_REGRESSION_ONLY"
+  },
+  "canonicalMultiObjectExecution": "NOT_RUN_CANONICAL_IMPORT_BLOCKED",
+  "note": "No duplicate or fabricated 4DJW/1CRN fixture was created. Existing prior evidence is referenced for regression context only."
+}

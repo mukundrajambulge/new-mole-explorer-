@@ -96,6 +96,27 @@ describe("workspace selection scope", () => {
     expect(resolveSelection("acceptors", workspace!).stableAtomIds).toEqual(["object:chem-second::second-atom"]);
   });
 
+  it("preserves canonical dataset IDs for a single loaded object", () => {
+    const base = loadResultFor("single-chemistry", "single-atom");
+    const scientificHash = "single-chemistry-revision".padEnd(64, "0");
+    const object = createWorkspaceObject({ ...base, structure: {
+      ...base.structure,
+      scientificHash,
+      chemistryDataset: {
+        datasetId: "single-chemistry:roles",
+        molecularRevision: scientificHash,
+        profileVersion: "canonical-chemistry-roles-v1" as const,
+        donorAtomIds: ["single-atom"],
+        acceptorAtomIds: [],
+        provenance: "validated canonical chemistry fixture",
+      },
+    }} satisfies StructureLoadResult);
+    const workspace = workspaceSelectionStructure([object]);
+    expect(workspace?.chemistryDataset?.donorAtomIds).toEqual(["single-atom"]);
+    expect(resolveSelection("donors", workspace!).stableAtomIds).toEqual(["single-atom"]);
+    expect(resolveSelection("pepseq A", workspace!).stableAtomIds).toEqual(["single-atom"]);
+  });
+
   it("preserves complete fragment assignments across a multi-object selection universe", () => {
     const fragmentObject = (id: string, atomId: string, fragmentId: string) => {
       const base = loadResultFor(id, atomId);

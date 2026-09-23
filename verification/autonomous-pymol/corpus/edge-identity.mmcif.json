@@ -1,0 +1,35 @@
+{
+  "caseId": "LOCAL-edge-identity.mmcif",
+  "source": "LOCAL_FIXTURE",
+  "pdbId": "",
+  "inputFormat": "mmcif",
+  "bytes": 540,
+  "sha256": "a0726404c7d899d2c32df02750a6343d379732072e80c8910dca93fd560e477a",
+  "collectedAt": "2026-09-09T10:33:40.794Z",
+  "status": "PASS",
+  "format": "mmcif",
+  "counts": {
+    "atoms": 4,
+    "residues": 3,
+    "chains": 2,
+    "polymerAtoms": 3,
+    "ligandAtoms": 1,
+    "waterAtoms": 0,
+    "ionAtoms": 0,
+    "otherAtoms": 0
+  },
+  "bondCount": 0,
+  "stateCount": 1,
+  "features": {
+    "multiState": false,
+    "unitCell": false,
+    "secondaryStructure": false,
+    "partialCharge": false,
+    "polymerTyping": false,
+    "chemistryRoles": false,
+    "insertionCodes": false,
+    "alternateLocations": true,
+    "formalCharges": false
+  },
+  "parserProfile": "molecular-workstation-g1b-canonical-v1"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "LM-RESP-001",
+  "status": "FIXED",
+  "viewport": { "width": 720, "height": 800 },
+  "fixture": "tests/fixtures/mini-protein.pdb",
+  "before": { "canvasCssWidth": 0, "canvasCssHeight": 702, "backingWidth": 0, "backingHeight": 1404, "appMainWidth": 56 },
+  "after": { "canvasCssWidth": 478, "canvasCssHeight": 702, "backingWidth": 956, "backingHeight": 1404, "appMainWidth": 720 },
+  "focusedTest": "PASS",
+  "focusedTestCommand": "npx playwright test tests/e2e/g1c-visualization.spec.ts:113 --project=chromium",
+  "fix": "Keep app-shell single-column at max-width 1080px and max-width 920px."
+}

@@ -1,0 +1,47 @@
+{
+  "sourceBytes": 38137644,
+  "atomRows": 307345,
+  "lightweightSourceScan": {
+    "elapsedMs": 1735,
+    "result": "PASS_SOURCE_SCAN_ONLY",
+    "memory": "not instrumented as browser/canonical import"
+  },
+  "canonicalAttempts": [
+    {
+      "stage": "pre-parser-fixes",
+      "observation": ">20 minutes",
+      "peakMemory": "approximately 0.8–1.15 GiB",
+      "result": "TIMEOUT_OR_CANCELLED"
+    },
+    {
+      "stage": "after parser append/index/reduce fixes",
+      "observation": ">20 minutes",
+      "peakMemory": "approximately 1.5–2.6 GiB",
+      "result": "TIMEOUT_OR_CANCELLED"
+    },
+    {
+      "stage": "after streaming canonical hash helper",
+      "observation": ">20 minutes",
+      "peakMemory": "approximately 1.5–2.1 GiB",
+      "result": "TIMEOUT_OR_CANCELLED"
+    },
+    {
+      "stage": "after lazy canonical payload views",
+      "observation": "approximately 4 minutes before cancellation",
+      "peakMemory": "approximately 1.5–1.85 GiB",
+      "result": "TIMEOUT_OR_CANCELLED"
+    }
+  ],
+  "uploadPolicyRegression": {
+    "result": "PASS",
+    "old25MiBBlocker": "resolved",
+    "maxBytes": 536870912
+  },
+  "standardBrowserRegressionBeforeResponsiveFix": {
+    "passed": 146,
+    "failed": 1,
+    "failure": "G1C-UI-003 zero-width canvas"
+  },
+  "focusedResponsiveRegressionAfterFix": "PASS",
+  "acceptanceStatus": "BLOCKED_CANONICAL_IMPORT"
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69",
+  "executableOracle": "BLOCKED",
+  "executableBlocker": "No pymol/pymol.exe executable or importable pymol module is installed.",
+  "authorities": [
+    {"kind":"source","repository":"schrodinger/pymol-open-source","commit":"5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69","path":"modules/pymol/api.py","url":"https://github.com/schrodinger/pymol-open-source/blob/5e8bfca5a7f5dc4d5e7f84fa1d15af707cc86e69/modules/pymol/api.py","result":"PASS_SOURCE_REFERENCE"},
+    {"kind":"documentation","title":"PyMOL Wiki Cealign","url":"https://wiki.pymol.org/index.php/Cealign","result":"PASS_DOCUMENTED_SIGNATURE"},
+    {"kind":"documentation","title":"PyMOL Command Reference","url":"https://pymol.org/pymol-command-ref.html","result":"PASS_COMMAND_REFERENCE"}
+  ],
+  "comparisonResults": {"cealign":"RUNTIME_UNAVAILABLE_CONTRADICTS_TRANSLATION_CLAIM_RESOLVED", "selection":"PINNED_LEDGER_51_ORACLE_VERIFIED_35_ORACLE_EQUIVALENT", "unsafe":"INTENTIONAL_REJECTION"}
+}
