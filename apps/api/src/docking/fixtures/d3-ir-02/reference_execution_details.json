@@ -1,0 +1,3790 @@
+[
+  {
+    "case": "acetamide",
+    "input_molecule": "acetamide",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=['H']",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "acetamide",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "c37e523a92c06bc96d667839a39e24e2c1cf3fdf83e813fe0ea3be849f601304",
+      "instrumented_stdout_sha256": "c37e523a92c06bc96d667839a39e24e2c1cf3fdf83e813fe0ea3be849f601304"
+    },
+    "file": "acetamide.pdbqt",
+    "raw_branch_count": 0,
+    "raw_branch_edges": [],
+    "raw_torsdof_values": [
+      0
+    ],
+    "raw_torsdof": 0,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 7,
+      "6": 8
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.00043588989435404483,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.000648074069840826,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.0006708203932498795,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.0002449489742782965,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 7,
+        "distance_angstrom": 0.0005744562646537879,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 8,
+        "distance_angstrom": 0.0003464101615137373,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [],
+    "source_search_axis_count": 0,
+    "source_stored_torsdof": 0,
+    "source_rotor_flags_internal": [],
+    "source_rotor_flags_mapped_to_input_graph": [],
+    "source_scorer_half_edge_contributions": [],
+    "source_scorer_ntors": 0.0,
+    "source_scorer_stored_torsdof_sum": 0
+  },
+  {
+    "case": "benzene",
+    "input_molecule": "benzene",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=['H']",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "benzene",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "85b2aed5f000982210fce8808a5d917719344a1bf2c8e3afc4ddd399683f2a11",
+      "instrumented_stdout_sha256": "85b2aed5f000982210fce8808a5d917719344a1bf2c8e3afc4ddd399683f2a11"
+    },
+    "file": "benzene.pdbqt",
+    "raw_branch_count": 0,
+    "raw_branch_edges": [],
+    "raw_torsdof_values": [
+      0
+    ],
+    "raw_torsdof": 0,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 4,
+      "6": 5
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.0004690415759823135,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.000547722557505114,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.0001732050807568827,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.0004690415759823135,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 4,
+        "distance_angstrom": 0.000547722557505114,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 5,
+        "distance_angstrom": 0.0001732050807568827,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [],
+    "source_search_axis_count": 0,
+    "source_stored_torsdof": 0,
+    "source_rotor_flags_internal": [],
+    "source_rotor_flags_mapped_to_input_graph": [],
+    "source_scorer_half_edge_contributions": [],
+    "source_scorer_ntors": 0.0,
+    "source_scorer_stored_torsdof_sum": 0
+  },
+  {
+    "case": "butane",
+    "input_molecule": "butane",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=['H']",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "butane",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "edbc85d02680bd28f524d66c798809f032bb8da389b7751861cc42ab2eec0380",
+      "instrumented_stdout_sha256": "edbc85d02680bd28f524d66c798809f032bb8da389b7751861cc42ab2eec0380"
+    },
+    "file": "butane.pdbqt",
+    "raw_branch_count": 1,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          2,
+          3
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          2
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      1
+    ],
+    "raw_torsdof": 1,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.000812403840463563,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.0005830951894844658,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.0005830951894844658,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.000812403840463563,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [
+      {
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "rotatable": true
+      }
+    ],
+    "source_search_axis_count": 1,
+    "source_stored_torsdof": 1,
+    "source_rotor_flags_internal": [
+      [
+        1,
+        2
+      ]
+    ],
+    "source_rotor_flags_mapped_to_input_graph": [
+      {
+        "pdbqt_serials": [
+          2,
+          3
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          2
+        ]
+      }
+    ],
+    "source_scorer_half_edge_contributions": [
+      {
+        "owner_internal": 1,
+        "neighbor_internal": 2,
+        "owner_pdbqt_serial": 2,
+        "neighbor_pdbqt_serial": 3,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 2,
+        "partner_heavy_degree": 2,
+        "contribution": 0.5
+      },
+      {
+        "owner_internal": 2,
+        "neighbor_internal": 1,
+        "owner_pdbqt_serial": 3,
+        "neighbor_pdbqt_serial": 2,
+        "owner_input_atom_index_zero_based": 2,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 2,
+        "contribution": 0.5
+      }
+    ],
+    "source_scorer_ntors": 1.0,
+    "source_scorer_stored_torsdof_sum": 1
+  },
+  {
+    "case": "ethylbenzene",
+    "input_molecule": "ethylbenzene",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=['H']",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "ethylbenzene",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "0af3252404891f6149777022aa8ba43314c3736b514bb9c60b219e1785092e50",
+      "instrumented_stdout_sha256": "0af3252404891f6149777022aa8ba43314c3736b514bb9c60b219e1785092e50"
+    },
+    "file": "ethylbenzene.pdbqt",
+    "raw_branch_count": 1,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          2,
+          3
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          3
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      1
+    ],
+    "raw_torsdof": 1,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 7,
+      "6": 4,
+      "7": 6,
+      "8": 5
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.0006557438524302844,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.0004123105625617947,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.00043588989435405757,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.000538516480713422,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 7,
+        "distance_angstrom": 0.0003162277660168031,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 4,
+        "distance_angstrom": 0.00031622776601701813,
+        "valid": true
+      },
+      {
+        "serial": 7,
+        "input_index": 6,
+        "distance_angstrom": 0.0004999999999999449,
+        "valid": true
+      },
+      {
+        "serial": 8,
+        "input_index": 5,
+        "distance_angstrom": 0.000812403840463715,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [
+      {
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "rotatable": true
+      }
+    ],
+    "source_search_axis_count": 1,
+    "source_stored_torsdof": 1,
+    "source_rotor_flags_internal": [
+      [
+        1,
+        2
+      ]
+    ],
+    "source_rotor_flags_mapped_to_input_graph": [
+      {
+        "pdbqt_serials": [
+          2,
+          3
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          3
+        ]
+      }
+    ],
+    "source_scorer_half_edge_contributions": [
+      {
+        "owner_internal": 1,
+        "neighbor_internal": 2,
+        "owner_pdbqt_serial": 2,
+        "neighbor_pdbqt_serial": 3,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 2,
+        "partner_heavy_degree": 3,
+        "contribution": 0.5
+      },
+      {
+        "owner_internal": 2,
+        "neighbor_internal": 1,
+        "owner_pdbqt_serial": 3,
+        "neighbor_pdbqt_serial": 2,
+        "owner_input_atom_index_zero_based": 2,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 2,
+        "contribution": 0.5
+      }
+    ],
+    "source_scorer_ntors": 1.0,
+    "source_scorer_stored_torsdof_sum": 1
+  },
+  {
+    "case": "methyl_acetate",
+    "input_molecule": "methyl_acetate",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=['H']",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "methyl_acetate",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "d98e2c45a858735943f5b0c1ae353cdfb8923dd68759b9693b032aefb651d479",
+      "instrumented_stdout_sha256": "d98e2c45a858735943f5b0c1ae353cdfb8923dd68759b9693b032aefb651d479"
+    },
+    "file": "methyl_acetate.pdbqt",
+    "raw_branch_count": 1,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          1,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          2,
+          1
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "O"
+        ],
+        "heavy_degrees": [
+          3,
+          2
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      1
+    ],
+    "raw_torsdof": 1,
+    "atom_serial_to_input_index": {
+      "1": 2,
+      "2": 3,
+      "3": 4,
+      "4": 1,
+      "5": 0
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 2,
+        "distance_angstrom": 0.0005744562646538072,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 3,
+        "distance_angstrom": 0.0002999999999999947,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 4,
+        "distance_angstrom": 0.00030000000000002247,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 1,
+        "distance_angstrom": 0.0006403124237433011,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 0,
+        "distance_angstrom": 0.0005656854249492469,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [
+      {
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "rotatable": true
+      }
+    ],
+    "source_search_axis_count": 1,
+    "source_stored_torsdof": 1,
+    "source_rotor_flags_internal": [
+      [
+        0,
+        1
+      ]
+    ],
+    "source_rotor_flags_mapped_to_input_graph": [
+      {
+        "pdbqt_serials": [
+          1,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          2,
+          1
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "O"
+        ],
+        "heavy_degrees": [
+          3,
+          2
+        ]
+      }
+    ],
+    "source_scorer_half_edge_contributions": [
+      {
+        "owner_internal": 0,
+        "neighbor_internal": 1,
+        "owner_pdbqt_serial": 1,
+        "neighbor_pdbqt_serial": 4,
+        "owner_input_atom_index_zero_based": 2,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 2,
+        "contribution": 0.5
+      },
+      {
+        "owner_internal": 1,
+        "neighbor_internal": 0,
+        "owner_pdbqt_serial": 4,
+        "neighbor_pdbqt_serial": 1,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 2,
+        "partner_heavy_degree": 3,
+        "contribution": 0.5
+      }
+    ],
+    "source_scorer_ntors": 1.0,
+    "source_scorer_stored_torsdof_sum": 1
+  },
+  {
+    "case": "n_methylacetamide",
+    "input_molecule": "n_methylacetamide",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=['H']",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "n_methylacetamide",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "6da64e046a8cb91216675551a4bd96c400c0215faa6e0cd9037fc18cd4ac71be",
+      "instrumented_stdout_sha256": "6da64e046a8cb91216675551a4bd96c400c0215faa6e0cd9037fc18cd4ac71be"
+    },
+    "file": "n_methylacetamide.pdbqt",
+    "raw_branch_count": 0,
+    "raw_branch_edges": [],
+    "raw_torsdof_values": [
+      0
+    ],
+    "raw_torsdof": 0,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 4,
+      "6": 8
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.0005999999999999721,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.0005477225575051077,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.0006403124237433292,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.0004690415759823231,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 4,
+        "distance_angstrom": 0.0006164414002968748,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 8,
+        "distance_angstrom": 0.0005744562646537686,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [],
+    "source_search_axis_count": 0,
+    "source_stored_torsdof": 0,
+    "source_rotor_flags_internal": [],
+    "source_rotor_flags_mapped_to_input_graph": [],
+    "source_scorer_half_edge_contributions": [],
+    "source_scorer_ntors": 0.0,
+    "source_scorer_stored_torsdof_sum": 0
+  },
+  {
+    "case": "toluene",
+    "input_molecule": "toluene",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=['H']",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "toluene",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "f8cbc74e97a21a487dc96ad95b87ef5fc4fc85f0a831ae0a7c82736299167e10",
+      "instrumented_stdout_sha256": "f8cbc74e97a21a487dc96ad95b87ef5fc4fc85f0a831ae0a7c82736299167e10"
+    },
+    "file": "toluene.pdbqt",
+    "raw_branch_count": 0,
+    "raw_branch_edges": [],
+    "raw_torsdof_values": [
+      0
+    ],
+    "raw_torsdof": 0,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 4,
+      "6": 5,
+      "7": 6
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.0006164414002968748,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.0005196152422707101,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.00036055512754640544,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.0005830951894844658,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 4,
+        "distance_angstrom": 0.0005999999999999709,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 5,
+        "distance_angstrom": 0.0002449489742782908,
+        "valid": true
+      },
+      {
+        "serial": 7,
+        "input_index": 6,
+        "distance_angstrom": 0.0008124038404635407,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [],
+    "source_search_axis_count": 0,
+    "source_stored_torsdof": 0,
+    "source_rotor_flags_internal": [],
+    "source_rotor_flags_mapped_to_input_graph": [],
+    "source_scorer_half_edge_contributions": [],
+    "source_scorer_ntors": 0.0,
+    "source_scorer_stored_torsdof_sum": 0
+  },
+  {
+    "case": "keepH_acetamide",
+    "input_molecule": "acetamide",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "keepH_acetamide",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "8ec32b4224c75259980aeeba573ab5f2820772d6578a820496c8e1573e15b193",
+      "instrumented_stdout_sha256": "8ec32b4224c75259980aeeba573ab5f2820772d6578a820496c8e1573e15b193"
+    },
+    "file": "acetamide.pdbqt",
+    "raw_branch_count": 1,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          1,
+          6
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      1
+    ],
+    "raw_torsdof": 1,
+    "atom_serial_to_input_index": {
+      "1": 1,
+      "2": 2,
+      "3": 3,
+      "4": 7,
+      "5": 8,
+      "6": 0,
+      "7": 4,
+      "8": 5,
+      "9": 6
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 1,
+        "distance_angstrom": 0.000648074069840826,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 2,
+        "distance_angstrom": 0.0006708203932498795,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 3,
+        "distance_angstrom": 0.0002449489742782965,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 7,
+        "distance_angstrom": 0.0005744562646537879,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 8,
+        "distance_angstrom": 0.0003464101615137373,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 0,
+        "distance_angstrom": 0.00043588989435404483,
+        "valid": true
+      },
+      {
+        "serial": 7,
+        "input_index": 4,
+        "distance_angstrom": 0.0006480740698407146,
+        "valid": true
+      },
+      {
+        "serial": 8,
+        "input_index": 5,
+        "distance_angstrom": 0.0005916079783099434,
+        "valid": true
+      },
+      {
+        "serial": 9,
+        "input_index": 6,
+        "distance_angstrom": 0.000489897948556627,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [
+      {
+        "input_atom_indices_zero_based": [
+          0,
+          1
+        ],
+        "rotatable": true
+      }
+    ],
+    "source_search_axis_count": 1,
+    "source_stored_torsdof": 1,
+    "source_rotor_flags_internal": [
+      [
+        0,
+        1
+      ]
+    ],
+    "source_rotor_flags_mapped_to_input_graph": [
+      {
+        "pdbqt_serials": [
+          1,
+          6
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "source_scorer_half_edge_contributions": [
+      {
+        "owner_internal": 0,
+        "neighbor_internal": 1,
+        "owner_pdbqt_serial": 1,
+        "neighbor_pdbqt_serial": 6,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 0,
+        "partner_heavy_degree": 1,
+        "contribution": 0.0
+      },
+      {
+        "owner_internal": 1,
+        "neighbor_internal": 0,
+        "owner_pdbqt_serial": 6,
+        "neighbor_pdbqt_serial": 1,
+        "owner_input_atom_index_zero_based": 0,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 3,
+        "contribution": 0.5
+      }
+    ],
+    "source_scorer_ntors": 0.5,
+    "source_scorer_stored_torsdof_sum": 1
+  },
+  {
+    "case": "keepH_benzene",
+    "input_molecule": "benzene",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "keepH_benzene",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "56b89b1b1859ac063822cb86b7ac4a47aa794d6a3bb7a6c214dffedb0cf13f28",
+      "instrumented_stdout_sha256": "56b89b1b1859ac063822cb86b7ac4a47aa794d6a3bb7a6c214dffedb0cf13f28"
+    },
+    "file": "benzene.pdbqt",
+    "raw_branch_count": 0,
+    "raw_branch_edges": [],
+    "raw_torsdof_values": [
+      0
+    ],
+    "raw_torsdof": 0,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 4,
+      "6": 5,
+      "7": 6,
+      "8": 7,
+      "9": 8,
+      "10": 9,
+      "11": 10,
+      "12": 11
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.0004690415759823135,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.000547722557505114,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.0001732050807568827,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.0004690415759823135,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 4,
+        "distance_angstrom": 0.000547722557505114,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 5,
+        "distance_angstrom": 0.0001732050807568827,
+        "valid": true
+      },
+      {
+        "serial": 7,
+        "input_index": 6,
+        "distance_angstrom": 0.0004242640687119734,
+        "valid": true
+      },
+      {
+        "serial": 8,
+        "input_index": 7,
+        "distance_angstrom": 0.0005830951894843826,
+        "valid": true
+      },
+      {
+        "serial": 9,
+        "input_index": 8,
+        "distance_angstrom": 0.0005744562646537928,
+        "valid": true
+      },
+      {
+        "serial": 10,
+        "input_index": 9,
+        "distance_angstrom": 0.0004242640687119734,
+        "valid": true
+      },
+      {
+        "serial": 11,
+        "input_index": 10,
+        "distance_angstrom": 0.0005830951894843826,
+        "valid": true
+      },
+      {
+        "serial": 12,
+        "input_index": 11,
+        "distance_angstrom": 0.0005744562646537928,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [],
+    "source_search_axis_count": 0,
+    "source_stored_torsdof": 0,
+    "source_rotor_flags_internal": [],
+    "source_rotor_flags_mapped_to_input_graph": [],
+    "source_scorer_half_edge_contributions": [],
+    "source_scorer_ntors": 0.0,
+    "source_scorer_stored_torsdof_sum": 0
+  },
+  {
+    "case": "keepH_butane",
+    "input_molecule": "butane",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "keepH_butane",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "611ef0175c7d58d0644e1ece2e14c79d2c9360eac3918314c4f5b4c71fda9991",
+      "instrumented_stdout_sha256": "611ef0175c7d58d0644e1ece2e14c79d2c9360eac3918314c4f5b4c71fda9991"
+    },
+    "file": "butane.pdbqt",
+    "raw_branch_count": 3,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          1,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          1
+        ]
+      },
+      {
+        "pdbqt_serials": [
+          1,
+          8
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          2
+        ]
+      },
+      {
+        "pdbqt_serials": [
+          8,
+          11
+        ],
+        "input_atom_indices_zero_based": [
+          2,
+          3
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          1
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      3
+    ],
+    "raw_torsdof": 3,
+    "atom_serial_to_input_index": {
+      "1": 1,
+      "2": 7,
+      "3": 8,
+      "4": 0,
+      "5": 4,
+      "6": 5,
+      "7": 6,
+      "8": 2,
+      "9": 9,
+      "10": 10,
+      "11": 3,
+      "12": 11,
+      "13": 12,
+      "14": 13
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 1,
+        "distance_angstrom": 0.0005830951894844658,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 7,
+        "distance_angstrom": 0.0004898979485566497,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 8,
+        "distance_angstrom": 0.0005916079783099434,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 0,
+        "distance_angstrom": 0.000812403840463563,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 4,
+        "distance_angstrom": 0.0004898979485565816,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 5,
+        "distance_angstrom": 0.00041231056256172067,
+        "valid": true
+      },
+      {
+        "serial": 7,
+        "input_index": 6,
+        "distance_angstrom": 0.0005477225575051565,
+        "valid": true
+      },
+      {
+        "serial": 8,
+        "input_index": 2,
+        "distance_angstrom": 0.0005830951894844658,
+        "valid": true
+      },
+      {
+        "serial": 9,
+        "input_index": 9,
+        "distance_angstrom": 0.0005916079783099434,
+        "valid": true
+      },
+      {
+        "serial": 10,
+        "input_index": 10,
+        "distance_angstrom": 0.0004898979485566497,
+        "valid": true
+      },
+      {
+        "serial": 11,
+        "input_index": 3,
+        "distance_angstrom": 0.000812403840463563,
+        "valid": true
+      },
+      {
+        "serial": 12,
+        "input_index": 11,
+        "distance_angstrom": 0.0004898979485565816,
+        "valid": true
+      },
+      {
+        "serial": 13,
+        "input_index": 12,
+        "distance_angstrom": 0.00041231056256172067,
+        "valid": true
+      },
+      {
+        "serial": 14,
+        "input_index": 13,
+        "distance_angstrom": 0.0005477225575051565,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [
+      {
+        "input_atom_indices_zero_based": [
+          0,
+          1
+        ],
+        "rotatable": true
+      },
+      {
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "rotatable": true
+      },
+      {
+        "input_atom_indices_zero_based": [
+          2,
+          3
+        ],
+        "rotatable": true
+      }
+    ],
+    "source_search_axis_count": 3,
+    "source_stored_torsdof": 3,
+    "source_rotor_flags_internal": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        2,
+        8
+      ]
+    ],
+    "source_rotor_flags_mapped_to_input_graph": [
+      {
+        "pdbqt_serials": [
+          1,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          1
+        ]
+      },
+      {
+        "pdbqt_serials": [
+          1,
+          8
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          2
+        ]
+      },
+      {
+        "pdbqt_serials": [
+          8,
+          11
+        ],
+        "input_atom_indices_zero_based": [
+          2,
+          3
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          1
+        ]
+      }
+    ],
+    "source_scorer_half_edge_contributions": [
+      {
+        "owner_internal": 0,
+        "neighbor_internal": 1,
+        "owner_pdbqt_serial": 1,
+        "neighbor_pdbqt_serial": 4,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 0,
+        "partner_heavy_degree": 1,
+        "contribution": 0.0
+      },
+      {
+        "owner_internal": 0,
+        "neighbor_internal": 2,
+        "owner_pdbqt_serial": 1,
+        "neighbor_pdbqt_serial": 8,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 2,
+        "partner_heavy_degree": 2,
+        "contribution": 0.5
+      },
+      {
+        "owner_internal": 1,
+        "neighbor_internal": 0,
+        "owner_pdbqt_serial": 4,
+        "neighbor_pdbqt_serial": 1,
+        "owner_input_atom_index_zero_based": 0,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 2,
+        "contribution": 0.5
+      },
+      {
+        "owner_internal": 2,
+        "neighbor_internal": 0,
+        "owner_pdbqt_serial": 8,
+        "neighbor_pdbqt_serial": 1,
+        "owner_input_atom_index_zero_based": 2,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 2,
+        "contribution": 0.5
+      },
+      {
+        "owner_internal": 2,
+        "neighbor_internal": 8,
+        "owner_pdbqt_serial": 8,
+        "neighbor_pdbqt_serial": 11,
+        "owner_input_atom_index_zero_based": 2,
+        "neighbor_input_atom_index_zero_based": 3,
+        "partner_heavy_degree": 1,
+        "contribution": 0.0
+      },
+      {
+        "owner_internal": 8,
+        "neighbor_internal": 2,
+        "owner_pdbqt_serial": 11,
+        "neighbor_pdbqt_serial": 8,
+        "owner_input_atom_index_zero_based": 3,
+        "neighbor_input_atom_index_zero_based": 2,
+        "partner_heavy_degree": 2,
+        "contribution": 0.5
+      }
+    ],
+    "source_scorer_ntors": 2.0,
+    "source_scorer_stored_torsdof_sum": 3
+  },
+  {
+    "case": "keepH_ethylbenzene",
+    "input_molecule": "ethylbenzene",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "keepH_ethylbenzene",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "ec1d0b331e4ee315bca58a64634f9119e200bf8cd0e470b74c58c9ba41602c6e",
+      "instrumented_stdout_sha256": "ec1d0b331e4ee315bca58a64634f9119e200bf8cd0e470b74c58c9ba41602c6e"
+    },
+    "file": "ethylbenzene.pdbqt",
+    "raw_branch_count": 2,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          1,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          1
+        ]
+      },
+      {
+        "pdbqt_serials": [
+          1,
+          8
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          3
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      2
+    ],
+    "raw_torsdof": 2,
+    "atom_serial_to_input_index": {
+      "1": 1,
+      "2": 11,
+      "3": 12,
+      "4": 0,
+      "5": 8,
+      "6": 9,
+      "7": 10,
+      "8": 2,
+      "9": 3,
+      "10": 7,
+      "11": 4,
+      "12": 6,
+      "13": 5,
+      "14": 13,
+      "15": 17,
+      "16": 14,
+      "17": 16,
+      "18": 15
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 1,
+        "distance_angstrom": 0.0004123105625617947,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 11,
+        "distance_angstrom": 0.000519615242270606,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 12,
+        "distance_angstrom": 0.0008124038404636159,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 0,
+        "distance_angstrom": 0.0006557438524302844,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 8,
+        "distance_angstrom": 0.0004690415759821493,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 9,
+        "distance_angstrom": 0.0004582575694955335,
+        "valid": true
+      },
+      {
+        "serial": 7,
+        "input_index": 10,
+        "distance_angstrom": 0.0005385164807134426,
+        "valid": true
+      },
+      {
+        "serial": 8,
+        "input_index": 2,
+        "distance_angstrom": 0.00043588989435405757,
+        "valid": true
+      },
+      {
+        "serial": 9,
+        "input_index": 3,
+        "distance_angstrom": 0.000538516480713422,
+        "valid": true
+      },
+      {
+        "serial": 10,
+        "input_index": 7,
+        "distance_angstrom": 0.0003162277660168031,
+        "valid": true
+      },
+      {
+        "serial": 11,
+        "input_index": 4,
+        "distance_angstrom": 0.00031622776601701813,
+        "valid": true
+      },
+      {
+        "serial": 12,
+        "input_index": 6,
+        "distance_angstrom": 0.0004999999999999449,
+        "valid": true
+      },
+      {
+        "serial": 13,
+        "input_index": 5,
+        "distance_angstrom": 0.000812403840463715,
+        "valid": true
+      },
+      {
+        "serial": 14,
+        "input_index": 13,
+        "distance_angstrom": 0.00031622776601701374,
+        "valid": true
+      },
+      {
+        "serial": 15,
+        "input_index": 17,
+        "distance_angstrom": 0.0005385164807134516,
+        "valid": true
+      },
+      {
+        "serial": 16,
+        "input_index": 14,
+        "distance_angstrom": 0.0005477225575049487,
+        "valid": true
+      },
+      {
+        "serial": 17,
+        "input_index": 16,
+        "distance_angstrom": 0.0005000000000003002,
+        "valid": true
+      },
+      {
+        "serial": 18,
+        "input_index": 15,
+        "distance_angstrom": 0.0003162277660168997,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [
+      {
+        "input_atom_indices_zero_based": [
+          0,
+          1
+        ],
+        "rotatable": true
+      },
+      {
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "rotatable": true
+      }
+    ],
+    "source_search_axis_count": 2,
+    "source_stored_torsdof": 2,
+    "source_rotor_flags_internal": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ]
+    ],
+    "source_rotor_flags_mapped_to_input_graph": [
+      {
+        "pdbqt_serials": [
+          1,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          1
+        ]
+      },
+      {
+        "pdbqt_serials": [
+          1,
+          8
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          3
+        ]
+      }
+    ],
+    "source_scorer_half_edge_contributions": [
+      {
+        "owner_internal": 0,
+        "neighbor_internal": 1,
+        "owner_pdbqt_serial": 1,
+        "neighbor_pdbqt_serial": 4,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 0,
+        "partner_heavy_degree": 1,
+        "contribution": 0.0
+      },
+      {
+        "owner_internal": 0,
+        "neighbor_internal": 2,
+        "owner_pdbqt_serial": 1,
+        "neighbor_pdbqt_serial": 8,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 2,
+        "partner_heavy_degree": 3,
+        "contribution": 0.5
+      },
+      {
+        "owner_internal": 1,
+        "neighbor_internal": 0,
+        "owner_pdbqt_serial": 4,
+        "neighbor_pdbqt_serial": 1,
+        "owner_input_atom_index_zero_based": 0,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 2,
+        "contribution": 0.5
+      },
+      {
+        "owner_internal": 2,
+        "neighbor_internal": 0,
+        "owner_pdbqt_serial": 8,
+        "neighbor_pdbqt_serial": 1,
+        "owner_input_atom_index_zero_based": 2,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 2,
+        "contribution": 0.5
+      }
+    ],
+    "source_scorer_ntors": 1.5,
+    "source_scorer_stored_torsdof_sum": 2
+  },
+  {
+    "case": "keepH_methyl_acetate",
+    "input_molecule": "methyl_acetate",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "keepH_methyl_acetate",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "0155fb4812a91bd5808e896b435ec2878ba63a46a6e2b73f38dda57845a56859",
+      "instrumented_stdout_sha256": "0155fb4812a91bd5808e896b435ec2878ba63a46a6e2b73f38dda57845a56859"
+    },
+    "file": "methyl_acetate.pdbqt",
+    "raw_branch_count": 3,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          1,
+          3
+        ],
+        "input_atom_indices_zero_based": [
+          2,
+          1
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "O"
+        ],
+        "heavy_degrees": [
+          3,
+          2
+        ]
+      },
+      {
+        "pdbqt_serials": [
+          3,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "O",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          1
+        ]
+      },
+      {
+        "pdbqt_serials": [
+          1,
+          8
+        ],
+        "input_atom_indices_zero_based": [
+          2,
+          3
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      3
+    ],
+    "raw_torsdof": 3,
+    "atom_serial_to_input_index": {
+      "1": 2,
+      "2": 4,
+      "3": 1,
+      "4": 0,
+      "5": 5,
+      "6": 6,
+      "7": 7,
+      "8": 3,
+      "9": 8,
+      "10": 9,
+      "11": 10
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 2,
+        "distance_angstrom": 0.0005744562646538072,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 4,
+        "distance_angstrom": 0.00030000000000002247,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 1,
+        "distance_angstrom": 0.0006403124237433011,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 0,
+        "distance_angstrom": 0.0005656854249492469,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 5,
+        "distance_angstrom": 0.0004472135954999087,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 6,
+        "distance_angstrom": 0.00022360679774995434,
+        "valid": true
+      },
+      {
+        "serial": 7,
+        "input_index": 7,
+        "distance_angstrom": 0.0006403124237432664,
+        "valid": true
+      },
+      {
+        "serial": 8,
+        "input_index": 3,
+        "distance_angstrom": 0.0002999999999999947,
+        "valid": true
+      },
+      {
+        "serial": 9,
+        "input_index": 8,
+        "distance_angstrom": 0.0007141428428542452,
+        "valid": true
+      },
+      {
+        "serial": 10,
+        "input_index": 9,
+        "distance_angstrom": 0.0003741657386774939,
+        "valid": true
+      },
+      {
+        "serial": 11,
+        "input_index": 10,
+        "distance_angstrom": 0.00041231056256174755,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [
+      {
+        "input_atom_indices_zero_based": [
+          0,
+          1
+        ],
+        "rotatable": true
+      },
+      {
+        "input_atom_indices_zero_based": [
+          1,
+          2
+        ],
+        "rotatable": true
+      },
+      {
+        "input_atom_indices_zero_based": [
+          2,
+          3
+        ],
+        "rotatable": true
+      }
+    ],
+    "source_search_axis_count": 3,
+    "source_stored_torsdof": 3,
+    "source_rotor_flags_internal": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        4
+      ]
+    ],
+    "source_rotor_flags_mapped_to_input_graph": [
+      {
+        "pdbqt_serials": [
+          1,
+          3
+        ],
+        "input_atom_indices_zero_based": [
+          2,
+          1
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "O"
+        ],
+        "heavy_degrees": [
+          3,
+          2
+        ]
+      },
+      {
+        "pdbqt_serials": [
+          1,
+          8
+        ],
+        "input_atom_indices_zero_based": [
+          2,
+          3
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      },
+      {
+        "pdbqt_serials": [
+          3,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "O",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          1
+        ]
+      }
+    ],
+    "source_scorer_half_edge_contributions": [
+      {
+        "owner_internal": 0,
+        "neighbor_internal": 1,
+        "owner_pdbqt_serial": 1,
+        "neighbor_pdbqt_serial": 3,
+        "owner_input_atom_index_zero_based": 2,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 2,
+        "contribution": 0.5
+      },
+      {
+        "owner_internal": 0,
+        "neighbor_internal": 2,
+        "owner_pdbqt_serial": 1,
+        "neighbor_pdbqt_serial": 8,
+        "owner_input_atom_index_zero_based": 2,
+        "neighbor_input_atom_index_zero_based": 3,
+        "partner_heavy_degree": 1,
+        "contribution": 0.0
+      },
+      {
+        "owner_internal": 1,
+        "neighbor_internal": 0,
+        "owner_pdbqt_serial": 3,
+        "neighbor_pdbqt_serial": 1,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 2,
+        "partner_heavy_degree": 3,
+        "contribution": 0.5
+      },
+      {
+        "owner_internal": 1,
+        "neighbor_internal": 4,
+        "owner_pdbqt_serial": 3,
+        "neighbor_pdbqt_serial": 4,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 0,
+        "partner_heavy_degree": 1,
+        "contribution": 0.0
+      },
+      {
+        "owner_internal": 2,
+        "neighbor_internal": 0,
+        "owner_pdbqt_serial": 8,
+        "neighbor_pdbqt_serial": 1,
+        "owner_input_atom_index_zero_based": 3,
+        "neighbor_input_atom_index_zero_based": 2,
+        "partner_heavy_degree": 3,
+        "contribution": 0.5
+      },
+      {
+        "owner_internal": 4,
+        "neighbor_internal": 1,
+        "owner_pdbqt_serial": 4,
+        "neighbor_pdbqt_serial": 3,
+        "owner_input_atom_index_zero_based": 0,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 2,
+        "contribution": 0.5
+      }
+    ],
+    "source_scorer_ntors": 2.0,
+    "source_scorer_stored_torsdof_sum": 3
+  },
+  {
+    "case": "keepH_n_methylacetamide",
+    "input_molecule": "n_methylacetamide",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "keepH_n_methylacetamide",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "e8dcd90408ff76cc2611ba22dca0226af99e35ed00259712eb3b2304258260fb",
+      "instrumented_stdout_sha256": "e8dcd90408ff76cc2611ba22dca0226af99e35ed00259712eb3b2304258260fb"
+    },
+    "file": "n_methylacetamide.pdbqt",
+    "raw_branch_count": 2,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          1,
+          5
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "N",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          1
+        ]
+      },
+      {
+        "pdbqt_serials": [
+          2,
+          9
+        ],
+        "input_atom_indices_zero_based": [
+          2,
+          3
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      2
+    ],
+    "raw_torsdof": 2,
+    "atom_serial_to_input_index": {
+      "1": 1,
+      "2": 2,
+      "3": 4,
+      "4": 8,
+      "5": 0,
+      "6": 5,
+      "7": 6,
+      "8": 7,
+      "9": 3,
+      "10": 9,
+      "11": 10,
+      "12": 11
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 1,
+        "distance_angstrom": 0.0005477225575051077,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 2,
+        "distance_angstrom": 0.0006403124237433292,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 4,
+        "distance_angstrom": 0.0006164414002968748,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 8,
+        "distance_angstrom": 0.0005744562646537686,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 0,
+        "distance_angstrom": 0.0005999999999999721,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 5,
+        "distance_angstrom": 0.0003741657386771749,
+        "valid": true
+      },
+      {
+        "serial": 7,
+        "input_index": 6,
+        "distance_angstrom": 0.000509901951359353,
+        "valid": true
+      },
+      {
+        "serial": 8,
+        "input_index": 7,
+        "distance_angstrom": 0.0005830951894843515,
+        "valid": true
+      },
+      {
+        "serial": 9,
+        "input_index": 3,
+        "distance_angstrom": 0.0004690415759823231,
+        "valid": true
+      },
+      {
+        "serial": 10,
+        "input_index": 9,
+        "distance_angstrom": 0.0006164414002968298,
+        "valid": true
+      },
+      {
+        "serial": 11,
+        "input_index": 10,
+        "distance_angstrom": 0.00010000000000021103,
+        "valid": true
+      },
+      {
+        "serial": 12,
+        "input_index": 11,
+        "distance_angstrom": 0.0005385164807133911,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [
+      {
+        "input_atom_indices_zero_based": [
+          0,
+          1
+        ],
+        "rotatable": true
+      },
+      {
+        "input_atom_indices_zero_based": [
+          2,
+          3
+        ],
+        "rotatable": true
+      }
+    ],
+    "source_search_axis_count": 2,
+    "source_stored_torsdof": 2,
+    "source_rotor_flags_internal": [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        3
+      ]
+    ],
+    "source_rotor_flags_mapped_to_input_graph": [
+      {
+        "pdbqt_serials": [
+          1,
+          5
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "N",
+          "C"
+        ],
+        "heavy_degrees": [
+          2,
+          1
+        ]
+      },
+      {
+        "pdbqt_serials": [
+          2,
+          9
+        ],
+        "input_atom_indices_zero_based": [
+          2,
+          3
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "source_scorer_half_edge_contributions": [
+      {
+        "owner_internal": 0,
+        "neighbor_internal": 1,
+        "owner_pdbqt_serial": 1,
+        "neighbor_pdbqt_serial": 5,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 0,
+        "partner_heavy_degree": 1,
+        "contribution": 0.0
+      },
+      {
+        "owner_internal": 1,
+        "neighbor_internal": 0,
+        "owner_pdbqt_serial": 5,
+        "neighbor_pdbqt_serial": 1,
+        "owner_input_atom_index_zero_based": 0,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 2,
+        "contribution": 0.5
+      },
+      {
+        "owner_internal": 2,
+        "neighbor_internal": 3,
+        "owner_pdbqt_serial": 2,
+        "neighbor_pdbqt_serial": 9,
+        "owner_input_atom_index_zero_based": 2,
+        "neighbor_input_atom_index_zero_based": 3,
+        "partner_heavy_degree": 1,
+        "contribution": 0.0
+      },
+      {
+        "owner_internal": 3,
+        "neighbor_internal": 2,
+        "owner_pdbqt_serial": 9,
+        "neighbor_pdbqt_serial": 2,
+        "owner_input_atom_index_zero_based": 3,
+        "neighbor_input_atom_index_zero_based": 2,
+        "partner_heavy_degree": 3,
+        "contribution": 0.5
+      }
+    ],
+    "source_scorer_ntors": 1.0,
+    "source_scorer_stored_torsdof_sum": 2
+  },
+  {
+    "case": "keepH_toluene",
+    "input_molecule": "toluene",
+    "representation_profile": "Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "keepH_toluene",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "5dca91063314b3b6bcf39317a8c49813c11c1eb6a8202f15813c4d2c46d2a2d7",
+      "instrumented_stdout_sha256": "5dca91063314b3b6bcf39317a8c49813c11c1eb6a8202f15813c4d2c46d2a2d7"
+    },
+    "file": "toluene.pdbqt",
+    "raw_branch_count": 1,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          1,
+          12
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      1
+    ],
+    "raw_torsdof": 1,
+    "atom_serial_to_input_index": {
+      "1": 1,
+      "2": 2,
+      "3": 3,
+      "4": 4,
+      "5": 5,
+      "6": 6,
+      "7": 10,
+      "8": 11,
+      "9": 12,
+      "10": 13,
+      "11": 14,
+      "12": 0,
+      "13": 7,
+      "14": 8,
+      "15": 9
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 1,
+        "distance_angstrom": 0.0005196152422707101,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 2,
+        "distance_angstrom": 0.00036055512754640544,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 3,
+        "distance_angstrom": 0.0005830951894844658,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 4,
+        "distance_angstrom": 0.0005999999999999709,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 5,
+        "distance_angstrom": 0.0002449489742782908,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 6,
+        "distance_angstrom": 0.0008124038404635407,
+        "valid": true
+      },
+      {
+        "serial": 7,
+        "input_index": 10,
+        "distance_angstrom": 0.0005916079783098965,
+        "valid": true
+      },
+      {
+        "serial": 8,
+        "input_index": 11,
+        "distance_angstrom": 0.00029999999999996696,
+        "valid": true
+      },
+      {
+        "serial": 9,
+        "input_index": 12,
+        "distance_angstrom": 0.00031622776601687334,
+        "valid": true
+      },
+      {
+        "serial": 10,
+        "input_index": 13,
+        "distance_angstrom": 0.0005477225575049031,
+        "valid": true
+      },
+      {
+        "serial": 11,
+        "input_index": 14,
+        "distance_angstrom": 0.0003741657386774716,
+        "valid": true
+      },
+      {
+        "serial": 12,
+        "input_index": 0,
+        "distance_angstrom": 0.0006164414002968748,
+        "valid": true
+      },
+      {
+        "serial": 13,
+        "input_index": 7,
+        "distance_angstrom": 0.0006403124237433531,
+        "valid": true
+      },
+      {
+        "serial": 14,
+        "input_index": 8,
+        "distance_angstrom": 0.0004123105625615591,
+        "valid": true
+      },
+      {
+        "serial": 15,
+        "input_index": 9,
+        "distance_angstrom": 0.0004582575694955335,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [
+      {
+        "input_atom_indices_zero_based": [
+          0,
+          1
+        ],
+        "rotatable": true
+      }
+    ],
+    "source_search_axis_count": 1,
+    "source_stored_torsdof": 1,
+    "source_rotor_flags_internal": [
+      [
+        0,
+        1
+      ]
+    ],
+    "source_rotor_flags_mapped_to_input_graph": [
+      {
+        "pdbqt_serials": [
+          1,
+          12
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "source_scorer_half_edge_contributions": [
+      {
+        "owner_internal": 0,
+        "neighbor_internal": 1,
+        "owner_pdbqt_serial": 1,
+        "neighbor_pdbqt_serial": 12,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 0,
+        "partner_heavy_degree": 1,
+        "contribution": 0.0
+      },
+      {
+        "owner_internal": 1,
+        "neighbor_internal": 0,
+        "owner_pdbqt_serial": 12,
+        "neighbor_pdbqt_serial": 1,
+        "owner_input_atom_index_zero_based": 0,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 3,
+        "contribution": 0.5
+      }
+    ],
+    "source_scorer_ntors": 0.5,
+    "source_scorer_stored_torsdof_sum": 1
+  },
+  {
+    "case": "acetamide_resonance_cn_torsdof_0",
+    "input_molecule": "acetamide",
+    "representation_profile": "synthetic adversarial mutation of toy PDBQT",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "acetamide_resonance_cn_torsdof_0",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "899a258ece147c46c384db27659937aaa2d298eb729b56aaa686d909c62cf4de",
+      "instrumented_stdout_sha256": "899a258ece147c46c384db27659937aaa2d298eb729b56aaa686d909c62cf4de"
+    },
+    "file": "acetamide_resonance_cn_torsdof_0.pdbqt",
+    "raw_branch_count": 1,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          2,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          3
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "N"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      0
+    ],
+    "raw_torsdof": 0,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 7,
+      "6": 8
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.00043588989435404483,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.000648074069840826,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.0006708203932498795,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.0002449489742782965,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 7,
+        "distance_angstrom": 0.0005744562646537879,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 8,
+        "distance_angstrom": 0.0003464101615137373,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [],
+    "source_search_axis_count": 1,
+    "source_stored_torsdof": 0,
+    "source_rotor_flags_internal": [
+      [
+        1,
+        2
+      ]
+    ],
+    "source_rotor_flags_mapped_to_input_graph": [
+      {
+        "pdbqt_serials": [
+          2,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          3
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "N"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "source_scorer_half_edge_contributions": [
+      {
+        "owner_internal": 1,
+        "neighbor_internal": 2,
+        "owner_pdbqt_serial": 2,
+        "neighbor_pdbqt_serial": 4,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 3,
+        "partner_heavy_degree": 1,
+        "contribution": 0.0
+      },
+      {
+        "owner_internal": 2,
+        "neighbor_internal": 1,
+        "owner_pdbqt_serial": 4,
+        "neighbor_pdbqt_serial": 2,
+        "owner_input_atom_index_zero_based": 3,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 3,
+        "contribution": 0.5
+      }
+    ],
+    "source_scorer_ntors": 0.5,
+    "source_scorer_stored_torsdof_sum": 0
+  },
+  {
+    "case": "acetamide_resonance_cn_torsdof_1",
+    "input_molecule": "acetamide",
+    "representation_profile": "synthetic adversarial mutation of toy PDBQT",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "acetamide_resonance_cn_torsdof_1",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "3be7fa3cc6f6c05a423759a177526136028e835c5e5d70c66678349a6caa60ad",
+      "instrumented_stdout_sha256": "3be7fa3cc6f6c05a423759a177526136028e835c5e5d70c66678349a6caa60ad"
+    },
+    "file": "acetamide_resonance_cn_torsdof_1.pdbqt",
+    "raw_branch_count": 1,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          2,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          3
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "N"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      1
+    ],
+    "raw_torsdof": 1,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 7,
+      "6": 8
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.00043588989435404483,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.000648074069840826,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.0006708203932498795,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.0002449489742782965,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 7,
+        "distance_angstrom": 0.0005744562646537879,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 8,
+        "distance_angstrom": 0.0003464101615137373,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [],
+    "source_search_axis_count": 1,
+    "source_stored_torsdof": 1,
+    "source_rotor_flags_internal": [
+      [
+        1,
+        2
+      ]
+    ],
+    "source_rotor_flags_mapped_to_input_graph": [
+      {
+        "pdbqt_serials": [
+          2,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          3
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "N"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "source_scorer_half_edge_contributions": [
+      {
+        "owner_internal": 1,
+        "neighbor_internal": 2,
+        "owner_pdbqt_serial": 2,
+        "neighbor_pdbqt_serial": 4,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 3,
+        "partner_heavy_degree": 1,
+        "contribution": 0.0
+      },
+      {
+        "owner_internal": 2,
+        "neighbor_internal": 1,
+        "owner_pdbqt_serial": 4,
+        "neighbor_pdbqt_serial": 2,
+        "owner_input_atom_index_zero_based": 3,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 3,
+        "contribution": 0.5
+      }
+    ],
+    "source_scorer_ntors": 0.5,
+    "source_scorer_stored_torsdof_sum": 1
+  },
+  {
+    "case": "acetamide_resonance_cn_torsdof_2",
+    "input_molecule": "acetamide",
+    "representation_profile": "synthetic adversarial mutation of toy PDBQT",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "acetamide_resonance_cn_torsdof_2",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "7ff87767a6fe0c168b8d30adf45bdc8f6efc6c57c075b3e9d094855b918ce0f5",
+      "instrumented_stdout_sha256": "7ff87767a6fe0c168b8d30adf45bdc8f6efc6c57c075b3e9d094855b918ce0f5"
+    },
+    "file": "acetamide_resonance_cn_torsdof_2.pdbqt",
+    "raw_branch_count": 1,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          2,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          3
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "N"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      2
+    ],
+    "raw_torsdof": 2,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 7,
+      "6": 8
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.00043588989435404483,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.000648074069840826,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.0006708203932498795,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.0002449489742782965,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 7,
+        "distance_angstrom": 0.0005744562646537879,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 8,
+        "distance_angstrom": 0.0003464101615137373,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [],
+    "source_search_axis_count": 1,
+    "source_stored_torsdof": 2,
+    "source_rotor_flags_internal": [
+      [
+        1,
+        2
+      ]
+    ],
+    "source_rotor_flags_mapped_to_input_graph": [
+      {
+        "pdbqt_serials": [
+          2,
+          4
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          3
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "N"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "source_scorer_half_edge_contributions": [
+      {
+        "owner_internal": 1,
+        "neighbor_internal": 2,
+        "owner_pdbqt_serial": 2,
+        "neighbor_pdbqt_serial": 4,
+        "owner_input_atom_index_zero_based": 1,
+        "neighbor_input_atom_index_zero_based": 3,
+        "partner_heavy_degree": 1,
+        "contribution": 0.0
+      },
+      {
+        "owner_internal": 2,
+        "neighbor_internal": 1,
+        "owner_pdbqt_serial": 4,
+        "neighbor_pdbqt_serial": 2,
+        "owner_input_atom_index_zero_based": 3,
+        "neighbor_input_atom_index_zero_based": 1,
+        "partner_heavy_degree": 3,
+        "contribution": 0.5
+      }
+    ],
+    "source_scorer_ntors": 0.5,
+    "source_scorer_stored_torsdof_sum": 2
+  },
+  {
+    "case": "acetamide_terminal_nh_torsdof_1",
+    "input_molecule": "acetamide",
+    "representation_profile": "synthetic adversarial mutation of toy PDBQT",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "acetamide_terminal_nh_torsdof_1",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "155d5105a2e268077a9b2cb4168cc7af68ea6cfbbe1f3fd5a7b13d4f787415b6",
+      "instrumented_stdout_sha256": "155d5105a2e268077a9b2cb4168cc7af68ea6cfbbe1f3fd5a7b13d4f787415b6"
+    },
+    "file": "acetamide_terminal_nh_torsdof_1.pdbqt",
+    "raw_branch_count": 1,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          4,
+          5
+        ],
+        "input_atom_indices_zero_based": [
+          3,
+          7
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "N",
+          "H"
+        ],
+        "heavy_degrees": [
+          1,
+          1
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      1
+    ],
+    "raw_torsdof": 1,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 7,
+      "6": 8
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.00043588989435404483,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.000648074069840826,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.0006708203932498795,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.0002449489742782965,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 7,
+        "distance_angstrom": 0.0005744562646537879,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 8,
+        "distance_angstrom": 0.0003464101615137373,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [],
+    "source_search_axis_count": 0,
+    "source_stored_torsdof": 1,
+    "source_rotor_flags_internal": [],
+    "source_rotor_flags_mapped_to_input_graph": [],
+    "source_scorer_half_edge_contributions": [],
+    "source_scorer_ntors": 0.0,
+    "source_scorer_stored_torsdof_sum": 1
+  },
+  {
+    "case": "benzene_no_branch_torsdof_1",
+    "input_molecule": "benzene",
+    "representation_profile": "synthetic adversarial mutation of toy PDBQT",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "benzene_no_branch_torsdof_1",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "f755b82be5d434c480075edf46461ade634af0f081676db37889e0ee9a61c17b",
+      "instrumented_stdout_sha256": "f755b82be5d434c480075edf46461ade634af0f081676db37889e0ee9a61c17b"
+    },
+    "file": "benzene_no_branch_torsdof_1.pdbqt",
+    "raw_branch_count": 0,
+    "raw_branch_edges": [],
+    "raw_torsdof_values": [
+      1
+    ],
+    "raw_torsdof": 1,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 4,
+      "6": 5
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.0004690415759823135,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.000547722557505114,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.0001732050807568827,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.0004690415759823135,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 4,
+        "distance_angstrom": 0.000547722557505114,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 5,
+        "distance_angstrom": 0.0001732050807568827,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [],
+    "source_search_axis_count": 0,
+    "source_stored_torsdof": 1,
+    "source_rotor_flags_internal": [],
+    "source_rotor_flags_mapped_to_input_graph": [],
+    "source_scorer_half_edge_contributions": [],
+    "source_scorer_ntors": 0.0,
+    "source_scorer_stored_torsdof_sum": 1
+  },
+  {
+    "case": "malformed_unclosed_branch",
+    "input_molecule": "toluene",
+    "representation_profile": "synthetic adversarial mutation of toy PDBQT",
+    "reference_status": {
+      "status": "REJECT",
+      "exit_code": 1
+    },
+    "instrumented_status": {
+      "status": "REJECT",
+      "exit_code": 1
+    },
+    "diagnostic_validation": {
+      "case": "malformed_unclosed_branch",
+      "reference_status": {
+        "status": "REJECT",
+        "exit_code": 1
+      },
+      "instrumented_status": {
+        "status": "REJECT",
+        "exit_code": 1
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "7a7b0bac96a4a566d634102d1519bf25d08bb2d11d99a13f6843211a1552666c",
+      "instrumented_stdout_sha256": "7a7b0bac96a4a566d634102d1519bf25d08bb2d11d99a13f6843211a1552666c"
+    },
+    "file": "malformed_unclosed_branch.pdbqt",
+    "raw_branch_count": 1,
+    "raw_torsdof_values": [
+      1
+    ],
+    "source_search_axis_count": null,
+    "source_stored_torsdof": null,
+    "source_rotor_flags_internal": [],
+    "source_rotor_flags_mapped_to_input_graph": [],
+    "source_scorer_half_edge_contributions": [],
+    "source_scorer_ntors": null,
+    "source_scorer_stored_torsdof_sum": null
+  },
+  {
+    "case": "toluene_terminal_cc_torsdof_0",
+    "input_molecule": "toluene",
+    "representation_profile": "synthetic adversarial mutation of toy PDBQT",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "toluene_terminal_cc_torsdof_0",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "19ccbb89fef80906cf4727175fa494906b1b0332ed570e211d61e3beb6f275c2",
+      "instrumented_stdout_sha256": "19ccbb89fef80906cf4727175fa494906b1b0332ed570e211d61e3beb6f275c2"
+    },
+    "file": "toluene_terminal_cc_torsdof_0.pdbqt",
+    "raw_branch_count": 1,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          2,
+          1
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      0
+    ],
+    "raw_torsdof": 0,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 4,
+      "6": 5,
+      "7": 6
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.0006164414002968748,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.0005196152422707101,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.00036055512754640544,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.0005830951894844658,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 4,
+        "distance_angstrom": 0.0005999999999999709,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 5,
+        "distance_angstrom": 0.0002449489742782908,
+        "valid": true
+      },
+      {
+        "serial": 7,
+        "input_index": 6,
+        "distance_angstrom": 0.0008124038404635407,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [],
+    "source_search_axis_count": 0,
+    "source_stored_torsdof": 0,
+    "source_rotor_flags_internal": [],
+    "source_rotor_flags_mapped_to_input_graph": [],
+    "source_scorer_half_edge_contributions": [],
+    "source_scorer_ntors": 0.0,
+    "source_scorer_stored_torsdof_sum": 0
+  },
+  {
+    "case": "toluene_terminal_cc_torsdof_1",
+    "input_molecule": "toluene",
+    "representation_profile": "synthetic adversarial mutation of toy PDBQT",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "toluene_terminal_cc_torsdof_1",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "467f9dd72417545829ac1a36ecb5740baa85d0c8354042d5666ad5f574eda3f6",
+      "instrumented_stdout_sha256": "467f9dd72417545829ac1a36ecb5740baa85d0c8354042d5666ad5f574eda3f6"
+    },
+    "file": "toluene_terminal_cc_torsdof_1.pdbqt",
+    "raw_branch_count": 1,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          2,
+          1
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      1
+    ],
+    "raw_torsdof": 1,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 4,
+      "6": 5,
+      "7": 6
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.0006164414002968748,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.0005196152422707101,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.00036055512754640544,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.0005830951894844658,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 4,
+        "distance_angstrom": 0.0005999999999999709,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 5,
+        "distance_angstrom": 0.0002449489742782908,
+        "valid": true
+      },
+      {
+        "serial": 7,
+        "input_index": 6,
+        "distance_angstrom": 0.0008124038404635407,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [],
+    "source_search_axis_count": 0,
+    "source_stored_torsdof": 1,
+    "source_rotor_flags_internal": [],
+    "source_rotor_flags_mapped_to_input_graph": [],
+    "source_scorer_half_edge_contributions": [],
+    "source_scorer_ntors": 0.0,
+    "source_scorer_stored_torsdof_sum": 1
+  },
+  {
+    "case": "toluene_terminal_cc_torsdof_2",
+    "input_molecule": "toluene",
+    "representation_profile": "synthetic adversarial mutation of toy PDBQT",
+    "reference_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "instrumented_status": {
+      "status": "ACCEPT",
+      "exit_code": 0
+    },
+    "diagnostic_validation": {
+      "case": "toluene_terminal_cc_torsdof_2",
+      "reference_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "instrumented_status": {
+        "status": "ACCEPT",
+        "exit_code": 0
+      },
+      "exit_statuses_equal": true,
+      "stdout_byte_identical": true,
+      "stderr_equal_after_removing_IR02_lines": true,
+      "diagnostic_present_for_accepted_case": true,
+      "reference_stdout_sha256": "0aad1c3430171cf73b58f81680c0636c59dcc4be8a73536836bcb5b7fe80e551",
+      "instrumented_stdout_sha256": "0aad1c3430171cf73b58f81680c0636c59dcc4be8a73536836bcb5b7fe80e551"
+    },
+    "file": "toluene_terminal_cc_torsdof_2.pdbqt",
+    "raw_branch_count": 1,
+    "raw_branch_edges": [
+      {
+        "pdbqt_serials": [
+          2,
+          1
+        ],
+        "input_atom_indices_zero_based": [
+          1,
+          0
+        ],
+        "source_bond_present": true,
+        "elements": [
+          "C",
+          "C"
+        ],
+        "heavy_degrees": [
+          3,
+          1
+        ]
+      }
+    ],
+    "raw_torsdof_values": [
+      2
+    ],
+    "raw_torsdof": 2,
+    "atom_serial_to_input_index": {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 4,
+      "6": 5,
+      "7": 6
+    },
+    "atom_mapping_coordinate_checks": [
+      {
+        "serial": 1,
+        "input_index": 0,
+        "distance_angstrom": 0.0006164414002968748,
+        "valid": true
+      },
+      {
+        "serial": 2,
+        "input_index": 1,
+        "distance_angstrom": 0.0005196152422707101,
+        "valid": true
+      },
+      {
+        "serial": 3,
+        "input_index": 2,
+        "distance_angstrom": 0.00036055512754640544,
+        "valid": true
+      },
+      {
+        "serial": 4,
+        "input_index": 3,
+        "distance_angstrom": 0.0005830951894844658,
+        "valid": true
+      },
+      {
+        "serial": 5,
+        "input_index": 4,
+        "distance_angstrom": 0.0005999999999999709,
+        "valid": true
+      },
+      {
+        "serial": 6,
+        "input_index": 5,
+        "distance_angstrom": 0.0002449489742782908,
+        "valid": true
+      },
+      {
+        "serial": 7,
+        "input_index": 6,
+        "distance_angstrom": 0.0008124038404635407,
+        "valid": true
+      }
+    ],
+    "all_mapped_atom_coordinates_within_0_002_A": true,
+    "meeko_logged_rotatable_bonds_input_indices": [],
+    "source_search_axis_count": 0,
+    "source_stored_torsdof": 2,
+    "source_rotor_flags_internal": [],
+    "source_rotor_flags_mapped_to_input_graph": [],
+    "source_scorer_half_edge_contributions": [],
+    "source_scorer_ntors": 0.0,
+    "source_scorer_stored_torsdof_sum": 2
+  }
+]

@@ -1,0 +1,24 @@
+case,input_molecule,representation_profile,accepted_by_unmodified_reference,exit_code,raw_branch_count,raw_branch_edges_pdbqt_serials,torsdof_input,source_search_axes,source_stored_torsdof,source_ntors,active_rotor_flags_input_edges,instrumented_stdout_byte_identical
+acetamide,acetamide,Meeko v0.8.0; merge_these_atom_types=['H'],True,0,0,[],0,0,0,0.0,[],True
+benzene,benzene,Meeko v0.8.0; merge_these_atom_types=['H'],True,0,0,[],0,0,0,0.0,[],True
+butane,butane,Meeko v0.8.0; merge_these_atom_types=['H'],True,0,1,"[[2, 3]]",1,1,1,1.0,"[[1, 2]]",True
+ethylbenzene,ethylbenzene,Meeko v0.8.0; merge_these_atom_types=['H'],True,0,1,"[[2, 3]]",1,1,1,1.0,"[[1, 2]]",True
+methyl_acetate,methyl_acetate,Meeko v0.8.0; merge_these_atom_types=['H'],True,0,1,"[[1, 4]]",1,1,1,1.0,"[[2, 1]]",True
+n_methylacetamide,n_methylacetamide,Meeko v0.8.0; merge_these_atom_types=['H'],True,0,0,[],0,0,0,0.0,[],True
+toluene,toluene,Meeko v0.8.0; merge_these_atom_types=['H'],True,0,0,[],0,0,0,0.0,[],True
+keepH_acetamide,acetamide,Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained,True,0,1,"[[1, 6]]",1,1,1,0.5,"[[1, 0]]",True
+keepH_benzene,benzene,Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained,True,0,0,[],0,0,0,0.0,[],True
+keepH_butane,butane,Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained,True,0,3,"[[1, 4], [1, 8], [8, 11]]",3,3,3,2.0,"[[1, 0], [1, 2], [2, 3]]",True
+keepH_ethylbenzene,ethylbenzene,Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained,True,0,2,"[[1, 4], [1, 8]]",2,2,2,1.5,"[[1, 0], [1, 2]]",True
+keepH_methyl_acetate,methyl_acetate,Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained,True,0,3,"[[1, 3], [3, 4], [1, 8]]",3,3,3,2.0,"[[2, 1], [2, 3], [1, 0]]",True
+keepH_n_methylacetamide,n_methylacetamide,Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained,True,0,2,"[[1, 5], [2, 9]]",2,2,2,1.0,"[[1, 0], [2, 3]]",True
+keepH_toluene,toluene,Meeko v0.8.0; merge_these_atom_types=[]; explicit hydrogens retained,True,0,1,"[[1, 12]]",1,1,1,0.5,"[[1, 0]]",True
+acetamide_resonance_cn_torsdof_0,acetamide,synthetic adversarial mutation of toy PDBQT,True,0,1,"[[2, 4]]",0,1,0,0.5,"[[1, 3]]",True
+acetamide_resonance_cn_torsdof_1,acetamide,synthetic adversarial mutation of toy PDBQT,True,0,1,"[[2, 4]]",1,1,1,0.5,"[[1, 3]]",True
+acetamide_resonance_cn_torsdof_2,acetamide,synthetic adversarial mutation of toy PDBQT,True,0,1,"[[2, 4]]",2,1,2,0.5,"[[1, 3]]",True
+acetamide_terminal_nh_torsdof_1,acetamide,synthetic adversarial mutation of toy PDBQT,True,0,1,"[[4, 5]]",1,0,1,0.0,[],True
+benzene_no_branch_torsdof_1,benzene,synthetic adversarial mutation of toy PDBQT,True,0,0,[],1,0,1,0.0,[],True
+malformed_unclosed_branch,toluene,synthetic adversarial mutation of toy PDBQT,False,1,1,[],,,,,[],True
+toluene_terminal_cc_torsdof_0,toluene,synthetic adversarial mutation of toy PDBQT,True,0,1,"[[2, 1]]",0,0,0,0.0,[],True
+toluene_terminal_cc_torsdof_1,toluene,synthetic adversarial mutation of toy PDBQT,True,0,1,"[[2, 1]]",1,0,1,0.0,[],True
+toluene_terminal_cc_torsdof_2,toluene,synthetic adversarial mutation of toy PDBQT,True,0,1,"[[2, 1]]",2,0,2,0.0,[],True

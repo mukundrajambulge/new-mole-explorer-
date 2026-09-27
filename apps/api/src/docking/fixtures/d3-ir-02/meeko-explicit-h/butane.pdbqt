@@ -1,0 +1,28 @@
+REMARK SMILES CCCC
+REMARK SMILES IDX 2 1 1 4 3 8 4 11
+REMARK H PARENT 2 2 2 3 1 5 1 6 1 7 3 9 3 10 4 12 4 13 4 14
+REMARK INDEX MAP 2 1 8 2 9 3 1 4 5 5 6 6 7 7 3 8 10 9 11 10 4 11 12 12 13 13
+REMARK INDEX MAP 14 14
+ROOT
+ATOM      1  C   UNL     1      -0.562  -0.437   0.275  1.00  0.00    -0.056 C 
+ATOM      2  H   UNL     1      -0.448  -0.553   1.359  1.00  0.00    +0.026 H 
+ATOM      3  H   UNL     1      -0.506  -1.439  -0.166  1.00  0.00    +0.026 H 
+ENDROOT
+BRANCH   1   4
+ATOM      4  C   UNL     1      -1.929   0.162  -0.021  1.00  0.00    -0.065 C 
+ATOM      5  H   UNL     1      -2.719  -0.480   0.382  1.00  0.00    +0.023 H 
+ATOM      6  H   UNL     1      -2.088   0.261  -1.099  1.00  0.00    +0.023 H 
+ATOM      7  H   UNL     1      -2.030   1.152   0.434  1.00  0.00    +0.023 H 
+ENDBRANCH   1   4
+BRANCH   1   8
+ATOM      8  C   UNL     1       0.562   0.437  -0.275  1.00  0.00    -0.056 C 
+ATOM      9  H   UNL     1       0.506   1.439   0.166  1.00  0.00    +0.026 H 
+ATOM     10  H   UNL     1       0.448   0.553  -1.359  1.00  0.00    +0.026 H 
+BRANCH   8  11
+ATOM     11  C   UNL     1       1.929  -0.162   0.021  1.00  0.00    -0.065 C 
+ATOM     12  H   UNL     1       2.719   0.480  -0.382  1.00  0.00    +0.023 H 
+ATOM     13  H   UNL     1       2.088  -0.261   1.099  1.00  0.00    +0.023 H 
+ATOM     14  H   UNL     1       2.030  -1.152  -0.434  1.00  0.00    +0.023 H 
+ENDBRANCH   8  11
+ENDBRANCH   1   8
+TORSDOF 3

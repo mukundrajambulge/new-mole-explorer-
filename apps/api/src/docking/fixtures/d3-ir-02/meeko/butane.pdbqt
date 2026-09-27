@@ -1,0 +1,13 @@
+REMARK SMILES CCCC
+REMARK SMILES IDX 1 1 2 2 3 3 4 4
+REMARK H PARENT
+REMARK INDEX MAP 1 1 2 2 3 3 4 4
+ROOT
+ATOM      1  C   UNL     1      -1.929   0.162  -0.021  1.00  0.00    +0.004 C 
+ATOM      2  C   UNL     1      -0.562  -0.437   0.275  1.00  0.00    -0.004 C 
+ENDROOT
+BRANCH   2   3
+ATOM      3  C   UNL     1       0.562   0.437  -0.275  1.00  0.00    -0.004 C 
+ATOM      4  C   UNL     1       1.929  -0.162   0.021  1.00  0.00    +0.004 C 
+ENDBRANCH   2   3
+TORSDOF 1

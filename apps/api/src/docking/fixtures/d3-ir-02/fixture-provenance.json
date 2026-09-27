@@ -1,0 +1,175 @@
+{
+  "sourceArtifact": {
+    "driveFileId": "1so_qAC3Qj9KqwVQsJ1aZCNCKDLyLEo3I",
+    "fileName": "D3-IR-02_COMPLETE_RESEARCH_PACKAGE.zip",
+    "sourceDigestManifestDriveFileId": "1WUPN4T_lmEPmJNgeI-vrwZysc6AmJjSR",
+    "copyProcedure": "Extracted these archive members byte-for-byte from the registered D3-IR-02 ZIP; verified each copied file against its SHA256SUMS.txt entry. No PDBQT bytes or matrix rows were transformed."
+  },
+  "testGraphIngestionTransform": {
+    "appliesTo": "sdf/*.sdf",
+    "procedure": "For the existing bounded SDF ingestion test only, replace the source file's initial empty title line with 'D3-IR-02 fixture header' so its counts line remains at the V2000 reader's expected line index after that reader trims surrounding whitespace. No atom, bond, coordinate, or property record is changed; original fixture files and hashes remain byte-for-byte unchanged.",
+    "atomMappingBasis": "D3-IR-02 reference_execution_details.json atom_serial_to_input_index records are applied to the unchanged SDF atom-row order."
+  },
+  "files": [
+    {
+      "sourcePath": "inputs/adversarial/acetamide_resonance_cn_torsdof_0.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/adversarial/acetamide_resonance_cn_torsdof_0.pdbqt",
+      "sourceSha256": "a713d1211c616dd71ae44fa204abaf925071ec4047c7e3503fe4e3dcd979555b"
+    },
+    {
+      "sourcePath": "inputs/adversarial/acetamide_resonance_cn_torsdof_1.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/adversarial/acetamide_resonance_cn_torsdof_1.pdbqt",
+      "sourceSha256": "4730ef4dbfbff3ba260c7ac210406e84ae1a538f59e0c79cd01c85435629323d"
+    },
+    {
+      "sourcePath": "inputs/adversarial/acetamide_resonance_cn_torsdof_2.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/adversarial/acetamide_resonance_cn_torsdof_2.pdbqt",
+      "sourceSha256": "4a32ca895651f7326b32a39e8ee11da3ea0d799e36d5e152c9484893aee518fe"
+    },
+    {
+      "sourcePath": "inputs/adversarial/acetamide_terminal_nh_torsdof_1.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/adversarial/acetamide_terminal_nh_torsdof_1.pdbqt",
+      "sourceSha256": "52a83272fb3e9242ab895f604bef0450d46fd802a75ece1aba51da0685eb4193"
+    },
+    {
+      "sourcePath": "inputs/adversarial/benzene_no_branch_torsdof_1.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/adversarial/benzene_no_branch_torsdof_1.pdbqt",
+      "sourceSha256": "3654085f066bca8abfe846afa7456e03c2420b82ef2bb735064189c6f2bf3815"
+    },
+    {
+      "sourcePath": "inputs/adversarial/malformed_unclosed_branch.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/adversarial/malformed_unclosed_branch.pdbqt",
+      "sourceSha256": "b7408e72e36256329302be365b977d0a5edb22563b283aae43ac2903a1f00f43"
+    },
+    {
+      "sourcePath": "inputs/adversarial/toluene_terminal_cc_torsdof_0.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/adversarial/toluene_terminal_cc_torsdof_0.pdbqt",
+      "sourceSha256": "0e26df69731b2cc6b9b7d99b37c100c328ee00de18990ea15839508d22b101dd"
+    },
+    {
+      "sourcePath": "inputs/adversarial/toluene_terminal_cc_torsdof_1.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/adversarial/toluene_terminal_cc_torsdof_1.pdbqt",
+      "sourceSha256": "de0bfdb145cd3011fda8271e419b9b407d974c24d47bbaa610fdec191bcda3ac"
+    },
+    {
+      "sourcePath": "inputs/adversarial/toluene_terminal_cc_torsdof_2.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/adversarial/toluene_terminal_cc_torsdof_2.pdbqt",
+      "sourceSha256": "4ea80e0259fc61202c83554976fbc075fd10397c3fac0354e241baa950054c08"
+    },
+    {
+      "sourcePath": "outputs/meeko/acetamide.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko/acetamide.pdbqt",
+      "sourceSha256": "717ab363b1a2b2cbf2e1959235d9e2e162310847bfff470148a3f17ab0270b6c"
+    },
+    {
+      "sourcePath": "outputs/meeko/benzene.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko/benzene.pdbqt",
+      "sourceSha256": "022cc44ed671b6f6d59dea6599e4c47ba9e1a6023d43382bf3ae5f50731a0c78"
+    },
+    {
+      "sourcePath": "outputs/meeko/butane.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko/butane.pdbqt",
+      "sourceSha256": "d30bd23a6ca85842376b2c1279b98af18dd05c51c20c8d526e6254da1719b85a"
+    },
+    {
+      "sourcePath": "outputs/meeko/ethylbenzene.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko/ethylbenzene.pdbqt",
+      "sourceSha256": "747d107ef8b51ae1cf28a41498113c3cb84847bd94114fe7596756be5ea5e866"
+    },
+    {
+      "sourcePath": "outputs/meeko/methyl_acetate.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko/methyl_acetate.pdbqt",
+      "sourceSha256": "c8b0d103889f4348951b7d9740708d66850f004a8b563ae41ce023f2caea6186"
+    },
+    {
+      "sourcePath": "outputs/meeko/n_methylacetamide.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko/n_methylacetamide.pdbqt",
+      "sourceSha256": "2f00568bb9b64c5f1b53d7790a2b264e79a8a3192e4ebe1cc980932b9465117b"
+    },
+    {
+      "sourcePath": "outputs/meeko/toluene.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko/toluene.pdbqt",
+      "sourceSha256": "485d3b54c13a1153001c0d6c78c4721df8f13edd635f9b34880c3a8d99690af5"
+    },
+    {
+      "sourcePath": "outputs/meeko-explicit-h/acetamide.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko-explicit-h/acetamide.pdbqt",
+      "sourceSha256": "a604de3a7c053f522ec80c05787c7573653fc19ef67014dc937f7806d15d2d5e"
+    },
+    {
+      "sourcePath": "outputs/meeko-explicit-h/benzene.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko-explicit-h/benzene.pdbqt",
+      "sourceSha256": "3d0b5e1d01c6c687bfe64291dd0b1829fd40c42c96ed6cb89cdea1b42fc0484c"
+    },
+    {
+      "sourcePath": "outputs/meeko-explicit-h/butane.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko-explicit-h/butane.pdbqt",
+      "sourceSha256": "a6cd9e7dea11e722640aef34b80c49ce50957dfdf3ab5948daee1237fbe5dc87"
+    },
+    {
+      "sourcePath": "outputs/meeko-explicit-h/ethylbenzene.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko-explicit-h/ethylbenzene.pdbqt",
+      "sourceSha256": "8f4957752537c8beb1f7733ea7f94fcd1cf41cc6bd53f2216b80e67febfd80a5"
+    },
+    {
+      "sourcePath": "outputs/meeko-explicit-h/methyl_acetate.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko-explicit-h/methyl_acetate.pdbqt",
+      "sourceSha256": "2ee2cc53b68f46fae25a75e32454e7f6e581453a7a7e48c0c9190f83c921d11d"
+    },
+    {
+      "sourcePath": "outputs/meeko-explicit-h/n_methylacetamide.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko-explicit-h/n_methylacetamide.pdbqt",
+      "sourceSha256": "7451f3dc17823682faa3ce789994dca09dd328b8a567f61bd50a86357cdc6da9"
+    },
+    {
+      "sourcePath": "outputs/meeko-explicit-h/toluene.pdbqt",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/meeko-explicit-h/toluene.pdbqt",
+      "sourceSha256": "081a9621a6132211e2e6dd4079d6a3f9b05e42a47f4623b06de93a7272cefbdb"
+    },
+    {
+      "sourcePath": "outputs/reference_execution_matrix.csv",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/reference_execution_matrix.csv",
+      "sourceSha256": "c3724c6b74021b4c1d61a57bd04d67d97f2d7a1114f46bf1abee09863988d238"
+    },
+    {
+      "sourcePath": "outputs/reference_execution_details.json",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/reference_execution_details.json",
+      "sourceSha256": "12f23f3ac6ebff4550e41a6558b41e8417b54fa067eb531d0739cd7ff91ed3c4"
+    },
+    {
+      "sourcePath": "inputs/sdf/acetamide.sdf",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/sdf/acetamide.sdf",
+      "sourceSha256": "5e06642cb21b4e6aaef7971eb618a5c91dadd551f20f98feb8ec317072995ea3"
+    },
+    {
+      "sourcePath": "inputs/sdf/benzene.sdf",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/sdf/benzene.sdf",
+      "sourceSha256": "41e2b5f792cae595e46def3373aff7a844d772e38a6f2486bb5959b2b89ad37d"
+    },
+    {
+      "sourcePath": "inputs/sdf/butane.sdf",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/sdf/butane.sdf",
+      "sourceSha256": "ac8a76f046f18c37b5a23b59284453b28c1b74efa4c6797e84cbd64d2781b6c9"
+    },
+    {
+      "sourcePath": "inputs/sdf/ethylbenzene.sdf",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/sdf/ethylbenzene.sdf",
+      "sourceSha256": "1b70bd3f8b0722481b3c56e0c28da438364d6c1e1f3497005e3b409b6af320bf"
+    },
+    {
+      "sourcePath": "inputs/sdf/methyl_acetate.sdf",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/sdf/methyl_acetate.sdf",
+      "sourceSha256": "495385b577eb8882a92437767a9c53028a11b69d8d796b7c9f4898ea51d892ff"
+    },
+    {
+      "sourcePath": "inputs/sdf/n_methylacetamide.sdf",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/sdf/n_methylacetamide.sdf",
+      "sourceSha256": "96b989b97a918823c796701bc1616222ff5dc37968d29ff123d2c513da3234a4"
+    },
+    {
+      "sourcePath": "inputs/sdf/toluene.sdf",
+      "repositoryPath": "apps/api/src/docking/fixtures/d3-ir-02/sdf/toluene.sdf",
+      "sourceSha256": "ee46db4302d28067e795a7ee0fd8feef750bfced938c25baa742d6b0ff8d688e"
+    }
+  ]
+}

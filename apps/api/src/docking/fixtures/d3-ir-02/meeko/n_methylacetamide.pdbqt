@@ -1,0 +1,13 @@
+REMARK SMILES CNC(C)=O
+REMARK SMILES IDX 1 1 2 2 3 3 4 4 5 5
+REMARK H PARENT 2 6
+REMARK INDEX MAP 1 1 2 2 3 3 4 4 5 5 9 6
+ROOT
+ATOM      1  C   UNL     1      -1.889  -0.044  -0.014  1.00  0.00    +0.142 C 
+ATOM      2  N   UNL     1      -0.503   0.030   0.372  1.00  0.00    -0.359 N 
+ATOM      3  C   UNL     1       0.498  -0.019  -0.569  1.00  0.00    +0.216 C 
+ATOM      4  C   UNL     1       1.883   0.054   0.014  1.00  0.00    +0.114 C 
+ATOM      5  O   UNL     1       0.297  -0.141  -1.773  1.00  0.00    -0.275 OA
+ATOM      6  H   UNL     1      -0.269   0.101   1.353  1.00  0.00    +0.163 HD
+ENDROOT
+TORSDOF 0
