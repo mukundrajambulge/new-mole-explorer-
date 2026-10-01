@@ -21,6 +21,9 @@ inline constexpr double kTorsionDivisorCoefficient = 0.05846;
 
 enum class Term : std::size_t { Gaussian1, Gaussian2, Repulsion, Hydrophobic, HydrogenBond, Count };
 inline constexpr std::size_t kTermCount = static_cast<std::size_t>(Term::Count);
+inline constexpr std::array<double, kTermCount> kScoringTermCoefficients{
+    -0.035579, -0.005156, 0.840245, -0.035069, -0.587439};
+using RawTerms = std::array<double, kTermCount>;
 
 struct Vec3 final {
   double x{};
@@ -129,6 +132,13 @@ struct Result final {
 [[nodiscard]] bool xs_hydrophobic(std::string_view type) noexcept;
 [[nodiscard]] bool xs_donor(std::string_view type) noexcept;
 [[nodiscard]] bool xs_acceptor(std::string_view type) noexcept;
+
+// Shared raw Vina-classical pair primitive. Unsupported XS labels or invalid
+// distances return nullopt; both the direct oracle and scoring-field builder
+// use this implementation.
+[[nodiscard]] std::optional<RawTerms> score_pair_terms(std::string_view receptor_xs_type,
+                                                       std::string_view ligand_xs_type,
+                                                       double distance) noexcept;
 
 // Evaluates the direct receptor-ligand score. Atom arrays are sorted by stable
 // AtomUID internally so caller order cannot affect pair or summation order.

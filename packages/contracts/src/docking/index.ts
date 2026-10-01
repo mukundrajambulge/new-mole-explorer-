@@ -7,3 +7,4 @@ export * from "./requests.js";
 export * from "./architecture.js";
 export * from "./d2.js";
 export * from "./d3VinaTorsion.js";
+export * from "./scoringField.js";

@@ -20,9 +20,6 @@ static_assert(std::numeric_limits<double>::is_iec559 &&
               std::numeric_limits<double>::digits == 53,
               "ME_DOCKING_V1_CPU_REFERENCE_NUMERIC_1_0 requires IEEE-754 binary64");
 
-constexpr std::array<double, kTermCount> kCoefficients{
-    -0.035579, -0.005156, 0.840245, -0.035069, -0.587439};
-
 class NeumaierSum final {
  public:
   void add(double value) noexcept {
@@ -112,45 +109,6 @@ class NeumaierSum final {
   return true;
 }
 
-[[nodiscard]] std::array<double, kTermCount> pair_terms(const Atom& receptor,
-                                                        const Atom& ligand,
-                                                        double distance) noexcept {
-  std::array<double, kTermCount> terms{};
-  if (!(distance < kPhysicalCutoffAngstrom)) return terms;
-
-  const double radius = *xs_radius(receptor.xs_type) + *xs_radius(ligand.xs_type);
-  const double surface_distance = distance - radius;
-  const double scaled_gaussian1 = surface_distance / 0.5;
-  const double scaled_gaussian2 = (surface_distance - 3.0) / 2.0;
-
-  terms[static_cast<std::size_t>(Term::Gaussian1)] =
-      std::exp(-(scaled_gaussian1 * scaled_gaussian1));
-  terms[static_cast<std::size_t>(Term::Gaussian2)] =
-      std::exp(-(scaled_gaussian2 * scaled_gaussian2));
-  terms[static_cast<std::size_t>(Term::Repulsion)] =
-      surface_distance <= 0.0 ? surface_distance * surface_distance : 0.0;
-
-  if (xs_hydrophobic(receptor.xs_type) && xs_hydrophobic(ligand.xs_type)) {
-    if (surface_distance <= 0.5) {
-      terms[static_cast<std::size_t>(Term::Hydrophobic)] = 1.0;
-    } else if (surface_distance < 1.5) {
-      terms[static_cast<std::size_t>(Term::Hydrophobic)] = 1.5 - surface_distance;
-    }
-  }
-
-  const bool donor_acceptor =
-      (xs_donor(receptor.xs_type) && xs_acceptor(ligand.xs_type)) ||
-      (xs_acceptor(receptor.xs_type) && xs_donor(ligand.xs_type));
-  if (donor_acceptor) {
-    if (surface_distance <= -0.7) {
-      terms[static_cast<std::size_t>(Term::HydrogenBond)] = 1.0;
-    } else if (surface_distance < 0.0) {
-      terms[static_cast<std::size_t>(Term::HydrogenBond)] = -surface_distance / 0.7;
-    }
-  }
-  return terms;
-}
-
 }  // namespace
 
 std::optional<double> xs_radius(std::string_view type) noexcept {
@@ -233,6 +191,49 @@ bool xs_donor(std::string_view type) noexcept {
 
 bool xs_acceptor(std::string_view type) noexcept {
   return type == "N_A" || type == "N_DA" || type == "O_A" || type == "O_DA";
+}
+
+std::optional<RawTerms> score_pair_terms(std::string_view receptor_xs_type,
+                                         std::string_view ligand_xs_type,
+                                         double distance) noexcept {
+  const auto receptor_radius = xs_radius(receptor_xs_type);
+  const auto ligand_radius = xs_radius(ligand_xs_type);
+  if (!receptor_radius || !ligand_radius || !std::isfinite(distance) || distance < 0.0) {
+    return std::nullopt;
+  }
+  RawTerms terms{};
+  if (!(distance < kPhysicalCutoffAngstrom)) return terms;
+
+  const double surface_distance = distance - (*receptor_radius + *ligand_radius);
+  const double scaled_gaussian1 = surface_distance / 0.5;
+  const double scaled_gaussian2 = (surface_distance - 3.0) / 2.0;
+
+  terms[static_cast<std::size_t>(Term::Gaussian1)] =
+      std::exp(-(scaled_gaussian1 * scaled_gaussian1));
+  terms[static_cast<std::size_t>(Term::Gaussian2)] =
+      std::exp(-(scaled_gaussian2 * scaled_gaussian2));
+  terms[static_cast<std::size_t>(Term::Repulsion)] =
+      surface_distance <= 0.0 ? surface_distance * surface_distance : 0.0;
+
+  if (xs_hydrophobic(receptor_xs_type) && xs_hydrophobic(ligand_xs_type)) {
+    if (surface_distance <= 0.5) {
+      terms[static_cast<std::size_t>(Term::Hydrophobic)] = 1.0;
+    } else if (surface_distance < 1.5) {
+      terms[static_cast<std::size_t>(Term::Hydrophobic)] = 1.5 - surface_distance;
+    }
+  }
+
+  const bool donor_acceptor =
+      (xs_donor(receptor_xs_type) && xs_acceptor(ligand_xs_type)) ||
+      (xs_acceptor(receptor_xs_type) && xs_donor(ligand_xs_type));
+  if (donor_acceptor) {
+    if (surface_distance <= -0.7) {
+      terms[static_cast<std::size_t>(Term::HydrogenBond)] = 1.0;
+    } else if (surface_distance < 0.0) {
+      terms[static_cast<std::size_t>(Term::HydrogenBond)] = -surface_distance / 0.7;
+    }
+  }
+  return terms;
 }
 
 Result score_direct(const Request& request) {
@@ -382,8 +383,12 @@ Result score_direct(const Request& request) {
         return invalid_result(request, "SCORING_NONFINITE_RESULT", "An atom-pair distance is not finite.");
       }
       if (distance == 0.0) gradient_valid = false;
-      const auto terms = pair_terms(*receptor_atom, *ligand_atom, distance);
-      for (std::size_t term = 0; term < kTermCount; ++term) raw_sums[term].add(terms[term]);
+      const auto terms = score_pair_terms(receptor_atom->xs_type, ligand_atom->xs_type, distance);
+      if (!terms) {
+        return invalid_result(request, "SCORING_ATOM_TYPE_UNSUPPORTED",
+                              "A direct-scoring pair has no supported XS interaction primitive.");
+      }
+      for (std::size_t term = 0; term < kTermCount; ++term) raw_sums[term].add((*terms)[term]);
     }
   }
 
@@ -407,7 +412,7 @@ Result score_direct(const Request& request) {
   NeumaierSum inter_score;
   for (std::size_t term = 0; term < kTermCount; ++term) {
     result.decomposition.raw[term] = raw_sums[term].value();
-    result.decomposition.weighted[term] = result.decomposition.raw[term] * kCoefficients[term];
+    result.decomposition.weighted[term] = result.decomposition.raw[term] * kScoringTermCoefficients[term];
     inter_score.add(result.decomposition.weighted[term]);
   }
   result.decomposition.inter_score = inter_score.value();
