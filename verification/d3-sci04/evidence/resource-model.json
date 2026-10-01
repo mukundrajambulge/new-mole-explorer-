@@ -1,0 +1,53 @@
+{
+  "schema": "D3_SCI04_CPP_RESOURCE_MODEL_V1",
+  "result": "PASS_FOR_RESEARCH_MODEL",
+  "model_scope": "test-only C++ allocation/build model; not a production ScoringField implementation",
+  "target": "x86_64-windows-gnu",
+  "grid_points_per_axis": 110,
+  "grid_point_count": 1331000,
+  "logical_channels": 80,
+  "physical_arrays": 59,
+  "receptor_scoring_atoms": 250000,
+  "receptor_residues": 50000,
+  "field_build_worker_scratch_slots": 8,
+  "model_construction_seconds": 0.308819,
+  "field_owned_components_requested_bytes": {
+    "field_metadata": 416,
+    "logical_and_physical_channel_descriptors": 3000,
+    "physical_arrays_and_payload": 628232000,
+    "axis_coordinates": 2640,
+    "receptor_atoms": 8000000,
+    "residue_descriptors": 800000,
+    "spatial_bvh_nodes_and_order": 32999936,
+    "spatial_index_build_scratch": 1000000,
+    "parallel_field_build_scratch": 3866624
+  },
+  "memory_metrics_bytes": {
+    "raw_field_payload": 628232000,
+    "total_field_owned_requested_allocation_current": 674904616,
+    "total_field_owned_requested_allocation_peak": 674904616,
+    "peak_working_set_rss": 681725952,
+    "current_working_set_rss": 681725952,
+    "peak_pagefile_usage": 679649280,
+    "private_usage": 679596032,
+    "allocation_calls": 69,
+    "checksum_bits": "000000000138ce21"
+  },
+  "resource_limits_bytes": {
+    "raw_field_payload": 805306368,
+    "total_field_owned_allocation": 1073741824,
+    "default_per_attempt_rss": 2147483648,
+    "ordinary_v1_safety_rss": 4294967296
+  },
+  "cap_checks": {
+    "raw_payload_pass": true,
+    "field_allocation_pass": true,
+    "default_attempt_rss_pass": true,
+    "safety_attempt_rss_pass": true
+  },
+  "accounting_limitations": [
+    "Field-owned allocation counts requested PMR bytes; allocator bookkeeping and executable/runtime memory are excluded from that metric.",
+    "RSS is the Windows process peak working set for this isolated model process.",
+    "The spatial tree and scratch layout are explicit research candidates; production resource acceptance requires measuring the eventual production layout."
+  ]
+}

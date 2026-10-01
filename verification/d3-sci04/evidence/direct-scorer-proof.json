@@ -1,0 +1,19 @@
+{
+  "schema": "D3_SCI04_DIRECT_SCORER_PROOF_V1",
+  "result": "PASS",
+  "direct_scorer_commit": "f0bd2eaf47b02faab4dea694e7c2677094969076",
+  "checked_type_pairs": 256,
+  "checked_pair_distances": 1280,
+  "surface_distance_angstrom": [-0.5, 0.25, 0.75, 1.25, 1.75],
+  "omitted_hyd_channel_count": 11,
+  "omitted_hyd_channel_ids": [8,13,18,23,28,33,38,43,48,53,58],
+  "omitted_hyd_raw_positive_zero_checks": 880,
+  "omitted_hb_channel_count": 10,
+  "omitted_hb_channel_ids": [4,9,14,34,54,59,64,69,74,79],
+  "omitted_hb_raw_positive_zero_checks": 800,
+  "raw_positive_zero_bits": "0000000000000000",
+  "negative_weighted_zero_bits": "8000000000000000",
+  "hyd_raw_zero_and_weighted_negative_zero": true,
+  "hb_raw_zero_and_weighted_negative_zero": true,
+  "boundary_policy": "No cutoff-boundary tolerance is inferred by this proof."
+}

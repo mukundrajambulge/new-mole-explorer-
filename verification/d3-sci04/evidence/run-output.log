@@ -1,0 +1,13 @@
+D3-SCI-04 resource model: PASS_FOR_RESEARCH_MODEL, raw=628232000, field-owned-requested=674904616, peak-RSS=681725952, checksum=0x138ce21
+Wrote C:\Users\mukun\.codex\worktrees\d3-sci04-proof\molecular-workstation\verification\d3-sci04\channel-map.json: 80 logical channels, 59 physical arrays.
+
+ RUN  v2.1.9 C:/Users/mukun/.codex/worktrees/d3-sci04-proof/molecular-workstation
+
+ ✓ verification/d3-sci04/sparse-contract.test.ts (7 tests) 38ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  14:10:15
+   Duration  1.46s (transform 147ms, setup 0ms, collect 192ms, tests 38ms, environment 0ms, prepare 623ms)
+
+D3-SCI-04 native evidence written to C:\Users\mukun\.codex\worktrees\d3-sci04-proof\molecular-workstation\verification\d3-sci04\evidence

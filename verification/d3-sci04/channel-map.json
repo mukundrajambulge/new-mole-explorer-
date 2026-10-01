@@ -1,0 +1,761 @@
+{
+  "schema": "D3_SCI04_CHANNEL_MAP_V1",
+  "approval": "OWNER_APPROVED_DIRECTION_CONDITIONAL_PHYSICAL_ACCEPTANCE",
+  "xs_types": [
+    "C_H",
+    "C_P",
+    "N_P",
+    "N_D",
+    "N_A",
+    "N_DA",
+    "O_P",
+    "O_D",
+    "O_A",
+    "O_DA",
+    "S_P",
+    "P_P",
+    "F_H",
+    "Cl_H",
+    "Br_H",
+    "I_H"
+  ],
+  "terms": [
+    "G1",
+    "G2",
+    "REP",
+    "HYD",
+    "HB"
+  ],
+  "physical_schema_id": "ME_SCORING_FIELD_EXACT_ZERO_59_RESEARCH_V1",
+  "logical_channel_count": 80,
+  "physical_array_count": 59,
+  "omitted_hyd_channel_count": 11,
+  "omitted_hb_channel_count": 10,
+  "channels": [
+    {
+      "logical_id": 0,
+      "xs_id": 0,
+      "xs_type": "C_H",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 0,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 1,
+      "xs_id": 0,
+      "xs_type": "C_H",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 1,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 2,
+      "xs_id": 0,
+      "xs_type": "C_H",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 2,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 3,
+      "xs_id": 0,
+      "xs_type": "C_H",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": 3,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 4,
+      "xs_id": 0,
+      "xs_type": "C_H",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": null,
+      "omitted_reason": "HB_ZERO_FOR_LIGAND_WITHOUT_DONOR_OR_ACCEPTOR_ROLE"
+    },
+    {
+      "logical_id": 5,
+      "xs_id": 1,
+      "xs_type": "C_P",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 4,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 6,
+      "xs_id": 1,
+      "xs_type": "C_P",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 5,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 7,
+      "xs_id": 1,
+      "xs_type": "C_P",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 6,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 8,
+      "xs_id": 1,
+      "xs_type": "C_P",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": null,
+      "omitted_reason": "HYD_ZERO_FOR_NON_HYDROPHOBIC_LIGAND"
+    },
+    {
+      "logical_id": 9,
+      "xs_id": 1,
+      "xs_type": "C_P",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": null,
+      "omitted_reason": "HB_ZERO_FOR_LIGAND_WITHOUT_DONOR_OR_ACCEPTOR_ROLE"
+    },
+    {
+      "logical_id": 10,
+      "xs_id": 2,
+      "xs_type": "N_P",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 7,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 11,
+      "xs_id": 2,
+      "xs_type": "N_P",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 8,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 12,
+      "xs_id": 2,
+      "xs_type": "N_P",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 9,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 13,
+      "xs_id": 2,
+      "xs_type": "N_P",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": null,
+      "omitted_reason": "HYD_ZERO_FOR_NON_HYDROPHOBIC_LIGAND"
+    },
+    {
+      "logical_id": 14,
+      "xs_id": 2,
+      "xs_type": "N_P",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": null,
+      "omitted_reason": "HB_ZERO_FOR_LIGAND_WITHOUT_DONOR_OR_ACCEPTOR_ROLE"
+    },
+    {
+      "logical_id": 15,
+      "xs_id": 3,
+      "xs_type": "N_D",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 10,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 16,
+      "xs_id": 3,
+      "xs_type": "N_D",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 11,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 17,
+      "xs_id": 3,
+      "xs_type": "N_D",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 12,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 18,
+      "xs_id": 3,
+      "xs_type": "N_D",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": null,
+      "omitted_reason": "HYD_ZERO_FOR_NON_HYDROPHOBIC_LIGAND"
+    },
+    {
+      "logical_id": 19,
+      "xs_id": 3,
+      "xs_type": "N_D",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": 13,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 20,
+      "xs_id": 4,
+      "xs_type": "N_A",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 14,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 21,
+      "xs_id": 4,
+      "xs_type": "N_A",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 15,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 22,
+      "xs_id": 4,
+      "xs_type": "N_A",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 16,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 23,
+      "xs_id": 4,
+      "xs_type": "N_A",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": null,
+      "omitted_reason": "HYD_ZERO_FOR_NON_HYDROPHOBIC_LIGAND"
+    },
+    {
+      "logical_id": 24,
+      "xs_id": 4,
+      "xs_type": "N_A",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": 17,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 25,
+      "xs_id": 5,
+      "xs_type": "N_DA",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 18,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 26,
+      "xs_id": 5,
+      "xs_type": "N_DA",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 19,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 27,
+      "xs_id": 5,
+      "xs_type": "N_DA",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 20,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 28,
+      "xs_id": 5,
+      "xs_type": "N_DA",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": null,
+      "omitted_reason": "HYD_ZERO_FOR_NON_HYDROPHOBIC_LIGAND"
+    },
+    {
+      "logical_id": 29,
+      "xs_id": 5,
+      "xs_type": "N_DA",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": 21,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 30,
+      "xs_id": 6,
+      "xs_type": "O_P",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 22,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 31,
+      "xs_id": 6,
+      "xs_type": "O_P",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 23,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 32,
+      "xs_id": 6,
+      "xs_type": "O_P",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 24,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 33,
+      "xs_id": 6,
+      "xs_type": "O_P",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": null,
+      "omitted_reason": "HYD_ZERO_FOR_NON_HYDROPHOBIC_LIGAND"
+    },
+    {
+      "logical_id": 34,
+      "xs_id": 6,
+      "xs_type": "O_P",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": null,
+      "omitted_reason": "HB_ZERO_FOR_LIGAND_WITHOUT_DONOR_OR_ACCEPTOR_ROLE"
+    },
+    {
+      "logical_id": 35,
+      "xs_id": 7,
+      "xs_type": "O_D",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 25,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 36,
+      "xs_id": 7,
+      "xs_type": "O_D",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 26,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 37,
+      "xs_id": 7,
+      "xs_type": "O_D",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 27,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 38,
+      "xs_id": 7,
+      "xs_type": "O_D",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": null,
+      "omitted_reason": "HYD_ZERO_FOR_NON_HYDROPHOBIC_LIGAND"
+    },
+    {
+      "logical_id": 39,
+      "xs_id": 7,
+      "xs_type": "O_D",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": 28,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 40,
+      "xs_id": 8,
+      "xs_type": "O_A",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 29,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 41,
+      "xs_id": 8,
+      "xs_type": "O_A",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 30,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 42,
+      "xs_id": 8,
+      "xs_type": "O_A",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 31,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 43,
+      "xs_id": 8,
+      "xs_type": "O_A",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": null,
+      "omitted_reason": "HYD_ZERO_FOR_NON_HYDROPHOBIC_LIGAND"
+    },
+    {
+      "logical_id": 44,
+      "xs_id": 8,
+      "xs_type": "O_A",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": 32,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 45,
+      "xs_id": 9,
+      "xs_type": "O_DA",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 33,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 46,
+      "xs_id": 9,
+      "xs_type": "O_DA",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 34,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 47,
+      "xs_id": 9,
+      "xs_type": "O_DA",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 35,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 48,
+      "xs_id": 9,
+      "xs_type": "O_DA",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": null,
+      "omitted_reason": "HYD_ZERO_FOR_NON_HYDROPHOBIC_LIGAND"
+    },
+    {
+      "logical_id": 49,
+      "xs_id": 9,
+      "xs_type": "O_DA",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": 36,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 50,
+      "xs_id": 10,
+      "xs_type": "S_P",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 37,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 51,
+      "xs_id": 10,
+      "xs_type": "S_P",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 38,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 52,
+      "xs_id": 10,
+      "xs_type": "S_P",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 39,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 53,
+      "xs_id": 10,
+      "xs_type": "S_P",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": null,
+      "omitted_reason": "HYD_ZERO_FOR_NON_HYDROPHOBIC_LIGAND"
+    },
+    {
+      "logical_id": 54,
+      "xs_id": 10,
+      "xs_type": "S_P",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": null,
+      "omitted_reason": "HB_ZERO_FOR_LIGAND_WITHOUT_DONOR_OR_ACCEPTOR_ROLE"
+    },
+    {
+      "logical_id": 55,
+      "xs_id": 11,
+      "xs_type": "P_P",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 40,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 56,
+      "xs_id": 11,
+      "xs_type": "P_P",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 41,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 57,
+      "xs_id": 11,
+      "xs_type": "P_P",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 42,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 58,
+      "xs_id": 11,
+      "xs_type": "P_P",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": null,
+      "omitted_reason": "HYD_ZERO_FOR_NON_HYDROPHOBIC_LIGAND"
+    },
+    {
+      "logical_id": 59,
+      "xs_id": 11,
+      "xs_type": "P_P",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": null,
+      "omitted_reason": "HB_ZERO_FOR_LIGAND_WITHOUT_DONOR_OR_ACCEPTOR_ROLE"
+    },
+    {
+      "logical_id": 60,
+      "xs_id": 12,
+      "xs_type": "F_H",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 43,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 61,
+      "xs_id": 12,
+      "xs_type": "F_H",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 44,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 62,
+      "xs_id": 12,
+      "xs_type": "F_H",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 45,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 63,
+      "xs_id": 12,
+      "xs_type": "F_H",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": 46,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 64,
+      "xs_id": 12,
+      "xs_type": "F_H",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": null,
+      "omitted_reason": "HB_ZERO_FOR_LIGAND_WITHOUT_DONOR_OR_ACCEPTOR_ROLE"
+    },
+    {
+      "logical_id": 65,
+      "xs_id": 13,
+      "xs_type": "Cl_H",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 47,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 66,
+      "xs_id": 13,
+      "xs_type": "Cl_H",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 48,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 67,
+      "xs_id": 13,
+      "xs_type": "Cl_H",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 49,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 68,
+      "xs_id": 13,
+      "xs_type": "Cl_H",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": 50,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 69,
+      "xs_id": 13,
+      "xs_type": "Cl_H",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": null,
+      "omitted_reason": "HB_ZERO_FOR_LIGAND_WITHOUT_DONOR_OR_ACCEPTOR_ROLE"
+    },
+    {
+      "logical_id": 70,
+      "xs_id": 14,
+      "xs_type": "Br_H",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 51,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 71,
+      "xs_id": 14,
+      "xs_type": "Br_H",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 52,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 72,
+      "xs_id": 14,
+      "xs_type": "Br_H",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 53,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 73,
+      "xs_id": 14,
+      "xs_type": "Br_H",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": 54,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 74,
+      "xs_id": 14,
+      "xs_type": "Br_H",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": null,
+      "omitted_reason": "HB_ZERO_FOR_LIGAND_WITHOUT_DONOR_OR_ACCEPTOR_ROLE"
+    },
+    {
+      "logical_id": 75,
+      "xs_id": 15,
+      "xs_type": "I_H",
+      "term_id": 0,
+      "term": "G1",
+      "physical_ordinal": 55,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 76,
+      "xs_id": 15,
+      "xs_type": "I_H",
+      "term_id": 1,
+      "term": "G2",
+      "physical_ordinal": 56,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 77,
+      "xs_id": 15,
+      "xs_type": "I_H",
+      "term_id": 2,
+      "term": "REP",
+      "physical_ordinal": 57,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 78,
+      "xs_id": 15,
+      "xs_type": "I_H",
+      "term_id": 3,
+      "term": "HYD",
+      "physical_ordinal": 58,
+      "omitted_reason": null
+    },
+    {
+      "logical_id": 79,
+      "xs_id": 15,
+      "xs_type": "I_H",
+      "term_id": 4,
+      "term": "HB",
+      "physical_ordinal": null,
+      "omitted_reason": "HB_ZERO_FOR_LIGAND_WITHOUT_DONOR_OR_ACCEPTOR_ROLE"
+    }
+  ],
+  "proof_basis": {
+    "normative_source": "PHD-V2-06, XS chemistry and raw-term scoring equations",
+    "executable_oracle": "native/docking-reference/scoring/src/scoring.cpp at D3-TOR-01 SHA f0bd2eaf47b02faab4dea694e7c2677094969076",
+    "rule": "HYD requires hydrophobic receptor and ligand types; HB requires complementary donor/acceptor roles."
+  }
+}

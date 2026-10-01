@@ -1,0 +1,17 @@
+{
+  "stage": "D3-SCI-04",
+  "harness_scope": "test-only; no production scoring-field implementation",
+  "d3_tor_commit": "f0bd2eaf47b02faab4dea694e7c2677094969076",
+  "direct_scorer_source_sha256": "4e376af7c1e6da4b5404678a138b05ff032ca9fef7b6d8040e3b263437ba55ec",
+  "compiler": "Zig C++",
+  "compiler_version": "0.16.0",
+  "compiler_executable_sha256": "086ce9d47ba42f33a514e1a6e04eb1d4a8fa1d75e0868e0213caad447c91e864",
+  "compiler_package_sha256": "68659eb5f1e4eb1437a722f1dd889c5a322c9954607f5edcf337bc3684a75a7e",
+  "test_runner": "Vitest",
+  "test_runner_version": "2.1.9",
+  "target": "x86_64-windows-gnu",
+  "floating_point_flags": [
+    "-ffp-contract=off",
+    "-fno-fast-math"
+  ]
+}
