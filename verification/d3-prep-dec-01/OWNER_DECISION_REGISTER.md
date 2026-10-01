@@ -1,0 +1,25 @@
+# Owner decision register — DEC-01 through DEC-15
+
+**Register status:** proposed choices only. No owner sign-off or independent review is evidenced. “Pending” means no decision is claimed. Evidence links point to source records or the lane documents.
+
+| ID | Decision / evidence | Proposed disposition | Owner status | Reviewer status | Blocked until resolved |
+|---|---|---|---|---|---|
+| DEC-01 | Intended claim and cohort; current request and DEVELOPMENT_COHORT_GOVERNANCE.md | Limit any future use to one development-only frozen-pose scoring case; exclude performance, accuracy, affinity, confirmatory, holdout, or tolerance-qualification claims. | Scope directed by request; formal owner acceptance pending | Pending | Candidate admission and any later execution |
+| DEC-02 | Exact construct; 181L_CONSTRUCT_DECISION.md; current mmCIF and D3-IR-01 | Hold. Recover sample/clone evidence or explicitly accept the deposited digital model as the bounded receptor identity with limitation. | Pending | Structural biologist pending | Receptor identity and preparation |
+| DEC-03 | Chain, assembly and model; frozen mmCIF; COMPONENT_RETENTION_POLICY.md | Propose entity 1, chain/asym A, model 1 and an explicit assembly/component decision. Do not infer component scope from “monomeric.” | Pending | Structural biologist pending | Receptor coordinate state |
+| DEC-04 | Missing ASN163/LEU164; 181L_TERMINAL_STATE_DECISION.md | Hold. Do not rebuild residues or assign Lys162 terminal chemistry without construct evidence and explicit disposition. | Pending | Structural biologist pending | Terminal chemical state and preparation |
+| DEC-05 | pH authority; RECEPTOR_CHEMICAL_STATE_POLICY.md | Record 6.7 only as bulk mother-liquor condition; do not use it as crystal pH or residue-state assignment. | Pending | Structural biologist and computational chemist pending | Chemical-state method |
+| DEC-06 | Receptor microstates/histidines; RECEPTOR_CHEMICAL_STATE_POLICY.md | Require reviewed residue-level protonation/tautomer table and explicit uncertainty; no generic defaults. | Pending | Computational chemist pending | Receptor ChemicalState |
+| DEC-07 | Hydrogen policy; HYDROGEN_POLICY.md | Require deterministic, mapped H generation only after chemistry is approved and exact heavy-atom immutability is demonstrated. | Pending | Computational chemist pending | Derived receptor/ligand states |
+| DEC-08 | Waters/ions/HED/assembly; COMPONENT_RETENTION_POLICY.md | Preserve source; require component-by-component approved inclusion/exclusion. No automatic deletion or addition. | Pending | Structural biologist and computational chemist pending | Receptor CoordinateState |
+| DEC-09 | BNZ identity/state; BNZ_CHEMICAL_STATE_POLICY.md and RCSB CCD BNZ | Propose neutral benzene C6H6 mapped to source C1–C6, with zero chemical rotors; validate pinned representation and scorer torsion semantics. | Pending | Computational chemist pending | Ligand ChemicalState and typing |
+| DEC-10 | Preparation tools and environment; TOOLCHAIN_LOCK_PROPOSAL.md | No tool selected. Require a complete immutable, reproducible environment and reviewed invocation/profile before execution. | Pending | Computational chemist pending | Any preparation execution |
+| DEC-11 | Source geometry preservation; PREPARED_STATE_OUTPUT_CONTRACT.md | Require exact source heavy-atom identities and coordinates or a separately approved CoordinateState transformation. | Pending | Computational chemist pending | State acceptance |
+| DEC-12 | Expected prepared outputs; PREPARED_STATE_OUTPUT_CONTRACT.md | Require complete D2-compatible receptor, ligand and shared experiment objects, mappings, profiles, and canonical digests. | Pending | Computational chemist pending | D2 sealing |
+| DEC-13 | SearchRegion; SEARCH_REGION_FIXTURE_POLICY.md | No numeric box yet. Later define a finite region and halo from the admitted state and current grid contract, then freeze its digest. | Pending | Computational chemist pending | Direct/grid state consumption |
+| DEC-14 | Direct/grid shared state and cohort governance; DEVELOPMENT_COHORT_GOVERNANCE.md | Require both paths to consume identical frozen geometry/state; retain DEVELOPMENT label and prohibit outcome-driven threshold tuning. | Pending | Computational chemist pending | Later comparison or validation |
+| DEC-15 | Named reviewers and sign-off record; both review packages | Assign qualified structural biology and computational chemistry reviewers; capture dated evidence-grounded responses. Names are not available and none are invented. | Pending | Pending | Any authorization transition |
+
+## Authorization rule
+
+No row above authorizes preparation. The exact construct/terminal hold is independently sufficient to stop. Preparation remains blocked until owner decisions and required independent reviews are recorded for all material fields, an admissible receptor and ligand identity is established, a reproducible toolchain is locked, and a new gate explicitly authorizes execution.

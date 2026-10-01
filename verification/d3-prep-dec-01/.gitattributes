@@ -1,0 +1,4 @@
+*.md text eol=lf
+*.txt text eol=lf
+.gitattributes text eol=lf
+source_artifacts/*.cif -text -whitespace
