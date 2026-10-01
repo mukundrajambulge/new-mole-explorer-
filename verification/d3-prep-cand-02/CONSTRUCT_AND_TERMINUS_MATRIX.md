@@ -1,0 +1,15 @@
+# Construct and terminus review
+
+| Candidate | Deposited polymer and mapping | Construct / sequence evidence | Missingness and terminal assessment | Finding |
+|---|---|---|---|---|
+| 4W52 | T4 lysozyme entity 1, chain A, 172 residues declared, 1–164 modeled | Sequence includes L99A and Arg12Gly/Ile137Arg differences plus C-terminal LEHHHHHH tag | Eight C-terminal residues absent; incomplete sidechains | Material engineered construct; modeled endpoint is not construct end |
+| 4W54 | Same T4 lysozyme entity and chain as 4W52 | Same substitutions/tag; shared ligand-series publication | Same missing tail; Lys83 missing CD/CE/NZ near pocket; multiple altlocs | Material engineered construct and local incomplete sidechain |
+| 3ATL | Cationic bovine trypsin entity 1, chain A, mature 223-residue sequence | Source is natural Bos taurus; no sequence-difference records; mature sequence mapping to UniProt P00760 | All 223 positions observed, both mature termini represented, no standard heavy atoms missing, no chain breaks | CLEAR for deposited mature-chain identity; verify mapping and six disulfide pairs again at authorization |
+| 1M17 | EGFR entity 1, chain A, 333 residues declared; 312 modeled | Primary paper describes kinase-domain construct including C-terminal tail | 1–6, 300–311, 331–333 absent; site residues 751 and 831 have altlocs | PROMISING, but resolve construct gaps and kinase state |
+| 3ERT | ER-alpha LBD entity 1, chain A, 261 declared, 247 observed | N-terminal cloning-artifact annotations; terminal construct needs reconciliation | Missing 1–12 and 260–261; incomplete site-adjacent sidechains and four altlocs | Material terminal and pocket uncertainty |
+| 1FJS | Factor Xa entities 1/2, chains A/B, complete as modeled | Primary paper reports autolysis during crystallization and cleavage of first EGF-like domain | No coordinate missingness; observed proteolytic complex is not an intact receptor | Explicit proteolysis state required |
+| 1HVR | HIV-1 protease entity 1, chains A/B, 99 each | mmCIF records sequence conflict ALA95 vs reference CYS151; CSO oxidized cysteines | Both chains and termini visible; identity conflict persists | Source/construct conflict despite coordinate completeness |
+| 1EVE | Torpedo acetylcholinesterase entity 1, chain A, 543 declared, 534 modeled | Native enzyme source; terminal coverage incomplete | Residue 1 and 536–543 absent; Asp2 and His3 lack heavy atoms | N-terminal repair and terminal chemistry unresolved |
+| 1STP | Streptavidin entity 1, chain A, 159 declared, 121 observed | Crystal structure represents streptavidin tetramer context | 1–12 and 134–159 absent; binding-associated loop state | Chain alone does not define the receptor assembly |
+
+For 3ATL, terminal clarity means that the deposited mature-chain polymer is fully represented; it does not mean terminal protonation has been measured. See [RCSB 3ATL](https://www.rcsb.org/structure/3ATL) and its [experimental record](https://www.rcsb.org/experimental/3ATL).

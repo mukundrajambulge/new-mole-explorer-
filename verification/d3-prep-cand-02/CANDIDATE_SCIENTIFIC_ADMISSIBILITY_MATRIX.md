@@ -1,0 +1,34 @@
+# Comparative scientific admissibility
+
+Classification means readiness to enter a candidate-specific preparation-authorization gate. It never means the molecule has been prepared or approved for D3 validation.
+
+| Candidate | Construct certainty | Sequence / termini | Missing heavy atoms and alternate conformations | Binding-site / ligand state | Components and chemistry | Burden | Classification and blocker |
+|---|---|---|---|---|---|---|---|
+| 4W52 / BNZ | Engineered T4 lysozyme L99A plus Arg12Gly and Ile137Arg differences; C-terminal LEHHHHHH tag is declared but absent from coordinates | 164/172 modeled; unresolved tag tail, so coordinate endpoint is not full construct terminus | Several incomplete side chains; multiple protein altlocs, including Met106 and Arg119 near ligand | Benzene is simple and neutral; occupancy 0.70 | EPE additive; one water within 8 Å; no unusual ligand chemistry | HIGH | HIGH_PREPARATION_AMBIGUITY — engineered construct, tag, local conformer selection, and incomplete side chains |
+| 4W54 / PYJ | Same engineered T4 lysozyme construct/tag issues | 164/172 modeled | Multiple receptor altlocs; Lys83 lacks CD/CE/NZ 6.205 Å from ligand; PYJ itself has A/B alternatives at 0.40/0.60 | Ethylbenzene is simple but deposited with two conformers | EPE and one water within 8 Å | HIGH | HIGH_PREPARATION_AMBIGUITY — more local state selection than 4W52 |
+| 3ATL / BEN | Natural Bos taurus mature cationic trypsin; no recorded sequence substitutions | 223/223 modeled; mature-chain termini represented | No missing standard protein heavy atoms; one model; no receptor or ligand altlocs | BEN is benzamidine, not benzene. CCD graph is neutral, while pH 8.5 and compiled pKa near 11.6 strongly indicate amidinium +1 in bulk solution; inference needs review | One Ca, three DMS, 317 water atoms; 8 waters within 5 Å | MODERATE, conditional on charge/water review | ADMISSIBLE_FOR_NEXT AUTHORIZATION GATE — unusually clear construct and coordinates; ligand charge and water network are mandatory stop conditions |
+| 1M17 / AQ4 | EGFR kinase construct; primary paper describes a kinase-domain construct with C-terminal tail | 312/333 modeled; gaps include 1–6, 300–311, 331–333 | Asp831 and Cys751 each have A/B states at 0.5/0.5 | AQ4 erlotinib graph is defined and complete | One nearby water; no other complex components in inventory | MODERATE-HIGH | PROMISING_BUT_REQUIRES_SOURCE_RESOLUTION — relate missing 300–311 segment to construct and kinase state |
+| 3ERT / OHT | ER-alpha LBD; cloning artifacts and construct termini need reconciliation | 247/261 modeled; missing 1–12 and 260–261 | Four altloc residues; incomplete sidechains including Lys529 and Val534 near site | OHT has protonatable tertiary amine | 79 waters; four within 5 Å | HIGH | HIGH_PREPARATION_AMBIGUITY — terminal, pocket sidechain, and ligand-state uncertainty |
+| 1FJS / Z34 | Factor Xa entities 1/2, chains A/B; paper reports autolysis and cleavage of first EGF-like domain | Both chains fully modeled | No missing standard heavy atoms or altlocs | Z34 has amidine/imidazoline, hydroxy, and carboxylate state issues | Ca, Cl, six GOL, 163 waters; 12 waters within 5 Å | HIGH | HIGH_PREPARATION_AMBIGUITY — proteolytic receptor and coupled multi-charge/component state |
+| 1HVR / XK2 | HIV-1 protease dimer; sequence conflict ALA95 vs CYS151 reference and two oxidized CSO residues | Both chains 99/99 modeled | No missing standard heavy atoms; two noncanonical CSO residues | Cyclic urea spans dimer interface; catalytic Asp25/Asp30 state central | No deposited waters; literature describes structural-water displacement | HIGH | HIGH_PREPARATION_AMBIGUITY — sequence conflict, dimer-spanning ligand, and catalytic chemistry |
+| 1EVE / E20 | Torpedo acetylcholinesterase construct | 534/543 modeled; residue 1 and 536–543 absent | Asp2 and His3 lack heavy atoms | Donepezil has protonatable piperidine | 396 waters; 18 within 5 Å; five NAG; contacts are solvent-mediated per structure paper | HIGH | NOT_SUITABLE_FOR_THIS D3 FIXTURE — dry-state assumption would alter a water-dependent bound pose |
+| 1STP / BTN | Streptavidin in biological tetramer context | 121/159 modeled; 1–12 and 134–159 absent | No missing standard heavy atoms in observed positions; no altlocs | Biotin is well-defined and neutral in CCD | 84 waters; pH not recorded | HIGH | HIGH_PREPARATION_AMBIGUITY — assembly and binding-associated loop state plus missing termini |
+
+3ATL is selected only to enter its own authorization gate. The eight local waters, calcium, DMS molecules, and likely amidinium charge are not silently resolved.
+
+
+## Preparation-sensitive receptor chemistry
+
+| Candidate | Site-local chemistry requiring explicit state review |
+|---|---|
+| 4W52 / BNZ | Hydrophobic lysozyme cavity; local Met106 and Arg119 have alternate conformations. The key issue is selecting a coherent deposited receptor state and resolving incomplete sidechains, rather than a ligand protomer. |
+| 4W54 / PYJ | Same cavity and engineered T4L background; multiple protein alternatives around residues 108–114 and ligand A/B alternatives. Select neither by occupancy alone without a stated policy. |
+| 3ATL / BEN | S1 site includes Asp189 salt-bridge contact and Ser190; catalytic His57/Asp102/Ser195 triad and the six disulfides require chemically coherent states. Calcium and the BEN-adjacent waters are explicit state concerns. |
+| 1M17 / AQ4 | EGFR kinase catalytic Lys721 and DFG Asp831 context; Asp831 and Cys751 are alternate conformers. Confirm kinase construct/state and local water before freezing chemistry. |
+| 3ERT / OHT | OHT contacts Glu353, Arg394, and Asp351; His513 and Met522 have alternate conformations. The tertiary-amine charge and local polar network are coupled review items. |
+| 1FJS / Z34 | Factor Xa catalytic His57/Asp102/Ser195 and S1 Asp189, plus Ca coordination, interact with a multi-charge inhibitor. Resolve ligand and protein states together. |
+| 1HVR / XK2 | Catalytic Asp25/Asp30 dyad spans the dimer; two deposited CSO residues encode oxidized cysteine chemistry. XK2's cyclic urea is reported to replace a structural water. |
+| 1EVE / E20 | Acetylcholinesterase catalytic Ser200/Glu327/His440 and protonatable donepezil piperidine; gorge contacts are described as solvent-mediated. Five NAG and the water network are explicit context. |
+| 1STP / BTN | Streptavidin binding loops and tetramer contacts define the site; the primary paper reports ligand-associated loop ordering and quaternary change. Crystal pH is unrecorded, so no state may be inferred from a pH value. |
+
+These are site review obligations, not protonation or component assignments made by this lane.
