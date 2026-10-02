@@ -1,0 +1,15 @@
+verification/d3-prep-dec-02/.gitattributes
+verification/d3-prep-dec-02/BEN_CHEMICAL_STATE_REVIEW.md
+verification/d3-prep-dec-02/COMPONENT_DISPOSITION.md
+verification/d3-prep-dec-02/D3_PREP_DEC_02_REPORT.md
+verification/d3-prep-dec-02/DECISION_MATRIX.md
+verification/d3-prep-dec-02/OPEN_BLOCKERS.md
+verification/d3-prep-dec-02/PREFLIGHT_RECORD.md
+verification/d3-prep-dec-02/PREPARATION_PROFILE_AND_STATE_CONTRACT.md
+verification/d3-prep-dec-02/PROVENANCE_AND_STATE_CONSUMPTION.md
+verification/d3-prep-dec-02/RECEPTOR_STATE_AND_HYDROGEN_POLICY.md
+verification/d3-prep-dec-02/SCIENTIFIC_REVIEW_AND_OWNER_REGISTER.md
+verification/d3-prep-dec-02/SOURCE_AND_CONSTRUCT_RECONCILIATION.md
+verification/d3-prep-dec-02/WATER_NETWORK_AUDIT.md
+verification/d3-prep-dec-02/CHANGED_PATHS.txt
+verification/d3-prep-dec-02/SHA256SUMS.txt
