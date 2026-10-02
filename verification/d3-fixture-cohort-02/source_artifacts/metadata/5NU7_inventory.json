@@ -1,0 +1,420 @@
+{
+  "entry_id": null,
+  "nonpolymer_instances": [
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "CL",
+      "entity_id": "3",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "CL"
+      ],
+      "label_asym_id": "C",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "202",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "HOH",
+      "entity_id": "4",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "D",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "301",
+          "?"
+        ],
+        [
+          "302",
+          "?"
+        ],
+        [
+          "303",
+          "?"
+        ],
+        [
+          "304",
+          "?"
+        ],
+        [
+          "305",
+          "?"
+        ],
+        [
+          "306",
+          "?"
+        ],
+        [
+          "307",
+          "?"
+        ],
+        [
+          "308",
+          "?"
+        ],
+        [
+          "309",
+          "?"
+        ],
+        [
+          "310",
+          "?"
+        ],
+        [
+          "311",
+          "?"
+        ],
+        [
+          "312",
+          "?"
+        ],
+        [
+          "313",
+          "?"
+        ],
+        [
+          "314",
+          "?"
+        ],
+        [
+          "315",
+          "?"
+        ],
+        [
+          "316",
+          "?"
+        ],
+        [
+          "317",
+          "?"
+        ],
+        [
+          "318",
+          "?"
+        ],
+        [
+          "319",
+          "?"
+        ],
+        [
+          "320",
+          "?"
+        ],
+        [
+          "321",
+          "?"
+        ],
+        [
+          "322",
+          "?"
+        ],
+        [
+          "323",
+          "?"
+        ],
+        [
+          "324",
+          "?"
+        ],
+        [
+          "325",
+          "?"
+        ],
+        [
+          "326",
+          "?"
+        ],
+        [
+          "327",
+          "?"
+        ],
+        [
+          "328",
+          "?"
+        ],
+        [
+          "329",
+          "?"
+        ],
+        [
+          "330",
+          "?"
+        ],
+        [
+          "331",
+          "?"
+        ],
+        [
+          "332",
+          "?"
+        ],
+        [
+          "333",
+          "?"
+        ],
+        [
+          "334",
+          "?"
+        ],
+        [
+          "335",
+          "?"
+        ],
+        [
+          "336",
+          "?"
+        ],
+        [
+          "337",
+          "?"
+        ],
+        [
+          "338",
+          "?"
+        ],
+        [
+          "339",
+          "?"
+        ],
+        [
+          "340",
+          "?"
+        ],
+        [
+          "341",
+          "?"
+        ],
+        [
+          "342",
+          "?"
+        ],
+        [
+          "343",
+          "?"
+        ],
+        [
+          "344",
+          "?"
+        ],
+        [
+          "345",
+          "?"
+        ],
+        [
+          "346",
+          "?"
+        ],
+        [
+          "347",
+          "?"
+        ],
+        [
+          "348",
+          "?"
+        ],
+        [
+          "349",
+          "?"
+        ],
+        [
+          "350",
+          "?"
+        ],
+        [
+          "351",
+          "?"
+        ],
+        [
+          "352",
+          "?"
+        ],
+        [
+          "353",
+          "?"
+        ],
+        [
+          "354",
+          "?"
+        ],
+        [
+          "355",
+          "?"
+        ],
+        [
+          "356",
+          "?"
+        ],
+        [
+          "357",
+          "?"
+        ],
+        [
+          "358",
+          "?"
+        ],
+        [
+          "359",
+          "?"
+        ],
+        [
+          "360",
+          "?"
+        ],
+        [
+          "361",
+          "?"
+        ],
+        [
+          "362",
+          "?"
+        ],
+        [
+          "363",
+          "?"
+        ],
+        [
+          "364",
+          "?"
+        ],
+        [
+          "365",
+          "?"
+        ],
+        [
+          "366",
+          "?"
+        ],
+        [
+          "367",
+          "?"
+        ],
+        [
+          "368",
+          "?"
+        ],
+        [
+          "369",
+          "?"
+        ],
+        [
+          "370",
+          "?"
+        ],
+        [
+          "371",
+          "?"
+        ],
+        [
+          "372",
+          "?"
+        ],
+        [
+          "373",
+          "?"
+        ],
+        [
+          "374",
+          "?"
+        ],
+        [
+          "375",
+          "?"
+        ],
+        [
+          "376",
+          "?"
+        ],
+        [
+          "377",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "RTL",
+      "entity_id": "2",
+      "heavy_atom_count": 21,
+      "heavy_atom_names": [
+        "C1",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C2",
+        "C20",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "O1"
+      ],
+      "label_asym_id": "B",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "201",
+          "?"
+        ]
+      ]
+    }
+  ],
+  "polymer_entities": [
+    {
+      "altloc_residues": [],
+      "asym_ids": [
+        "A"
+      ],
+      "author_chains": [
+        "A"
+      ],
+      "description": "Retinol-binding protein 4",
+      "entity_id": "1",
+      "missing_label_seq_ids": [
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182
+      ],
+      "monomer_count_expected": 182,
+      "monomer_count_observed": 175,
+      "sequence": "GLUARGASPCYSARGVALSERSERPHEARGVALLYSGLUASNPHEASPLYSALAARGPHESERGLYTHRTRPTYRALAMETALALYSLYSASPPROGLUGLYLEUPHELEUGLNASPASNILEVALALAGLUPHESERVALASPGLUTHRGLYGLNMETSERALATHRALALYSGLYARGVALARGLEULEUASNASNTRPASPVALCYSALAASPMETVALGLYTHRPHETHRASPTHRGLUASPPROALALYSPHELYSMETLYSTYRTRPGLYVALALASERPHELEUGLNLYSGLYASNASPASPHISTRPILEVALASPTHRASPTYRASPTHRTYRALAVALGLNTYRSERCYSARGLEULEUASNLEUASPGLYTHRCYSALAASPSERTYRSERPHEVALPHESERARGASPPROASNGLYLEUPROPROGLUALAGLNLYSILEVALARGGLNARGGLNGLUGLULEUCYSLEUALAARGGLNTYRARGLEUILEVALHISASNGLYTYRCYSASPGLYARGSERGLUARGASNLEU",
+      "type": "polypeptide(L)"
+    }
+  ],
+  "resolution_A": null,
+  "source_categories": {},
+  "source_citation": [],
+  "source_file": "5NU7.cif",
+  "title": null
+}

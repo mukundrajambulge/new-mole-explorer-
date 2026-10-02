@@ -1,0 +1,110 @@
+{
+  "source_file": "1GX8-assembly1.cif",
+  "target_ligand_label_asym": "B",
+  "polymer_instance_distances_to_ligand": {
+    "A": {
+      "minimum_distance_A": 1.4797,
+      "nearest_ligand_atom": "C3",
+      "nearest_protein_residue": "PHE:105",
+      "nearest_protein_atom": "CE1",
+      "protein_residues_with_any_atom_within_5A": [
+        "ALA:118",
+        "CYS:106",
+        "GLN:120",
+        "GLU:62",
+        "ILE:56",
+        "ILE:71",
+        "ILE:84",
+        "LEU:39",
+        "LEU:58",
+        "LYS:60",
+        "LYS:69",
+        "MET:107",
+        "PHE:105",
+        "VAL:41",
+        "VAL:43",
+        "VAL:92"
+      ]
+    },
+    "A-2": {
+      "minimum_distance_A": 3.9314,
+      "nearest_ligand_atom": "O1",
+      "nearest_protein_residue": "LYS:69",
+      "nearest_protein_atom": "NZ",
+      "protein_residues_with_any_atom_within_5A": [
+        "GLU:62",
+        "LYS:69"
+      ]
+    }
+  },
+  "selected_major_altloc_A_or_common_atoms": {
+    "minimum_heavy_atom_distance_A": 2.4843,
+    "nearest_pair": [
+      "RTL:O1",
+      "GLU:62:OE2"
+    ],
+    "minimum_distance_from_retinol_O1_A": 2.4843,
+    "nearest_O1_pair": [
+      "RTL:O1",
+      "GLU:62:OE2"
+    ]
+  },
+  "minor_altloc_B_minimum_distance_A": 1.4797,
+  "symmetry_copy_ligand_distance_A": 3.1339,
+  "nearest_observed_atom_in_label_seq_2": {
+    "distance_A": 12.0385,
+    "ligand_atom": "C18",
+    "protein_atom": "CG2"
+  },
+  "local_altloc_occupancies": {
+    "104": [
+      [
+        ".",
+        "1.00"
+      ],
+      [
+        "A",
+        "0.73"
+      ],
+      [
+        "B",
+        "0.27"
+      ]
+    ],
+    "105": [
+      [
+        "A",
+        "0.73"
+      ],
+      [
+        "B",
+        "0.27"
+      ]
+    ],
+    "106": [
+      [
+        "A",
+        "0.73"
+      ],
+      [
+        "B",
+        "0.27"
+      ]
+    ],
+    "107": [
+      [
+        ".",
+        "1.00"
+      ],
+      [
+        "A",
+        "0.73"
+      ],
+      [
+        "B",
+        "0.27"
+      ]
+    ]
+  },
+  "nearest_water_distance_A": 4.25
+}

@@ -1,0 +1,3 @@
+* -text
+source_artifacts/** -diff -text
+*.pdf binary

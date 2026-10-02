@@ -1,0 +1,3082 @@
+{
+  "source_file": "1OPB.cif",
+  "ligand_component": "RET",
+  "ligand_label_asym": "H",
+  "ligand_residues": [
+    [
+      "D",
+      "134",
+      "RET"
+    ]
+  ],
+  "ligand_heavy_atom_names_observed": [
+    "C1",
+    "C10",
+    "C11",
+    "C12",
+    "C13",
+    "C14",
+    "C15",
+    "C16",
+    "C17",
+    "C18",
+    "C19",
+    "C2",
+    "C20",
+    "C3",
+    "C4",
+    "C5",
+    "C6",
+    "C7",
+    "C8",
+    "C9",
+    "O1"
+  ],
+  "ligand_heavy_atom_count_observed": 21,
+  "ligand_atom_rows_including_altlocs": 21,
+  "ligand_altloc_labels": [],
+  "ligand_occupancy_values": [
+    1.0
+  ],
+  "model_1_only": true,
+  "receptor_label_asym": "D",
+  "receptor_entity_id": "1",
+  "receptor_observed_heavy_atom_count": 1087,
+  "receptor_observed_residue_count": 133,
+  "receptor_polymer_expected_residue_count": 134,
+  "receptor_observed_label_seq_min_max": [
+    2,
+    134
+  ],
+  "receptor_unobserved_label_seq_ids": [
+    1
+  ],
+  "unobserved_atom_rows_model_1": [],
+  "unobserved_residue_rows_model_1": [
+    {
+      "_pdbx_unobs_or_zero_occ_residues.id": "4",
+      "_pdbx_unobs_or_zero_occ_residues.PDB_model_num": "1",
+      "_pdbx_unobs_or_zero_occ_residues.polymer_flag": "Y",
+      "_pdbx_unobs_or_zero_occ_residues.occupancy_flag": "1",
+      "_pdbx_unobs_or_zero_occ_residues.auth_asym_id": "D",
+      "_pdbx_unobs_or_zero_occ_residues.auth_comp_id": "MET",
+      "_pdbx_unobs_or_zero_occ_residues.auth_seq_id": "0",
+      "_pdbx_unobs_or_zero_occ_residues.PDB_ins_code": "?",
+      "_pdbx_unobs_or_zero_occ_residues.label_asym_id": "D",
+      "_pdbx_unobs_or_zero_occ_residues.label_comp_id": "MET",
+      "_pdbx_unobs_or_zero_occ_residues.label_seq_id": "1"
+    }
+  ],
+  "receptor_altloc_residue_count_total": 0,
+  "receptor_altloc_residues_within_5A_of_ligand": [],
+  "waters_by_min_heavy_atom_distance": [
+    {
+      "asym": "L",
+      "auth_seq": "423",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 6.71,
+      "min_distance_A": 3.6377777557184547
+    },
+    {
+      "asym": "L",
+      "auth_seq": "443",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 14.55,
+      "min_distance_A": 3.7996886714571714
+    },
+    {
+      "asym": "L",
+      "auth_seq": "446",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 11.65,
+      "min_distance_A": 4.931703965162547
+    },
+    {
+      "asym": "L",
+      "auth_seq": "433",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 28.72,
+      "min_distance_A": 4.947070446233814
+    },
+    {
+      "asym": "L",
+      "auth_seq": "430",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 18.64,
+      "min_distance_A": 5.093369906064156
+    },
+    {
+      "asym": "L",
+      "auth_seq": "468",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 30.43,
+      "min_distance_A": 5.175444425360971
+    },
+    {
+      "asym": "L",
+      "auth_seq": "476",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 35.76,
+      "min_distance_A": 5.689215763178614
+    },
+    {
+      "asym": "L",
+      "auth_seq": "424",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 13.21,
+      "min_distance_A": 6.43185906251062
+    },
+    {
+      "asym": "L",
+      "auth_seq": "404",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 29.19,
+      "min_distance_A": 7.240800715390526
+    },
+    {
+      "asym": "L",
+      "auth_seq": "448",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 28.24,
+      "min_distance_A": 7.492799743753998
+    },
+    {
+      "asym": "L",
+      "auth_seq": "402",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 17.2,
+      "min_distance_A": 8.004638842571229
+    },
+    {
+      "asym": "L",
+      "auth_seq": "473",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 20.68,
+      "min_distance_A": 8.98301296893197
+    },
+    {
+      "asym": "L",
+      "auth_seq": "403",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 18.43,
+      "min_distance_A": 9.176352052967452
+    },
+    {
+      "asym": "L",
+      "auth_seq": "447",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 26.28,
+      "min_distance_A": 9.327847447294578
+    },
+    {
+      "asym": "L",
+      "auth_seq": "435",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 20.04,
+      "min_distance_A": 9.492657214921435
+    },
+    {
+      "asym": "L",
+      "auth_seq": "400",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 12.61,
+      "min_distance_A": 10.644778109476965
+    },
+    {
+      "asym": "L",
+      "auth_seq": "431",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 40.49,
+      "min_distance_A": 10.830875957188315
+    },
+    {
+      "asym": "L",
+      "auth_seq": "406",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 6.84,
+      "min_distance_A": 11.166306640962354
+    },
+    {
+      "asym": "L",
+      "auth_seq": "422",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 28.56,
+      "min_distance_A": 11.463319719871729
+    },
+    {
+      "asym": "L",
+      "auth_seq": "428",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 34.06,
+      "min_distance_A": 11.474010501999722
+    },
+    {
+      "asym": "L",
+      "auth_seq": "440",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 20.89,
+      "min_distance_A": 11.498476464297346
+    },
+    {
+      "asym": "L",
+      "auth_seq": "472",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 32.43,
+      "min_distance_A": 11.609437583276806
+    },
+    {
+      "asym": "L",
+      "auth_seq": "445",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 14.75,
+      "min_distance_A": 11.836130448757313
+    },
+    {
+      "asym": "L",
+      "auth_seq": "409",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 25.12,
+      "min_distance_A": 12.240166747230203
+    },
+    {
+      "asym": "L",
+      "auth_seq": "496",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 32.19,
+      "min_distance_A": 12.37741313845506
+    },
+    {
+      "asym": "L",
+      "auth_seq": "417",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 14.44,
+      "min_distance_A": 12.384472011353571
+    },
+    {
+      "asym": "L",
+      "auth_seq": "436",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 33.81,
+      "min_distance_A": 12.455614758011745
+    },
+    {
+      "asym": "L",
+      "auth_seq": "432",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 5.03,
+      "min_distance_A": 12.870044483217606
+    },
+    {
+      "asym": "L",
+      "auth_seq": "493",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 36.65,
+      "min_distance_A": 13.084283205433916
+    },
+    {
+      "asym": "L",
+      "auth_seq": "427",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 12.12,
+      "min_distance_A": 13.362366968467823
+    },
+    {
+      "asym": "L",
+      "auth_seq": "410",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 10.61,
+      "min_distance_A": 13.564365705774815
+    },
+    {
+      "asym": "L",
+      "auth_seq": "408",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 23.77,
+      "min_distance_A": 13.83900697304543
+    },
+    {
+      "asym": "L",
+      "auth_seq": "466",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 33.41,
+      "min_distance_A": 14.211338466168483
+    },
+    {
+      "asym": "L",
+      "auth_seq": "463",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 32.43,
+      "min_distance_A": 14.216000035171637
+    },
+    {
+      "asym": "L",
+      "auth_seq": "439",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 45.51,
+      "min_distance_A": 14.329123839230368
+    },
+    {
+      "asym": "L",
+      "auth_seq": "414",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 14.16,
+      "min_distance_A": 14.91499225611599
+    },
+    {
+      "asym": "L",
+      "auth_seq": "464",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 31.04,
+      "min_distance_A": 15.185090253271463
+    },
+    {
+      "asym": "L",
+      "auth_seq": "465",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 34.85,
+      "min_distance_A": 15.319040766314318
+    },
+    {
+      "asym": "L",
+      "auth_seq": "434",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 38.82,
+      "min_distance_A": 15.517862288343714
+    },
+    {
+      "asym": "L",
+      "auth_seq": "437",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 64.43,
+      "min_distance_A": 15.84768778087201
+    },
+    {
+      "asym": "L",
+      "auth_seq": "441",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 28.55,
+      "min_distance_A": 15.976974838811005
+    },
+    {
+      "asym": "K",
+      "auth_seq": "318",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 18.57,
+      "min_distance_A": 16.367249157998415
+    },
+    {
+      "asym": "L",
+      "auth_seq": "489",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 34.89,
+      "min_distance_A": 16.756207476633843
+    },
+    {
+      "asym": "L",
+      "auth_seq": "467",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 22.39,
+      "min_distance_A": 16.955719506998225
+    },
+    {
+      "asym": "K",
+      "auth_seq": "418",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 26.34,
+      "min_distance_A": 17.232811262240414
+    },
+    {
+      "asym": "L",
+      "auth_seq": "474",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 43.94,
+      "min_distance_A": 17.575037325707164
+    },
+    {
+      "asym": "L",
+      "auth_seq": "411",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 22.84,
+      "min_distance_A": 17.626624322314242
+    },
+    {
+      "asym": "K",
+      "auth_seq": "319",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 27.04,
+      "min_distance_A": 17.91041769473844
+    },
+    {
+      "asym": "I",
+      "auth_seq": "164",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 19.01,
+      "min_distance_A": 18.159742509187733
+    },
+    {
+      "asym": "L",
+      "auth_seq": "419",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 13.7,
+      "min_distance_A": 18.506214523775522
+    },
+    {
+      "asym": "K",
+      "auth_seq": "309",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 11.77,
+      "min_distance_A": 20.11217944430688
+    },
+    {
+      "asym": "K",
+      "auth_seq": "358",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 19.9,
+      "min_distance_A": 20.52920587845521
+    },
+    {
+      "asym": "K",
+      "auth_seq": "306",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 16.83,
+      "min_distance_A": 20.618862262501295
+    },
+    {
+      "asym": "I",
+      "auth_seq": "157",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 12.6,
+      "min_distance_A": 20.92782497059835
+    },
+    {
+      "asym": "I",
+      "auth_seq": "148",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 25.64,
+      "min_distance_A": 21.62689753524532
+    },
+    {
+      "asym": "K",
+      "auth_seq": "317",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 9.86,
+      "min_distance_A": 22.006064505040424
+    },
+    {
+      "asym": "I",
+      "auth_seq": "162",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 15.46,
+      "min_distance_A": 22.432419530670337
+    },
+    {
+      "asym": "I",
+      "auth_seq": "168",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 23.21,
+      "min_distance_A": 22.632599077436954
+    },
+    {
+      "asym": "K",
+      "auth_seq": "320",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 51.74,
+      "min_distance_A": 23.95600968441948
+    },
+    {
+      "asym": "I",
+      "auth_seq": "154",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 31.72,
+      "min_distance_A": 24.33421519178295
+    },
+    {
+      "asym": "I",
+      "auth_seq": "144",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 32.77,
+      "min_distance_A": 24.4528100021245
+    },
+    {
+      "asym": "I",
+      "auth_seq": "147",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 36.0,
+      "min_distance_A": 24.81502427965768
+    },
+    {
+      "asym": "I",
+      "auth_seq": "165",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 24.11,
+      "min_distance_A": 24.83828281101574
+    },
+    {
+      "asym": "K",
+      "auth_seq": "352",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 54.47,
+      "min_distance_A": 25.741108484290258
+    },
+    {
+      "asym": "I",
+      "auth_seq": "141",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 40.08,
+      "min_distance_A": 25.871067179380137
+    },
+    {
+      "asym": "K",
+      "auth_seq": "331",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 25.45,
+      "min_distance_A": 25.966473499495457
+    },
+    {
+      "asym": "I",
+      "auth_seq": "156",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 16.75,
+      "min_distance_A": 26.172286927206038
+    },
+    {
+      "asym": "K",
+      "auth_seq": "341",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 14.96,
+      "min_distance_A": 26.542964887140997
+    },
+    {
+      "asym": "I",
+      "auth_seq": "153",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 5.55,
+      "min_distance_A": 26.853737188704297
+    },
+    {
+      "asym": "I",
+      "auth_seq": "151",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 12.38,
+      "min_distance_A": 27.708410004906455
+    },
+    {
+      "asym": "K",
+      "auth_seq": "300",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 25.55,
+      "min_distance_A": 28.3634398654324
+    },
+    {
+      "asym": "K",
+      "auth_seq": "368",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 24.95,
+      "min_distance_A": 28.587886263240936
+    },
+    {
+      "asym": "K",
+      "auth_seq": "375",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 21.01,
+      "min_distance_A": 28.81947999183885
+    },
+    {
+      "asym": "I",
+      "auth_seq": "150",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 27.99,
+      "min_distance_A": 28.844924995568977
+    },
+    {
+      "asym": "K",
+      "auth_seq": "310",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 7.74,
+      "min_distance_A": 29.267631643165114
+    },
+    {
+      "asym": "I",
+      "auth_seq": "158",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 26.18,
+      "min_distance_A": 30.438519642058807
+    },
+    {
+      "asym": "K",
+      "auth_seq": "328",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 31.49,
+      "min_distance_A": 31.1310305322519
+    },
+    {
+      "asym": "K",
+      "auth_seq": "314",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 15.26,
+      "min_distance_A": 31.313852733255292
+    },
+    {
+      "asym": "K",
+      "auth_seq": "324",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 13.86,
+      "min_distance_A": 31.605173595473257
+    },
+    {
+      "asym": "K",
+      "auth_seq": "333",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 30.79,
+      "min_distance_A": 31.625595109025216
+    },
+    {
+      "asym": "I",
+      "auth_seq": "159",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 33.12,
+      "min_distance_A": 31.664899147162934
+    },
+    {
+      "asym": "K",
+      "auth_seq": "332",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 9.84,
+      "min_distance_A": 31.668448698981134
+    },
+    {
+      "asym": "K",
+      "auth_seq": "335",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 35.06,
+      "min_distance_A": 32.257813534088136
+    },
+    {
+      "asym": "I",
+      "auth_seq": "167",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 28.13,
+      "min_distance_A": 32.2821827948483
+    },
+    {
+      "asym": "K",
+      "auth_seq": "371",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 23.74,
+      "min_distance_A": 33.151992443893924
+    },
+    {
+      "asym": "K",
+      "auth_seq": "330",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 31.27,
+      "min_distance_A": 33.32472598537008
+    },
+    {
+      "asym": "I",
+      "auth_seq": "163",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 24.7,
+      "min_distance_A": 33.519955504147084
+    },
+    {
+      "asym": "K",
+      "auth_seq": "303",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 31.47,
+      "min_distance_A": 33.667522317509494
+    },
+    {
+      "asym": "K",
+      "auth_seq": "323",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 19.41,
+      "min_distance_A": 33.7915752074389
+    },
+    {
+      "asym": "K",
+      "auth_seq": "370",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 33.86,
+      "min_distance_A": 33.85169565915421
+    },
+    {
+      "asym": "I",
+      "auth_seq": "143",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 19.82,
+      "min_distance_A": 34.392583197544205
+    },
+    {
+      "asym": "I",
+      "auth_seq": "152",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 5.19,
+      "min_distance_A": 35.75925627023023
+    },
+    {
+      "asym": "I",
+      "auth_seq": "138",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 64.27,
+      "min_distance_A": 36.581470746813885
+    },
+    {
+      "asym": "I",
+      "auth_seq": "140",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 4.21,
+      "min_distance_A": 37.09035162950063
+    },
+    {
+      "asym": "K",
+      "auth_seq": "343",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 17.65,
+      "min_distance_A": 37.12884060942383
+    },
+    {
+      "asym": "J",
+      "auth_seq": "155",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 17.86,
+      "min_distance_A": 37.28111588995158
+    },
+    {
+      "asym": "I",
+      "auth_seq": "137",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 8.76,
+      "min_distance_A": 37.63106331210958
+    },
+    {
+      "asym": "J",
+      "auth_seq": "135",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 23.78,
+      "min_distance_A": 38.06539534800604
+    },
+    {
+      "asym": "J",
+      "auth_seq": "150",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 24.59,
+      "min_distance_A": 38.11812090069498
+    },
+    {
+      "asym": "J",
+      "auth_seq": "141",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 3.21,
+      "min_distance_A": 38.146256762623516
+    },
+    {
+      "asym": "I",
+      "auth_seq": "149",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 19.6,
+      "min_distance_A": 38.43028057404733
+    },
+    {
+      "asym": "I",
+      "auth_seq": "166",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 29.87,
+      "min_distance_A": 38.59383459828785
+    },
+    {
+      "asym": "J",
+      "auth_seq": "166",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 30.11,
+      "min_distance_A": 39.357246207020125
+    },
+    {
+      "asym": "K",
+      "auth_seq": "344",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 37.17,
+      "min_distance_A": 39.49099746777738
+    },
+    {
+      "asym": "J",
+      "auth_seq": "142",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 7.09,
+      "min_distance_A": 40.26263212955656
+    },
+    {
+      "asym": "K",
+      "auth_seq": "307",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 37.83,
+      "min_distance_A": 40.53679780150376
+    },
+    {
+      "asym": "J",
+      "auth_seq": "168",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 29.01,
+      "min_distance_A": 40.73399451318272
+    },
+    {
+      "asym": "K",
+      "auth_seq": "316",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 45.26,
+      "min_distance_A": 41.21068750943134
+    },
+    {
+      "asym": "K",
+      "auth_seq": "337",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 25.85,
+      "min_distance_A": 41.381957831886105
+    },
+    {
+      "asym": "J",
+      "auth_seq": "164",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 30.57,
+      "min_distance_A": 41.72505642896124
+    },
+    {
+      "asym": "I",
+      "auth_seq": "146",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 16.26,
+      "min_distance_A": 42.3243982827872
+    },
+    {
+      "asym": "J",
+      "auth_seq": "151",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 4.27,
+      "min_distance_A": 42.698018010207456
+    },
+    {
+      "asym": "J",
+      "auth_seq": "143",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 18.92,
+      "min_distance_A": 43.19298796101052
+    },
+    {
+      "asym": "K",
+      "auth_seq": "359",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 15.17,
+      "min_distance_A": 43.53449627594191
+    },
+    {
+      "asym": "I",
+      "auth_seq": "135",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 23.55,
+      "min_distance_A": 43.69519617761202
+    },
+    {
+      "asym": "K",
+      "auth_seq": "351",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 30.61,
+      "min_distance_A": 43.73638349246541
+    },
+    {
+      "asym": "J",
+      "auth_seq": "139",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 12.19,
+      "min_distance_A": 43.859379863377
+    },
+    {
+      "asym": "K",
+      "auth_seq": "376",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 32.77,
+      "min_distance_A": 44.064275110343075
+    },
+    {
+      "asym": "I",
+      "auth_seq": "169",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 22.21,
+      "min_distance_A": 44.1239433527875
+    },
+    {
+      "asym": "J",
+      "auth_seq": "147",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 8.31,
+      "min_distance_A": 44.26167856057879
+    },
+    {
+      "asym": "K",
+      "auth_seq": "349",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 31.11,
+      "min_distance_A": 44.65323918821568
+    },
+    {
+      "asym": "K",
+      "auth_seq": "356",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 46.07,
+      "min_distance_A": 45.333057816564725
+    },
+    {
+      "asym": "K",
+      "auth_seq": "369",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 16.41,
+      "min_distance_A": 45.53717826128449
+    },
+    {
+      "asym": "J",
+      "auth_seq": "145",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 28.28,
+      "min_distance_A": 45.60034827717876
+    },
+    {
+      "asym": "I",
+      "auth_seq": "145",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 21.52,
+      "min_distance_A": 45.71525161256361
+    },
+    {
+      "asym": "K",
+      "auth_seq": "357",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 29.18,
+      "min_distance_A": 45.92313157875887
+    },
+    {
+      "asym": "J",
+      "auth_seq": "158",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 55.41,
+      "min_distance_A": 46.17120630869417
+    },
+    {
+      "asym": "J",
+      "auth_seq": "165",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 27.64,
+      "min_distance_A": 46.5371738183573
+    },
+    {
+      "asym": "I",
+      "auth_seq": "161",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 48.72,
+      "min_distance_A": 46.63705640367968
+    },
+    {
+      "asym": "J",
+      "auth_seq": "162",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 25.68,
+      "min_distance_A": 46.81505959624531
+    },
+    {
+      "asym": "J",
+      "auth_seq": "149",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 37.19,
+      "min_distance_A": 47.03160251362907
+    },
+    {
+      "asym": "J",
+      "auth_seq": "136",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 18.81,
+      "min_distance_A": 47.25729526750341
+    },
+    {
+      "asym": "J",
+      "auth_seq": "144",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 16.68,
+      "min_distance_A": 47.29754405886209
+    },
+    {
+      "asym": "K",
+      "auth_seq": "302",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 17.05,
+      "min_distance_A": 47.57565086259987
+    },
+    {
+      "asym": "K",
+      "auth_seq": "325",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 17.2,
+      "min_distance_A": 47.60040125881293
+    },
+    {
+      "asym": "I",
+      "auth_seq": "155",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 12.36,
+      "min_distance_A": 47.65531346030577
+    },
+    {
+      "asym": "J",
+      "auth_seq": "152",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 20.2,
+      "min_distance_A": 47.773489468532645
+    },
+    {
+      "asym": "I",
+      "auth_seq": "139",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 32.26,
+      "min_distance_A": 48.276257995002055
+    },
+    {
+      "asym": "I",
+      "auth_seq": "160",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 21.36,
+      "min_distance_A": 49.00932860180804
+    },
+    {
+      "asym": "J",
+      "auth_seq": "161",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 30.62,
+      "min_distance_A": 49.16451066572309
+    },
+    {
+      "asym": "I",
+      "auth_seq": "142",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 51.84,
+      "min_distance_A": 49.21861361314436
+    },
+    {
+      "asym": "I",
+      "auth_seq": "136",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 29.88,
+      "min_distance_A": 50.71954291986472
+    },
+    {
+      "asym": "J",
+      "auth_seq": "163",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 53.36,
+      "min_distance_A": 50.80736731026318
+    },
+    {
+      "asym": "J",
+      "auth_seq": "154",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 19.17,
+      "min_distance_A": 50.97749540728732
+    },
+    {
+      "asym": "J",
+      "auth_seq": "153",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 25.95,
+      "min_distance_A": 52.137903496400774
+    },
+    {
+      "asym": "J",
+      "auth_seq": "160",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 13.45,
+      "min_distance_A": 52.21383305217115
+    },
+    {
+      "asym": "J",
+      "auth_seq": "157",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 37.73,
+      "min_distance_A": 52.40188717021554
+    },
+    {
+      "asym": "J",
+      "auth_seq": "169",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 23.3,
+      "min_distance_A": 53.23216115282189
+    },
+    {
+      "asym": "J",
+      "auth_seq": "146",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 18.1,
+      "min_distance_A": 53.47207155141831
+    },
+    {
+      "asym": "J",
+      "auth_seq": "140",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 35.33,
+      "min_distance_A": 55.44943171034308
+    },
+    {
+      "asym": "J",
+      "auth_seq": "170",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 30.01,
+      "min_distance_A": 55.615351819439205
+    },
+    {
+      "asym": "J",
+      "auth_seq": "167",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 15.38,
+      "min_distance_A": 56.63208933104976
+    },
+    {
+      "asym": "J",
+      "auth_seq": "137",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 33.22,
+      "min_distance_A": 57.851161310729104
+    },
+    {
+      "asym": "J",
+      "auth_seq": "159",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 46.9,
+      "min_distance_A": 58.26576893854572
+    },
+    {
+      "asym": "J",
+      "auth_seq": "148",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 36.86,
+      "min_distance_A": 62.764443771931894
+    },
+    {
+      "asym": "J",
+      "auth_seq": "138",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 32.52,
+      "min_distance_A": 62.88399314610992
+    },
+    {
+      "asym": "J",
+      "auth_seq": "156",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 24.76,
+      "min_distance_A": 63.52012579490063
+    }
+  ],
+  "water_network_geometry_only_within_8A": [
+    {
+      "water": {
+        "label_asym": "L",
+        "auth_seq": "423",
+        "comp": "HOH",
+        "occupancy": 1.0,
+        "B_iso_A2": 6.71
+      },
+      "nearest_ligand_atom": {
+        "comp": "RET",
+        "auth_seq": "134",
+        "atom": "C14",
+        "distance_A": 3.6377777557184547
+      },
+      "direct_ligand_water_contact_lt_3_5A": false,
+      "nearest_receptor_heavy_atoms": [
+        {
+          "comp": "THR",
+          "auth_seq": "53",
+          "atom": "OG1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.7376670725272687
+        },
+        {
+          "comp": "THR",
+          "auth_seq": "51",
+          "atom": "OG1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.863446524732039
+        },
+        {
+          "comp": "TYR",
+          "auth_seq": "60",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.154758944832395
+        },
+        {
+          "comp": "THR",
+          "auth_seq": "53",
+          "atom": "N",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.282280914242414
+        },
+        {
+          "comp": "LYS",
+          "auth_seq": "52",
+          "atom": "C",
+          "element": "C",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.627525465107035
+        }
+      ],
+      "nearby_polar_receptor_atoms_geometry_only": [
+        {
+          "comp": "THR",
+          "auth_seq": "53",
+          "atom": "OG1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.7376670725272687
+        },
+        {
+          "comp": "THR",
+          "auth_seq": "51",
+          "atom": "OG1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.863446524732039
+        },
+        {
+          "comp": "TYR",
+          "auth_seq": "60",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.154758944832395
+        },
+        {
+          "comp": "THR",
+          "auth_seq": "53",
+          "atom": "N",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.282280914242414
+        }
+      ],
+      "potential_water_bridge_geometry_only": false
+    },
+    {
+      "water": {
+        "label_asym": "L",
+        "auth_seq": "443",
+        "comp": "HOH",
+        "occupancy": 1.0,
+        "B_iso_A2": 14.55
+      },
+      "nearest_ligand_atom": {
+        "comp": "RET",
+        "auth_seq": "134",
+        "atom": "C11",
+        "distance_A": 3.7996886714571714
+      },
+      "direct_ligand_water_contact_lt_3_5A": false,
+      "nearest_receptor_heavy_atoms": [
+        {
+          "comp": "GLN",
+          "auth_seq": "128",
+          "atom": "OE1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.988544294468465
+        },
+        {
+          "comp": "LYS",
+          "auth_seq": "40",
+          "atom": "NZ",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.0046166144784543
+        },
+        {
+          "comp": "GLN",
+          "auth_seq": "38",
+          "atom": "OE1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.0917376990941543
+        },
+        {
+          "comp": "THR",
+          "auth_seq": "53",
+          "atom": "CG2",
+          "element": "C",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.4721350780175584
+        },
+        {
+          "comp": "LYS",
+          "auth_seq": "40",
+          "atom": "CE",
+          "element": "C",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.767989649667311
+        }
+      ],
+      "nearby_polar_receptor_atoms_geometry_only": [
+        {
+          "comp": "GLN",
+          "auth_seq": "128",
+          "atom": "OE1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.988544294468465
+        },
+        {
+          "comp": "LYS",
+          "auth_seq": "40",
+          "atom": "NZ",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.0046166144784543
+        },
+        {
+          "comp": "GLN",
+          "auth_seq": "38",
+          "atom": "OE1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.0917376990941543
+        }
+      ],
+      "potential_water_bridge_geometry_only": false
+    },
+    {
+      "water": {
+        "label_asym": "L",
+        "auth_seq": "446",
+        "comp": "HOH",
+        "occupancy": 1.0,
+        "B_iso_A2": 11.65
+      },
+      "nearest_ligand_atom": {
+        "comp": "RET",
+        "auth_seq": "134",
+        "atom": "C17",
+        "distance_A": 4.931703965162547
+      },
+      "direct_ligand_water_contact_lt_3_5A": false,
+      "nearest_receptor_heavy_atoms": [
+        {
+          "comp": "ASN",
+          "auth_seq": "59",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.8360743995882745
+        },
+        {
+          "comp": "LYS",
+          "auth_seq": "75",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.912320209042957
+        },
+        {
+          "comp": "GLY",
+          "auth_seq": "76",
+          "atom": "CA",
+          "element": "C",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.137931484274314
+        },
+        {
+          "comp": "ARG",
+          "auth_seq": "58",
+          "atom": "CG",
+          "element": "C",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.504002425798245
+        },
+        {
+          "comp": "ARG",
+          "auth_seq": "58",
+          "atom": "CD",
+          "element": "C",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.576851828074513
+        }
+      ],
+      "nearby_polar_receptor_atoms_geometry_only": [
+        {
+          "comp": "ASN",
+          "auth_seq": "59",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.8360743995882745
+        },
+        {
+          "comp": "LYS",
+          "auth_seq": "75",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.912320209042957
+        }
+      ],
+      "potential_water_bridge_geometry_only": false
+    },
+    {
+      "water": {
+        "label_asym": "L",
+        "auth_seq": "433",
+        "comp": "HOH",
+        "occupancy": 1.0,
+        "B_iso_A2": 28.72
+      },
+      "nearest_ligand_atom": {
+        "comp": "RET",
+        "auth_seq": "134",
+        "atom": "C11",
+        "distance_A": 4.947070446233814
+      },
+      "direct_ligand_water_contact_lt_3_5A": false,
+      "nearest_receptor_heavy_atoms": [
+        {
+          "comp": "GLN",
+          "auth_seq": "97",
+          "atom": "OE1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.956452265807787
+        },
+        {
+          "comp": "GLU",
+          "auth_seq": "72",
+          "atom": "OE2",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.959141429536612
+        },
+        {
+          "comp": "GLU",
+          "auth_seq": "72",
+          "atom": "CD",
+          "element": "C",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.824923528647334
+        },
+        {
+          "comp": "TYR",
+          "auth_seq": "60",
+          "atom": "CE2",
+          "element": "C",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.8308465121954463
+        }
+      ],
+      "nearby_polar_receptor_atoms_geometry_only": [
+        {
+          "comp": "GLN",
+          "auth_seq": "97",
+          "atom": "OE1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.956452265807787
+        },
+        {
+          "comp": "GLU",
+          "auth_seq": "72",
+          "atom": "OE2",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.959141429536612
+        }
+      ],
+      "potential_water_bridge_geometry_only": false
+    },
+    {
+      "water": {
+        "label_asym": "L",
+        "auth_seq": "430",
+        "comp": "HOH",
+        "occupancy": 1.0,
+        "B_iso_A2": 18.64
+      },
+      "nearest_ligand_atom": {
+        "comp": "RET",
+        "auth_seq": "134",
+        "atom": "C19",
+        "distance_A": 5.093369906064156
+      },
+      "direct_ligand_water_contact_lt_3_5A": false,
+      "nearest_receptor_heavy_atoms": [
+        {
+          "comp": "TYR",
+          "auth_seq": "19",
+          "atom": "OH",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.7833551695750214
+        },
+        {
+          "comp": "ARG",
+          "auth_seq": "104",
+          "atom": "NH2",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.263510073525131
+        },
+        {
+          "comp": "GLN",
+          "auth_seq": "97",
+          "atom": "OE1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.6232991872049447
+        },
+        {
+          "comp": "GLN",
+          "auth_seq": "97",
+          "atom": "NE2",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.703513061945376
+        },
+        {
+          "comp": "ARG",
+          "auth_seq": "104",
+          "atom": "NE",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.8212058306246703
+        }
+      ],
+      "nearby_polar_receptor_atoms_geometry_only": [
+        {
+          "comp": "TYR",
+          "auth_seq": "19",
+          "atom": "OH",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.7833551695750214
+        },
+        {
+          "comp": "ARG",
+          "auth_seq": "104",
+          "atom": "NH2",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.263510073525131
+        }
+      ],
+      "potential_water_bridge_geometry_only": false
+    },
+    {
+      "water": {
+        "label_asym": "L",
+        "auth_seq": "468",
+        "comp": "HOH",
+        "occupancy": 1.0,
+        "B_iso_A2": 30.43
+      },
+      "nearest_ligand_atom": {
+        "comp": "RET",
+        "auth_seq": "134",
+        "atom": "C20",
+        "distance_A": 5.175444425360971
+      },
+      "direct_ligand_water_contact_lt_3_5A": false,
+      "nearest_receptor_heavy_atoms": [
+        {
+          "comp": "GLU",
+          "auth_seq": "72",
+          "atom": "OE1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.8434018358297553
+        },
+        {
+          "comp": "GLU",
+          "auth_seq": "72",
+          "atom": "OE2",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.964132588127597
+        },
+        {
+          "comp": "GLN",
+          "auth_seq": "97",
+          "atom": "OE1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.9883671126553377
+        },
+        {
+          "comp": "TRP",
+          "auth_seq": "106",
+          "atom": "NE1",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.032775296654863
+        },
+        {
+          "comp": "GLU",
+          "auth_seq": "72",
+          "atom": "CD",
+          "element": "C",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.28109067232224
+        }
+      ],
+      "nearby_polar_receptor_atoms_geometry_only": [
+        {
+          "comp": "GLU",
+          "auth_seq": "72",
+          "atom": "OE1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.8434018358297553
+        },
+        {
+          "comp": "GLU",
+          "auth_seq": "72",
+          "atom": "OE2",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.964132588127597
+        },
+        {
+          "comp": "GLN",
+          "auth_seq": "97",
+          "atom": "OE1",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.9883671126553377
+        },
+        {
+          "comp": "TRP",
+          "auth_seq": "106",
+          "atom": "NE1",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.032775296654863
+        }
+      ],
+      "potential_water_bridge_geometry_only": false
+    },
+    {
+      "water": {
+        "label_asym": "L",
+        "auth_seq": "476",
+        "comp": "HOH",
+        "occupancy": 1.0,
+        "B_iso_A2": 35.76
+      },
+      "nearest_ligand_atom": {
+        "comp": "RET",
+        "auth_seq": "134",
+        "atom": "C16",
+        "distance_A": 5.689215763178614
+      },
+      "direct_ligand_water_contact_lt_3_5A": false,
+      "nearest_receptor_heavy_atoms": [
+        {
+          "comp": "GLN",
+          "auth_seq": "38",
+          "atom": "NE2",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.7984606482850505
+        },
+        {
+          "comp": "LEU",
+          "auth_seq": "36",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.86917549132151
+        },
+        {
+          "comp": "ALA",
+          "auth_seq": "33",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.9602719469670378
+        },
+        {
+          "comp": "ASN",
+          "auth_seq": "13",
+          "atom": "ND2",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.2697831732394738
+        },
+        {
+          "comp": "PHE",
+          "auth_seq": "16",
+          "atom": "CE2",
+          "element": "C",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.500220850175029
+        }
+      ],
+      "nearby_polar_receptor_atoms_geometry_only": [
+        {
+          "comp": "GLN",
+          "auth_seq": "38",
+          "atom": "NE2",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.7984606482850505
+        },
+        {
+          "comp": "LEU",
+          "auth_seq": "36",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.86917549132151
+        },
+        {
+          "comp": "ALA",
+          "auth_seq": "33",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.9602719469670378
+        },
+        {
+          "comp": "ASN",
+          "auth_seq": "13",
+          "atom": "ND2",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.2697831732394738
+        }
+      ],
+      "potential_water_bridge_geometry_only": false
+    },
+    {
+      "water": {
+        "label_asym": "L",
+        "auth_seq": "424",
+        "comp": "HOH",
+        "occupancy": 1.0,
+        "B_iso_A2": 13.21
+      },
+      "nearest_ligand_atom": {
+        "comp": "RET",
+        "auth_seq": "134",
+        "atom": "C19",
+        "distance_A": 6.43185906251062
+      },
+      "direct_ligand_water_contact_lt_3_5A": false,
+      "nearest_receptor_heavy_atoms": [
+        {
+          "comp": "GLN",
+          "auth_seq": "97",
+          "atom": "NE2",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.725044770274426
+        },
+        {
+          "comp": "TYR",
+          "auth_seq": "19",
+          "atom": "OH",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.7364944728612173
+        },
+        {
+          "comp": "GLY",
+          "auth_seq": "105",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.958591725804695
+        },
+        {
+          "comp": "THR",
+          "auth_seq": "120",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.5180710623863187
+        },
+        {
+          "comp": "GLY",
+          "auth_seq": "105",
+          "atom": "N",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.562583472706289
+        }
+      ],
+      "nearby_polar_receptor_atoms_geometry_only": [
+        {
+          "comp": "GLN",
+          "auth_seq": "97",
+          "atom": "NE2",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.725044770274426
+        },
+        {
+          "comp": "TYR",
+          "auth_seq": "19",
+          "atom": "OH",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.7364944728612173
+        },
+        {
+          "comp": "GLY",
+          "auth_seq": "105",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.958591725804695
+        },
+        {
+          "comp": "THR",
+          "auth_seq": "120",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.5180710623863187
+        },
+        {
+          "comp": "GLY",
+          "auth_seq": "105",
+          "atom": "N",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.562583472706289
+        }
+      ],
+      "potential_water_bridge_geometry_only": false
+    },
+    {
+      "water": {
+        "label_asym": "L",
+        "auth_seq": "404",
+        "comp": "HOH",
+        "occupancy": 1.0,
+        "B_iso_A2": 29.19
+      },
+      "nearest_ligand_atom": {
+        "comp": "RET",
+        "auth_seq": "134",
+        "atom": "C17",
+        "distance_A": 7.240800715390526
+      },
+      "direct_ligand_water_contact_lt_3_5A": false,
+      "nearest_receptor_heavy_atoms": [
+        {
+          "comp": "SER",
+          "auth_seq": "55",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.899485471596643
+        },
+        {
+          "comp": "ARG",
+          "auth_seq": "58",
+          "atom": "N",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.9922757225897483
+        },
+        {
+          "comp": "THR",
+          "auth_seq": "56",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.049649979915738
+        },
+        {
+          "comp": "ASN",
+          "auth_seq": "59",
+          "atom": "ND2",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.0784155015202193
+        },
+        {
+          "comp": "ARG",
+          "auth_seq": "58",
+          "atom": "CA",
+          "element": "C",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.092976236572144
+        }
+      ],
+      "nearby_polar_receptor_atoms_geometry_only": [
+        {
+          "comp": "SER",
+          "auth_seq": "55",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.899485471596643
+        },
+        {
+          "comp": "ARG",
+          "auth_seq": "58",
+          "atom": "N",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 2.9922757225897483
+        },
+        {
+          "comp": "THR",
+          "auth_seq": "56",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.049649979915738
+        },
+        {
+          "comp": "ASN",
+          "auth_seq": "59",
+          "atom": "ND2",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.0784155015202193
+        },
+        {
+          "comp": "PHE",
+          "auth_seq": "57",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.3169467888406055
+        },
+        {
+          "comp": "ASN",
+          "auth_seq": "59",
+          "atom": "N",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.5818881892097028
+        }
+      ],
+      "potential_water_bridge_geometry_only": false
+    },
+    {
+      "water": {
+        "label_asym": "L",
+        "auth_seq": "448",
+        "comp": "HOH",
+        "occupancy": 1.0,
+        "B_iso_A2": 28.24
+      },
+      "nearest_ligand_atom": {
+        "comp": "RET",
+        "auth_seq": "134",
+        "atom": "C17",
+        "distance_A": 7.492799743753998
+      },
+      "direct_ligand_water_contact_lt_3_5A": false,
+      "nearest_receptor_heavy_atoms": [
+        {
+          "comp": "GLY",
+          "auth_seq": "76",
+          "atom": "CA",
+          "element": "C",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.3805724367331633
+        },
+        {
+          "comp": "GLY",
+          "auth_seq": "76",
+          "atom": "N",
+          "element": "N",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.639151549468641
+        },
+        {
+          "comp": "LYS",
+          "auth_seq": "75",
+          "atom": "C",
+          "element": "C",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.8383117382516008
+        },
+        {
+          "comp": "LYS",
+          "auth_seq": "75",
+          "atom": "O",
+          "element": "O",
+          "altloc": ".",
+          "occupancy": 1.0,
+          "distance_A": 3.9190392955417046
+        }
+      ],
+      "nearby_polar_receptor_atoms_geometry_only": [],
+      "potential_water_bridge_geometry_only": false
+    }
+  ],
+  "water_residue_count_within_5A": 4,
+  "water_residue_count_within_8A": 10,
+  "nearest_water_distance_A": 3.6377777557184547,
+  "nonpolymer_components_by_min_distance": [],
+  "metals_by_min_distance_A": [],
+  "nearest_100_receptor_atoms_to_ligand": [
+    {
+      "distance_A": 2.6542256874651806,
+      "comp": "GLN",
+      "auth_seq": "108",
+      "atom": "OE1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 2.8549544654862706,
+      "comp": "GLN",
+      "auth_seq": "108",
+      "atom": "NE2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.1204310599659144,
+      "comp": "GLN",
+      "auth_seq": "108",
+      "atom": "CD",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.426983805039063,
+      "comp": "ARG",
+      "auth_seq": "58",
+      "atom": "O",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.4714015901361837,
+      "comp": "THR",
+      "auth_seq": "53",
+      "atom": "OG1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.487075708957297,
+      "comp": "LYS",
+      "auth_seq": "40",
+      "atom": "NZ",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.5815584596652847,
+      "comp": "TRP",
+      "auth_seq": "106",
+      "atom": "NE1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.6447197423121582,
+      "comp": "TRP",
+      "auth_seq": "106",
+      "atom": "CE2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.706989344468096,
+      "comp": "ILE",
+      "auth_seq": "25",
+      "atom": "CD1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.732995981781923,
+      "comp": "TRP",
+      "auth_seq": "106",
+      "atom": "CD1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.733680355895507,
+      "comp": "LYS",
+      "auth_seq": "40",
+      "atom": "CD",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.790851355566452,
+      "comp": "PHE",
+      "auth_seq": "16",
+      "atom": "CZ",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.7953256777251694,
+      "comp": "LEU",
+      "auth_seq": "119",
+      "atom": "CD2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.8127277636883528,
+      "comp": "TRP",
+      "auth_seq": "106",
+      "atom": "CZ2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.835529168185268,
+      "comp": "TRP",
+      "auth_seq": "106",
+      "atom": "CD2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.8696331867503937,
+      "comp": "LEU",
+      "auth_seq": "77",
+      "atom": "CD2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.882337053889063,
+      "comp": "TRP",
+      "auth_seq": "106",
+      "atom": "CH2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.884678365064475,
+      "comp": "TRP",
+      "auth_seq": "106",
+      "atom": "CG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 3.9306662285164853,
+      "comp": "ARG",
+      "auth_seq": "58",
+      "atom": "C",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.007222978572568,
+      "comp": "GLN",
+      "auth_seq": "38",
+      "atom": "CD",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.00804229019605,
+      "comp": "LEU",
+      "auth_seq": "119",
+      "atom": "CD1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.023216996384858,
+      "comp": "ARG",
+      "auth_seq": "58",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.061941161563031,
+      "comp": "LEU",
+      "auth_seq": "117",
+      "atom": "CD2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.082129591279533,
+      "comp": "GLN",
+      "auth_seq": "38",
+      "atom": "OE1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.083499724501028,
+      "comp": "GLY",
+      "auth_seq": "76",
+      "atom": "O",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.086482717447854,
+      "comp": "ARG",
+      "auth_seq": "58",
+      "atom": "CD",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.114763905742343,
+      "comp": "ASN",
+      "auth_seq": "59",
+      "atom": "C",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.131564110600248,
+      "comp": "GLN",
+      "auth_seq": "38",
+      "atom": "NE2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.133278722757515,
+      "comp": "THR",
+      "auth_seq": "51",
+      "atom": "OG1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.13587052505274,
+      "comp": "THR",
+      "auth_seq": "53",
+      "atom": "CG2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.145406373324573,
+      "comp": "TYR",
+      "auth_seq": "19",
+      "atom": "CE2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.154804688550355,
+      "comp": "MET",
+      "auth_seq": "20",
+      "atom": "SD",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.158631986603289,
+      "comp": "SER",
+      "auth_seq": "55",
+      "atom": "OG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.193969360879978,
+      "comp": "LEU",
+      "auth_seq": "117",
+      "atom": "CD1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.195736407354497,
+      "comp": "THR",
+      "auth_seq": "53",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.207810119290079,
+      "comp": "TYR",
+      "auth_seq": "60",
+      "atom": "CD2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.219727716334312,
+      "comp": "PHE",
+      "auth_seq": "57",
+      "atom": "CD2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.276077057303809,
+      "comp": "ALA",
+      "auth_seq": "33",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.2794221572544116,
+      "comp": "ASN",
+      "auth_seq": "59",
+      "atom": "O",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.284108425331928,
+      "comp": "MET",
+      "auth_seq": "20",
+      "atom": "CG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.314894320837996,
+      "comp": "ARG",
+      "auth_seq": "58",
+      "atom": "CG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.3260094775670614,
+      "comp": "LYS",
+      "auth_seq": "40",
+      "atom": "CE",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.336578605306261,
+      "comp": "PHE",
+      "auth_seq": "16",
+      "atom": "CE1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.350331021887874,
+      "comp": "ASN",
+      "auth_seq": "59",
+      "atom": "N",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.355168538644628,
+      "comp": "TYR",
+      "auth_seq": "60",
+      "atom": "N",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.355224334061331,
+      "comp": "TYR",
+      "auth_seq": "60",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.365510050383574,
+      "comp": "ASN",
+      "auth_seq": "59",
+      "atom": "CA",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.394854832642372,
+      "comp": "TRP",
+      "auth_seq": "106",
+      "atom": "CZ3",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.457587127583709,
+      "comp": "LEU",
+      "auth_seq": "77",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.460278690844328,
+      "comp": "LEU",
+      "auth_seq": "77",
+      "atom": "CA",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.482339233034464,
+      "comp": "THR",
+      "auth_seq": "51",
+      "atom": "CG2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.492352835653049,
+      "comp": "GLN",
+      "auth_seq": "38",
+      "atom": "CG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.501490975221434,
+      "comp": "TYR",
+      "auth_seq": "19",
+      "atom": "OH",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.56180611161851,
+      "comp": "TRP",
+      "auth_seq": "106",
+      "atom": "CE3",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.5751955149479695,
+      "comp": "ILE",
+      "auth_seq": "42",
+      "atom": "CD1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.582521249268793,
+      "comp": "GLN",
+      "auth_seq": "108",
+      "atom": "CG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.587569509010191,
+      "comp": "PHE",
+      "auth_seq": "57",
+      "atom": "CE2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.619313910095307,
+      "comp": "THR",
+      "auth_seq": "51",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.647208839723047,
+      "comp": "LEU",
+      "auth_seq": "77",
+      "atom": "CD1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.663237287550358,
+      "comp": "SER",
+      "auth_seq": "55",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.667053674428867,
+      "comp": "TRP",
+      "auth_seq": "106",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.680568127909265,
+      "comp": "LYS",
+      "auth_seq": "40",
+      "atom": "CG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.71146325465879,
+      "comp": "TYR",
+      "auth_seq": "60",
+      "atom": "CG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.713127623988134,
+      "comp": "LEU",
+      "auth_seq": "117",
+      "atom": "CG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.761461225296285,
+      "comp": "ARG",
+      "auth_seq": "58",
+      "atom": "CA",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.7822556393400815,
+      "comp": "TYR",
+      "auth_seq": "19",
+      "atom": "CZ",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.795087173347321,
+      "comp": "LEU",
+      "auth_seq": "77",
+      "atom": "CG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.818967835543211,
+      "comp": "PHE",
+      "auth_seq": "16",
+      "atom": "CE2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.821072287365124,
+      "comp": "LEU",
+      "auth_seq": "62",
+      "atom": "CD2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.823337019118609,
+      "comp": "THR",
+      "auth_seq": "53",
+      "atom": "O",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.83297475681386,
+      "comp": "LEU",
+      "auth_seq": "119",
+      "atom": "CG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.888057487386992,
+      "comp": "THR",
+      "auth_seq": "29",
+      "atom": "CG2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.903287570599954,
+      "comp": "ARG",
+      "auth_seq": "58",
+      "atom": "NE",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.965891762815619,
+      "comp": "TYR",
+      "auth_seq": "60",
+      "atom": "CA",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.978807688593724,
+      "comp": "ARG",
+      "auth_seq": "58",
+      "atom": "N",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.013177634993597,
+      "comp": "ARG",
+      "auth_seq": "58",
+      "atom": "NH1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.04118299608336,
+      "comp": "TYR",
+      "auth_seq": "19",
+      "atom": "CD2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.046045580452081,
+      "comp": "TYR",
+      "auth_seq": "60",
+      "atom": "CE2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.073913184121306,
+      "comp": "ILE",
+      "auth_seq": "42",
+      "atom": "CG1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.088129125719984,
+      "comp": "GLN",
+      "auth_seq": "108",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.111445001171392,
+      "comp": "PHE",
+      "auth_seq": "64",
+      "atom": "CE2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.183878953062079,
+      "comp": "ILE",
+      "auth_seq": "25",
+      "atom": "CG1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.207122525925422,
+      "comp": "GLY",
+      "auth_seq": "76",
+      "atom": "C",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.283690376999772,
+      "comp": "ARG",
+      "auth_seq": "58",
+      "atom": "CZ",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.303397873062143,
+      "comp": "PHE",
+      "auth_seq": "57",
+      "atom": "CG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.355293736108225,
+      "comp": "ALA",
+      "auth_seq": "33",
+      "atom": "CA",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.370044133896854,
+      "comp": "THR",
+      "auth_seq": "53",
+      "atom": "C",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.37841063884118,
+      "comp": "LEU",
+      "auth_seq": "77",
+      "atom": "C",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.404673995718891,
+      "comp": "SER",
+      "auth_seq": "55",
+      "atom": "N",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.452010363159632,
+      "comp": "MET",
+      "auth_seq": "20",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.4833968486696305,
+      "comp": "ASN",
+      "auth_seq": "54",
+      "atom": "C",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.48470172388618,
+      "comp": "GLN",
+      "auth_seq": "38",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.503770889126839,
+      "comp": "PHE",
+      "auth_seq": "64",
+      "atom": "CZ",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.525577073935354,
+      "comp": "LEU",
+      "auth_seq": "77",
+      "atom": "N",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.557089705952203,
+      "comp": "PHE",
+      "auth_seq": "57",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.582340906823947,
+      "comp": "PHE",
+      "auth_seq": "16",
+      "atom": "CD1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.617079401254709,
+      "comp": "LEU",
+      "auth_seq": "62",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.642103331205483,
+      "comp": "ASN",
+      "auth_seq": "54",
+      "atom": "O",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.645436209895567,
+      "comp": "ILE",
+      "auth_seq": "25",
+      "atom": "CG2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.689606840547068,
+      "comp": "LEU",
+      "auth_seq": "119",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    }
+  ],
+  "ligand_bounds_A": {
+    "x": [
+      9.423,
+      14.863
+    ],
+    "y": [
+      52.933,
+      62.716
+    ],
+    "z": [
+      6.417,
+      17.473
+    ]
+  }
+}

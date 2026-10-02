@@ -1,0 +1,90 @@
+{
+  "query_id" : "bace3a1f-ef88-466c-bb05-aa3799c105b8",
+  "result_type" : "entry",
+  "total_count" : 28,
+  "result_set" : [ {
+    "identifier" : "5HBS",
+    "score" : 1.0
+  }, {
+    "identifier" : "1KT6",
+    "score" : 1.0
+  }, {
+    "identifier" : "4QYN",
+    "score" : 1.0
+  }, {
+    "identifier" : "2RCT",
+    "score" : 1.0
+  }, {
+    "identifier" : "5H8T",
+    "score" : 1.0
+  }, {
+    "identifier" : "5LJB",
+    "score" : 1.0
+  }, {
+    "identifier" : "1KT7",
+    "score" : 1.0
+  }, {
+    "identifier" : "1KQW",
+    "score" : 1.0
+  }, {
+    "identifier" : "1KT3",
+    "score" : 1.0
+  }, {
+    "identifier" : "5LJE",
+    "score" : 1.0
+  }, {
+    "identifier" : "5LJC",
+    "score" : 1.0
+  }, {
+    "identifier" : "1KT5",
+    "score" : 1.0
+  }, {
+    "identifier" : "1KT4",
+    "score" : 1.0
+  }, {
+    "identifier" : "4QZU",
+    "score" : 1.0
+  }, {
+    "identifier" : "5NU7",
+    "score" : 1.0
+  }, {
+    "identifier" : "5LJD",
+    "score" : 1.0
+  }, {
+    "identifier" : "1AQB",
+    "score" : 1.0
+  }, {
+    "identifier" : "1HBP",
+    "score" : 1.0
+  }, {
+    "identifier" : "4QZT",
+    "score" : 1.0
+  }, {
+    "identifier" : "9I7N",
+    "score" : 1.0
+  }, {
+    "identifier" : "1FMJ",
+    "score" : 1.0
+  }, {
+    "identifier" : "1RBP",
+    "score" : 1.0
+  }, {
+    "identifier" : "9I7O",
+    "score" : 1.0
+  }, {
+    "identifier" : "1CRB",
+    "score" : 1.0
+  }, {
+    "identifier" : "6PY0",
+    "score" : 1.0
+  }, {
+    "identifier" : "1GX8",
+    "score" : 1.0
+  }, {
+    "identifier" : "1BRP",
+    "score" : 1.0
+  }, {
+    "identifier" : "1IIU",
+    "score" : 1.0
+  } ]
+}

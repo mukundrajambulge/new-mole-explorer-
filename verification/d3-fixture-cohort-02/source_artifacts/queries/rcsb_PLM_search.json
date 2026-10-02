@@ -1,0 +1,306 @@
+{
+  "query_id" : "be8978c7-f3f5-49b2-8dd1-1d277e1145f5",
+  "result_type" : "entry",
+  "total_count" : 322,
+  "result_set" : [ {
+    "identifier" : "6S2M",
+    "score" : 1.0
+  }, {
+    "identifier" : "6S2S",
+    "score" : 1.0
+  }, {
+    "identifier" : "4TKJ",
+    "score" : 1.0
+  }, {
+    "identifier" : "5B28",
+    "score" : 1.0
+  }, {
+    "identifier" : "4BVM",
+    "score" : 1.0
+  }, {
+    "identifier" : "7V2G",
+    "score" : 1.0
+  }, {
+    "identifier" : "5B27",
+    "score" : 1.0
+  }, {
+    "identifier" : "5LJG",
+    "score" : 1.0
+  }, {
+    "identifier" : "4KU0",
+    "score" : 1.0
+  }, {
+    "identifier" : "4N03",
+    "score" : 1.0
+  }, {
+    "identifier" : "7FW5",
+    "score" : 1.0
+  }, {
+    "identifier" : "4AL0",
+    "score" : 1.0
+  }, {
+    "identifier" : "5DIC",
+    "score" : 1.0
+  }, {
+    "identifier" : "4A1Y",
+    "score" : 1.0
+  }, {
+    "identifier" : "6KAX",
+    "score" : 1.0
+  }, {
+    "identifier" : "6EW4",
+    "score" : 1.0
+  }, {
+    "identifier" : "4JJ2",
+    "score" : 1.0
+  }, {
+    "identifier" : "5B29",
+    "score" : 1.0
+  }, {
+    "identifier" : "3L1N",
+    "score" : 1.0
+  }, {
+    "identifier" : "6LX6",
+    "score" : 1.0
+  }, {
+    "identifier" : "1PZ4",
+    "score" : 1.0
+  }, {
+    "identifier" : "7QBP",
+    "score" : 1.0
+  }, {
+    "identifier" : "3OCJ",
+    "score" : 1.0
+  }, {
+    "identifier" : "9M0L",
+    "score" : 1.0
+  }, {
+    "identifier" : "6F6M",
+    "score" : 1.0
+  }, {
+    "identifier" : "2ZWS",
+    "score" : 1.0
+  }, {
+    "identifier" : "3BKR",
+    "score" : 1.0
+  }, {
+    "identifier" : "3O22",
+    "score" : 1.0
+  }, {
+    "identifier" : "6AQ1",
+    "score" : 1.0
+  }, {
+    "identifier" : "3VG7",
+    "score" : 1.0
+  }, {
+    "identifier" : "37CB",
+    "score" : 1.0
+  }, {
+    "identifier" : "4D6A",
+    "score" : 1.0
+  }, {
+    "identifier" : "8A26",
+    "score" : 1.0
+  }, {
+    "identifier" : "2DT8",
+    "score" : 1.0
+  }, {
+    "identifier" : "6UBL",
+    "score" : 1.0
+  }, {
+    "identifier" : "2HNX",
+    "score" : 1.0
+  }, {
+    "identifier" : "5NU2",
+    "score" : 1.0
+  }, {
+    "identifier" : "5NU9",
+    "score" : 1.0
+  }, {
+    "identifier" : "7A77",
+    "score" : 1.0
+  }, {
+    "identifier" : "7NSR",
+    "score" : 1.0
+  }, {
+    "identifier" : "7TAE",
+    "score" : 1.0
+  }, {
+    "identifier" : "7BQ1",
+    "score" : 1.0
+  }, {
+    "identifier" : "5N4P",
+    "score" : 1.0
+  }, {
+    "identifier" : "7DZK",
+    "score" : 1.0
+  }, {
+    "identifier" : "1SZ7",
+    "score" : 1.0
+  }, {
+    "identifier" : "3B2H",
+    "score" : 1.0
+  }, {
+    "identifier" : "3STK",
+    "score" : 1.0
+  }, {
+    "identifier" : "5FUK",
+    "score" : 1.0
+  }, {
+    "identifier" : "7DZE",
+    "score" : 1.0
+  }, {
+    "identifier" : "3U3L",
+    "score" : 1.0
+  }, {
+    "identifier" : "6EW2",
+    "score" : 1.0
+  }, {
+    "identifier" : "5N4M",
+    "score" : 1.0
+  }, {
+    "identifier" : "5NU8",
+    "score" : 1.0
+  }, {
+    "identifier" : "9IWN",
+    "score" : 1.0
+  }, {
+    "identifier" : "6QK2",
+    "score" : 1.0
+  }, {
+    "identifier" : "1LIE",
+    "score" : 1.0
+  }, {
+    "identifier" : "1O8V",
+    "score" : 1.0
+  }, {
+    "identifier" : "2DEB",
+    "score" : 1.0
+  }, {
+    "identifier" : "2E9L",
+    "score" : 1.0
+  }, {
+    "identifier" : "3G08",
+    "score" : 1.0
+  }, {
+    "identifier" : "3GMO",
+    "score" : 1.0
+  }, {
+    "identifier" : "5AZB",
+    "score" : 1.0
+  }, {
+    "identifier" : "7DVN",
+    "score" : 1.0
+  }, {
+    "identifier" : "7DZG",
+    "score" : 1.0
+  }, {
+    "identifier" : "7E25",
+    "score" : 1.0
+  }, {
+    "identifier" : "7SCL",
+    "score" : 1.0
+  }, {
+    "identifier" : "3K3C",
+    "score" : 1.0
+  }, {
+    "identifier" : "6F6E",
+    "score" : 1.0
+  }, {
+    "identifier" : "7DZJ",
+    "score" : 1.0
+  }, {
+    "identifier" : "4RW5",
+    "score" : 1.0
+  }, {
+    "identifier" : "7DZL",
+    "score" : 1.0
+  }, {
+    "identifier" : "3AWM",
+    "score" : 1.0
+  }, {
+    "identifier" : "6XSV",
+    "score" : 1.0
+  }, {
+    "identifier" : "6XU5",
+    "score" : 1.0
+  }, {
+    "identifier" : "7DZH",
+    "score" : 1.0
+  }, {
+    "identifier" : "7DZI",
+    "score" : 1.0
+  }, {
+    "identifier" : "3U3N",
+    "score" : 1.0
+  }, {
+    "identifier" : "3O19",
+    "score" : 1.0
+  }, {
+    "identifier" : "5NU6",
+    "score" : 1.0
+  }, {
+    "identifier" : "7CAQ",
+    "score" : 1.0
+  }, {
+    "identifier" : "8Y21",
+    "score" : 1.0
+  }, {
+    "identifier" : "2JAF",
+    "score" : 1.0
+  }, {
+    "identifier" : "2QZT",
+    "score" : 1.0
+  }, {
+    "identifier" : "3GML",
+    "score" : 1.0
+  }, {
+    "identifier" : "3GMN",
+    "score" : 1.0
+  }, {
+    "identifier" : "3GMP",
+    "score" : 1.0
+  }, {
+    "identifier" : "3O2Y",
+    "score" : 1.0
+  }, {
+    "identifier" : "4DOL",
+    "score" : 1.0
+  }, {
+    "identifier" : "7DZF",
+    "score" : 1.0
+  }, {
+    "identifier" : "7YF1",
+    "score" : 1.0
+  }, {
+    "identifier" : "5OMK",
+    "score" : 1.0
+  }, {
+    "identifier" : "4RW3",
+    "score" : 1.0
+  }, {
+    "identifier" : "5N4Q",
+    "score" : 1.0
+  }, {
+    "identifier" : "7A78",
+    "score" : 1.0
+  }, {
+    "identifier" : "3B2K",
+    "score" : 1.0
+  }, {
+    "identifier" : "4JAQ",
+    "score" : 1.0
+  }, {
+    "identifier" : "6P20",
+    "score" : 1.0
+  }, {
+    "identifier" : "1MDC",
+    "score" : 1.0
+  }, {
+    "identifier" : "5TW2",
+    "score" : 1.0
+  }, {
+    "identifier" : "6U1U",
+    "score" : 1.0
+  } ]
+}

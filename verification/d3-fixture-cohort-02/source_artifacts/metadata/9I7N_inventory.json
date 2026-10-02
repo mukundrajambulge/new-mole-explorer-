@@ -1,0 +1,254 @@
+{
+  "entry_id": null,
+  "nonpolymer_instances": [
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "HOH",
+      "entity_id": "3",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "C",
+      "occupancies": [
+        "1.000"
+      ],
+      "residues": [
+        [
+          "601",
+          "?"
+        ],
+        [
+          "602",
+          "?"
+        ],
+        [
+          "603",
+          "?"
+        ],
+        [
+          "604",
+          "?"
+        ],
+        [
+          "605",
+          "?"
+        ],
+        [
+          "606",
+          "?"
+        ],
+        [
+          "607",
+          "?"
+        ],
+        [
+          "608",
+          "?"
+        ],
+        [
+          "609",
+          "?"
+        ],
+        [
+          "610",
+          "?"
+        ],
+        [
+          "611",
+          "?"
+        ],
+        [
+          "612",
+          "?"
+        ],
+        [
+          "613",
+          "?"
+        ],
+        [
+          "614",
+          "?"
+        ],
+        [
+          "615",
+          "?"
+        ],
+        [
+          "616",
+          "?"
+        ],
+        [
+          "617",
+          "?"
+        ],
+        [
+          "618",
+          "?"
+        ],
+        [
+          "619",
+          "?"
+        ],
+        [
+          "620",
+          "?"
+        ],
+        [
+          "621",
+          "?"
+        ],
+        [
+          "622",
+          "?"
+        ],
+        [
+          "623",
+          "?"
+        ],
+        [
+          "624",
+          "?"
+        ],
+        [
+          "625",
+          "?"
+        ],
+        [
+          "626",
+          "?"
+        ],
+        [
+          "627",
+          "?"
+        ],
+        [
+          "628",
+          "?"
+        ],
+        [
+          "629",
+          "?"
+        ],
+        [
+          "630",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "RTL",
+      "entity_id": "2",
+      "heavy_atom_count": 21,
+      "heavy_atom_names": [
+        "C1",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C2",
+        "C20",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "O1"
+      ],
+      "label_asym_id": "B",
+      "occupancies": [
+        "0.598"
+      ],
+      "residues": [
+        [
+          "500",
+          "?"
+        ]
+      ]
+    }
+  ],
+  "polymer_entities": [
+    {
+      "altloc_residues": [
+        [
+          "A",
+          "121",
+          "PHE"
+        ],
+        [
+          "A",
+          "134",
+          "ALA"
+        ],
+        [
+          "A",
+          "134",
+          "VAL"
+        ],
+        [
+          "A",
+          "80",
+          "ASP"
+        ],
+        [
+          "A",
+          "80",
+          "GLY"
+        ]
+      ],
+      "asym_ids": [
+        "A"
+      ],
+      "author_chains": [
+        "A"
+      ],
+      "description": "Beta-lactoglobulin",
+      "entity_id": "1",
+      "missing_label_seq_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        127,
+        128,
+        129,
+        130,
+        179,
+        180
+      ],
+      "monomer_count_expected": 180,
+      "monomer_count_observed": 157,
+      "sequence": "METLYSCYSLEULEULEUALALEUALALEUTHRCYSGLYALAGLNALALEUILEVALTHRGLNTHRMETLYSGLYLEUASPILEGLNLYSVALALAGLYTHRTRPTYRSERLEUALAMETALAALASERASPILESERLEULEUASPALAGLNSERALAPROLEUARGVALTYRVALGLUGLULEULYSPROTHRPROGLUGLYASPLEUGLUILELEULEUGLNLYSTRPGLUASNASPGLYGLUCYSALAGLNLYSLYSILEILEALAGLULYSTHRLYSILEPROALAVALPHELYSILEASPALALEUASNGLUASNLYSVALLEUVALLEUASPTHRASPTYRLYSLYSTYRLEULEUPHECYSMETGLUASNSERALAGLUPROGLUGLNSERLEUVALALACYSGLNCYSLEUVALARGTHRPROGLUVALASPASPGLUALALEUGLULYSPHEASPLYSALALEULYSALALEUPROMETHISILEARGLEUSERPHEASNPROTHRGLNLEUGLUGLUGLNCYSHISILE",
+      "type": "polypeptide(L)"
+    }
+  ],
+  "resolution_A": null,
+  "source_categories": {},
+  "source_citation": [],
+  "source_file": "9I7N.cif",
+  "title": null
+}

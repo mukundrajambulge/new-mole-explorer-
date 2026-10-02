@@ -1,0 +1,9 @@
+{
+  "query_id" : "254b89af-b7fe-4b72-9448-05b91c229532",
+  "result_type" : "entry",
+  "total_count" : 1,
+  "result_set" : [ {
+    "identifier" : "1FEL",
+    "score" : 1.0
+  } ]
+}

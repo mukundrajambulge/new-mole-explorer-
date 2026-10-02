@@ -1,0 +1,580 @@
+{
+  "entry_id": null,
+  "nonpolymer_instances": [
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "CD",
+      "entity_id": "2",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "CD"
+      ],
+      "label_asym_id": "B",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "201",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "CD",
+      "entity_id": "2",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "CD"
+      ],
+      "label_asym_id": "C",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "202",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "HOH",
+      "entity_id": "4",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "E",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "301",
+          "?"
+        ],
+        [
+          "302",
+          "?"
+        ],
+        [
+          "303",
+          "?"
+        ],
+        [
+          "304",
+          "?"
+        ],
+        [
+          "305",
+          "?"
+        ],
+        [
+          "306",
+          "?"
+        ],
+        [
+          "307",
+          "?"
+        ],
+        [
+          "308",
+          "?"
+        ],
+        [
+          "309",
+          "?"
+        ],
+        [
+          "310",
+          "?"
+        ],
+        [
+          "311",
+          "?"
+        ],
+        [
+          "312",
+          "?"
+        ],
+        [
+          "313",
+          "?"
+        ],
+        [
+          "314",
+          "?"
+        ],
+        [
+          "315",
+          "?"
+        ],
+        [
+          "316",
+          "?"
+        ],
+        [
+          "317",
+          "?"
+        ],
+        [
+          "318",
+          "?"
+        ],
+        [
+          "319",
+          "?"
+        ],
+        [
+          "320",
+          "?"
+        ],
+        [
+          "321",
+          "?"
+        ],
+        [
+          "322",
+          "?"
+        ],
+        [
+          "323",
+          "?"
+        ],
+        [
+          "324",
+          "?"
+        ],
+        [
+          "325",
+          "?"
+        ],
+        [
+          "326",
+          "?"
+        ],
+        [
+          "327",
+          "?"
+        ],
+        [
+          "328",
+          "?"
+        ],
+        [
+          "329",
+          "?"
+        ],
+        [
+          "330",
+          "?"
+        ],
+        [
+          "331",
+          "?"
+        ],
+        [
+          "332",
+          "?"
+        ],
+        [
+          "333",
+          "?"
+        ],
+        [
+          "334",
+          "?"
+        ],
+        [
+          "335",
+          "?"
+        ],
+        [
+          "336",
+          "?"
+        ],
+        [
+          "337",
+          "?"
+        ],
+        [
+          "338",
+          "?"
+        ],
+        [
+          "339",
+          "?"
+        ],
+        [
+          "340",
+          "?"
+        ],
+        [
+          "341",
+          "?"
+        ],
+        [
+          "342",
+          "?"
+        ],
+        [
+          "343",
+          "?"
+        ],
+        [
+          "344",
+          "?"
+        ],
+        [
+          "345",
+          "?"
+        ],
+        [
+          "346",
+          "?"
+        ],
+        [
+          "347",
+          "?"
+        ],
+        [
+          "348",
+          "?"
+        ],
+        [
+          "349",
+          "?"
+        ],
+        [
+          "350",
+          "?"
+        ],
+        [
+          "351",
+          "?"
+        ],
+        [
+          "352",
+          "?"
+        ],
+        [
+          "353",
+          "?"
+        ],
+        [
+          "354",
+          "?"
+        ],
+        [
+          "355",
+          "?"
+        ],
+        [
+          "356",
+          "?"
+        ],
+        [
+          "357",
+          "?"
+        ],
+        [
+          "358",
+          "?"
+        ],
+        [
+          "359",
+          "?"
+        ],
+        [
+          "360",
+          "?"
+        ],
+        [
+          "361",
+          "?"
+        ],
+        [
+          "362",
+          "?"
+        ],
+        [
+          "363",
+          "?"
+        ],
+        [
+          "364",
+          "?"
+        ],
+        [
+          "365",
+          "?"
+        ],
+        [
+          "366",
+          "?"
+        ],
+        [
+          "367",
+          "?"
+        ],
+        [
+          "368",
+          "?"
+        ],
+        [
+          "369",
+          "?"
+        ],
+        [
+          "370",
+          "?"
+        ],
+        [
+          "371",
+          "?"
+        ],
+        [
+          "372",
+          "?"
+        ],
+        [
+          "373",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "RTL",
+      "entity_id": "3",
+      "heavy_atom_count": 21,
+      "heavy_atom_names": [
+        "C1",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C2",
+        "C20",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "O1"
+      ],
+      "label_asym_id": "D",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "200",
+          "?"
+        ]
+      ]
+    }
+  ],
+  "polymer_entities": [
+    {
+      "altloc_residues": [],
+      "asym_ids": [
+        "A"
+      ],
+      "author_chains": [
+        "A"
+      ],
+      "description": "CELLULAR RETINOL BINDING PROTEIN",
+      "entity_id": "1",
+      "missing_label_seq_ids": [],
+      "monomer_count_expected": 134,
+      "monomer_count_observed": 134,
+      "sequence": "PROVALASPPHEASNGLYTYRTRPLYSMETLEUSERASNGLUASNPHEGLUGLUTYRLEUARGALALEUASPVALASNVALALALEUARGLYSILEALAASNLEULEULYSPROASPLYSGLUILEVALGLNASPGLYASPHISMETILEILEARGTHRLEUSERTHRPHEARGASNTYRILEMETASPPHEGLNVALGLYLYSGLUPHEGLUGLUASPLEUTHRGLYILEASPASPARGLYSCYSMETTHRTHRVALSERTRPASPGLYASPLYSLEUGLNCYSVALGLNLYSGLYGLULYSGLUGLYARGGLYTRPTHRGLNTRPILEGLUGLYASPGLULEUHISLEUGLUMETARGALAGLUGLYVALTHRCYSLYSGLNVALPHELYSLYSVALHIS",
+      "type": "polypeptide(L)"
+    }
+  ],
+  "resolution_A": null,
+  "source_categories": {
+    "_citation": [
+      {
+        "_citation.book_publisher": "?",
+        "_citation.country": "UK",
+        "_citation.id": "primary",
+        "_citation.journal_abbrev": "J.Mol.Biol.",
+        "_citation.journal_id_ASTM": "JMOBAK",
+        "_citation.journal_id_CSD": "0070",
+        "_citation.journal_id_ISSN": "0022-2836",
+        "_citation.journal_volume": "230",
+        "_citation.page_first": "1225",
+        "_citation.page_last": "1246",
+        "_citation.pdbx_database_id_DOI": "10.1006/jmbi.1993.1238",
+        "_citation.pdbx_database_id_PubMed": "7683727",
+        "_citation.title": "Crystallographic studies on a family of cellular lipophilic transport proteins. Refinement of P2 myelin protein and the structure determination and refinement of cellular retinol-binding protein in complex with all-trans-retinol.",
+        "_citation.year": "1993"
+      },
+      {
+        "_citation.book_publisher": "?",
+        "_citation.country": "US",
+        "_citation.id": "1",
+        "_citation.journal_abbrev": "Adv.Protein Chem.",
+        "_citation.journal_id_ASTM": "APCHA2",
+        "_citation.journal_id_CSD": "0433",
+        "_citation.journal_id_ISSN": "0065-3233",
+        "_citation.journal_volume": "45",
+        "_citation.page_first": "89",
+        "_citation.page_last": "?",
+        "_citation.pdbx_database_id_DOI": "?",
+        "_citation.pdbx_database_id_PubMed": "?",
+        "_citation.title": "Lipid-Binding Proteins: A Family of Fatty Acid and Retinoid Transport Proteins",
+        "_citation.year": "1994"
+      },
+      {
+        "_citation.book_publisher": "?",
+        "_citation.country": "IX",
+        "_citation.id": "2",
+        "_citation.journal_abbrev": "Eur.J.Biochem.",
+        "_citation.journal_id_ASTM": "EJBCAI",
+        "_citation.journal_id_CSD": "0262",
+        "_citation.journal_id_ISSN": "0014-2956",
+        "_citation.journal_volume": "210",
+        "_citation.page_first": "937",
+        "_citation.page_last": "?",
+        "_citation.pdbx_database_id_DOI": "?",
+        "_citation.pdbx_database_id_PubMed": "?",
+        "_citation.title": "The Primary Structure of Piscine (Oncorhynchus Mykiss) Retinol-Binding Protein and a Comparison with the Three-Dimensional Structure of Mammalian Retinol-Binding Protein",
+        "_citation.year": "1992"
+      },
+      {
+        "_citation.book_publisher": "?",
+        "_citation.country": "US",
+        "_citation.id": "3",
+        "_citation.journal_abbrev": "Proteins",
+        "_citation.journal_id_ASTM": "PSFGEY",
+        "_citation.journal_id_CSD": "0867",
+        "_citation.journal_id_ISSN": "0887-3585",
+        "_citation.journal_volume": "8",
+        "_citation.page_first": "44",
+        "_citation.page_last": "?",
+        "_citation.pdbx_database_id_DOI": "?",
+        "_citation.pdbx_database_id_PubMed": "?",
+        "_citation.title": "Crystallographic Refinement of Human Serum Retinol Binding Protein at 2 Angstroms Resolution",
+        "_citation.year": "1990"
+      },
+      {
+        "_citation.book_publisher": "?",
+        "_citation.country": "US",
+        "_citation.id": "4",
+        "_citation.journal_abbrev": "J.Biol.Chem.",
+        "_citation.journal_id_ASTM": "JBCHA3",
+        "_citation.journal_id_CSD": "0071",
+        "_citation.journal_id_ISSN": "0021-9258",
+        "_citation.journal_volume": "256",
+        "_citation.page_first": "8162",
+        "_citation.page_last": "?",
+        "_citation.pdbx_database_id_DOI": "?",
+        "_citation.pdbx_database_id_PubMed": "?",
+        "_citation.title": "Crystallization of and Preliminary X-Ray Data for an Intracellular Vitamin A-Binding Protein from Rat Liver",
+        "_citation.year": "1981"
+      }
+    ]
+  },
+  "source_citation": [
+    {
+      "_citation.book_publisher": "?",
+      "_citation.country": "UK",
+      "_citation.id": "primary",
+      "_citation.journal_abbrev": "J.Mol.Biol.",
+      "_citation.journal_id_ASTM": "JMOBAK",
+      "_citation.journal_id_CSD": "0070",
+      "_citation.journal_id_ISSN": "0022-2836",
+      "_citation.journal_volume": "230",
+      "_citation.page_first": "1225",
+      "_citation.page_last": "1246",
+      "_citation.pdbx_database_id_DOI": "10.1006/jmbi.1993.1238",
+      "_citation.pdbx_database_id_PubMed": "7683727",
+      "_citation.title": "Crystallographic studies on a family of cellular lipophilic transport proteins. Refinement of P2 myelin protein and the structure determination and refinement of cellular retinol-binding protein in complex with all-trans-retinol.",
+      "_citation.year": "1993"
+    },
+    {
+      "_citation.book_publisher": "?",
+      "_citation.country": "US",
+      "_citation.id": "1",
+      "_citation.journal_abbrev": "Adv.Protein Chem.",
+      "_citation.journal_id_ASTM": "APCHA2",
+      "_citation.journal_id_CSD": "0433",
+      "_citation.journal_id_ISSN": "0065-3233",
+      "_citation.journal_volume": "45",
+      "_citation.page_first": "89",
+      "_citation.page_last": "?",
+      "_citation.pdbx_database_id_DOI": "?",
+      "_citation.pdbx_database_id_PubMed": "?",
+      "_citation.title": "Lipid-Binding Proteins: A Family of Fatty Acid and Retinoid Transport Proteins",
+      "_citation.year": "1994"
+    },
+    {
+      "_citation.book_publisher": "?",
+      "_citation.country": "IX",
+      "_citation.id": "2",
+      "_citation.journal_abbrev": "Eur.J.Biochem.",
+      "_citation.journal_id_ASTM": "EJBCAI",
+      "_citation.journal_id_CSD": "0262",
+      "_citation.journal_id_ISSN": "0014-2956",
+      "_citation.journal_volume": "210",
+      "_citation.page_first": "937",
+      "_citation.page_last": "?",
+      "_citation.pdbx_database_id_DOI": "?",
+      "_citation.pdbx_database_id_PubMed": "?",
+      "_citation.title": "The Primary Structure of Piscine (Oncorhynchus Mykiss) Retinol-Binding Protein and a Comparison with the Three-Dimensional Structure of Mammalian Retinol-Binding Protein",
+      "_citation.year": "1992"
+    },
+    {
+      "_citation.book_publisher": "?",
+      "_citation.country": "US",
+      "_citation.id": "3",
+      "_citation.journal_abbrev": "Proteins",
+      "_citation.journal_id_ASTM": "PSFGEY",
+      "_citation.journal_id_CSD": "0867",
+      "_citation.journal_id_ISSN": "0887-3585",
+      "_citation.journal_volume": "8",
+      "_citation.page_first": "44",
+      "_citation.page_last": "?",
+      "_citation.pdbx_database_id_DOI": "?",
+      "_citation.pdbx_database_id_PubMed": "?",
+      "_citation.title": "Crystallographic Refinement of Human Serum Retinol Binding Protein at 2 Angstroms Resolution",
+      "_citation.year": "1990"
+    },
+    {
+      "_citation.book_publisher": "?",
+      "_citation.country": "US",
+      "_citation.id": "4",
+      "_citation.journal_abbrev": "J.Biol.Chem.",
+      "_citation.journal_id_ASTM": "JBCHA3",
+      "_citation.journal_id_CSD": "0071",
+      "_citation.journal_id_ISSN": "0021-9258",
+      "_citation.journal_volume": "256",
+      "_citation.page_first": "8162",
+      "_citation.page_last": "?",
+      "_citation.pdbx_database_id_DOI": "?",
+      "_citation.pdbx_database_id_PubMed": "?",
+      "_citation.title": "Crystallization of and Preliminary X-Ray Data for an Intracellular Vitamin A-Binding Protein from Rat Liver",
+      "_citation.year": "1981"
+    }
+  ],
+  "source_file": "1CRB.cif",
+  "title": null
+}

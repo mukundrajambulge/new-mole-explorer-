@@ -1,0 +1,48 @@
+{
+  "query_id" : "881f0db3-9b71-4151-b39b-5948abe5cadc",
+  "result_type" : "entry",
+  "total_count" : 14,
+  "result_set" : [ {
+    "identifier" : "4TNS",
+    "score" : 1.0
+  }, {
+    "identifier" : "2FR3",
+    "score" : 1.0
+  }, {
+    "identifier" : "3CWK",
+    "score" : 1.0
+  }, {
+    "identifier" : "2G78",
+    "score" : 1.0
+  }, {
+    "identifier" : "1CBS",
+    "score" : 1.0
+  }, {
+    "identifier" : "1FEM",
+    "score" : 1.0
+  }, {
+    "identifier" : "1G5Y",
+    "score" : 1.0
+  }, {
+    "identifier" : "2LBD",
+    "score" : 1.0
+  }, {
+    "identifier" : "3FC6",
+    "score" : 1.0
+  }, {
+    "identifier" : "1N4H",
+    "score" : 1.0
+  }, {
+    "identifier" : "2VE3",
+    "score" : 1.0
+  }, {
+    "identifier" : "4DM8",
+    "score" : 1.0
+  }, {
+    "identifier" : "1GX9",
+    "score" : 1.0
+  }, {
+    "identifier" : "3FAL",
+    "score" : 1.0
+  } ]
+}

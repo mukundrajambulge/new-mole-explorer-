@@ -1,0 +1,1557 @@
+{
+  "entry_id": null,
+  "nonpolymer_instances": [
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "A3P",
+      "entity_id": "4",
+      "heavy_atom_count": 27,
+      "heavy_atom_names": [
+        "C1'",
+        "C2",
+        "C2'",
+        "C3'",
+        "C4",
+        "C4'",
+        "C5",
+        "C5'",
+        "C6",
+        "C8",
+        "N1",
+        "N3",
+        "N6",
+        "N7",
+        "N9",
+        "O1P",
+        "O2'",
+        "O2P",
+        "O3'",
+        "O3P",
+        "O4'",
+        "O4P",
+        "O5'",
+        "O5P",
+        "O6P",
+        "P1",
+        "P2"
+      ],
+      "label_asym_id": "G",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "400",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "B",
+      "comp_id": "A3P",
+      "entity_id": "4",
+      "heavy_atom_count": 27,
+      "heavy_atom_names": [
+        "C1'",
+        "C2",
+        "C2'",
+        "C3'",
+        "C4",
+        "C4'",
+        "C5",
+        "C5'",
+        "C6",
+        "C8",
+        "N1",
+        "N3",
+        "N6",
+        "N7",
+        "N9",
+        "O1P",
+        "O2'",
+        "O2P",
+        "O3'",
+        "O3P",
+        "O4'",
+        "O4P",
+        "O5'",
+        "O5P",
+        "O6P",
+        "P1",
+        "P2"
+      ],
+      "label_asym_id": "M",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "500",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "CA",
+      "entity_id": "3",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "CA"
+      ],
+      "label_asym_id": "F",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "402",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "B",
+      "comp_id": "CA",
+      "entity_id": "3",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "CA"
+      ],
+      "label_asym_id": "L",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "502",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [
+        "A",
+        "B"
+      ],
+      "author_chain": "A",
+      "comp_id": "HG",
+      "entity_id": "2",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "HG"
+      ],
+      "label_asym_id": "C",
+      "occupancies": [
+        "0.40",
+        "0.60"
+      ],
+      "residues": [
+        [
+          "451",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "HG",
+      "entity_id": "2",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "HG"
+      ],
+      "label_asym_id": "D",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "452",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "HG",
+      "entity_id": "2",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "HG"
+      ],
+      "label_asym_id": "E",
+      "occupancies": [
+        "0.50"
+      ],
+      "residues": [
+        [
+          "453",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [
+        "A",
+        "B"
+      ],
+      "author_chain": "B",
+      "comp_id": "HG",
+      "entity_id": "2",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "HG"
+      ],
+      "label_asym_id": "I",
+      "occupancies": [
+        "0.40",
+        "0.60"
+      ],
+      "residues": [
+        [
+          "551",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "B",
+      "comp_id": "HG",
+      "entity_id": "2",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "HG"
+      ],
+      "label_asym_id": "J",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "552",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "B",
+      "comp_id": "HG",
+      "entity_id": "2",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "HG"
+      ],
+      "label_asym_id": "K",
+      "occupancies": [
+        "0.50"
+      ],
+      "residues": [
+        [
+          "553",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "HOH",
+      "entity_id": "6",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "O",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "454",
+          "?"
+        ],
+        [
+          "455",
+          "?"
+        ],
+        [
+          "456",
+          "?"
+        ],
+        [
+          "457",
+          "?"
+        ],
+        [
+          "458",
+          "?"
+        ],
+        [
+          "459",
+          "?"
+        ],
+        [
+          "460",
+          "?"
+        ],
+        [
+          "461",
+          "?"
+        ],
+        [
+          "462",
+          "?"
+        ],
+        [
+          "463",
+          "?"
+        ],
+        [
+          "464",
+          "?"
+        ],
+        [
+          "465",
+          "?"
+        ],
+        [
+          "466",
+          "?"
+        ],
+        [
+          "467",
+          "?"
+        ],
+        [
+          "468",
+          "?"
+        ],
+        [
+          "469",
+          "?"
+        ],
+        [
+          "470",
+          "?"
+        ],
+        [
+          "471",
+          "?"
+        ],
+        [
+          "472",
+          "?"
+        ],
+        [
+          "473",
+          "?"
+        ],
+        [
+          "474",
+          "?"
+        ],
+        [
+          "475",
+          "?"
+        ],
+        [
+          "476",
+          "?"
+        ],
+        [
+          "477",
+          "?"
+        ],
+        [
+          "478",
+          "?"
+        ],
+        [
+          "479",
+          "?"
+        ],
+        [
+          "480",
+          "?"
+        ],
+        [
+          "481",
+          "?"
+        ],
+        [
+          "482",
+          "?"
+        ],
+        [
+          "483",
+          "?"
+        ],
+        [
+          "484",
+          "?"
+        ],
+        [
+          "485",
+          "?"
+        ],
+        [
+          "486",
+          "?"
+        ],
+        [
+          "487",
+          "?"
+        ],
+        [
+          "488",
+          "?"
+        ],
+        [
+          "489",
+          "?"
+        ],
+        [
+          "490",
+          "?"
+        ],
+        [
+          "491",
+          "?"
+        ],
+        [
+          "492",
+          "?"
+        ],
+        [
+          "493",
+          "?"
+        ],
+        [
+          "494",
+          "?"
+        ],
+        [
+          "495",
+          "?"
+        ],
+        [
+          "496",
+          "?"
+        ],
+        [
+          "497",
+          "?"
+        ],
+        [
+          "498",
+          "?"
+        ],
+        [
+          "499",
+          "?"
+        ],
+        [
+          "500",
+          "?"
+        ],
+        [
+          "501",
+          "?"
+        ],
+        [
+          "502",
+          "?"
+        ],
+        [
+          "503",
+          "?"
+        ],
+        [
+          "504",
+          "?"
+        ],
+        [
+          "505",
+          "?"
+        ],
+        [
+          "506",
+          "?"
+        ],
+        [
+          "507",
+          "?"
+        ],
+        [
+          "508",
+          "?"
+        ],
+        [
+          "509",
+          "?"
+        ],
+        [
+          "510",
+          "?"
+        ],
+        [
+          "511",
+          "?"
+        ],
+        [
+          "512",
+          "?"
+        ],
+        [
+          "513",
+          "?"
+        ],
+        [
+          "514",
+          "?"
+        ],
+        [
+          "515",
+          "?"
+        ],
+        [
+          "516",
+          "?"
+        ],
+        [
+          "517",
+          "?"
+        ],
+        [
+          "518",
+          "?"
+        ],
+        [
+          "519",
+          "?"
+        ],
+        [
+          "520",
+          "?"
+        ],
+        [
+          "521",
+          "?"
+        ],
+        [
+          "522",
+          "?"
+        ],
+        [
+          "523",
+          "?"
+        ],
+        [
+          "524",
+          "?"
+        ],
+        [
+          "525",
+          "?"
+        ],
+        [
+          "526",
+          "?"
+        ],
+        [
+          "527",
+          "?"
+        ],
+        [
+          "528",
+          "?"
+        ],
+        [
+          "529",
+          "?"
+        ],
+        [
+          "530",
+          "?"
+        ],
+        [
+          "531",
+          "?"
+        ],
+        [
+          "532",
+          "?"
+        ],
+        [
+          "533",
+          "?"
+        ],
+        [
+          "534",
+          "?"
+        ],
+        [
+          "535",
+          "?"
+        ],
+        [
+          "536",
+          "?"
+        ],
+        [
+          "537",
+          "?"
+        ],
+        [
+          "538",
+          "?"
+        ],
+        [
+          "539",
+          "?"
+        ],
+        [
+          "540",
+          "?"
+        ],
+        [
+          "541",
+          "?"
+        ],
+        [
+          "542",
+          "?"
+        ],
+        [
+          "543",
+          "?"
+        ],
+        [
+          "544",
+          "?"
+        ],
+        [
+          "545",
+          "?"
+        ],
+        [
+          "546",
+          "?"
+        ],
+        [
+          "547",
+          "?"
+        ],
+        [
+          "548",
+          "?"
+        ],
+        [
+          "549",
+          "?"
+        ],
+        [
+          "550",
+          "?"
+        ],
+        [
+          "551",
+          "?"
+        ],
+        [
+          "552",
+          "?"
+        ],
+        [
+          "553",
+          "?"
+        ],
+        [
+          "554",
+          "?"
+        ],
+        [
+          "555",
+          "?"
+        ],
+        [
+          "556",
+          "?"
+        ],
+        [
+          "557",
+          "?"
+        ],
+        [
+          "558",
+          "?"
+        ],
+        [
+          "559",
+          "?"
+        ],
+        [
+          "560",
+          "?"
+        ],
+        [
+          "561",
+          "?"
+        ],
+        [
+          "562",
+          "?"
+        ],
+        [
+          "563",
+          "?"
+        ],
+        [
+          "564",
+          "?"
+        ],
+        [
+          "565",
+          "?"
+        ],
+        [
+          "566",
+          "?"
+        ],
+        [
+          "567",
+          "?"
+        ],
+        [
+          "568",
+          "?"
+        ],
+        [
+          "569",
+          "?"
+        ],
+        [
+          "570",
+          "?"
+        ],
+        [
+          "571",
+          "?"
+        ],
+        [
+          "572",
+          "?"
+        ],
+        [
+          "573",
+          "?"
+        ],
+        [
+          "574",
+          "?"
+        ],
+        [
+          "575",
+          "?"
+        ],
+        [
+          "576",
+          "?"
+        ],
+        [
+          "577",
+          "?"
+        ],
+        [
+          "578",
+          "?"
+        ],
+        [
+          "579",
+          "?"
+        ],
+        [
+          "580",
+          "?"
+        ],
+        [
+          "581",
+          "?"
+        ],
+        [
+          "582",
+          "?"
+        ],
+        [
+          "583",
+          "?"
+        ],
+        [
+          "584",
+          "?"
+        ],
+        [
+          "585",
+          "?"
+        ],
+        [
+          "586",
+          "?"
+        ],
+        [
+          "587",
+          "?"
+        ],
+        [
+          "588",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "B",
+      "comp_id": "HOH",
+      "entity_id": "6",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "P",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "554",
+          "?"
+        ],
+        [
+          "555",
+          "?"
+        ],
+        [
+          "556",
+          "?"
+        ],
+        [
+          "557",
+          "?"
+        ],
+        [
+          "558",
+          "?"
+        ],
+        [
+          "559",
+          "?"
+        ],
+        [
+          "560",
+          "?"
+        ],
+        [
+          "561",
+          "?"
+        ],
+        [
+          "562",
+          "?"
+        ],
+        [
+          "563",
+          "?"
+        ],
+        [
+          "564",
+          "?"
+        ],
+        [
+          "565",
+          "?"
+        ],
+        [
+          "566",
+          "?"
+        ],
+        [
+          "567",
+          "?"
+        ],
+        [
+          "568",
+          "?"
+        ],
+        [
+          "569",
+          "?"
+        ],
+        [
+          "570",
+          "?"
+        ],
+        [
+          "571",
+          "?"
+        ],
+        [
+          "572",
+          "?"
+        ],
+        [
+          "573",
+          "?"
+        ],
+        [
+          "574",
+          "?"
+        ],
+        [
+          "575",
+          "?"
+        ],
+        [
+          "576",
+          "?"
+        ],
+        [
+          "577",
+          "?"
+        ],
+        [
+          "578",
+          "?"
+        ],
+        [
+          "579",
+          "?"
+        ],
+        [
+          "580",
+          "?"
+        ],
+        [
+          "581",
+          "?"
+        ],
+        [
+          "582",
+          "?"
+        ],
+        [
+          "583",
+          "?"
+        ],
+        [
+          "584",
+          "?"
+        ],
+        [
+          "585",
+          "?"
+        ],
+        [
+          "586",
+          "?"
+        ],
+        [
+          "587",
+          "?"
+        ],
+        [
+          "588",
+          "?"
+        ],
+        [
+          "589",
+          "?"
+        ],
+        [
+          "590",
+          "?"
+        ],
+        [
+          "591",
+          "?"
+        ],
+        [
+          "592",
+          "?"
+        ],
+        [
+          "593",
+          "?"
+        ],
+        [
+          "594",
+          "?"
+        ],
+        [
+          "595",
+          "?"
+        ],
+        [
+          "596",
+          "?"
+        ],
+        [
+          "597",
+          "?"
+        ],
+        [
+          "598",
+          "?"
+        ],
+        [
+          "599",
+          "?"
+        ],
+        [
+          "600",
+          "?"
+        ],
+        [
+          "601",
+          "?"
+        ],
+        [
+          "602",
+          "?"
+        ],
+        [
+          "603",
+          "?"
+        ],
+        [
+          "604",
+          "?"
+        ],
+        [
+          "605",
+          "?"
+        ],
+        [
+          "606",
+          "?"
+        ],
+        [
+          "607",
+          "?"
+        ],
+        [
+          "608",
+          "?"
+        ],
+        [
+          "609",
+          "?"
+        ],
+        [
+          "610",
+          "?"
+        ],
+        [
+          "611",
+          "?"
+        ],
+        [
+          "612",
+          "?"
+        ],
+        [
+          "613",
+          "?"
+        ],
+        [
+          "614",
+          "?"
+        ],
+        [
+          "615",
+          "?"
+        ],
+        [
+          "616",
+          "?"
+        ],
+        [
+          "617",
+          "?"
+        ],
+        [
+          "618",
+          "?"
+        ],
+        [
+          "619",
+          "?"
+        ],
+        [
+          "620",
+          "?"
+        ],
+        [
+          "621",
+          "?"
+        ],
+        [
+          "622",
+          "?"
+        ],
+        [
+          "623",
+          "?"
+        ],
+        [
+          "624",
+          "?"
+        ],
+        [
+          "625",
+          "?"
+        ],
+        [
+          "626",
+          "?"
+        ],
+        [
+          "627",
+          "?"
+        ],
+        [
+          "628",
+          "?"
+        ],
+        [
+          "629",
+          "?"
+        ],
+        [
+          "630",
+          "?"
+        ],
+        [
+          "631",
+          "?"
+        ],
+        [
+          "632",
+          "?"
+        ],
+        [
+          "633",
+          "?"
+        ],
+        [
+          "634",
+          "?"
+        ],
+        [
+          "635",
+          "?"
+        ],
+        [
+          "636",
+          "?"
+        ],
+        [
+          "637",
+          "?"
+        ],
+        [
+          "638",
+          "?"
+        ],
+        [
+          "639",
+          "?"
+        ],
+        [
+          "640",
+          "?"
+        ],
+        [
+          "641",
+          "?"
+        ],
+        [
+          "642",
+          "?"
+        ],
+        [
+          "643",
+          "?"
+        ],
+        [
+          "644",
+          "?"
+        ],
+        [
+          "645",
+          "?"
+        ],
+        [
+          "646",
+          "?"
+        ],
+        [
+          "647",
+          "?"
+        ],
+        [
+          "648",
+          "?"
+        ],
+        [
+          "649",
+          "?"
+        ],
+        [
+          "650",
+          "?"
+        ],
+        [
+          "651",
+          "?"
+        ],
+        [
+          "652",
+          "?"
+        ],
+        [
+          "653",
+          "?"
+        ],
+        [
+          "654",
+          "?"
+        ],
+        [
+          "655",
+          "?"
+        ],
+        [
+          "656",
+          "?"
+        ],
+        [
+          "657",
+          "?"
+        ],
+        [
+          "658",
+          "?"
+        ],
+        [
+          "659",
+          "?"
+        ],
+        [
+          "660",
+          "?"
+        ],
+        [
+          "661",
+          "?"
+        ],
+        [
+          "662",
+          "?"
+        ],
+        [
+          "663",
+          "?"
+        ],
+        [
+          "664",
+          "?"
+        ],
+        [
+          "665",
+          "?"
+        ],
+        [
+          "666",
+          "?"
+        ],
+        [
+          "667",
+          "?"
+        ],
+        [
+          "668",
+          "?"
+        ],
+        [
+          "669",
+          "?"
+        ],
+        [
+          "670",
+          "?"
+        ],
+        [
+          "671",
+          "?"
+        ],
+        [
+          "672",
+          "?"
+        ],
+        [
+          "673",
+          "?"
+        ],
+        [
+          "674",
+          "?"
+        ],
+        [
+          "675",
+          "?"
+        ],
+        [
+          "676",
+          "?"
+        ],
+        [
+          "677",
+          "?"
+        ],
+        [
+          "678",
+          "?"
+        ],
+        [
+          "679",
+          "?"
+        ],
+        [
+          "680",
+          "?"
+        ],
+        [
+          "681",
+          "?"
+        ],
+        [
+          "682",
+          "?"
+        ],
+        [
+          "683",
+          "?"
+        ],
+        [
+          "684",
+          "?"
+        ],
+        [
+          "685",
+          "?"
+        ],
+        [
+          "686",
+          "?"
+        ],
+        [
+          "687",
+          "?"
+        ],
+        [
+          "688",
+          "?"
+        ],
+        [
+          "689",
+          "?"
+        ],
+        [
+          "690",
+          "?"
+        ],
+        [
+          "691",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "RTL",
+      "entity_id": "5",
+      "heavy_atom_count": 21,
+      "heavy_atom_names": [
+        "C1",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C2",
+        "C20",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "O1"
+      ],
+      "label_asym_id": "H",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "401",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "B",
+      "comp_id": "RTL",
+      "entity_id": "5",
+      "heavy_atom_count": 21,
+      "heavy_atom_names": [
+        "C1",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C2",
+        "C20",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "O1"
+      ],
+      "label_asym_id": "N",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "501",
+          "?"
+        ]
+      ]
+    }
+  ],
+  "polymer_entities": [
+    {
+      "altloc_residues": [],
+      "asym_ids": [
+        "A",
+        "B"
+      ],
+      "author_chains": [
+        "A",
+        "B"
+      ],
+      "description": "RETINOL DEHYDRATASE",
+      "entity_id": "1",
+      "missing_label_seq_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        350,
+        351
+      ],
+      "monomer_count_expected": 351,
+      "monomer_count_observed": 342,
+      "sequence": "METGLULYSGLNGLNASPLEUPROPHEPROTYRGLUPHEARGGLULEUASNPROGLUGLUASPLYSLEUVALLYSALAASNLEUGLYALAPHEPROTHRTHRTYRVALLYSLEUGLYPROLYSGLYTYRMETVALTYRARGPROTYRLEULYSASPALAALAASNILETYRASNMETPROLEUARGPROTHRASPVALPHEVALALASERTYRGLNARGSERGLYTHRTHRMETTHRGLNGLULEUVALTRPLEUILEGLUASNASPLEUASNPHEGLUALAALALYSTHRTYRMETSERLEUARGTYRILETYRLEUASPGLYPHEMETILETYRASPPROGLULYSGLNGLUGLUTYRASNASPILELEUPROASNPROGLUASNLEUASPMETGLUARGTYRLEUGLYLEULEUGLUTYRSERSERARGPROGLYSERSERLEULEUALAALAVALPROPROTHRGLULYSARGPHEVALLYSTHRHISLEUPROLEUSERLEUMETPROPROASNMETLEUASPTHRVALLYSMETVALTYRLEUALAARGASPPROARGASPVALALAVALSERSERPHEHISHISALAARGLEULEUTYRLEULEUASNLYSGLNSERASNPHELYSASPPHETRPGLUMETPHEHISARGGLYLEUTYRTHRLEUTHRPROTYRPHEGLUHISVALLYSGLUALATRPALALYSARGHISASPPROASNMETLEUPHELEUPHETYRGLUASPTYRLEULYSASPLEUPROGLYCYSILEALAARGILEALAASPPHELEUGLYLYSLYSLEUSERGLUGLUGLNILEGLNARGLEUCYSGLUHISLEUASNPHEGLULYSPHELYSASNASNGLYALAVALASNMETGLUASPTYRARGGLUILEGLYILELEUALAASPGLYGLUHISPHEILEARGLYSGLYLYSALAGLYCYSTRPARGASPTYRPHEASPGLUGLUMETTHRLYSGLNALAGLULYSTRPILELYSASPASNLEULYSASPTHRASPLEUARGTYRPROASNMETGLULEU",
+      "type": "polypeptide(L)"
+    }
+  ],
+  "resolution_A": null,
+  "source_categories": {
+    "_pdbx_struct_assembly": [
+      {
+        "_pdbx_struct_assembly.details": "author_defined_assembly",
+        "_pdbx_struct_assembly.id": "1",
+        "_pdbx_struct_assembly.method_details": "?",
+        "_pdbx_struct_assembly.oligomeric_count": "1",
+        "_pdbx_struct_assembly.oligomeric_details": "monomeric"
+      },
+      {
+        "_pdbx_struct_assembly.details": "author_defined_assembly",
+        "_pdbx_struct_assembly.id": "2",
+        "_pdbx_struct_assembly.method_details": "?",
+        "_pdbx_struct_assembly.oligomeric_count": "1",
+        "_pdbx_struct_assembly.oligomeric_details": "monomeric"
+      }
+    ],
+    "_struct_ref_seq": [
+      {
+        "_struct_ref_seq.align_id": "1",
+        "_struct_ref_seq.db_align_beg": "1",
+        "_struct_ref_seq.db_align_end": "351",
+        "_struct_ref_seq.pdbx_PDB_id_code": "1FMJ",
+        "_struct_ref_seq.pdbx_auth_seq_align_beg": "1",
+        "_struct_ref_seq.pdbx_auth_seq_align_end": "351",
+        "_struct_ref_seq.pdbx_db_accession": "Q26490",
+        "_struct_ref_seq.pdbx_db_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_db_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_strand_id": "A",
+        "_struct_ref_seq.ref_id": "1",
+        "_struct_ref_seq.seq_align_beg": "1",
+        "_struct_ref_seq.seq_align_end": "351"
+      },
+      {
+        "_struct_ref_seq.align_id": "2",
+        "_struct_ref_seq.db_align_beg": "1",
+        "_struct_ref_seq.db_align_end": "351",
+        "_struct_ref_seq.pdbx_PDB_id_code": "1FMJ",
+        "_struct_ref_seq.pdbx_auth_seq_align_beg": "1",
+        "_struct_ref_seq.pdbx_auth_seq_align_end": "351",
+        "_struct_ref_seq.pdbx_db_accession": "Q26490",
+        "_struct_ref_seq.pdbx_db_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_db_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_strand_id": "B",
+        "_struct_ref_seq.ref_id": "1",
+        "_struct_ref_seq.seq_align_beg": "1",
+        "_struct_ref_seq.seq_align_end": "351"
+      }
+    ]
+  },
+  "source_citation": [],
+  "source_file": "1FMJ.cif",
+  "title": null
+}

@@ -1,0 +1,1551 @@
+{
+  "entry_id": null,
+  "nonpolymer_instances": [
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "ACT",
+      "entity_id": "3",
+      "heavy_atom_count": 4,
+      "heavy_atom_names": [
+        "C",
+        "CH3",
+        "O",
+        "OXT"
+      ],
+      "label_asym_id": "F",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "202",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "C",
+      "comp_id": "ACT",
+      "entity_id": "3",
+      "heavy_atom_count": 4,
+      "heavy_atom_names": [
+        "C",
+        "CH3",
+        "O",
+        "OXT"
+      ],
+      "label_asym_id": "H",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "202",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "B",
+      "comp_id": "ACT",
+      "entity_id": "3",
+      "heavy_atom_count": 4,
+      "heavy_atom_names": [
+        "C",
+        "CH3",
+        "O",
+        "OXT"
+      ],
+      "label_asym_id": "I",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "201",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "HOH",
+      "entity_id": "4",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "J",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "301",
+          "?"
+        ],
+        [
+          "302",
+          "?"
+        ],
+        [
+          "303",
+          "?"
+        ],
+        [
+          "304",
+          "?"
+        ],
+        [
+          "305",
+          "?"
+        ],
+        [
+          "306",
+          "?"
+        ],
+        [
+          "307",
+          "?"
+        ],
+        [
+          "308",
+          "?"
+        ],
+        [
+          "309",
+          "?"
+        ],
+        [
+          "310",
+          "?"
+        ],
+        [
+          "311",
+          "?"
+        ],
+        [
+          "312",
+          "?"
+        ],
+        [
+          "313",
+          "?"
+        ],
+        [
+          "314",
+          "?"
+        ],
+        [
+          "315",
+          "?"
+        ],
+        [
+          "316",
+          "?"
+        ],
+        [
+          "317",
+          "?"
+        ],
+        [
+          "318",
+          "?"
+        ],
+        [
+          "319",
+          "?"
+        ],
+        [
+          "320",
+          "?"
+        ],
+        [
+          "321",
+          "?"
+        ],
+        [
+          "322",
+          "?"
+        ],
+        [
+          "323",
+          "?"
+        ],
+        [
+          "324",
+          "?"
+        ],
+        [
+          "325",
+          "?"
+        ],
+        [
+          "326",
+          "?"
+        ],
+        [
+          "327",
+          "?"
+        ],
+        [
+          "328",
+          "?"
+        ],
+        [
+          "329",
+          "?"
+        ],
+        [
+          "330",
+          "?"
+        ],
+        [
+          "331",
+          "?"
+        ],
+        [
+          "332",
+          "?"
+        ],
+        [
+          "333",
+          "?"
+        ],
+        [
+          "334",
+          "?"
+        ],
+        [
+          "335",
+          "?"
+        ],
+        [
+          "336",
+          "?"
+        ],
+        [
+          "337",
+          "?"
+        ],
+        [
+          "338",
+          "?"
+        ],
+        [
+          "339",
+          "?"
+        ],
+        [
+          "340",
+          "?"
+        ],
+        [
+          "341",
+          "?"
+        ],
+        [
+          "342",
+          "?"
+        ],
+        [
+          "343",
+          "?"
+        ],
+        [
+          "344",
+          "?"
+        ],
+        [
+          "345",
+          "?"
+        ],
+        [
+          "346",
+          "?"
+        ],
+        [
+          "347",
+          "?"
+        ],
+        [
+          "348",
+          "?"
+        ],
+        [
+          "349",
+          "?"
+        ],
+        [
+          "350",
+          "?"
+        ],
+        [
+          "351",
+          "?"
+        ],
+        [
+          "352",
+          "?"
+        ],
+        [
+          "353",
+          "?"
+        ],
+        [
+          "354",
+          "?"
+        ],
+        [
+          "355",
+          "?"
+        ],
+        [
+          "356",
+          "?"
+        ],
+        [
+          "357",
+          "?"
+        ],
+        [
+          "358",
+          "?"
+        ],
+        [
+          "359",
+          "?"
+        ],
+        [
+          "360",
+          "?"
+        ],
+        [
+          "361",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "C",
+      "comp_id": "HOH",
+      "entity_id": "4",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "K",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "301",
+          "?"
+        ],
+        [
+          "302",
+          "?"
+        ],
+        [
+          "303",
+          "?"
+        ],
+        [
+          "304",
+          "?"
+        ],
+        [
+          "305",
+          "?"
+        ],
+        [
+          "306",
+          "?"
+        ],
+        [
+          "307",
+          "?"
+        ],
+        [
+          "308",
+          "?"
+        ],
+        [
+          "309",
+          "?"
+        ],
+        [
+          "310",
+          "?"
+        ],
+        [
+          "311",
+          "?"
+        ],
+        [
+          "312",
+          "?"
+        ],
+        [
+          "313",
+          "?"
+        ],
+        [
+          "314",
+          "?"
+        ],
+        [
+          "315",
+          "?"
+        ],
+        [
+          "316",
+          "?"
+        ],
+        [
+          "317",
+          "?"
+        ],
+        [
+          "318",
+          "?"
+        ],
+        [
+          "319",
+          "?"
+        ],
+        [
+          "320",
+          "?"
+        ],
+        [
+          "321",
+          "?"
+        ],
+        [
+          "322",
+          "?"
+        ],
+        [
+          "323",
+          "?"
+        ],
+        [
+          "324",
+          "?"
+        ],
+        [
+          "325",
+          "?"
+        ],
+        [
+          "326",
+          "?"
+        ],
+        [
+          "327",
+          "?"
+        ],
+        [
+          "328",
+          "?"
+        ],
+        [
+          "329",
+          "?"
+        ],
+        [
+          "330",
+          "?"
+        ],
+        [
+          "331",
+          "?"
+        ],
+        [
+          "332",
+          "?"
+        ],
+        [
+          "333",
+          "?"
+        ],
+        [
+          "334",
+          "?"
+        ],
+        [
+          "335",
+          "?"
+        ],
+        [
+          "336",
+          "?"
+        ],
+        [
+          "337",
+          "?"
+        ],
+        [
+          "338",
+          "?"
+        ],
+        [
+          "339",
+          "?"
+        ],
+        [
+          "340",
+          "?"
+        ],
+        [
+          "341",
+          "?"
+        ],
+        [
+          "342",
+          "?"
+        ],
+        [
+          "343",
+          "?"
+        ],
+        [
+          "344",
+          "?"
+        ],
+        [
+          "345",
+          "?"
+        ],
+        [
+          "346",
+          "?"
+        ],
+        [
+          "347",
+          "?"
+        ],
+        [
+          "348",
+          "?"
+        ],
+        [
+          "349",
+          "?"
+        ],
+        [
+          "350",
+          "?"
+        ],
+        [
+          "351",
+          "?"
+        ],
+        [
+          "352",
+          "?"
+        ],
+        [
+          "353",
+          "?"
+        ],
+        [
+          "354",
+          "?"
+        ],
+        [
+          "355",
+          "?"
+        ],
+        [
+          "356",
+          "?"
+        ],
+        [
+          "357",
+          "?"
+        ],
+        [
+          "358",
+          "?"
+        ],
+        [
+          "359",
+          "?"
+        ],
+        [
+          "360",
+          "?"
+        ],
+        [
+          "361",
+          "?"
+        ],
+        [
+          "362",
+          "?"
+        ],
+        [
+          "363",
+          "?"
+        ],
+        [
+          "364",
+          "?"
+        ],
+        [
+          "365",
+          "?"
+        ],
+        [
+          "366",
+          "?"
+        ],
+        [
+          "367",
+          "?"
+        ],
+        [
+          "368",
+          "?"
+        ],
+        [
+          "369",
+          "?"
+        ],
+        [
+          "370",
+          "?"
+        ],
+        [
+          "371",
+          "?"
+        ],
+        [
+          "372",
+          "?"
+        ],
+        [
+          "373",
+          "?"
+        ],
+        [
+          "374",
+          "?"
+        ],
+        [
+          "375",
+          "?"
+        ],
+        [
+          "376",
+          "?"
+        ],
+        [
+          "377",
+          "?"
+        ],
+        [
+          "378",
+          "?"
+        ],
+        [
+          "379",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "B",
+      "comp_id": "HOH",
+      "entity_id": "4",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "L",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "301",
+          "?"
+        ],
+        [
+          "302",
+          "?"
+        ],
+        [
+          "303",
+          "?"
+        ],
+        [
+          "304",
+          "?"
+        ],
+        [
+          "305",
+          "?"
+        ],
+        [
+          "306",
+          "?"
+        ],
+        [
+          "307",
+          "?"
+        ],
+        [
+          "308",
+          "?"
+        ],
+        [
+          "309",
+          "?"
+        ],
+        [
+          "310",
+          "?"
+        ],
+        [
+          "311",
+          "?"
+        ],
+        [
+          "312",
+          "?"
+        ],
+        [
+          "313",
+          "?"
+        ],
+        [
+          "314",
+          "?"
+        ],
+        [
+          "315",
+          "?"
+        ],
+        [
+          "316",
+          "?"
+        ],
+        [
+          "317",
+          "?"
+        ],
+        [
+          "318",
+          "?"
+        ],
+        [
+          "319",
+          "?"
+        ],
+        [
+          "320",
+          "?"
+        ],
+        [
+          "321",
+          "?"
+        ],
+        [
+          "322",
+          "?"
+        ],
+        [
+          "323",
+          "?"
+        ],
+        [
+          "324",
+          "?"
+        ],
+        [
+          "325",
+          "?"
+        ],
+        [
+          "326",
+          "?"
+        ],
+        [
+          "327",
+          "?"
+        ],
+        [
+          "328",
+          "?"
+        ],
+        [
+          "329",
+          "?"
+        ],
+        [
+          "330",
+          "?"
+        ],
+        [
+          "331",
+          "?"
+        ],
+        [
+          "332",
+          "?"
+        ],
+        [
+          "333",
+          "?"
+        ],
+        [
+          "334",
+          "?"
+        ],
+        [
+          "335",
+          "?"
+        ],
+        [
+          "336",
+          "?"
+        ],
+        [
+          "337",
+          "?"
+        ],
+        [
+          "338",
+          "?"
+        ],
+        [
+          "339",
+          "?"
+        ],
+        [
+          "340",
+          "?"
+        ],
+        [
+          "341",
+          "?"
+        ],
+        [
+          "342",
+          "?"
+        ],
+        [
+          "343",
+          "?"
+        ],
+        [
+          "344",
+          "?"
+        ],
+        [
+          "345",
+          "?"
+        ],
+        [
+          "346",
+          "?"
+        ],
+        [
+          "347",
+          "?"
+        ],
+        [
+          "348",
+          "?"
+        ],
+        [
+          "349",
+          "?"
+        ],
+        [
+          "350",
+          "?"
+        ],
+        [
+          "351",
+          "?"
+        ],
+        [
+          "352",
+          "?"
+        ],
+        [
+          "353",
+          "?"
+        ],
+        [
+          "354",
+          "?"
+        ],
+        [
+          "355",
+          "?"
+        ],
+        [
+          "356",
+          "?"
+        ],
+        [
+          "357",
+          "?"
+        ],
+        [
+          "358",
+          "?"
+        ],
+        [
+          "359",
+          "?"
+        ],
+        [
+          "360",
+          "?"
+        ],
+        [
+          "361",
+          "?"
+        ],
+        [
+          "362",
+          "?"
+        ],
+        [
+          "363",
+          "?"
+        ],
+        [
+          "364",
+          "?"
+        ],
+        [
+          "365",
+          "?"
+        ],
+        [
+          "366",
+          "?"
+        ],
+        [
+          "367",
+          "?"
+        ],
+        [
+          "368",
+          "?"
+        ],
+        [
+          "369",
+          "?"
+        ],
+        [
+          "370",
+          "?"
+        ],
+        [
+          "371",
+          "?"
+        ],
+        [
+          "372",
+          "?"
+        ],
+        [
+          "373",
+          "?"
+        ],
+        [
+          "374",
+          "?"
+        ],
+        [
+          "375",
+          "?"
+        ],
+        [
+          "376",
+          "?"
+        ],
+        [
+          "377",
+          "?"
+        ],
+        [
+          "378",
+          "?"
+        ],
+        [
+          "379",
+          "?"
+        ],
+        [
+          "380",
+          "?"
+        ],
+        [
+          "381",
+          "?"
+        ],
+        [
+          "382",
+          "?"
+        ],
+        [
+          "383",
+          "?"
+        ],
+        [
+          "384",
+          "?"
+        ],
+        [
+          "385",
+          "?"
+        ],
+        [
+          "386",
+          "?"
+        ],
+        [
+          "387",
+          "?"
+        ],
+        [
+          "388",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "D",
+      "comp_id": "HOH",
+      "entity_id": "4",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "M",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "201",
+          "?"
+        ],
+        [
+          "202",
+          "?"
+        ],
+        [
+          "203",
+          "?"
+        ],
+        [
+          "204",
+          "?"
+        ],
+        [
+          "205",
+          "?"
+        ],
+        [
+          "206",
+          "?"
+        ],
+        [
+          "207",
+          "?"
+        ],
+        [
+          "208",
+          "?"
+        ],
+        [
+          "209",
+          "?"
+        ],
+        [
+          "210",
+          "?"
+        ],
+        [
+          "211",
+          "?"
+        ],
+        [
+          "212",
+          "?"
+        ],
+        [
+          "213",
+          "?"
+        ],
+        [
+          "214",
+          "?"
+        ],
+        [
+          "215",
+          "?"
+        ],
+        [
+          "216",
+          "?"
+        ],
+        [
+          "217",
+          "?"
+        ],
+        [
+          "218",
+          "?"
+        ],
+        [
+          "219",
+          "?"
+        ],
+        [
+          "220",
+          "?"
+        ],
+        [
+          "221",
+          "?"
+        ],
+        [
+          "222",
+          "?"
+        ],
+        [
+          "223",
+          "?"
+        ],
+        [
+          "224",
+          "?"
+        ],
+        [
+          "225",
+          "?"
+        ],
+        [
+          "226",
+          "?"
+        ],
+        [
+          "227",
+          "?"
+        ],
+        [
+          "228",
+          "?"
+        ],
+        [
+          "229",
+          "?"
+        ],
+        [
+          "230",
+          "?"
+        ],
+        [
+          "231",
+          "?"
+        ],
+        [
+          "232",
+          "?"
+        ],
+        [
+          "233",
+          "?"
+        ],
+        [
+          "234",
+          "?"
+        ],
+        [
+          "235",
+          "?"
+        ],
+        [
+          "236",
+          "?"
+        ],
+        [
+          "237",
+          "?"
+        ],
+        [
+          "238",
+          "?"
+        ],
+        [
+          "239",
+          "?"
+        ],
+        [
+          "240",
+          "?"
+        ],
+        [
+          "241",
+          "?"
+        ],
+        [
+          "242",
+          "?"
+        ],
+        [
+          "243",
+          "?"
+        ],
+        [
+          "244",
+          "?"
+        ],
+        [
+          "245",
+          "?"
+        ],
+        [
+          "246",
+          "?"
+        ],
+        [
+          "247",
+          "?"
+        ],
+        [
+          "248",
+          "?"
+        ],
+        [
+          "249",
+          "?"
+        ],
+        [
+          "250",
+          "?"
+        ],
+        [
+          "251",
+          "?"
+        ],
+        [
+          "252",
+          "?"
+        ],
+        [
+          "253",
+          "?"
+        ],
+        [
+          "254",
+          "?"
+        ],
+        [
+          "255",
+          "?"
+        ],
+        [
+          "256",
+          "?"
+        ],
+        [
+          "257",
+          "?"
+        ],
+        [
+          "258",
+          "?"
+        ],
+        [
+          "259",
+          "?"
+        ],
+        [
+          "260",
+          "?"
+        ],
+        [
+          "261",
+          "?"
+        ],
+        [
+          "262",
+          "?"
+        ],
+        [
+          "263",
+          "?"
+        ],
+        [
+          "264",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [
+        "A",
+        "B"
+      ],
+      "author_chain": "A",
+      "comp_id": "RTL",
+      "entity_id": "2",
+      "heavy_atom_count": 21,
+      "heavy_atom_names": [
+        "C1",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C2",
+        "C20",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "O1"
+      ],
+      "label_asym_id": "E",
+      "occupancies": [
+        "0.50",
+        "1.00"
+      ],
+      "residues": [
+        [
+          "201",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "C",
+      "comp_id": "RTL",
+      "entity_id": "2",
+      "heavy_atom_count": 21,
+      "heavy_atom_names": [
+        "C1",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C2",
+        "C20",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "O1"
+      ],
+      "label_asym_id": "G",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "201",
+          "?"
+        ]
+      ]
+    }
+  ],
+  "polymer_entities": [
+    {
+      "altloc_residues": [
+        [
+          "A",
+          "47",
+          "ASP"
+        ],
+        [
+          "D",
+          "118",
+          "GLU"
+        ],
+        [
+          "D",
+          "59",
+          "ASN"
+        ],
+        [
+          "D",
+          "60",
+          "TYR"
+        ],
+        [
+          "D",
+          "61",
+          "ASP"
+        ],
+        [
+          "D",
+          "71",
+          "ASP"
+        ]
+      ],
+      "asym_ids": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "author_chains": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "description": "Retinol-binding protein 2",
+      "entity_id": "1",
+      "missing_label_seq_ids": [],
+      "monomer_count_expected": 133,
+      "monomer_count_observed": 133,
+      "sequence": "THRARGASPGLNASNGLYTHRTRPGLUMETGLUSERASNGLUASNPHEGLUGLYTYRMETLYSALALEUASPILEASPPHEALATHRARGLYSILEALAVALARGLEUTHRGLNTHRLYSVALILEASPGLNASPGLYASPASNPHELYSTHRLYSTHRTHRSERTHRPHEARGASNTYRASPVALASPPHETHRVALGLYVALGLUPHEASPGLUTYRTHRLYSSERLEUASPASNARGHISVALLYSALALEUVALTHRTRPGLUGLYASPVALLEUVALCYSVALGLNLYSGLYGLULYSGLUASNARGGLYTRPLYSGLNTRPILEGLUGLYASPLYSLEUTYRLEUGLULEUTHRCYSGLYASPGLNVALCYSARGGLNVALPHELYSLYSLYS",
+      "type": "polypeptide(L)"
+    }
+  ],
+  "resolution_A": null,
+  "source_categories": {
+    "_pdbx_struct_assembly": [
+      {
+        "_pdbx_struct_assembly.details": "author_and_software_defined_assembly",
+        "_pdbx_struct_assembly.id": "1",
+        "_pdbx_struct_assembly.method_details": "PISA",
+        "_pdbx_struct_assembly.oligomeric_count": "1",
+        "_pdbx_struct_assembly.oligomeric_details": "monomeric"
+      },
+      {
+        "_pdbx_struct_assembly.details": "author_and_software_defined_assembly",
+        "_pdbx_struct_assembly.id": "2",
+        "_pdbx_struct_assembly.method_details": "PISA",
+        "_pdbx_struct_assembly.oligomeric_count": "1",
+        "_pdbx_struct_assembly.oligomeric_details": "monomeric"
+      },
+      {
+        "_pdbx_struct_assembly.details": "author_and_software_defined_assembly",
+        "_pdbx_struct_assembly.id": "3",
+        "_pdbx_struct_assembly.method_details": "PISA",
+        "_pdbx_struct_assembly.oligomeric_count": "1",
+        "_pdbx_struct_assembly.oligomeric_details": "monomeric"
+      },
+      {
+        "_pdbx_struct_assembly.details": "author_and_software_defined_assembly",
+        "_pdbx_struct_assembly.id": "4",
+        "_pdbx_struct_assembly.method_details": "PISA",
+        "_pdbx_struct_assembly.oligomeric_count": "1",
+        "_pdbx_struct_assembly.oligomeric_details": "monomeric"
+      }
+    ],
+    "_struct_ref_seq": [
+      {
+        "_struct_ref_seq.align_id": "1",
+        "_struct_ref_seq.db_align_beg": "2",
+        "_struct_ref_seq.db_align_end": "134",
+        "_struct_ref_seq.pdbx_PDB_id_code": "4QZT",
+        "_struct_ref_seq.pdbx_auth_seq_align_beg": "1",
+        "_struct_ref_seq.pdbx_auth_seq_align_end": "133",
+        "_struct_ref_seq.pdbx_db_accession": "P50120",
+        "_struct_ref_seq.pdbx_db_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_db_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_strand_id": "A",
+        "_struct_ref_seq.ref_id": "1",
+        "_struct_ref_seq.seq_align_beg": "1",
+        "_struct_ref_seq.seq_align_end": "133"
+      },
+      {
+        "_struct_ref_seq.align_id": "2",
+        "_struct_ref_seq.db_align_beg": "2",
+        "_struct_ref_seq.db_align_end": "134",
+        "_struct_ref_seq.pdbx_PDB_id_code": "4QZT",
+        "_struct_ref_seq.pdbx_auth_seq_align_beg": "1",
+        "_struct_ref_seq.pdbx_auth_seq_align_end": "133",
+        "_struct_ref_seq.pdbx_db_accession": "P50120",
+        "_struct_ref_seq.pdbx_db_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_db_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_strand_id": "C",
+        "_struct_ref_seq.ref_id": "1",
+        "_struct_ref_seq.seq_align_beg": "1",
+        "_struct_ref_seq.seq_align_end": "133"
+      },
+      {
+        "_struct_ref_seq.align_id": "3",
+        "_struct_ref_seq.db_align_beg": "2",
+        "_struct_ref_seq.db_align_end": "134",
+        "_struct_ref_seq.pdbx_PDB_id_code": "4QZT",
+        "_struct_ref_seq.pdbx_auth_seq_align_beg": "1",
+        "_struct_ref_seq.pdbx_auth_seq_align_end": "133",
+        "_struct_ref_seq.pdbx_db_accession": "P50120",
+        "_struct_ref_seq.pdbx_db_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_db_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_strand_id": "B",
+        "_struct_ref_seq.ref_id": "1",
+        "_struct_ref_seq.seq_align_beg": "1",
+        "_struct_ref_seq.seq_align_end": "133"
+      },
+      {
+        "_struct_ref_seq.align_id": "4",
+        "_struct_ref_seq.db_align_beg": "2",
+        "_struct_ref_seq.db_align_end": "134",
+        "_struct_ref_seq.pdbx_PDB_id_code": "4QZT",
+        "_struct_ref_seq.pdbx_auth_seq_align_beg": "1",
+        "_struct_ref_seq.pdbx_auth_seq_align_end": "133",
+        "_struct_ref_seq.pdbx_db_accession": "P50120",
+        "_struct_ref_seq.pdbx_db_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_db_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_strand_id": "D",
+        "_struct_ref_seq.ref_id": "1",
+        "_struct_ref_seq.seq_align_beg": "1",
+        "_struct_ref_seq.seq_align_end": "133"
+      }
+    ]
+  },
+  "source_citation": [],
+  "source_file": "4QZT.cif",
+  "title": null
+}

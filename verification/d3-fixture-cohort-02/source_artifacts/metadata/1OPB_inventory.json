@@ -1,0 +1,989 @@
+{
+  "entry_id": null,
+  "nonpolymer_instances": [
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "HOH",
+      "entity_id": "3",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "I",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "135",
+          "?"
+        ],
+        [
+          "136",
+          "?"
+        ],
+        [
+          "137",
+          "?"
+        ],
+        [
+          "138",
+          "?"
+        ],
+        [
+          "139",
+          "?"
+        ],
+        [
+          "140",
+          "?"
+        ],
+        [
+          "141",
+          "?"
+        ],
+        [
+          "142",
+          "?"
+        ],
+        [
+          "143",
+          "?"
+        ],
+        [
+          "144",
+          "?"
+        ],
+        [
+          "145",
+          "?"
+        ],
+        [
+          "146",
+          "?"
+        ],
+        [
+          "147",
+          "?"
+        ],
+        [
+          "148",
+          "?"
+        ],
+        [
+          "149",
+          "?"
+        ],
+        [
+          "150",
+          "?"
+        ],
+        [
+          "151",
+          "?"
+        ],
+        [
+          "152",
+          "?"
+        ],
+        [
+          "153",
+          "?"
+        ],
+        [
+          "154",
+          "?"
+        ],
+        [
+          "155",
+          "?"
+        ],
+        [
+          "156",
+          "?"
+        ],
+        [
+          "157",
+          "?"
+        ],
+        [
+          "158",
+          "?"
+        ],
+        [
+          "159",
+          "?"
+        ],
+        [
+          "160",
+          "?"
+        ],
+        [
+          "161",
+          "?"
+        ],
+        [
+          "162",
+          "?"
+        ],
+        [
+          "163",
+          "?"
+        ],
+        [
+          "164",
+          "?"
+        ],
+        [
+          "165",
+          "?"
+        ],
+        [
+          "166",
+          "?"
+        ],
+        [
+          "167",
+          "?"
+        ],
+        [
+          "168",
+          "?"
+        ],
+        [
+          "169",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "B",
+      "comp_id": "HOH",
+      "entity_id": "3",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "J",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "135",
+          "?"
+        ],
+        [
+          "136",
+          "?"
+        ],
+        [
+          "137",
+          "?"
+        ],
+        [
+          "138",
+          "?"
+        ],
+        [
+          "139",
+          "?"
+        ],
+        [
+          "140",
+          "?"
+        ],
+        [
+          "141",
+          "?"
+        ],
+        [
+          "142",
+          "?"
+        ],
+        [
+          "143",
+          "?"
+        ],
+        [
+          "144",
+          "?"
+        ],
+        [
+          "145",
+          "?"
+        ],
+        [
+          "146",
+          "?"
+        ],
+        [
+          "147",
+          "?"
+        ],
+        [
+          "148",
+          "?"
+        ],
+        [
+          "149",
+          "?"
+        ],
+        [
+          "150",
+          "?"
+        ],
+        [
+          "151",
+          "?"
+        ],
+        [
+          "152",
+          "?"
+        ],
+        [
+          "153",
+          "?"
+        ],
+        [
+          "154",
+          "?"
+        ],
+        [
+          "155",
+          "?"
+        ],
+        [
+          "156",
+          "?"
+        ],
+        [
+          "157",
+          "?"
+        ],
+        [
+          "158",
+          "?"
+        ],
+        [
+          "159",
+          "?"
+        ],
+        [
+          "160",
+          "?"
+        ],
+        [
+          "161",
+          "?"
+        ],
+        [
+          "162",
+          "?"
+        ],
+        [
+          "163",
+          "?"
+        ],
+        [
+          "164",
+          "?"
+        ],
+        [
+          "165",
+          "?"
+        ],
+        [
+          "166",
+          "?"
+        ],
+        [
+          "167",
+          "?"
+        ],
+        [
+          "168",
+          "?"
+        ],
+        [
+          "169",
+          "?"
+        ],
+        [
+          "170",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "C",
+      "comp_id": "HOH",
+      "entity_id": "3",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "K",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "300",
+          "?"
+        ],
+        [
+          "302",
+          "?"
+        ],
+        [
+          "303",
+          "?"
+        ],
+        [
+          "306",
+          "?"
+        ],
+        [
+          "307",
+          "?"
+        ],
+        [
+          "309",
+          "?"
+        ],
+        [
+          "310",
+          "?"
+        ],
+        [
+          "314",
+          "?"
+        ],
+        [
+          "316",
+          "?"
+        ],
+        [
+          "317",
+          "?"
+        ],
+        [
+          "318",
+          "?"
+        ],
+        [
+          "319",
+          "?"
+        ],
+        [
+          "320",
+          "?"
+        ],
+        [
+          "323",
+          "?"
+        ],
+        [
+          "324",
+          "?"
+        ],
+        [
+          "325",
+          "?"
+        ],
+        [
+          "328",
+          "?"
+        ],
+        [
+          "330",
+          "?"
+        ],
+        [
+          "331",
+          "?"
+        ],
+        [
+          "332",
+          "?"
+        ],
+        [
+          "333",
+          "?"
+        ],
+        [
+          "335",
+          "?"
+        ],
+        [
+          "337",
+          "?"
+        ],
+        [
+          "341",
+          "?"
+        ],
+        [
+          "343",
+          "?"
+        ],
+        [
+          "344",
+          "?"
+        ],
+        [
+          "349",
+          "?"
+        ],
+        [
+          "351",
+          "?"
+        ],
+        [
+          "352",
+          "?"
+        ],
+        [
+          "356",
+          "?"
+        ],
+        [
+          "357",
+          "?"
+        ],
+        [
+          "358",
+          "?"
+        ],
+        [
+          "359",
+          "?"
+        ],
+        [
+          "368",
+          "?"
+        ],
+        [
+          "369",
+          "?"
+        ],
+        [
+          "370",
+          "?"
+        ],
+        [
+          "371",
+          "?"
+        ],
+        [
+          "375",
+          "?"
+        ],
+        [
+          "376",
+          "?"
+        ],
+        [
+          "418",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "D",
+      "comp_id": "HOH",
+      "entity_id": "3",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "L",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "400",
+          "?"
+        ],
+        [
+          "402",
+          "?"
+        ],
+        [
+          "403",
+          "?"
+        ],
+        [
+          "404",
+          "?"
+        ],
+        [
+          "406",
+          "?"
+        ],
+        [
+          "408",
+          "?"
+        ],
+        [
+          "409",
+          "?"
+        ],
+        [
+          "410",
+          "?"
+        ],
+        [
+          "411",
+          "?"
+        ],
+        [
+          "414",
+          "?"
+        ],
+        [
+          "417",
+          "?"
+        ],
+        [
+          "419",
+          "?"
+        ],
+        [
+          "422",
+          "?"
+        ],
+        [
+          "423",
+          "?"
+        ],
+        [
+          "424",
+          "?"
+        ],
+        [
+          "427",
+          "?"
+        ],
+        [
+          "428",
+          "?"
+        ],
+        [
+          "430",
+          "?"
+        ],
+        [
+          "431",
+          "?"
+        ],
+        [
+          "432",
+          "?"
+        ],
+        [
+          "433",
+          "?"
+        ],
+        [
+          "434",
+          "?"
+        ],
+        [
+          "435",
+          "?"
+        ],
+        [
+          "436",
+          "?"
+        ],
+        [
+          "437",
+          "?"
+        ],
+        [
+          "439",
+          "?"
+        ],
+        [
+          "440",
+          "?"
+        ],
+        [
+          "441",
+          "?"
+        ],
+        [
+          "443",
+          "?"
+        ],
+        [
+          "445",
+          "?"
+        ],
+        [
+          "446",
+          "?"
+        ],
+        [
+          "447",
+          "?"
+        ],
+        [
+          "448",
+          "?"
+        ],
+        [
+          "463",
+          "?"
+        ],
+        [
+          "464",
+          "?"
+        ],
+        [
+          "465",
+          "?"
+        ],
+        [
+          "466",
+          "?"
+        ],
+        [
+          "467",
+          "?"
+        ],
+        [
+          "468",
+          "?"
+        ],
+        [
+          "472",
+          "?"
+        ],
+        [
+          "473",
+          "?"
+        ],
+        [
+          "474",
+          "?"
+        ],
+        [
+          "476",
+          "?"
+        ],
+        [
+          "489",
+          "?"
+        ],
+        [
+          "493",
+          "?"
+        ],
+        [
+          "496",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "RET",
+      "entity_id": "2",
+      "heavy_atom_count": 21,
+      "heavy_atom_names": [
+        "C1",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C2",
+        "C20",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "O1"
+      ],
+      "label_asym_id": "E",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "134",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "B",
+      "comp_id": "RET",
+      "entity_id": "2",
+      "heavy_atom_count": 21,
+      "heavy_atom_names": [
+        "C1",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C2",
+        "C20",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "O1"
+      ],
+      "label_asym_id": "F",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "134",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "C",
+      "comp_id": "RET",
+      "entity_id": "2",
+      "heavy_atom_count": 21,
+      "heavy_atom_names": [
+        "C1",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C2",
+        "C20",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "O1"
+      ],
+      "label_asym_id": "G",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "134",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "D",
+      "comp_id": "RET",
+      "entity_id": "2",
+      "heavy_atom_count": 21,
+      "heavy_atom_names": [
+        "C1",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C2",
+        "C20",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "O1"
+      ],
+      "label_asym_id": "H",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "134",
+          "?"
+        ]
+      ]
+    }
+  ],
+  "polymer_entities": [
+    {
+      "altloc_residues": [],
+      "asym_ids": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "author_chains": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "description": "CELLULAR RETINOL BINDING PROTEIN II",
+      "entity_id": "1",
+      "missing_label_seq_ids": [
+        1
+      ],
+      "monomer_count_expected": 134,
+      "monomer_count_observed": 133,
+      "sequence": "METTHRLYSASPGLNASNGLYTHRTRPGLUMETGLUSERASNGLUASNPHEGLUGLYTYRMETLYSALALEUASPILEASPPHEALATHRARGLYSILEALAVALARGLEUTHRGLNTHRLYSILEILEVALGLNASPGLYASPASNPHELYSTHRLYSTHRASNSERTHRPHEARGASNTYRASPLEUASPPHETHRVALGLYVALGLUPHEASPGLUHISTHRLYSGLYLEUASPGLYARGASNVALLYSTHRLEUVALTHRTRPGLUGLYASNTHRLEUVALCYSVALGLNLYSGLYGLULYSGLUASNARGGLYTRPLYSGLNTRPVALGLUGLYASPLYSLEUTYRLEUGLULEUTHRCYSGLYASPGLNVALCYSARGGLNVALPHELYSLYSLYS",
+      "type": "polypeptide(L)"
+    }
+  ],
+  "resolution_A": null,
+  "source_categories": {
+    "_pdbx_struct_assembly": [
+      {
+        "_pdbx_struct_assembly.details": "author_defined_assembly",
+        "_pdbx_struct_assembly.id": "1",
+        "_pdbx_struct_assembly.method_details": "?",
+        "_pdbx_struct_assembly.oligomeric_count": "1",
+        "_pdbx_struct_assembly.oligomeric_details": "monomeric"
+      },
+      {
+        "_pdbx_struct_assembly.details": "author_defined_assembly",
+        "_pdbx_struct_assembly.id": "2",
+        "_pdbx_struct_assembly.method_details": "?",
+        "_pdbx_struct_assembly.oligomeric_count": "1",
+        "_pdbx_struct_assembly.oligomeric_details": "monomeric"
+      },
+      {
+        "_pdbx_struct_assembly.details": "author_defined_assembly",
+        "_pdbx_struct_assembly.id": "3",
+        "_pdbx_struct_assembly.method_details": "?",
+        "_pdbx_struct_assembly.oligomeric_count": "1",
+        "_pdbx_struct_assembly.oligomeric_details": "monomeric"
+      },
+      {
+        "_pdbx_struct_assembly.details": "author_defined_assembly",
+        "_pdbx_struct_assembly.id": "4",
+        "_pdbx_struct_assembly.method_details": "?",
+        "_pdbx_struct_assembly.oligomeric_count": "1",
+        "_pdbx_struct_assembly.oligomeric_details": "monomeric"
+      }
+    ],
+    "_struct_ref_seq": [
+      {
+        "_struct_ref_seq.align_id": "1",
+        "_struct_ref_seq.db_align_beg": "1",
+        "_struct_ref_seq.db_align_end": "133",
+        "_struct_ref_seq.pdbx_PDB_id_code": "1OPB",
+        "_struct_ref_seq.pdbx_auth_seq_align_beg": "1",
+        "_struct_ref_seq.pdbx_auth_seq_align_end": "133",
+        "_struct_ref_seq.pdbx_db_accession": "P06768",
+        "_struct_ref_seq.pdbx_db_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_db_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_strand_id": "A",
+        "_struct_ref_seq.ref_id": "1",
+        "_struct_ref_seq.seq_align_beg": "2",
+        "_struct_ref_seq.seq_align_end": "134"
+      },
+      {
+        "_struct_ref_seq.align_id": "2",
+        "_struct_ref_seq.db_align_beg": "1",
+        "_struct_ref_seq.db_align_end": "133",
+        "_struct_ref_seq.pdbx_PDB_id_code": "1OPB",
+        "_struct_ref_seq.pdbx_auth_seq_align_beg": "1",
+        "_struct_ref_seq.pdbx_auth_seq_align_end": "133",
+        "_struct_ref_seq.pdbx_db_accession": "P06768",
+        "_struct_ref_seq.pdbx_db_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_db_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_strand_id": "B",
+        "_struct_ref_seq.ref_id": "1",
+        "_struct_ref_seq.seq_align_beg": "2",
+        "_struct_ref_seq.seq_align_end": "134"
+      },
+      {
+        "_struct_ref_seq.align_id": "3",
+        "_struct_ref_seq.db_align_beg": "1",
+        "_struct_ref_seq.db_align_end": "133",
+        "_struct_ref_seq.pdbx_PDB_id_code": "1OPB",
+        "_struct_ref_seq.pdbx_auth_seq_align_beg": "1",
+        "_struct_ref_seq.pdbx_auth_seq_align_end": "133",
+        "_struct_ref_seq.pdbx_db_accession": "P06768",
+        "_struct_ref_seq.pdbx_db_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_db_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_strand_id": "C",
+        "_struct_ref_seq.ref_id": "1",
+        "_struct_ref_seq.seq_align_beg": "2",
+        "_struct_ref_seq.seq_align_end": "134"
+      },
+      {
+        "_struct_ref_seq.align_id": "4",
+        "_struct_ref_seq.db_align_beg": "1",
+        "_struct_ref_seq.db_align_end": "133",
+        "_struct_ref_seq.pdbx_PDB_id_code": "1OPB",
+        "_struct_ref_seq.pdbx_auth_seq_align_beg": "1",
+        "_struct_ref_seq.pdbx_auth_seq_align_end": "133",
+        "_struct_ref_seq.pdbx_db_accession": "P06768",
+        "_struct_ref_seq.pdbx_db_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_db_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_beg_ins_code": "?",
+        "_struct_ref_seq.pdbx_seq_align_end_ins_code": "?",
+        "_struct_ref_seq.pdbx_strand_id": "D",
+        "_struct_ref_seq.ref_id": "1",
+        "_struct_ref_seq.seq_align_beg": "2",
+        "_struct_ref_seq.seq_align_end": "134"
+      }
+    ]
+  },
+  "source_citation": [],
+  "source_file": "1OPB.cif",
+  "title": null
+}

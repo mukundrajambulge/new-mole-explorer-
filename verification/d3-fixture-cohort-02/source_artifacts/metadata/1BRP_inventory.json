@@ -1,0 +1,408 @@
+{
+  "entry_id": null,
+  "nonpolymer_instances": [
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "HOH",
+      "entity_id": "3",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "C",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "184",
+          "?"
+        ],
+        [
+          "185",
+          "?"
+        ],
+        [
+          "186",
+          "?"
+        ],
+        [
+          "187",
+          "?"
+        ],
+        [
+          "188",
+          "?"
+        ],
+        [
+          "189",
+          "?"
+        ],
+        [
+          "190",
+          "?"
+        ],
+        [
+          "191",
+          "?"
+        ],
+        [
+          "192",
+          "?"
+        ],
+        [
+          "193",
+          "?"
+        ],
+        [
+          "194",
+          "?"
+        ],
+        [
+          "195",
+          "?"
+        ],
+        [
+          "196",
+          "?"
+        ],
+        [
+          "197",
+          "?"
+        ],
+        [
+          "198",
+          "?"
+        ],
+        [
+          "199",
+          "?"
+        ],
+        [
+          "200",
+          "?"
+        ],
+        [
+          "201",
+          "?"
+        ],
+        [
+          "202",
+          "?"
+        ],
+        [
+          "203",
+          "?"
+        ],
+        [
+          "204",
+          "?"
+        ],
+        [
+          "205",
+          "?"
+        ],
+        [
+          "206",
+          "?"
+        ],
+        [
+          "207",
+          "?"
+        ],
+        [
+          "208",
+          "?"
+        ],
+        [
+          "209",
+          "?"
+        ],
+        [
+          "210",
+          "?"
+        ],
+        [
+          "211",
+          "?"
+        ],
+        [
+          "212",
+          "?"
+        ],
+        [
+          "213",
+          "?"
+        ],
+        [
+          "214",
+          "?"
+        ],
+        [
+          "215",
+          "?"
+        ],
+        [
+          "216",
+          "?"
+        ],
+        [
+          "217",
+          "?"
+        ],
+        [
+          "218",
+          "?"
+        ],
+        [
+          "219",
+          "?"
+        ],
+        [
+          "220",
+          "?"
+        ],
+        [
+          "221",
+          "?"
+        ],
+        [
+          "222",
+          "?"
+        ],
+        [
+          "223",
+          "?"
+        ],
+        [
+          "224",
+          "?"
+        ],
+        [
+          "225",
+          "?"
+        ],
+        [
+          "226",
+          "?"
+        ],
+        [
+          "227",
+          "?"
+        ],
+        [
+          "228",
+          "?"
+        ],
+        [
+          "229",
+          "?"
+        ],
+        [
+          "230",
+          "?"
+        ],
+        [
+          "231",
+          "?"
+        ],
+        [
+          "232",
+          "?"
+        ],
+        [
+          "233",
+          "?"
+        ],
+        [
+          "234",
+          "?"
+        ],
+        [
+          "235",
+          "?"
+        ],
+        [
+          "236",
+          "?"
+        ],
+        [
+          "237",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "RTL",
+      "entity_id": "2",
+      "heavy_atom_count": 21,
+      "heavy_atom_names": [
+        "C1",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C2",
+        "C20",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "O1"
+      ],
+      "label_asym_id": "B",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "183",
+          "?"
+        ]
+      ]
+    }
+  ],
+  "polymer_entities": [
+    {
+      "altloc_residues": [],
+      "asym_ids": [
+        "A"
+      ],
+      "author_chains": [
+        "A"
+      ],
+      "description": "RETINOL BINDING PROTEIN",
+      "entity_id": "1",
+      "missing_label_seq_ids": [
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182
+      ],
+      "monomer_count_expected": 182,
+      "monomer_count_observed": 175,
+      "sequence": "GLUARGASPCYSARGVALSERSERPHEARGVALLYSGLUASNPHEASPLYSALAARGPHESERGLYTHRTRPTYRALAMETALALYSLYSASPPROGLUGLYLEUPHELEUGLNASPASNILEVALALAGLUPHESERVALASPGLUTHRGLYGLNMETSERALATHRALALYSGLYARGVALARGLEULEUASNASNTRPASPVALCYSALAASPMETVALGLYTHRPHETHRASPTHRGLUASPPROALALYSPHELYSMETLYSTYRTRPGLYVALALASERPHELEUGLNLYSGLYASNASPASPHISTRPILEVALASPTHRASPTYRASPTHRTYRALAVALGLNTYRSERCYSARGLEULEUASNLEUASPGLYTHRCYSALAASPSERTYRSERPHEVALPHESERARGASPPROASNGLYLEUPROPROGLUALAGLNLYSILEVALARGGLNARGGLNGLUGLULEUCYSLEUALAARGGLNTYRARGLEUILEVALHISASNGLYTYRCYSASPGLYARGSERGLUARGASNLEU",
+      "type": "polypeptide(L)"
+    }
+  ],
+  "resolution_A": null,
+  "source_categories": {
+    "_citation": [
+      {
+        "_citation.book_publisher": "?",
+        "_citation.country": "UK",
+        "_citation.id": "primary",
+        "_citation.journal_abbrev": "J.Mol.Biol.",
+        "_citation.journal_id_ASTM": "JMOBAK",
+        "_citation.journal_id_CSD": "0070",
+        "_citation.journal_id_ISSN": "0022-2836",
+        "_citation.journal_volume": "230",
+        "_citation.page_first": "613",
+        "_citation.page_last": "624",
+        "_citation.pdbx_database_id_DOI": "10.1006/jmbi.1993.1173",
+        "_citation.pdbx_database_id_PubMed": "8464067",
+        "_citation.title": "Crystal structure of the trigonal form of human plasma retinol-binding protein at 2.5 A resolution.",
+        "_citation.year": "1993"
+      },
+      {
+        "_citation.book_publisher": "?",
+        "_citation.country": "UK",
+        "_citation.id": "1",
+        "_citation.journal_abbrev": "J.Mol.Biol.",
+        "_citation.journal_id_ASTM": "JMOBAK",
+        "_citation.journal_id_CSD": "0070",
+        "_citation.journal_id_ISSN": "0022-2836",
+        "_citation.journal_volume": "178",
+        "_citation.page_first": "477",
+        "_citation.page_last": "?",
+        "_citation.pdbx_database_id_DOI": "?",
+        "_citation.pdbx_database_id_PubMed": "?",
+        "_citation.title": "Crystallization of Human Plasma Apo-Retinol-Binding Protein",
+        "_citation.year": "1984"
+      },
+      {
+        "_citation.book_publisher": "?",
+        "_citation.country": "UK",
+        "_citation.id": "2",
+        "_citation.journal_abbrev": "J.Mol.Biol.",
+        "_citation.journal_id_ASTM": "JMOBAK",
+        "_citation.journal_id_CSD": "0070",
+        "_citation.journal_id_ISSN": "0022-2836",
+        "_citation.journal_volume": "163",
+        "_citation.page_first": "679",
+        "_citation.page_last": "?",
+        "_citation.pdbx_database_id_DOI": "?",
+        "_citation.pdbx_database_id_PubMed": "?",
+        "_citation.title": "Crystallization and Preliminary X-Ray Data of Human Plasma Retinol-Binding Protein",
+        "_citation.year": "1983"
+      }
+    ]
+  },
+  "source_citation": [
+    {
+      "_citation.book_publisher": "?",
+      "_citation.country": "UK",
+      "_citation.id": "primary",
+      "_citation.journal_abbrev": "J.Mol.Biol.",
+      "_citation.journal_id_ASTM": "JMOBAK",
+      "_citation.journal_id_CSD": "0070",
+      "_citation.journal_id_ISSN": "0022-2836",
+      "_citation.journal_volume": "230",
+      "_citation.page_first": "613",
+      "_citation.page_last": "624",
+      "_citation.pdbx_database_id_DOI": "10.1006/jmbi.1993.1173",
+      "_citation.pdbx_database_id_PubMed": "8464067",
+      "_citation.title": "Crystal structure of the trigonal form of human plasma retinol-binding protein at 2.5 A resolution.",
+      "_citation.year": "1993"
+    },
+    {
+      "_citation.book_publisher": "?",
+      "_citation.country": "UK",
+      "_citation.id": "1",
+      "_citation.journal_abbrev": "J.Mol.Biol.",
+      "_citation.journal_id_ASTM": "JMOBAK",
+      "_citation.journal_id_CSD": "0070",
+      "_citation.journal_id_ISSN": "0022-2836",
+      "_citation.journal_volume": "178",
+      "_citation.page_first": "477",
+      "_citation.page_last": "?",
+      "_citation.pdbx_database_id_DOI": "?",
+      "_citation.pdbx_database_id_PubMed": "?",
+      "_citation.title": "Crystallization of Human Plasma Apo-Retinol-Binding Protein",
+      "_citation.year": "1984"
+    },
+    {
+      "_citation.book_publisher": "?",
+      "_citation.country": "UK",
+      "_citation.id": "2",
+      "_citation.journal_abbrev": "J.Mol.Biol.",
+      "_citation.journal_id_ASTM": "JMOBAK",
+      "_citation.journal_id_CSD": "0070",
+      "_citation.journal_id_ISSN": "0022-2836",
+      "_citation.journal_volume": "163",
+      "_citation.page_first": "679",
+      "_citation.page_last": "?",
+      "_citation.pdbx_database_id_DOI": "?",
+      "_citation.pdbx_database_id_PubMed": "?",
+      "_citation.title": "Crystallization and Preliminary X-Ray Data of Human Plasma Retinol-Binding Protein",
+      "_citation.year": "1983"
+    }
+  ],
+  "source_file": "1BRP.cif",
+  "title": null
+}

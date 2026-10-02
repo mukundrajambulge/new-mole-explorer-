@@ -1,0 +1,618 @@
+{
+  "entry_id": null,
+  "nonpolymer_instances": [
+    {
+      "altlocs": [
+        "A"
+      ],
+      "author_chain": "A",
+      "comp_id": "HOH",
+      "entity_id": "3",
+      "heavy_atom_count": 1,
+      "heavy_atom_names": [
+        "O"
+      ],
+      "label_asym_id": "C",
+      "occupancies": [
+        "0.50",
+        "1.00"
+      ],
+      "residues": [
+        [
+          "2001",
+          "?"
+        ],
+        [
+          "2002",
+          "?"
+        ],
+        [
+          "2003",
+          "?"
+        ],
+        [
+          "2004",
+          "?"
+        ],
+        [
+          "2005",
+          "?"
+        ],
+        [
+          "2006",
+          "?"
+        ],
+        [
+          "2007",
+          "?"
+        ],
+        [
+          "2008",
+          "?"
+        ],
+        [
+          "2009",
+          "?"
+        ],
+        [
+          "2010",
+          "?"
+        ],
+        [
+          "2011",
+          "?"
+        ],
+        [
+          "2012",
+          "?"
+        ],
+        [
+          "2013",
+          "?"
+        ],
+        [
+          "2014",
+          "?"
+        ],
+        [
+          "2015",
+          "?"
+        ],
+        [
+          "2016",
+          "?"
+        ],
+        [
+          "2017",
+          "?"
+        ],
+        [
+          "2018",
+          "?"
+        ],
+        [
+          "2019",
+          "?"
+        ],
+        [
+          "2020",
+          "?"
+        ],
+        [
+          "2021",
+          "?"
+        ],
+        [
+          "2022",
+          "?"
+        ],
+        [
+          "2023",
+          "?"
+        ],
+        [
+          "2024",
+          "?"
+        ],
+        [
+          "2025",
+          "?"
+        ],
+        [
+          "2026",
+          "?"
+        ],
+        [
+          "2027",
+          "?"
+        ],
+        [
+          "2028",
+          "?"
+        ],
+        [
+          "2029",
+          "?"
+        ],
+        [
+          "2030",
+          "?"
+        ],
+        [
+          "2031",
+          "?"
+        ],
+        [
+          "2032",
+          "?"
+        ],
+        [
+          "2033",
+          "?"
+        ],
+        [
+          "2034",
+          "?"
+        ],
+        [
+          "2035",
+          "?"
+        ],
+        [
+          "2036",
+          "?"
+        ],
+        [
+          "2037",
+          "?"
+        ],
+        [
+          "2038",
+          "?"
+        ],
+        [
+          "2039",
+          "?"
+        ],
+        [
+          "2040",
+          "?"
+        ],
+        [
+          "2041",
+          "?"
+        ],
+        [
+          "2042",
+          "?"
+        ],
+        [
+          "2043",
+          "?"
+        ],
+        [
+          "2044",
+          "?"
+        ],
+        [
+          "2045",
+          "?"
+        ],
+        [
+          "2046",
+          "?"
+        ],
+        [
+          "2047",
+          "?"
+        ],
+        [
+          "2048",
+          "?"
+        ],
+        [
+          "2049",
+          "?"
+        ],
+        [
+          "2050",
+          "?"
+        ],
+        [
+          "2051",
+          "?"
+        ],
+        [
+          "2052",
+          "?"
+        ],
+        [
+          "2053",
+          "?"
+        ],
+        [
+          "2054",
+          "?"
+        ],
+        [
+          "2055",
+          "?"
+        ],
+        [
+          "2056",
+          "?"
+        ],
+        [
+          "2057",
+          "?"
+        ],
+        [
+          "2058",
+          "?"
+        ],
+        [
+          "2059",
+          "?"
+        ],
+        [
+          "2060",
+          "?"
+        ],
+        [
+          "2061",
+          "?"
+        ],
+        [
+          "2062",
+          "?"
+        ],
+        [
+          "2063",
+          "?"
+        ],
+        [
+          "2064",
+          "?"
+        ],
+        [
+          "2065",
+          "?"
+        ],
+        [
+          "2066",
+          "?"
+        ],
+        [
+          "2067",
+          "?"
+        ],
+        [
+          "2068",
+          "?"
+        ],
+        [
+          "2069",
+          "?"
+        ],
+        [
+          "2070",
+          "?"
+        ],
+        [
+          "2071",
+          "?"
+        ],
+        [
+          "2072",
+          "?"
+        ],
+        [
+          "2073",
+          "?"
+        ],
+        [
+          "2074",
+          "?"
+        ],
+        [
+          "2075",
+          "?"
+        ],
+        [
+          "2076",
+          "?"
+        ],
+        [
+          "2077",
+          "?"
+        ],
+        [
+          "2078",
+          "?"
+        ],
+        [
+          "2079",
+          "?"
+        ],
+        [
+          "2080",
+          "?"
+        ],
+        [
+          "2081",
+          "?"
+        ],
+        [
+          "2082",
+          "?"
+        ],
+        [
+          "2083",
+          "?"
+        ],
+        [
+          "2084",
+          "?"
+        ],
+        [
+          "2085",
+          "?"
+        ],
+        [
+          "2086",
+          "?"
+        ],
+        [
+          "2087",
+          "?"
+        ],
+        [
+          "2088",
+          "?"
+        ],
+        [
+          "2089",
+          "?"
+        ],
+        [
+          "2090",
+          "?"
+        ],
+        [
+          "2091",
+          "?"
+        ],
+        [
+          "2092",
+          "?"
+        ],
+        [
+          "2093",
+          "?"
+        ],
+        [
+          "2094",
+          "?"
+        ],
+        [
+          "2095",
+          "?"
+        ],
+        [
+          "2096",
+          "?"
+        ],
+        [
+          "2097",
+          "?"
+        ],
+        [
+          "2098",
+          "?"
+        ],
+        [
+          "2099",
+          "?"
+        ],
+        [
+          "2100",
+          "?"
+        ],
+        [
+          "2101",
+          "?"
+        ],
+        [
+          "2102",
+          "?"
+        ],
+        [
+          "2103",
+          "?"
+        ],
+        [
+          "2104",
+          "?"
+        ],
+        [
+          "2105",
+          "?"
+        ],
+        [
+          "2106",
+          "?"
+        ],
+        [
+          "2107",
+          "?"
+        ],
+        [
+          "2108",
+          "?"
+        ],
+        [
+          "2109",
+          "?"
+        ],
+        [
+          "2110",
+          "?"
+        ],
+        [
+          "2111",
+          "?"
+        ],
+        [
+          "2112",
+          "?"
+        ],
+        [
+          "2113",
+          "?"
+        ],
+        [
+          "2114",
+          "?"
+        ],
+        [
+          "2115",
+          "?"
+        ],
+        [
+          "2116",
+          "?"
+        ]
+      ]
+    },
+    {
+      "altlocs": [],
+      "author_chain": "A",
+      "comp_id": "PLM",
+      "entity_id": "2",
+      "heavy_atom_count": 18,
+      "heavy_atom_names": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "CA",
+        "CB",
+        "CC",
+        "CD",
+        "CE",
+        "CF",
+        "CG",
+        "O1",
+        "O2"
+      ],
+      "label_asym_id": "B",
+      "occupancies": [
+        "1.00"
+      ],
+      "residues": [
+        [
+          "1163",
+          "?"
+        ]
+      ]
+    }
+  ],
+  "polymer_entities": [
+    {
+      "altloc_residues": [],
+      "asym_ids": [
+        "A"
+      ],
+      "author_chains": [
+        "A"
+      ],
+      "description": "BETA-LACTOGLOBULIN",
+      "entity_id": "1",
+      "missing_label_seq_ids": [
+        1
+      ],
+      "monomer_count_expected": 162,
+      "monomer_count_observed": 161,
+      "sequence": "LEUILEVALTHRGLNTHRMETLYSGLYLEUASPILEGLNLYSVALALAGLYTHRTRPTYRSERLEUALAMETALAALASERASPILESERLEULEUASPALAGLNSERALAPROLEUARGVALTYRVALGLUGLULEULYSPROTHRPROGLUGLYASPLEUGLUILELEULEUGLNLYSTRPGLUASNGLYGLUCYSALAGLNLYSLYSILEILEALAGLULYSTHRLYSILEPROALAVALPHELYSILEASPALALEUASNGLUASNLYSVALLEUVALLEUASPTHRASPTYRLYSLYSTYRLEULEUPHECYSMETGLUASNSERALAGLUPROGLUGLNSERLEUALACYSGLNCYSLEUVALARGTHRPROGLUVALASPASPGLUALALEUGLULYSPHEASPLYSALALEULYSALALEUPROMETHISILEARGLEUSERPHEASNPROTHRGLNLEUGLUGLUGLNCYSHISILE",
+      "type": "polypeptide(L)"
+    }
+  ],
+  "resolution_A": null,
+  "source_categories": {
+    "_citation": [
+      {
+        "_citation.book_publisher": "?",
+        "_citation.country": "UK",
+        "_citation.id": "primary",
+        "_citation.journal_abbrev": "J.Mol.Biol.",
+        "_citation.journal_id_ASTM": "JMOBAK",
+        "_citation.journal_id_CSD": "0070",
+        "_citation.journal_id_ISSN": "0022-2836",
+        "_citation.journal_volume": "318",
+        "_citation.page_first": "1043",
+        "_citation.page_last": "?",
+        "_citation.pdbx_database_id_DOI": "10.1016/S0022-2836(02)00017-7",
+        "_citation.pdbx_database_id_PubMed": "12054801",
+        "_citation.title": "The Ligand-Binding Site of Bovine Beta-Lactoglobulin: Evidence for a Function?",
+        "_citation.year": "2002"
+      },
+      {
+        "_citation.book_publisher": "?",
+        "_citation.country": "US",
+        "_citation.id": "1",
+        "_citation.journal_abbrev": "J.Biol.Chem.",
+        "_citation.journal_id_ASTM": "JBCHA3",
+        "_citation.journal_id_CSD": "0071",
+        "_citation.journal_id_ISSN": "0021-9258",
+        "_citation.journal_volume": "274",
+        "_citation.page_first": "170",
+        "_citation.page_last": "?",
+        "_citation.pdbx_database_id_DOI": "10.1074/JBC.274.1.170",
+        "_citation.pdbx_database_id_PubMed": "9867826",
+        "_citation.title": "Beta-Lactoglobuli Binds Palmitate within its Central Cavity",
+        "_citation.year": "1999"
+      }
+    ]
+  },
+  "source_citation": [
+    {
+      "_citation.book_publisher": "?",
+      "_citation.country": "UK",
+      "_citation.id": "primary",
+      "_citation.journal_abbrev": "J.Mol.Biol.",
+      "_citation.journal_id_ASTM": "JMOBAK",
+      "_citation.journal_id_CSD": "0070",
+      "_citation.journal_id_ISSN": "0022-2836",
+      "_citation.journal_volume": "318",
+      "_citation.page_first": "1043",
+      "_citation.page_last": "?",
+      "_citation.pdbx_database_id_DOI": "10.1016/S0022-2836(02)00017-7",
+      "_citation.pdbx_database_id_PubMed": "12054801",
+      "_citation.title": "The Ligand-Binding Site of Bovine Beta-Lactoglobulin: Evidence for a Function?",
+      "_citation.year": "2002"
+    },
+    {
+      "_citation.book_publisher": "?",
+      "_citation.country": "US",
+      "_citation.id": "1",
+      "_citation.journal_abbrev": "J.Biol.Chem.",
+      "_citation.journal_id_ASTM": "JBCHA3",
+      "_citation.journal_id_CSD": "0071",
+      "_citation.journal_id_ISSN": "0021-9258",
+      "_citation.journal_volume": "274",
+      "_citation.page_first": "170",
+      "_citation.page_last": "?",
+      "_citation.pdbx_database_id_DOI": "10.1074/JBC.274.1.170",
+      "_citation.pdbx_database_id_PubMed": "9867826",
+      "_citation.title": "Beta-Lactoglobuli Binds Palmitate within its Central Cavity",
+      "_citation.year": "1999"
+    }
+  ],
+  "source_file": "1GXA.cif",
+  "title": null
+}
