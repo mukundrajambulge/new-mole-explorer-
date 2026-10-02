@@ -1,0 +1,5 @@
+* -text
+source_artifacts/** -diff
+*.cif binary
+*.pdf binary
+*.pyc binary

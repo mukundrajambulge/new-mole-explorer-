@@ -1,0 +1,1765 @@
+{
+  "data": {
+    "entries": [
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9C05"
+        },
+        "struct": {
+          "title": "UIC-1 soaked in equimolar benzene, toluene, isopropylbenzene, and ortho-xylene"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.97
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "PYJ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "PYJ",
+                "name": "PHENYLETHANE",
+                "formula_weight": 106.165,
+                "formula": "C8 H10"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "OXE",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "OXE",
+                "name": "ORTHO-XYLENE",
+                "formula_weight": 106.165,
+                "formula": "C8 H10"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "IPB",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "IPB",
+                "name": "5-METHYL-2-(1-METHYLETHYL)PHENOL",
+                "formula_weight": 150.218,
+                "formula": "C10 H14 O"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I6W",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I6W",
+                "name": "ethyl 5'-formyl[2,2'-bipyridine]-5-carboxylate",
+                "formula_weight": 272.256,
+                "formula": "C14 H12 N2 O4"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I77",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I77",
+                "name": "5'-(hydrazinecarbonyl)[2,2'-bipyridine]-5-carboxamide",
+                "formula_weight": 257.248,
+                "formula": "C12 H11 N5 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "UIC-1"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "synthetic construct"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "3HH4"
+        },
+        "struct": {
+          "title": "New azaborine compounds bind to the T4 lysozyme L99A cavity - Benzene as control"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.25
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "PO4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "PO4",
+                "name": "PHOSPHATE ION",
+                "formula_weight": 94.971,
+                "formula": "O4 P"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "HED",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "HED",
+                "name": "2-HYDROXYETHYL DISULFIDE",
+                "formula_weight": 154.251,
+                "formula": "C4 H10 O2 S2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Lysozyme"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Tequatrovirus T4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "5JWT"
+        },
+        "struct": {
+          "title": "T4 Lysozyme L99A/M102Q with Benzene Bound"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.41
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Endolysin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Tequatrovirus T4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "23UH"
+        },
+        "struct": {
+          "title": "Structure of the CYP102A1 Heme Domain with 2-(undecylcarbamoyl)benzoic acid and benzene"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.48
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "A1MES",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "A1MES",
+                "name": "2-(undecylcarbamoyl)benzoic acid",
+                "formula_weight": 319.438,
+                "formula": "C19 H29 N O3"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "HEM",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "HEM",
+                "name": "PROTOPORPHYRIN IX CONTAINING FE",
+                "formula_weight": 616.487,
+                "formula": "C34 H32 Fe N4 O4"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Bifunctional cytochrome P450/NADPH--P450 reductase"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Priestia megaterium"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "4W52"
+        },
+        "struct": {
+          "title": "T4 Lysozyme L99A with Benzene Bound"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.5001
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "EPE",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "EPE",
+                "name": "4-(2-HYDROXYETHYL)-1-PIPERAZINE ETHANESULFONIC ACID",
+                "formula_weight": 238.305,
+                "formula": "C8 H18 N2 O4 S"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Endolysin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Tequatrovirus T4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "3GUJ"
+        },
+        "struct": {
+          "title": "T4 lysozyme M102E/L99A mutant with buried charge in apolar cavity--Benzene binding"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.6
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BME",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BME",
+                "name": "BETA-MERCAPTOETHANOL",
+                "formula_weight": 78.133,
+                "formula": "C2 H6 O S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SO4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SO4",
+                "name": "SULFATE ION",
+                "formula_weight": 96.063,
+                "formula": "O4 S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "EPE",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "EPE",
+                "name": "4-(2-HYDROXYETHYL)-1-PIPERAZINE ETHANESULFONIC ACID",
+                "formula_weight": 238.305,
+                "formula": "C8 H18 N2 O4 S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CO3",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CO3",
+                "name": "CARBONATE ION",
+                "formula_weight": 60.009,
+                "formula": "C O3"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Lysozyme"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Tequatrovirus T4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "4I7J"
+        },
+        "struct": {
+          "title": "T4 Lysozyme L99A/M102H with benzene bound"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.67
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BME",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BME",
+                "name": "BETA-MERCAPTOETHANOL",
+                "formula_weight": 78.133,
+                "formula": "C2 H6 O S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SO4",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SO4",
+                "name": "SULFATE ION",
+                "formula_weight": 96.063,
+                "formula": "O4 S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "ACT",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "ACT",
+                "name": "ACETATE ION",
+                "formula_weight": 59.044,
+                "formula": "C2 H3 O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "HED",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "HED",
+                "name": "2-HYDROXYETHYL DISULFIDE",
+                "formula_weight": 154.251,
+                "formula": "C4 H10 O2 S2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Lysozyme"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Tequatrovirus T4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "2YKY"
+        },
+        "struct": {
+          "title": "Structural Determinants of the Beta-Selectivity of a Bacterial Aminotransferase"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.69
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "EDO",
+              "auth_asym_ids": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "EDO",
+                "name": "1,2-ETHANEDIOL",
+                "formula_weight": 62.068,
+                "formula": "C2 H6 O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "PLP",
+              "auth_asym_ids": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "PLP",
+                "name": "PYRIDOXAL-5'-PHOSPHATE",
+                "formula_weight": 247.142,
+                "formula": "C8 H10 N O6 P"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SFE",
+              "auth_asym_ids": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SFE",
+                "name": "(3S)-3-amino-3-phenylpropanoic acid",
+                "formula_weight": 165.189,
+                "formula": "C9 H11 N O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "B",
+                "C"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "GOL",
+              "auth_asym_ids": [
+                "C"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "GOL",
+                "name": "GLYCEROL",
+                "formula_weight": 92.094,
+                "formula": "C3 H8 O3"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "BETA-TRANSAMINASE"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Mesorhizobium sp. LUK"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "1L83"
+        },
+        "struct": {
+          "title": "A CAVITY-CONTAINING MUTANT OF T4 LYSOZYME IS STABILIZED BY BURIED BENZENE"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.7
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BME",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BME",
+                "name": "BETA-MERCAPTOETHANOL",
+                "formula_weight": 78.133,
+                "formula": "C2 H6 O S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CL",
+                "name": "CHLORIDE ION",
+                "formula_weight": 35.453,
+                "formula": "Cl"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "T4 LYSOZYME"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Tequatrovirus T4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "3DMX"
+        },
+        "struct": {
+          "title": "Benzene binding in the hydrophobic cavity of T4 lysozyme L99A mutant"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.8
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "PO4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "PO4",
+                "name": "PHOSPHATE ION",
+                "formula_weight": 94.971,
+                "formula": "O4 P"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "HED",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "HED",
+                "name": "2-HYDROXYETHYL DISULFIDE",
+                "formula_weight": 154.251,
+                "formula": "C4 H10 O2 S2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CL",
+                "name": "CHLORIDE ION",
+                "formula_weight": 35.453,
+                "formula": "Cl"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Lysozyme"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Tequatrovirus T4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "220L"
+        },
+        "struct": {
+          "title": "GENERATING LIGAND BINDING SITES IN T4 LYSOZYME USING DEFICIENCY-CREATING SUBSTITUTIONS"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.85
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BME",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BME",
+                "name": "BETA-MERCAPTOETHANOL",
+                "formula_weight": 78.133,
+                "formula": "C2 H6 O S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CL",
+                "name": "CHLORIDE ION",
+                "formula_weight": 35.453,
+                "formula": "Cl"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "T4 LYSOZYME"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Tequatrovirus T4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "2Z9G"
+        },
+        "struct": {
+          "title": "Complex structure of SARS-CoV 3C-like protease with PMA"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.86
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "HG",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "HG",
+                "name": "MERCURY (II) ION",
+                "formula_weight": 200.59,
+                "formula": "Hg"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "3C-like proteinase"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Severe acute respiratory syndrome-related coronavirus"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "1CP4"
+        },
+        "struct": {
+          "title": "FORMATION, CRYSTAL STRUCTURE, AND REARRANGEMENT OF A CYTOCHROME P450-CAM IRON-PHENYL COMPLEX"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "HEM",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "HEM",
+                "name": "PROTOPORPHYRIN IX CONTAINING FE",
+                "formula_weight": 616.487,
+                "formula": "C34 H32 Fe N4 O4"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "CYTOCHROME P450-CAM"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Pseudomonas putida"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "1L84"
+        },
+        "struct": {
+          "title": "A CAVITY-CONTAINING MUTANT OF T4 LYSOZYME IS STABILIZED BY BURIED BENZENE"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BME",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BME",
+                "name": "BETA-MERCAPTOETHANOL",
+                "formula_weight": 78.133,
+                "formula": "C2 H6 O S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CL",
+                "name": "CHLORIDE ION",
+                "formula_weight": 35.453,
+                "formula": "Cl"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "T4 LYSOZYME"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Tequatrovirus T4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "223L"
+        },
+        "struct": {
+          "title": "GENERATING LIGAND BINDING SITES IN T4 LYSOZYME USING DEFICIENCY-CREATING SUBSTITUTIONS"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BME",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BME",
+                "name": "BETA-MERCAPTOETHANOL",
+                "formula_weight": 78.133,
+                "formula": "C2 H6 O S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CL",
+                "name": "CHLORIDE ION",
+                "formula_weight": 35.453,
+                "formula": "Cl"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "T4 LYSOZYME"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Tequatrovirus T4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9BZT"
+        },
+        "struct": {
+          "title": "UIC-1 bound to benzene"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.82
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I6W",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I6W",
+                "name": "ethyl 5'-formyl[2,2'-bipyridine]-5-carboxylate",
+                "formula_weight": 272.256,
+                "formula": "C14 H12 N2 O4"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I77",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I77",
+                "name": "5'-(hydrazinecarbonyl)[2,2'-bipyridine]-5-carboxamide",
+                "formula_weight": 257.248,
+                "formula": "C12 H11 N5 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "UIC-1"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "synthetic construct"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "227L"
+        },
+        "struct": {
+          "title": "GENERATING LIGAND BINDING SITES IN T4 LYSOZYME USING DEFICIENCY-CREATING SUBSTITUTIONS"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            2.0
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BME",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BME",
+                "name": "BETA-MERCAPTOETHANOL",
+                "formula_weight": 78.133,
+                "formula": "C2 H6 O S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CL",
+                "name": "CHLORIDE ION",
+                "formula_weight": 35.453,
+                "formula": "Cl"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "T4 LYSOZYME"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Tequatrovirus T4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "1A7Z"
+        },
+        "struct": {
+          "title": "CRYSTAL STRUCTURE OF ACTINOMYCIN Z3"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.95
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "ACTINOMYCIN Z3"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Streptomyces fradiae"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "181L"
+        },
+        "struct": {
+          "title": "SPECIFICITY OF LIGAND BINDING IN A BURIED NON-POLAR CAVITY OF T4 LYSOZYME: LINKAGE OF DYNAMICS AND STRUCTURAL PLASTICITY"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            1.8
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CL",
+                "name": "CHLORIDE ION",
+                "formula_weight": 35.453,
+                "formula": "Cl"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "HED",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "HED",
+                "name": "2-HYDROXYETHYL DISULFIDE",
+                "formula_weight": 154.251,
+                "formula": "C4 H10 O2 S2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "T4 LYSOZYME"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Tequatrovirus T4"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

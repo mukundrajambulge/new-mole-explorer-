@@ -1,0 +1,79 @@
+{
+  "query": {
+    "type": "group",
+    "logical_operator": "and",
+    "nodes": [
+      {
+        "type": "terminal",
+        "service": "text",
+        "parameters": {
+          "attribute": "exptl.method",
+          "operator": "exact_match",
+          "value": "X-RAY DIFFRACTION"
+        }
+      },
+      {
+        "type": "terminal",
+        "service": "text",
+        "parameters": {
+          "attribute": "rcsb_entry_info.resolution_combined",
+          "operator": "less_or_equal",
+          "value": 2.0
+        }
+      },
+      {
+        "type": "terminal",
+        "service": "text",
+        "parameters": {
+          "attribute": "rcsb_entry_info.deposited_model_count",
+          "operator": "equals",
+          "value": 1
+        }
+      },
+      {
+        "type": "terminal",
+        "service": "text",
+        "parameters": {
+          "attribute": "rcsb_entry_info.polymer_entity_count_protein",
+          "operator": "greater_or_equal",
+          "value": 1
+        }
+      },
+      {
+        "type": "terminal",
+        "service": "text",
+        "parameters": {
+          "attribute": "rcsb_nonpolymer_entity_container_identifiers.nonpolymer_comp_id",
+          "operator": "in",
+          "value": [
+            "BNZ",
+            "BEN",
+            "BEZ",
+            "N92",
+            "TZL",
+            "IPH",
+            "IND",
+            "NAP",
+            "TOL",
+            "4I1",
+            "IPB",
+            "PYJ"
+          ]
+        }
+      }
+    ]
+  },
+  "return_type": "entry",
+  "request_options": {
+    "paginate": {
+      "start": 0,
+      "rows": 100
+    },
+    "sort": [
+      {
+        "sort_by": "rcsb_entry_info.resolution_combined",
+        "direction": "asc"
+      }
+    ]
+  }
+}

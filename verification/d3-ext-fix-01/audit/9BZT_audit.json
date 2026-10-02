@@ -1,0 +1,582 @@
+{
+  "source_file": "9BZT.cif",
+  "ligand_component": "BNZ",
+  "ligand_label_asym": "C",
+  "ligand_residues": [
+    [
+      "A",
+      "102",
+      "BNZ"
+    ]
+  ],
+  "ligand_heavy_atom_names_observed": [
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "C5",
+    "C6"
+  ],
+  "ligand_heavy_atom_count_observed": 6,
+  "ligand_atom_rows_including_altlocs": 6,
+  "ligand_altloc_labels": [],
+  "ligand_occupancy_values": [
+    1.0
+  ],
+  "model_1_only": true,
+  "receptor_label_asym": "A",
+  "receptor_entity_id": "1",
+  "receptor_observed_heavy_atom_count": 54,
+  "receptor_observed_residue_count": 5,
+  "receptor_polymer_expected_residue_count": 9,
+  "receptor_observed_label_seq_min_max": [
+    1,
+    9
+  ],
+  "receptor_unobserved_label_seq_ids": [
+    2,
+    4,
+    6,
+    8
+  ],
+  "unobserved_atom_rows_model_1": [],
+  "unobserved_residue_rows_model_1": [],
+  "receptor_altloc_residue_count_total": 2,
+  "receptor_altloc_residues_within_5A_of_ligand": [
+    [
+      "9",
+      "LEU"
+    ]
+  ],
+  "waters_by_min_heavy_atom_distance": [
+    {
+      "asym": "G",
+      "auth_seq": "201",
+      "comp": "HOH",
+      "occupancy": 1.0,
+      "B_iso_A2": 9.32918,
+      "min_distance_A": 9.041968923414855
+    }
+  ],
+  "water_network_geometry_only_within_8A": [],
+  "water_residue_count_within_5A": 0,
+  "water_residue_count_within_8A": 0,
+  "nearest_water_distance_A": 9.041968923414855,
+  "nonpolymer_components_by_min_distance": [
+    {
+      "asym": "B",
+      "auth_seq": "101",
+      "comp": "I77",
+      "min_distance_A": 3.228495655332372,
+      "elements": [
+        "C",
+        "N",
+        "O"
+      ]
+    },
+    {
+      "asym": "A",
+      "auth_seq": "9",
+      "comp": "AIB",
+      "min_distance_A": 3.5986576921958,
+      "elements": [
+        "C",
+        "N",
+        "O"
+      ]
+    },
+    {
+      "asym": "A",
+      "auth_seq": "7",
+      "comp": "AIB",
+      "min_distance_A": 6.7942079609620425,
+      "elements": [
+        "C",
+        "N",
+        "O"
+      ]
+    },
+    {
+      "asym": "A",
+      "auth_seq": "5",
+      "comp": "AIB",
+      "min_distance_A": 10.3459145888655,
+      "elements": [
+        "C",
+        "N",
+        "O"
+      ]
+    },
+    {
+      "asym": "A",
+      "auth_seq": "3",
+      "comp": "AIB",
+      "min_distance_A": 12.386478998589551,
+      "elements": [
+        "C",
+        "N",
+        "O"
+      ]
+    },
+    {
+      "asym": "F",
+      "auth_seq": "105",
+      "comp": "I6W",
+      "min_distance_A": 15.16476924101056,
+      "elements": [
+        "C",
+        "N",
+        "O"
+      ]
+    }
+  ],
+  "metals_by_min_distance_A": [],
+  "nearest_100_receptor_atoms_to_ligand": [
+    {
+      "distance_A": 3.893710946975905,
+      "comp": "GLN",
+      "auth_seq": "8",
+      "atom": "O",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 4.342777394502278,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "O",
+      "altloc": "B",
+      "occupancy": 0.237
+    },
+    {
+      "distance_A": 4.443518672786241,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "C",
+      "altloc": "B",
+      "occupancy": 0.237
+    },
+    {
+      "distance_A": 4.841960660445311,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "C",
+      "altloc": "A",
+      "occupancy": 0.763
+    },
+    {
+      "distance_A": 4.920106534273419,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "CA",
+      "altloc": "B",
+      "occupancy": 0.237
+    },
+    {
+      "distance_A": 4.944842009538828,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "N",
+      "altloc": "B",
+      "occupancy": 0.237
+    },
+    {
+      "distance_A": 4.99974569527291,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "N",
+      "altloc": "A",
+      "occupancy": 0.763
+    },
+    {
+      "distance_A": 5.0603053598078445,
+      "comp": "GLN",
+      "auth_seq": "8",
+      "atom": "C",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 5.174103345112078,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "CA",
+      "altloc": "A",
+      "occupancy": 0.763
+    },
+    {
+      "distance_A": 5.497969821906992,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "O",
+      "altloc": "A",
+      "occupancy": 0.763
+    },
+    {
+      "distance_A": 6.226985101467643,
+      "comp": "GLN",
+      "auth_seq": "8",
+      "atom": "CA",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 6.41165904447515,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "CB",
+      "altloc": "B",
+      "occupancy": 0.237
+    },
+    {
+      "distance_A": 6.692670777230866,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "CB",
+      "altloc": "A",
+      "occupancy": 0.763
+    },
+    {
+      "distance_A": 6.73638679265079,
+      "comp": "GLN",
+      "auth_seq": "8",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 7.203559201408704,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "CG",
+      "altloc": "B",
+      "occupancy": 0.237
+    },
+    {
+      "distance_A": 7.219169999251991,
+      "comp": "GLN",
+      "auth_seq": "8",
+      "atom": "CG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 7.289739891237547,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "CD2",
+      "altloc": "A",
+      "occupancy": 0.763
+    },
+    {
+      "distance_A": 7.421752022103675,
+      "comp": "GLN",
+      "auth_seq": "8",
+      "atom": "N",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 7.525787376567318,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "CG",
+      "altloc": "A",
+      "occupancy": 0.763
+    },
+    {
+      "distance_A": 7.677141053999203,
+      "comp": "GLN",
+      "auth_seq": "8",
+      "atom": "OE1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 8.036815187834046,
+      "comp": "GLN",
+      "auth_seq": "8",
+      "atom": "CD",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 8.12406592192604,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "CD2",
+      "altloc": "B",
+      "occupancy": 0.237
+    },
+    {
+      "distance_A": 8.175136152951827,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "CD1",
+      "altloc": "B",
+      "occupancy": 0.237
+    },
+    {
+      "distance_A": 8.814780800825396,
+      "comp": "LEU",
+      "auth_seq": "6",
+      "atom": "O",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 8.991674666718097,
+      "comp": "LEU",
+      "auth_seq": "10",
+      "atom": "CD1",
+      "altloc": "A",
+      "occupancy": 0.763
+    },
+    {
+      "distance_A": 9.335339736688752,
+      "comp": "GLN",
+      "auth_seq": "8",
+      "atom": "NE2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 9.702067875185167,
+      "comp": "LEU",
+      "auth_seq": "6",
+      "atom": "C",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 10.2773622196262,
+      "comp": "ALA",
+      "auth_seq": "4",
+      "atom": "O",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 10.972060231738613,
+      "comp": "LEU",
+      "auth_seq": "6",
+      "atom": "CA",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 11.509933982912326,
+      "comp": "ALA",
+      "auth_seq": "4",
+      "atom": "C",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 11.539437639161624,
+      "comp": "LEU",
+      "auth_seq": "6",
+      "atom": "N",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 12.09360026991549,
+      "comp": "LEU",
+      "auth_seq": "6",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 12.29786310000644,
+      "comp": "ALA",
+      "auth_seq": "4",
+      "atom": "CA",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 12.881913682326086,
+      "comp": "ALA",
+      "auth_seq": "4",
+      "atom": "CB",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 13.134060219067827,
+      "comp": "LEU",
+      "auth_seq": "6",
+      "atom": "CD2",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 13.345458488088747,
+      "comp": "LEU",
+      "auth_seq": "6",
+      "atom": "CG",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 13.450331138354922,
+      "comp": "ALA",
+      "auth_seq": "4",
+      "atom": "N",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 14.423587434608631,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "O",
+      "altloc": "B",
+      "occupancy": 0.372
+    },
+    {
+      "distance_A": 14.425996128507036,
+      "comp": "LEU",
+      "auth_seq": "6",
+      "atom": "CD1",
+      "altloc": ".",
+      "occupancy": 1.0
+    },
+    {
+      "distance_A": 14.553856399576711,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "O",
+      "altloc": "A",
+      "occupancy": 0.628
+    },
+    {
+      "distance_A": 15.440140182799508,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "C",
+      "altloc": "B",
+      "occupancy": 0.372
+    },
+    {
+      "distance_A": 15.513730657465985,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "C",
+      "altloc": "A",
+      "occupancy": 0.628
+    },
+    {
+      "distance_A": 16.56532478878093,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "CA",
+      "altloc": "B",
+      "occupancy": 0.372
+    },
+    {
+      "distance_A": 16.70603379107381,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "CA",
+      "altloc": "A",
+      "occupancy": 0.628
+    },
+    {
+      "distance_A": 17.001970976839715,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "CD1",
+      "altloc": "B",
+      "occupancy": 0.372
+    },
+    {
+      "distance_A": 17.07259078650045,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "N",
+      "altloc": "B",
+      "occupancy": 0.372
+    },
+    {
+      "distance_A": 17.148256919214848,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "N",
+      "altloc": "A",
+      "occupancy": 0.628
+    },
+    {
+      "distance_A": 17.41126820546683,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "CD1",
+      "altloc": "A",
+      "occupancy": 0.628
+    },
+    {
+      "distance_A": 17.501073997475128,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "CG",
+      "altloc": "B",
+      "occupancy": 0.372
+    },
+    {
+      "distance_A": 17.75379939248216,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "CB",
+      "altloc": "B",
+      "occupancy": 0.372
+    },
+    {
+      "distance_A": 17.75467614182247,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "CG",
+      "altloc": "A",
+      "occupancy": 0.628
+    },
+    {
+      "distance_A": 17.92223949224538,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "CB",
+      "altloc": "A",
+      "occupancy": 0.628
+    },
+    {
+      "distance_A": 18.835393687361567,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "CD2",
+      "altloc": "B",
+      "occupancy": 0.372
+    },
+    {
+      "distance_A": 19.09105508177848,
+      "comp": "LEU",
+      "auth_seq": "2",
+      "atom": "CD2",
+      "altloc": "A",
+      "occupancy": 0.628
+    }
+  ],
+  "ligand_bounds_A": {
+    "x": [
+      4.18164,
+      6.79031
+    ],
+    "y": [
+      -2.93775,
+      -1.69293
+    ],
+    "z": [
+      -6.30465,
+      -3.81189
+    ]
+  }
+}

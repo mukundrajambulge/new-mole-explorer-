@@ -1,0 +1,19 @@
+{
+  "query_id": "3b3f68a3-2b8f-4d04-ad92-473b1ad76f85",
+  "result_type": "entry",
+  "total_count": 3,
+  "result_set": [
+    {
+      "identifier": "1JV4",
+      "score": 1.0
+    },
+    {
+      "identifier": "1I06",
+      "score": 1.0
+    },
+    {
+      "identifier": "1MUP",
+      "score": 1.0
+    }
+  ]
+}

@@ -1,0 +1,6356 @@
+{
+  "data": {
+    "entries": [
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "30OH"
+        },
+        "struct": {
+          "title": "Pyrococcus abyssi Rubredoxin @ 0.43 Angstrom resolution, Transferable Aspherical Atom Model (TAAM) refinement"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.434
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "FE",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "FE",
+                "name": "FE (III) ION",
+                "formula_weight": 55.845,
+                "formula": "Fe"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "NA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "NA",
+                "name": "SODIUM ION",
+                "formula_weight": 22.99,
+                "formula": "Na"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Rubredoxin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Pyrococcus abyssi GE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "30OR"
+        },
+        "struct": {
+          "title": "Pyrococcus abyssi Rubredoxin @ 0.43 Angstrom resolution, Independent Atom Model (IAM) refinement"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.434
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "FE",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "FE",
+                "name": "FE (III) ION",
+                "formula_weight": 55.845,
+                "formula": "Fe"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "NA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "NA",
+                "name": "SODIUM ION",
+                "formula_weight": 22.99,
+                "formula": "Na"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Rubredoxin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Pyrococcus abyssi GE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9TA4"
+        },
+        "struct": {
+          "title": "Pyrococcus abyssi Rubredoxin @ 0.55 Angstrom resolution, 50 kGy structure"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.545
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "FE",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "FE",
+                "name": "FE (III) ION",
+                "formula_weight": 55.845,
+                "formula": "Fe"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Rubredoxin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Pyrococcus abyssi GE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7VOS"
+        },
+        "struct": {
+          "title": "High-resolution neutron and X-ray joint refined structure of high-potential iron-sulfur protein in the oxidized state"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          },
+          {
+            "method": "NEUTRON DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.66,
+            1.2
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "D3O",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "D3O",
+                "name": "trideuteriooxidanium",
+                "formula_weight": 22.042,
+                "formula": "D3 O"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "NH4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "NH4",
+                "name": "AMMONIUM ION",
+                "formula_weight": 18.038,
+                "formula": "H4 N"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "GOL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "GOL",
+                "name": "GLYCEROL",
+                "formula_weight": 92.094,
+                "formula": "C3 H8 O3"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SO4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SO4",
+                "name": "SULFATE ION",
+                "formula_weight": 96.063,
+                "formula": "O4 S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SF4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SF4",
+                "name": "IRON/SULFUR CLUSTER",
+                "formula_weight": 351.64,
+                "formula": "Fe4 S4"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "High-potential iron-sulfur protein"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Thermochromatium tepidum"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7FEZ"
+        },
+        "struct": {
+          "title": "The 0.76 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with petroselinic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.76
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "1PE",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "1PE",
+                "name": "PENTAETHYLENE GLYCOL",
+                "formula_weight": 238.278,
+                "formula": "C10 H22 O6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "PG4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "PG4",
+                "name": "TETRAETHYLENE GLYCOL",
+                "formula_weight": 194.226,
+                "formula": "C8 H18 O5"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "4I1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "4I1",
+                "name": "Petroselinic acid",
+                "formula_weight": 282.461,
+                "formula": "C18 H34 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9Y2E"
+        },
+        "struct": {
+          "title": "Rubredoxin from Pyrococcus Furiosus at 100K, formyl-Methionine N-terminus"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.78
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "K",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "K",
+                "name": "POTASSIUM ION",
+                "formula_weight": 39.098,
+                "formula": "K"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "ZN",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "ZN",
+                "name": "ZINC ION",
+                "formula_weight": 65.409,
+                "formula": "Zn"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Rubredoxin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Pyrococcus furiosus"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7R2H"
+        },
+        "struct": {
+          "title": "0.79A resolution structure of DMSO bound Cyclophilin D"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.79
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "DMS",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "DMS",
+                "name": "DIMETHYL SULFOXIDE",
+                "formula_weight": 78.133,
+                "formula": "C2 H6 O S"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Peptidyl-prolyl cis-trans isomerase F, mitochondrial"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9BZV"
+        },
+        "struct": {
+          "title": "UIC-1 bound to isopropylbenzene"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.8
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "A1ATB",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "A1ATB",
+                "name": "(propan-2-yl)benzene",
+                "formula_weight": 120.192,
+                "formula": "C9 H12"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I6W",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I6W",
+                "name": "ethyl 5'-formyl[2,2'-bipyridine]-5-carboxylate",
+                "formula_weight": 272.256,
+                "formula": "C14 H12 N2 O4"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I77",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I77",
+                "name": "5'-(hydrazinecarbonyl)[2,2'-bipyridine]-5-carboxamide",
+                "formula_weight": 257.248,
+                "formula": "C12 H11 N5 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "UIC-1"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "synthetic construct"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9CY0"
+        },
+        "struct": {
+          "title": "Crystal structure of SARS-CoV-2 NSP3 macrodomain in complex with AVI-4206"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.8
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "A1A55",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "A1A55",
+                "name": "N-{4-[(2,2-dimethyl-5-oxopyrrolidin-1-yl)amino]-9H-pyrimido[4,5-b]indol-8-yl}-N'-ethylurea",
+                "formula_weight": 381.432,
+                "formula": "C19 H23 N7 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Papain-like protease Non-structural protein 3"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Severe acute respiratory syndrome coronavirus 2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7WKB"
+        },
+        "struct": {
+          "title": "The 0.81 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with docosahexaenoic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.81
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "HXA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "HXA",
+                "name": "DOCOSA-4,7,10,13,16,19-HEXAENOIC ACID",
+                "formula_weight": 328.488,
+                "formula": "C22 H32 O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "1PE",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "1PE",
+                "name": "PENTAETHYLENE GLYCOL",
+                "formula_weight": 238.278,
+                "formula": "C10 H22 O6"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9BZT"
+        },
+        "struct": {
+          "title": "UIC-1 bound to benzene"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.82
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I6W",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I6W",
+                "name": "ethyl 5'-formyl[2,2'-bipyridine]-5-carboxylate",
+                "formula_weight": 272.256,
+                "formula": "C14 H12 N2 O4"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BNZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BNZ",
+                "name": "BENZENE",
+                "formula_weight": 78.112,
+                "formula": "C6 H6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I77",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I77",
+                "name": "5'-(hydrazinecarbonyl)[2,2'-bipyridine]-5-carboxamide",
+                "formula_weight": 257.248,
+                "formula": "C12 H11 N5 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "UIC-1"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "synthetic construct"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9XZU"
+        },
+        "struct": {
+          "title": "Rubredoxin from Pyrococcus Furiosus at 100K, Alanine-2 N terminus"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.825
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "K",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "K",
+                "name": "POTASSIUM ION",
+                "formula_weight": 39.098,
+                "formula": "K"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "ZN",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "ZN",
+                "name": "ZINC ION",
+                "formula_weight": 65.409,
+                "formula": "Zn"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Rubredoxin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Pyrococcus furiosus"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "6MZ2"
+        },
+        "struct": {
+          "title": "CTX-M-14 Class A Beta-Lactamase in Complex with Avibactam at pH 7.9"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.83
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "K",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "K",
+                "name": "POTASSIUM ION",
+                "formula_weight": 39.098,
+                "formula": "K"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "NA",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "NA",
+                "name": "SODIUM ION",
+                "formula_weight": 22.99,
+                "formula": "Na"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "PO4",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "PO4",
+                "name": "PHOSPHATE ION",
+                "formula_weight": 94.971,
+                "formula": "O4 P"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "NXL",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "NXL",
+                "name": "(2S,5R)-1-formyl-5-[(sulfooxy)amino]piperidine-2-carboxamide",
+                "formula_weight": 267.26,
+                "formula": "C7 H13 N3 O6 S"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Beta-lactamase"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Escherichia coli"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7FF6"
+        },
+        "struct": {
+          "title": "The 0.83 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with cis-vaccenic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.83
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "GLP",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "GLP",
+                "name": "2-amino-2-deoxy-6-O-phosphono-alpha-D-glucopyranose",
+                "formula_weight": 259.151,
+                "formula": "C6 H14 N O8 P"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "4IF",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "4IF",
+                "name": "cis-vaccenic acid",
+                "formula_weight": 282.461,
+                "formula": "C18 H34 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "8RMA"
+        },
+        "struct": {
+          "title": "Structure of CTX-M-15 complexed with benzoxaborole AK-431"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.83
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SO4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SO4",
+                "name": "SULFATE ION",
+                "formula_weight": 96.063,
+                "formula": "O4 S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "A1H1U",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "A1H1U",
+                "name": "2-[(3~{R})-1-oxidanyl-3~{H}-2,1-benzoxaborol-3-yl]ethanoic acid",
+                "formula_weight": 191.976,
+                "formula": "C9 H9 B O4"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CL",
+                "name": "CHLORIDE ION",
+                "formula_weight": 35.453,
+                "formula": "Cl"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Beta-lactamase"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Klebsiella pneumoniae"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9C01"
+        },
+        "struct": {
+          "title": "UIC-1 bound to phenol"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.83
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "IPH",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "IPH",
+                "name": "PHENOL",
+                "formula_weight": 94.111,
+                "formula": "C6 H6 O"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I6W",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I6W",
+                "name": "ethyl 5'-formyl[2,2'-bipyridine]-5-carboxylate",
+                "formula_weight": 272.256,
+                "formula": "C14 H12 N2 O4"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I77",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I77",
+                "name": "5'-(hydrazinecarbonyl)[2,2'-bipyridine]-5-carboxamide",
+                "formula_weight": 257.248,
+                "formula": "C12 H11 N5 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "UIC-1"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "synthetic construct"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9HDW"
+        },
+        "struct": {
+          "title": "Orotidine 5'-monophosphate decarboxylase-domain of human UMPS in complex with the product UMP at 0.83 Angstroms resolution"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.83
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "GOL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "GOL",
+                "name": "GLYCEROL",
+                "formula_weight": 92.094,
+                "formula": "C3 H8 O3"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "U5P",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "U5P",
+                "name": "URIDINE-5'-MONOPHOSPHATE",
+                "formula_weight": 324.181,
+                "formula": "C9 H13 N2 O9 P"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Uridine 5'-monophosphate synthase"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9Y00"
+        },
+        "struct": {
+          "title": "Zinc Rubredoxin from Pyrococcus Furiosus at 140K, A2 Nterminus"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.83
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "K",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "K",
+                "name": "POTASSIUM ION",
+                "formula_weight": 39.098,
+                "formula": "K"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "ZN",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "ZN",
+                "name": "ZINC ION",
+                "formula_weight": 65.409,
+                "formula": "Zn"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Rubredoxin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Pyrococcus furiosus"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "6TGU"
+        },
+        "struct": {
+          "title": "Crystal structure of human protein kinase CK2alpha'(CSNK2A2 gene product) in complex with the 2-aminothiazole-type inhibitor Cl-OH-3"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.833
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "EDO",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "EDO",
+                "name": "1,2-ETHANEDIOL",
+                "formula_weight": 62.068,
+                "formula": "C2 H6 O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "N92",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "N92",
+                "name": "4-[[4-(4-chlorophenyl)-1,3-thiazol-2-yl]amino]-2-oxidanyl-benzoic acid",
+                "formula_weight": 346.788,
+                "formula": "C16 H11 Cl N2 O3 S"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Casein kinase II subunit alpha'"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7BNH"
+        },
+        "struct": {
+          "title": "Complex structure at atomic resolution of SH3b domain with benzoic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.84
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "MES",
+              "auth_asym_ids": [
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "MES",
+                "name": "2-(N-MORPHOLINO)-ETHANESULFONIC ACID",
+                "formula_weight": 195.237,
+                "formula": "C6 H13 N O4 S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "NA",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "NA",
+                "name": "SODIUM ION",
+                "formula_weight": 22.99,
+                "formula": "Na"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SO4",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SO4",
+                "name": "SULFATE ION",
+                "formula_weight": 96.063,
+                "formula": "O4 S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "GOL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "GOL",
+                "name": "GLYCEROL",
+                "formula_weight": 92.094,
+                "formula": "C3 H8 O3"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BEZ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BEZ",
+                "name": "BENZOIC ACID",
+                "formula_weight": 122.121,
+                "formula": "C7 H6 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Lysostaphin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Staphylococcus simulans"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7FFK"
+        },
+        "struct": {
+          "title": "The 0.84 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with palmitoleic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.84
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "PAM",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "PAM",
+                "name": "PALMITOLEIC ACID",
+                "formula_weight": 254.408,
+                "formula": "C16 H30 O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7G0Z"
+        },
+        "struct": {
+          "title": "Crystal Structure of human FABP4 binding site mutated to that of FABP5 in complex with 5-[[3-(3-cyclopropyl-1,2,4-oxadiazol-5-yl)-4,5,6,7-tetrahydro-1-benzothiophen-2-yl]carbamoyl]-3,6-dihydro-2H-pyran-4-carboxylic acid, i.e. SMILES S1C(=C(C2=NC(=NO2)C2CC2)C2=C1CCCC2)NC(=O)C1=C(CCOC1)C(=O)O with IC50=0.48537 microM"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.84
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "WMB",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "WMB",
+                "name": "5-{[(3M)-3-(3-cyclopropyl-1,2,4-oxadiazol-5-yl)-4,5,6,7-tetrahydro-1-benzothiophen-2-yl]carbamoyl}-3,6-dihydro-2H-pyran-4-carboxylic acid",
+                "formula_weight": 415.463,
+                "formula": "C20 H21 N3 O5 S"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, adipocyte"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7TX0"
+        },
+        "struct": {
+          "title": "Crystal structure of SARS-CoV-2 NSP3 macrodomain in complex with ADP-ribose at pH 9 (P43 crystal form)"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.84
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "AR6",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "AR6",
+                "name": "[(2R,3S,4R,5R)-5-(6-AMINOPURIN-9-YL)-3,4-DIHYDROXY-OXOLAN-2-YL]METHYL[HYDROXY-[[(2R,3S,4R,5S)-3,4,5-TRIHYDROXYOXOLAN-2-YL]METHOXY]PHOSPHORYL] HYDROGEN PHOSPHATE",
+                "formula_weight": 559.316,
+                "formula": "C15 H23 N5 O14 P2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Non-structural protein 3"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Severe acute respiratory syndrome coronavirus 2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7WKG"
+        },
+        "struct": {
+          "title": "The 0.84 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with erucic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.84
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "08O",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "08O",
+                "name": "(Z)-docos-13-enoic acid",
+                "formula_weight": 338.568,
+                "formula": "C22 H42 O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "8V5Z"
+        },
+        "struct": {
+          "title": "UIC-1 mutant - UIC-1-L6M"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.84
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CCN",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CCN",
+                "name": "ACETONITRILE",
+                "formula_weight": 41.052,
+                "formula": "C2 H3 N"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "UIC-1-L6M"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "synthetic construct"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9ZDO"
+        },
+        "struct": {
+          "title": "Crystal structure of Zn-substituted rubredoxin from psychrophilic clostridia Clostridium psychrophilum"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.842
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "K",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "K",
+                "name": "POTASSIUM ION",
+                "formula_weight": 39.098,
+                "formula": "K"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "ZN",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "ZN",
+                "name": "ZINC ION",
+                "formula_weight": 65.409,
+                "formula": "Zn"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Rubredoxin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Clostridium psychrophilum"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "6AIQ"
+        },
+        "struct": {
+          "title": "High resolution structure of recombinant high-potential iron-sulfur protein"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.85
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "GOL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "GOL",
+                "name": "GLYCEROL",
+                "formula_weight": 92.094,
+                "formula": "C3 H8 O3"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SO4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SO4",
+                "name": "SULFATE ION",
+                "formula_weight": 96.063,
+                "formula": "O4 S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SF4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SF4",
+                "name": "IRON/SULFUR CLUSTER",
+                "formula_weight": 351.64,
+                "formula": "Fe4 S4"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "High-potential iron-sulfur protein"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Thermochromatium tepidum"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "6UN0"
+        },
+        "struct": {
+          "title": "Crystal structure of photoactive yellow protein (PYP); F96(4-IF) construct with 3-Br-p-coumaric acid chromophore"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.85
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "QBV",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "QBV",
+                "name": "(2E)-3-(3-bromo-4-hydroxyphenyl)prop-2-enoic acid",
+                "formula_weight": 243.054,
+                "formula": "C9 H7 Br O3"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Photoactive yellow protein"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Halorhodospira halophila"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7WCI"
+        },
+        "struct": {
+          "title": "The 0.85 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with two molecules of pelargonic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.85
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "KNA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "KNA",
+                "name": "nonanoic acid",
+                "formula_weight": 158.238,
+                "formula": "C9 H18 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "8W8V"
+        },
+        "struct": {
+          "title": "High-resolution X-ray structure of cellulase Cel6A from Phanerochaete chrysosporium at cryogenic temperature, Enzyme-Product complex"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.85
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BGC",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BGC",
+                "name": "beta-D-glucopyranose",
+                "formula_weight": 180.156,
+                "formula": "C6 H12 O6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "PEG",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "PEG",
+                "name": "DI(HYDROXYETHYL)ETHER",
+                "formula_weight": 106.12,
+                "formula": "C4 H10 O3"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CL",
+                "name": "CHLORIDE ION",
+                "formula_weight": 35.453,
+                "formula": "Cl"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "NA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "NA",
+                "name": "SODIUM ION",
+                "formula_weight": 22.99,
+                "formula": "Na"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Glucanase"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Phanerodontia chrysosporium"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9Y0Y"
+        },
+        "struct": {
+          "title": "Rubredoxin from Pyrococcus Furiosus at 180K, Alanine-2 N terminus"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.852
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "K",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "K",
+                "name": "POTASSIUM ION",
+                "formula_weight": 39.098,
+                "formula": "K"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "ZN",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "ZN",
+                "name": "ZINC ION",
+                "formula_weight": 65.409,
+                "formula": "Zn"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Rubredoxin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Pyrococcus furiosus"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7FDT"
+        },
+        "struct": {
+          "title": "The 0.86 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with elaidic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.86
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "ELA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "ELA",
+                "name": "Elaidic acid",
+                "formula_weight": 282.461,
+                "formula": "C18 H34 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7FDU"
+        },
+        "struct": {
+          "title": "The 0.86 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with heptadecanoic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.86
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "X90",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "X90",
+                "name": "heptadecanoic acid",
+                "formula_weight": 270.451,
+                "formula": "C17 H34 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7WJ1"
+        },
+        "struct": {
+          "title": "The 0.86 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with arachidonic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.86
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "ACD",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "ACD",
+                "name": "ARACHIDONIC ACID",
+                "formula_weight": 304.467,
+                "formula": "C20 H32 O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7X48"
+        },
+        "struct": {
+          "title": "The 0.86 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with pelargonic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.86
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "KNA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "KNA",
+                "name": "nonanoic acid",
+                "formula_weight": 158.238,
+                "formula": "C9 H18 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "8K9N"
+        },
+        "struct": {
+          "title": "Subatomic resolution structure of Pseudoazurin from Alcaligenes faecalis"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.86
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SO4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SO4",
+                "name": "SULFATE ION",
+                "formula_weight": 96.063,
+                "formula": "O4 S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CU",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CU",
+                "name": "COPPER (II) ION",
+                "formula_weight": 63.546,
+                "formula": "Cu"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Pseudoazurin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Alcaligenes faecalis"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9HDS"
+        },
+        "struct": {
+          "title": "Variant T321N of Orotidine 5'-monophosphate decarboxylase-domain of human UMPS in complex with the product UMP and the nucleotide TMP at 0.86 Angstrom resolution"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.86
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "U5P",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "U5P",
+                "name": "URIDINE-5'-MONOPHOSPHATE",
+                "formula_weight": 324.181,
+                "formula": "C9 H13 N2 O9 P"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "PRO",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "PRO",
+                "name": "PROLINE",
+                "formula_weight": 115.13,
+                "formula": "C5 H9 N O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "TMP",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "TMP",
+                "name": "THYMIDINE-5'-PHOSPHATE",
+                "formula_weight": 322.208,
+                "formula": "C10 H15 N2 O8 P"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Uridine 5'-monophosphate synthase"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9Y0Z"
+        },
+        "struct": {
+          "title": "Rubredoxin from Pyrococcus Furiosus at 200K, Alanine-2 N terminus"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.86
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "K",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "K",
+                "name": "POTASSIUM ION",
+                "formula_weight": 39.098,
+                "formula": "K"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "ZN",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "ZN",
+                "name": "ZINC ION",
+                "formula_weight": 65.409,
+                "formula": "Zn"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Rubredoxin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Pyrococcus furiosus"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "6ZPA"
+        },
+        "struct": {
+          "title": "Cyanophage S-2L HD phosphohydrolase (DatZ) bound to dA and one catalytic Zn2+ ion"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.860002552904
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "LI",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "LI",
+                "name": "LITHIUM ION",
+                "formula_weight": 6.941,
+                "formula": "Li"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "ZN",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "ZN",
+                "name": "ZINC ION",
+                "formula_weight": 65.409,
+                "formula": "Zn"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "3D1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "3D1",
+                "name": "(2R,3S,5R)-5-(6-amino-9H-purin-9-yl)-tetrahydro-2-(hydroxymethyl)furan-3-ol",
+                "formula_weight": 251.242,
+                "formula": "C10 H13 N5 O3"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "DatZ"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Cyanophage S-2L"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7WE5"
+        },
+        "struct": {
+          "title": "The 0.87 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with oleic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.87
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "OLA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "OLA",
+                "name": "OLEIC ACID",
+                "formula_weight": 282.461,
+                "formula": "C18 H34 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7WQ7"
+        },
+        "struct": {
+          "title": "The 0.87 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with nonadecanoic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.87
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "EW8",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "EW8",
+                "name": "nonadecanoic acid",
+                "formula_weight": 298.504,
+                "formula": "C19 H38 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7FFX"
+        },
+        "struct": {
+          "title": "The 0.88 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with alpha-llinolenic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.88
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "GLP",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "GLP",
+                "name": "2-amino-2-deoxy-6-O-phosphono-alpha-D-glucopyranose",
+                "formula_weight": 259.151,
+                "formula": "C6 H14 N O8 P"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "LNL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "LNL",
+                "name": "ALPHA-LINOLENIC ACID",
+                "formula_weight": 278.43,
+                "formula": "C18 H30 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7KQP"
+        },
+        "struct": {
+          "title": "Crystal structure of SARS-CoV-2 NSP3 macrodomain in complex with ADP-ribose (P43 crystal form)"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.88
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "AR6",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "AR6",
+                "name": "[(2R,3S,4R,5R)-5-(6-AMINOPURIN-9-YL)-3,4-DIHYDROXY-OXOLAN-2-YL]METHYL[HYDROXY-[[(2R,3S,4R,5S)-3,4,5-TRIHYDROXYOXOLAN-2-YL]METHOXY]PHOSPHORYL] HYDROGEN PHOSPHATE",
+                "formula_weight": 559.316,
+                "formula": "C15 H23 N5 O14 P2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Non-structural protein 3"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Severe acute respiratory syndrome coronavirus 2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7XHU"
+        },
+        "struct": {
+          "title": "The 0.88 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with tricosanoic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.88
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "1PE",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "1PE",
+                "name": "PENTAETHYLENE GLYCOL",
+                "formula_weight": 238.278,
+                "formula": "C10 H22 O6"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "F23",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "F23",
+                "name": "TRICOSANOIC ACID",
+                "formula_weight": 354.61,
+                "formula": "C23 H46 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "6KFN"
+        },
+        "struct": {
+          "title": "Crystal structure of alginate lyase from Paenibacillus sp. str. FPU-7"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.89
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "IMD",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "IMD",
+                "name": "IMIDAZOLE",
+                "formula_weight": 69.085,
+                "formula": "C3 H5 N2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "NA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "NA",
+                "name": "SODIUM ION",
+                "formula_weight": 22.99,
+                "formula": "Na"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "alginate lyase"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Paenibacillus sp. FPU-7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7APW"
+        },
+        "struct": {
+          "title": "The Fk1 domain of FKBP51 in complex with (1S,5S,6R)-10-(benzo[d]thiazol-6-ylsulfonyl)-5-(methoxymethyl)-3-(pyridin-2-ylethyl)-3,10-diazabicyclo[4.3.1]decan-2-one"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.89
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "RSB",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "RSB",
+                "name": "(1S,5S,6R)-10-(benzo[d]thiazol-6-ylsulfonyl)-5-(methoxymethyl)-3-(pyridin-2-ylethyl)-3,10-diazabicyclo[4.3.1]decan-2-one",
+                "formula_weight": 500.634,
+                "formula": "C24 H28 N4 O4 S2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Peptidyl-prolyl cis-trans isomerase FKBP5"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "8PB5"
+        },
+        "struct": {
+          "title": "PsiM in complex with sinefungin and norbaeocystin"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.89
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SFG",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SFG",
+                "name": "SINEFUNGIN",
+                "formula_weight": 381.387,
+                "formula": "C15 H23 N7 O5"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "XP6",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "XP6",
+                "name": "Norbaeocystin",
+                "formula_weight": 256.195,
+                "formula": "C10 H13 N2 O4 P"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CL",
+                "name": "CHLORIDE ION",
+                "formula_weight": 35.453,
+                "formula": "Cl"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Psilocybin synthase"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Psilocybe cubensis"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9PWM"
+        },
+        "struct": {
+          "title": "Dihydrofolate Reductase Complexed with Folate and Nicotinamide Adenine Dinucleotide Phosphate (Oxidized Form)"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.89
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "NAP",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "NAP",
+                "name": "NADP NICOTINAMIDE-ADENINE-DINUCLEOTIDE PHOSPHATE",
+                "formula_weight": 743.405,
+                "formula": "C21 H28 N7 O17 P3"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "MN",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "MN",
+                "name": "MANGANESE (II) ION",
+                "formula_weight": 54.938,
+                "formula": "Mn"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "FOL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "FOL",
+                "name": "FOLIC ACID",
+                "formula_weight": 441.397,
+                "formula": "C19 H19 N7 O6"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Dihydrofolate reductase"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Escherichia coli"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9Q9D"
+        },
+        "struct": {
+          "title": "Protein kinase CK2 catalytic subunit alpha' (CSNK2A2 gene product) in complex with F2X-Entry screen fragment D06 and CX-4945 (Silmitasertib)"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.89
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CL",
+                "name": "CHLORIDE ION",
+                "formula_weight": 35.453,
+                "formula": "Cl"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "R9G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "R9G",
+                "name": "(3-methoxyphenyl)(pyrrolidin-1-yl)methanone",
+                "formula_weight": 205.253,
+                "formula": "C12 H15 N O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "3NG",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "3NG",
+                "name": "5-[(3-chlorophenyl)amino]benzo[c][2,6]naphthyridine-8-carboxylic acid",
+                "formula_weight": 349.77,
+                "formula": "C19 H12 Cl N3 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Casein kinase II subunit alpha'"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "10CX"
+        },
+        "struct": {
+          "title": "Crystal structure of Pyrobaculum calidifontis Rpp30"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "2PE",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "2PE",
+                "name": "NONAETHYLENE GLYCOL",
+                "formula_weight": 414.488,
+                "formula": "C18 H38 O10"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Rpp30"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Pyrobaculum calidifontis"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "5RBR"
+        },
+        "struct": {
+          "title": "PanDDA analysis group deposition -- Endothiapepsin changed state model for fragment F2X-Entry Library C04a"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "NA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "NA",
+                "name": "SODIUM ION",
+                "formula_weight": 22.99,
+                "formula": "Na"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "PG4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "PG4",
+                "name": "TETRAETHYLENE GLYCOL",
+                "formula_weight": 194.226,
+                "formula": "C8 H18 O5"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "ACT",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "ACT",
+                "name": "ACETATE ION",
+                "formula_weight": 59.044,
+                "formula": "C2 H3 O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "GOL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "GOL",
+                "name": "GLYCEROL",
+                "formula_weight": 92.094,
+                "formula": "C3 H8 O3"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "DMS",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "DMS",
+                "name": "DIMETHYL SULFOXIDE",
+                "formula_weight": 78.133,
+                "formula": "C2 H6 O S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "R8S",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "R8S",
+                "name": "2-hydrazinyl-4-methoxypyrimidine",
+                "formula_weight": 140.143,
+                "formula": "C5 H8 N4 O"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Endothiapepsin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Cryphonectria parasitica"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "6KLZ"
+        },
+        "struct": {
+          "title": "Human Carbonic Anhydrase II V143I variant 00 atm CO2"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "ZN",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "ZN",
+                "name": "ZINC ION",
+                "formula_weight": 65.409,
+                "formula": "Zn"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "GOL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "GOL",
+                "name": "GLYCEROL",
+                "formula_weight": 92.094,
+                "formula": "C3 H8 O3"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BCT",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BCT",
+                "name": "BICARBONATE ION",
+                "formula_weight": 61.017,
+                "formula": "C H O3"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Carbonic anhydrase 2"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "6KM2"
+        },
+        "struct": {
+          "title": "Human Carbonic Anhydrase II V143I variant 15 atm CO2"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "ZN",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "ZN",
+                "name": "ZINC ION",
+                "formula_weight": 65.409,
+                "formula": "Zn"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CO2",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CO2",
+                "name": "CARBON DIOXIDE",
+                "formula_weight": 44.01,
+                "formula": "C O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "GOL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "GOL",
+                "name": "GLYCEROL",
+                "formula_weight": 92.094,
+                "formula": "C3 H8 O3"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BCT",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BCT",
+                "name": "BICARBONATE ION",
+                "formula_weight": 61.017,
+                "formula": "C H O3"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Carbonic anhydrase 2"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "6LK1"
+        },
+        "struct": {
+          "title": "Ultrahigh resolution X-ray structure of Ferredoxin I from C. reinhardtii"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "FES",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "FES",
+                "name": "FE2/S2 (INORGANIC) CLUSTER",
+                "formula_weight": 175.82,
+                "formula": "Fe2 S2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BEN",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BEN",
+                "name": "BENZAMIDINE",
+                "formula_weight": 120.152,
+                "formula": "C7 H8 N2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SCN",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SCN",
+                "name": "THIOCYANATE ION",
+                "formula_weight": 58.082,
+                "formula": "C N S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SO4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SO4",
+                "name": "SULFATE ION",
+                "formula_weight": 96.063,
+                "formula": "O4 S"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Ferredoxin, chloroplastic"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Chlamydomonas reinhardtii"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "6UMZ"
+        },
+        "struct": {
+          "title": "Crystal structure of photoactive yellow protein (PYP); 3-Br-p-coumaric acid chromophore"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "QBV",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "QBV",
+                "name": "(2E)-3-(3-bromo-4-hydroxyphenyl)prop-2-enoic acid",
+                "formula_weight": 243.054,
+                "formula": "C9 H7 Br O3"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Photoactive yellow protein"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Halorhodospira halophila"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7PGZ"
+        },
+        "struct": {
+          "title": "Structure of dark-adapted AsLOV2 Q513L"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "MG",
+              "auth_asym_ids": [
+                "AAA"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "MG",
+                "name": "MAGNESIUM ION",
+                "formula_weight": 24.305,
+                "formula": "Mg"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "GOL",
+              "auth_asym_ids": [
+                "AAA"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "GOL",
+                "name": "GLYCEROL",
+                "formula_weight": 92.094,
+                "formula": "C3 H8 O3"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "EDO",
+              "auth_asym_ids": [
+                "AAA"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "EDO",
+                "name": "1,2-ETHANEDIOL",
+                "formula_weight": 62.068,
+                "formula": "C2 H6 O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "FMN",
+              "auth_asym_ids": [
+                "AAA"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "FMN",
+                "name": "FLAVIN MONONUCLEOTIDE",
+                "formula_weight": 456.344,
+                "formula": "C17 H21 N4 O9 P"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "NPH1-1"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "AAA"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Avena sativa"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7TWT"
+        },
+        "struct": {
+          "title": "Crystal structure of SARS-CoV-2 NSP3 macrodomain in complex with ADP-ribose at pH 4 (P43 crystal form)"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "AR6",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "AR6",
+                "name": "[(2R,3S,4R,5R)-5-(6-AMINOPURIN-9-YL)-3,4-DIHYDROXY-OXOLAN-2-YL]METHYL[HYDROXY-[[(2R,3S,4R,5S)-3,4,5-TRIHYDROXYOXOLAN-2-YL]METHOXY]PHOSPHORYL] HYDROGEN PHOSPHATE",
+                "formula_weight": 559.316,
+                "formula": "C15 H23 N5 O14 P2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Non-structural protein 3"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Severe acute respiratory syndrome coronavirus 2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7TWV"
+        },
+        "struct": {
+          "title": "Crystal structure of SARS-CoV-2 NSP3 macrodomain in complex with ADP-ribose at pH 5 (P43 crystal form)"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "AR6",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "AR6",
+                "name": "[(2R,3S,4R,5R)-5-(6-AMINOPURIN-9-YL)-3,4-DIHYDROXY-OXOLAN-2-YL]METHYL[HYDROXY-[[(2R,3S,4R,5S)-3,4,5-TRIHYDROXYOXOLAN-2-YL]METHOXY]PHOSPHORYL] HYDROGEN PHOSPHATE",
+                "formula_weight": 559.316,
+                "formula": "C15 H23 N5 O14 P2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CIT",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CIT",
+                "name": "CITRIC ACID",
+                "formula_weight": 192.124,
+                "formula": "C6 H8 O7"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Non-structural protein 3"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Severe acute respiratory syndrome coronavirus 2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7TWW"
+        },
+        "struct": {
+          "title": "Crystal structure of SARS-CoV-2 NSP3 macrodomain in complex with ADP-ribose at pH 6 (P43 crystal form)"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "AR6",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "AR6",
+                "name": "[(2R,3S,4R,5R)-5-(6-AMINOPURIN-9-YL)-3,4-DIHYDROXY-OXOLAN-2-YL]METHYL[HYDROXY-[[(2R,3S,4R,5S)-3,4,5-TRIHYDROXYOXOLAN-2-YL]METHOXY]PHOSPHORYL] HYDROGEN PHOSPHATE",
+                "formula_weight": 559.316,
+                "formula": "C15 H23 N5 O14 P2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CIT",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CIT",
+                "name": "CITRIC ACID",
+                "formula_weight": 192.124,
+                "formula": "C6 H8 O7"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Non-structural protein 3"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Severe acute respiratory syndrome coronavirus 2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7TWX"
+        },
+        "struct": {
+          "title": "Crystal structure of SARS-CoV-2 NSP3 macrodomain in complex with ADP-ribose at pH 7 (P43 crystal form)"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "AR6",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "AR6",
+                "name": "[(2R,3S,4R,5R)-5-(6-AMINOPURIN-9-YL)-3,4-DIHYDROXY-OXOLAN-2-YL]METHYL[HYDROXY-[[(2R,3S,4R,5S)-3,4,5-TRIHYDROXYOXOLAN-2-YL]METHOXY]PHOSPHORYL] HYDROGEN PHOSPHATE",
+                "formula_weight": 559.316,
+                "formula": "C15 H23 N5 O14 P2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Non-structural protein 3"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Severe acute respiratory syndrome coronavirus 2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7TWY"
+        },
+        "struct": {
+          "title": "Crystal structure of SARS-CoV-2 NSP3 macrodomain in complex with ADP-ribose at pH 8 (P43 crystal form)"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "AR6",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "AR6",
+                "name": "[(2R,3S,4R,5R)-5-(6-AMINOPURIN-9-YL)-3,4-DIHYDROXY-OXOLAN-2-YL]METHYL[HYDROXY-[[(2R,3S,4R,5S)-3,4,5-TRIHYDROXYOXOLAN-2-YL]METHOXY]PHOSPHORYL] HYDROGEN PHOSPHATE",
+                "formula_weight": 559.316,
+                "formula": "C15 H23 N5 O14 P2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Non-structural protein 3"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Severe acute respiratory syndrome coronavirus 2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7TX1"
+        },
+        "struct": {
+          "title": "Crystal structure of SARS-CoV-2 NSP3 macrodomain in complex with ADP-ribose at pH 10 (P43 crystal form)"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "AR6",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "AR6",
+                "name": "[(2R,3S,4R,5R)-5-(6-AMINOPURIN-9-YL)-3,4-DIHYDROXY-OXOLAN-2-YL]METHYL[HYDROXY-[[(2R,3S,4R,5S)-3,4,5-TRIHYDROXYOXOLAN-2-YL]METHOXY]PHOSPHORYL] HYDROGEN PHOSPHATE",
+                "formula_weight": 559.316,
+                "formula": "C15 H23 N5 O14 P2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Non-structural protein 3"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Severe acute respiratory syndrome coronavirus 2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7WDJ"
+        },
+        "struct": {
+          "title": "The 0.90 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with linoleic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "EIC",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "EIC",
+                "name": "LINOLEIC ACID",
+                "formula_weight": 280.445,
+                "formula": "C18 H32 O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7WOM"
+        },
+        "struct": {
+          "title": "The 0.90 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with eicosapentaenoic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "EPA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "EPA",
+                "name": "5,8,11,14,17-EICOSAPENTAENOIC ACID",
+                "formula_weight": 302.451,
+                "formula": "C20 H30 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7WPG"
+        },
+        "struct": {
+          "title": "The 0.90 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with heptanoic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "DKL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "DKL",
+                "name": "heptane-1,1-diol",
+                "formula_weight": 132.201,
+                "formula": "C7 H16 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "8SH8"
+        },
+        "struct": {
+          "title": "Crystal structure of SARS-CoV-2 NSP3 macrodomain Asn40Asp mutant in complex with ADP-ribose (P43 crystal form)"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "AR6",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "AR6",
+                "name": "[(2R,3S,4R,5R)-5-(6-AMINOPURIN-9-YL)-3,4-DIHYDROXY-OXOLAN-2-YL]METHYL[HYDROXY-[[(2R,3S,4R,5S)-3,4,5-TRIHYDROXYOXOLAN-2-YL]METHOXY]PHOSPHORYL] HYDROGEN PHOSPHATE",
+                "formula_weight": 559.316,
+                "formula": "C15 H23 N5 O14 P2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Papain-like protease nsp3"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Severe acute respiratory syndrome coronavirus 2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9TA6"
+        },
+        "struct": {
+          "title": "Rubredoxin @ 0.57 Angstrom resolution, 1 MGy structure"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.567
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "FE",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "FE",
+                "name": "FE (III) ION",
+                "formula_weight": 55.845,
+                "formula": "Fe"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Rubredoxin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Pyrococcus abyssi GE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9HOO"
+        },
+        "struct": {
+          "title": "Variant K281A of Orotidine 5'-monophosphate decarboxylase-domain of human UMPS in complex with the product UMP at 0.83 Angstrom resolution"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.83
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "U5P",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "U5P",
+                "name": "URIDINE-5'-MONOPHOSPHATE",
+                "formula_weight": 324.181,
+                "formula": "C9 H13 N2 O9 P"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Uridine 5'-monophosphate synthase"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9C06"
+        },
+        "struct": {
+          "title": "UIC-1 A4S/B5(4-Cl)F soaked in equimolar ortho-, meta-, and para-xylene"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.85
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "OXE",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "OXE",
+                "name": "ORTHO-XYLENE",
+                "formula_weight": 106.165,
+                "formula": "C8 H10"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I6W",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I6W",
+                "name": "ethyl 5'-formyl[2,2'-bipyridine]-5-carboxylate",
+                "formula_weight": 272.256,
+                "formula": "C14 H12 N2 O4"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I77",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I77",
+                "name": "5'-(hydrazinecarbonyl)[2,2'-bipyridine]-5-carboxamide",
+                "formula_weight": 257.248,
+                "formula": "C12 H11 N5 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "UIC-1-A4S/B5F(4-Cl)/B7M"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "synthetic construct"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9C00"
+        },
+        "struct": {
+          "title": "UIC-1 soaked with R/S 1-chloroethylbenzene"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "A1C1V",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "A1C1V",
+                "name": "[(1R)-1-chloroethyl]benzene",
+                "formula_weight": 140.61,
+                "formula": "C8 H9 Cl"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "A1ATC",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "A1ATC",
+                "name": "[(1S)-1-chloroethyl]benzene",
+                "formula_weight": 140.61,
+                "formula": "C8 H9 Cl"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I6W",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I6W",
+                "name": "ethyl 5'-formyl[2,2'-bipyridine]-5-carboxylate",
+                "formula_weight": 272.256,
+                "formula": "C14 H12 N2 O4"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I77",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I77",
+                "name": "5'-(hydrazinecarbonyl)[2,2'-bipyridine]-5-carboxamide",
+                "formula_weight": 257.248,
+                "formula": "C12 H11 N5 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "UIC-1"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "synthetic construct"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "9BZZ"
+        },
+        "struct": {
+          "title": "UIC-1 peptide bound with ethylbenzene"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.81
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "PYJ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "PYJ",
+                "name": "PHENYLETHANE",
+                "formula_weight": 106.165,
+                "formula": "C8 H10"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I6W",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I6W",
+                "name": "ethyl 5'-formyl[2,2'-bipyridine]-5-carboxylate",
+                "formula_weight": 272.256,
+                "formula": "C14 H12 N2 O4"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "I77",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "I77",
+                "name": "5'-(hydrazinecarbonyl)[2,2'-bipyridine]-5-carboxamide",
+                "formula_weight": 257.248,
+                "formula": "C12 H11 N5 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "UIC-1"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "synthetic construct"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "8R5K"
+        },
+        "struct": {
+          "title": "The Fk1 domain of FKBP51 in complex with Antascomicine B"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.89
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "Y6Z",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "Y6Z",
+                "name": "Antascomicine B",
+                "formula_weight": 675.849,
+                "formula": "C37 H57 N O10"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Peptidyl-prolyl cis-trans isomerase FKBP5"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "8R30"
+        },
+        "struct": {
+          "title": "Structure of CTX-M-15 complexed with benzoxaborole AK-408"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.85
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "NA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "NA",
+                "name": "SODIUM ION",
+                "formula_weight": 22.99,
+                "formula": "Na"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "DMS",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "DMS",
+                "name": "DIMETHYL SULFOXIDE",
+                "formula_weight": 78.133,
+                "formula": "C2 H6 O S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CL",
+                "name": "CHLORIDE ION",
+                "formula_weight": 35.453,
+                "formula": "Cl"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SO4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SO4",
+                "name": "SULFATE ION",
+                "formula_weight": 96.063,
+                "formula": "O4 S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "XR3",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "XR3",
+                "name": "N-[[(3S)-1-oxidanyl-3H-2,1-benzoxaborol-3-yl]methyl]-4-[oxidanyl(oxidanylidene)-$l^{4}-azanyl]benzenesulfonamide",
+                "formula_weight": 348.139,
+                "formula": "C14 H13 B N2 O6 S"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Beta-lactamase"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Klebsiella pneumoniae"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7XHM"
+        },
+        "struct": {
+          "title": "The 0.88 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with behenic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.88
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "EO3",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "EO3",
+                "name": "docosanoic acid",
+                "formula_weight": 340.584,
+                "formula": "C22 H44 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7WF0"
+        },
+        "struct": {
+          "title": "The 0.83 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with nervonic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.83
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "NER",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "NER",
+                "name": "(15E)-TETRACOS-15-ENOIC ACID",
+                "formula_weight": 366.621,
+                "formula": "C24 H46 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7VB1"
+        },
+        "struct": {
+          "title": "The 0.90 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with trans-vaccenic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "VCA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "VCA",
+                "name": "VACCENIC ACID",
+                "formula_weight": 282.461,
+                "formula": "C18 H34 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7PSY"
+        },
+        "struct": {
+          "title": "X-ray crystal structure of perdeuterated LecB lectin in complex with perdeuterated fucose"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "FUC",
+              "auth_asym_ids": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "FUC",
+                "name": "alpha-L-fucopyranose",
+                "formula_weight": 164.156,
+                "formula": "C6 H12 O5"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SO4",
+              "auth_asym_ids": [
+                "A",
+                "B"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SO4",
+                "name": "SULFATE ION",
+                "formula_weight": 96.063,
+                "formula": "O4 S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "CA",
+              "auth_asym_ids": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "CA",
+                "name": "CALCIUM ION",
+                "formula_weight": 40.078,
+                "formula": "Ca"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fucose-binding lectin"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Pseudomonas aeruginosa"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7OUZ"
+        },
+        "struct": {
+          "title": "Human OMPD-domain of UMPS in complex with 6-hydroxy-UMP at 0.9 Angstroms resolution, crystal 1"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.9
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "GOL",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "GOL",
+                "name": "GLYCEROL",
+                "formula_weight": 92.094,
+                "formula": "C3 H8 O3"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "PRO",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "PRO",
+                "name": "PROLINE",
+                "formula_weight": 115.13,
+                "formula": "C5 H9 N O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "BMP",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "BMP",
+                "name": "6-HYDROXYURIDINE-5'-PHOSPHATE",
+                "formula_weight": 340.181,
+                "formula": "C9 H13 N2 O10 P"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Uridine 5'-monophosphate synthase"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7FXV"
+        },
+        "struct": {
+          "title": "Crystal Structure of human FABP4 in complex with 6-[(4-methoxyphenyl)methyl]-2H-1,2,4-triazine-3,5-dithione"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.88
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "SO4",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "SO4",
+                "name": "SULFATE ION",
+                "formula_weight": 96.063,
+                "formula": "O4 S"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "EDO",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "EDO",
+                "name": "1,2-ETHANEDIOL",
+                "formula_weight": 62.068,
+                "formula": "C2 H6 O2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "U8H",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "U8H",
+                "name": "6-[(4-methoxyphenyl)methyl]-1,2,4-triazine-3,5(2H,4H)-dithione",
+                "formula_weight": 265.355,
+                "formula": "C11 H11 N3 O S2"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "DMS",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "DMS",
+                "name": "DIMETHYL SULFOXIDE",
+                "formula_weight": 78.133,
+                "formula": "C2 H6 O S"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, adipocyte"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7FBF"
+        },
+        "struct": {
+          "title": "The 0.86 angstrom X-ray structure of the human heart fatty acid-binding protein complexed with octanoic acid"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.86
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "P6G",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "P6G",
+                "name": "HEXAETHYLENE GLYCOL",
+                "formula_weight": 282.331,
+                "formula": "C12 H26 O7"
+              }
+            }
+          },
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "OCA",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "OCA",
+                "name": "OCTANOIC ACID (CAPRYLIC ACID)",
+                "formula_weight": 144.211,
+                "formula": "C8 H16 O2"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Fatty acid-binding protein, heart"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rcsb_entry_container_identifiers": {
+          "entry_id": "7AOT"
+        },
+        "struct": {
+          "title": "The Fk1 domain of FKBP51 in complex with (2R,5S,12R)-12-cyclohexyl-2-[2-(3,4-dimethoxyphenyl)ethyl]-3,19-dioxa-10,13,16-triazatricyclo[18.3.1.0-5,10]tetracosa- 1(24),20,22-triene-4,11,14,17-tetrone"
+        },
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ],
+        "rcsb_entry_info": {
+          "resolution_combined": [
+            0.85
+          ],
+          "deposited_model_count": 1,
+          "polymer_entity_count_protein": 1,
+          "polymer_entity_count": 1
+        },
+        "nonpolymer_entities": [
+          {
+            "rcsb_nonpolymer_entity_container_identifiers": {
+              "nonpolymer_comp_id": "RTQ",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "nonpolymer_comp": {
+              "chem_comp": {
+                "id": "RTQ",
+                "name": "(2R,5S,12R)-12-cyclohexyl-2-[2-(3,4-dimethoxyphenyl)ethyl]-3,19-dioxa-10,13,16-triazatricyclo[18.3.1.0-5,10]tetracosa- 1(24),20,22-triene-4,11,14,17-tetrone",
+                "formula_weight": 635.747,
+                "formula": "C35 H45 N3 O8"
+              }
+            }
+          }
+        ],
+        "polymer_entities": [
+          {
+            "rcsb_polymer_entity": {
+              "pdbx_description": "Peptidyl-prolyl cis-trans isomerase FKBP5"
+            },
+            "rcsb_polymer_entity_container_identifiers": {
+              "entity_id": "1",
+              "auth_asym_ids": [
+                "A"
+              ]
+            },
+            "rcsb_entity_source_organism": [
+              {
+                "ncbi_scientific_name": "Homo sapiens"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

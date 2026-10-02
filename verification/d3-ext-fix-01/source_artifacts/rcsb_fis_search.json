@@ -1,0 +1,15 @@
+{
+  "query_id": "d322669d-546f-489b-a36e-ee50377a8f14",
+  "result_type": "entry",
+  "total_count": 2,
+  "result_set": [
+    {
+      "identifier": "3BCJ",
+      "score": 1.0
+    },
+    {
+      "identifier": "1X98",
+      "score": 1.0
+    }
+  ]
+}

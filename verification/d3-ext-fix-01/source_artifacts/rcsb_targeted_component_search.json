@@ -1,0 +1,407 @@
+{
+  "query_id": "1be28637-407c-4543-bed2-29fcccfd18df",
+  "result_type": "entry",
+  "total_count": 1552,
+  "result_set": [
+    {
+      "identifier": "4I8H",
+      "score": 1.0
+    },
+    {
+      "identifier": "4LBS",
+      "score": 1.0
+    },
+    {
+      "identifier": "7FEZ",
+      "score": 1.0
+    },
+    {
+      "identifier": "3BCJ",
+      "score": 1.0
+    },
+    {
+      "identifier": "3MFJ",
+      "score": 1.0
+    },
+    {
+      "identifier": "3MI4",
+      "score": 1.0
+    },
+    {
+      "identifier": "4I8G",
+      "score": 1.0
+    },
+    {
+      "identifier": "4LB3",
+      "score": 1.0
+    },
+    {
+      "identifier": "4LB4",
+      "score": 1.0
+    },
+    {
+      "identifier": "4LBR",
+      "score": 1.0
+    },
+    {
+      "identifier": "9BZZ",
+      "score": 1.0
+    },
+    {
+      "identifier": "2J8T",
+      "score": 1.0
+    },
+    {
+      "identifier": "9BZT",
+      "score": 1.0
+    },
+    {
+      "identifier": "9C01",
+      "score": 1.0
+    },
+    {
+      "identifier": "6TGU",
+      "score": 1.0
+    },
+    {
+      "identifier": "7BNH",
+      "score": 1.0
+    },
+    {
+      "identifier": "4LAU",
+      "score": 1.0
+    },
+    {
+      "identifier": "4PSS",
+      "score": 1.0
+    },
+    {
+      "identifier": "45PC",
+      "score": 1.0
+    },
+    {
+      "identifier": "4I8K",
+      "score": 1.0
+    },
+    {
+      "identifier": "4IGS",
+      "score": 1.0
+    },
+    {
+      "identifier": "4LAZ",
+      "score": 1.0
+    },
+    {
+      "identifier": "4PSY",
+      "score": 1.0
+    },
+    {
+      "identifier": "6Q01",
+      "score": 1.0
+    },
+    {
+      "identifier": "5MNG",
+      "score": 1.0
+    },
+    {
+      "identifier": "4QXI",
+      "score": 1.0
+    },
+    {
+      "identifier": "4I8J",
+      "score": 1.0
+    },
+    {
+      "identifier": "4I8L",
+      "score": 1.0
+    },
+    {
+      "identifier": "9PWM",
+      "score": 1.0
+    },
+    {
+      "identifier": "4GCA",
+      "score": 1.0
+    },
+    {
+      "identifier": "6LK1",
+      "score": 1.0
+    },
+    {
+      "identifier": "1PWM",
+      "score": 1.0
+    },
+    {
+      "identifier": "6F7R",
+      "score": 1.0
+    },
+    {
+      "identifier": "6UWW",
+      "score": 1.0
+    },
+    {
+      "identifier": "5MNH",
+      "score": 1.0
+    },
+    {
+      "identifier": "5MOQ",
+      "score": 1.0
+    },
+    {
+      "identifier": "6SYW",
+      "score": 1.0
+    },
+    {
+      "identifier": "8A4N",
+      "score": 1.0
+    },
+    {
+      "identifier": "8UVZ",
+      "score": 1.0
+    },
+    {
+      "identifier": "8UW0",
+      "score": 1.0
+    },
+    {
+      "identifier": "3M4H",
+      "score": 1.0
+    },
+    {
+      "identifier": "5OU0",
+      "score": 1.0
+    },
+    {
+      "identifier": "6Y1P",
+      "score": 1.0
+    },
+    {
+      "identifier": "8CNP",
+      "score": 1.0
+    },
+    {
+      "identifier": "9C04",
+      "score": 1.0
+    },
+    {
+      "identifier": "1A7Z",
+      "score": 1.0
+    },
+    {
+      "identifier": "1Z8A",
+      "score": 1.0
+    },
+    {
+      "identifier": "3LZ5",
+      "score": 1.0
+    },
+    {
+      "identifier": "6TXP",
+      "score": 1.0
+    },
+    {
+      "identifier": "8AE9",
+      "score": 1.0
+    },
+    {
+      "identifier": "8AQG",
+      "score": 1.0
+    },
+    {
+      "identifier": "8AUU",
+      "score": 1.0
+    },
+    {
+      "identifier": "8B66",
+      "score": 1.0
+    },
+    {
+      "identifier": "8CNF",
+      "score": 1.0
+    },
+    {
+      "identifier": "5OUK",
+      "score": 1.0
+    },
+    {
+      "identifier": "4PRT",
+      "score": 1.0
+    },
+    {
+      "identifier": "5DP2",
+      "score": 1.0
+    },
+    {
+      "identifier": "5OUJ",
+      "score": 1.0
+    },
+    {
+      "identifier": "8AQP",
+      "score": 1.0
+    },
+    {
+      "identifier": "8B3R",
+      "score": 1.0
+    },
+    {
+      "identifier": "2AYW",
+      "score": 1.0
+    },
+    {
+      "identifier": "6F81",
+      "score": 1.0
+    },
+    {
+      "identifier": "6T3P",
+      "score": 1.0
+    },
+    {
+      "identifier": "6TD8",
+      "score": 1.0
+    },
+    {
+      "identifier": "6XUM",
+      "score": 1.0
+    },
+    {
+      "identifier": "8B34",
+      "score": 1.0
+    },
+    {
+      "identifier": "8BJL",
+      "score": 1.0
+    },
+    {
+      "identifier": "9C05",
+      "score": 1.0
+    },
+    {
+      "identifier": "4QBX",
+      "score": 1.0
+    },
+    {
+      "identifier": "3LEP",
+      "score": 1.0
+    },
+    {
+      "identifier": "1HJ8",
+      "score": 1.0
+    },
+    {
+      "identifier": "1ZK4",
+      "score": 1.0
+    },
+    {
+      "identifier": "2AGT",
+      "score": 1.0
+    },
+    {
+      "identifier": "2PZN",
+      "score": 1.0
+    },
+    {
+      "identifier": "3U2C",
+      "score": 1.0
+    },
+    {
+      "identifier": "4XZH",
+      "score": 1.0
+    },
+    {
+      "identifier": "4ZGF",
+      "score": 1.0
+    },
+    {
+      "identifier": "4PRR",
+      "score": 1.0
+    },
+    {
+      "identifier": "6T7Q",
+      "score": 1.0
+    },
+    {
+      "identifier": "1CC8",
+      "score": 1.0
+    },
+    {
+      "identifier": "1S0R",
+      "score": 1.0
+    },
+    {
+      "identifier": "4YU1",
+      "score": 1.0
+    },
+    {
+      "identifier": "3LZ3",
+      "score": 1.0
+    },
+    {
+      "identifier": "6F82",
+      "score": 1.0
+    },
+    {
+      "identifier": "7FPP",
+      "score": 1.0
+    },
+    {
+      "identifier": "7FPQ",
+      "score": 1.0
+    },
+    {
+      "identifier": "8B3N",
+      "score": 1.0
+    },
+    {
+      "identifier": "7FPM",
+      "score": 1.0
+    },
+    {
+      "identifier": "7FPN",
+      "score": 1.0
+    },
+    {
+      "identifier": "7FPV",
+      "score": 1.0
+    },
+    {
+      "identifier": "7FPW",
+      "score": 1.0
+    },
+    {
+      "identifier": "8OZ2",
+      "score": 1.0
+    },
+    {
+      "identifier": "1T41",
+      "score": 1.0
+    },
+    {
+      "identifier": "3BEU",
+      "score": 1.0
+    },
+    {
+      "identifier": "4PST",
+      "score": 1.0
+    },
+    {
+      "identifier": "4QR6",
+      "score": 1.0
+    },
+    {
+      "identifier": "4RGC",
+      "score": 1.0
+    },
+    {
+      "identifier": "5FI3",
+      "score": 1.0
+    },
+    {
+      "identifier": "7FPU",
+      "score": 1.0
+    },
+    {
+      "identifier": "3ONC",
+      "score": 1.0
+    }
+  ]
+}
