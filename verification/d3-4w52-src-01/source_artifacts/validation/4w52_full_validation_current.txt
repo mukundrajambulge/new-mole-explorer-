@@ -1,0 +1,335 @@
+Full wwPDB X-ray Structure Validation Report i○
+Mar 9, 2026 – 04:18 AM UTC
+PDB ID : 4W52 / pdb_00004w52
+Title : T4 Lysozyme L99A with Benzene Bound
+Authors : Merski, M.; Shoichet, B.K.; Eidam, O.; Fischer, M.
+Deposited on : 2014-08-16
+Resolution : 1.50 Å(reported)
+This is a Full wwPDB X-ray Structure Validation Report for a publicly released PDB entry.
+We welcome your comments atvalidation@mail.wwpdb.org
+A user guide is available at
+https://www.wwpdb.org/validation/2017/XrayValidationReportHelp
+with speciﬁc help available everywhere you see thei○ symbol.
+The types of validation reports are described at
+http://www.wwpdb.org/validation/2017/FAQs#types.
+The following versions of software and data (see referencesi○) were used in the production of this report:
+MolProbity : 4-5-2 with Phenix2.0
+Mogul : 2022.3.0, CSD as543be (2022)
+Xtriage (Phenix) : 2.0
+EDS : 3.0
+Percentile statistics : 20250101.v01 (using entries in the PDB archive January 1st 2025)
+CCP4 : 9.0.010 (Gargrove)
+Density-Fitness : 1.0.12
+Ideal geometry (proteins) : Engh & Huber (2001)
+Ideal geometry (DNA, RNA) : Parkinson et al. (1996)
+Validation Pipeline (wwPDB-VP) : 2.49
+
+Page 2 Full wwPDB X-ray Structure Validation Report 4W52
+1 Overall quality at a glance i○
+The following experimental techniques were used to determine the structure:
+X-RAY DIFFRACTION
+The reported resolution of this entry is 1.50 Å.
+Percentile scores (ranging between 0-100) for global validation metrics of the entry are shown in
+the following graphic. The table shows the number of entries on which the scores are based.
+Metric Whole archive
+(#Entries)
+Similar resolution
+(#Entries, resolution range(Å))
+Rf ree 180053 4037 (1.50-1.50)
+Clashscore 190562 4235 (1.50-1.50)
+Ramachandran outliers 187476 4153 (1.50-1.50)
+Sidechain outliers 187428 4150 (1.50-1.50)
+RSRZ outliers 180081 4039 (1.50-1.50)
+The table below summarises the geometric issues observed across the polymeric chains and their
+ﬁt to the electron density. The red, orange, yellow and green segments of the lower bar indicate
+the fraction of residues that contain outliers for >=3, 2, 1 and 0 types of geometric quality
+criteria respectively. A grey segment represents the fraction of residues that are not modelled.
+The numeric value for each fraction is indicated below the corresponding segment, with a dot
+representing fractions<=5% The upper red bar (where present) indicates the fraction of residues
+that have poor ﬁt to the electron density. The numeric value is given above the bar.
+Mol Chain Length Quality of chain
+1 A 172
+
+
+Page 3 Full wwPDB X-ray Structure Validation Report 4W52
+2 Entry composition i○
+There are 4 unique types of molecules in this entry. The entry contains 1525 atoms, of which 0
+are hydrogens and 0 are deuteriums.
+In the tables below, the ZeroOcc column contains the number of atoms modelled with zero occu-
+pancy, the AltConf column contains the number of residues with at least one atom in alternate
+conformation and the Trace column contains the number of residues modelled with at most 2
+atoms.
+• Molecule 1 is a protein called Endolysin.
+Mol Chain Residues Atoms ZeroOcc AltConf Trace
+1 A 164 Total C N O S
+1358 863 240 245 10 0 13 0
+There are 11 discrepancies between the modelled and reference sequences:
+Chain Residue Modelled Actual Comment Reference
+A 12 GLY ARG variant UNP P00720
+A 99 ALA LEU engineered mutation UNP P00720
+A 137 ARG ILE variant UNP P00720
+A 165 LEU - expression tag UNP P00720
+A 166 GLU - expression tag UNP P00720
+A 167 HIS - expression tag UNP P00720
+A 168 HIS - expression tag UNP P00720
+A 169 HIS - expression tag UNP P00720
+A 170 HIS - expression tag UNP P00720
+A 171 HIS - expression tag UNP P00720
+A 172 HIS - expression tag UNP P00720
+• Molecule 2 is BENZENE (CCD ID: BNZ) (formula: C6H6).
+
+
+Page 4 Full wwPDB X-ray Structure Validation Report 4W52
+Mol Chain Residues Atoms ZeroOcc AltConf
+2 A 1 Total C
+6 6 0 0
+• Molecule 3 is 4-(2-HYDROXYETHYL)-1-PIPERAZINE ETHANESULFONIC ACID (CCD
+ID: EPE) (formula: C8H18N2O4S).
+Mol Chain Residues Atoms ZeroOcc AltConf
+3 A 1 Total C N O S
+15 8 2 4 1 0 0
+• Molecule 4 is water.
+
+
+Page 5 Full wwPDB X-ray Structure Validation Report 4W52
+Mol Chain Residues Atoms ZeroOcc AltConf
+4 A 146 Total O
+146 146 0 18
+
+
+Page 6 Full wwPDB X-ray Structure Validation Report 4W52
+3 Residue-property plots i○
+These plots are drawn for all protein, RNA, DNA and oligosaccharide chains in the entry. The
+ﬁrst graphic for a chain summarises the proportions of the various outlier classes displayed in the
+second graphic. The second graphic shows the sequence view annotated by issues in geometry and
+electron density. Residues are color-coded according to the number of geometric quality criteria
+for which they contain at least one outlier: green = 0, yellow = 1, orange = 2 and red = 3 or more.
+A red dot above a residue indicates a poor ﬁt to the electron density (RSRZ> 2). Stretches of 2
+or more consecutive residues without any outlier are shown as a green connector. Residues present
+in the sample, but not in the model, are shown in grey.
+• Molecule 1: Endolysin
+Chain A:
+M1
+N2
+E5
+K16
+K43
+V57
+N68
+W158
+Y161
+K162 •
+N163 •
+L164 •
+LEU
+GLU
+HIS
+HIS
+HIS
+HIS
+HIS
+HIS
+
+
+Page 7 Full wwPDB X-ray Structure Validation Report 4W52
+4 Data and reﬁnement statistics i○
+Property Value Source
+Space group P 32 2 1 Depositor
+Cell constants
+a, b, c,α, β, γ
+60.35Å 60.35Å 96.61Å
+90.00◦ 90.00◦ 120.00◦ Depositor
+Resolution (Å) 45.97 – 1.50
+45.97 – 1.50
+Depositor
+EDS
+% Data completeness
+(in resolution range)
+100.0 (45.97-1.50)
+100.0 (45.97-1.50)
+Depositor
+EDS
+Rmerge 0.07 Depositor
+Rsym (Not available) Depositor
+<I/σ (I)> 1 4.33 (at 1.50Å) Xtriage
+Reﬁnement program PHENIX (phenix.reﬁne: 1.7.1_743) Depositor
+R, Rf ree
+0.165 , 0.182
+0.164 , 0.177
+Depositor
+DCC
+Rf ree test set 1331 reﬂections (4.00%) wwPDB-VP
+Wilson B-factor (Å2) 12.7 Xtriage
+Anisotropy 0.316 Xtriage
+Bulk solventksol(e/Å3), Bsol(Å2) 0.39 , 37.5 EDS
+L-test for twinning2 <|L|> = 0.49,<L 2 > = 0.32 Xtriage
+Estimated twinning fraction 0.031 for -h,-k,l Xtriage
+Fo,Fc correlation 0.96 EDS
+Total number of atoms 1525 wwPDB-VP
+Average B, all atoms (Å2) 15.0 wwPDB-VP
+Xtriage’s analysis on translational NCS is as follows:The largest oﬀ-origin peak in the Patterson
+function is 5.53% of the height of the origin peak. No signiﬁcant pseudotranslation is detected.
+1Intensities estimated from amplitudes.
+2Theoretical values of<|L| >, < L 2 > for acentric reﬂections are 0.5, 0.333 respectively for untwinned datasets,
+and 0.375, 0.2 for perfectly twinned datasets.
+
+
+Page 8 Full wwPDB X-ray Structure Validation Report 4W52
+5 Model quality i○
+5.1 Standard geometry i○
+Bond lengths and bond angles in the following residue types are not validated in this section: EPE,
+BNZ
+The Z score for a bond length (or angle) is the number of standard deviations the observed value
+is removed from the expected value. A bond length (or angle) with|Z| > 5 is considered an
+outlier worth inspection. RMSZ is the root-mean-square of all Z scores of the bond lengths (or
+angles).
+Mol Chain Bond lengths Bond angles
+RMSZ #|Z|>5 RMSZ #|Z|>5
+1 A 0.62 0/1417 0.80 0/1908
+There are no bond length outliers.
+There are no bond angle outliers.
+There are no chirality outliers.
+There are no planarity outliers.
+5.2 Too-close contacts i○
+In the following table, the Non-H and H(model) columns list the number of non-hydrogen atoms
+and hydrogen atoms in the chain respectively. The H(added) column lists the number of hydrogen
+atoms added and optimized by MolProbity. The Clashes column lists the number of clashes within
+the asymmetric unit, whereas Symm-Clashes lists symmetry-related clashes.
+Mol Chain Non-H H(model) H(added) Clashes Symm-Clashes
+1 A 1358 0 1399 13 0
+2 A 6 0 6 0 0
+3 A 15 0 17 0 0
+4 A 146 0 0 2 0
+All All 1525 0 1422 13 0
+The all-atom clashscore is deﬁned as the number of clashes found per 1000 atoms (including
+hydrogen atoms). The all-atom clashscore for this structure is 5.
+All (13) close contacts within the same asymmetric unit are listed below, sorted by their clash
+magnitude.
+
+
+Page 9 Full wwPDB X-ray Structure Validation Report 4W52
+Atom-1 Atom-2 Interatomic
+distance (Å)
+Clash
+overlap (Å)
+1:A:16:LYS:HG2 1:A:57[B]:VAL:HG12 1.66 0.78
+1:A:1[A]:MET:HG2 1:A:158:TRP:CE3 2.27 0.69
+1:A:163:ASN:O 1:A:164:LEU:HB2 2.01 0.60
+1:A:1[A]:MET:HG3 1:A:2:ASN:N 2.19 0.57
+1:A:1[A]:MET:HG2 1:A:158:TRP:CZ3 2.41 0.56
+1:A:43:LYS:NZ 4:A:386:HOH:O 2.39 0.55
+1:A:163:ASN:O 1:A:164:LEU:CB 2.56 0.53
+1:A:161:TYR:O 1:A:164:LEU:HD22 2.11 0.51
+1:A:1[A]:MET:HG2 1:A:158:TRP:CD2 2.51 0.45
+1:A:1[A]:MET:HE2 1:A:1[A]:MET:HB2 1.52 0.44
+1:A:163:ASN:C 1:A:164:LEU:HD23 2.44 0.43
+1:A:1[A]:MET:HA 1:A:5:GLU:OE1 2.20 0.41
+1:A:68[B]:ASN:ND2 4:A:303:HOH:O 2.53 0.41
+There are no symmetry-related clashes.
+5.3 Torsion angles i○
+5.3.1 Protein backbone i○
+In the following table, the Percentiles column shows the percent Ramachandran outliers of the
+chain as a percentile score with respect to all X-ray entries followed by that with respect to entries
+of similar resolution.
+The Analysed column shows the number of residues for which the backbone conformation was
+analysed, and the total number of residues.
+Mol Chain Analysed Favoured Allowed Outliers Percentiles
+1 A 174/172 (101%) 172 (99%) 2 (1%) 0 100 100
+There are no Ramachandran outliers to report.
+5.3.2 Protein sidechains i○
+In the following table, the Percentiles column shows the percent sidechain outliers of the chain as a
+percentile score with respect to all X-ray entries followed by that with respect to entries of similar
+resolution.
+The Analysed column shows the number of residues for which the sidechain conformation was
+analysed, and the total number of residues.
+
+
+Page 10 Full wwPDB X-ray Structure Validation Report 4W52
+Mol Chain Analysed Rotameric Outliers Percentiles
+1 A 142/145 (98%) 141 (99%) 1 (1%) 76 57
+All (1) residues with a non-rotameric sidechain are listed below:
+Mol Chain Res Type
+1 A 164 LEU
+Sometimes sidechains can be ﬂipped to improve hydrogen bonding and reduce clashes. All (1) such
+sidechains are listed below:
+Mol Chain Res Type
+1 A 132 ASN
+5.3.3 RNA i○
+There are no RNA molecules in this entry.
+5.4 Non-standard residues in protein, DNA, RNA chains i○
+There are no non-standard protein/DNA/RNA residues in this entry.
+5.5 Carbohydrates i○
+There are no oligosaccharides in this entry.
+5.6 Ligand geometry i○
+2 ligands are modelled in this entry.
+In the following table, the Counts columns list the number of bonds (or angles) for which Mogul
+statistics could be retrieved, the number of bonds (or angles) that are observed in the model and
+the number of bonds (or angles) that are deﬁned in the Chemical Component Dictionary. The
+Link column lists molecule types, if any, to which the group is linked. The Z score for a bond
+length (or angle) is the number of standard deviations the observed value is removed from the
+expected value. A bond length (or angle) with|Z|> 2 is considered an outlier worth inspection.
+RMSZ is the root-mean-square of all Z scores of the bond lengths (or angles).
+Mol Type Chain Res Link Bond lengths Bond angles
+Counts RMSZ #|Z|> 2 Counts RMSZ #|Z|> 2
+3 EPE A 201 - 15,15,15 0.84 1 (6%) 19,20,20 1.07 1 (5%)
+2 BNZ A 200 - 6,6,6 0.62 0 6,6,6 1.05 0
+
+
+Page 11 Full wwPDB X-ray Structure Validation Report 4W52
+In the following table, the Chirals column lists the number of chiral outliers, the number of chiral
+centers analysed, the number of these observed in the model and the number deﬁned in the
+Chemical Component Dictionary. Similar counts are reported in the Torsion and Rings columns.
+’-’ means no outliers of that kind were identiﬁed.
+Mol Type Chain Res Link Chirals Torsions Rings
+3 EPE A 201 - - 0/9/19/19 0/1/1/1
+2 BNZ A 200 - - - 0/1/1/1
+All (1) bond length outliers are listed below:
+Mol Chain Res Type Atoms Z Observed(Å) Ideal(Å)
+3 A 201 EPE C10-S 2.75 1.81 1.77
+All (1) bond angle outliers are listed below:
+Mol Chain Res Type Atoms Z Observed(o) Ideal(o)
+3 A 201 EPE C5-N4-C3 2.73 114.72 108.84
+There are no chirality outliers.
+There are no torsion outliers.
+There are no ring outliers.
+No monomer is involved in short contacts.
+5.7 Other polymers i○
+There are no such residues in this entry.
+5.8 Polymer linkage issues i○
+There are no chain breaks in this entry.
+
+
+Page 12 Full wwPDB X-ray Structure Validation Report 4W52
+6 Fit of model and data i○
+6.1 Protein, DNA and RNA chains i○
+In the following table, the column labelled ‘#RSRZ> 2’ contains the number (and percentage)
+of RSRZ outliers, followed by percent RSRZ outliers for the chain as percentile scores relative to
+all X-ray entries and entries of similar resolution. The OWAB column contains the minimum,
+median, 95th percentile and maximum values of the occupancy-weighted average B-factor per
+residue. The column labelled ‘Q< 0.9’ lists the number of (and percentage) of residues with an
+average occupancy less than0.9.
+Mol Chain Analysed <RSRZ> #RSRZ>2 OW AB(Å2) Q<0.9
+1 A 164/172 (95%) -0.18 3 (1%) 67 71 8, 12, 20, 30 22 (13%)
+All (3) RSRZ outliers are listed below:
+Mol Chain Res Type RSRZ
+1 A 164 LEU 10.0
+1 A 163 ASN 7.3
+1 A 162 LYS 3.6
+6.2 Non-standard residues in protein, DNA, RNA chains i○
+There are no non-standard protein/DNA/RNA residues in this entry.
+6.3 Carbohydrates i○
+There are no oligosaccharides in this entry.
+6.4 Ligands i○
+In the following table, the Atoms column lists the number of modelled atoms in the group and the
+number deﬁned in the chemical component dictionary. The B-factors column lists the minimum,
+median, 95th percentile and maximum values of B factors of atoms in the group. The column
+labelled ‘Q< 0.9’ lists the number of atoms with occupancy less than0.9.
+Mol Type Chain Res Atoms RSCC RSR B-factors(Å2) Q<0.9
+3 EPE A 201 15/15 0.92 0.10 13,19,47,49 0
+2 BNZ A 200 6/6 0.93 0.10 12,12,14,15 6
+
+
+Page 13 Full wwPDB X-ray Structure Validation Report 4W52
+6.5 Other polymers i○
+There are no such residues in this entry.
+

@@ -1,0 +1,13 @@
+{
+  "predecessor_commit": "697f6074fa1869bf120d537cbcffd7d85c006981",
+  "predecessor_path": "verification\\d3-ext-fix-01\\source_artifacts\\cif\\4W52.cif",
+  "predecessor_bytes": 216440,
+  "predecessor_sha256": "29636d4be96bd30079007ffd65835fc351bf751238e701068d1b4d924aaf8a22",
+  "current_official_path": "source_artifacts\\cif\\4W52_current.cif",
+  "current_official_url": "https://files.rcsb.org/download/4W52.cif",
+  "current_official_bytes": 216440,
+  "current_official_sha256": "29636d4be96bd30079007ffd65835fc351bf751238e701068d1b4d924aaf8a22",
+  "byte_identical": true,
+  "predecessor_atom_site_rows": 1525,
+  "current_atom_site_rows": 1525
+}

@@ -1,0 +1,4272 @@
+{
+  "source_file": "source_artifacts\\cif\\4W52_current.cif",
+  "models": [
+    "1"
+  ],
+  "atom_site_rows_total": 1525,
+  "heavy_atoms_total": 1525,
+  "protein_heavy_atoms": 1358,
+  "protein_modeled_residues": 164,
+  "protein_auth_residue_numbers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129,
+    130,
+    131,
+    132,
+    133,
+    134,
+    135,
+    136,
+    137,
+    138,
+    139,
+    140,
+    141,
+    142,
+    143,
+    144,
+    145,
+    146,
+    147,
+    148,
+    149,
+    150,
+    151,
+    152,
+    153,
+    154,
+    155,
+    156,
+    157,
+    158,
+    159,
+    160,
+    161,
+    162,
+    163,
+    164
+  ],
+  "modeled_residue_164": {
+    "minimum_distance_to_BNZ_A": 20.05,
+    "nearest_atom": "O",
+    "nearest_BNZ_atom": "C2"
+  },
+  "protein_missing_heavy_atom_count_from_CIF_annotation": 18,
+  "missing_heavy_atom_annotations": [
+    {
+      "residue": "LYS16",
+      "missing_atom": "NZ",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 27.68,
+      "nearest_observed_atom": "O",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "LYS60",
+      "missing_atom": "NZ",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 26.24,
+      "nearest_observed_atom": "O",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "ARG80",
+      "missing_atom": "CG",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 9.802,
+      "nearest_observed_atom": "N",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "ARG80",
+      "missing_atom": "CD",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 9.802,
+      "nearest_observed_atom": "N",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "ARG80",
+      "missing_atom": "NE",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 9.802,
+      "nearest_observed_atom": "N",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "ARG80",
+      "missing_atom": "CZ",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 9.802,
+      "nearest_observed_atom": "N",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "ARG80",
+      "missing_atom": "NH1",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 9.802,
+      "nearest_observed_atom": "N",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "ARG80",
+      "missing_atom": "NH2",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 9.802,
+      "nearest_observed_atom": "N",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "ARG125",
+      "missing_atom": "CZ",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 11.614,
+      "nearest_observed_atom": "O",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "ARG125",
+      "missing_atom": "NH1",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 11.614,
+      "nearest_observed_atom": "O",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "ARG125",
+      "missing_atom": "NH2",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 11.614,
+      "nearest_observed_atom": "O",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "LYS147",
+      "missing_atom": "NZ",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 13.673,
+      "nearest_observed_atom": "O",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "LYS162",
+      "missing_atom": "CD",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 19.922,
+      "nearest_observed_atom": "N",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "LYS162",
+      "missing_atom": "CE",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 19.922,
+      "nearest_observed_atom": "N",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "LYS162",
+      "missing_atom": "NZ",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 19.922,
+      "nearest_observed_atom": "N",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "ASN163",
+      "missing_atom": "CG",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 22.51,
+      "nearest_observed_atom": "N",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "ASN163",
+      "missing_atom": "OD1",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 22.51,
+      "nearest_observed_atom": "N",
+      "within_8A_by_observed_residue_atoms": false
+    },
+    {
+      "residue": "ASN163",
+      "missing_atom": "ND2",
+      "nearest_observed_residue_atom_distance_to_BNZ_A": 22.51,
+      "nearest_observed_atom": "N",
+      "within_8A_by_observed_residue_atoms": false
+    }
+  ],
+  "unobserved_polymer_residues": [
+    {
+      "id": "1",
+      "PDB_model_num": "1",
+      "polymer_flag": "Y",
+      "occupancy_flag": "1",
+      "auth_asym_id": "A",
+      "auth_comp_id": "LEU",
+      "auth_seq_id": "165",
+      "PDB_ins_code": "?",
+      "label_asym_id": "A",
+      "label_comp_id": "LEU",
+      "label_seq_id": "165"
+    },
+    {
+      "id": "2",
+      "PDB_model_num": "1",
+      "polymer_flag": "Y",
+      "occupancy_flag": "1",
+      "auth_asym_id": "A",
+      "auth_comp_id": "GLU",
+      "auth_seq_id": "166",
+      "PDB_ins_code": "?",
+      "label_asym_id": "A",
+      "label_comp_id": "GLU",
+      "label_seq_id": "166"
+    },
+    {
+      "id": "3",
+      "PDB_model_num": "1",
+      "polymer_flag": "Y",
+      "occupancy_flag": "1",
+      "auth_asym_id": "A",
+      "auth_comp_id": "HIS",
+      "auth_seq_id": "167",
+      "PDB_ins_code": "?",
+      "label_asym_id": "A",
+      "label_comp_id": "HIS",
+      "label_seq_id": "167"
+    },
+    {
+      "id": "4",
+      "PDB_model_num": "1",
+      "polymer_flag": "Y",
+      "occupancy_flag": "1",
+      "auth_asym_id": "A",
+      "auth_comp_id": "HIS",
+      "auth_seq_id": "168",
+      "PDB_ins_code": "?",
+      "label_asym_id": "A",
+      "label_comp_id": "HIS",
+      "label_seq_id": "168"
+    },
+    {
+      "id": "5",
+      "PDB_model_num": "1",
+      "polymer_flag": "Y",
+      "occupancy_flag": "1",
+      "auth_asym_id": "A",
+      "auth_comp_id": "HIS",
+      "auth_seq_id": "169",
+      "PDB_ins_code": "?",
+      "label_asym_id": "A",
+      "label_comp_id": "HIS",
+      "label_seq_id": "169"
+    },
+    {
+      "id": "6",
+      "PDB_model_num": "1",
+      "polymer_flag": "Y",
+      "occupancy_flag": "1",
+      "auth_asym_id": "A",
+      "auth_comp_id": "HIS",
+      "auth_seq_id": "170",
+      "PDB_ins_code": "?",
+      "label_asym_id": "A",
+      "label_comp_id": "HIS",
+      "label_seq_id": "170"
+    },
+    {
+      "id": "7",
+      "PDB_model_num": "1",
+      "polymer_flag": "Y",
+      "occupancy_flag": "1",
+      "auth_asym_id": "A",
+      "auth_comp_id": "HIS",
+      "auth_seq_id": "171",
+      "PDB_ins_code": "?",
+      "label_asym_id": "A",
+      "label_comp_id": "HIS",
+      "label_seq_id": "171"
+    },
+    {
+      "id": "8",
+      "PDB_model_num": "1",
+      "polymer_flag": "Y",
+      "occupancy_flag": "1",
+      "auth_asym_id": "A",
+      "auth_comp_id": "HIS",
+      "auth_seq_id": "172",
+      "PDB_ins_code": "?",
+      "label_asym_id": "A",
+      "label_comp_id": "HIS",
+      "label_seq_id": "172"
+    }
+  ],
+  "BNZ": {
+    "atom_count": 6,
+    "atoms": [
+      {
+        "atom_name": "C1",
+        "element": "C",
+        "occupancy": 0.7,
+        "B_A2": 15.06,
+        "alt_id": ".",
+        "xyz_A": [
+          -32.969,
+          6.196,
+          2.877
+        ]
+      },
+      {
+        "atom_name": "C2",
+        "element": "C",
+        "occupancy": 0.7,
+        "B_A2": 12.84,
+        "alt_id": ".",
+        "xyz_A": [
+          -32.945,
+          7.046,
+          3.973
+        ]
+      },
+      {
+        "atom_name": "C3",
+        "element": "C",
+        "occupancy": 0.7,
+        "B_A2": 12.24,
+        "alt_id": ".",
+        "xyz_A": [
+          -33.719,
+          6.798,
+          5.113
+        ]
+      },
+      {
+        "atom_name": "C4",
+        "element": "C",
+        "occupancy": 0.7,
+        "B_A2": 13.09,
+        "alt_id": ".",
+        "xyz_A": [
+          -34.54,
+          5.68,
+          5.143
+        ]
+      },
+      {
+        "atom_name": "C5",
+        "element": "C",
+        "occupancy": 0.7,
+        "B_A2": 12.54,
+        "alt_id": ".",
+        "xyz_A": [
+          -34.545,
+          4.825,
+          4.044
+        ]
+      },
+      {
+        "atom_name": "C6",
+        "element": "C",
+        "occupancy": 0.7,
+        "B_A2": 14.23,
+        "alt_id": ".",
+        "xyz_A": [
+          -33.787,
+          5.069,
+          2.915
+        ]
+      }
+    ],
+    "label_asym_id": "B",
+    "auth_asym_id": "A",
+    "auth_seq_id": "200",
+    "occupancies": [
+      0.7
+    ],
+    "alt_ids": [
+      "."
+    ],
+    "minimum_distance_to_protein_A": 3.405,
+    "minimum_contact_atom_pair": {
+      "protein": {
+        "auth_seq_id": "111",
+        "auth_comp_id": "VAL",
+        "auth_atom_id": "CG1"
+      },
+      "BNZ_atom": "C2"
+    }
+  },
+  "alternate_conformation_residue_count": 13,
+  "alternate_conformations": [
+    {
+      "residue": {
+        "chain": "A",
+        "auth_seq_id": "1",
+        "insertion_code": "?",
+        "name": "MET"
+      },
+      "atoms_with_altloc": [
+        "CA",
+        "CB",
+        "CE",
+        "CG",
+        "SD"
+      ],
+      "conformers": [
+        {
+          "alt_id": "A",
+          "occupancies": [
+            0.5
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 16.559,
+          "nearest_residue_atom": "CG",
+          "nearest_BNZ_atom": "C1",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 16.559,
+          "nearest_alternate_atom": "CG",
+          "nearest_BNZ_atom_to_alternate": "C1",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        },
+        {
+          "alt_id": "B",
+          "occupancies": [
+            0.5
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 16.968,
+          "nearest_residue_atom": "CE",
+          "nearest_BNZ_atom": "C2",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 16.968,
+          "nearest_alternate_atom": "CE",
+          "nearest_BNZ_atom_to_alternate": "C2",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        }
+      ]
+    },
+    {
+      "residue": {
+        "chain": "A",
+        "auth_seq_id": "14",
+        "insertion_code": "?",
+        "name": "ARG"
+      },
+      "atoms_with_altloc": [
+        "CA",
+        "CB",
+        "CD",
+        "CG",
+        "CZ",
+        "NE",
+        "NH1",
+        "NH2"
+      ],
+      "conformers": [
+        {
+          "alt_id": "A",
+          "occupancies": [
+            0.5
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 24.851,
+          "nearest_residue_atom": "N",
+          "nearest_BNZ_atom": "C2",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 25.545,
+          "nearest_alternate_atom": "CG",
+          "nearest_BNZ_atom_to_alternate": "C2",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        },
+        {
+          "alt_id": "B",
+          "occupancies": [
+            0.5
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 22.029,
+          "nearest_residue_atom": "NH2",
+          "nearest_BNZ_atom": "C2",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 22.029,
+          "nearest_alternate_atom": "NH2",
+          "nearest_BNZ_atom_to_alternate": "C2",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        }
+      ]
+    },
+    {
+      "residue": {
+        "chain": "A",
+        "auth_seq_id": "21",
+        "insertion_code": "?",
+        "name": "THR"
+      },
+      "atoms_with_altloc": [
+        "CA",
+        "CB",
+        "CG2",
+        "OG1"
+      ],
+      "conformers": [
+        {
+          "alt_id": "A",
+          "occupancies": [
+            0.8
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 18.067,
+          "nearest_residue_atom": "OG1",
+          "nearest_BNZ_atom": "C2",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 18.067,
+          "nearest_alternate_atom": "OG1",
+          "nearest_BNZ_atom_to_alternate": "C2",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        },
+        {
+          "alt_id": "B",
+          "occupancies": [
+            0.2
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 17.918,
+          "nearest_residue_atom": "CG2",
+          "nearest_BNZ_atom": "C2",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 17.918,
+          "nearest_alternate_atom": "CG2",
+          "nearest_BNZ_atom_to_alternate": "C2",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        }
+      ]
+    },
+    {
+      "residue": {
+        "chain": "A",
+        "auth_seq_id": "53",
+        "insertion_code": "?",
+        "name": "ASN"
+      },
+      "atoms_with_altloc": [
+        "CA",
+        "CB",
+        "CG",
+        "ND2",
+        "OD1"
+      ],
+      "conformers": [
+        {
+          "alt_id": "A",
+          "occupancies": [
+            0.6
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 34.791,
+          "nearest_residue_atom": "N",
+          "nearest_BNZ_atom": "C3",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 35.01,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C3",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        },
+        {
+          "alt_id": "B",
+          "occupancies": [
+            0.4
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 34.791,
+          "nearest_residue_atom": "N",
+          "nearest_BNZ_atom": "C3",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 35.011,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C3",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        }
+      ]
+    },
+    {
+      "residue": {
+        "chain": "A",
+        "auth_seq_id": "57",
+        "insertion_code": "?",
+        "name": "VAL"
+      },
+      "atoms_with_altloc": [
+        "CA",
+        "CB",
+        "CG1",
+        "CG2"
+      ],
+      "conformers": [
+        {
+          "alt_id": "A",
+          "occupancies": [
+            0.6
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 31.17,
+          "nearest_residue_atom": "C",
+          "nearest_BNZ_atom": "C3",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 31.588,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C3",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        },
+        {
+          "alt_id": "B",
+          "occupancies": [
+            0.4
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 31.17,
+          "nearest_residue_atom": "C",
+          "nearest_BNZ_atom": "C3",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 31.53,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C3",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        }
+      ]
+    },
+    {
+      "residue": {
+        "chain": "A",
+        "auth_seq_id": "61",
+        "insertion_code": "?",
+        "name": "ASP"
+      },
+      "atoms_with_altloc": [
+        "CA",
+        "CB",
+        "CG",
+        "OD1",
+        "OD2"
+      ],
+      "conformers": [
+        {
+          "alt_id": "A",
+          "occupancies": [
+            0.6
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 26.007,
+          "nearest_residue_atom": "O",
+          "nearest_BNZ_atom": "C3",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 27.847,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C3",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        },
+        {
+          "alt_id": "B",
+          "occupancies": [
+            0.4
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 26.007,
+          "nearest_residue_atom": "O",
+          "nearest_BNZ_atom": "C3",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 27.829,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C3",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        }
+      ]
+    },
+    {
+      "residue": {
+        "chain": "A",
+        "auth_seq_id": "68",
+        "insertion_code": "?",
+        "name": "ASN"
+      },
+      "atoms_with_altloc": [
+        "CA",
+        "CB",
+        "CG",
+        "ND2",
+        "OD1"
+      ],
+      "conformers": [
+        {
+          "alt_id": "A",
+          "occupancies": [
+            0.7
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 16.54,
+          "nearest_residue_atom": "O",
+          "nearest_BNZ_atom": "C3",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 18.184,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C3",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        },
+        {
+          "alt_id": "B",
+          "occupancies": [
+            0.3
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 16.54,
+          "nearest_residue_atom": "O",
+          "nearest_BNZ_atom": "C3",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 18.127,
+          "nearest_alternate_atom": "OD1",
+          "nearest_BNZ_atom_to_alternate": "C3",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        }
+      ]
+    },
+    {
+      "residue": {
+        "chain": "A",
+        "auth_seq_id": "106",
+        "insertion_code": "?",
+        "name": "MET"
+      },
+      "atoms_with_altloc": [
+        "CA",
+        "CB",
+        "CE",
+        "CG",
+        "SD"
+      ],
+      "conformers": [
+        {
+          "alt_id": "A",
+          "occupancies": [
+            0.6
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 7.986,
+          "nearest_residue_atom": "SD",
+          "nearest_BNZ_atom": "C2",
+          "within_5A": false,
+          "within_8A": true,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 7.986,
+          "nearest_alternate_atom": "SD",
+          "nearest_BNZ_atom_to_alternate": "C2",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": true,
+          "contacts_le_4_5A": []
+        },
+        {
+          "alt_id": "B",
+          "occupancies": [
+            0.4
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 7.72,
+          "nearest_residue_atom": "CE",
+          "nearest_BNZ_atom": "C2",
+          "within_5A": false,
+          "within_8A": true,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 7.72,
+          "nearest_alternate_atom": "CE",
+          "nearest_BNZ_atom_to_alternate": "C2",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": true,
+          "contacts_le_4_5A": []
+        }
+      ]
+    },
+    {
+      "residue": {
+        "chain": "A",
+        "auth_seq_id": "109",
+        "insertion_code": "?",
+        "name": "THR"
+      },
+      "atoms_with_altloc": [
+        "CA",
+        "CB",
+        "CG2",
+        "OG1"
+      ],
+      "conformers": [
+        {
+          "alt_id": "A",
+          "occupancies": [
+            0.6
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 9.185,
+          "nearest_residue_atom": "N",
+          "nearest_BNZ_atom": "C3",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 9.851,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C3",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        },
+        {
+          "alt_id": "B",
+          "occupancies": [
+            0.3
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 9.185,
+          "nearest_residue_atom": "N",
+          "nearest_BNZ_atom": "C3",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 9.808,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C3",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        }
+      ]
+    },
+    {
+      "residue": {
+        "chain": "A",
+        "auth_seq_id": "119",
+        "insertion_code": "?",
+        "name": "ARG"
+      },
+      "atoms_with_altloc": [
+        "CA",
+        "CB",
+        "CD",
+        "CG",
+        "CZ",
+        "NE",
+        "NH1",
+        "NH2"
+      ],
+      "conformers": [
+        {
+          "alt_id": "A",
+          "occupancies": [
+            0.5
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 7.821,
+          "nearest_residue_atom": "N",
+          "nearest_BNZ_atom": "C6",
+          "within_5A": false,
+          "within_8A": true,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 8.849,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C6",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        },
+        {
+          "alt_id": "B",
+          "occupancies": [
+            0.5
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 7.821,
+          "nearest_residue_atom": "N",
+          "nearest_BNZ_atom": "C6",
+          "within_5A": false,
+          "within_8A": true,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 8.849,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C6",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        }
+      ]
+    },
+    {
+      "residue": {
+        "chain": "A",
+        "auth_seq_id": "120",
+        "insertion_code": "?",
+        "name": "MET"
+      },
+      "atoms_with_altloc": [
+        "CA",
+        "CB",
+        "CE",
+        "CG",
+        "SD"
+      ],
+      "conformers": [
+        {
+          "alt_id": "A",
+          "occupancies": [
+            0.8
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 8.716,
+          "nearest_residue_atom": "C",
+          "nearest_BNZ_atom": "C6",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 9.566,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C6",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        },
+        {
+          "alt_id": "B",
+          "occupancies": [
+            0.2
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 8.716,
+          "nearest_residue_atom": "C",
+          "nearest_BNZ_atom": "C6",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 9.552,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C6",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        }
+      ]
+    },
+    {
+      "residue": {
+        "chain": "A",
+        "auth_seq_id": "125",
+        "insertion_code": "?",
+        "name": "ARG"
+      },
+      "atoms_with_altloc": [
+        "CA",
+        "CB",
+        "CD",
+        "CG",
+        "NE"
+      ],
+      "conformers": [
+        {
+          "alt_id": "A",
+          "occupancies": [
+            0.5
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 11.614,
+          "nearest_residue_atom": "O",
+          "nearest_BNZ_atom": "C6",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 12.563,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C6",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        },
+        {
+          "alt_id": "B",
+          "occupancies": [
+            0.5
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 11.614,
+          "nearest_residue_atom": "O",
+          "nearest_BNZ_atom": "C6",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 12.551,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C6",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        }
+      ]
+    },
+    {
+      "residue": {
+        "chain": "A",
+        "auth_seq_id": "154",
+        "insertion_code": "?",
+        "name": "ARG"
+      },
+      "atoms_with_altloc": [
+        "CA",
+        "CB",
+        "CD",
+        "CG",
+        "CZ",
+        "NE",
+        "NH1",
+        "NH2"
+      ],
+      "conformers": [
+        {
+          "alt_id": "A",
+          "occupancies": [
+            0.6
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 10.678,
+          "nearest_residue_atom": "N",
+          "nearest_BNZ_atom": "C1",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 11.801,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C1",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        },
+        {
+          "alt_id": "B",
+          "occupancies": [
+            0.4
+          ],
+          "minimum_BNZ_distance_A_including_common_atoms": 10.678,
+          "nearest_residue_atom": "N",
+          "nearest_BNZ_atom": "C1",
+          "within_5A": false,
+          "within_8A": false,
+          "alternate_atoms_only_minimum_BNZ_distance_A": 11.793,
+          "nearest_alternate_atom": "CA",
+          "nearest_BNZ_atom_to_alternate": "C1",
+          "alternate_atoms_only_within_5A": false,
+          "alternate_atoms_only_within_8A": false,
+          "contacts_le_4_5A": []
+        }
+      ]
+    }
+  ],
+  "water_count": 146,
+  "waters_within_5A": 0,
+  "waters_within_8A": 1,
+  "waters": [
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "400",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 7.841,
+      "nearest_BNZ_atom": "C5",
+      "nearest_protein_distance_A": 2.624,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "83",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "401",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 8.053,
+      "nearest_BNZ_atom": "C6",
+      "nearest_protein_distance_A": 2.737,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "90",
+        "auth_comp_id": "SER",
+        "auth_atom_id": "OG"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "438",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 8.318,
+      "nearest_BNZ_atom": "C6",
+      "nearest_protein_distance_A": 3.493,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "119",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "CA"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "402",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 8.819,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.833,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "105",
+        "auth_comp_id": "GLN",
+        "auth_atom_id": "OE1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "437",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 9.496,
+      "nearest_BNZ_atom": "C6",
+      "nearest_protein_distance_A": 2.781,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "115",
+        "auth_comp_id": "THR",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "326",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.5,
+      "nearest_BNZ_distance_A": 9.665,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.744,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "117",
+        "auth_comp_id": "SER",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "439",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.7,
+      "nearest_BNZ_distance_A": 9.726,
+      "nearest_BNZ_atom": "C6",
+      "nearest_protein_distance_A": 3.475,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "122",
+        "auth_comp_id": "GLN",
+        "auth_atom_id": "OE1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "318",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 9.735,
+      "nearest_BNZ_atom": "C5",
+      "nearest_protein_distance_A": 2.708,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "86",
+        "auth_comp_id": "PRO",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "394",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 10.017,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.907,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "103",
+        "auth_comp_id": "VAL",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "436",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 10.063,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.955,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "108",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "444",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.5,
+      "nearest_BNZ_distance_A": 10.353,
+      "nearest_BNZ_atom": "C5",
+      "nearest_protein_distance_A": 2.663,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "89",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "OD2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "398",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 10.664,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 3.017,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "81",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "ND2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "325",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 10.99,
+      "nearest_BNZ_atom": "C6",
+      "nearest_protein_distance_A": 2.737,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "122",
+        "auth_comp_id": "GLN",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "415",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 11.137,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.751,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "106",
+        "auth_comp_id": "MET",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "435",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 11.391,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.75,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "109",
+        "auth_comp_id": "THR",
+        "auth_atom_id": "OG1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "434",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 11.477,
+      "nearest_BNZ_atom": "C4",
+      "nearest_protein_distance_A": 3.128,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "82",
+        "auth_comp_id": "ALA",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "346",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 11.594,
+      "nearest_BNZ_atom": "C5",
+      "nearest_protein_distance_A": 2.871,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "90",
+        "auth_comp_id": "SER",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "399",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 11.843,
+      "nearest_BNZ_atom": "C4",
+      "nearest_protein_distance_A": 2.904,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "82",
+        "auth_comp_id": "ALA",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "433",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 12.167,
+      "nearest_BNZ_atom": "C4",
+      "nearest_protein_distance_A": 2.975,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "108",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "OE1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "379",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 12.196,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.816,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "70",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "397",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.8,
+      "nearest_BNZ_distance_A": 12.411,
+      "nearest_BNZ_atom": "C4",
+      "nearest_protein_distance_A": 2.843,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "79",
+        "auth_comp_id": "LEU",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "396",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 12.485,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.681,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "73",
+        "auth_comp_id": "ALA",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "395",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 12.513,
+      "nearest_BNZ_atom": "C4",
+      "nearest_protein_distance_A": 2.881,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "76",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "305",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 12.53,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.601,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "113",
+        "auth_comp_id": "GLY",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "361",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.7,
+      "nearest_BNZ_distance_A": 13.177,
+      "nearest_BNZ_atom": "C5",
+      "nearest_protein_distance_A": 3.27,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "96",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "NH1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "363",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 13.382,
+      "nearest_BNZ_atom": "C5",
+      "nearest_protein_distance_A": 3.519,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "96",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "NH2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "323",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 13.579,
+      "nearest_BNZ_atom": "C6",
+      "nearest_protein_distance_A": 2.73,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "92",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "OD2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "426",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.5,
+      "nearest_BNZ_distance_A": 14.205,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.755,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "11",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "OE2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "427",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.6,
+      "nearest_BNZ_distance_A": 14.308,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.729,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "105",
+        "auth_comp_id": "GLN",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "406",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 14.366,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.868,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "130",
+        "auth_comp_id": "ALA",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "413",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 14.454,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.755,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "157",
+        "auth_comp_id": "THR",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "403",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 14.462,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.998,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "142",
+        "auth_comp_id": "THR",
+        "auth_atom_id": "OG1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "422",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 14.66,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 3.027,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "105",
+        "auth_comp_id": "GLN",
+        "auth_atom_id": "NE2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "404",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 14.71,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.798,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "128",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "408",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 14.82,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.928,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "154",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "NH1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "442",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.4,
+      "nearest_BNZ_distance_A": 14.838,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.969,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "30",
+        "auth_comp_id": "GLY",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "360",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 15.113,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 3.049,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "135",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "NZ"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "329",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 15.201,
+      "nearest_BNZ_atom": "C6",
+      "nearest_protein_distance_A": 2.773,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "123",
+        "auth_comp_id": "GLN",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "446",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 15.207,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.941,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "154",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "NH1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "324",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 15.275,
+      "nearest_BNZ_atom": "C6",
+      "nearest_protein_distance_A": 2.733,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "154",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "405",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 15.549,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.966,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "127",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "337",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 15.656,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.799,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "135",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "409",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 15.722,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.83,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "145",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "NH1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "301",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 15.742,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.429,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "72",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "OD2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "353",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 15.902,
+      "nearest_BNZ_atom": "C6",
+      "nearest_protein_distance_A": 2.919,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "155",
+        "auth_comp_id": "THR",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "358",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 15.932,
+      "nearest_BNZ_atom": "C6",
+      "nearest_protein_distance_A": 3.028,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "127",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "OD1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "425",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.8,
+      "nearest_BNZ_distance_A": 16.013,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.584,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "30",
+        "auth_comp_id": "GLY",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "319",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 16.333,
+      "nearest_BNZ_atom": "C6",
+      "nearest_protein_distance_A": 2.712,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "156",
+        "auth_comp_id": "GLY",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "407",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 16.369,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.852,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "131",
+        "auth_comp_id": "VAL",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "375",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 16.507,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.358,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "22",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "OE2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "418",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 16.645,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 3.061,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "11",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "OE1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "347",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 16.661,
+      "nearest_BNZ_atom": "C6",
+      "nearest_protein_distance_A": 2.875,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "158",
+        "auth_comp_id": "TRP",
+        "auth_atom_id": "NE1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "373",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 16.813,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.692,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "20",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "OD2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "304",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 17.128,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.552,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "127",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "OD1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "334",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 17.157,
+      "nearest_BNZ_atom": "C6",
+      "nearest_protein_distance_A": 2.788,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "155",
+        "auth_comp_id": "THR",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "368",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 17.162,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.729,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "10",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "423",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.8,
+      "nearest_BNZ_distance_A": 17.257,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.73,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "151",
+        "auth_comp_id": "THR",
+        "auth_atom_id": "OG1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "445",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 17.28,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.487,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "139",
+        "auth_comp_id": "TYR",
+        "auth_atom_id": "OH"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "354",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 17.442,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.935,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "145",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "364",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 17.487,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 3.824,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "145",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "CB"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "441",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 17.687,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.863,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "11",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "OE1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "350",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 17.717,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.897,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "140",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "OD1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "383",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.5,
+      "nearest_BNZ_distance_A": 17.92,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.73,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "32",
+        "auth_comp_id": "LEU",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "378",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 17.933,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.688,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "70",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "OD2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "410",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 18.13,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.812,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "144",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "372",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 18.194,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.594,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "20",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "OD2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "357",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 18.275,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.972,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "158",
+        "auth_comp_id": "TRP",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "303",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 19.078,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.532,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "68",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "ND2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "440",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 19.158,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.704,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "18",
+        "auth_comp_id": "TYR",
+        "auth_atom_id": "OH"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "348",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 19.189,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.877,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "70",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "OD1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "412",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 19.282,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.685,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "160",
+        "auth_comp_id": "ALA",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "411",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 19.436,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.88,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "148",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "NH1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "416",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 20.175,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 3.323,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "144",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "OD1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "338",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 20.304,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 2.813,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "140",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "ND2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "332",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 20.359,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.786,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "68",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "OD1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "362",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 20.464,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 3.439,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "4",
+        "auth_comp_id": "PHE",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "366",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 20.632,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.954,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "5",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "351",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 20.644,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.909,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "2",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "ND2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "377",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 20.681,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.804,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "63",
+        "auth_comp_id": "ALA",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "327",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 20.922,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.745,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "140",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "328",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 21.197,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.766,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "1",
+        "auth_comp_id": "MET",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "310",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 21.288,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.667,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "141",
+        "auth_comp_id": "GLN",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "335",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 21.522,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.79,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "5",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "OE2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "367",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 21.574,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.788,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "9",
+        "auth_comp_id": "ILE",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "320",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 21.745,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.713,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "31",
+        "auth_comp_id": "HIS",
+        "auth_atom_id": "NE2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "341",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 21.829,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.845,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "137",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "NH2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "330",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 21.865,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.777,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "22",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "OE1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "365",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 21.928,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 3.848,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "5",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "CG"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "417",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 22.069,
+      "nearest_BNZ_atom": "C1",
+      "nearest_protein_distance_A": 3.009,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "159",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "314",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 22.128,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.69,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "22",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "369",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 22.153,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.728,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "14",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "NE"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "355",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 22.352,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.946,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "35",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "307",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 22.384,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.657,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "33",
+        "auth_comp_id": "LEU",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "333",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 22.768,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.787,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "19",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "342",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 23.196,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.853,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "49",
+        "auth_comp_id": "ALA",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "443",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 23.265,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 3.033,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "64",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "OE2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "340",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 23.352,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.824,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "21",
+        "auth_comp_id": "THR",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "308",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 23.377,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.662,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "69",
+        "auth_comp_id": "GLN",
+        "auth_atom_id": "NE2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "311",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 23.788,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.683,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "5",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "OE2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "428",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 24.51,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.957,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "13",
+        "auth_comp_id": "LEU",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "374",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 24.587,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.789,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "22",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "424",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.8,
+      "nearest_BNZ_distance_A": 24.816,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.791,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "8",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "NE"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "376",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 24.932,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.656,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "36",
+        "auth_comp_id": "SER",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "309",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 24.935,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.663,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "69",
+        "auth_comp_id": "GLN",
+        "auth_atom_id": "NE2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "349",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 24.94,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.879,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "20",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "430",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 25.73,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 3.048,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "35",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "380",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 25.77,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 3.335,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "62",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "322",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 25.786,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.727,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "61",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "356",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 25.918,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.962,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "49",
+        "auth_comp_id": "ALA",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "331",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 26.1,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.778,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "19",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "302",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 26.46,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.526,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "64",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "OE1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "429",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 26.586,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.688,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "23",
+        "auth_comp_id": "GLY",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "339",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 27.295,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.823,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "23",
+        "auth_comp_id": "GLY",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "306",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 27.409,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.645,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "61",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "OD2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "352",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 28.12,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.917,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "65",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "NZ"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "359",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 28.316,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 3.048,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "19",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "414",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 28.592,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.878,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "16",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "345",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 29.108,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.867,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "48",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "419",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 29.524,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.906,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "15",
+        "auth_comp_id": "LEU",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "371",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 29.53,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.938,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "37",
+        "auth_comp_id": "PRO",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "313",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.8,
+      "nearest_BNZ_distance_A": 29.605,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.69,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "44",
+        "auth_comp_id": "SER",
+        "auth_atom_id": "OG"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "316",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 29.899,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.696,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "17",
+        "auth_comp_id": "ILE",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "420",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 29.968,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 3.485,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "15",
+        "auth_comp_id": "LEU",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "381",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 30.934,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.568,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "62",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "OE2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "393",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 31.198,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.966,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "61",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "431",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 31.469,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.629,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "17",
+        "auth_comp_id": "ILE",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "321",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 31.596,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.719,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "50",
+        "auth_comp_id": "ILE",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "343",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 31.812,
+      "nearest_BNZ_atom": "C2",
+      "nearest_protein_distance_A": 2.86,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "19",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "NZ"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "382",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 31.846,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.767,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "59",
+        "auth_comp_id": "THR",
+        "auth_atom_id": "OG1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "387",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 31.858,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.71,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "47",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "OD1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "392",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 31.889,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.919,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "60",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "432",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.7,
+      "nearest_BNZ_distance_A": 32.432,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.805,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "56",
+        "auth_comp_id": "GLY",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "317",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 32.699,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.7,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "51",
+        "auth_comp_id": "GLY",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "370",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 32.783,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.718,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "58",
+        "auth_comp_id": "ILE",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "421",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 0.7,
+      "nearest_BNZ_distance_A": 33.299,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.75,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "62",
+        "auth_comp_id": "GLU",
+        "auth_atom_id": "OE2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "384",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 33.488,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.922,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "39",
+        "auth_comp_id": "LEU",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "391",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 33.917,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 3.135,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "52",
+        "auth_comp_id": "ARG",
+        "auth_atom_id": "NH2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "344",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 34.013,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.862,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "44",
+        "auth_comp_id": "SER",
+        "auth_atom_id": "OG"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "312",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 34.172,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.684,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "40",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "336",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 34.428,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.792,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "47",
+        "auth_comp_id": "ASP",
+        "auth_atom_id": "OD2"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "390",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 34.55,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.811,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "54",
+        "auth_comp_id": "CYS",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "385",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 34.627,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 3.043,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "40",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "315",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 35.126,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 1.979,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "53",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "OD1"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "386",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 35.934,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.388,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "43",
+        "auth_comp_id": "LYS",
+        "auth_atom_id": "NZ"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "389",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 36.507,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.875,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "53",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "O"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    },
+    {
+      "identity": {
+        "label_asym_id": "D",
+        "label_seq_id": ".",
+        "auth_asym_id": "A",
+        "auth_seq_id": "388",
+        "label_comp_id": "HOH",
+        "label_atom_id": "O"
+      },
+      "occupancy": 1.0,
+      "nearest_BNZ_distance_A": 37.171,
+      "nearest_BNZ_atom": "C3",
+      "nearest_protein_distance_A": 2.937,
+      "nearest_protein_atom": {
+        "auth_asym_id": "A",
+        "auth_seq_id": "53",
+        "auth_comp_id": "ASN",
+        "auth_atom_id": "N"
+      },
+      "protein_water_and_water_ligand_both_le_3_5A": false
+    }
+  ],
+  "EPE": {
+    "atom_count": 15,
+    "residue_ids": [
+      [
+        "C",
+        "A",
+        "201"
+      ]
+    ],
+    "occupancies": [
+      1.0
+    ],
+    "minimum_distance_to_BNZ_A": 12.445,
+    "nearest_EPE_atom": "C2",
+    "nearest_BNZ_atom": "C3"
+  },
+  "other_nonpolymer_residue_names": [],
+  "metal_atom_count": 0
+}

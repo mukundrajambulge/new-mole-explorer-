@@ -1,0 +1,6 @@
+*.md text eol=lf
+*.csv text eol=lf
+*.txt text eol=lf
+.gitattributes text eol=lf
+tools/*.py text eol=lf
+source_artifacts/** -text -diff -eol
