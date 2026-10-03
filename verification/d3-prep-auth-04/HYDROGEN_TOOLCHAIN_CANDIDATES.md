@@ -48,3 +48,7 @@ RDKit is publicly accessible under BSD-3-Clause. Python is available from python
 - [OpenMM 8.6.1 Modeller source](https://github.com/openmm/openmm/blob/8.6.1/wrappers/python/openmm/app/modeller.py)
 - [OpenMM 8.6.1 PDBxFile source](https://github.com/openmm/openmm/blob/8.6.1/wrappers/python/openmm/app/pdbxfile.py)
 - [OpenMM license description](https://docs.openmm.org/latest/userguide/library/01_introduction.html)
+
+## Pinned Python API signature correction
+
+The RDKit 2026.03.6 Python wrapper is called with explicit boolean keyword arguments, not by passing an `AddHsParameters` object. Its internal C++ parameter struct defaults `skipQueries` to false. The approved adapter must first reject query atoms and query bonds, then use the exact call in `PINNED_TOOLCHAIN_PROPOSAL.md`. This changes only call syntax; it does not change the pinned software, effective flags, state, or scientific interpretation. Primary source verification is recorded in `TOOLCHAIN_API_VERIFICATION.md`.

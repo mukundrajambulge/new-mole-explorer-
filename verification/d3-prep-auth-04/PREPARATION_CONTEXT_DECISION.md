@@ -16,6 +16,6 @@ Declare:
 
 The pH is a named input to this candidate profile; it is not evidence that the deposited receptor was protonated at pH 6.9 during ligand binding. A later analysis that requires an experimentally established binding-solution pH cannot cite this profile for that claim.
 
-## Owner decision
+## Owner decision status
 
-AUTH04-02 in OWNER_DECISION_PACKET.md asks the owner to approve or replace the use of pH 6.9 as a crystallization-context proxy and the associated per-residue state map, including explicit GLU128 disposition and reconciliation of the 49-versus-51 source count. YES accepts only this explicit profile context and fully enumerated state. NO blocks preparation. An alternative pH, residue state, cap, construct, disulfide, or chemical-state method requires a new explicit profile version and decision; it must not be silently substituted during execution.
+AUTH04-02 is OWNER APPROVED — YES; see `OWNER_AUTHORIZATION_RECORD.md`. It accepts only pH 6.9 as a crystallization-context proxy and the fully enumerated explicit state, including GLU128− and the reconciled 51-side-chain-plus-two-termini inventory. An alternative pH, residue state, cap, construct, disulfide, or chemical-state method requires a new explicit profile version and decision; it must not be silently substituted during execution.

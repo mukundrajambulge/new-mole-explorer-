@@ -46,4 +46,4 @@ The exception changes no accepted D1 or D2 semantic rule. It authorizes only a s
 
 ## Owner status
 
-NOT RECORDED. This file is a decision proposal only. Execution remains blocked until the project owner explicitly approves this exact exception.
+OWNER APPROVED — YES on 2026-10-04; see `OWNER_AUTHORIZATION_RECORD.md`. The exact single-use 3DMX/BNZ scope and every non-permission in this proposal remain controlling. AUTH04 gate exit is still held for the independent evidence review.

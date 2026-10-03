@@ -1,6 +1,6 @@
 # Candidate-specific preparation profile freeze
 
-Status: exact profile proposal; not registered in application contracts, not owner-approved, not executable until AUTH04-02 resolves the GLU128/count conflict, and not executed.
+Status: owner-approved exact candidate profile for one 3DMX/BNZ development preparation; not registered in application contracts and not executed. The GLU128/count conflict is resolved by AUTH04-02 as recorded in `OWNER_AUTHORIZATION_RECORD.md`. AUTH04 gate exit remains held for independent evidence review.
 
 ## Identity
 
@@ -37,4 +37,4 @@ Any change to one of those items changes the profile version/content identity. R
 
 ## Owner approval boundary
 
-Owner approval of this profile would authorize only the one fixture bootstrap exception described in BOOTSTRAP_EXCEPTION_DECISION.md and the proposed profile contents above. It would not accept D3 or authorize scoring, grids, docking, PyMOL, D4, production PDBQT, or DOCKING.RUN.
+Owner approval recorded in `OWNER_AUTHORIZATION_RECORD.md` authorizes only the one-fixture bootstrap exception described in BOOTSTRAP_EXCEPTION_DECISION.md and the profile contents above. It does not accept D3 or authorize scoring, grids, docking, PyMOL, D4, production PDBQT, or DOCKING.RUN.

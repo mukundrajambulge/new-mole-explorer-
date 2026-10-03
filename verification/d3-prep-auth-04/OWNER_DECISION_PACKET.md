@@ -1,6 +1,6 @@
 # D3-PREP-AUTH-04 owner decision packet
 
-All items below are genuinely unresolved in the reviewed project evidence. The owner may answer YES or NO for each item and name any replacement values/conditions. A partial or changed proposal requires a revised packet/profile version before execution.
+This packet preserves the exact three questions, proposed choices, evidence, and consequences that were presented for owner decision. The owner later explicitly approved each exact proposed choice; no owner decision remains open. The owner statuses below are current, and the original proposal details remain here for audit. Any changed choice requires a revised packet/profile version before execution.
 
 ## AUTH04-01 — one-fixture bootstrap exception
 
@@ -10,13 +10,13 @@ All items below are genuinely unresolved in the reviewed project evidence. The o
 
 **Evidence:** D3-PREP-DEC-04 report proposes a one-fixture bootstrap before the general profile is approved. Current D3-GRID-DEC-02 says no preparation profile is approved and profiles remain separate owner decisions after suitable D2-sealed prepared-state/full-pose evidence. The first prepared state cannot exist before one preparation.
 
-**YES consequence:** Removes the timing blocker for one 3DMX/BNZ development preparation under the exact profile if AUTH04-02 and AUTH04-03 are also YES and all execution preflight checks pass. It creates no general profile or D3 acceptance.
+**YES consequence:** Removes the timing blocker for one 3DMX/BNZ development preparation under the exact profile if AUTH04-02 and AUTH04-03 are also YES, the required independent evidence review is recorded, and all execution preflight checks pass. It creates no general profile or D3 acceptance.
 
 **NO consequence:** No D3-PREP-EXEC-04 preparation may occur under this exception; wait for the project’s general prepared-state/full-pose prerequisite or a later explicit owner amendment.
 
 **Preparation blocked:** YES unless approved.
 
-**Owner status:** NOT RECORDED.
+**Owner status:** OWNER APPROVED — YES on 2026-10-04; see `OWNER_AUTHORIZATION_RECORD.md`.
 
 ## AUTH04-02 — chemical state and context
 
@@ -26,13 +26,13 @@ All items below are genuinely unresolved in the reviewed project evidence. The o
 
 **Evidence:** DEC04 source freeze and receptor chemical-state proposal; RCSB/mmCIF crystallization metadata; residue-level coordinate/proximity audit. The source does not state a distinct soak/binding pH. HIS31 neutral/positive state is unobserved; geometry weakly supports HID. BNZ graph and neutrality are CCD/source facts. The predecessor says 49 ionizable side-chain groups and omits GLU128 from its numbered list; the predecessor CSV has 51 distinct side-chain identities, including GLU128, plus two termini. The proposed YES explicitly resolves this discrepancy.
 
-**YES consequence:** Authorizes only the listed explicit candidate ChemicalState in this profile, including GLU128− and the reconciled 51-site enumeration. The run must record all states explicitly and fail closed if they differ. It does not authorize automatic pKa/protonation, alternate states, physiological pH substitution, or a broader rule.
+**YES consequence:** Authorizes only the listed explicit candidate ChemicalState in this profile, including GLU128− and the reconciled 51-site enumeration. The run must record all states explicitly and fail closed if they differ. Execution still requires the recorded independent evidence review and all preflight checks. It does not authorize automatic pKa/protonation, alternate states, physiological pH substitution, or a broader rule.
 
 **NO consequence:** ChemicalState remains unresolved and preparation is blocked. A replacement state/context requires a revised decision packet and new profile version.
 
 **Preparation blocked:** YES unless approved.
 
-**Owner status:** NOT RECORDED.
+**Owner status:** OWNER APPROVED — YES on 2026-10-04; see `OWNER_AUTHORIZATION_RECORD.md`.
 
 ## AUTH04-03 — exact toolchain, profile and component interpretation
 
@@ -42,14 +42,14 @@ All items below are genuinely unresolved in the reviewed project evidence. The o
 
 **Evidence:** DEC04 altloc/component freeze; PHD-V2-03 REC-D04/12/16/18; D2 profile contracts; RDKit 2026.03.6 API/source and pinned wheel/runtime hashes. OpenMM 8.6.1 was not selected because its addHydrogens API performs minimization. The profile ID is separate from the registered D2 dry-core consumer profile.
 
-**YES consequence:** Closes the candidate toolchain/profile owner decision for the single fixture only. It permits the next separate execution task to follow the pinned command after its driver/config source hash, full input hashes, state/graph checks, owner approvals and run manifest are sealed and validated.
+**YES consequence:** Closes the candidate toolchain/profile owner decision for the single fixture only. It permits a separate execution task to follow the pinned command only after the required independent evidence review is recorded and its driver/config source hash, full input hashes, state/graph checks, owner approvals and run manifest are sealed and validated.
 
 **NO consequence:** No execution. Revisit toolchain/profile research only for the named unresolved reason or a replacement profile, without changing fixture selection.
 
 **Preparation blocked:** YES unless approved.
 
-**Owner status:** NOT RECORDED.
+**Owner status:** OWNER APPROVED — YES on 2026-10-04; see `OWNER_AUTHORIZATION_RECORD.md`.
 
 ## Recording instructions
 
-The project owner must record each item’s YES/NO, name/role, date/time and any conditions in the canonical owner decision record before a future task claims approval. This packet is not that record. Running this task and presenting this packet are not owner authorization. No authorization record or execution prompt is present in this lane.
+The project owner’s explicit YES for all three exact proposed choices is recorded in `OWNER_AUTHORIZATION_RECORD.md`, sourced to the later owner instruction and its SHA-256. No owner decision remains open. AUTH04 gate exit and D3-PREP-EXEC-04 remain blocked only by the independent evidence-review condition documented in `REVIEW_REQUIREMENT_STATUS.md`; no execution prompt is present.

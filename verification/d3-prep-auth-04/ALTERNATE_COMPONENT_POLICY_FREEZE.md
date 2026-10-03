@@ -34,3 +34,7 @@ No metal/cofactor is reported within 8 Å of BNZ. No generic HETATM filter is pe
 ## Prepared-state interpretation
 
 The derived receptor represents the declared polymer receptor in a dry-core scoring component policy, with coherent major A conformers and the proposed explicit chemical state. It is not the complete crystallographic contents and does not claim that omitted water/additives were absent from the experiment. D2's ME_DOCKING_V1_RECEPTOR_CORE_DRY_1_0 remains the consumer/component profile; the preparation profile supplies one provenance-bearing realization of it.
+
+## Owner decision status
+
+The coherent MET106/GLU108 A-altloc policy and occurrence-level CORE_DRY_V1 component dispositions are OWNER APPROVED — YES under AUTH04-03; see `OWNER_AUTHORIZATION_RECORD.md`. This approval remains single-fixture and development-only.

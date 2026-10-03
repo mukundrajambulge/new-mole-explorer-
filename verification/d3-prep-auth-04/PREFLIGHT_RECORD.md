@@ -5,9 +5,9 @@
 - Workspace: C:/Users/mukun/.codex/worktrees/d3-prep-auth-04-3dmx-bnz/molecular-workstation
 - Branch: research/d3-prep-auth-04-3dmx-bnz
 - Required parent: be16bd1149e7a2e1285916846265ffbcbee8c341
-- Pre-write HEAD: verified at the exact required parent.
+- Pre-write HEAD: 2fa8660cdd8accd1a9acedd0018cea1fdec0b9e8 (`docs: add D3 prep AUTH04 decision package`), a direct child of the required parent above.
 - Pre-write status: clean.
-- New worktree was created from the exact predecessor SHA and attached to this task. No predecessor files were edited.
+- The existing isolated AUTH04 managed worktree and branch were continued; the setup commit above introduced the initial AUTH04 lane on top of the exact predecessor. The independent DEC04 worktree remained at the exact required parent and was verified separately. No predecessor files were edited.
 - Write scope: verification/d3-prep-auth-04/** only.
 
 ## Predecessor verification
@@ -20,7 +20,9 @@
 - The six-entry SOURCE_MANIFEST.csv was checked against local source bytes: 6/6 entries match.
 - Predecessor branch and cleanliness checks passed: exact expected branch, exact commit, zero porcelain status entries.
 
-## Authority/source preflight
+During final review, the same inherited DEC04 paths were also checked as materialized in the AUTH04 worktree. That Windows checkout uses `core.autocrlf=true`: 14/19 inherited DEC04 SHA256SUMS entries are not byte-identical there, and the source manifest's 3DMX.cif and BNZ.cif inputs are 2/6 entries whose AUTH04-worktree bytes fail their expected SHA-256 values after LF-to-CRLF checkout conversion. This does not indicate a change to the clean DEC04 worktree: its exact `be16bd1149e7a2e1285916846265ffbcbee8c341` checkout still passes 19/19 and 6/6. No DEC04 files were modified. Any execution must read the exact source bytes from that predecessor checkout (or use independently hash-verified byte-identical copies) and verify every digest before parsing; it must stop on any mismatch and must not silently normalize the AUTH04-worktree files.
+
+## Authority/source preflight at original AUTH04 preparation time
 
 Current source records were read from Google Drive on 2026-10-03. Current revisions inspected:
 
@@ -33,12 +35,20 @@ Current source records were read from Google Drive on 2026-10-03. Current revisi
 - PHD-V2 normalized requirements — ANLCKQmtImJkL0jzAX0tEWe60IujhfqJ6tupR1gdajVLTmssVLnYDSrAZ28xxii8x87ycUPyxxepBsJumZdT8SxePEQ6Csd8dHZdQFF4gj8.
 - PHD-V2 final acceptance specification — ANLCKQnGgNT040dvQhVTt7hJkBCuHUdaXDz34CcdPGQtQljd3u63CX3VqKjZNvoB7CAyInv7bhXmr9GNUidGWSisakQkoE2p5tYICygafzc.
 
-Searches for D3-PREP-AUTH-04 and 3DMX BNZ preparation owner approval returned no matching owner-approval record. The current Architecture B approval explicitly says it does not approve a preparation profile. No individual owner approval is claimed.
+At the time of this original pre-write preflight, searches for D3-PREP-AUTH-04 and 3DMX BNZ preparation owner approval returned no matching record. The current Architecture B approval explicitly says it does not approve a preparation profile. The later explicit owner authorization is documented separately below; it was not part of this original preflight snapshot.
 
 ## Toolchain preflight
 
-Official primary release/API/source pages and version-specific package hashes are in HYDROGEN_TOOLCHAIN_CANDIDATES.md and PINNED_TOOLCHAIN_PROPOSAL.md. Exact packages have not been downloaded or installed for this authorization lane. No chemistry package import, fixture parse for preparation, AddHs call, or molecular output occurred.
+Official primary release/API/source pages and version-specific package hashes are in HYDROGEN_TOOLCHAIN_CANDIDATES.md, PINNED_TOOLCHAIN_PROPOSAL.md and TOOLCHAIN_API_VERIFICATION.md. The Python 3.13.16 official installer was acquired and its SHA-256 matched the published release checksum. The RDKit and dependency wheels were not acquired or installed. No chemistry package import, fixture parse for preparation, AddHs call, or molecular output occurred.
 
 The observed host processor at preflight is 12th Gen Intel(R) Core(TM) i5-12500H, 12 cores/16 logical processors. The OS API reports Windows 10 Pro, build 26200, x64. The eventual execution task must recapture these facts; they identify this preflight host only.
 
 The lane-local .gitattributes pins Markdown/text artifact line endings to LF so byte-level checksums remain stable on Windows checkout. SHA256SUMS.txt covers the report/evidence files and CHANGED_PATHS.txt; it excludes itself to avoid recursive self-hashing and excludes .gitattributes because that file only controls checkout representation.
+
+## Post-owner-decision closure preflight — 2026-10-04
+
+- The user instruction `MOLE EXPLORER — D3-CLOSURE-EXEC-01` explicitly records owner YES for AUTH04-01, AUTH04-02 and AUTH04-03 using the exact proposed choices and fixture-only scope. The source file SHA-256 is recorded in `OWNER_AUTHORIZATION_RECORD.md`.
+- The current Roadmap was reread from Drive on 2026-10-04 (revision `AHj4eMRHkctrstRa_A9CeOD3tpDUQHvVTEXBMiAq5vHT-UTCavbbWyMlFnCrhsD0tpdHfCjZ4hPM3nxKoAa7lWBBuUAePc-TWbfKI3ENcxs`). It requires code review and an independent evidence review for gate closure. No reviewer or sign-off was available; `REVIEW_REQUIREMENT_STATUS.md` records this unresolved gate-exit condition.
+- RDKit 2026.03.6 API documentation and pinned release wrapper/source were checked. The Python call uses explicit bool flags, and the internal `skipQueries` default is false. The executable instruction is in `TOOLCHAIN_API_VERIFICATION.md` and `PINNED_TOOLCHAIN_PROPOSAL.md`.
+- The official Python installer hash matched. A per-user isolated installation attempt rolled back with Windows Installer error `0x80070003` while opening the local `core.msi` cache path. No CPython 3.13.16 runtime or package wheel was installed. This task performed no import, graph construction, AddHs operation, 3DMX/BNZ preparation, scoring, or grid construction.
+- Because the required independent evidence review is absent, AUTH04 remains HOLD, D3-PREP-EXEC-04 is not authorized, and no execution prompt is generated.

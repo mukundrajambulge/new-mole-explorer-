@@ -9,6 +9,7 @@ verification/d3-prep-auth-04/HEAVY_ATOM_INVARIANT.md
 verification/d3-prep-auth-04/HYDROGEN_PROVENANCE_CONTRACT.md
 verification/d3-prep-auth-04/HYDROGEN_TOOLCHAIN_CANDIDATES.md
 verification/d3-prep-auth-04/OPEN_BLOCKERS.md
+verification/d3-prep-auth-04/OWNER_AUTHORIZATION_RECORD.md
 verification/d3-prep-auth-04/OWNER_DECISION_PACKET.md
 verification/d3-prep-auth-04/PINNED_TOOLCHAIN_PROPOSAL.md
 verification/d3-prep-auth-04/PREDECESSOR_DECISION_EXTRACTION.md
@@ -17,3 +18,4 @@ verification/d3-prep-auth-04/PREPARATION_CONTEXT_DECISION.md
 verification/d3-prep-auth-04/PREPARATION_PROFILE_FREEZE.md
 verification/d3-prep-auth-04/REVIEW_REQUIREMENT_STATUS.md
 verification/d3-prep-auth-04/SHA256SUMS.txt
+verification/d3-prep-auth-04/TOOLCHAIN_API_VERIFICATION.md

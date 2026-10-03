@@ -1,33 +1,25 @@
 # Open blockers — D3-PREP-AUTH-04
 
-## Blocks preparation execution
+## Blocks AUTH04 gate exit and D3-PREP-EXEC-04
 
-1. **AUTH04-01 owner bootstrap decision:** no current record permits this one 3DMX/BNZ bootstrap before the later prepared-state/full-pose prerequisite.
-2. **AUTH04-02 owner state/context decision:** no owner approval accepts or replaces the pH 6.9 crystallization-context proxy and exact receptor residue/terminus state map.
-3. **AUTH04-03 owner profile/toolchain decision:** no owner approval accepts the named RDKit profile, hydrogen-only method, component/altloc interpretation, or exact dependency stack.
-4. **Per-site enumeration conflict within DEC04:** its prose reports 49 ionizable side-chain groups, its CSV groups to 51 distinct side-chain residue identities plus the two termini, and the numbered state list omits source-audited GLU128. AUTH04-02 asks the owner to confirm the exact 51-site set and GLU128− inclusion. No per-residue preparation is permitted until that answer is explicit.
+1. **Roadmap independent evidence review is absent.** The current Execution Roadmap requires an independent evidence review for gate closure. No independent reviewer report or sign-off is present in this lane. Until it is completed and recorded, do not mark AUTH04 PASS, generate an execution prompt, or begin preparation.
 
-Each question has exact YES/NO consequences in OWNER_DECISION_PACKET.md. Do not infer approval from task initiation or from existing approvals of Architecture B, fixture selection, or D2 contracts.
+## Execution preconditions after the review closes
 
-## Run-time fail-closed preconditions after approval
+These are fail-closed execution checks, not unresolved owner decisions:
 
-These are execution checks, not open scientific decisions:
+- reverify the owner authorization, exact profile and all DEC04 source hashes;
+- install/verify CPython 3.13.16 x64 and every pinned wheel using the exact listed artifact hashes;
+- verify the corrected RDKit Python wrapper signature and no-query-atom/bond precondition;
+- seal the preparation driver/config hashes before graph construction and before the first AddHs call;
+- validate graph completeness, the 164-residue construct, 51 side-chain identities plus two termini, GLU128−, BNZ graph, altloc coherence and occurrence-level component dispositions;
+- require deterministic replay, full hydrogen provenance and bitwise heavy-atom invariance;
+- fail closed on any discrepancy and preserve all diagnostics.
 
-- exact source hashes and selected atom rows match the predecessor source manifest;
-- approved profile and explicit state map are provided without hidden defaults;
-- driver source and configuration are sealed and hashed before the first AddHs call;
-- graph completeness, atom mapping, polymer connectivity, altloc coherence, and component-role checks all pass;
-- exact CPython/RDKit/dependency wheels and hashes verify in the offline environment;
-- all H additions have one exact parent AtomUID and expected atom inventory;
-- heavy-atom bitwise equality and serialization-only round-trip checks pass;
-- run provenance and all output digests are produced without changing the source.
+## Resolved owner decisions
 
-Any violation aborts before or during the tool operation with preserved diagnostics. A failed check is not overridable under this proposal.
+AUTH04-01, AUTH04-02 and AUTH04-03 are all **OWNER APPROVED — YES** as recorded in `OWNER_AUTHORIZATION_RECORD.md`. The approved exception remains single-use and fixture-specific; no general profile or production capability is approved.
 
-## Not blockers
+## Preserved boundaries
 
-No independent structural-biologist/computational-chemist approval is required before preparation by the canonical PHD-V2 preparation rules reviewed; it is recommended. General independent evidence review at gate closure and final D3 scientific qualification review remain separate requirements. The absence of a prepared-state digest in this lane is correct because no prepared state exists.
-
-## Preserved gate status
-
-3DMX/BNZ remains the active selected fixture. D3-FIXTURE-READY-03 remains PASS. D3-PREP-DEC-04 remains HOLD for authorization. D3-PREP-EXEC-04 remains NOT AUTHORIZED. Full D3 remains HOLD. D4 remains BLOCKED. DOCKING.RUN remains UNAVAILABLE.
+No preparation or hydrogen addition occurred in AUTH04. D1/D2 semantics, PyMOL, `CORE_DRY_V1`, scoring, grids, search, D4 and `DOCKING.RUN` are unchanged. Full D3 remains HOLD; D4 remains BLOCKED; `DOCKING.RUN` remains UNAVAILABLE.
