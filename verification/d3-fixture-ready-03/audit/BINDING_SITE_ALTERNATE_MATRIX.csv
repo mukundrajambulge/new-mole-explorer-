@@ -1,0 +1,39 @@
+pdb_id,receptor_label_asym,label_seq_id,residue_comp_id,altloc_ids,state_occupancies,affected_atom_names_by_state,minimum_alt_atom_ligand_distance_A,nearest_state_distances_A,core_site_within_5A,interaction_geometry_change_assessment,dominant_state_explicit_in_deposit
+5LJB,A,50,MET,A;B,A:0.56;B:0.44,"A=CA,CB,CE,CG,SD;B=CA,CB,CE,CG,SD",7.4711,A:7.4711;B:7.6717,no,not direct ligand-contact geometry; outside 5 A,no single >=0.7 state / assess
+1KT5,A,,,NONE within 8 A,,,,,,,
+1GX8,A,104,LEU,A;B,A:0.73;B:0.27,"A=C,O;B=C,O",7.7885,A:7.8334;B:7.7885,no,not direct ligand-contact geometry; outside 5 A,one major occupancy state only
+1GX8,A,105,PHE,A;B,A:0.73;B:0.27,"A=C,CA,CB,CD1,CD2,CE1,CE2,CG,CZ,N,O;B=C,CA,CB,CD1,CD2,CE1,CE2,CG,CZ,N,O",1.4797,A:3.7582;B:1.4797,yes,requires explicit state review,one major occupancy state only
+1GX8,A,106,CYS,A;B,A:0.73;B:0.27,"A=C,CA,CB,N,O,SG;B=C,CA,CB,N,O,SG",4.6174,A:4.6174;B:5.0632,yes,requires explicit state review,one major occupancy state only
+1GX8,A,107,MET,A;B,A:0.73;B:0.27,"A=CE,CG,SD;B=CE,CG,SD",2.9342,A:3.2637;B:2.9342,yes,requires explicit state review,one major occupancy state only
+6PY0,A,,,NONE within 8 A,,,,,,,
+5HBS,A,10,MET,A;B,A:0.37;B:0.63,"A=CA,CB,CE,CG,SD;B=CA,CB,CE,CG,SD",7.8720,A:8.3251;B:7.8720,no,not direct ligand-contact geometry; outside 5 A,no single >=0.7 state / assess
+5HBS,A,37,LYS,A;B,A:0.63;B:0.37,"A=CA,CB,CD,CE,CG,NZ;B=CA,CB,CD,CE,CG,NZ",7.8499,A:7.8499;B:7.8548,no,not direct ligand-contact geometry; outside 5 A,no single >=0.7 state / assess
+5HBS,A,38,PRO,A;B,A:0.61;B:0.39,"A=CA,CB,CD,CG;B=CA,CB,CD,CG",3.8326,A:3.8326;B:4.1985,yes,requires explicit state review,no single >=0.7 state / assess
+5HBS,A,49,MET,A;B,A:0.58;B:0.42,"A=CA,CB,CE,CG,SD;B=CA,CB,CE,CG,SD",7.5802,A:7.9459;B:7.5802,no,not direct ligand-contact geometry; outside 5 A,no single >=0.7 state / assess
+5HBS,A,93,LEU,A;B,A:0.28;B:0.72,"A=CA,CB,CD1,CD2,CG;B=CA,CB,CD1,CD2,CG",6.8339,A:7.2336;B:6.8339,no,not direct ligand-contact geometry; outside 5 A,one major occupancy state only
+5HBS,A,115,LEU,A;B,A:0.78;B:0.22,"A=CA,CB,CD1,CD2,CG;B=CA,CB,CD1,CD2,CG",5.7463,A:5.9718;B:5.7463,no,not direct ligand-contact geometry; outside 5 A,one major occupancy state only
+5H8T,A,49,MET,A;B,A:0.56;B:0.44,"A=CA,CB,CE,CG,SD;B=CA,CB,CE,CG,SD",7.7373,A:8.1647;B:7.7373,no,not direct ligand-contact geometry; outside 5 A,no single >=0.7 state / assess
+5H8T,A,119,MET,A;B,A:0.71;B:0.29,"A=CA,CB,CE,CG,SD;B=CA,CB,CE,CG,SD",3.6697,A:3.6697;B:4.2355,yes,requires explicit state review,one major occupancy state only
+1KQW,A,,,NONE within 8 A,,,,,,,
+1AQB,A,,,NONE within 8 A,,,,,,,
+1HBP,A,,,NONE within 8 A,,,,,,,
+4QZT,A,,,NONE within 8 A,,,,,,,
+9I7N,A,121,PHE,A;B,A:0.598;B:0.402,"A=C,CA,CB,CD1,CD2,CE1,CE2,CG,CZ,N,O;B=C,CA,CB,CD1,CD2,CE1,CE2,CG,CZ,N,O",1.4928,A:3.2996;B:1.4928,yes,requires explicit state review,no single >=0.7 state / assess
+9I7N,A,134,ALA,B,B:0.351,"B=C,CA,CB,N,O",3.4523,B:3.4523,yes,requires explicit state review,no single >=0.7 state / assess
+9I7N,A,134,VAL,A,A:0.649,"A=C,CA,CB,CG1,CG2,N,O",3.7115,A:3.7115,yes,requires explicit state review,no single >=0.7 state / assess
+1FMJ,A,,,NONE within 8 A,,,,,,,
+1RBP,A,,,NONE within 8 A,,,,,,,
+1CRB,A,,,NONE within 8 A,,,,,,,
+1L83,A,,,NONE within 8 A,,,,,,,
+1L84,A,,,NONE within 8 A,,,,,,,
+220L,A,,,NONE within 8 A,,,,,,,
+223L,A,,,NONE within 8 A,,,,,,,
+227L,A,,,NONE within 8 A,,,,,,,
+3DMX,A,106,MET,A;B,A:0.7;B:0.3,"A=CA,CB,CE,CG,SD;B=CA,CB,CE,CG,SD",7.9205,A:7.9205;B:8.0028,no,not direct ligand-contact geometry; outside 5 A,one major occupancy state only
+3DMX,A,108,GLU,A;B,A:0.7;B:0.3,"A=CA,CB,CD,CG,OE1,OE2;B=CA,CB,CD,CG,OE1,OE2",7.6341,A:7.6341;B:7.6590,no,not direct ligand-contact geometry; outside 5 A,one major occupancy state only
+3GUJ,A,,,NONE within 8 A,,,,,,,
+3HH4,A,83,LYS,A;B,A:0.5;B:0.5,"A=CA,CB,CD,CE,CG,NZ;B=CA,CB,CD,CE,CG,NZ",7.9651,A:7.9651;B:7.9652,no,not direct ligand-contact geometry; outside 5 A,no single >=0.7 state / assess
+3HH4,A,106,MET,A;B,A:0.7;B:0.3,"A=CA,CB,CE,CG,SD;B=CA,CB,CE,CG,SD",7.9372,A:7.9372;B:8.0063,no,not direct ligand-contact geometry; outside 5 A,one major occupancy state only
+3HH4,A,108,GLU,A;B,A:0.6;B:0.4,"A=C,CA,CB,CD,CG,N,O,OE1,OE2;B=C,CA,CB,CD,CG,N,O,OE1,OE2",7.2946,A:7.2946;B:7.3281,no,not direct ligand-contact geometry; outside 5 A,no single >=0.7 state / assess
+3HH4,A,119,ARG,A;B,A:0.7;B:0.3,"A=C,CA,CB,CD,CG,CZ,N,NE,NH1,NH2,O;B=C,CA,CB,CD,CG,CZ,N,NE,NH1,NH2,O",7.8734,A:7.8734;B:7.8736,no,not direct ligand-contact geometry; outside 5 A,one major occupancy state only
+4I7J,A,108,LYS,A;B,A:0.7;B:0.3,"A=CA,CB,CD,CE,CG,NZ;B=CA,CB,CD,CE,CG,NZ",6.3461,A:6.3461;B:6.4010,no,not direct ligand-contact geometry; outside 5 A,one major occupancy state only

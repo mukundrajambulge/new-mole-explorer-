@@ -1,0 +1,177 @@
+pdb_id,waters_le_5A,waters_le_8A,nearest_water_distance_A,water_label_asym,water_auth_seq_id,water_comp_id,occupancy,minimum_ligand_distance_A,nearest_ligand_atom,nearest_protein_distance_A,nearest_protein_residue_atom,direct_ligand_water_contact_le_3_5A,geometry_only_water_bridge_candidate
+5LJB,6,17,3.3301,C,360,HOH,1.0,3.3301,C11,2.7677,GLN:128:OE1,yes,possible geometry only
+5LJB,6,17,3.3301,C,445,HOH,1.0,3.5559,C11,3.5139,GLN:97:NE2,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,355,HOH,1.0,3.6567,C14,2.7426,THR:53:OG1,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,429,HOH,1.0,3.7522,C9,3.2399,GLN:128:NE2,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,334,HOH,1.0,3.9340,C20,2.6840,GLU:72:OE2,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,372,HOH,1.0,4.7776,C19,2.8196,ARG:104:NH2,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,321,HOH,1.0,5.2414,C16,2.6051,THR:75:O,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,331,HOH,1.0,5.3862,C20,2.6506,TYR:19:OH,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,349,HOH,1.0,5.5926,C10,2.7275,GLN:128:OE1,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,432,HOH,1.0,6.5097,C3,3.2844,ILE:77:O,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,395,HOH,1.0,7.1841,C18,2.9132,ILE:77:O,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,394,HOH,1.0,7.3640,C16,2.9025,ILE:61:N,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,323,HOH,1.0,7.5466,C3,2.6203,ARG:58:NH2,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,430,HOH,1.0,7.5552,C17,3.2499,LYS:37:N,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,338,HOH,1.0,7.5634,C16,2.7007,THR:75:O,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,407,HOH,1.0,7.7373,C18,2.9701,ASP:79:OD2,no,no geometric bridge at these cutoffs
+5LJB,6,17,3.3301,C,325,HOH,1.0,7.7854,C18,2.6327,GLU:17:OE1,no,no geometric bridge at these cutoffs
+1KT5,4,12,2.5769,C,272,HOH,1.0,2.5769,O1,2.8222,PHE:96:O,yes,possible geometry only
+1KT5,4,12,2.5769,C,212,HOH,1.0,3.3893,C20,2.8102,GLN:98:NE2,yes,possible geometry only
+1KT5,4,12,2.5769,C,177,HOH,1.0,4.0501,C16,2.7490,TYR:133:OH,no,no geometric bridge at these cutoffs
+1KT5,4,12,2.5769,C,198,HOH,1.0,4.8972,C20,2.5729,LEU:35:O,no,no geometric bridge at these cutoffs
+1KT5,4,12,2.5769,C,296,HOH,1.0,5.3862,O1,3.0799,LEU:64:N,no,no geometric bridge at these cutoffs
+1KT5,4,12,2.5769,C,239,HOH,1.0,5.3901,C2,2.7892,HIS:104:NE2,no,no geometric bridge at these cutoffs
+1KT5,4,12,2.5769,C,312,HOH,1.0,6.1960,C20,2.8934,LEU:35:N,no,no geometric bridge at these cutoffs
+1KT5,4,12,2.5769,C,193,HOH,1.0,6.4604,C19,2.6744,TYR:90:OH,no,no geometric bridge at these cutoffs
+1KT5,4,12,2.5769,C,294,HOH,1.0,6.4655,O1,2.8130,LEU:97:O,no,no geometric bridge at these cutoffs
+1KT5,4,12,2.5769,C,242,HOH,1.0,6.7349,O1,3.1990,LYS:99:N,no,no geometric bridge at these cutoffs
+1KT5,4,12,2.5769,C,227,HOH,1.0,6.8862,O1,2.8531,GLY:92:N,no,no geometric bridge at these cutoffs
+1KT5,4,12,2.5769,C,270,HOH,1.0,7.8400,C20,2.4847,GLY:34:O,no,no geometric bridge at these cutoffs
+1GX8,1,7,4.2500,C,2032,HOH,1.0,4.2500,C18,2.2989,LEU:39:O,no,no geometric bridge at these cutoffs
+1GX8,1,7,4.2500,C,2061,HOH,1.0,5.1052,O1,3.5667,ASN:63:OD1,no,no geometric bridge at these cutoffs
+1GX8,1,7,4.2500,C,2057,HOH,1.0,5.8696,O1,3.1465,LYS:60:NZ,no,no geometric bridge at these cutoffs
+1GX8,1,7,4.2500,C,2076,HOH,1.0,6.2285,C20,3.5980,ASP:85:O,no,no geometric bridge at these cutoffs
+1GX8,1,7,4.2500,C,2064,HOH,1.0,6.3913,C20,3.5147,GLN:68:O,no,no geometric bridge at these cutoffs
+1GX8,1,7,4.2500,C,2065,HOH,1.0,7.0831,C20,3.2130,LYS:70:O,no,no geometric bridge at these cutoffs
+1GX8,1,7,4.2500,C,2060,HOH,1.0,7.9238,O1,2.4961,ASN:63:N,no,no geometric bridge at these cutoffs
+6PY0,1,4,4.0097,G,326,HOH,1.0,4.0097,O1,8.3644,PHE:86:CE2,no,no geometric bridge at these cutoffs
+6PY0,1,4,4.0097,F,214,HOH,1.0,5.2005,C14,7.6620,PHE:86:CE2,no,no geometric bridge at these cutoffs
+6PY0,1,4,4.0097,F,215,HOH,1.0,5.9135,O1,12.4099,VAL:83:CG2,no,no geometric bridge at these cutoffs
+6PY0,1,4,4.0097,G,318,HOH,1.0,6.0264,C3,4.1797,LYS:74:CE,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,352,HOH,0.96,3.3322,C11,2.7259,GLN:128:OE1,yes,possible geometry only
+5HBS,6,20,3.3322,C,535,HOH,0.96,3.4339,C11,3.6394,LEU:74:CD2,yes,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,499,HOH,0.9,3.6042,C9,3.1283,GLN:128:NE2,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,340,HOH,1.0,3.7828,C14,2.7106,THR:53:OG1,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,330,HOH,1.0,3.8311,C20,2.6930,GLU:72:OE2,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,417,HOH,0.99,4.9982,C19,2.8340,ARG:104:NH2,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,345,HOH,0.27,5.0054,C16,2.7201,ASN:59:O,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,309,HOH,0.98,5.5763,C20,2.6204,TYR:19:OH,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,341,HOH,0.57,6.1245,C3,2.7110,ARG:58:NE,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,489,HOH,0.4,6.3522,C4,3.0603,ASP:79:OD1,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,485,HOH,0.72,6.7409,C4,3.0289,ARG:58:NH2,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,326,HOH,0.69,7.0055,C4,2.6851,ILE:77:O,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,521,HOH,0.94,7.0254,C16,3.5073,GLY:76:CA,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,360,HOH,0.9,7.2748,C18,2.7352,GLU:17:OE1,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,431,HOH,0.99,7.2881,C16,2.8589,ILE:61:N,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,505,HOH,1.0,7.5272,C17,3.2135,LYS:37:N,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,501,HOH,0.95,7.6260,C3,3.1698,ARG:58:NE,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,524,HOH,0.73,7.6550,C3,3.3924,GLY:76:CA,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,375,HOH,0.68,7.6971,C17,2.7626,ALA:33:O,no,no geometric bridge at these cutoffs
+5HBS,6,20,3.3322,C,484,HOH,0.74,7.8265,C4,3.0081,ASN:26:ND2,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,489,HOH,1.0,3.4386,C9,3.3819,GLN:128:NE2,yes,possible geometry only
+5H8T,6,22,3.4386,C,509,HOH,1.0,3.4559,C11,3.5625,LEU:74:CD2,yes,possible geometry only
+5H8T,6,22,3.4386,C,351,HOH,1.0,3.4930,C11,2.7483,GLN:128:OE1,yes,possible geometry only
+5H8T,6,22,3.4386,C,348,HOH,1.0,3.8005,C14,2.7414,THR:53:OG1,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,362,HOH,1.0,3.9516,C3,2.7673,GLY:76:O,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,344,HOH,1.0,3.9861,C13,2.7357,GLU:72:OE2,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,388,HOH,1.0,5.0654,C19,2.8139,ARG:104:NH2,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,443,HOH,0.73,5.1144,C17,2.9818,GLN:128:NE2,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,392,HOH,0.82,5.4975,C17,2.8261,LEU:36:O,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,324,HOH,1.0,5.5058,C20,2.6682,TYR:19:OH,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,306,HOH,0.87,5.9105,C16,2.4448,ARG:58:NE,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,565,HOH,0.85,6.0197,C3,3.7862,LEU:29:CD1,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,442,HOH,0.99,6.1130,C4,2.9812,ASP:79:OD2,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,463,HOH,0.98,6.3963,C3,3.0899,PHE:57:O,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,503,HOH,0.91,6.8134,C3,3.5751,ARG:58:NH1,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,538,HOH,0.98,6.8720,C4,3.9043,LEU:29:CD2,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,345,HOH,0.9,6.8978,C18,2.7377,ILE:77:O,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,357,HOH,1.0,7.1873,C16,2.7566,THR:75:O,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,410,HOH,1.0,7.2154,C16,2.8872,ILE:61:N,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,482,HOH,1.0,7.4529,C17,3.3163,THR:56:N,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,484,HOH,1.0,7.6088,C16,3.3477,ASN:59:O,no,no geometric bridge at these cutoffs
+5H8T,6,22,3.4386,C,572,HOH,0.88,7.6996,C4,4.1473,LEU:29:CD2,no,no geometric bridge at these cutoffs
+1KQW,5,13,3.4832,C,148,HOH,1.0,3.4832,C10,2.6084,GLN:38:OE1,yes,possible geometry only
+1KQW,5,13,3.4832,C,151,HOH,1.0,3.6611,C15,2.7836,THR:53:OG1,no,no geometric bridge at these cutoffs
+1KQW,5,13,3.4832,C,223,HOH,1.0,3.7695,C12,3.0633,GLU:72:OE2,no,no geometric bridge at these cutoffs
+1KQW,5,13,3.4832,C,235,HOH,1.0,4.8538,C19,3.0598,ARG:104:NH2,no,no geometric bridge at these cutoffs
+1KQW,5,13,3.4832,C,168,HOH,1.0,4.8723,C14,2.8041,GLU:72:OE1,no,no geometric bridge at these cutoffs
+1KQW,5,13,3.4832,C,197,HOH,1.0,5.4058,C17,2.2875,LEU:36:O,no,no geometric bridge at these cutoffs
+1KQW,5,13,3.4832,C,199,HOH,1.0,5.5822,C20,2.6783,GLN:97:NE2,no,no geometric bridge at these cutoffs
+1KQW,5,13,3.4832,C,170,HOH,1.0,5.7225,C4,2.5745,LEU:77:O,no,no geometric bridge at these cutoffs
+1KQW,5,13,3.4832,C,212,HOH,1.0,6.6571,C16,2.8603,ASN:59:N,no,no geometric bridge at these cutoffs
+1KQW,5,13,3.4832,C,261,HOH,1.0,7.0211,C16,3.9238,ASN:59:O,no,no geometric bridge at these cutoffs
+1KQW,5,13,3.4832,C,150,HOH,1.0,7.3183,C17,2.4284,LYS:37:O,no,no geometric bridge at these cutoffs
+1KQW,5,13,3.4832,C,293,HOH,1.0,7.6780,C3,2.4971,ARG:58:NH2,no,no geometric bridge at these cutoffs
+1KQW,5,13,3.4832,C,250,HOH,1.0,7.6995,C16,3.0646,GLU:61:N,no,no geometric bridge at these cutoffs
+1AQB,3,10,2.5302,D,387,HOH,1.0,2.5302,O1,3.0336,PHE:96:O,yes,possible geometry only
+1AQB,3,10,2.5302,D,330,HOH,1.0,3.5686,C20,2.5825,GLN:98:OE1,no,no geometric bridge at these cutoffs
+1AQB,3,10,2.5302,D,303,HOH,1.0,4.1968,C16,2.7050,TYR:133:OH,no,no geometric bridge at these cutoffs
+1AQB,3,10,2.5302,D,349,HOH,1.0,5.1173,C2,2.9011,HIS:104:NE2,no,no geometric bridge at these cutoffs
+1AQB,3,10,2.5302,D,312,HOH,1.0,5.5017,C20,2.5218,LEU:35:O,no,no geometric bridge at these cutoffs
+1AQB,3,10,2.5302,D,404,HOH,1.0,6.2392,O1,2.5277,LEU:97:O,no,no geometric bridge at these cutoffs
+1AQB,3,10,2.5302,D,322,HOH,1.0,6.5123,C19,2.7385,TYR:90:OH,no,no geometric bridge at these cutoffs
+1AQB,3,10,2.5302,D,396,HOH,1.0,7.0200,C15,2.6961,ARG:62:N,no,no geometric bridge at these cutoffs
+1AQB,3,10,2.5302,D,314,HOH,1.0,7.1198,O1,2.8676,LEU:97:O,no,no geometric bridge at these cutoffs
+1AQB,3,10,2.5302,D,366,HOH,1.0,7.2168,C20,3.0641,GLN:38:OE1,no,no geometric bridge at these cutoffs
+1HBP,4,5,3.4246,C,220,HOH,1.0,3.4246,C20,2.2809,GLN:98:NE2,yes,possible geometry only
+1HBP,4,5,3.4246,C,315,HOH,1.0,3.5412,O1,3.0452,PHE:96:O,no,no geometric bridge at these cutoffs
+1HBP,4,5,3.4246,C,189,HOH,1.0,4.4029,C16,2.7960,TYR:133:OH,no,no geometric bridge at these cutoffs
+1HBP,4,5,3.4246,C,334,HOH,1.0,4.8653,C20,2.5160,LEU:35:O,no,no geometric bridge at these cutoffs
+1HBP,4,5,3.4246,C,311,HOH,1.0,6.1928,C20,2.9419,LEU:35:N,no,no geometric bridge at these cutoffs
+4QZT,2,9,3.6683,J,301,HOH,1.0,3.6683,C12,2.6815,THR:53:OG1,no,no geometric bridge at these cutoffs
+4QZT,2,9,3.6683,J,333,HOH,1.0,4.0041,C19,2.6618,GLN:128:OE1,no,no geometric bridge at these cutoffs
+4QZT,2,9,3.6683,J,313,HOH,1.0,5.4872,C13,2.6318,GLU:72:OE1,no,no geometric bridge at these cutoffs
+4QZT,2,9,3.6683,J,328,HOH,1.0,5.5602,C4,2.6602,LEU:77:O,no,no geometric bridge at these cutoffs
+4QZT,2,9,3.6683,J,334,HOH,1.0,5.8198,C19,2.7329,ARG:104:NH2,no,no geometric bridge at these cutoffs
+4QZT,2,9,3.6683,J,316,HOH,1.0,6.7284,C20,2.6833,GLN:97:OE1,no,no geometric bridge at these cutoffs
+4QZT,2,9,3.6683,J,345,HOH,1.0,7.7640,C4,2.8901,ASP:26:OD1,no,no geometric bridge at these cutoffs
+4QZT,2,9,3.6683,J,305,HOH,1.0,7.9291,C16,2.6163,THR:37:O,no,no geometric bridge at these cutoffs
+4QZT,2,9,3.6683,M,226,HOH,1.0,7.9938,C17,3.1074,ASN:59:CB,no,no geometric bridge at these cutoffs
+9I7N,1,1,4.1352,C,606,HOH,1.0,4.1352,C18,2.5674,LEU:39:O,no,no geometric bridge at these cutoffs
+1FMJ,2,14,2.9221,O,588,HOH,1.0,2.9221,O1,3.0638,HIS:164:NE2,yes,possible geometry only
+1FMJ,2,14,2.9221,O,573,HOH,1.0,3.2872,C20,2.5885,LYS:162:NZ,yes,possible geometry only
+1FMJ,2,14,2.9221,O,471,HOH,1.0,5.2556,C15,2.6820,ASP:107:OD2,no,no geometric bridge at these cutoffs
+1FMJ,2,14,2.9221,O,583,HOH,1.0,5.2706,O1,2.8677,THR:77:OG1,no,no geometric bridge at these cutoffs
+1FMJ,2,14,2.9221,O,462,HOH,1.0,5.8271,C15,2.8798,GLN:72:NE2,no,no geometric bridge at these cutoffs
+1FMJ,2,14,2.9221,O,575,HOH,1.0,5.9396,C20,3.2896,GLN:80:OE1,no,no geometric bridge at these cutoffs
+1FMJ,2,14,2.9221,O,552,HOH,1.0,5.9921,C20,2.7426,VAL:293:O,no,no geometric bridge at these cutoffs
+1FMJ,2,14,2.9221,O,503,HOH,1.0,6.2876,C15,3.1693,ASP:107:O,no,no geometric bridge at these cutoffs
+1FMJ,2,14,2.9221,O,520,HOH,1.0,6.8876,C11,3.5555,SER:100:O,no,no geometric bridge at these cutoffs
+1FMJ,2,14,2.9221,O,455,HOH,1.0,7.0271,C14,2.5544,TYR:222:OH,no,no geometric bridge at these cutoffs
+1FMJ,2,14,2.9221,O,497,HOH,1.0,7.5695,C20,3.1449,SER:100:N,no,no geometric bridge at these cutoffs
+1FMJ,2,14,2.9221,O,459,HOH,1.0,7.5858,C15,2.7587,GLN:72:N,no,no geometric bridge at these cutoffs
+1FMJ,2,14,2.9221,O,513,HOH,1.0,7.6703,O1,3.1632,THR:77:OG1,no,no geometric bridge at these cutoffs
+1FMJ,2,14,2.9221,O,556,HOH,1.0,7.7759,C15,2.6772,THR:223:OG1,no,no geometric bridge at these cutoffs
+1RBP,3,6,2.7262,C,313,HOH,1.0,2.7262,O1,3.2961,LEU:63:CD1,yes,possible geometry only
+1RBP,3,6,2.7262,C,218,HOH,1.0,3.2143,C20,2.6512,GLN:98:NE2,yes,possible geometry only
+1RBP,3,6,2.7262,C,187,HOH,1.0,4.4572,C16,2.7343,TYR:133:OH,no,no geometric bridge at these cutoffs
+1RBP,3,6,2.7262,C,332,HOH,1.0,5.1714,C20,2.6094,ARG:121:NH1,no,no geometric bridge at these cutoffs
+1RBP,3,6,2.7262,C,245,HOH,1.0,5.7615,C15,3.6085,LEU:35:CD2,no,no geometric bridge at these cutoffs
+1RBP,3,6,2.7262,C,309,HOH,1.0,6.4423,C20,2.9895,LEU:35:N,no,no geometric bridge at these cutoffs
+1CRB,6,10,3.6239,E,343,HOH,1.0,3.6239,C11,3.4742,GLN:97:NE2,no,no geometric bridge at these cutoffs
+1CRB,6,10,3.6239,E,324,HOH,1.0,3.6631,C14,2.8552,ILE:51:O,no,no geometric bridge at these cutoffs
+1CRB,6,10,3.6239,E,357,HOH,1.0,3.6802,C17,2.9989,GLN:128:NE2,no,no geometric bridge at these cutoffs
+1CRB,6,10,3.6239,E,314,HOH,1.0,3.7919,C20,2.6890,GLU:72:OE2,no,no geometric bridge at these cutoffs
+1CRB,6,10,3.6239,E,316,HOH,1.0,4.6200,C19,2.8675,TYR:19:OH,no,no geometric bridge at these cutoffs
+1CRB,6,10,3.6239,E,312,HOH,1.0,4.9155,C17,2.7138,ALA:33:O,no,no geometric bridge at these cutoffs
+1CRB,6,10,3.6239,E,309,HOH,1.0,5.5578,C20,2.5442,GLN:97:OE1,no,no geometric bridge at these cutoffs
+1CRB,6,10,3.6239,E,342,HOH,1.0,6.1142,C16,2.5287,THR:75:O,no,no geometric bridge at these cutoffs
+1CRB,6,10,3.6239,E,346,HOH,1.0,6.4704,C18,2.7294,ILE:77:O,no,no geometric bridge at these cutoffs
+1CRB,6,10,3.6239,E,364,HOH,1.0,7.9371,C17,2.6426,ASN:34:O,no,no geometric bridge at these cutoffs
+1L83,0,0,8.0638,NONE within 8 A,,,,no water within 8 A,,,,,
+1L84,0,1,7.8475,G,253,HOH,1.0,7.8475,C6,2.5641,LYS:83:O,no,no geometric bridge at these cutoffs
+220L,0,2,6.0851,G,208,HOH,1.0,6.0851,C2,2.6164,GLN:105:OE1,no,no geometric bridge at these cutoffs
+220L,0,2,6.0851,G,270,HOH,1.0,7.4521,C3,3.0609,TRP:138:N,no,no geometric bridge at these cutoffs
+223L,0,2,6.9062,G,197,HOH,1.0,6.9062,C6,2.9005,ASN:132:OD1,no,no geometric bridge at these cutoffs
+223L,0,2,6.9062,G,216,HOH,1.0,7.6467,C4,2.9598,ALA:130:O,no,no geometric bridge at these cutoffs
+227L,5,15,2.9646,G,266,HOH,1.0,2.9646,C5,3.1565,GLY:30:O,yes,possible geometry only
+227L,5,15,2.9646,G,274,HOH,1.0,3.1700,C4,3.2729,ASP:70:O,yes,possible geometry only
+227L,5,15,2.9646,G,404,HOH,1.0,3.7332,C4,2.5245,VAL:103:O,no,no geometric bridge at these cutoffs
+227L,5,15,2.9646,G,171,HOH,1.0,3.9125,C6,2.6257,ASP:70:OD2,no,no geometric bridge at these cutoffs
+227L,5,15,2.9646,G,224,HOH,1.0,4.5190,C5,2.6123,GLY:30:O,no,no geometric bridge at these cutoffs
+227L,5,15,2.9646,G,421,HOH,1.0,5.4559,C4,3.5669,VAL:103:CG1,no,no geometric bridge at these cutoffs
+227L,5,15,2.9646,G,256,HOH,1.0,6.0716,C5,2.8492,GLU:11:OE2,no,no geometric bridge at these cutoffs
+227L,5,15,2.9646,G,280,HOH,1.0,6.2343,C5,2.4896,LEU:32:O,no,no geometric bridge at these cutoffs
+227L,5,15,2.9646,G,179,HOH,1.0,6.6120,C6,2.8029,ILE:29:N,no,no geometric bridge at these cutoffs
+227L,5,15,2.9646,G,204,HOH,1.0,7.0188,C6,2.8235,GLU:11:OE1,no,no geometric bridge at these cutoffs
+227L,5,15,2.9646,G,203,HOH,1.0,7.0823,C5,2.6606,ASP:20:OD2,no,no geometric bridge at these cutoffs
+227L,5,15,2.9646,G,413,HOH,1.0,7.8022,C4,3.1934,GLU:108:N,no,no geometric bridge at these cutoffs
+227L,5,15,2.9646,G,246,HOH,1.0,7.9418,C4,3.9847,HIS:31:CE1,no,no geometric bridge at these cutoffs
+227L,5,15,2.9646,G,182,HOH,1.0,7.9691,C4,2.8488,GLN:69:NE2,no,no geometric bridge at these cutoffs
+227L,5,15,2.9646,G,229,HOH,1.0,7.9888,C6,2.5385,GLU:11:OE1,no,no geometric bridge at these cutoffs
+3DMX,0,1,7.8253,H,1147,HOH,1.0,7.8253,C2,3.2703,VAL:87:CG2,no,no geometric bridge at these cutoffs
+3GUJ,1,2,3.7003,G,601,HOH,1.0,3.7003,C1,2.7371,GLU:102:OE1,no,no geometric bridge at these cutoffs
+3GUJ,1,2,3.7003,G,602,HOH,1.0,5.4244,C1,2.6665,VAL:111:O,no,no geometric bridge at these cutoffs
+3HH4,0,0,8.0308,NONE within 8 A,,,,no water within 8 A,,,,,
+4I7J,0,1,7.9044,T,347,HOH,1.0,7.9044,C6,2.6646,LYS:83:O,no,no geometric bridge at these cutoffs

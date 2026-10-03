@@ -1,0 +1,75 @@
+pdb_id,component_label_asym,minimum_ligand_distance_A,component_auth_seq_id,component_id,elements,within_5A,within_8A,metal_or_ion,CORE_DRY_V1_disposition_evidence_needed
+5LJB,NONE,no nonwater components in source,,,,,,,
+1KT5,NONE,no nonwater components in source,,,,,,,
+1GX8,NONE,no nonwater components in source,,,,,,,
+6PY0,NONE,no nonwater components in source,,,,,,,
+5HBS,NONE,no nonwater components in source,,,,,,,
+5H8T,NONE,no nonwater components in source,,,,,,,
+1KQW,NONE,no nonwater components in source,,,,,,,
+1AQB,B,21.2779,184,CD,CD,no,no,yes,remote from ligand scoring shell; record provenance and omission rationale
+1HBP,NONE,no nonwater components in source,,,,,,,
+4QZT,F,3.3928,202,ACT,C;O,yes,yes,no,review site role; no blanket deletion
+4QZT,H,27.7728,202,ACT,C;O,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4QZT,I,28.1674,201,ACT,C;O,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+9I7N,NONE,no nonwater components in source,,,,,,,
+1FMJ,G,4.8031,400,A3P,C;N;O;P,yes,yes,no,review site role; no blanket deletion
+1FMJ,F,11.4240,402,CA,CA,no,no,yes,remote from ligand scoring shell; record provenance and omission rationale
+1FMJ,C,21.2382,451,HG,HG,no,no,yes,remote from ligand scoring shell; record provenance and omission rationale
+1FMJ,E,21.9651,453,HG,HG,no,no,yes,remote from ligand scoring shell; record provenance and omission rationale
+1FMJ,D,24.2640,452,HG,HG,no,no,yes,remote from ligand scoring shell; record provenance and omission rationale
+1FMJ,J,34.8636,552,HG,HG,no,no,yes,remote from ligand scoring shell; record provenance and omission rationale
+1FMJ,M,34.8941,500,A3P,C;N;O;P,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+1FMJ,K,45.2714,553,HG,HG,no,no,yes,remote from ligand scoring shell; record provenance and omission rationale
+1FMJ,I,45.6355,551,HG,HG,no,no,yes,remote from ligand scoring shell; record provenance and omission rationale
+1FMJ,L,48.0269,502,CA,CA,no,no,yes,remote from ligand scoring shell; record provenance and omission rationale
+1RBP,NONE,no nonwater components in source,,,,,,,
+1CRB,C,14.7001,202,CD,CD,no,no,yes,remote from ligand scoring shell; record provenance and omission rationale
+1CRB,B,18.9515,201,CD,CD,no,no,yes,remote from ligand scoring shell; record provenance and omission rationale
+1L83,E,11.4980,902,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+1L83,D,11.9408,901,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+1L83,B,18.0058,173,CL,CL,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+1L83,C,21.2757,178,CL,CL,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+1L84,E,11.4577,902,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+1L84,D,12.3188,901,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+1L84,B,18.2957,173,CL,CL,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+1L84,C,21.3645,178,CL,CL,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+220L,B,13.7244,173,CL,CL,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+220L,E,14.2799,902,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+220L,D,16.1207,901,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+220L,C,23.2188,178,CL,CL,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+223L,B,12.7319,178,CL,CL,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+223L,D,14.9803,901,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+223L,E,17.6549,902,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+223L,C,35.6793,900,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+227L,C,10.1315,178,CL,CL,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+227L,D,10.3269,901,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+227L,E,11.2195,902,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+227L,B,15.2695,173,CL,CL,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+3DMX,E,10.8478,904,HED,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+3DMX,F,11.6196,905,HED,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+3DMX,B,15.3395,901,PO4,O;P,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+3DMX,C,20.1564,902,PO4,O;P,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+3DMX,D,32.5330,903,CL,CL,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+3GUJ,A,7.8771,97,CME,C;N;O;S,no,yes,no,review site role; no blanket deletion
+3GUJ,E,12.7841,167,EPE,C;N;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+3GUJ,C,13.5323,165,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+3GUJ,D,15.6455,166,CO3,C;O,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+3GUJ,F,30.7949,168,SO4,O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+3HH4,C,10.9076,166,HED,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+3HH4,B,13.2563,165,HED,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+3HH4,D,25.9065,167,PO4,O;P,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,C,10.5261,201,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,L,10.9575,210,HED,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,F,14.4640,204,SO4,O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,K,14.7960,209,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,G,15.3989,205,SO4,O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,J,17.0754,208,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,H,19.2635,206,ACT,C;O,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,I,20.7210,207,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,R,21.9386,206,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,S,24.0920,207,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,E,28.7984,203,SO4,O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,O,30.0716,203,SO4,O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,M,35.2496,201,BME,C;O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,P,35.2691,204,SO4,O;S,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
+4I7J,Q,39.3131,205,ACT,C;O,no,no,no,remote from ligand scoring shell; record provenance and omission rationale
