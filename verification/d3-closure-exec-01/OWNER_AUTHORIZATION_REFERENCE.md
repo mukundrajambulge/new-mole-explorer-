@@ -10,6 +10,6 @@ The approval covers the stated chemical state, GLU128− correction, pH proxy in
 
 ## Deterministic replay status
 
-AUTH04 lists deterministic replay, hydrogen-parent provenance, and the zero-change heavy-atom invariant as mandatory execution preconditions. Integrated closure task §25 directs running preparation again from the same byte-exact inputs and profile, with identical canonical outputs/digests. This package makes no claim that replay passed or that any preparation use was consumed: the approved RDKit extension could not be imported, so no fixture preparation or replay began.
+AUTH04 lists deterministic replay, hydrogen-parent provenance, and the zero-change heavy-atom invariant as mandatory execution preconditions. Integrated closure task §25 directs running preparation again from the same byte-exact inputs and profile, with identical canonical outputs/digests. This package makes no claim that fixture replay passed or that any preparation use was consumed. The exact pinned Linux runtime imported successfully and repeated safe synthetic AddHs controls passed, but the hash-gated fixture preflight stopped at unapproved alternate coordinate groups before any fixture graph reached RDKit.
 
-The required fixture replay remains outstanding with the other chemistry execution steps. The permitted synthetic-control replay was also not run because it requires the same blocked RDKit extension; it cannot substitute for the fixture replay.
+The required fixture replay remains outstanding with the other chemistry execution steps. Repeated synthetic controls are runtime evidence only and cannot substitute for fixture replay.
