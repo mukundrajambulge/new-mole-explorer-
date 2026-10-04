@@ -1,0 +1,7 @@
+Looking in links: c:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\wheelhouse
+Processing c:\users\mukun\appdata\local\mole-explorer\d3-closure-exec-01\wheelhouse\rdkit-2026.3.6-cp313-cp313-win_amd64.whl (from -r C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\requirements.lock (line 1))
+Processing c:\users\mukun\appdata\local\mole-explorer\d3-closure-exec-01\wheelhouse\numpy-2.3.3-cp313-cp313-win_amd64.whl (from -r C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\requirements.lock (line 2))
+Processing c:\users\mukun\appdata\local\mole-explorer\d3-closure-exec-01\wheelhouse\pillow-12.0.0-cp313-cp313-win_amd64.whl (from -r C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\requirements.lock (line 3))
+Installing collected packages: rdkit, pillow, numpy
+
+Successfully installed numpy-2.3.3 pillow-12.0.0 rdkit-2026.3.6

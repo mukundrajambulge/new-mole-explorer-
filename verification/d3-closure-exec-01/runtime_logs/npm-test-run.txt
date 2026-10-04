@@ -1,0 +1,10 @@
+command=npm test
+started=2026-10-04T09:09:34.4222724+05:30
+finished=2026-10-04T09:09:44.3068738+05:30
+exit_code=0
+node=v24.14.1
+npm=11.11.0
+web_files=34
+web_tests=156
+api_files=13
+api_tests=97

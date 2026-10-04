@@ -1,0 +1,18 @@
+COMMAND: "C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe" -I -c <runtime identity check>
+EXIT: 0
+{
+  "version": "3.13.16 (tags/v3.13.16:cbc944f, Sep 30 2026, 19:17:50) [MSC v.1944 64 bit (AMD64)]",
+  "implementation": "CPython",
+  "architecture": [
+    "64bit",
+    "WindowsPE"
+  ],
+  "pointer_bits": 64,
+  "isolated": 1,
+  "executable": "C:\\Users\\mukun\\AppData\\Local\\mole-explorer\\d3-closure-exec-01\\python-embed\\python.exe",
+  "sys_path": [
+    "C:\\Users\\mukun\\AppData\\Local\\mole-explorer\\d3-closure-exec-01\\python-embed\\python313.zip",
+    "C:\\Users\\mukun\\AppData\\Local\\mole-explorer\\d3-closure-exec-01\\python-embed",
+    "C:\\Users\\mukun\\AppData\\Local\\mole-explorer\\d3-closure-exec-01\\python-embed\\Lib\\site-packages"
+  ]
+}

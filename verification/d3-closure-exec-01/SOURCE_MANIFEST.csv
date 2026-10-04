@@ -1,0 +1,7 @@
+"file","role","official_source_url","retrieved_utc_date","byte_length","sha256"
+"source_artifacts/current_rcsb/3DMX.cif","Official RCSB deposited mmCIF source coordinates","https://files.rcsb.org/download/3DMX.cif","2026-10-03","218104","e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef"
+"source_artifacts/current_rcsb/3DMX_assembly_1.json","RCSB biological assembly 1 metadata","https://data.rcsb.org/rest/v1/core/assembly/3DMX/1","2026-10-03","3543","2accfe2d4b9eabc50c37932da6af4ce6b36ad0b0ee078192fd882fd005ea9670"
+"source_artifacts/current_rcsb/3DMX_entry.json","RCSB entry metadata","https://data.rcsb.org/rest/v1/core/entry/3DMX","2026-10-03","22036","e9b303678dab19908f7708201586e732caf1f015fde0e4d36c4d7c97bfbaad1b"
+"source_artifacts/current_rcsb/3DMX_full_validation.pdf","Official RCSB full validation report","https://files.rcsb.org/pub/pdb/validation_reports/dm/3dmx/3dmx_full_validation.pdf","2026-10-03","515092","e24681b6500f8489ad93b8ce747978b1346df2f2817aa208683a1b6656e47f62"
+"source_artifacts/current_rcsb/3DMX_polymer_entity_1.json","RCSB polymer entity 1 sequence and source metadata","https://data.rcsb.org/rest/v1/core/polymer_entity/3DMX/1","2026-10-03","50665","e016e357934b43d07c58e971720d800ba253b441b614dfd547933838226a508d"
+"source_artifacts/current_rcsb/BNZ.cif","Official PDB Chemical Component Dictionary definition for BNZ","https://files.rcsb.org/ligands/view/BNZ.cif","2026-10-03","4633","01bcf7c3ce9befdb4078e9832252eb5fe99e2598f320f87358ea1a9a247f7c61"

@@ -1,0 +1,4 @@
+command=python.exe -I -m pip install --no-index --no-deps --require-hashes --upgrade --force-reinstall --find-links <wheelhouse> --target <private-site-packages> -r <requirements.lock>
+started=2026-10-04T09:05:19.3121236+05:30
+finished=2026-10-04T09:05:48.8468743+05:30
+exit_code=0

@@ -1,0 +1,15 @@
+{
+  "processor": "12th Gen Intel(R) Core(TM) i5-12500H",
+  "logicalProcessors": 16,
+  "osCaption": "Microsoft Windows 11 Pro",
+  "osVersion": "10.0.26200",
+  "osBuild": "26200",
+  "locale": "en-IN",
+  "timezone": "India Standard Time",
+  "localTimestamp": "2026-10-04T09:03:55.5598020+05:30",
+  "utcTimestamp": "2026-10-04T03:33:55.5655372Z",
+  "pythonExecutable": "C:\\Users\\mukun\\AppData\\Local\\mole-explorer\\d3-closure-exec-01\\python-embed\\python.exe",
+  "pythonSha256": "31fe10b4ed82a2f960af0ef9931f46a4b84ff286f8b6ffd9dee098cf4f10f17f",
+  "rdBasePyd": "C:\\Users\\mukun\\AppData\\Local\\mole-explorer\\d3-closure-exec-01\\python-embed\\Lib\\site-packages\\rdkit\\rdBase.pyd",
+  "rdBasePydSha256": "4ffc113eabdc59b79a6d8d120539d8a9ea082eb999916ebdf26df0cf13503305"
+}

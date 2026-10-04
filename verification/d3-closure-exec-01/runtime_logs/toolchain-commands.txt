@@ -1,0 +1,16 @@
+# CPython full installer attempt (user-scoped, no PATH mutation)
+python-3.13.16-amd64.exe /quiet InstallAllUsers=0 TargetDir="C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\python313" Include_launcher=0 Include_test=0 Include_pip=1 Include_dev=1 Include_exe=1 Include_lib=1 PrependPath=0 Shortcuts=0 /log "C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\python-install.log"
+# Retry: same command with TEMP and TMP set to C:\Users\mukun\AppData\Local\Temp\d3-closure-exec-01 and a distinct bundle log.
+# Official embeddable zip was SHA-256-verified and extracted to C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\python-embed.
+# python313._pth contents:
+python313.zip
+.
+Lib\site-packages
+import site
+# pip 25.2 wheel was SHA-256-verified and unpacked into the private Lib\site-packages directory.
+python.exe -I -m pip install --no-index --no-deps --require-hashes --upgrade --force-reinstall --find-links "C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\wheelhouse" --target "C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages" -r "C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\requirements.lock"
+python.exe -I -m pip list --format=json
+python.exe -I -c "from rdkit import rdBase; print(rdBase.rdkitVersion)"  # failed: Code Integrity block; no chemistry call was made
+# Repository cumulative regressions
+npm ci
+npm test

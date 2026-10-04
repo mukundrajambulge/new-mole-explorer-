@@ -1,0 +1,9 @@
+# Scientific source payloads and captured command/system logs are raw evidence.
+source_artifacts/** -text -diff
+runtime_logs/** -text -diff
+SOURCE_MANIFEST.csv -text -diff
+
+# Keep authored reports and this package's digest list stable across checkouts.
+*.md text eol=lf
+SHA256SUMS.txt text eol=lf
+.gitattributes text eol=lf
