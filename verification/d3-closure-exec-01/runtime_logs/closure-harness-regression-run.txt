@@ -1,0 +1,20 @@
+D3-CLOSURE-EXEC-01 post-harness regression
+Repository regression observed at: 2026-10-04 11:36 UTC
+Final harness revision build/smoke observed at: 2026-10-04 11:44 UTC
+Branch: feature/d3-closure-exec-01
+Application revision under test: prior to committing the closure-local harness and its evidence updates
+
+Commands and observed results:
+- `npm test`: PASS, web 34 files / 156 tests; API 13 files / 98 tests; total 47 / 254.
+- `npm run typecheck`: PASS across API, app, web and contracts.
+- `npm run lint`: PASS across API, app, web and contracts.
+- `npm run build`: PASS. Existing 3Dmol.js eval and chunk-size advisories were emitted.
+- Native CMake/CTest in WSL2 Ubuntu 24.04.5 with GCC 13.3.0: PASS, 2/2 tests (direct scorer and scoring field).
+- Full-pose runner CMake build: PASS under the strict project floating-point and warning flags.
+- `python -m py_compile` on both runner Python files: PASS.
+- `full_pose_compare_smoke.py`: PASS, five marked synthetic poses reached direct and grid paths; temporary output removed.
+- `npm run test:e2e -- tests/e2e/final-pymol-acceptance.spec.ts`: PASS, 3/3 Playwright tests.
+- The two screenshot fixtures were restored to the recorded pre-run SHA-256 values: `60f7418fb1dca4ca6c40f4440622dae052f7523e76f65af486cedb47a2efd594` and `2dfe80c13af86a65afa0d6ab6d41e6fd63d15a8f4291bc5a36d570714d8afdf2`.
+- `git diff --check`: PASS; final `python -m py_compile` on the runner files: PASS.
+
+No fixture molecule was submitted to RDKit. No sealed-state full-pose run occurred. These are repository/harness checks only.

@@ -12,4 +12,4 @@ The historical Windows Code Integrity block remains preserved, but it is no long
 
 ## Work not started because B1 remains unresolved
 
-No fixture `Chem.AddHs` call, preparation run config/seal, receptor/BNZ prepared state, heavy-atom invariant measurement, fixture hydrogen provenance, deterministic fixture replay, SearchRegion, full-pose direct/grid cohort/statistics, or fixture-specific resource check was produced. No scientific scoring discrepancy or regression was measured; fixture evaluation was not reached.
+No fixture `Chem.AddHs` call, preparation run config/seal, receptor/BNZ prepared state, heavy-atom invariant measurement, fixture hydrogen provenance, deterministic fixture replay, SearchRegion, full-pose direct/grid cohort/statistics, or fixture-specific resource check was produced. The executable full-pose runner is now available and passed only a marked synthetic smoke control; it is not a substitute for the missing sealed states. No scientific scoring discrepancy or regression was measured; fixture evaluation was not reached.

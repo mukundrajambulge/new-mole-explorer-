@@ -19,6 +19,21 @@ The captured command output and start/end/exit record are `runtime_logs/npm-test
 
 The tests ran with Node.js `v24.14.1` and npm `11.11.0` on the Windows x64 worktree host. The API count includes a regression proving that malformed atom serial field `0001X` fails with `D3_PDBQT_ATOM_SERIAL_INVALID`.
 
+## Full-pose harness addition — 2026-10-04
+
+After adding the closure-local runner, a fresh regression completed at 11:36 UTC on the same branch:
+
+- `npm test`: PASS, 47 files / 254 tests (web 34/156, API 13/98).
+- `npm run typecheck`: PASS across workspaces.
+- `npm run lint`: PASS across workspaces.
+- `npm run build`: PASS; existing 3Dmol.js `eval` and large-chunk advisories remain.
+- Native CMake/CTest: PASS, 2/2 targets (direct scorer and scoring field).
+- Full-pose runner strict C++ build and `py_compile`: PASS.
+- Full-pose orchestration smoke control: PASS for five marked synthetic poses; temporary outputs were discarded and synthetic files use the `CONTROL_` prefix.
+- Protected PyMOL browser suite: PASS, 3/3 Playwright tests.
+
+The repeated check scope and observed outcomes are recorded in `runtime_logs/closure-harness-regression-run.txt`. This does not claim fixture-specific preparation/scoring tests, because the ASN68/ASP72/ARG76 source/profile conflict still prevents fixture-state formation.
+
 ## Runtime-unblock continuation regression
 
 After the continuation's source-preflight/validation tooling and evidence updates, the repository regression was run again on 2026-10-04 with Node.js `v24.14.1` and npm `11.11.0`:
