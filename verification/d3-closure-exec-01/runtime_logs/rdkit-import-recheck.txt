@@ -1,0 +1,42 @@
+UTC started: 2026-10-04T04:13:04.3382526Z
+Command: "C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe" -I -c "from rdkit import rdBase; print(rdBase.rdkitVersion)"
+Exit: 1
+Output:
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    from rdkit import rdBase; print(rdBase.rdkitVersion)
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages\rdkit\__init__.py", line 17, in <module>
+    from . import rdBase
+ImportError: DLL load failed while importing rdBase: An Application Control policy has blocked this file.
+
+Recent matching Code Integrity events:
+EventId=3077 Time=2026-10-04T04:13:04.7189161Z
+Code Integrity determined that a process (\Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe) attempted to load \Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages\rdkit\rdBase.pyd that did not meet the Enterprise signing level requirements or violated code integrity policy (Policy ID:{0283ac0f-fff1-49ae-ada1-8a933130cad6}).
+---
+EventId=3033 Time=2026-10-04T04:13:04.7140640Z
+Code Integrity determined that a process (\Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe) attempted to load \Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages\rdkit\rdBase.pyd that did not meet the Enterprise signing level requirements.
+---
+EventId=3077 Time=2026-10-04T03:36:14.6557504Z
+Code Integrity determined that a process (\Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe) attempted to load \Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages\rdkit\rdBase.pyd that did not meet the Enterprise signing level requirements or violated code integrity policy (Policy ID:{0283ac0f-fff1-49ae-ada1-8a933130cad6}).
+---
+EventId=3033 Time=2026-10-04T03:36:14.6493996Z
+Code Integrity determined that a process (\Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe) attempted to load \Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages\rdkit\rdBase.pyd that did not meet the Enterprise signing level requirements.
+---
+EventId=3077 Time=2026-10-04T03:32:44.1617475Z
+Code Integrity determined that a process (\Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe) attempted to load \Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages\rdkit\rdBase.pyd that did not meet the Enterprise signing level requirements or violated code integrity policy (Policy ID:{0283ac0f-fff1-49ae-ada1-8a933130cad6}).
+---
+EventId=3033 Time=2026-10-04T03:32:44.1558421Z
+Code Integrity determined that a process (\Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe) attempted to load \Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages\rdkit\rdBase.pyd that did not meet the Enterprise signing level requirements.
+---
+EventId=3077 Time=2026-10-04T03:20:21.7004153Z
+Code Integrity determined that a process (\Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe) attempted to load \Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages\rdkit\rdBase.pyd that did not meet the Enterprise signing level requirements or violated code integrity policy (Policy ID:{0283ac0f-fff1-49ae-ada1-8a933130cad6}).
+---
+EventId=3033 Time=2026-10-04T03:20:21.6943561Z
+Code Integrity determined that a process (\Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe) attempted to load \Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages\rdkit\rdBase.pyd that did not meet the Enterprise signing level requirements.
+---
+EventId=3077 Time=2026-10-04T03:20:21.2834120Z
+Code Integrity determined that a process (\Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe) attempted to load \Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages\rdkit\rdBase.pyd that did not meet the Enterprise signing level requirements or violated code integrity policy (Policy ID:{0283ac0f-fff1-49ae-ada1-8a933130cad6}).
+---
+EventId=3033 Time=2026-10-04T03:20:21.2767930Z
+Code Integrity determined that a process (\Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe) attempted to load \Device\HarddiskVolume3\Users\mukun\AppData\Local\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages\rdkit\rdBase.pyd that did not meet the Enterprise signing level requirements.

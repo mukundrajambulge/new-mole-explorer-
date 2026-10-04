@@ -193,14 +193,17 @@ const edgeKey = (left: string, right: string): string => left < right ? `${left}
 
 const parseAtom = (line: string, lineNumber: number, branchOrdinal: number | null): ParsedAtom | D3VinaDiagnostic => {
   if (line.length < 54) return d3Error("D3_PDBQT_ATOM_TRUNCATED", `PDBQT atom record on line ${lineNumber} is shorter than its required coordinate fields.`, `line:${lineNumber}`);
-  const serial = Number.parseInt(line.slice(6, 11).trim(), 10);
+  const serialField = line.slice(6, 11);
+  const serialText = serialField.trim();
+  const serialFieldValid = /^ *[0-9]+ *$/.test(serialField);
+  const serial = serialFieldValid ? Number(serialText) : Number.NaN;
   const x = Number(line.slice(30, 38).trim());
   const y = Number(line.slice(38, 46).trim());
   const z = Number(line.slice(46, 54).trim());
   const fields = line.trim().split(/\s+/);
   const atomType = (fields.at(-1) ?? "").toUpperCase();
   const element = ATOM_TYPE_ELEMENT[atomType];
-  if (!Number.isSafeInteger(serial) || serial <= 0) return d3Error("D3_PDBQT_ATOM_SERIAL_INVALID", `PDBQT atom record on line ${lineNumber} has an invalid serial.`, `line:${lineNumber}`);
+  if (!serialFieldValid || !Number.isSafeInteger(serial) || serial <= 0) return d3Error("D3_PDBQT_ATOM_SERIAL_INVALID", `PDBQT atom record on line ${lineNumber} has an invalid serial.`, `line:${lineNumber}`);
   if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) return d3Error("D3_PDBQT_COORDINATE_INVALID", `PDBQT atom record on line ${lineNumber} has a missing, malformed, or non-finite coordinate.`, `line:${lineNumber}`);
   if (!element || !SUPPORTED_ELEMENTS.has(element)) return d3Error("D3_CHEMISTRY_UNSUPPORTED", `AutoDock atom type ${atomType || "<missing>"} on line ${lineNumber} is outside the supported D3-TOR-01 chemistry boundary.`, `line:${lineNumber}`);
   return { serial, element, atomType, x, y, z, line: lineNumber, branchOrdinal };

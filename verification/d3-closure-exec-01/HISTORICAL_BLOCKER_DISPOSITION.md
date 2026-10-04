@@ -1,0 +1,8 @@
+# Historical blocker disposition
+
+- **Active fixture:** 3DMX/BNZ, as directed by the integrated task and AUTH04. The prior 181L/BNZ, 3ATL/BEN, 4W52/BNZ and 9I7O/RTL paths were not reselected or reopened.
+- **DEC04 source-line-ending issue:** superseded for this task by byte-exact copies verified against all six DEC04 manifest entries. The copies were not used for chemistry because runtime execution stopped before parsing.
+- **AUTH04 owner decisions:** resolved/approved in the local owner record, including GLU128 deprotonated, pH-context interpretation, component policy and exact profile. No decision was recreated here.
+- **AUTH04 Roadmap-review blocker:** the pre-execution independent review passed. The Roadmap does not require a human reviewer. The inherited-code review found and corrected malformed TOR atom-serial parsing; code review passed after re-review. The blocked-state evidence-package audit passed. A final independent scientific-acceptance review of execution outputs remains impossible because scientific execution is absent.
+- **AUTH04 installer blocker:** investigated by a standard installer attempt and a separately verified CPython embeddable runtime. Python 3.13.16 x64 starts and pinned wheels install, but current enterprise signing policy blocks the pinned RDKit extension. This is the active technical hard stop.
+- **Deterministic replay:** AUTH04 lists replay as a mandatory execution precondition and integrated task §25 directs replay from the same source/profile. It was not run because RDKit import failed before any preparation began; the authorization remains unconsumed.

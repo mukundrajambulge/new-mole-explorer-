@@ -1,0 +1,4 @@
+Command: npm run lint
+Started UTC: 2026-10-04T04:36:37.9241760Z
+Ended UTC: 2026-10-04T04:36:48.3254684Z
+Exit: 1

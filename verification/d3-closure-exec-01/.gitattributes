@@ -6,4 +6,6 @@ SOURCE_MANIFEST.csv -text -diff
 # Keep authored reports and this package's digest list stable across checkouts.
 *.md text eol=lf
 SHA256SUMS.txt text eol=lf
+CHANGED_PATHS.txt text eol=lf
+FULLPOSE_*.csv text eol=lf
 .gitattributes text eol=lf

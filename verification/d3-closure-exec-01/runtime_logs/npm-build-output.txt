@@ -1,0 +1,35 @@
+
+> molecular-workstation@0.1.0 build
+> npm run build --workspaces
+
+
+> @molecular/api@0.1.0 build
+> tsc -p tsconfig.json --outDir dist --noEmit false
+
+
+> @molecular/app@0.1.0 build
+> node --check src/server.mjs
+
+
+> @molecular/web@0.1.0 build
+> tsc -p tsconfig.json && vite build
+
+vite v6.4.3 building for production...
+transforming...
+✓ 1659 modules transformed.
+../../node_modules/3dmol/build/3Dmol.js (43198:19): Use of eval in "../../node_modules/3dmol/build/3Dmol.js" is strongly discouraged as it poses security risks and may cause issues with minification.
+rendering chunks...
+computing gzip size...
+dist/index.html                     1.08 kB │ gzip:   0.61 kB
+dist/assets/index-D9pQbsk2.css     59.91 kB │ gzip:  12.77 kB
+dist/assets/index-l9QKxxxJ.js   1,406.87 kB │ gzip: 388.54 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 7.87s
+
+> @molecular/contracts@0.1.0 build
+> tsc -p tsconfig.json --outDir dist --noEmit false
+

@@ -1,0 +1,35 @@
+
+> molecular-workstation@0.1.0 lint
+> npm run lint --workspaces
+
+
+> @molecular/api@0.1.0 lint
+> eslint src --max-warnings 0
+
+
+C:\Users\mukun\.codex\worktrees\d3-closure-exec-01-9814\molecular-workstation\apps\api\src\docking\d3VinaTorsion.test.ts
+  231:58  error  Spaces are hard to count. Use {2}  no-regex-spaces
+
+✖ 1 problem (1 error, 0 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+
+npm error Lifecycle script `lint` failed with error:
+npm error code 1
+npm error path C:\Users\mukun\.codex\worktrees\d3-closure-exec-01-9814\molecular-workstation\apps\api
+npm error workspace @molecular/api@0.1.0
+npm error location C:\Users\mukun\.codex\worktrees\d3-closure-exec-01-9814\molecular-workstation\apps\api
+npm error command failed
+npm error command C:\Windows\system32\cmd.exe /d /s /c eslint src --max-warnings 0
+
+
+> @molecular/app@0.1.0 lint
+> node --check src/server.mjs
+
+
+> @molecular/web@0.1.0 lint
+> eslint src --max-warnings 0
+
+
+> @molecular/contracts@0.1.0 lint
+> eslint src --max-warnings 0
+

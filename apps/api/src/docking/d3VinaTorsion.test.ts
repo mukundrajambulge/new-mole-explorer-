@@ -225,6 +225,16 @@ describe("D3-TOR-01 Vina v1.2.7 PDBQT torsion representation", () => {
     expect(mismatch.status).toBe("AMBIGUOUS");
   });
 
+  it("rejects malformed characters in the fixed-width atom serial field", async () => {
+    const row = referenceCases.find((candidate) => candidate.case === "benzene")!;
+    const bytes = readFileSync(pdbqtPathFor(row));
+    const malformedText = bytes.toString("utf8").replace(/^(ATOM {2}|HETATM).{5}/m, (record) => `${record.slice(0, 6)}0001X`);
+    expect(malformedText).not.toBe(bytes.toString("utf8"));
+    const malformed = await makeImport(row, Buffer.from(malformedText));
+    expect(malformed.imported.status).toBe("INVALID");
+    expect(malformed.imported.diagnostics.map((diagnostic) => diagnostic.code)).toContain("D3_PDBQT_ATOM_SERIAL_INVALID");
+  });
+
   it("keeps scoring results stable when PDBQT root atom record order changes under the same mapping", async () => {
     const row = referenceCases.find((candidate) => candidate.case === "keepH_toluene")!;
     const originalBytes = readFileSync(pdbqtPathFor(row));
