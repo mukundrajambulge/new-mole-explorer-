@@ -1,0 +1,46 @@
+D3-CLOSURE-EXEC-01 cumulative continuation regression
+Evidence complete at: 2026-10-04 10:40:15 UTC
+Worktree branch at run: feature/d3-closure-exec-01
+Application revision at run: 6582406076a3295bda68b2d6747da5438e1b6142
+Host: Windows x64 worktree
+Node.js: v24.14.1
+npm: 11.11.0
+
+Command: npm test
+Exit: 0 (PASS)
+Result: 47 test files, 254 tests; web 34 files / 156 tests, API 13 files / 98 tests
+Output: continuation-npm-test-output.txt
+
+Command: npm run typecheck
+Exit: 0 (PASS)
+Output: continuation-npm-typecheck-output.txt
+
+Command: npm run lint
+Exit: 0 (PASS)
+Output: continuation-npm-lint-output.txt
+
+Command: npm run build
+Exit: 0 (PASS)
+Output: continuation-npm-build-output.txt
+Build advisories: existing 3Dmol.js use of eval and large-chunk warning; build succeeded.
+
+Command: native CMake/CTest in WSL2 Ubuntu 24.04.5; CMake 3.28.3; GCC 13.3.0; strict project flags
+Exit: 0 (PASS), 2/2 targets
+Result: direct scorer and scoring field passed; six fixture groups each
+Output: continuation-native-linux-cmake-ctest-output.txt
+
+Command: direct native scorer binary
+Exit: 0 (PASS), six fixture groups
+Output: continuation-native-direct-output.txt
+
+Command: native scoring-field resource binary
+Exit: 0 (PASS), six fixture groups; maximum geometry resource case passed
+Output: continuation-native-field-resource-output.txt
+Resource measurement: raw=628232000 B; field-owned=635301752 B; retained=628234296 B; construction peak=635301752 B; process peak RSS=676855808 B; receptor scoring atoms=250000
+
+Command: npm run test:e2e -- tests/e2e/final-pymol-acceptance.spec.ts
+Exit: 0 (PASS), 3/3 Playwright tests
+Output: continuation-pymol-e2e-output.txt
+The two screenshots were restored to pre-run bytes; verified hashes: `60f7418fb1dca4ca6c40f4440622dae052f7523e76f65af486cedb47a2efd594` and `2dfe80c13af86a65afa0d6ab6d41e6fd63d15a8f4291bc5a36d570714d8afdf2`.
+
+Not run: fixture-specific preparation/full-pose tests (not eligible because the source/profile alternate coordinate state is unresolved). The pinned PyMOL executable oracle remains unavailable; browser tests do not claim executable-oracle conformance.

@@ -1,0 +1,2 @@
+RESOURCE raw_payload_bytes=628232000 field_owned_allocation_bytes=635301752 retained_field_allocation_bytes=628234296 construction_peak_owned_bytes=635301752 peak_rss_bytes=676855808 receptor_scoring_atoms=250000
+PASS: scoring-field unit fixtures (6 groups)

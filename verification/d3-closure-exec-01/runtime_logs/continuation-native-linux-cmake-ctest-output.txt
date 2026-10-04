@@ -1,0 +1,29 @@
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (2.9s)
+-- Generating done (0.0s)
+-- Build files have been written to: /root/.local/share/mole-explorer/d3-closure-exec-01-linux/native-build
+[ 14%] Building CXX object CMakeFiles/mole_docking_reference.dir/src/scoring.cpp.o
+[ 28%] Building CXX object CMakeFiles/mole_docking_reference.dir/src/scoring_field.cpp.o
+[ 42%] Linking CXX static library libmole_docking_reference.a
+[ 42%] Built target mole_docking_reference
+[ 57%] Building CXX object CMakeFiles/mole_docking_reference_tests.dir/tests/scoring_test.cpp.o
+[ 71%] Building CXX object CMakeFiles/mole_docking_reference_field_tests.dir/tests/scoring_field_test.cpp.o
+[ 85%] Linking CXX executable mole_docking_reference_tests
+[ 85%] Built target mole_docking_reference_tests
+[100%] Linking CXX executable mole_docking_reference_field_tests
+[100%] Built target mole_docking_reference_field_tests
+Internal ctest changing into directory: /root/.local/share/mole-explorer/d3-closure-exec-01-linux/native-build
+Test project /root/.local/share/mole-explorer/d3-closure-exec-01-linux/native-build
+    Start 1: mole_docking_reference_tests
+1/2 Test #1: mole_docking_reference_tests .........   Passed    0.00 sec
+    Start 2: mole_docking_reference_field_tests
+2/2 Test #2: mole_docking_reference_field_tests ...   Passed   11.43 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =  11.44 sec

@@ -1,0 +1,20 @@
+
+> molecular-workstation@0.1.0 typecheck
+> npm run typecheck --workspaces
+
+
+> @molecular/api@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @molecular/app@0.1.0 typecheck
+> node --check src/server.mjs
+
+
+> @molecular/web@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @molecular/contracts@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+

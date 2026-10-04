@@ -1,0 +1,20 @@
+
+> molecular-workstation@0.1.0 lint
+> npm run lint --workspaces
+
+
+> @molecular/api@0.1.0 lint
+> eslint src --max-warnings 0
+
+
+> @molecular/app@0.1.0 lint
+> node --check src/server.mjs
+
+
+> @molecular/web@0.1.0 lint
+> eslint src --max-warnings 0
+
+
+> @molecular/contracts@0.1.0 lint
+> eslint src --max-warnings 0
+

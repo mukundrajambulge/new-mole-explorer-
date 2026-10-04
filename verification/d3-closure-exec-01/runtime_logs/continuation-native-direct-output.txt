@@ -1,0 +1,1 @@
+PASS: direct-scoring unit fixtures (6 groups)

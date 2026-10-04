@@ -8,6 +8,6 @@ All six frozen source artifacts passed Windows-versus-WSL SHA-256 and byte-lengt
 
 The exact unresolved owner decision was requested: extend the current fixture profile to select coherent maximum-occupancy A at ASN68, ASP72, and ARG76, or preserve the current authorization. The existing one-fixture bootstrap remains unconsumed. Do not infer approval, mutate the profile, or start dependent chemistry work before that response.
 
-Predecessor code review, blocked-state evidence review, and software regression results remain preserved. No application scoring/capability code changed in this continuation, so the earlier 47-file/254-test regression is not recast as a failure or represented as rerun.
+Predecessor code review and blocked-state evidence review remain preserved. The continuation reran `npm test` (47 files/254 tests), typecheck, lint, build, native direct/field scorer tests, and protected PyMOL browser regression (3/3); all passed. Both test screenshot fixtures were restored to their pre-run hashes. No fixture-preparation/full-pose test could run because the profile mismatch stops before fixture chemistry.
 
 The Windows Application Control failure remains in the record as the reason for relocation; it is no longer the active runtime issue. No security policy was changed. D4 remains blocked and `DOCKING.RUN` unavailable. Continue only within the same D3-CLOSURE-EXEC-01 objective after the owner resolves the exact coordinate-state mismatch; do not create another D3 stage.

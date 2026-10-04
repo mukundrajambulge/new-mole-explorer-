@@ -23,7 +23,17 @@ verification/d3-closure-exec-01/PREPARATION_REPLAY_REPORT.md
 verification/d3-closure-exec-01/PREPARED_LIGAND_STATE_REPORT.md
 verification/d3-closure-exec-01/PREPARED_RECEPTOR_STATE_REPORT.md
 verification/d3-closure-exec-01/REGRESSION_TEST_REPORT.md
+verification/d3-closure-exec-01/RESOURCE_VALIDATION.md
 verification/d3-closure-exec-01/RUNTIME_INSTALLATION_RECORD.md
+verification/d3-closure-exec-01/runtime_logs/continuation-native-direct-output.txt
+verification/d3-closure-exec-01/runtime_logs/continuation-native-field-resource-output.txt
+verification/d3-closure-exec-01/runtime_logs/continuation-native-linux-cmake-ctest-output.txt
+verification/d3-closure-exec-01/runtime_logs/continuation-npm-build-output.txt
+verification/d3-closure-exec-01/runtime_logs/continuation-npm-lint-output.txt
+verification/d3-closure-exec-01/runtime_logs/continuation-npm-test-output.txt
+verification/d3-closure-exec-01/runtime_logs/continuation-npm-typecheck-output.txt
+verification/d3-closure-exec-01/runtime_logs/continuation-pymol-e2e-output.txt
+verification/d3-closure-exec-01/runtime_logs/continuation-regression-run.txt
 verification/d3-closure-exec-01/runtime_logs/linux/api-query-guard-check.json
 verification/d3-closure-exec-01/runtime_logs/linux/artifact-manifest.json
 verification/d3-closure-exec-01/runtime_logs/linux/runtime-identity.json

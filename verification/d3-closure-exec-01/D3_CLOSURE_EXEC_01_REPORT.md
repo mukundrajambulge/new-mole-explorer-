@@ -14,13 +14,13 @@ The Windows Application Control restriction was an execution-host restriction, n
 - Ran safe synthetic ethane AddHs and aromatic benzene AddHs controls twice in separate processes. Both controls passed with identical canonical signatures across their two runs. Query atom and query bond guards rejected their test inputs. Heavy-atom coordinates/bonds remained unchanged and only expected hydrogens were added.
 - Rehashed all six source artifacts on Windows and inside WSL; byte lengths and SHA-256 values matched the frozen manifest. The parser verifies each source hash before parsing the same bytes in memory.
 - Ran a fail-closed hash-gated 3DMX/BNZ source/profile preflight. It found alternates at ASN68 (A .70/B .30), ASP72 (A .80/B .20), and ARG76 (A .60/B .40), in addition to the already approved MET106 and GLU108 groups. It rejected the first unresolved group at ASN68 before accepting a receptor atom graph. Row-level evidence is `runtime_logs/linux/source-altloc-preflight.json`; the disposition is `SOURCE_PROFILE_MISMATCH.md`.
-- Preserved the predecessor code-review, independent blocked-state evidence-review, and 47-file/254-test regression evidence. No application scoring or capability code changed in this continuation.
+- Preserved the predecessor code-review and independent blocked-state evidence-review. Reran the repository suite (47 files/254 tests), typecheck, lint, build, strict native direct/field scorer tests, and protected PyMOL browser regression (3/3); all passed. No application scoring or capability code changed in this continuation.
 
 ## Not performed
 
 No fixture-derived graph was supplied to RDKit and no fixture `Chem.AddHs` call occurred. No run configuration or sealed run-input record was created. No receptor or ligand preparation, heavy-atom invariance measurement, hydrogen provenance output, prepared-state/envelope sealing, SearchRegion, deterministic fixture replay, direct/grid scorer evaluation, full-pose statistics, or fixture-specific resource measurement was produced. Existing header-only pose tables remain empty. Safe synthetic controls are not fixture evidence.
 
-The single-use owner-approved preparation remains unconsumed. Regressions from the corrected TOR parser are preserved; this continuation made no application code changes and did not repeat the repository regression commands. Fixture preparation/full-pose regression tests could not run because the fixture state is unresolved.
+The single-use owner-approved preparation remains unconsumed. The cumulative repository suite, native direct/field tests, and protected PyMOL browser suite were rerun and passed. Fixture preparation/full-pose regression tests could not run because the fixture state is unresolved.
 
 ## Required disposition
 

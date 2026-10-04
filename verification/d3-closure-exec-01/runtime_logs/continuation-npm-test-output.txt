@@ -1,0 +1,77 @@
+
+> molecular-workstation@0.1.0 test
+> npm run test --workspace @molecular/web && npm run test --workspace @molecular/api
+
+
+> @molecular/web@0.1.0 test
+> vitest run
+
+
+ RUN  v2.1.9 C:/Users/mukun/.codex/worktrees/d3-closure-exec-01-9814/molecular-workstation/apps/web
+
+ ✓ src/biological/adapters.test.ts (9 tests) 91ms
+ ✓ src/commands/commandRegistry.test.ts (3 tests) 13ms
+ ✓ src/interaction/labels-picking.test.ts (7 tests) 12ms
+ ✓ src/rendering/presentationState.test.ts (6 tests) 11ms
+ ✓ src/rendering/colorSchemes.test.ts (10 tests) 14ms
+ ✓ src/analysis/alignment.test.ts (6 tests) 26ms
+ ✓ src/workspace/workspaceModel.test.ts (10 tests) 37ms
+ ✓ src/selection/selectionEngine.test.ts (21 tests) 59ms
+ ✓ src/rendering/renderDirectives.test.ts (5 tests) 11ms
+ ✓ src/lifecycle/scenes.test.ts (2 tests) 11ms
+ ✓ src/rendering/g1cVisualization.test.ts (11 tests) 19ms
+ ✓ src/editing/hydrogenPickedEditing.test.ts (6 tests) 48ms
+ ✓ src/editing/editFoundation.test.ts (14 tests) 52ms
+ ✓ src/lifecycle/export.test.ts (2 tests) 17ms
+ ✓ src/analysis/pymolFitting.test.ts (4 tests) 62ms
+ ✓ src/analysis/structuralAnalysis.test.ts (2 tests) 8ms
+ ✓ src/rendering/surfaceProfiles.test.ts (3 tests) 9ms
+ ✓ src/docking/dockingApiAdapter.test.ts (2 tests) 24ms
+ ✓ src/science/datasetValidity.test.ts (2 tests) 8ms
+ ✓ src/interaction/measurements.test.ts (2 tests) 7ms
+ ✓ src/docking/dockingUiState.test.ts (3 tests) 8ms
+ ✓ src/rendering/putty.test.ts (2 tests) 8ms
+ ✓ src/interaction/selectionResolver.test.ts (2 tests) 21ms
+ ✓ src/rendering/cameraController.test.ts (3 tests) 7ms
+ ✓ src/analysis/alignmentPresentation.test.ts (2 tests) 9ms
+ ✓ src/commands/sdk.test.ts (1 test) 5ms
+ ✓ src/commands/uiDispatcher.test.ts (3 tests) 9ms
+ ✓ src/rendering/presentationActions.test.ts (2 tests) 6ms
+ ✓ src/rendering/searchRegionOverlay.test.ts (1 test) 2ms
+ ✓ src/domain/registry.test.ts (2 tests) 17ms
+ ✓ src/rendering/colorRegistry.test.ts (3 tests) 6ms
+ ✓ src/commands/batchTokenizer.test.ts (3 tests) 5ms
+ ✓ src/rendering/surfaceMaterial.test.ts (1 test) 10ms
+ ✓ src/commands/safeBoundary.test.ts (1 test) 4ms
+
+ Test Files  34 passed (34)
+      Tests  156 passed (156)
+   Start at  15:58:51
+   Duration  3.75s (transform 5.27s, setup 0ms, collect 17.80s, tests 657ms, environment 13ms, prepare 9.42s)
+
+
+> @molecular/api@0.1.0 test
+> vitest run
+
+
+ RUN  v2.1.9 C:/Users/mukun/.codex/worktrees/d3-closure-exec-01-9814/molecular-workstation/apps/api
+
+ ✓ src/lifecycle/canonicalSerialization.test.ts (2 tests) 6ms
+ ✓ src/command/settings.test.ts (1 test) 8ms
+ ✓ src/command/registry.test.ts (5 tests) 13ms
+ ✓ src/command/securityFuzz.test.ts (2 tests) 21ms
+ ✓ src/command/compiler.test.ts (8 tests) 24ms
+ ✓ src/command/dispatcher.test.ts (6 tests) 49ms
+ ✓ src/projects/projectStore.test.ts (2 tests) 95ms
+ ✓ src/structures/ingestion.test.ts (34 tests) 110ms
+ ✓ src/command/macro.test.ts (1 test) 19ms
+ ✓ src/docking/d1Contracts.test.ts (14 tests) 50ms
+ ✓ src/projects/sessionStore.test.ts (4 tests) 428ms
+ ✓ src/docking/d2Preparation.test.ts (11 tests) 66ms
+ ✓ src/docking/d3VinaTorsion.test.ts (8 tests) 286ms
+
+ Test Files  13 passed (13)
+      Tests  98 passed (98)
+   Start at  15:58:56
+   Duration  2.44s (transform 3.15s, setup 0ms, collect 9.63s, tests 1.17s, environment 5ms, prepare 4.06s)
+
