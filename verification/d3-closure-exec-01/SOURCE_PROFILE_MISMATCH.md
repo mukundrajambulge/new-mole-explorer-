@@ -16,6 +16,8 @@ The source has 1,335 model-1 entity-1/chain-A polymer atom-site rows and a compl
 
 AUTH04's pinned adapter proposal specifies “common blank-altloc atoms and the coherent A conformer for MET106 and GLU108 only,” and directs the runner to reject unlisted state/input identities. The owner authorization approves the exact proposal and forbids scope expansion. The source-only geometry audit below was computed from the byte-hash-verified source buffers without importing RDKit or constructing molecules; full per-atom distances are in `runtime_logs/linux/source-altloc-distance-audit.json`.
 
+The D2 contract type `D2AltlocResolution` exposes policy labels including `COHERENT_MAX_OCCUPANCY_V1` (`packages/contracts/src/docking/d2.ts`, lines 175–180), but it does not supply a fixture default or broaden AUTH04's exact selected-group list. The owner-approved preparation profile and pinned adapter proposal bind the candidate-specific selection to MET106/GLU108. Merely having a reusable policy enum does not authorize extending this profile to ASN68/ASP72/ARG76.
+
 | Residue | Occupancy A/B | Nearest A-or-B heavy atom to BNZ | Maximum matched A↔B atom displacement | Within 8 Å of BNZ |
 |---|---|---:|---:|---|
 | ASN68 | 0.70 / 0.30 | 18.094552 Å | 3.172592 Å | No |
