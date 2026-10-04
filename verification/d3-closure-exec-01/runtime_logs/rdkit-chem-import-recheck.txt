@@ -1,0 +1,10 @@
+{"python": "3.13.16", "rdkit": "2026.03.6", "rdBase": "2026.03.6", "rdkit_file": "C:\\Users\\mukun\\AppData\\Local\\mole-explorer\\d3-closure-exec-01\\python-embed\\Lib\\site-packages\\rdkit\\__init__.py", "rdBase_file": "C:\\Users\\mukun\\AppData\\Local\\mole-explorer\\d3-closure-exec-01\\python-embed\\Lib\\site-packages\\rdkit\\rdBase.pyd", "rdmolfiles_file": "C:\\Users\\mukun\\AppData\\Local\\mole-explorer\\d3-closure-exec-01\\python-embed\\Lib\\site-packages\\rdkit\\Chem\\rdmolfiles.pyd", "rdmolfiles_record_sha256": "42f89f7f7b129b0b166af7bd46225beede035d0110b5ba64d8010a50d6244627", "rdmolfiles_actual_sha256": "42f89f7f7b129b0b166af7bd46225beede035d0110b5ba64d8010a50d6244627", "record_match": true}
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import rdkit.Chem
+  File "C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages\rdkit\Chem\__init__.py", line 23, in <module>
+    from rdkit.Chem.rdmolfiles import *
+ImportError: DLL load failed while importing rdmolfiles: An Application Control policy has blocked this file.
+import_rdkit_Chem_exit=1
+rdmolfiles_pyd_sha256=42f89f7f7b129b0b166af7bd46225beede035d0110b5ba64d8010a50d6244627
+matching_CodeIntegrity_events_last_30m=0

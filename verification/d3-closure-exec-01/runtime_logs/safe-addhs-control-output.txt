@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "C:\Users\mukun\.codex\worktrees\d3-closure-exec-01-9814\molecular-workstation\verification\d3-closure-exec-01\tools\safe_addhs_control.py", line 16, in <module>
+    from rdkit import Chem, rdBase
+  File "C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\python-embed\Lib\site-packages\rdkit\Chem\__init__.py", line 23, in <module>
+    from rdkit.Chem.rdmolfiles import *
+ImportError: DLL load failed while importing rdmolfiles: An Application Control policy has blocked this file.

@@ -1,0 +1,7 @@
+timestamp_utc=2026-10-04T08:46:40.3059654Z
+command=C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe -I verification/d3-closure-exec-01/tools/safe_addhs_control.py
+script_sha256=a9e647e85350a9ee0fe40e46177e5f457754f8453e63b1603c869fbebd36b9c6
+rdBase_pyd_sha256=4ffc113eabdc59b79a6d8d120539d8a9ea082eb999916ebdf26df0cf13503305
+TZ=UTC
+LC_ALL=C
+exit_code=1

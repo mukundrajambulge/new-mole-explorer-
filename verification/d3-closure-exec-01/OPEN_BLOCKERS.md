@@ -1,8 +1,8 @@
 # Open blockers
 
-## B1 — RDKit native module blocked by host code-integrity policy
+## B1 — Pinned RDKit Chem API blocked by host Application Control
 
-Windows Code Integrity events 3077 and 3033 block the unsigned pinned `rdkit\rdBase.pyd` under enterprise signing-level requirements. CPython and pip work, but RDKit cannot be imported. The allowed chemistry operation cannot run under the approved toolchain on this host. Resume only after the device policy admits an authorized pinned RDKit binary; do not disable or bypass Code Integrity and do not substitute another chemistry engine.
+CPython 3.13.16, the pinned wheel metadata, and `rdkit.rdBase` currently load, but importing `rdkit.Chem` is blocked at the unsigned pinned `rdkit\Chem\rdmolfiles.pyd` with an Application Control error. Its SHA-256 matches the installed wheel `RECORD`; no code-integrity policy was changed. The required AddHs wrapper cannot run, and the safe synthetic control stopped before any molecular operation. Earlier `rdBase.pyd` failures with events 3077 and 3033 remain preserved. Resume only on a policy-approved host/runtime that loads the complete pinned RDKit modules; do not disable or bypass Application Control and do not substitute another chemistry engine.
 
 ## Work not started because B1 is a hard stop
 

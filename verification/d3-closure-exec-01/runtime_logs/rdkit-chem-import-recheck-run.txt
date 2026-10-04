@@ -1,0 +1,7 @@
+timestamp_utc=2026-10-04T08:48:52.9290209Z
+python_path=C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe
+metadata_command_exit=0
+chem_import_command=C:\Users\mukun\AppData\Local\mole-explorer\d3-closure-exec-01\python-embed\python.exe -I -c import rdkit.Chem
+chem_import_exit=1
+rdmolfiles_pyd_sha256=42f89f7f7b129b0b166af7bd46225beede035d0110b5ba64d8010a50d6244627
+matching_CodeIntegrity_events_last_30m=0

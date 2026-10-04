@@ -61,8 +61,12 @@ verification/d3-closure-exec-01/runtime_logs/python-install-tempfix_000_core_Jus
 verification/d3-closure-exec-01/runtime_logs/python-install-tempfix.log
 verification/d3-closure-exec-01/runtime_logs/python-install.log
 verification/d3-closure-exec-01/runtime_logs/python-runtime-check.txt
+verification/d3-closure-exec-01/runtime_logs/rdkit-chem-import-recheck-run.txt
+verification/d3-closure-exec-01/runtime_logs/rdkit-chem-import-recheck.txt
 verification/d3-closure-exec-01/runtime_logs/rdkit-import-attempt.txt
 verification/d3-closure-exec-01/runtime_logs/rdkit-import-recheck.txt
+verification/d3-closure-exec-01/runtime_logs/safe-addhs-control-output.txt
+verification/d3-closure-exec-01/runtime_logs/safe-addhs-control-run.txt
 verification/d3-closure-exec-01/runtime_logs/toolchain-commands.txt
 verification/d3-closure-exec-01/SEARCH_REGION_REPORT.md
 verification/d3-closure-exec-01/SHA256SUMS.txt
@@ -73,3 +77,4 @@ verification/d3-closure-exec-01/source_artifacts/current_rcsb/3DMX_polymer_entit
 verification/d3-closure-exec-01/source_artifacts/current_rcsb/3DMX.cif
 verification/d3-closure-exec-01/source_artifacts/current_rcsb/BNZ.cif
 verification/d3-closure-exec-01/SOURCE_MANIFEST.csv
+verification/d3-closure-exec-01/tools/safe_addhs_control.py
