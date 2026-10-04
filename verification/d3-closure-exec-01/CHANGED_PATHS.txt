@@ -44,6 +44,7 @@ verification/d3-closure-exec-01/runtime_logs/linux/safe-addhs-run-2.json
 verification/d3-closure-exec-01/runtime_logs/linux/safe-addhs-run-2.stderr
 verification/d3-closure-exec-01/runtime_logs/linux/safe-aromatic-run-1.json
 verification/d3-closure-exec-01/runtime_logs/linux/safe-aromatic-run-2.json
+verification/d3-closure-exec-01/runtime_logs/linux/source-altloc-distance-audit.json
 verification/d3-closure-exec-01/runtime_logs/linux/source-altloc-preflight.json
 verification/d3-closure-exec-01/runtime_logs/linux/windows-source-hashes.json
 verification/d3-closure-exec-01/runtime_logs/linux/wsl-source-hashes.txt

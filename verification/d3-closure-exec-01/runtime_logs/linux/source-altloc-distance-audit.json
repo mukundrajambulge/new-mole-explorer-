@@ -1,0 +1,306 @@
+{
+  "alternate_groups": [
+    {
+      "atom_names": [
+        "CA",
+        "CB",
+        "CG",
+        "ND2",
+        "OD1"
+      ],
+      "atomwise_distances": [
+        {
+          "altloc": "A",
+          "atom": "CA",
+          "distance_to_BNZ_A": 18.094552,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "A",
+          "atom": "CB",
+          "distance_to_BNZ_A": 19.376857,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "A",
+          "atom": "CG",
+          "distance_to_BNZ_A": 19.198441,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "A",
+          "atom": "OD1",
+          "distance_to_BNZ_A": 18.21179,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "A",
+          "atom": "ND2",
+          "distance_to_BNZ_A": 20.250092,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "B",
+          "atom": "CA",
+          "distance_to_BNZ_A": 18.101996,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "B",
+          "atom": "CB",
+          "distance_to_BNZ_A": 19.384429,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "B",
+          "atom": "CG",
+          "distance_to_BNZ_A": 19.91346,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "B",
+          "atom": "OD1",
+          "distance_to_BNZ_A": 19.210822,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "B",
+          "atom": "ND2",
+          "distance_to_BNZ_A": 21.23395,
+          "nearest_ligand_atom": "C4"
+        }
+      ],
+      "comp_id": "ASN",
+      "label_seq_id": 68,
+      "maximum_matched_atom_A_to_B_displacement_A": 3.172592,
+      "mean_matched_atom_A_to_B_displacement_A": 1.465949,
+      "minimum_alt_atom_to_BNZ_heavy_A": 18.094552,
+      "occupancies_by_altloc": {
+        "A": [
+          0.7
+        ],
+        "B": [
+          0.3
+        ]
+      },
+      "within_8A_of_BNZ_heavy": false
+    },
+    {
+      "atom_names": [
+        "CA",
+        "CB",
+        "CG",
+        "OD1",
+        "OD2"
+      ],
+      "atomwise_distances": [
+        {
+          "altloc": "A",
+          "atom": "CA",
+          "distance_to_BNZ_A": 13.757546,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "A",
+          "atom": "CB",
+          "distance_to_BNZ_A": 15.25061,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "A",
+          "atom": "CG",
+          "distance_to_BNZ_A": 15.748754,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "A",
+          "atom": "OD1",
+          "distance_to_BNZ_A": 14.963701,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "A",
+          "atom": "OD2",
+          "distance_to_BNZ_A": 16.942868,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "B",
+          "atom": "CA",
+          "distance_to_BNZ_A": 13.74,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "B",
+          "atom": "CB",
+          "distance_to_BNZ_A": 15.219974,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "B",
+          "atom": "CG",
+          "distance_to_BNZ_A": 15.965244,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "B",
+          "atom": "OD1",
+          "distance_to_BNZ_A": 16.126287,
+          "nearest_ligand_atom": "C4"
+        },
+        {
+          "altloc": "B",
+          "atom": "OD2",
+          "distance_to_BNZ_A": 16.49131,
+          "nearest_ligand_atom": "C3"
+        }
+      ],
+      "comp_id": "ASP",
+      "label_seq_id": 72,
+      "maximum_matched_atom_A_to_B_displacement_A": 3.11545,
+      "mean_matched_atom_A_to_B_displacement_A": 1.211314,
+      "minimum_alt_atom_to_BNZ_heavy_A": 13.74,
+      "occupancies_by_altloc": {
+        "A": [
+          0.8
+        ],
+        "B": [
+          0.2
+        ]
+      },
+      "within_8A_of_BNZ_heavy": false
+    },
+    {
+      "atom_names": [
+        "CA",
+        "CB",
+        "CD",
+        "CG",
+        "CZ",
+        "NE",
+        "NH1",
+        "NH2"
+      ],
+      "atomwise_distances": [
+        {
+          "altloc": "A",
+          "atom": "CA",
+          "distance_to_BNZ_A": 10.976824,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "A",
+          "atom": "CB",
+          "distance_to_BNZ_A": 12.412864,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "A",
+          "atom": "CG",
+          "distance_to_BNZ_A": 13.347259,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "A",
+          "atom": "CD",
+          "distance_to_BNZ_A": 14.759862,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "A",
+          "atom": "NE",
+          "distance_to_BNZ_A": 15.844853,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "A",
+          "atom": "CZ",
+          "distance_to_BNZ_A": 15.829006,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "A",
+          "atom": "NH1",
+          "distance_to_BNZ_A": 17.005129,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "A",
+          "atom": "NH2",
+          "distance_to_BNZ_A": 14.752473,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "B",
+          "atom": "CA",
+          "distance_to_BNZ_A": 10.975264,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "B",
+          "atom": "CB",
+          "distance_to_BNZ_A": 12.425145,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "B",
+          "atom": "CG",
+          "distance_to_BNZ_A": 13.500795,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "B",
+          "atom": "CD",
+          "distance_to_BNZ_A": 13.885589,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "B",
+          "atom": "NE",
+          "distance_to_BNZ_A": 13.161904,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "B",
+          "atom": "CZ",
+          "distance_to_BNZ_A": 13.748579,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "B",
+          "atom": "NH1",
+          "distance_to_BNZ_A": 13.198161,
+          "nearest_ligand_atom": "C3"
+        },
+        {
+          "altloc": "B",
+          "atom": "NH2",
+          "distance_to_BNZ_A": 14.99346,
+          "nearest_ligand_atom": "C3"
+        }
+      ],
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "maximum_matched_atom_A_to_B_displacement_A": 5.283865,
+      "mean_matched_atom_A_to_B_displacement_A": 2.161448,
+      "minimum_alt_atom_to_BNZ_heavy_A": 10.975264,
+      "occupancies_by_altloc": {
+        "A": [
+          0.6
+        ],
+        "B": [
+          0.4
+        ]
+      },
+      "within_8A_of_BNZ_heavy": false
+    }
+  ],
+  "bnz_heavy_atom_count": 6,
+  "molecules_constructed": false,
+  "rdkit_imported": false,
+  "source_sha256": {
+    "3DMX.cif": "e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef",
+    "BNZ.cif": "01bcf7c3ce9befdb4078e9832252eb5fe99e2598f320f87358ea1a9a247f7c61"
+  },
+  "status": "PASS_SOURCE_ONLY_GEOMETRY_AUDIT"
+}
