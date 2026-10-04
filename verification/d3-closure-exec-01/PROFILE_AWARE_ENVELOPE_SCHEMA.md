@@ -4,9 +4,10 @@
 
 ## Profile manifest
 
-Use semantic schema `D3_3DMX_BNZ_PREPARATION_PROFILE_V1` and semantic version `1.0.0` for the immutable approved preparation profile. Its canonical payload binds:
+Use semantic schema `D3_3DMX_BNZ_PREPARATION_PROFILE_V1` for the immutable candidate profile. The original profile was semantic version `1.0.0`; the bounded source/profile completeness correction is semantic version `1.1.0` with profile ID `ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_1`. The v1.0 profile record remains preserved. The v1.1 canonical payload binds:
 
 - the frozen AUTH04 profile ID and exact approved state/component/H policies;
+- the explicit ASN68/ASP72/ARG76 altloc selections and the unchanged MET106/GLU108 selections;
 - DEC04 source-manifest digest and each selected source artifact digest;
 - pinned runtime and wheel identities/hashes;
 - exact AddHs API and parameters;

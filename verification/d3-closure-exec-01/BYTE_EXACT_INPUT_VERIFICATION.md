@@ -1,5 +1,7 @@
 # Byte-exact input verification
 
+**Continuation result (2026-10-05):** The byte-pinned 3DMX/BNZ inputs were verified again by each v1.1 preparation run before parsing. Both prepared outputs and the full-pose bundle bind the same hashes below. The predecessor stop note at the end of this file records the earlier v1.0 preflight and is historical.
+
 The six immutable DEC04 source artifacts in this closure package were checked on Windows and inside Ubuntu/WSL2 on 2026-10-04. The Windows and WSL SHA-256 values agree for all six files and match the committed DEC04 `SOURCE_MANIFEST.csv` byte lengths/digests. The source hashes were then checked again inside the Python adapter immediately before it parsed the mmCIF/CCD byte buffers; the same in-memory bytes were passed to the CIF parser. See `runtime_logs/linux/windows-source-hashes.json`, `runtime_logs/linux/wsl-source-hashes.txt`, and `runtime_logs/linux/source-altloc-preflight.json`.
 
 | Input | Bytes | SHA-256 | Windows | WSL2 | DEC04 manifest |

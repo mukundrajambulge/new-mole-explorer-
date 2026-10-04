@@ -1,0 +1,1156 @@
+{
+  "schemaVersion": 1,
+  "semanticSchemaId": "D2_PREPARED_LIGAND_STATE_V1",
+  "molecularIdentityDigest": "sha256:901ec876b1ebf49bce53076558f5c10822d90236cea0c137ae4864c3a6bbff57",
+  "graphRevisionDigest": "sha256:044cf8a72ac3906ead4b5fd2f1b1ae7ac1f6a8f07e72818ad231c317fa2012fd",
+  "chemicalStateDigest": "sha256:be91b4a856434cb0ae2192478c3c8f5f7d6bc8128365b2da25997f130164c779",
+  "coordinateStateDigest": "sha256:6867f7bdf67192bcf16ccd11e730a61a7deb2d1e83eae5f13fd16249a8dcac95",
+  "selectedComponentId": "component:7a4119cd14727459cbe42552",
+  "atomTyping": [
+    {
+      "atomUid": "atom:f9fb0bade61665c9f79247fdb6be904f",
+      "typeId": "C_H",
+      "chargeModel": "AUTH04_EXPLICIT_STATE_NO_IMPORTED_PARTIAL_CHARGE",
+      "evidenceRef": "AUTH04 owner-approved chemical-state policy and residue identity list; exact attachment SHA-256 f4526524331f33e6e0055a4cddeac083dba2aedeec52421d89d161f31c95688d; ME_XS_TYPING_V1_1_0; atom:C1"
+    },
+    {
+      "atomUid": "atom:3381a1159a49ccb7169565715acf9bf1",
+      "typeId": "C_H",
+      "chargeModel": "AUTH04_EXPLICIT_STATE_NO_IMPORTED_PARTIAL_CHARGE",
+      "evidenceRef": "AUTH04 owner-approved chemical-state policy and residue identity list; exact attachment SHA-256 f4526524331f33e6e0055a4cddeac083dba2aedeec52421d89d161f31c95688d; ME_XS_TYPING_V1_1_0; atom:C2"
+    },
+    {
+      "atomUid": "atom:adc3ab7279c8bf56fac811b71dd088e6",
+      "typeId": "C_H",
+      "chargeModel": "AUTH04_EXPLICIT_STATE_NO_IMPORTED_PARTIAL_CHARGE",
+      "evidenceRef": "AUTH04 owner-approved chemical-state policy and residue identity list; exact attachment SHA-256 f4526524331f33e6e0055a4cddeac083dba2aedeec52421d89d161f31c95688d; ME_XS_TYPING_V1_1_0; atom:C3"
+    },
+    {
+      "atomUid": "atom:abebf62ea85988f2794f6dde6a6ffe82",
+      "typeId": "C_H",
+      "chargeModel": "AUTH04_EXPLICIT_STATE_NO_IMPORTED_PARTIAL_CHARGE",
+      "evidenceRef": "AUTH04 owner-approved chemical-state policy and residue identity list; exact attachment SHA-256 f4526524331f33e6e0055a4cddeac083dba2aedeec52421d89d161f31c95688d; ME_XS_TYPING_V1_1_0; atom:C4"
+    },
+    {
+      "atomUid": "atom:89aa26341556744504307d07c7cd6c4b",
+      "typeId": "C_H",
+      "chargeModel": "AUTH04_EXPLICIT_STATE_NO_IMPORTED_PARTIAL_CHARGE",
+      "evidenceRef": "AUTH04 owner-approved chemical-state policy and residue identity list; exact attachment SHA-256 f4526524331f33e6e0055a4cddeac083dba2aedeec52421d89d161f31c95688d; ME_XS_TYPING_V1_1_0; atom:C5"
+    },
+    {
+      "atomUid": "atom:3d451c2da7d3198e386a93ffcaf91c5d",
+      "typeId": "C_H",
+      "chargeModel": "AUTH04_EXPLICIT_STATE_NO_IMPORTED_PARTIAL_CHARGE",
+      "evidenceRef": "AUTH04 owner-approved chemical-state policy and residue identity list; exact attachment SHA-256 f4526524331f33e6e0055a4cddeac083dba2aedeec52421d89d161f31c95688d; ME_XS_TYPING_V1_1_0; atom:C6"
+    },
+    {
+      "atomUid": "atom:578790e593f3becdcbd7f08227bc3bd9",
+      "typeId": "H_EXCLUDED_FROM_XS_SCORING",
+      "chargeModel": "AUTH04_EXPLICIT_FORMAL_CHARGE_NO_PARTIAL_CHARGE_SCORING",
+      "evidenceRef": "HYDROGEN_PROVENANCE.json"
+    },
+    {
+      "atomUid": "atom:07262f5216ec0079599066926cc542f1",
+      "typeId": "H_EXCLUDED_FROM_XS_SCORING",
+      "chargeModel": "AUTH04_EXPLICIT_FORMAL_CHARGE_NO_PARTIAL_CHARGE_SCORING",
+      "evidenceRef": "HYDROGEN_PROVENANCE.json"
+    },
+    {
+      "atomUid": "atom:48e560855f7e193ce20dd55526adb045",
+      "typeId": "H_EXCLUDED_FROM_XS_SCORING",
+      "chargeModel": "AUTH04_EXPLICIT_FORMAL_CHARGE_NO_PARTIAL_CHARGE_SCORING",
+      "evidenceRef": "HYDROGEN_PROVENANCE.json"
+    },
+    {
+      "atomUid": "atom:1a5b3a59dba2dd397134e6b9bed90bf7",
+      "typeId": "H_EXCLUDED_FROM_XS_SCORING",
+      "chargeModel": "AUTH04_EXPLICIT_FORMAL_CHARGE_NO_PARTIAL_CHARGE_SCORING",
+      "evidenceRef": "HYDROGEN_PROVENANCE.json"
+    },
+    {
+      "atomUid": "atom:f441a3a674bec82286e90ee6a5d98742",
+      "typeId": "H_EXCLUDED_FROM_XS_SCORING",
+      "chargeModel": "AUTH04_EXPLICIT_FORMAL_CHARGE_NO_PARTIAL_CHARGE_SCORING",
+      "evidenceRef": "HYDROGEN_PROVENANCE.json"
+    },
+    {
+      "atomUid": "atom:e62f162e18e26dd3ef944152bb0352fa",
+      "typeId": "H_EXCLUDED_FROM_XS_SCORING",
+      "chargeModel": "AUTH04_EXPLICIT_FORMAL_CHARGE_NO_PARTIAL_CHARGE_SCORING",
+      "evidenceRef": "HYDROGEN_PROVENANCE.json"
+    }
+  ],
+  "kinematicModelDigest": "sha256:d42acf577c438f3477a73718ee8797b48f4e3914e021b0f9b955266310f005d5",
+  "profileId": "ME_DOCKING_V1_LIGAND_EXPLICIT_STATE_1_0",
+  "preparedStateId": "prepared-ligand:27973260b5e851a1",
+  "molecularIdentity": {
+    "schemaVersion": 1,
+    "semanticSchemaId": "D2_MOLECULAR_IDENTITY_V1",
+    "graphRevisionDigest": "sha256:044cf8a72ac3906ead4b5fd2f1b1ae7ac1f6a8f07e72818ad231c317fa2012fd",
+    "sourceArtifactRefs": [
+      {
+        "sourceArtifactId": "source:3DMX-byte-exact-coordinate-state",
+        "artifactByteDigest": "sha256:e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef"
+      }
+    ],
+    "identityId": "molecular:ae4864c3a6bbff57",
+    "digest": "sha256:901ec876b1ebf49bce53076558f5c10822d90236cea0c137ae4864c3a6bbff57"
+  },
+  "graphRevision": {
+    "schemaVersion": 1,
+    "semanticSchemaId": "D2_MOLECULAR_GRAPH_REVISION_V1",
+    "atoms": [
+      {
+        "atomUid": "atom:f9fb0bade61665c9f79247fdb6be904f",
+        "element": "C",
+        "atomName": "C1",
+        "componentId": "component:7a4119cd14727459cbe42552",
+        "formalCharge": 0,
+        "aliases": [
+          {
+            "sourceNamespace": "MMCIF_AUTH",
+            "sourceSerial": 1363,
+            "sourceIndex": 0,
+            "chainId": "A",
+            "residueId": "BNZ:900:",
+            "atomName": "C1"
+          },
+          {
+            "sourceNamespace": "MMCIF_LABEL",
+            "sourceSerial": 1363,
+            "sourceIndex": 0,
+            "chainId": "G",
+            "residueId": "BNZ:G:900",
+            "atomName": "C1"
+          }
+        ]
+      },
+      {
+        "atomUid": "atom:3381a1159a49ccb7169565715acf9bf1",
+        "element": "C",
+        "atomName": "C2",
+        "componentId": "component:7a4119cd14727459cbe42552",
+        "formalCharge": 0,
+        "aliases": [
+          {
+            "sourceNamespace": "MMCIF_AUTH",
+            "sourceSerial": 1364,
+            "sourceIndex": 1,
+            "chainId": "A",
+            "residueId": "BNZ:900:",
+            "atomName": "C2"
+          },
+          {
+            "sourceNamespace": "MMCIF_LABEL",
+            "sourceSerial": 1364,
+            "sourceIndex": 1,
+            "chainId": "G",
+            "residueId": "BNZ:G:900",
+            "atomName": "C2"
+          }
+        ]
+      },
+      {
+        "atomUid": "atom:adc3ab7279c8bf56fac811b71dd088e6",
+        "element": "C",
+        "atomName": "C3",
+        "componentId": "component:7a4119cd14727459cbe42552",
+        "formalCharge": 0,
+        "aliases": [
+          {
+            "sourceNamespace": "MMCIF_AUTH",
+            "sourceSerial": 1365,
+            "sourceIndex": 2,
+            "chainId": "A",
+            "residueId": "BNZ:900:",
+            "atomName": "C3"
+          },
+          {
+            "sourceNamespace": "MMCIF_LABEL",
+            "sourceSerial": 1365,
+            "sourceIndex": 2,
+            "chainId": "G",
+            "residueId": "BNZ:G:900",
+            "atomName": "C3"
+          }
+        ]
+      },
+      {
+        "atomUid": "atom:abebf62ea85988f2794f6dde6a6ffe82",
+        "element": "C",
+        "atomName": "C4",
+        "componentId": "component:7a4119cd14727459cbe42552",
+        "formalCharge": 0,
+        "aliases": [
+          {
+            "sourceNamespace": "MMCIF_AUTH",
+            "sourceSerial": 1366,
+            "sourceIndex": 3,
+            "chainId": "A",
+            "residueId": "BNZ:900:",
+            "atomName": "C4"
+          },
+          {
+            "sourceNamespace": "MMCIF_LABEL",
+            "sourceSerial": 1366,
+            "sourceIndex": 3,
+            "chainId": "G",
+            "residueId": "BNZ:G:900",
+            "atomName": "C4"
+          }
+        ]
+      },
+      {
+        "atomUid": "atom:89aa26341556744504307d07c7cd6c4b",
+        "element": "C",
+        "atomName": "C5",
+        "componentId": "component:7a4119cd14727459cbe42552",
+        "formalCharge": 0,
+        "aliases": [
+          {
+            "sourceNamespace": "MMCIF_AUTH",
+            "sourceSerial": 1367,
+            "sourceIndex": 4,
+            "chainId": "A",
+            "residueId": "BNZ:900:",
+            "atomName": "C5"
+          },
+          {
+            "sourceNamespace": "MMCIF_LABEL",
+            "sourceSerial": 1367,
+            "sourceIndex": 4,
+            "chainId": "G",
+            "residueId": "BNZ:G:900",
+            "atomName": "C5"
+          }
+        ]
+      },
+      {
+        "atomUid": "atom:3d451c2da7d3198e386a93ffcaf91c5d",
+        "element": "C",
+        "atomName": "C6",
+        "componentId": "component:7a4119cd14727459cbe42552",
+        "formalCharge": 0,
+        "aliases": [
+          {
+            "sourceNamespace": "MMCIF_AUTH",
+            "sourceSerial": 1368,
+            "sourceIndex": 5,
+            "chainId": "A",
+            "residueId": "BNZ:900:",
+            "atomName": "C6"
+          },
+          {
+            "sourceNamespace": "MMCIF_LABEL",
+            "sourceSerial": 1368,
+            "sourceIndex": 5,
+            "chainId": "G",
+            "residueId": "BNZ:G:900",
+            "atomName": "C6"
+          }
+        ]
+      },
+      {
+        "atomUid": "atom:578790e593f3becdcbd7f08227bc3bd9",
+        "element": "H",
+        "atomName": "H1",
+        "componentId": "component:7a4119cd14727459cbe42552",
+        "formalCharge": 0,
+        "aliases": [
+          {
+            "sourceNamespace": "INTERNAL",
+            "sourceIndex": 6,
+            "chainId": "A",
+            "residueId": "BNZ:900",
+            "atomName": "H1"
+          }
+        ]
+      },
+      {
+        "atomUid": "atom:07262f5216ec0079599066926cc542f1",
+        "element": "H",
+        "atomName": "H2",
+        "componentId": "component:7a4119cd14727459cbe42552",
+        "formalCharge": 0,
+        "aliases": [
+          {
+            "sourceNamespace": "INTERNAL",
+            "sourceIndex": 7,
+            "chainId": "A",
+            "residueId": "BNZ:900",
+            "atomName": "H2"
+          }
+        ]
+      },
+      {
+        "atomUid": "atom:48e560855f7e193ce20dd55526adb045",
+        "element": "H",
+        "atomName": "H3",
+        "componentId": "component:7a4119cd14727459cbe42552",
+        "formalCharge": 0,
+        "aliases": [
+          {
+            "sourceNamespace": "INTERNAL",
+            "sourceIndex": 8,
+            "chainId": "A",
+            "residueId": "BNZ:900",
+            "atomName": "H3"
+          }
+        ]
+      },
+      {
+        "atomUid": "atom:1a5b3a59dba2dd397134e6b9bed90bf7",
+        "element": "H",
+        "atomName": "H4",
+        "componentId": "component:7a4119cd14727459cbe42552",
+        "formalCharge": 0,
+        "aliases": [
+          {
+            "sourceNamespace": "INTERNAL",
+            "sourceIndex": 9,
+            "chainId": "A",
+            "residueId": "BNZ:900",
+            "atomName": "H4"
+          }
+        ]
+      },
+      {
+        "atomUid": "atom:f441a3a674bec82286e90ee6a5d98742",
+        "element": "H",
+        "atomName": "H5",
+        "componentId": "component:7a4119cd14727459cbe42552",
+        "formalCharge": 0,
+        "aliases": [
+          {
+            "sourceNamespace": "INTERNAL",
+            "sourceIndex": 10,
+            "chainId": "A",
+            "residueId": "BNZ:900",
+            "atomName": "H5"
+          }
+        ]
+      },
+      {
+        "atomUid": "atom:e62f162e18e26dd3ef944152bb0352fa",
+        "element": "H",
+        "atomName": "H6",
+        "componentId": "component:7a4119cd14727459cbe42552",
+        "formalCharge": 0,
+        "aliases": [
+          {
+            "sourceNamespace": "INTERNAL",
+            "sourceIndex": 11,
+            "chainId": "A",
+            "residueId": "BNZ:900",
+            "atomName": "H6"
+          }
+        ]
+      }
+    ],
+    "bonds": [
+      {
+        "bondUid": "bond:4ce80136d78b1e875f0bee18c0b26e18",
+        "atom1Uid": "atom:f9fb0bade61665c9f79247fdb6be904f",
+        "atom2Uid": "atom:3381a1159a49ccb7169565715acf9bf1",
+        "order": "AROMATIC",
+        "evidence": "SOURCE_EXPLICIT",
+        "sourceRef": "heavy:0:G:900:BNZ:C1:G:900:BNZ:C2"
+      },
+      {
+        "bondUid": "bond:ccc144622e5943850114df2e60253d6d",
+        "atom1Uid": "atom:f9fb0bade61665c9f79247fdb6be904f",
+        "atom2Uid": "atom:3d451c2da7d3198e386a93ffcaf91c5d",
+        "order": "AROMATIC",
+        "evidence": "SOURCE_EXPLICIT",
+        "sourceRef": "heavy:1:G:900:BNZ:C1:G:900:BNZ:C6"
+      },
+      {
+        "bondUid": "bond:ed1ae73017346ffcd7b7ed398103c51b",
+        "atom1Uid": "atom:3381a1159a49ccb7169565715acf9bf1",
+        "atom2Uid": "atom:adc3ab7279c8bf56fac811b71dd088e6",
+        "order": "AROMATIC",
+        "evidence": "SOURCE_EXPLICIT",
+        "sourceRef": "heavy:2:G:900:BNZ:C2:G:900:BNZ:C3"
+      },
+      {
+        "bondUid": "bond:31e33efbc081a27cbc88c46784594ffc",
+        "atom1Uid": "atom:adc3ab7279c8bf56fac811b71dd088e6",
+        "atom2Uid": "atom:abebf62ea85988f2794f6dde6a6ffe82",
+        "order": "AROMATIC",
+        "evidence": "SOURCE_EXPLICIT",
+        "sourceRef": "heavy:3:G:900:BNZ:C3:G:900:BNZ:C4"
+      },
+      {
+        "bondUid": "bond:0e69bb0840673b7097adc16d7379042f",
+        "atom1Uid": "atom:abebf62ea85988f2794f6dde6a6ffe82",
+        "atom2Uid": "atom:89aa26341556744504307d07c7cd6c4b",
+        "order": "AROMATIC",
+        "evidence": "SOURCE_EXPLICIT",
+        "sourceRef": "heavy:4:G:900:BNZ:C4:G:900:BNZ:C5"
+      },
+      {
+        "bondUid": "bond:f8be8c16bde73d046b1f1821d471053f",
+        "atom1Uid": "atom:89aa26341556744504307d07c7cd6c4b",
+        "atom2Uid": "atom:3d451c2da7d3198e386a93ffcaf91c5d",
+        "order": "AROMATIC",
+        "evidence": "SOURCE_EXPLICIT",
+        "sourceRef": "heavy:5:G:900:BNZ:C5:G:900:BNZ:C6"
+      },
+      {
+        "bondUid": "bond:cc16ce1cfc7a9c73d360f1b3f4f3ae27",
+        "atom1Uid": "atom:f9fb0bade61665c9f79247fdb6be904f",
+        "atom2Uid": "atom:578790e593f3becdcbd7f08227bc3bd9",
+        "order": "SINGLE",
+        "evidence": "SOURCE_INFERRED",
+        "sourceRef": "generated-h:0:ligand|G:900:BNZ:C1|H1|1"
+      },
+      {
+        "bondUid": "bond:dc407d6301ba960a1a47b46c6b6aab25",
+        "atom1Uid": "atom:3381a1159a49ccb7169565715acf9bf1",
+        "atom2Uid": "atom:07262f5216ec0079599066926cc542f1",
+        "order": "SINGLE",
+        "evidence": "SOURCE_INFERRED",
+        "sourceRef": "generated-h:1:ligand|G:900:BNZ:C2|H2|1"
+      },
+      {
+        "bondUid": "bond:590df030b27d7cb96a3c11153bba4141",
+        "atom1Uid": "atom:adc3ab7279c8bf56fac811b71dd088e6",
+        "atom2Uid": "atom:48e560855f7e193ce20dd55526adb045",
+        "order": "SINGLE",
+        "evidence": "SOURCE_INFERRED",
+        "sourceRef": "generated-h:2:ligand|G:900:BNZ:C3|H3|1"
+      },
+      {
+        "bondUid": "bond:89a040530712ded18e4d0d7738d3e56e",
+        "atom1Uid": "atom:abebf62ea85988f2794f6dde6a6ffe82",
+        "atom2Uid": "atom:1a5b3a59dba2dd397134e6b9bed90bf7",
+        "order": "SINGLE",
+        "evidence": "SOURCE_INFERRED",
+        "sourceRef": "generated-h:3:ligand|G:900:BNZ:C4|H4|1"
+      },
+      {
+        "bondUid": "bond:e5e27859b17ba49648200075d238abab",
+        "atom1Uid": "atom:89aa26341556744504307d07c7cd6c4b",
+        "atom2Uid": "atom:f441a3a674bec82286e90ee6a5d98742",
+        "order": "SINGLE",
+        "evidence": "SOURCE_INFERRED",
+        "sourceRef": "generated-h:4:ligand|G:900:BNZ:C5|H5|1"
+      },
+      {
+        "bondUid": "bond:140e20fabba6b2457b21e0ba607ac5a6",
+        "atom1Uid": "atom:3d451c2da7d3198e386a93ffcaf91c5d",
+        "atom2Uid": "atom:e62f162e18e26dd3ef944152bb0352fa",
+        "order": "SINGLE",
+        "evidence": "SOURCE_INFERRED",
+        "sourceRef": "generated-h:5:ligand|G:900:BNZ:C6|H6|1"
+      }
+    ],
+    "components": [
+      {
+        "componentId": "component:7a4119cd14727459cbe42552",
+        "role": "LIGAND",
+        "atomUids": [
+          "atom:f9fb0bade61665c9f79247fdb6be904f",
+          "atom:3381a1159a49ccb7169565715acf9bf1",
+          "atom:adc3ab7279c8bf56fac811b71dd088e6",
+          "atom:abebf62ea85988f2794f6dde6a6ffe82",
+          "atom:89aa26341556744504307d07c7cd6c4b",
+          "atom:3d451c2da7d3198e386a93ffcaf91c5d",
+          "atom:578790e593f3becdcbd7f08227bc3bd9",
+          "atom:07262f5216ec0079599066926cc542f1",
+          "atom:48e560855f7e193ce20dd55526adb045",
+          "atom:1a5b3a59dba2dd397134e6b9bed90bf7",
+          "atom:f441a3a674bec82286e90ee6a5d98742",
+          "atom:e62f162e18e26dd3ef944152bb0352fa"
+        ],
+        "sourceRefs": [
+          "component:A\u0000BNZ\u0000900\u0000"
+        ]
+      }
+    ],
+    "sourceArtifactIds": [
+      "source:3DMX-byte-exact-coordinate-state"
+    ],
+    "revisionId": "graph:d231c317fa2012fd",
+    "digest": "sha256:044cf8a72ac3906ead4b5fd2f1b1ae7ac1f6a8f07e72818ad231c317fa2012fd"
+  },
+  "chemicalState": {
+    "schemaVersion": 1,
+    "semanticSchemaId": "D2_CHEMICAL_STATE_V1",
+    "molecularIdentityDigest": "sha256:901ec876b1ebf49bce53076558f5c10822d90236cea0c137ae4864c3a6bbff57",
+    "resolution": "EXPLICIT_DERIVED_PROFILE",
+    "protonationStatus": "NOT_APPLICABLE",
+    "tautomerStatus": "NOT_APPLICABLE",
+    "formalCharges": {
+      "atom:f9fb0bade61665c9f79247fdb6be904f": 0,
+      "atom:3381a1159a49ccb7169565715acf9bf1": 0,
+      "atom:adc3ab7279c8bf56fac811b71dd088e6": 0,
+      "atom:abebf62ea85988f2794f6dde6a6ffe82": 0,
+      "atom:89aa26341556744504307d07c7cd6c4b": 0,
+      "atom:3d451c2da7d3198e386a93ffcaf91c5d": 0,
+      "atom:578790e593f3becdcbd7f08227bc3bd9": 0,
+      "atom:07262f5216ec0079599066926cc542f1": 0,
+      "atom:48e560855f7e193ce20dd55526adb045": 0,
+      "atom:1a5b3a59dba2dd397134e6b9bed90bf7": 0,
+      "atom:f441a3a674bec82286e90ee6a5d98742": 0,
+      "atom:e62f162e18e26dd3ef944152bb0352fa": 0
+    },
+    "stereo": [],
+    "selectedComponentIds": [
+      "component:7a4119cd14727459cbe42552"
+    ],
+    "sourceEvidenceRefs": [
+      "e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef",
+      "01bcf7c3ce9befdb4078e9832252eb5fe99e2598f320f87358ea1a9a247f7c61",
+      "AUTH04_OWNER_APPROVED_STATE_POLICY"
+    ],
+    "stateId": "chemical:25997f130164c779",
+    "digest": "sha256:be91b4a856434cb0ae2192478c3c8f5f7d6bc8128365b2da25997f130164c779"
+  },
+  "coordinateState": {
+    "schemaVersion": 1,
+    "semanticSchemaId": "D2_COORDINATE_STATE_V1",
+    "chemicalStateDigest": "sha256:be91b4a856434cb0ae2192478c3c8f5f7d6bc8128365b2da25997f130164c779",
+    "sourceModelNumber": 1,
+    "coordinateFrame": "receptor-source-frame",
+    "coordinateUnits": "ANGSTROM",
+    "dimensionality": 3,
+    "origin": [
+      {
+        "tag": "f64",
+        "bytes": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0
+        }
+      },
+      {
+        "tag": "f64",
+        "bytes": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0
+        }
+      },
+      {
+        "tag": "f64",
+        "bytes": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0
+        }
+      }
+    ],
+    "coordinates": {
+      "atom:f9fb0bade61665c9f79247fdb6be904f": [
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 58,
+            "2": 160,
+            "3": 65,
+            "4": 137,
+            "5": 55,
+            "6": 75,
+            "7": 199
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 21,
+            "2": 81,
+            "3": 235,
+            "4": 133,
+            "5": 30,
+            "6": 184,
+            "7": 82
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 8,
+            "2": 151,
+            "3": 141,
+            "4": 79,
+            "5": 223,
+            "6": 59,
+            "7": 100
+          }
+        }
+      ],
+      "atom:3381a1159a49ccb7169565715acf9bf1": [
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 57,
+            "2": 208,
+            "3": 229,
+            "4": 96,
+            "5": 65,
+            "6": 137,
+            "7": 55
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 20,
+            "2": 63,
+            "3": 124,
+            "4": 237,
+            "5": 145,
+            "6": 104,
+            "7": 115
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 16,
+            "2": 184,
+            "3": 81,
+            "4": 235,
+            "5": 133,
+            "6": 30,
+            "7": 184
+          }
+        }
+      ],
+      "atom:adc3ab7279c8bf56fac811b71dd088e6": [
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 57,
+            "2": 208,
+            "3": 32,
+            "4": 196,
+            "5": 155,
+            "6": 165,
+            "7": 227
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 23,
+            "2": 178,
+            "3": 45,
+            "4": 14,
+            "5": 86,
+            "6": 4,
+            "7": 25
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 21,
+            "2": 29,
+            "3": 178,
+            "4": 45,
+            "5": 14,
+            "6": 86,
+            "7": 4
+          }
+        }
+      ],
+      "atom:abebf62ea85988f2794f6dde6a6ffe82": [
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 58,
+            "2": 157,
+            "3": 243,
+            "4": 182,
+            "5": 69,
+            "6": 161,
+            "7": 203
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 28,
+            "2": 66,
+            "3": 143,
+            "4": 92,
+            "5": 40,
+            "6": 245,
+            "7": 195
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 21,
+            "2": 20,
+            "3": 122,
+            "4": 225,
+            "5": 71,
+            "6": 174,
+            "7": 20
+          }
+        }
+      ],
+      "atom:89aa26341556744504307d07c7cd6c4b": [
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 59,
+            "2": 109,
+            "3": 210,
+            "4": 241,
+            "5": 169,
+            "6": 251,
+            "7": 231
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 29,
+            "2": 80,
+            "3": 229,
+            "4": 96,
+            "5": 65,
+            "6": 137,
+            "7": 55
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 16,
+            "2": 169,
+            "3": 251,
+            "4": 231,
+            "5": 108,
+            "6": 139,
+            "7": 68
+          }
+        }
+      ],
+      "atom:3d451c2da7d3198e386a93ffcaf91c5d": [
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 59,
+            "2": 110,
+            "3": 151,
+            "4": 141,
+            "5": 79,
+            "6": 223,
+            "7": 59
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 25,
+            "2": 223,
+            "3": 59,
+            "4": 100,
+            "5": 90,
+            "6": 28,
+            "7": 172
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 8,
+            "2": 135,
+            "3": 43,
+            "4": 2,
+            "5": 12,
+            "6": 73,
+            "7": 186
+          }
+        }
+      ],
+      "atom:578790e593f3becdcbd7f08227bc3bd9": [
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 58,
+            "2": 160,
+            "3": 202,
+            "4": 230,
+            "5": 38,
+            "6": 235,
+            "7": 218
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 18,
+            "2": 149,
+            "3": 117,
+            "4": 216,
+            "5": 231,
+            "6": 93,
+            "7": 162
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 1,
+            "2": 179,
+            "3": 81,
+            "4": 236,
+            "5": 219,
+            "6": 218,
+            "7": 180
+          }
+        }
+      ],
+      "atom:07262f5216ec0079599066926cc542f1": [
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 57,
+            "2": 45,
+            "3": 63,
+            "4": 62,
+            "5": 210,
+            "6": 35,
+            "7": 26
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 16,
+            "2": 170,
+            "3": 214,
+            "4": 40,
+            "5": 228,
+            "6": 136,
+            "7": 196
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 16,
+            "2": 189,
+            "3": 237,
+            "4": 153,
+            "5": 83,
+            "6": 29,
+            "7": 74
+          }
+        }
+      ],
+      "atom:48e560855f7e193ce20dd55526adb045": [
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 57,
+            "2": 45,
+            "3": 158,
+            "4": 177,
+            "5": 148,
+            "6": 167,
+            "7": 137
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 22,
+            "2": 209,
+            "3": 0,
+            "4": 151,
+            "5": 154,
+            "6": 253,
+            "7": 230
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 24,
+            "2": 153,
+            "3": 159,
+            "4": 46,
+            "5": 94,
+            "6": 217,
+            "7": 49
+          }
+        }
+      ],
+      "atom:1a5b3a59dba2dd397134e6b9bed90bf7": [
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 58,
+            "2": 156,
+            "3": 83,
+            "4": 17,
+            "5": 221,
+            "6": 117,
+            "7": 150
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 31,
+            "2": 2,
+            "3": 158,
+            "4": 116,
+            "5": 55,
+            "6": 121,
+            "7": 190
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 24,
+            "2": 131,
+            "3": 180,
+            "4": 84,
+            "5": 16,
+            "6": 118,
+            "7": 202
+          }
+        }
+      ],
+      "atom:f441a3a674bec82286e90ee6a5d98742": [
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 60,
+            "2": 18,
+            "3": 77,
+            "4": 179,
+            "5": 176,
+            "6": 40,
+            "7": 152
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 32,
+            "2": 113,
+            "3": 150,
+            "4": 71,
+            "5": 29,
+            "6": 254,
+            "7": 211
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 16,
+            "2": 165,
+            "3": 239,
+            "4": 49,
+            "5": 127,
+            "6": 9,
+            "7": 109
+          }
+        }
+      ],
+      "atom:e62f162e18e26dd3ef944152bb0352fa": [
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 60,
+            "2": 17,
+            "3": 128,
+            "4": 11,
+            "5": 182,
+            "6": 130,
+            "7": 184
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 26,
+            "2": 191,
+            "3": 133,
+            "4": 194,
+            "5": 214,
+            "6": 126,
+            "7": 7
+          }
+        },
+        {
+          "tag": "f64",
+          "bytes": {
+            "0": 64,
+            "1": 1,
+            "2": 145,
+            "3": 53,
+            "4": 50,
+            "5": 173,
+            "6": 31,
+            "7": 199
+          }
+        }
+      ]
+    },
+    "sourceArtifactRefs": [
+      "sha256:e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef"
+    ],
+    "stateId": "coordinates:3fd16249a8dcac95",
+    "digest": "sha256:6867f7bdf67192bcf16ccd11e730a61a7deb2d1e83eae5f13fd16249a8dcac95"
+  },
+  "kinematicModel": {
+    "schemaVersion": 1,
+    "semanticSchemaId": "D2_LIGAND_KINEMATIC_MODEL_V1",
+    "molecularIdentityDigest": "sha256:901ec876b1ebf49bce53076558f5c10822d90236cea0c137ae4864c3a6bbff57",
+    "rootAtomUid": "atom:f9fb0bade61665c9f79247fdb6be904f",
+    "fragments": [
+      {
+        "fragmentId": "bnz-rigid-aromatic",
+        "atomUids": [
+          "atom:f9fb0bade61665c9f79247fdb6be904f",
+          "atom:3381a1159a49ccb7169565715acf9bf1",
+          "atom:adc3ab7279c8bf56fac811b71dd088e6",
+          "atom:abebf62ea85988f2794f6dde6a6ffe82",
+          "atom:89aa26341556744504307d07c7cd6c4b",
+          "atom:3d451c2da7d3198e386a93ffcaf91c5d",
+          "atom:578790e593f3becdcbd7f08227bc3bd9",
+          "atom:07262f5216ec0079599066926cc542f1",
+          "atom:48e560855f7e193ce20dd55526adb045",
+          "atom:1a5b3a59dba2dd397134e6b9bed90bf7",
+          "atom:f441a3a674bec82286e90ee6a5d98742",
+          "atom:e62f162e18e26dd3ef944152bb0352fa"
+        ]
+      }
+    ],
+    "rotatableEdges": [],
+    "searchTorsionCount": 0,
+    "scorerTorsionCount": 0,
+    "profileId": "ME_DOCKING_V1_KINEMATIC_MODEL_1_0",
+    "modelId": "kinematic:b955266310f005d5",
+    "provenance": {
+      "schemaVersion": 1,
+      "semanticSchemaId": "D2_PROVENANCE_RECORD_V1",
+      "operation": "SEAL_LIGAND_KINEMATIC_MODEL",
+      "softwareRef": "molecular-workstation-d2",
+      "profileId": "ME_DOCKING_V1_KINEMATIC_MODEL_1_0",
+      "inputDigests": [
+        "sha256:044cf8a72ac3906ead4b5fd2f1b1ae7ac1f6a8f07e72818ad231c317fa2012fd",
+        "sha256:901ec876b1ebf49bce53076558f5c10822d90236cea0c137ae4864c3a6bbff57"
+      ],
+      "sourceArtifactRefs": [
+        "source:3DMX-byte-exact-coordinate-state"
+      ],
+      "mappingRefs": [
+        "sha256:044cf8a72ac3906ead4b5fd2f1b1ae7ac1f6a8f07e72818ad231c317fa2012fd"
+      ],
+      "informationLoss": [
+        {
+          "field": "search_torsion_count",
+          "status": "DERIVED",
+          "explanation": "Counted only explicit admissible rotatable edges."
+        },
+        {
+          "field": "scorer_torsion_count",
+          "status": "DERIVED",
+          "explanation": "Scorer torsion accounting remains distinct from search torsions."
+        }
+      ],
+      "recordId": "provenance:def3eab6955a2dbd",
+      "digest": "sha256:6d6ccf117f43e9b8354fd5e95d59e057d32b22d2494c4cd1def3eab6955a2dbd"
+    },
+    "digest": "sha256:d42acf577c438f3477a73718ee8797b48f4e3914e021b0f9b955266310f005d5"
+  },
+  "provenance": {
+    "schemaVersion": 1,
+    "semanticSchemaId": "D2_PROVENANCE_RECORD_V1",
+    "operation": "SEAL_PREPARED_LIGAND_STATE",
+    "softwareRef": "molecular-workstation-d2",
+    "profileId": "ME_DOCKING_V1_LIGAND_EXPLICIT_STATE_1_0",
+    "inputDigests": [
+      "sha256:901ec876b1ebf49bce53076558f5c10822d90236cea0c137ae4864c3a6bbff57",
+      "sha256:044cf8a72ac3906ead4b5fd2f1b1ae7ac1f6a8f07e72818ad231c317fa2012fd",
+      "sha256:be91b4a856434cb0ae2192478c3c8f5f7d6bc8128365b2da25997f130164c779",
+      "sha256:6867f7bdf67192bcf16ccd11e730a61a7deb2d1e83eae5f13fd16249a8dcac95",
+      "sha256:d42acf577c438f3477a73718ee8797b48f4e3914e021b0f9b955266310f005d5"
+    ],
+    "sourceArtifactRefs": [
+      "source:3DMX-byte-exact-coordinate-state"
+    ],
+    "mappingRefs": [
+      "sha256:044cf8a72ac3906ead4b5fd2f1b1ae7ac1f6a8f07e72818ad231c317fa2012fd"
+    ],
+    "informationLoss": [
+      {
+        "field": "chemical_state_generation",
+        "status": "PRESERVED",
+        "explanation": "Only the explicit supplied ChemicalState is admitted."
+      },
+      {
+        "field": "coordinate_state_generation",
+        "status": "PRESERVED",
+        "explanation": "Only the explicit supplied finite 3D CoordinateState is admitted."
+      }
+    ],
+    "recordId": "provenance:b65bde4391ef3b32",
+    "digest": "sha256:6ef4cb83da311f060740f735064eaec2faa1d7814c9e1bc8b65bde4391ef3b32"
+  },
+  "digest": "sha256:65e8b07631df6cc83800b31bf7682b420fce282cadaf3b2427973260b5e851a1"
+}

@@ -23,7 +23,7 @@
 
 The Linux wheel is a different platform binary and has its own recorded SHA-256 and extension hashes. No claim is made that platform-specific floating-point implementations generate bitwise-identical hydrogen coordinates across Windows and Linux. The authorized scientific contract requires unchanged source heavy-atom coordinate bits and deterministic replay in the chosen Linux environment; the fixture will record both replay digests. The source input byte hashes must match across Windows and WSL immediately before parsing. The approved chemical graph/state and API arguments are unchanged.
 
-This review covers the bounded runtime/API relocation and synthetic operation only. The exact source hash-gated CIF preflight later discovered additional unresolved A/B states at ASN68, ASP72, and ARG76. The frozen profile does not resolve these groups, so no fixture-derived molecule was supplied to RDKit and no fixture `AddHs` operation is authorized under the current profile. See `SOURCE_PROFILE_MISMATCH.md`.
+This review covers the bounded runtime/API relocation and synthetic operation only. At the time of that review, the exact source hash-gated CIF preflight had discovered unresolved A/B states at ASN68, ASP72, and ARG76. The later profile v1.1 continuation resolved those states under separate bounded authorization and completed preparation/replay. The predecessor v1.0 profile did not resolve those groups, so that review had no fixture state. The bounded v1.1 profile is complete and fixture preparation/replay passed. This does not claim cross-platform coordinate identity. See `SOURCE_PROFILE_MISMATCH.md`.
 
 ## Primary pinned sources
 

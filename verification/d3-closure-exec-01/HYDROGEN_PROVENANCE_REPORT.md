@@ -1,7 +1,7 @@
 # Hydrogen provenance report
 
-**Status: NOT GENERATED for the fixture — no fixture hydrogen operation ran.**
+**Status: PASS for the prepared fixture.**
 
-The safe synthetic ethane and aromatic controls generated only expected hydrogens and verified their parent mapping/coordinates within those controls; their records are in `runtime_logs/linux/safe-addhs-run-*` and `safe-aromatic-run-*`. No 3DMX receptor or BNZ fixture hydrogens were generated, so no fixture hydrogen parent UIDs, provenance digest, counts, or coordinate report exists. The exact approved RDKit wrapper call and query guards remain specified by `verification/d3-prep-auth-04/PINNED_TOOLCHAIN_PROPOSAL.md` and `TOOLCHAIN_API_VERIFICATION.md`.
+The authorized RDKit 2026.03.6 hydrogen-only operation generated 1,330 receptor hydrogens and 6 ligand hydrogens from the explicit v1.1 state graphs. Each generated hydrogen is recorded against its parent atom and stable AtomUID in the two per-run provenance manifests. Replay runs produced the same scientific payload and hydrogen provenance digest: sha256:f578e9a683a2fead15f28b4dc415d7b8b29e8f54e65fdc6172feda55bd709c06.
 
-Fixture execution stopped before molecule construction because the source contains alternate states not resolved by the approved profile. No fixture hydrogen-count or coordinate-validity claim is made.
+No query atom or query bond was accepted; no implicit chemical-state choice or geometry optimization occurred. Heavy atoms and heavy-heavy bonds were unchanged. Per-run evidence is prepared_states/run-1/HYDROGEN_PROVENANCE.json and prepared_states/run-2/HYDROGEN_PROVENANCE.json.

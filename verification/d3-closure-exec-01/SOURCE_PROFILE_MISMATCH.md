@@ -1,5 +1,9 @@
 # Source/profile mismatch: additional receptor alternate conformers
 
+**Current disposition (2026-10-05): RESOLVED under the bounded continuation authorization.** Profile v1.1 explicitly dispositions ASN68, ASP72, and ARG76. The source/profile validator, preparation, D2 seals, SearchRegion, and fixture full-pose run all pass. The hard stop below is the correct historical v1.0 result and remains preserved.
+
+**Historical evidence note:** the hard stop below records the correct v1.0 disposition before the bounded owner-authorized correction. The mismatch is resolved for profile v1.1 in the continuation addendum at the end of this file; the earlier source rows, policy analysis, and stop evidence remain unchanged.
+
 **Disposition:** hard stop before constructing or supplying a fixture molecule to RDKit.
 
 The exact source hash gate passed for all six DEC04 artifacts on Windows and WSL2. The hash-checked 3DMX mmCIF contains three additional A/B polymer alternate groups in entity 1, chain/asym A, model 1, beyond the only groups named by the owner-approved candidate profile (`MET106` and `GLU108`). The source alternatives have unique maximum occupancy A, but the profile explicitly limits its resolved selection to MET106/GLU108. Applying the same rule to these new groups would alter the authorized coordinate-state selection and profile content.
@@ -34,3 +38,11 @@ The controlling profile sources specify the only resolved altlocs as MET106 and 
 - D3-CLOSURE-EXEC-01 remains on HOLD for this concrete source/profile scientific-state conflict.
 
 The exact-version Linux RDKit runtime and synthetic AddHs dry-runs passed independently. The source-only geometry audit imported no RDKit modules. Windows Application Control remains unchanged, and the historical Windows failure evidence is preserved.
+
+## Continuation resolution under bounded owner authorization
+
+The owner continuation dated 2026-10-04 authorizes one profile-completeness correction for ASN68, ASP72, and ARG76 when the exact source and already approved state rules uniquely support the required disposition. The attachment SHA-256 and exact scope are recorded in `PROFILE_CORRECTION_AUTHORIZATION.md`.
+
+The 164-residue, source-only profile validator found exactly five altloc sites and no additional omitted site. ASN68 has complete A/B atom sets at 0.70/0.30, ASP72 at 0.80/0.20, and ARG76 at 0.60/0.40. Each has one coherent, unique occupancy maximum A, with all common atoms retained. ASP72− and ARG76+ were already explicit in the approved 51-side-chain state table; ASN68 is a neutral CCD amide, not an ionizable member of that table. No side-chain atom swap or heavy-atom movement was performed.
+
+Profile v1.1 now lists all five exact groups. The same fail-closed inventory validator passed all 164 source residues, 1,306 selected receptor heavy atoms, 51 explicit side-chain states, both termini, and all 418 component occurrences before RDKit import. There is no fourth omission. See `CORRECTED_PREPARATION_PROFILE.md`, `PROFILE_OMISSION_ROOT_CAUSE.md`, and `PROFILE_COMPLETENESS_VALIDATION.md` for the full correction and matrix-backed audit.

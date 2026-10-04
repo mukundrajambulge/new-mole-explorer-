@@ -1,9 +1,27 @@
+/D2_SEALED_STATE_SUMMARY.json text eol=lf
+/D2_SEAL_DIGEST_REPLAY_VALIDATION.json text eol=lf
+/D3_PROFILE_AWARE_PREPARED_STATE_ENVELOPES.json text eol=lf
+/FULLPOSE_PROFILE_DIGESTS.json text eol=lf
+/PREPARATION_REPLAY_VALIDATION.json text eol=lf
+/PREPARATION_RUN_CONFIG.json text eol=lf
+/PROFILE_COMPLETENESS_VALIDATION.json text eol=lf
+/SEALED_PREPARATION_RUN_INPUTS.json text eol=lf
+/STATE_CHARGE_VALIDATION.json text eol=lf
+/VALIDATION_POSE_COHORT.json text eol=lf
+/SOURCE_PROFILE_COMPLETENESS_MATRIX.csv text eol=lf
+prepared_states/** text eol=lf
+profiles/** text eol=lf
+sealed_states/** text eol=lf
+fullpose/** text eol=lf
+typing/** text eol=lf
+torsion/** text eol=lf
+
 # Scientific source payloads and captured command/system logs are raw evidence.
 source_artifacts/** -text -diff
 runtime_logs/** -text -diff
 SOURCE_MANIFEST.csv -text -diff
 
-# Keep authored reports and this package's digest list stable across checkouts.
+# Keep authored reports and this package digest list stable across checkouts.
 *.md text eol=lf
 tools/*.py text eol=lf
 SHA256SUMS.txt text eol=lf

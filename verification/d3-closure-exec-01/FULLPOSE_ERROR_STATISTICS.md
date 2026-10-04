@@ -1,5 +1,19 @@
 # Full-pose error statistics
 
-**Status: NOT COMPUTABLE — zero eligible poses.** The fixture profile/source mismatch prevented state sealing, so no direct or grid full-pose score was evaluated. Signed bias, MAE, RMSE, p50, p95, p99 and maximum absolute error are therefore undefined, both overall and by term/cutoff-stress subset. No empty-population statistic is reported as zero.
+**Status: COMPLETE — SEALED_STATES fixture result, six deterministic poses.**
 
-The quantile convention is not applicable because no sample exists. No numerical acceptance recommendation can be evidence-backed without the requested distribution. Current PHD-V2 amendments state that direct-versus-grid approximation limits and ranking thresholds remain unapproved; the `1e-10` backend-equivalence tolerance is not substituted.
+Errors are signed grid minus direct. Percentiles use linear interpolation at h=(n−1)p. Values are kcal/mol.
+
+| E_inter statistic | Full cohort (n=6) | Cutoff-stress subset (n=1) |
+|---|---:|---:|
+| Signed mean bias | 0.17536494515694448 | -0.02524701521328865 |
+| MAE | 0.18378061689470737 | 0.02524701521328865 |
+| RMSE | 0.20092119392847385 | 0.02524701521328865 |
+| p50 | 0.20046883300537743 | -0.02524701521328865 |
+| p95 | 0.27381649927862073 | -0.02524701521328865 |
+| p99 | 0.2868527181294298 | -0.02524701521328865 |
+| Maximum absolute error | 0.2901117728421321 | 0.02524701521328865 |
+
+All five raw and weighted term distributions are in fullpose/results/FULLPOSE_ERROR_STATISTICS.json. Per-pose direct/grid terms, weighted values, torsion quantities, total scores, and differences are in FULLPOSE_TERM_DECOMPOSITION.csv and FULLPOSE_PER_POSE_RESULTS.csv. Exact transform, state digests, field digest, pose digest, and boundary disposition are in FULLPOSE_POSE_MANIFEST.csv.
+
+Direct and grid orders match exactly. There are no ties, pairwise reversals, or nonzero rank displacements. The current D3 materials approve no scalar direct-versus-grid approximation/ranking threshold; these values are evidence for D3-FINAL-01, not an invented acceptance limit. The six-pose deterministic validation cohort is not a general error-bound sample.

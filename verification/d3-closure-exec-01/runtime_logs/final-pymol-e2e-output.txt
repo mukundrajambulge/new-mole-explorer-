@@ -1,0 +1,20 @@
+
+> molecular-workstation@0.1.0 test:e2e
+> playwright test tests/e2e/final-pymol-acceptance.spec.ts
+
+[WebServer] (node:9988) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:22336) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:38464) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:26788) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [chromium] › tests\e2e\final-pymol-acceptance.spec.ts:23:1 › final acceptance keeps scenes, ownership and console within the workspace (11.4s)
+  ok 2 [chromium] › tests\e2e\final-pymol-acceptance.spec.ts:50:1 › final acceptance covers camera, ligand color, selection, and representation together (10.9s)
+  ok 3 [chromium] › tests\e2e\final-pymol-acceptance.spec.ts:72:1 › final acceptance covers R07 edit undo/redo, R08 alignment, R09 scene save, and R10 rejection (14.6s)
+
+  3 passed (45.1s)

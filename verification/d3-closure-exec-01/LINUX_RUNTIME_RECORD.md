@@ -29,4 +29,4 @@ Build dependencies were installed only inside the existing Ubuntu distribution t
 
 ## Environment for scientific runs
 
-Run from the repository worktree mounted into WSL at `/mnt/c/Users/mukun/.codex/worktrees/d3-closure-exec-01-9814/molecular-workstation`, using the task venv's absolute Python path with `-I`, `TZ=UTC`, `LC_ALL=C`, a clean stdout/stderr capture, and no external service or GPU. Each run records timestamps, command arguments, environment, source/profile/driver digests, and package identities. The preparation tool operates single-process without RNG.
+Run from the repository worktree mounted into WSL at `/mnt/c/Users/mukun/.codex/worktrees/d3-profile-completeness/molecular-workstation`, using the task venv's absolute Python path with `-I`, `TZ=UTC`, `LC_ALL=C`, a clean stdout/stderr capture, and no external service or GPU. Each run records timestamps, command arguments, environment, source/profile/driver digests, and package identities. The preparation tool operates single-process without RNG.

@@ -1,0 +1,114 @@
+{
+  "schemaId": "D3_CLOSURE_D2_SEALED_STATE_SUMMARY_V1",
+  "status": "PASS",
+  "preparedReceptorDigest": "sha256:cc8556b9e66fc8baedcff42ac72a56da5ac18cedd2f65a065054e667366c2a06",
+  "preparedLigandDigest": "sha256:65e8b07631df6cc83800b31bf7682b420fce282cadaf3b2427973260b5e851a1",
+  "receptorCoordinateStateDigest": "sha256:7326d80384638649b8ba28664988b9332c276ca859d7e85d936cb0620b9e1f94",
+  "ligandCoordinateStateDigest": "sha256:6867f7bdf67192bcf16ccd11e730a61a7deb2d1e83eae5f13fd16249a8dcac95",
+  "searchRegionDigest": "sha256:690c208e99f9cf467662c071e6934abe01950b0d2e22f7753b5cc5e2ee5b1f2d",
+  "receptorAtomCount": 2636,
+  "receptorHeavyAtomCount": 1306,
+  "receptorHydrogenCount": 1330,
+  "receptorResidueCount": 164,
+  "ligandAtomCount": 12,
+  "ligandHeavyAtomCount": 6,
+  "ligandHydrogenCount": 6,
+  "ligandSearchTorsionCount": 0,
+  "searchRegion": {
+    "min": [
+      25.813,
+      0.653875981912301,
+      2.769350971986182
+    ],
+    "max": [
+      28.656180604292317,
+      7.417396483918871,
+      5.279
+    ],
+    "paddingAngstrom": [
+      0,
+      0,
+      0
+    ],
+    "dimensionsAngstrom": [
+      2.843180604292318,
+      6.76352050200657,
+      2.509649028013818
+    ],
+    "volumeAngstrom3": 48.260325713361766,
+    "grid": {
+      "minimum": [
+        25.813,
+        0.653875981912301,
+        2.769350971986182
+      ],
+      "maximum": [
+        28.656180604292317,
+        7.417396483918871,
+        5.279
+      ],
+      "extent": [
+        2.843180604292318,
+        6.76352050200657,
+        2.509649028013818
+      ],
+      "gridProfileId": "ME_VINA_GRID_V1_1_0",
+      "spacingAngstrom": 0.375,
+      "interpolationHaloAngstrom": 0.375,
+      "fieldOrigin": [
+        25.438,
+        0.278875981912301,
+        2.394350971986182
+      ],
+      "fieldDomainMaximum": [
+        29.188,
+        8.1538759819123,
+        5.7693509719861815
+      ],
+      "gridCells": [
+        10,
+        21,
+        9
+      ],
+      "pointCounts": [
+        11,
+        22,
+        10
+      ],
+      "totalGridPoints": 2420,
+      "pairCutoffAngstrom": 8,
+      "receptorInfluenceSupportRadiusAngstrom": 8.649519052838329,
+      "receptorInfluenceMinimum": [
+        17.16348094716167,
+        -7.995643070926028,
+        -5.8801680808521475
+      ],
+      "receptorInfluenceMaximum": [
+        37.305699657130646,
+        16.0669155367572,
+        13.928519052838329
+      ]
+    }
+  },
+  "sourceArtifactSha256": "e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef",
+  "profileId": "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_1",
+  "altlocSelections": {
+    "ASN68": "A",
+    "ASP72": "A",
+    "ARG76": "A",
+    "MET106": "A",
+    "GLU108": "A"
+  },
+  "typeCounts": {
+    "C_P": 448,
+    "C_H": 373,
+    "N_D": 234,
+    "O_A": 218,
+    "S_P": 5,
+    "O_DA": 24,
+    "N_P": 3,
+    "N_A": 1
+  },
+  "poseCount": 6,
+  "cutoffStressPairDistanceAngstrom": 7.999999999999998
+}

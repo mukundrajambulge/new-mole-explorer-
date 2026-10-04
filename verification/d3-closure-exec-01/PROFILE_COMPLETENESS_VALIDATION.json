@@ -1,0 +1,7147 @@
+{
+  "completeness_matrix": {
+    "path": "/mnt/c/Users/mukun/.codex/worktrees/d3-profile-completeness/molecular-workstation/verification/d3-closure-exec-01/SOURCE_PROFILE_COMPLETENESS_MATRIX.csv",
+    "rows": 164,
+    "sha256": "703ddb058982b972807d5b7dc26cda34a094f0414ded1de8980d6fe1cd7ce979"
+  },
+  "component_disposition_counts": {
+    "EXCLUDE_NONPOLYMER_PROFILE_OMISSION": 5,
+    "EXCLUDE_WATER_CORE_DRY_V1": 248,
+    "SELECT_AS_DOCKED_LIGAND": 1,
+    "SELECT_POLYMER_RECEPTOR": 164
+  },
+  "component_occurrence_count": 418,
+  "component_occurrences": [
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1",
+      "comp_id": "MET",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "10",
+      "comp_id": "ASP",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "100",
+      "comp_id": "ILE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "101",
+      "comp_id": "ASN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "102",
+      "comp_id": "MET",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "103",
+      "comp_id": "VAL",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "104",
+      "comp_id": "PHE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "105",
+      "comp_id": "GLN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)",
+        "A",
+        "B"
+      ],
+      "atomSiteRowCount": 13,
+      "auth_asym_id": "A",
+      "auth_seq_id": "106",
+      "comp_id": "MET",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 4,
+      "auth_asym_id": "A",
+      "auth_seq_id": "107",
+      "comp_id": "GLY",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)",
+        "A",
+        "B"
+      ],
+      "atomSiteRowCount": 15,
+      "auth_asym_id": "A",
+      "auth_seq_id": "108",
+      "comp_id": "GLU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "109",
+      "comp_id": "THR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "11",
+      "comp_id": "GLU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 4,
+      "auth_asym_id": "A",
+      "auth_seq_id": "110",
+      "comp_id": "GLY",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "111",
+      "comp_id": "VAL",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "112",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 4,
+      "auth_asym_id": "A",
+      "auth_seq_id": "113",
+      "comp_id": "GLY",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "114",
+      "comp_id": "PHE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "115",
+      "comp_id": "THR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "116",
+      "comp_id": "ASN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 6,
+      "auth_asym_id": "A",
+      "auth_seq_id": "117",
+      "comp_id": "SER",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "118",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "119",
+      "comp_id": "ARG",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 4,
+      "auth_asym_id": "A",
+      "auth_seq_id": "12",
+      "comp_id": "GLY",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "120",
+      "comp_id": "MET",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "121",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "122",
+      "comp_id": "GLN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "123",
+      "comp_id": "GLN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "124",
+      "comp_id": "LYS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "125",
+      "comp_id": "ARG",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 14,
+      "auth_asym_id": "A",
+      "auth_seq_id": "126",
+      "comp_id": "TRP",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "127",
+      "comp_id": "ASP",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "128",
+      "comp_id": "GLU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "129",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "13",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "130",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "131",
+      "comp_id": "VAL",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "132",
+      "comp_id": "ASN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "133",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "134",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "135",
+      "comp_id": "LYS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 6,
+      "auth_asym_id": "A",
+      "auth_seq_id": "136",
+      "comp_id": "SER",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "137",
+      "comp_id": "ARG",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 14,
+      "auth_asym_id": "A",
+      "auth_seq_id": "138",
+      "comp_id": "TRP",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 12,
+      "auth_asym_id": "A",
+      "auth_seq_id": "139",
+      "comp_id": "TYR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "14",
+      "comp_id": "ARG",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "140",
+      "comp_id": "ASN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "141",
+      "comp_id": "GLN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "142",
+      "comp_id": "THR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "143",
+      "comp_id": "PRO",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "144",
+      "comp_id": "ASN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "145",
+      "comp_id": "ARG",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "146",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "147",
+      "comp_id": "LYS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "148",
+      "comp_id": "ARG",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "149",
+      "comp_id": "VAL",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "15",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "150",
+      "comp_id": "ILE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "151",
+      "comp_id": "THR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "152",
+      "comp_id": "THR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "153",
+      "comp_id": "PHE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "154",
+      "comp_id": "ARG",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "155",
+      "comp_id": "THR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 4,
+      "auth_asym_id": "A",
+      "auth_seq_id": "156",
+      "comp_id": "GLY",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "157",
+      "comp_id": "THR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 14,
+      "auth_asym_id": "A",
+      "auth_seq_id": "158",
+      "comp_id": "TRP",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "159",
+      "comp_id": "ASP",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "16",
+      "comp_id": "LYS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "160",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 12,
+      "auth_asym_id": "A",
+      "auth_seq_id": "161",
+      "comp_id": "TYR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "162",
+      "comp_id": "LYS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "163",
+      "comp_id": "ASN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "164",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "17",
+      "comp_id": "ILE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 12,
+      "auth_asym_id": "A",
+      "auth_seq_id": "18",
+      "comp_id": "TYR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "19",
+      "comp_id": "LYS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "2",
+      "comp_id": "ASN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "20",
+      "comp_id": "ASP",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "21",
+      "comp_id": "THR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "22",
+      "comp_id": "GLU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 4,
+      "auth_asym_id": "A",
+      "auth_seq_id": "23",
+      "comp_id": "GLY",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 12,
+      "auth_asym_id": "A",
+      "auth_seq_id": "24",
+      "comp_id": "TYR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 12,
+      "auth_asym_id": "A",
+      "auth_seq_id": "25",
+      "comp_id": "TYR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "26",
+      "comp_id": "THR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "27",
+      "comp_id": "ILE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 4,
+      "auth_asym_id": "A",
+      "auth_seq_id": "28",
+      "comp_id": "GLY",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "29",
+      "comp_id": "ILE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "3",
+      "comp_id": "ILE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 4,
+      "auth_asym_id": "A",
+      "auth_seq_id": "30",
+      "comp_id": "GLY",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 10,
+      "auth_asym_id": "A",
+      "auth_seq_id": "31",
+      "comp_id": "HIS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "32",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "33",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "34",
+      "comp_id": "THR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "35",
+      "comp_id": "LYS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 6,
+      "auth_asym_id": "A",
+      "auth_seq_id": "36",
+      "comp_id": "SER",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "37",
+      "comp_id": "PRO",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 6,
+      "auth_asym_id": "A",
+      "auth_seq_id": "38",
+      "comp_id": "SER",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "39",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "4",
+      "comp_id": "PHE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "40",
+      "comp_id": "ASN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "41",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "42",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "43",
+      "comp_id": "LYS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 6,
+      "auth_asym_id": "A",
+      "auth_seq_id": "44",
+      "comp_id": "SER",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "45",
+      "comp_id": "GLU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "46",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "47",
+      "comp_id": "ASP",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "48",
+      "comp_id": "LYS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "49",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "5",
+      "comp_id": "GLU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "50",
+      "comp_id": "ILE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 4,
+      "auth_asym_id": "A",
+      "auth_seq_id": "51",
+      "comp_id": "GLY",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "52",
+      "comp_id": "ARG",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "53",
+      "comp_id": "ASN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "54",
+      "comp_id": "THR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "55",
+      "comp_id": "ASN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 4,
+      "auth_asym_id": "A",
+      "auth_seq_id": "56",
+      "comp_id": "GLY",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "57",
+      "comp_id": "VAL",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "58",
+      "comp_id": "ILE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "59",
+      "comp_id": "THR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "6",
+      "comp_id": "MET",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "60",
+      "comp_id": "LYS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "61",
+      "comp_id": "ASP",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "62",
+      "comp_id": "GLU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "63",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "64",
+      "comp_id": "GLU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "65",
+      "comp_id": "LYS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "66",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "67",
+      "comp_id": "PHE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)",
+        "A",
+        "B"
+      ],
+      "atomSiteRowCount": 13,
+      "auth_asym_id": "A",
+      "auth_seq_id": "68",
+      "comp_id": "ASN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "69",
+      "comp_id": "GLN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "7",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "70",
+      "comp_id": "ASP",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "71",
+      "comp_id": "VAL",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)",
+        "A",
+        "B"
+      ],
+      "atomSiteRowCount": 13,
+      "auth_asym_id": "A",
+      "auth_seq_id": "72",
+      "comp_id": "ASP",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "73",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "74",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "75",
+      "comp_id": "VAL",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)",
+        "A",
+        "B"
+      ],
+      "atomSiteRowCount": 19,
+      "auth_asym_id": "A",
+      "auth_seq_id": "76",
+      "comp_id": "ARG",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 4,
+      "auth_asym_id": "A",
+      "auth_seq_id": "77",
+      "comp_id": "GLY",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "78",
+      "comp_id": "ILE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "79",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "8",
+      "comp_id": "ARG",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "80",
+      "comp_id": "ARG",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "81",
+      "comp_id": "ASN",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "82",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "83",
+      "comp_id": "LYS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "84",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 9,
+      "auth_asym_id": "A",
+      "auth_seq_id": "85",
+      "comp_id": "LYS",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "86",
+      "comp_id": "PRO",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "87",
+      "comp_id": "VAL",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 12,
+      "auth_asym_id": "A",
+      "auth_seq_id": "88",
+      "comp_id": "TYR",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "89",
+      "comp_id": "ASP",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "9",
+      "comp_id": "ILE",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 6,
+      "auth_asym_id": "A",
+      "auth_seq_id": "90",
+      "comp_id": "SER",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "91",
+      "comp_id": "LEU",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "92",
+      "comp_id": "ASP",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "93",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 7,
+      "auth_asym_id": "A",
+      "auth_seq_id": "94",
+      "comp_id": "VAL",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "95",
+      "comp_id": "ARG",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 11,
+      "auth_asym_id": "A",
+      "auth_seq_id": "96",
+      "comp_id": "ARG",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "97",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "98",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "99",
+      "comp_id": "ALA",
+      "disposition": "SELECT_POLYMER_RECEPTOR",
+      "entity_id": "1",
+      "group_PDB": "ATOM",
+      "label_asym_id": "A",
+      "role": "T4 lysozyme receptor polymer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "901",
+      "comp_id": "PO4",
+      "disposition": "EXCLUDE_NONPOLYMER_PROFILE_OMISSION",
+      "entity_id": "2",
+      "group_PDB": "HETATM",
+      "label_asym_id": "B",
+      "role": "crystallization buffer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 5,
+      "auth_asym_id": "A",
+      "auth_seq_id": "902",
+      "comp_id": "PO4",
+      "disposition": "EXCLUDE_NONPOLYMER_PROFILE_OMISSION",
+      "entity_id": "2",
+      "group_PDB": "HETATM",
+      "label_asym_id": "C",
+      "role": "crystallization buffer"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "903",
+      "comp_id": "CL",
+      "disposition": "EXCLUDE_NONPOLYMER_PROFILE_OMISSION",
+      "entity_id": "3",
+      "group_PDB": "HETATM",
+      "label_asym_id": "D",
+      "role": "crystal-associated ion"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "904",
+      "comp_id": "HED",
+      "disposition": "EXCLUDE_NONPOLYMER_PROFILE_OMISSION",
+      "entity_id": "4",
+      "group_PDB": "HETATM",
+      "label_asym_id": "E",
+      "role": "crystallization additive"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 8,
+      "auth_asym_id": "A",
+      "auth_seq_id": "905",
+      "comp_id": "HED",
+      "disposition": "EXCLUDE_NONPOLYMER_PROFILE_OMISSION",
+      "entity_id": "4",
+      "group_PDB": "HETATM",
+      "label_asym_id": "F",
+      "role": "crystallization additive"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 6,
+      "auth_asym_id": "A",
+      "auth_seq_id": "900",
+      "comp_id": "BNZ",
+      "disposition": "SELECT_AS_DOCKED_LIGAND",
+      "entity_id": "5",
+      "group_PDB": "HETATM",
+      "label_asym_id": "G",
+      "role": "reference ligand and selected ligand occurrence"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1000",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1001",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1002",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1003",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1004",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1005",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1006",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1007",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1008",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1009",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1010",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1011",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1012",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1013",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1014",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1015",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1016",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1017",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1018",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1019",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1020",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1021",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1022",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1023",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1024",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1025",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1026",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1027",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1028",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1029",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1030",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1031",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1032",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1033",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1034",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1035",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1036",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1037",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1038",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1039",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1040",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1041",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1042",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1043",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1044",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1045",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1046",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1047",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1048",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1049",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1050",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1051",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1052",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1053",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1054",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1055",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1056",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1057",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1058",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1059",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1060",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1061",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1062",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1063",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1064",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1065",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1066",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1067",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1068",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1069",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1070",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1071",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1072",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1073",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1074",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1075",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1076",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1077",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1078",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1079",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1080",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1081",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1082",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1083",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1084",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1085",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1086",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1087",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1088",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1089",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1090",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1091",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1092",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1093",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1094",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1095",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1096",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1097",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1098",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1099",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1100",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1101",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1102",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1103",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1104",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1105",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1106",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1107",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1108",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1109",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1110",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1111",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1112",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1113",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1114",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1115",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1116",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1117",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1118",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1119",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1120",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1121",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1122",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1123",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1124",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1125",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1126",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1127",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1128",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1129",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1130",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1131",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1132",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1133",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1134",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1135",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1136",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1137",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1138",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1139",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1140",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1141",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1142",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1143",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1144",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1145",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1146",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1147",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1148",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1149",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1150",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1151",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1152",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "1153",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "906",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "907",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "908",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "909",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "910",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "911",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "912",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "913",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "914",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "915",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "916",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "917",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "918",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "919",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "920",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "921",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "922",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "923",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "924",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "925",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "926",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "927",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "928",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "929",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "930",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "931",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "932",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "933",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "934",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "935",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "936",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "937",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "938",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "939",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "940",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "941",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "942",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "943",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "944",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "945",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "946",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "947",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "948",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "949",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "950",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "951",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "952",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "953",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "954",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "955",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "956",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "957",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "958",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "959",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "960",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "961",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "962",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "963",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "964",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "965",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "966",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "967",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "968",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "969",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "970",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "971",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "972",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "973",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "974",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "975",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "976",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "977",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "978",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "979",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "980",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "981",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "982",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "983",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "984",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "985",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "986",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "987",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "988",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "989",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "990",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "991",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "992",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "993",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "994",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "995",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "996",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "997",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "998",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    },
+    {
+      "altlocLabels": [
+        "(blank)"
+      ],
+      "atomSiteRowCount": 1,
+      "auth_asym_id": "A",
+      "auth_seq_id": "999",
+      "comp_id": "HOH",
+      "disposition": "EXCLUDE_WATER_CORE_DRY_V1",
+      "entity_id": "6",
+      "group_PDB": "HETATM",
+      "label_asym_id": "H",
+      "role": "crystallographic water"
+    }
+  ],
+  "local_interaction_environment": {
+    "method": "source-coordinate nearest heavy-atom pairs; descriptive only; no contact cutoff used for state assignment",
+    "residues": [
+      {
+        "comp_id": "ASN",
+        "label_seq_id": 68,
+        "states": [
+          {
+            "altloc": "A",
+            "nearest_pairs": [
+              {
+                "distance_angstrom": 3.157901,
+                "neighbor": "GLN:69:N:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.163342,
+                "neighbor": "HOH:1089:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "water",
+                "target_altloc": "A",
+                "target_atom": "ND2"
+              },
+              {
+                "distance_angstrom": 3.300224,
+                "neighbor": "HOH:914:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "water",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.520071,
+                "neighbor": "HOH:1089:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "water",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.616589,
+                "neighbor": "GLU:64:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.673648,
+                "neighbor": "LYS:65:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.72383,
+                "neighbor": "PHE:67:C:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.762819,
+                "neighbor": "HOH:1089:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "water",
+                "target_altloc": "A",
+                "target_atom": "CG"
+              },
+              {
+                "distance_angstrom": 3.920324,
+                "neighbor": "HOH:914:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "water",
+                "target_altloc": "A",
+                "target_atom": "CG"
+              },
+              {
+                "distance_angstrom": 3.995579,
+                "neighbor": "GLN:69:N:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "OD1"
+              },
+              {
+                "distance_angstrom": 4.022517,
+                "neighbor": "GLN:69:N:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CG"
+              },
+              {
+                "distance_angstrom": 4.026001,
+                "neighbor": "PHE:4:CZ:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "OD1"
+              }
+            ]
+          },
+          {
+            "altloc": "B",
+            "nearest_pairs": [
+              {
+                "distance_angstrom": 2.326949,
+                "neighbor": "HOH:1089:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "water",
+                "target_altloc": "B",
+                "target_atom": "ND2"
+              },
+              {
+                "distance_angstrom": 2.67024,
+                "neighbor": "HOH:1126:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "water",
+                "target_altloc": "B",
+                "target_atom": "ND2"
+              },
+              {
+                "distance_angstrom": 2.72501,
+                "neighbor": "PHE:4:CE1:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "OD1"
+              },
+              {
+                "distance_angstrom": 3.130984,
+                "neighbor": "GLN:69:N:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.265174,
+                "neighbor": "HOH:914:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "water",
+                "target_altloc": "B",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.317697,
+                "neighbor": "HOH:1089:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "water",
+                "target_altloc": "B",
+                "target_atom": "CG"
+              },
+              {
+                "distance_angstrom": 3.436799,
+                "neighbor": "PHE:4:CD1:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "OD1"
+              },
+              {
+                "distance_angstrom": 3.46645,
+                "neighbor": "GLU:64:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "ND2"
+              },
+              {
+                "distance_angstrom": 3.511166,
+                "neighbor": "HOH:1089:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "water",
+                "target_altloc": "B",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.520837,
+                "neighbor": "GLU:64:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CG"
+              },
+              {
+                "distance_angstrom": 3.532898,
+                "neighbor": "PHE:4:CZ:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "OD1"
+              },
+              {
+                "distance_angstrom": 3.630107,
+                "neighbor": "GLU:64:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CB"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "comp_id": "ASP",
+        "label_seq_id": 72,
+        "states": [
+          {
+            "altloc": "A",
+            "nearest_pairs": [
+              {
+                "distance_angstrom": 3.070105,
+                "neighbor": "ALA:73:N:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.383283,
+                "neighbor": "GLN:69:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.386574,
+                "neighbor": "ASN:68:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.709275,
+                "neighbor": "VAL:71:C:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 4.064706,
+                "neighbor": "GLN:69:C:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 4.130883,
+                "neighbor": "ALA:73:N:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CG"
+              },
+              {
+                "distance_angstrom": 4.190389,
+                "neighbor": "ARG:76:CD:A",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "OD1"
+              },
+              {
+                "distance_angstrom": 4.239756,
+                "neighbor": "ARG:76:CG:A",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "OD1"
+              },
+              {
+                "distance_angstrom": 4.28479,
+                "neighbor": "GLN:69:CA:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 4.296955,
+                "neighbor": "VAL:71:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 4.389289,
+                "neighbor": "ARG:76:CD:A",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CG"
+              },
+              {
+                "distance_angstrom": 4.422273,
+                "neighbor": "ALA:73:CA:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              }
+            ]
+          },
+          {
+            "altloc": "B",
+            "nearest_pairs": [
+              {
+                "distance_angstrom": 2.863438,
+                "neighbor": "ASN:68:OD1:A",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "OD1"
+              },
+              {
+                "distance_angstrom": 2.908577,
+                "neighbor": "ASN:68:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "OD1"
+              },
+              {
+                "distance_angstrom": 3.094381,
+                "neighbor": "ALA:73:N:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.473514,
+                "neighbor": "ASN:68:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.477843,
+                "neighbor": "GLN:69:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.552625,
+                "neighbor": "ASN:68:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CG"
+              },
+              {
+                "distance_angstrom": 3.736361,
+                "neighbor": "VAL:71:C:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.914183,
+                "neighbor": "ASN:68:OD1:A",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CG"
+              },
+              {
+                "distance_angstrom": 3.926827,
+                "neighbor": "ASN:68:C:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "OD1"
+              },
+              {
+                "distance_angstrom": 4.08242,
+                "neighbor": "ASN:68:CG:A",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "OD1"
+              },
+              {
+                "distance_angstrom": 4.169058,
+                "neighbor": "GLN:69:C:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 4.28143,
+                "neighbor": "VAL:71:C:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "OD1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "comp_id": "ARG",
+        "label_seq_id": 76,
+        "states": [
+          {
+            "altloc": "A",
+            "nearest_pairs": [
+              {
+                "distance_angstrom": 3.203223,
+                "neighbor": "GLY:77:N:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.245328,
+                "neighbor": "ASP:72:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CG"
+              },
+              {
+                "distance_angstrom": 3.322516,
+                "neighbor": "HOH:1120:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "water",
+                "target_altloc": "A",
+                "target_atom": "CD"
+              },
+              {
+                "distance_angstrom": 3.350594,
+                "neighbor": "ASP:72:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.463483,
+                "neighbor": "ARG:80:NH1:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.72312,
+                "neighbor": "VAL:75:C:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.786969,
+                "neighbor": "ASP:72:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CD"
+              },
+              {
+                "distance_angstrom": 3.78875,
+                "neighbor": "ALA:73:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.794874,
+                "neighbor": "HOH:1120:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "water",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.968428,
+                "neighbor": "ARG:80:NH1:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CG"
+              },
+              {
+                "distance_angstrom": 4.07549,
+                "neighbor": "ARG:80:NH1:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "A",
+                "target_atom": "CD"
+              },
+              {
+                "distance_angstrom": 4.151305,
+                "neighbor": "HOH:950:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "water",
+                "target_altloc": "A",
+                "target_atom": "CB"
+              }
+            ]
+          },
+          {
+            "altloc": "B",
+            "nearest_pairs": [
+              {
+                "distance_angstrom": 2.568831,
+                "neighbor": "ASP:72:OD1:A",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "NH2"
+              },
+              {
+                "distance_angstrom": 3.136501,
+                "neighbor": "ASP:72:OD1:A",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CZ"
+              },
+              {
+                "distance_angstrom": 3.225046,
+                "neighbor": "GLY:77:N:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.310279,
+                "neighbor": "ARG:80:NH1:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CG"
+              },
+              {
+                "distance_angstrom": 3.373066,
+                "neighbor": "ASP:72:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.397618,
+                "neighbor": "ASP:72:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CD"
+              },
+              {
+                "distance_angstrom": 3.428492,
+                "neighbor": "ASP:72:OD1:A",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CD"
+              },
+              {
+                "distance_angstrom": 3.441977,
+                "neighbor": "ARG:80:NH1:(blank)",
+                "neighbor_element": "N",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "CB"
+              },
+              {
+                "distance_angstrom": 3.475227,
+                "neighbor": "VAL:75:CG1:(blank)",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "NH1"
+              },
+              {
+                "distance_angstrom": 3.479675,
+                "neighbor": "ASP:72:OD1:A",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "NE"
+              },
+              {
+                "distance_angstrom": 3.612873,
+                "neighbor": "ASP:72:CG:A",
+                "neighbor_element": "C",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "NH2"
+              },
+              {
+                "distance_angstrom": 3.703964,
+                "neighbor": "ASP:72:O:(blank)",
+                "neighbor_element": "O",
+                "neighbor_role": "polymer_or_component",
+                "target_altloc": "B",
+                "target_atom": "NE"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "molecules_constructed": false,
+  "profile_dispositioned_residue_count": 164,
+  "profile_id": "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_1",
+  "profile_semantic_version": "1.1.0",
+  "rdkit_imported": false,
+  "residue_altloc_dispositions": [
+    {
+      "altloc": "A",
+      "atom_name": "CA",
+      "comp_id": "ASN",
+      "label_seq_id": 68,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 531
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CA",
+      "comp_id": "ASN",
+      "label_seq_id": 68,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 532
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CB",
+      "comp_id": "ASN",
+      "label_seq_id": 68,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 535
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CB",
+      "comp_id": "ASN",
+      "label_seq_id": 68,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 536
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CG",
+      "comp_id": "ASN",
+      "label_seq_id": 68,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 537
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CG",
+      "comp_id": "ASN",
+      "label_seq_id": 68,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 538
+    },
+    {
+      "altloc": "A",
+      "atom_name": "ND2",
+      "comp_id": "ASN",
+      "label_seq_id": 68,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 541
+    },
+    {
+      "altloc": "B",
+      "atom_name": "ND2",
+      "comp_id": "ASN",
+      "label_seq_id": 68,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 542
+    },
+    {
+      "altloc": "A",
+      "atom_name": "OD1",
+      "comp_id": "ASN",
+      "label_seq_id": 68,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 539
+    },
+    {
+      "altloc": "B",
+      "atom_name": "OD1",
+      "comp_id": "ASN",
+      "label_seq_id": 68,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 540
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CA",
+      "comp_id": "ASP",
+      "label_seq_id": 72,
+      "occupancy": 0.8,
+      "selected": true,
+      "source_row": 568
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CA",
+      "comp_id": "ASP",
+      "label_seq_id": 72,
+      "occupancy": 0.2,
+      "selected": false,
+      "source_row": 569
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CB",
+      "comp_id": "ASP",
+      "label_seq_id": 72,
+      "occupancy": 0.8,
+      "selected": true,
+      "source_row": 572
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CB",
+      "comp_id": "ASP",
+      "label_seq_id": 72,
+      "occupancy": 0.2,
+      "selected": false,
+      "source_row": 573
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CG",
+      "comp_id": "ASP",
+      "label_seq_id": 72,
+      "occupancy": 0.8,
+      "selected": true,
+      "source_row": 574
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CG",
+      "comp_id": "ASP",
+      "label_seq_id": 72,
+      "occupancy": 0.2,
+      "selected": false,
+      "source_row": 575
+    },
+    {
+      "altloc": "A",
+      "atom_name": "OD1",
+      "comp_id": "ASP",
+      "label_seq_id": 72,
+      "occupancy": 0.8,
+      "selected": true,
+      "source_row": 576
+    },
+    {
+      "altloc": "B",
+      "atom_name": "OD1",
+      "comp_id": "ASP",
+      "label_seq_id": 72,
+      "occupancy": 0.2,
+      "selected": false,
+      "source_row": 577
+    },
+    {
+      "altloc": "A",
+      "atom_name": "OD2",
+      "comp_id": "ASP",
+      "label_seq_id": 72,
+      "occupancy": 0.8,
+      "selected": true,
+      "source_row": 578
+    },
+    {
+      "altloc": "B",
+      "atom_name": "OD2",
+      "comp_id": "ASP",
+      "label_seq_id": 72,
+      "occupancy": 0.2,
+      "selected": false,
+      "source_row": 579
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CA",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.6,
+      "selected": true,
+      "source_row": 598
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CA",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.4,
+      "selected": false,
+      "source_row": 599
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CB",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.6,
+      "selected": true,
+      "source_row": 602
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CB",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.4,
+      "selected": false,
+      "source_row": 603
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CD",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.6,
+      "selected": true,
+      "source_row": 606
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CD",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.4,
+      "selected": false,
+      "source_row": 607
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CG",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.6,
+      "selected": true,
+      "source_row": 604
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CG",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.4,
+      "selected": false,
+      "source_row": 605
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CZ",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.6,
+      "selected": true,
+      "source_row": 610
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CZ",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.4,
+      "selected": false,
+      "source_row": 611
+    },
+    {
+      "altloc": "A",
+      "atom_name": "NE",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.6,
+      "selected": true,
+      "source_row": 608
+    },
+    {
+      "altloc": "B",
+      "atom_name": "NE",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.4,
+      "selected": false,
+      "source_row": 609
+    },
+    {
+      "altloc": "A",
+      "atom_name": "NH1",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.6,
+      "selected": true,
+      "source_row": 612
+    },
+    {
+      "altloc": "B",
+      "atom_name": "NH1",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.4,
+      "selected": false,
+      "source_row": 613
+    },
+    {
+      "altloc": "A",
+      "atom_name": "NH2",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.6,
+      "selected": true,
+      "source_row": 614
+    },
+    {
+      "altloc": "B",
+      "atom_name": "NH2",
+      "comp_id": "ARG",
+      "label_seq_id": 76,
+      "occupancy": 0.4,
+      "selected": false,
+      "source_row": 615
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CA",
+      "comp_id": "MET",
+      "label_seq_id": 106,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 843
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CA",
+      "comp_id": "MET",
+      "label_seq_id": 106,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 844
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CB",
+      "comp_id": "MET",
+      "label_seq_id": 106,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 847
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CB",
+      "comp_id": "MET",
+      "label_seq_id": 106,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 848
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CE",
+      "comp_id": "MET",
+      "label_seq_id": 106,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 853
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CE",
+      "comp_id": "MET",
+      "label_seq_id": 106,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 854
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CG",
+      "comp_id": "MET",
+      "label_seq_id": 106,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 849
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CG",
+      "comp_id": "MET",
+      "label_seq_id": 106,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 850
+    },
+    {
+      "altloc": "A",
+      "atom_name": "SD",
+      "comp_id": "MET",
+      "label_seq_id": 106,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 851
+    },
+    {
+      "altloc": "B",
+      "atom_name": "SD",
+      "comp_id": "MET",
+      "label_seq_id": 106,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 852
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CA",
+      "comp_id": "GLU",
+      "label_seq_id": 108,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 860
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CA",
+      "comp_id": "GLU",
+      "label_seq_id": 108,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 861
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CB",
+      "comp_id": "GLU",
+      "label_seq_id": 108,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 864
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CB",
+      "comp_id": "GLU",
+      "label_seq_id": 108,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 865
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CD",
+      "comp_id": "GLU",
+      "label_seq_id": 108,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 868
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CD",
+      "comp_id": "GLU",
+      "label_seq_id": 108,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 869
+    },
+    {
+      "altloc": "A",
+      "atom_name": "CG",
+      "comp_id": "GLU",
+      "label_seq_id": 108,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 866
+    },
+    {
+      "altloc": "B",
+      "atom_name": "CG",
+      "comp_id": "GLU",
+      "label_seq_id": 108,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 867
+    },
+    {
+      "altloc": "A",
+      "atom_name": "OE1",
+      "comp_id": "GLU",
+      "label_seq_id": 108,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 870
+    },
+    {
+      "altloc": "B",
+      "atom_name": "OE1",
+      "comp_id": "GLU",
+      "label_seq_id": 108,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 871
+    },
+    {
+      "altloc": "A",
+      "atom_name": "OE2",
+      "comp_id": "GLU",
+      "label_seq_id": 108,
+      "occupancy": 0.7,
+      "selected": true,
+      "source_row": 872
+    },
+    {
+      "altloc": "B",
+      "atom_name": "OE2",
+      "comp_id": "GLU",
+      "label_seq_id": 108,
+      "occupancy": 0.3,
+      "selected": false,
+      "source_row": 873
+    }
+  ],
+  "selected_receptor_heavy_atom_count": 1306,
+  "selected_residue_count": 164,
+  "source_hashes_preparse": {
+    "3DMX.cif": {
+      "byteLength": 218104,
+      "manifestRole": "Official RCSB deposited mmCIF source coordinates",
+      "sha256": "e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef",
+      "sourceUrl": "https://files.rcsb.org/download/3DMX.cif"
+    },
+    "3DMX_assembly_1.json": {
+      "byteLength": 3543,
+      "manifestRole": "RCSB biological assembly 1 metadata",
+      "sha256": "2accfe2d4b9eabc50c37932da6af4ce6b36ad0b0ee078192fd882fd005ea9670",
+      "sourceUrl": "https://data.rcsb.org/rest/v1/core/assembly/3DMX/1"
+    },
+    "3DMX_entry.json": {
+      "byteLength": 22036,
+      "manifestRole": "RCSB entry metadata",
+      "sha256": "e9b303678dab19908f7708201586e732caf1f015fde0e4d36c4d7c97bfbaad1b",
+      "sourceUrl": "https://data.rcsb.org/rest/v1/core/entry/3DMX"
+    },
+    "3DMX_full_validation.pdf": {
+      "byteLength": 515092,
+      "manifestRole": "Official RCSB full validation report",
+      "sha256": "e24681b6500f8489ad93b8ce747978b1346df2f2817aa208683a1b6656e47f62",
+      "sourceUrl": "https://files.rcsb.org/pub/pdb/validation_reports/dm/3dmx/3dmx_full_validation.pdf"
+    },
+    "3DMX_polymer_entity_1.json": {
+      "byteLength": 50665,
+      "manifestRole": "RCSB polymer entity 1 sequence and source metadata",
+      "sha256": "e016e357934b43d07c58e971720d800ba253b441b614dfd547933838226a508d",
+      "sourceUrl": "https://data.rcsb.org/rest/v1/core/polymer_entity/3DMX/1"
+    },
+    "BNZ.cif": {
+      "byteLength": 4633,
+      "manifestRole": "Official PDB Chemical Component Dictionary definition for BNZ",
+      "sha256": "01bcf7c3ce9befdb4078e9832252eb5fe99e2598f320f87358ea1a9a247f7c61",
+      "sourceUrl": "https://files.rcsb.org/ligands/view/BNZ.cif"
+    }
+  },
+  "source_selected_residues_equal_profile_dispositioned_residues": true,
+  "state_sensitive_assignments": {
+    "10": "ASP_DEPROTONATED",
+    "108": "GLU_DEPROTONATED",
+    "11": "GLU_DEPROTONATED",
+    "119": "ARG_PROTONATED",
+    "124": "LYS_PROTONATED",
+    "125": "ARG_PROTONATED",
+    "127": "ASP_DEPROTONATED",
+    "128": "GLU_DEPROTONATED",
+    "135": "LYS_PROTONATED",
+    "137": "ARG_PROTONATED",
+    "139": "TYR_NEUTRAL",
+    "14": "ARG_PROTONATED",
+    "145": "ARG_PROTONATED",
+    "147": "LYS_PROTONATED",
+    "148": "ARG_PROTONATED",
+    "154": "ARG_PROTONATED",
+    "159": "ASP_DEPROTONATED",
+    "16": "LYS_PROTONATED",
+    "161": "TYR_NEUTRAL",
+    "162": "LYS_PROTONATED",
+    "18": "TYR_NEUTRAL",
+    "19": "LYS_PROTONATED",
+    "20": "ASP_DEPROTONATED",
+    "22": "GLU_DEPROTONATED",
+    "24": "TYR_NEUTRAL",
+    "25": "TYR_NEUTRAL",
+    "31": "HIS31_NEUTRAL_HID",
+    "35": "LYS_PROTONATED",
+    "43": "LYS_PROTONATED",
+    "45": "GLU_DEPROTONATED",
+    "47": "ASP_DEPROTONATED",
+    "48": "LYS_PROTONATED",
+    "5": "GLU_DEPROTONATED",
+    "52": "ARG_PROTONATED",
+    "60": "LYS_PROTONATED",
+    "61": "ASP_DEPROTONATED",
+    "62": "GLU_DEPROTONATED",
+    "64": "GLU_DEPROTONATED",
+    "65": "LYS_PROTONATED",
+    "70": "ASP_DEPROTONATED",
+    "72": "ASP_DEPROTONATED",
+    "76": "ARG_PROTONATED",
+    "8": "ARG_PROTONATED",
+    "80": "ARG_PROTONATED",
+    "83": "LYS_PROTONATED",
+    "85": "LYS_PROTONATED",
+    "88": "TYR_NEUTRAL",
+    "89": "ASP_DEPROTONATED",
+    "92": "ASP_DEPROTONATED",
+    "95": "ARG_PROTONATED",
+    "96": "ARG_PROTONATED"
+  },
+  "state_sensitive_site_count": 51,
+  "status": "PASS",
+  "termini": {
+    "1": "MET_N_TERMINUS_PROTONATED(+1)",
+    "164": "LEU_C_TERMINUS_DEPROTONATED(-1)"
+  },
+  "validations": {
+    "all_164_source_polymer_residues_mapped": true,
+    "all_51_state_sensitive_side_chains_explicit": true,
+    "all_altloc_sites_exactly_listed": true,
+    "all_expected_heavy_atoms_present_once": true,
+    "all_source_components_dispositioned": true,
+    "both_termini_explicit": true,
+    "no_extra_source_heavy_atoms": true,
+    "no_unknown_state_or_hidden_default": true
+  },
+  "validator": "same source/profile residue inventory used by hydrogen-only preparation adapter; source-only; no RDKit import or molecular construction"
+}

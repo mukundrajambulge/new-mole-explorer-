@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "semanticSchemaId": "D3_VINA_SCORER_TORSION_ASSIGNMENT_V1",
+  "profileId": "ME_D3_VINA_TORSION_AUTODOCK_VINA_1_2_7_V1",
+  "profileDigest": "sha256:0c042369f70f8a555930aa32cf2c0211abf93ef4bc837cdb389caff50e0edc6b",
+  "graphRevisionDigest": "sha256:044cf8a72ac3906ead4b5fd2f1b1ae7ac1f6a8f07e72818ad231c317fa2012fd",
+  "pdbqtEvidenceDigest": "sha256:52de5137154df1b837e8aea8d03fe2ede70abea002f5c086922d21b1ed04f6ab",
+  "bondAssignments": [],
+  "nTorsVina": 0,
+  "digest": "sha256:96a843d5349e5ce908d56595ef2c31b7d8f0f818e260db85894ab715b670c4fe",
+  "sourceArtifact": {
+    "sourceArtifactId": "source:d3-closure-bnz-rigid-torsion-representation",
+    "byteLength": 959,
+    "sha256": "b4c96de77d8c7342484ee0e5f1cd1db102e8a174c13df004831c5f331187b5da"
+  },
+  "searchTorsionCount": 0
+}

@@ -1,0 +1,330 @@
+{
+  "status": "PASS",
+  "profileId": "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_1",
+  "targetPHProxy": "6.9",
+  "stateSensitiveSideChains": 51,
+  "formalChargeAssignments": [
+    {
+      "residue": "ASP10",
+      "stateClass": "ASP_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 8
+    },
+    {
+      "residue": "ASP20",
+      "stateClass": "ASP_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 8
+    },
+    {
+      "residue": "ASP47",
+      "stateClass": "ASP_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 8
+    },
+    {
+      "residue": "ASP61",
+      "stateClass": "ASP_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 8
+    },
+    {
+      "residue": "ASP70",
+      "stateClass": "ASP_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 8
+    },
+    {
+      "residue": "ASP72",
+      "stateClass": "ASP_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 8
+    },
+    {
+      "residue": "ASP89",
+      "stateClass": "ASP_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 8
+    },
+    {
+      "residue": "ASP92",
+      "stateClass": "ASP_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 8
+    },
+    {
+      "residue": "ASP127",
+      "stateClass": "ASP_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 8
+    },
+    {
+      "residue": "ASP159",
+      "stateClass": "ASP_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 8
+    },
+    {
+      "residue": "GLU5",
+      "stateClass": "GLU_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 9
+    },
+    {
+      "residue": "GLU11",
+      "stateClass": "GLU_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 9
+    },
+    {
+      "residue": "GLU22",
+      "stateClass": "GLU_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 9
+    },
+    {
+      "residue": "GLU45",
+      "stateClass": "GLU_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 9
+    },
+    {
+      "residue": "GLU62",
+      "stateClass": "GLU_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 9
+    },
+    {
+      "residue": "GLU64",
+      "stateClass": "GLU_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 9
+    },
+    {
+      "residue": "GLU108",
+      "stateClass": "GLU_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 9
+    },
+    {
+      "residue": "GLU128",
+      "stateClass": "GLU_DEPROTONATED",
+      "formalCharge": -1,
+      "atomCount": 9
+    },
+    {
+      "residue": "ARG8",
+      "stateClass": "ARG_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 11
+    },
+    {
+      "residue": "ARG14",
+      "stateClass": "ARG_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 11
+    },
+    {
+      "residue": "ARG52",
+      "stateClass": "ARG_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 11
+    },
+    {
+      "residue": "ARG76",
+      "stateClass": "ARG_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 11
+    },
+    {
+      "residue": "ARG80",
+      "stateClass": "ARG_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 11
+    },
+    {
+      "residue": "ARG95",
+      "stateClass": "ARG_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 11
+    },
+    {
+      "residue": "ARG96",
+      "stateClass": "ARG_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 11
+    },
+    {
+      "residue": "ARG119",
+      "stateClass": "ARG_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 11
+    },
+    {
+      "residue": "ARG125",
+      "stateClass": "ARG_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 11
+    },
+    {
+      "residue": "ARG137",
+      "stateClass": "ARG_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 11
+    },
+    {
+      "residue": "ARG145",
+      "stateClass": "ARG_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 11
+    },
+    {
+      "residue": "ARG148",
+      "stateClass": "ARG_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 11
+    },
+    {
+      "residue": "ARG154",
+      "stateClass": "ARG_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 11
+    },
+    {
+      "residue": "LYS16",
+      "stateClass": "LYS_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 9
+    },
+    {
+      "residue": "LYS19",
+      "stateClass": "LYS_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 9
+    },
+    {
+      "residue": "LYS35",
+      "stateClass": "LYS_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 9
+    },
+    {
+      "residue": "LYS43",
+      "stateClass": "LYS_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 9
+    },
+    {
+      "residue": "LYS48",
+      "stateClass": "LYS_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 9
+    },
+    {
+      "residue": "LYS60",
+      "stateClass": "LYS_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 9
+    },
+    {
+      "residue": "LYS65",
+      "stateClass": "LYS_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 9
+    },
+    {
+      "residue": "LYS83",
+      "stateClass": "LYS_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 9
+    },
+    {
+      "residue": "LYS85",
+      "stateClass": "LYS_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 9
+    },
+    {
+      "residue": "LYS124",
+      "stateClass": "LYS_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 9
+    },
+    {
+      "residue": "LYS135",
+      "stateClass": "LYS_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 9
+    },
+    {
+      "residue": "LYS147",
+      "stateClass": "LYS_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 9
+    },
+    {
+      "residue": "LYS162",
+      "stateClass": "LYS_PROTONATED",
+      "formalCharge": 1,
+      "atomCount": 9
+    },
+    {
+      "residue": "TYR18",
+      "stateClass": "TYR_NEUTRAL",
+      "formalCharge": 0,
+      "atomCount": 12
+    },
+    {
+      "residue": "TYR24",
+      "stateClass": "TYR_NEUTRAL",
+      "formalCharge": 0,
+      "atomCount": 12
+    },
+    {
+      "residue": "TYR25",
+      "stateClass": "TYR_NEUTRAL",
+      "formalCharge": 0,
+      "atomCount": 12
+    },
+    {
+      "residue": "TYR88",
+      "stateClass": "TYR_NEUTRAL",
+      "formalCharge": 0,
+      "atomCount": 12
+    },
+    {
+      "residue": "TYR139",
+      "stateClass": "TYR_NEUTRAL",
+      "formalCharge": 0,
+      "atomCount": 12
+    },
+    {
+      "residue": "TYR161",
+      "stateClass": "TYR_NEUTRAL",
+      "formalCharge": 0,
+      "atomCount": 12
+    },
+    {
+      "residue": "HIS31",
+      "stateClass": "HIS31_NEUTRAL_HID",
+      "formalCharge": 0,
+      "atomCount": 10
+    }
+  ],
+  "termini": [
+    {
+      "residue": "MET1",
+      "atomName": "N",
+      "charge": 1,
+      "atomUid": "atom:ca24726686c4527c0e646d52381af6b0"
+    },
+    {
+      "residue": "LEU164",
+      "atomName": "OXT",
+      "charge": -1,
+      "atomUid": "atom:50761a4e4f7aa867ce58baa6eac40848"
+    }
+  ],
+  "noAutomaticStateSelection": true,
+  "sourceChargeSummaryReconciled": true
+}

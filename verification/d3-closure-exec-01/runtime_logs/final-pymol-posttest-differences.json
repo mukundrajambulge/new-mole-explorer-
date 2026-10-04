@@ -1,0 +1,23 @@
+{
+  "schema_id": "D3_PROTECTED_SCREENSHOT_POSTTEST_DIFF_V1",
+  "test": "npm run test:e2e -- tests/e2e/final-pymol-acceptance.spec.ts",
+  "test_exit_code": 0,
+  "pretest_count": 40,
+  "changed_count": 2,
+  "changes": [
+    {
+      "path": "verification/evidence/final-pymol-acceptance/16-cross-feature/01-camera-color-selection.png",
+      "pretest_sha256": "60f7418fb1dca4ca6c40f4440622dae052f7523e76f65af486cedb47a2efd594",
+      "posttest_sha256": "666f9c1248c5dd086f7b764a5e96b19aab7cad92c14516ada0dc8540963adf3e",
+      "restored_sha256": "60f7418fb1dca4ca6c40f4440622dae052f7523e76f65af486cedb47a2efd594"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/16-cross-feature/02-r07-r08-r09-r10.png",
+      "pretest_sha256": "2dfe80c13af86a65afa0d6ab6d41e6fd63d15a8f4291bc5a36d570714d8afdf2",
+      "posttest_sha256": "add174bee766e9e56e4f9058dbed9fe22b1f5d6ccb17c7cadbf3677352d9a256",
+      "restored_sha256": "2dfe80c13af86a65afa0d6ab6d41e6fd63d15a8f4291bc5a36d570714d8afdf2"
+    }
+  ],
+  "post_restore_verified_count": 40,
+  "remaining_mismatches": []
+}

@@ -1,5 +1,7 @@
 # Final preparation profile status
 
+**Historical v1.0 record:** This file preserves the original AUTH04 profile freeze. It is superseded for this bounded fixture continuation by CORRECTED_PREPARATION_PROFILE.md and PREPARATION_RUN_CONFIG.json (profile v1.1), which passed the complete source/profile validator and was used for the sealed preparation and replay.
+
 **Profile:** `ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_0`, semantic version `1.0.0`.
 
 **Authority:** the exact candidate profile in `verification/d3-prep-auth-04/PREPARATION_PROFILE_FREEZE.md`, with tool and dependency pins in `PINNED_TOOLCHAIN_PROPOSAL.md`, was explicitly owner-approved for one 3DMX/BNZ development bootstrap. It is not an ordinary-V1 default or production capability.

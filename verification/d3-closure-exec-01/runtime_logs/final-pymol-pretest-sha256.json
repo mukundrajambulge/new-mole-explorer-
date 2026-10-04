@@ -1,0 +1,167 @@
+{
+  "schema_id": "D3_PROTECTED_SCREENSHOT_HASHES_V1",
+  "captured_at_utc": "2026-10-04T19:54:49Z",
+  "count": 40,
+  "files": [
+    {
+      "path": "verification/evidence/final-pymol-acceptance/01-app-loaded.png",
+      "sha256": "d4f52bbc5a9701a17e1e27a5143ea53a6336177d94dc95d3c9697533fa596615"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/01-workspace/02-4djw-cartoon.png",
+      "sha256": "b755d23534186d38aa923c4af3e0f5fdc099ebd20204ce8caef27840b21fc54d"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/02-4djw-cartoon.png",
+      "sha256": "a365161ded88e7119306a82181b2f740a071aa205d7cfad579af0e021e24d341"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/02-visualization/04-protein-stick.png",
+      "sha256": "659694f96e805795d6049a3bc517c9993cb031f9faea3a078aa3973e6959365a"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/02-visualization/05-protein-ball-stick.png",
+      "sha256": "102e9d917df9a8ff480d5f562d5d2870371e70682309e58adffe1f0f14749d0a"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/03-ligand-custom-color.png",
+      "sha256": "8efe36fe8736cc732edfd06654b66055c46a3c7a0b5f5a9cd7f08de593c5898b"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/04-protein-stick.png",
+      "sha256": "b65448bebcd023adcfc8ded545043a25d50cbb81cec32b9f1c0b846b0e6360d0"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/04-selection/08-residue-selection-focus-initial.png",
+      "sha256": "50132b62945079a8c2a4bed126f636bc1ab648038b895699daaf3cdd1f2b46ac"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/05-protein-ball-stick.png",
+      "sha256": "c8710cd10376a3669886ce30bcb560b481e25f9b2aa0d0a6fbf2ecbd5036a847"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/06-vdw-surface.png",
+      "sha256": "da0bf2ddd722aa6d8e55c1b61a94a1b2d415b40a45131247370bc760f98773f6"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/07-mesh.png",
+      "sha256": "75ef35b1125123b2db18387b76dde990918a55d12d441aefa6fc719f1db23eb1"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/07-surfaces/07-mesh-initial.png",
+      "sha256": "a70aad06e92619a17aed47d26c9a47c418060a3aa577f499ab743492492c1c80"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/07-surfaces/07-mesh.png",
+      "sha256": "75ef35b1125123b2db18387b76dde990918a55d12d441aefa6fc719f1db23eb1"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/08-residue-selection-focus.png",
+      "sha256": "b564281d74d811f1dc155848f599b6761262249f52fed3a8a9068d685039f5c2"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/09-chain-selection.png",
+      "sha256": "0552996397b87df0eea6a29907a2bfea13ca67ace7b1e6d2576787a9d76cb0c3"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/10-ligand-selection.png",
+      "sha256": "4cd768ca7c9a27d78d0c26659324f7d488e42b8ce5e47c44c494a2fb7ebf10dc"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/11-selection-plus-representation.png",
+      "sha256": "e7d331c468d68e936dbff09f84b8f3d243c9f97ab64b32f597cd7041c39f3bee"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/12-selection-clear-restored.png",
+      "sha256": "6d9564a512d754ab77c10d7d6b92ba3eea566e36b38a215275141486e903b62a"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/13-console-overlay-full-canvas.png",
+      "sha256": "4a230502e0b1b7972cc2ab2c39f52a2f722543e240db510c53b4f7403393689a"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/14-orthographic.png",
+      "sha256": "d96e131b6a4fe0536e0f841a79eba4e3a8ca274db28cb04f06a84f2b40b71328"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/15-perspective.png",
+      "sha256": "f947bd590a22b42dd0a4b6a69733cc89b30ec8334e40a90f26e77eb2e2791ccb"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/16-cross-feature/01-camera-color-selection.png",
+      "sha256": "60f7418fb1dca4ca6c40f4440622dae052f7523e76f65af486cedb47a2efd594"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/16-cross-feature/02-r07-r08-r09-r10.png",
+      "sha256": "2dfe80c13af86a65afa0d6ab6d41e6fd63d15a8f4291bc5a36d570714d8afdf2"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/16-multi-object.png",
+      "sha256": "8bf13a7b0dc3b4c3d81e842208e45fe0e276a870fed8e439a978356ba526c434"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/17-labels.png",
+      "sha256": "aa4f0743e79f8c27b4d4b6c22d5f94b8976d03d5c366eb08ac826fae458a4426"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/18-measurement.png",
+      "sha256": "330cdcc5e711af714ca3728723de874b30afadffb350f2ef8a6114f1ac1fdb06"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/19-edit-before.png",
+      "sha256": "d4f52bbc5a9701a17e1e27a5143ea53a6336177d94dc95d3c9697533fa596615"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/20-edit-after.png",
+      "sha256": "061eda4f76f34553a06252f7cb568c0beadb22a78bd4c98e41742064d6037dcd"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/21-edit-undo.png",
+      "sha256": "faa1d2a1a19fcb3295705a04ae16280107582a33aadebcc865bfc0744e3535cb"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/22-edit-redo.png",
+      "sha256": "20e29122f2baa959f039558fdbcfa4b7fa339faeaa40e2369d99b29c386c1ae6"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/23-r08-alignment.png",
+      "sha256": "e21eb1dc2e18b10b4b691dcd41a4849b4c4a913cd8fa1dac4096cafafc982d66"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/24-r08-alignment-overlay.png",
+      "sha256": "9fc88b5f25fd1362fb583a1f7eb6f98c32a952fd7761291b65b105933a0282f1"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/25-scene-a.png",
+      "sha256": "d16261100b9189b12051f969dd1a31caf207f92c3b967839d7593c33c95f5ef3"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/26-scene-b.png",
+      "sha256": "fce970ec0fb484d81b9c4c1e230945e408ee353890353f6c48e2bf44e5790f15"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/27-session-restored.png",
+      "sha256": "c28017356e10c74142b291c04f3b436427828324ababce89f1c669fa6595dc62"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/28-export.png",
+      "sha256": "9a75c779e4e37036260e27487419ac1f4f7d726c4484b7bcfd9b39debd8b7672"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/29-command-console.png",
+      "sha256": "2dc8fa9c5c24d72be0fa56566f423fe3346a25273138133bcb4a7ae53c07cbc2"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/30-setting.png",
+      "sha256": "cdbcbe3b1c16ea76ed4744ad55b70572ab972715bc46b2f4242a937ca3445f45"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/31-security-rejection.png",
+      "sha256": "2dc8fa9c5c24d72be0fa56566f423fe3346a25273138133bcb4a7ae53c07cbc2"
+    },
+    {
+      "path": "verification/evidence/final-pymol-acceptance/32-final-cross-feature-workspace.png",
+      "sha256": "ecd0704c518872690a7d8a767fd7e05c22b7ef9ac5716a277119ffd607e1e721"
+    }
+  ]
+}

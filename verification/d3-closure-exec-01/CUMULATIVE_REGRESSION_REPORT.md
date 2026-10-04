@@ -1,25 +1,31 @@
 # Cumulative regression report
 
-## Current closure branch
+## Current D3-CLOSURE-EXEC-01 continuation
 
-On the execution branch containing D3-TOR-01 and D3-GRID-01 ancestry:
+All required fixture and regression steps completed on the isolated continuation branch from exact base 783aa166d9d5790f798bff41444d6ba0fac7bd27. The original dirty checkout was preserved.
 
-| Command | Result |
+| Scope | Result |
 |---|---|
-| `npm ci` | PASS; lockfile install succeeded, 248 packages; npm reported 6 advisories (3 moderate, 2 high, 1 critical); no fixes applied. |
-| `npm test` | PASS on the corrected TOR parser and again in the runtime-unblock continuation; 47 files and 254 tests (web 34/156, API 13/98). Continuation output is `runtime_logs/continuation-npm-test-output.txt`. The regression rejects `0001X` in the five-character PDBQT serial field. |
-| `npm run typecheck` | PASS across API, app, web and contracts in the continuation; see `runtime_logs/continuation-npm-typecheck-output.txt`. |
-| `npm run lint` | PASS across API, app, web and contracts in the continuation; see `runtime_logs/continuation-npm-lint-output.txt`. The earlier initial lint failure/fix remains in `runtime_logs/`. |
-| `npm run build` | PASS in the continuation; see `runtime_logs/continuation-npm-build-output.txt`. Existing 3Dmol.js `eval` and large-chunk advisories were emitted; build completed. |
-| Native CMake/CTest | PASS in WSL2 Ubuntu 24.04.5 with CMake 3.28.3 / GCC 13.3.0; direct scorer and scoring field both pass, 2/2 targets. Detailed resource run is recorded under `runtime_logs/continuation-native-*`. |
-| Protected PyMOL browser suite | PASS, 3/3 in this continuation; screenshot fixture hashes were restored and verified after Playwright rewrote them. |
-| Closure-local full-pose harness | Added to the existing D3-CLOSURE-EXEC-01 package. Strict C++ build, Python syntax check, and five-pose marked synthetic control PASS; no fixture output retained. |
-| Post-harness regression | `npm test` 47/254, typecheck, lint, build, native CTest 2/2, and protected PyMOL browser suite 3/3 all PASS. See `runtime_logs/closure-harness-regression-run.txt`. |
+| Source/profile completeness | PASS: 164/164 residues; 51/51 state-sensitive side chains; 5/5 altloc groups; 2 termini; 418/418 components; no extra or unlisted selected state |
+| Hydrogen-only preparation | PASS: two runs, same canonical scientific payload SHA-256 212468a368eed75d9522819cb2f8d898d26167001f5dc9af7846fc4a79e1298f |
+| Heavy-atom invariance | PASS: 1,306 receptor and 6 ligand heavy atoms unchanged bitwise; no additions, deletions, or remappings; maximum serialization displacement 0.0 Å |
+| D2 states and independent digest replay | PASS: receptor, ligand, graph, identity, chemistry, coordinate, kinematic, prepared-state, and SearchRegion digests recomputed and matched |
+| SearchRegion | PASS: all six cohort poses IN_DOMAIN; 11×22×10 nodes; below axis, center, and raw payload caps |
+| Full-pose fixture direct/grid | PASS: six sealed-state poses, crystal/translation/rotation/combined/grid-phase/cutoff classes; five-term raw and weighted outputs retained; zero fallback on OOD |
+| Pose order | PASS: no ties, no reversals, zero rank displacement |
+| Workspace unit tests | PASS: 47 files, 254 tests (web 34 files/156; API 13 files/98); D1 contracts 14, D2 preparation 11, D3-TOR 8 are included |
+| D3-GRID contract tests | PASS: 1 file, 5 tests |
+| Native direct scorer and scoring field | PASS: CMake/CTest 2/2 targets under WSL2 Ubuntu 24.04.5 / GCC 13.3.0 |
+| Protected PyMOL browser suite | PASS: Playwright 3/3; all 40 protected screenshot hashes match their pretest bytes after restoring the two generated images |
+| Typecheck / lint / build | PASS across API, app, web, and contracts |
+| Synthetic full-pose smoke | PASS: five marked synthetic control poses; no fixture evidence attributed to control |
 
-## Preserved D3 implementation evidence
+The production scoring implementation was not modified. Native C++ work in this package is an execution-only full-pose comparison harness linked to the unchanged repository scorer/field library. Build completed with pre-existing 3Dmol.js eval and large-chunk advisories.
 
-`verification/d3-grid/D3_GRID_01_TEST_REPORT.md` records strict Zig 0.16.0 C++ direct-scoring tests (6 fixture groups) and field tests (6 fixture groups), the focused TypeScript contract test (5 tests), D1/D2 regressions, D3-TOR-01 tests (7), workspace typecheck/lint/build/tests, and protected final PyMOL browser tests (3/3). Its implementation commit is an ancestor of this branch. The continuation independently reran native direct/field tests with CMake/GCC on WSL2 and the protected PyMOL browser suite. No D2-sealed prepared complex was available, and no direct-versus-grid fixture full-pose result is claimed.
+## Preserved predecessor evidence
 
-The independent code review identified a permissive TOR atom-serial parse; the corrected implementation validates the complete fixed-width field, and the new test rejects a trailing non-numeric character. The reviewer re-reviewed the correction and passed the Roadmap code-review element. Continuation regressions pass at the same 47-file/254-test count, plus typecheck, lint, build, native scorer/field tests, and protected PyMOL browser tests. Fixture preparation and full-pose tests did not run: although the relocated pinned Python/RDKit runtime and safe synthetic controls pass, the fixture preflight found unresolved coordinate states outside the approved profile. The pinned PyMOL executable oracle remains pending; browser tests do not claim executable-oracle conformance or manual user retest.
+The earlier D3-GRID report records six native direct-scoring and six field fixture groups, resource evidence, D1/D2/TOR tests, repository regression, and the protected PyMOL browser suite. Historical Windows Code Integrity and v1.0 source/profile stop evidence remain preserved. The profile-completeness correction is separately authorized and does not alter the original record.
 
-The added full-pose tool tests orchestration against only a synthetic control bundle; it does not materialize D2 scientific state or score 3DMX/BNZ. Direct/grid fixture statistics remain uncomputed until the frozen source/profile mismatch is resolved.
+## Numerical acceptance status
+
+No approved D3 direct-versus-grid approximation or ranking threshold was found. This report does not create one or substitute the 1e-10/1e-12 backend-equivalence tolerances. The six-pose error distributions and no-reversal result are measured evidence for D3-FINAL-01. The exact closure classification is PASS — ready for final D3 acceptance; it is not final D3 acceptance itself.

@@ -44,4 +44,4 @@ The output pose digest is SHA-256 over atoms sorted by AtomUID, each encoded as 
 
 ## Current closure status
 
-The harness was added because the existing protocol, empty CSV headers and native unit tests did not provide an executable full-pose cohort runner. It has not been run on 3DMX/BNZ: the frozen preparation profile still does not resolve ASN68, ASP72 and ARG76 alternate locations. Synthetic control execution can verify the orchestration and scorer calls, but cannot fill the fixture result tables or establish approximation behavior.
+The runner has been built and executed on the sealed 3DMX/BNZ fixture after profile v1.1 passed source/profile completeness and preparation. Six deterministic SEALED_STATES poses produced per-term, weighted, E_inter, cutoff, boundary, field-digest, and ordering evidence under fullpose/results/. The D2 state artifacts were independently resealed and replay-validated before the run. Results and their limits are summarized in FULLPOSE_ERROR_STATISTICS.md and D3_CLOSURE_EXEC_01_REPORT.md.

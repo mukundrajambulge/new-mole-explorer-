@@ -10,6 +10,10 @@ The owner authorized relocating only the execution environment for this D3-CLOSU
 
 Safe synthetic ethane and aromatic-benzene AddHs controls both passed twice in separate processes with matching output signatures. The controls verify the bounded API operation only; they are not fixture preparation or fixture replay.
 
-## Current fixture execution status
+## Pre-correction fixture execution status (historical)
 
 Windows input-side and WSL source-side hashes match for all six byte-exact manifest artifacts. Hash-gated CIF preflight found additional A/B alternates at ASN68, ASP72, and ARG76 beyond the only explicitly approved groups, MET106 and GLU108. The existing profile does not resolve the three additional coordinate states, and the relocation instruction forbids changing the alternate policy. The preflight therefore stopped before fixture graph construction or any fixture molecule was supplied to RDKit. No fixture AddHs operation or preparation ran. The Windows loader issue is no longer the active execution blocker; the unresolved source/profile coordinate-state conflict is.
+
+## Current fixture execution status (2026-10-05)
+
+The bounded owner authorization permitted corrected preparation profile v1.1 after the source-only validator established complete, unique A altloc selections and unchanged AUTH04 chemical states. The pinned Linux runtime was used for two preparation/replay runs; both passed. Prepared states, D2 seals, SearchRegion and full-pose results are complete. The previous no-run statement above records the v1.0 checkpoint only. See D3_CLOSURE_EXEC_01_REPORT.md and runtime_logs/FINAL_CLOSURE_RUN.md.

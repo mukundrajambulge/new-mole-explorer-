@@ -1,5 +1,9 @@
 # Owner authorization reference
 
+## Bounded continuation authorization and current execution
+
+The owner’s 2026-10-04 continuation attachment separately authorizes the exact v1.1 profile-completeness amendment for ASN68, ASP72, and ARG76 when uniquely supported by the existing policy and source evidence. Its verified SHA-256, exact delta, and scope are recorded in PROFILE_CORRECTION_AUTHORIZATION.md. The v1.1 source-only validator passed, preparation/replay passed, and the single-use bootstrap was consumed only for this fixture. No production, D4, or DOCKING.RUN authorization is created.
+
 ## Frozen authorization
 
 Source: `verification/d3-prep-auth-04/OWNER_AUTHORIZATION_RECORD.md` in verified AUTH04 closeout commit `2e05be567d96592e866ab13acb161c9eb3ae2953`, which is the base of this closure branch.

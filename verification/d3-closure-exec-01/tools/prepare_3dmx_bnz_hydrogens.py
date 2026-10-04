@@ -20,11 +20,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cif_io import CifLoop, find_loop, read_loops, rows_by_header  # noqa: E402
 
-from rdkit import Chem, rdBase  # noqa: E402
-from rdkit.Geometry import Point3D  # noqa: E402
-
-
-PROFILE_ID = "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_0"
+PROFILE_ID = "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_1"
 EXPECTED_RDKit = "2026.03.6"
 EXPECTED_PYTHON = "3.13.16"
 EXPECTED_SOURCE = {
@@ -231,7 +227,14 @@ def build_component_maps(loops: tuple[CifLoop, ...]) -> tuple[dict[str, dict[str
     return atoms_by_comp, bonds_by_comp
 
 
-def create_residue_inventory(rows: list[dict[str, Any]], mmcif_loops: tuple[CifLoop, ...], atoms_by_comp: dict[str, dict[str, dict[str, Any]]], bonds_by_comp: dict[str, list[dict[str, Any]]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+def component_graph_signature(atoms_by_name: dict[str, dict[str, Any]], bonds: list[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        "atoms": {name: {key: atom[key] for key in ("element", "charge", "aromatic")} for name, atom in sorted(atoms_by_name.items())},
+        "bonds": sorted((min(bond["a1"], bond["a2"]), max(bond["a1"], bond["a2"]), bond["order"], bond["aromatic"]) for bond in bonds),
+    }
+
+
+def create_residue_inventory(rows: list[dict[str, Any]], mmcif_loops: tuple[CifLoop, ...], atoms_by_comp: dict[str, dict[str, dict[str, Any]]], bonds_by_comp: dict[str, list[dict[str, Any]]], profile: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
     polymer_sequence = get_rows(mmcif_loops, "_entity_poly_seq.")
     sequence = sorted(
         [row for row in polymer_sequence if value(row, "_entity_poly_seq.entity_id") == "1"],
@@ -250,6 +253,20 @@ def create_residue_inventory(rows: list[dict[str, Any]], mmcif_loops: tuple[CifL
             raise ValueError(f"unexpected insertion code in the frozen chain: {atom}")
         by_residue[atom["label_seq"]].append(atom)
 
+    altloc_groups = profile.get("altloc_resolution", {}).get("groups")
+    if not isinstance(altloc_groups, list):
+        raise ValueError("profile must explicitly enumerate altloc groups")
+    altloc_by_position: dict[int, dict[str, Any]] = {}
+    for group in altloc_groups:
+        if not isinstance(group, dict) or not isinstance(group.get("label_seq_id"), int):
+            raise ValueError("profile altloc group is malformed")
+        position = group["label_seq_id"]
+        if position in altloc_by_position:
+            raise ValueError(f"profile repeats an altloc disposition for residue {position}")
+        if group.get("selected_label") != "A" or group.get("occupancy_by_label") not in ({"A": 0.7, "B": 0.3}, {"A": 0.8, "B": 0.2}, {"A": 0.6, "B": 0.4}):
+            raise ValueError(f"profile altloc disposition is not a supported explicit coherent-A rule at residue {position}")
+        altloc_by_position[position] = group
+
     selected: list[dict[str, Any]] = []
     residue_rows: list[dict[str, Any]] = []
     alternate_rows: list[dict[str, Any]] = []
@@ -263,12 +280,15 @@ def create_residue_inventory(rows: list[dict[str, Any]], mmcif_loops: tuple[CifL
         groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for atom in all_rows:
             groups[atom["atom"]].append(atom)
+        extra_names = set(groups) - expected
+        if extra_names:
+            raise ValueError(f"unlisted source heavy atoms at residue {position} {comp}: {sorted(extra_names)}")
         resolved: list[dict[str, Any]] = []
         for atom_name in sorted(expected):
             candidates = groups.get(atom_name, [])
             common = [atom for atom in candidates if not atom["alt"]]
             alternatives = [atom for atom in candidates if atom["alt"]]
-            if position in (106, 108):
+            if position in altloc_by_position:
                 if alternatives:
                     alt_names = {atom["alt"] for atom in alternatives}
                     if alt_names != {"A", "B"}:
@@ -277,8 +297,9 @@ def create_residue_inventory(rows: list[dict[str, Any]], mmcif_loops: tuple[CifL
                     b_rows = [atom for atom in alternatives if atom["alt"] == "B"]
                     if len(a_rows) != 1 or len(b_rows) != 1:
                         raise ValueError(f"duplicate/missing A/B alternate {position}:{atom_name}")
-                    if abs(a_rows[0]["occupancy"] - 0.70) > 1e-6 or abs(b_rows[0]["occupancy"] - 0.30) > 1e-6:
-                        raise ValueError(f"occupancy differs from approved unique-major-A policy at {position}:{atom_name}")
+                    expected_occupancies = altloc_by_position[position]["occupancy_by_label"]
+                    if abs(a_rows[0]["occupancy"] - expected_occupancies["A"]) > 1e-6 or abs(b_rows[0]["occupancy"] - expected_occupancies["B"]) > 1e-6:
+                        raise ValueError(f"occupancy differs from the profile's explicit coherent-A policy at {position}:{atom_name}")
                     resolved.extend(common)
                     resolved.append(a_rows[0])
                     alternate_rows.extend([
@@ -310,19 +331,59 @@ def create_residue_inventory(rows: list[dict[str, Any]], mmcif_loops: tuple[CifL
             "comp_id": comp,
             "heavy_atom_count": len(resolved),
             "expected_heavy_atom_names": sorted(expected),
-            "selected_altloc": "A+blank" if position in (106, 108) else "blank",
+            "selected_altloc": "A+blank" if position in altloc_by_position else "blank",
         })
-        if position in (106, 108):
+        if position in altloc_by_position:
             candidate_labels = {atom["alt"] for atom in all_rows if atom["alt"]}
             if candidate_labels != {"A", "B"}:
                 raise ValueError(f"altloc group at residue {position} is incomplete: {candidate_labels}")
+        elif any(atom["alt"] for atom in all_rows):
+            raise ValueError(f"unapproved alternate state at polymer position {position}")
     if len(by_residue) != 164:
         raise ValueError(f"expected all 164 residue positions, found {len(by_residue)}")
+    observed_altloc_positions = {position for position, atoms in by_residue.items() if any(atom["alt"] for atom in atoms)}
+    if observed_altloc_positions != set(altloc_by_position):
+        raise ValueError(f"source/profile altloc residue sets differ: source={sorted(observed_altloc_positions)}, profile={sorted(altloc_by_position)}")
     if len(selected) != len({(atom["label_seq"], atom["atom"]) for atom in selected}):
         raise ValueError("selected receptor heavy atom identity is not unique")
-    if len(selected) != 1324:
-        raise ValueError(f"frozen receptor heavy-atom inventory mismatch: expected 1324, found {len(selected)}")
+    expected_selected_count = profile.get("selected_receptor_heavy_atom_count")
+    if not isinstance(expected_selected_count, int) or len(selected) != expected_selected_count:
+        raise ValueError(f"profile receptor heavy-atom inventory mismatch: expected {expected_selected_count}, found {len(selected)}")
     return selected, residue_rows, alternate_rows
+
+
+def validate_chemical_state_profile(profile: dict[str, Any], sequence: list[dict[str, str]]) -> dict[int, str]:
+    expected = {
+        "ASP_DEPROTONATED": {10, 20, 47, 61, 70, 72, 89, 92, 127, 159},
+        "GLU_DEPROTONATED": {5, 11, 22, 45, 62, 64, 108, 128},
+        "ARG_PROTONATED": {8, 14, 52, 76, 80, 95, 96, 119, 125, 137, 145, 148, 154},
+        "LYS_PROTONATED": {16, 19, 35, 43, 48, 60, 65, 83, 85, 124, 135, 147, 162},
+        "TYR_NEUTRAL": {18, 24, 25, 88, 139, 161},
+        "HIS31_NEUTRAL_HID": {31},
+    }
+    configured = profile.get("chemical_state_assignments")
+    if not isinstance(configured, dict):
+        raise ValueError("profile must explicitly enumerate its state-sensitive residue assignments")
+    parsed: dict[int, str] = {}
+    for category, positions in expected.items():
+        values = configured.get(category)
+        if not isinstance(values, list) or any(not isinstance(pos, int) for pos in values) or set(values) != positions or len(values) != len(positions):
+            raise ValueError(f"profile chemical-state map differs from AUTH04 for {category}")
+        for position in positions:
+            parsed[position] = category
+    sequence_by_position = {int(required(row, "_entity_poly_seq.num")): required(row, "_entity_poly_seq.mon_id").upper() for row in sequence}
+    expected_component = {"ASP_DEPROTONATED": "ASP", "GLU_DEPROTONATED": "GLU", "ARG_PROTONATED": "ARG", "LYS_PROTONATED": "LYS", "TYR_NEUTRAL": "TYR", "HIS31_NEUTRAL_HID": "HIS"}
+    for position, category in parsed.items():
+        if sequence_by_position.get(position) != expected_component[category]:
+            raise ValueError(f"profile state assignment {category} does not match source residue {position}")
+    observed_ionizable = {pos: comp for pos, comp in sequence_by_position.items() if comp in {"ASP", "GLU", "ARG", "LYS", "TYR", "HIS"}}
+    if set(observed_ionizable) != set(parsed):
+        raise ValueError(f"state-sensitive residue coverage mismatch: source={sorted(observed_ionizable)}, profile={sorted(parsed)}")
+    if sequence_by_position.get(1) != "MET" or sequence_by_position.get(164) != "LEU":
+        raise ValueError("the approved charged Met1 and Leu164 termini do not match the selected source construct")
+    if profile.get("default_standard_residue_state") != "NEUTRAL_CCD_COMPONENT_STATE_WITH_EXPLICIT_HYDROGEN_RULES":
+        raise ValueError("profile lacks the explicit standard-residue CCD state rule")
+    return parsed
 
 
 def profile_charges(comp: str, pos: int, atom_name: str) -> int:
@@ -644,25 +705,51 @@ def prepare_run(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError("profile configuration hash differs from sealed run inputs")
     if sha256((root / "SOURCE_MANIFEST.csv").read_bytes()) != sealed["source_manifest_sha256"]:
         raise ValueError("source manifest hash differs from sealed run inputs")
+    completeness_path = root / "PROFILE_COMPLETENESS_VALIDATION.json"
+    matrix_path = root / "SOURCE_PROFILE_COMPLETENESS_MATRIX.csv"
+    if sha256(completeness_path.read_bytes()) != sealed.get("profile_completeness_validation_sha256"):
+        raise ValueError("source/profile completeness validation bytes differ from the pre-execution seal")
+    if sha256(matrix_path.read_bytes()) != sealed.get("completeness_matrix_sha256"):
+        raise ValueError("source/profile completeness matrix bytes differ from the pre-execution seal")
+    completeness = json.loads(completeness_path.read_text(encoding="utf-8"))
+    if completeness.get("status") != "PASS" or completeness.get("profile_id") != PROFILE_ID or completeness.get("selected_residue_count") != 164 or completeness.get("profile_dispositioned_residue_count") != 164 or completeness.get("rdkit_imported") is not False or completeness.get("molecules_constructed") is not False:
+        raise ValueError("source/profile completeness validation did not pass before RDKit import")
+    profile = json.loads(config_bytes.decode("utf-8"))
+    if profile.get("profile_id") != PROFILE_ID or profile.get("semantic_version") != "1.1.0" or profile.get("rdkit_version") != EXPECTED_RDKit or profile.get("python_version") != EXPECTED_PYTHON:
+        raise ValueError("preparation profile configuration disagrees with the approved exact pins")
     if sys.version_info[:3] != (3, 13, 16):
         raise ValueError(f"CPython pin mismatch: {sys.version}")
-    if rdBase.rdkitVersion != EXPECTED_RDKit:
-        raise ValueError(f"RDKit pin mismatch: {rdBase.rdkitVersion}")
-    profile = json.loads(config_bytes.decode("utf-8"))
-    if profile.get("profile_id") != PROFILE_ID or profile.get("rdkit_version") != EXPECTED_RDKit or profile.get("python_version") != EXPECTED_PYTHON:
-        raise ValueError("preparation profile configuration disagrees with the approved exact pins")
 
     source_dir = root / "source_artifacts" / "current_rcsb"
     raw_sources, source_hashes = read_and_verify_sources(source_dir, root / "SOURCE_MANIFEST.csv")
+    if source_hashes != completeness.get("source_hashes_preparse"):
+        raise ValueError("preparation input hashes differ from the pre-RDKit source/profile validation")
     # The bytes parsed below are exactly the bytes whose hashes were checked immediately above.
     mmcif_loops = read_loops(raw_sources["3DMX.cif"])
     ligand_loops = read_loops(raw_sources["BNZ.cif"])
     all_site_rows = atom_site_rows(raw_sources["3DMX.cif"])
     component_atoms, component_bonds = build_component_maps(mmcif_loops)
     ligand_component_atoms, ligand_component_bonds = build_component_maps(ligand_loops)
-    if component_atoms.get("BNZ") != ligand_component_atoms.get("BNZ") or component_bonds.get("BNZ") != ligand_component_bonds.get("BNZ"):
+    if component_graph_signature(component_atoms.get("BNZ", {}), component_bonds.get("BNZ", [])) != component_graph_signature(ligand_component_atoms.get("BNZ", {}), ligand_component_bonds.get("BNZ", [])):
         raise ValueError("3DMX embedded BNZ CCD component conflicts with the separately pinned BNZ CCD input")
-    receptor_heavy, residue_manifest, alternate_manifest = create_residue_inventory(all_site_rows, mmcif_loops, component_atoms, component_bonds)
+    sequence_rows = get_rows(mmcif_loops, "_entity_poly_seq.")
+    state_categories = validate_chemical_state_profile(profile, sequence_rows)
+    receptor_heavy, residue_manifest, alternate_manifest = create_residue_inventory(all_site_rows, mmcif_loops, component_atoms, component_bonds, profile)
+    component_dispositions = source_occurrences(all_site_rows)
+    disposition_counts: dict[str, int] = defaultdict(int)
+    for occurrence in component_dispositions:
+        disposition_counts[occurrence["disposition"]] += 1
+    if disposition_counts != profile.get("component_disposition_counts"):
+        raise ValueError(f"source/profile component disposition mismatch: source={dict(disposition_counts)}, profile={profile.get('component_disposition_counts')}")
+
+    # Only after byte, residue, chemical-state, altloc, CCD graph, and component
+    # completeness checks pass may this adapter import or use RDKit.
+    from rdkit import Chem, rdBase  # noqa: PLC0415
+    from rdkit.Geometry import Point3D  # noqa: PLC0415
+
+    globals().update({"Chem": Chem, "rdBase": rdBase, "Point3D": Point3D})
+    if rdBase.rdkitVersion != EXPECTED_RDKit:
+        raise ValueError(f"RDKit pin mismatch: {rdBase.rdkitVersion}")
     ligand_heavy = [row for row in all_site_rows if row["model"] == 1 and row["record"] == "HETATM" and row["entity"] == "5" and row["label_asym"] == "G" and row["auth_asym"] == "A" and row["comp"] == "BNZ" and row["auth_seq"] == "900"]
     if len(ligand_heavy) != 6 or {row["atom"] for row in ligand_heavy} != {f"C{i}" for i in range(1, 7)} or any(row["element"] != "C" or row["alt"] for row in ligand_heavy):
         raise ValueError("selected 3DMX BNZ occurrence must be exactly six unaltloc carbon atoms")
@@ -734,6 +821,7 @@ def prepare_run(args: argparse.Namespace) -> dict[str, Any]:
 
     atom_bond_payload = {
         "profile_id": PROFILE_ID,
+        "profile_semantic_version": profile["semantic_version"],
         "source_hashes": source_hashes,
         "receptor": {
             "heavy_atoms": source_heavy_rows[:len(receptor_atoms)],
@@ -762,18 +850,18 @@ def prepare_run(args: argparse.Namespace) -> dict[str, Any]:
         "source_manifest": source_manifest_payload,
         "graph_state": atom_bond_payload,
         "generated_hydrogens": hydrogen_rows,
-        "component_occurrences": source_occurrences(all_site_rows),
+        "component_occurrences": component_dispositions,
     }
     canonical_state_bytes = canonical_json(canonical_state_payload)
     output_root = Path(args.output_dir).resolve()
     output_root.mkdir(parents=True, exist_ok=True)
     (output_root / "PREPARED_SCIENTIFIC_PAYLOAD.json").write_bytes(canonical_state_bytes)
-    (output_root / "PREPARED_SCIENT_PAYLOAD.sha256").write_text(sha256(canonical_state_bytes) + "\n", encoding="ascii")
+    (output_root / "PREPARED_SCIENTIFIC_PAYLOAD.sha256").write_text(sha256(canonical_state_bytes) + "\n", encoding="ascii")
     (output_root / "SOURCE_ARTIFACT_HASHES.json").write_bytes(canonical_json(source_manifest_payload))
     (output_root / "SELECTED_HEAVY_ATOM_MANIFEST.json").write_bytes(canonical_json(source_heavy_rows))
     (output_root / "EXPLICIT_GRAPH_STATE.json").write_bytes(canonical_json(atom_bond_payload))
     (output_root / "HYDROGEN_PROVENANCE.json").write_bytes(canonical_json(hydrogen_rows))
-    (output_root / "COMPONENT_DISPOSITIONS.json").write_bytes(canonical_json(source_occurrences(all_site_rows)))
+    (output_root / "COMPONENT_DISPOSITIONS.json").write_bytes(canonical_json(component_dispositions))
     (output_root / "ALTLOC_DISPOSITIONS.json").write_bytes(canonical_json(alternate_manifest))
     (output_root / "RESIDUE_STATE_INVENTORY.json").write_bytes(canonical_json(residue_manifest))
     (output_root / "HEAVY_ATOM_INVARIANTS.json").write_bytes(canonical_json({"receptor": receptor_invariants, "ligand": ligand_invariants, "heavyAtomAdditions": 0, "heavyAtomDeletions": 0, "heavyAtomIdentityChanges": 0, "heavyAtomCoordinateBitChanges": 0}))
@@ -788,9 +876,11 @@ def prepare_run(args: argparse.Namespace) -> dict[str, Any]:
         "machine": platform.machine(),
         "rdkit_version": rdBase.rdkitVersion,
         "profile_id": PROFILE_ID,
+        "profile_semantic_version": profile["semantic_version"],
         "environment": {name: os.environ.get(name) for name in ("TZ", "LC_ALL", "LANG", "PYTHONHASHSEED")},
         "sealed_inputs": sealed,
         "source_hashes_preparse": source_hashes,
+        "source_profile_completeness": {"status": "PASS", "residue_count": len(residue_manifest), "selected_heavy_atom_count": len(receptor_heavy), "state_sensitive_site_count": len(state_categories), "component_disposition_counts": dict(disposition_counts)},
         "atom_count": {"receptor_heavy": len(receptor_atoms), "receptor_hydrogen": len(receptor_hydrogens), "ligand_heavy": len(ligand_atoms), "ligand_hydrogen": len(ligand_hydrogens)},
         "bond_count": {"receptor_heavy": len(receptor_bonds), "ligand_heavy": len(ligand_bonds)},
         "invariants": {"receptor": receptor_invariants, "ligand": ligand_invariants},

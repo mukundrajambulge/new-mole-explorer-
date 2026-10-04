@@ -1,10 +1,7 @@
 # Final D3 open items
 
-All open work remains inside D3-CLOSURE-EXEC-01; this list does not create a new gate or prompt.
+D3-CLOSURE-EXEC-01 execution is complete and ready for final D3 acceptance. There is no unresolved profile, runtime, preparation, replay, state-sealing, SearchRegion, full-pose, or regression blocker in this package.
 
-1. Resolve whether the one-fixture profile may be explicitly extended to select coherent maximum-occupancy A at ASN68, ASP72, and ARG76. The owner decision request is pending. Do not interpret elapsed time as approval or change the profile without a direct answer.
-2. If the owner approves the extension, update the same preparation-profile package with the exact residue/atom selection and provenance, review the driver and run-input seal, and revalidate the profile/configuration identity before any fixture molecule operation. If the owner declines, preserve the existing profile and close with the unresolved source/profile mismatch documented.
-3. Only after the source coordinate state is fully specified, prepare the receptor and BNZ under the already approved chemistry/component state; measure bitwise heavy-atom identity and hydrogen-parent provenance; seal both states; construct and validate SearchRegion; and perform full deterministic fixture replay.
-4. Use the newly added closure-local runner to execute the deterministic same-state direct/grid pose cohort, per-term and aggregate statistics, ordering analysis, cutoff-stress review, and fixture-specific resource checks after states are sealed. Do not invent a scalar acceptance limit.
-5. Cumulative repository, native scorer/field, full-pose harness smoke, and protected PyMOL regressions passed in this continuation. After any future fixture-preparation or validation implementation change, rerun the applicable affected suites and compare against the 47-file/254-test baseline.
-6. Complete requirement traceability and final handoff only from actual sealed-state and full-pose evidence. Until then, D3-FINAL-01 is not ready; D4 remains blocked and `DOCKING.RUN` unavailable.
+The only remaining D3 prompt is D3-FINAL-01. Its handoff is D3_FINAL_01_HANDOFF.md. Carry the measured six-pose and per-term evidence forward, note the absence of an approved direct-versus-grid approximation threshold and the n=1 cutoff-stress scope, and make the final D3 decision only under existing acceptance authority. This instruction creates no additional prompt or gate.
+
+D4 remains blocked and DOCKING.RUN remains unavailable.

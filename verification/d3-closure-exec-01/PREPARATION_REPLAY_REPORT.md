@@ -1,9 +1,14 @@
 # Preparation replay report
 
-**Status: NOT RUN.** No fixture preparation was run, so no replay or digest-equality result exists. Synthetic safe-control repeats passed, but are not fixture replay evidence.
+**Status: PASS.** The authorized hydrogen-only fixture preparation ran twice under the same byte-exact sources, corrected v1.1 profile, Linux x86-64 runtime, pinned toolchain, command, and controlled environment.
 
-AUTH04 lists deterministic replay as a mandatory execution precondition. Integrated task §25 directs running preparation again from the same byte-exact sources and profile and requires identical canonical outputs/digests. This report records that requirement without claiming a replay result or interpreting a run that did not occur.
+- Runtime: WSL2 Ubuntu 24.04.5, CPython 3.13.16, RDKit 2026.03.6.
+- Controlled environment: LANG=C.UTF-8, LC_ALL=C, PYTHONHASHSEED=0, TZ=UTC.
+- Source hashes: 3DMX e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef; BNZ 01bcf7c3ce9befdb4078e9832252eb5fe99e2598f320f87358ea1a9a247f7c61.
+- Run-1 and run-2 canonical scientific payload SHA-256: 212468a368eed75d9522819cb2f8d898d26167001f5dc9af7846fc4a79e1298f.
+- Replay validation: PASS; all scientific artifacts identical.
+- Heavy-atom additions/deletions/remappings/coordinate-bit changes: 0/0/0/0.
+- Serialization round-trip maximum displacement: 0.0 Å (the allowed bound is 0.001 Å).
+- Generated hydrogens: receptor 1,330; ligand 6.
 
-The Linux continuation resolved the import restriction and passed safe synthetic controls. Fixture preparation remains unconsumed because hash-gated source preflight found unresolved A/B coordinate states at ASN68, ASP72, and ARG76 that are not covered by the frozen profile. No initial fixture preparation started, so deterministic fixture replay could not be performed.
-
-The hand-built ethane and aromatic benzene controls each ran twice in separate Linux processes. Their within-control signatures matched. These synthetic results do not establish fixture determinism and are recorded under `runtime_logs/linux/`.
+Machine evidence is PREPARATION_REPLAY_VALIDATION.json. Per-run source/input/runtime/invariant and hydrogen-parent provenance are in prepared_states/run-1/ and prepared_states/run-2/. The pre-chemistry source/profile validator ran before each preparation.

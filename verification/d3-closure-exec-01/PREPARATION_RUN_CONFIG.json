@@ -1,0 +1,68 @@
+{
+  "schema_id": "D3_3DMX_BNZ_PREPARATION_PROFILE_V1",
+  "profile_id": "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_1",
+  "semantic_version": "1.1.0",
+  "predecessor_profile_id": "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_0",
+  "scope": "One development-only 3DMX/BNZ fixture profile completeness amendment.",
+  "python_version": "3.13.16",
+  "rdkit_version": "2026.03.6",
+  "target_pH": 6.9,
+  "context": "crystal-growth-condition proxy; binding/soak pH and preparation route are not reported",
+  "source_selection": {
+    "entry_id": "3DMX",
+    "model_number": 1,
+    "assembly_id": "1",
+    "polymer_entity_id": "1",
+    "label_asym_id": "A",
+    "auth_asym_id": "A",
+    "expected_sequence_positions": 164,
+    "selected_receptor_heavy_atom_count": 1306
+  },
+  "selected_receptor_heavy_atom_count": 1306,
+  "chemical_state_assignments": {
+    "ASP_DEPROTONATED": [10, 20, 47, 61, 70, 72, 89, 92, 127, 159],
+    "GLU_DEPROTONATED": [5, 11, 22, 45, 62, 64, 108, 128],
+    "ARG_PROTONATED": [8, 14, 52, 76, 80, 95, 96, 119, 125, 137, 145, 148, 154],
+    "LYS_PROTONATED": [16, 19, 35, 43, 48, 60, 65, 83, 85, 124, 135, 147, 162],
+    "TYR_NEUTRAL": [18, 24, 25, 88, 139, 161],
+    "HIS31_NEUTRAL_HID": [31]
+  },
+  "termini": {
+    "n_terminus": {"position": 1, "residue_name": "MET", "state": "PROTONATED", "formal_charge": 1},
+    "c_terminus": {"position": 164, "residue_name": "LEU", "state": "DEPROTONATED", "formal_charge": -1, "source_atom": "OXT"}
+  },
+  "default_standard_residue_state": "NEUTRAL_CCD_COMPONENT_STATE_WITH_EXPLICIT_HYDROGEN_RULES",
+  "altloc_resolution": {
+    "policy": "COHERENT_MAX_OCCUPANCY_V1",
+    "unlisted_altlocs": "REJECT",
+    "common_blank_atoms": "retain exactly once",
+    "groups": [
+      {"label_seq_id": 68, "residue_name": "ASN", "selected_label": "A", "occupancy_by_label": {"A": 0.7, "B": 0.3}, "provenance": "bounded owner authorization plus byte-verified 3DMX source occupancies"},
+      {"label_seq_id": 72, "residue_name": "ASP", "selected_label": "A", "occupancy_by_label": {"A": 0.8, "B": 0.2}, "provenance": "bounded owner authorization plus byte-verified 3DMX source occupancies"},
+      {"label_seq_id": 76, "residue_name": "ARG", "selected_label": "A", "occupancy_by_label": {"A": 0.6, "B": 0.4}, "provenance": "bounded owner authorization plus byte-verified 3DMX source occupancies"},
+      {"label_seq_id": 106, "residue_name": "MET", "selected_label": "A", "occupancy_by_label": {"A": 0.7, "B": 0.3}, "provenance": "unchanged AUTH04 owner-approved disposition"},
+      {"label_seq_id": 108, "residue_name": "GLU", "selected_label": "A", "occupancy_by_label": {"A": 0.7, "B": 0.3}, "provenance": "unchanged AUTH04 owner-approved disposition"}
+    ]
+  },
+  "component_policy": "CORE_DRY_V1 occurrence-level AUTH04 policy",
+  "component_disposition_counts": {
+    "SELECT_POLYMER_RECEPTOR": 164,
+    "SELECT_AS_DOCKED_LIGAND": 1,
+    "EXCLUDE_WATER_CORE_DRY_V1": 248,
+    "EXCLUDE_NONPOLYMER_PROFILE_OMISSION": 5
+  },
+  "hydrogen_method": {
+    "operation": "Chem.AddHs(molecule, explicitOnly=False, addCoords=True, onlyOnAtoms=None, addResidueInfo=True)",
+    "no_query_atoms_or_bonds": true,
+    "no_geometry_optimization": true,
+    "no_implicit_state_selection": true,
+    "hydrogen_names": "source CCD bond inventory plus the explicit AUTH04 terminal, ASP/GLU, and HIS31 HID adjustments"
+  },
+  "heavy_atom_invariant": {
+    "zero_additions": true,
+    "zero_deletions": true,
+    "zero_remappings": true,
+    "bitwise_in_memory_coordinate_identity": true,
+    "serialization_roundtrip_tolerance_angstrom": 0.001
+  }
+}

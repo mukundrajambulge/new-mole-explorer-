@@ -1,17 +1,17 @@
 # Resource validation
 
-**Closure-task status: PARTIAL.** No prepared fixture states or actual fixture SearchRegion were produced, so dimensions, serialized final field size, full-pose workload, and fixture-specific runtime/RSS remain unavailable.
+**Closure-task status: SearchRegion geometry and fixed field budget PASS; allocator/RSS profiling not performed for the small fixture field.**
 
-The preserved D3-GRID-01 maximum-field implementation evidence uses a 110×110×110 node grid and 250,000 receptor scoring centers. The runtime-unblock continuation rebuilt the same native direct/field tests in WSL2 Ubuntu 24.04.5 with CMake 3.28.3 and GCC 13.3.0, using the repository's strict floating-point and warning flags. CTest passed both native test targets. The maximum-geometry resource fixture was also run directly and reported:
+The fixture SearchRegion contains 2,420 grid points at 0.375 Å spacing with a 0.375 Å interpolation halo. Its axes are 11, 22, and 10 points, below the native 110-point maximum. The receptor uses 1,306 scoring centers, below the 250,000-center maximum. The 59-channel physical layout implies 1,142,240 bytes of double values (59 × 2,420 × 8), below the 805,306,368-byte raw-payload limit. This is a layout calculation; metadata, allocator overhead, serialized-field size, and fixture RSS were not separately measured. Native construction of the field completed successfully in the full-pose run.
 
-| Measure | Prior Windows Zig result | Continuation Linux GCC result | Limit | Interpretation |
-|---|---:|---:|---:|---|
-| Raw physical payload | 628,232,000 B | 628,232,000 B | 805,306,368 B (768 MiB) | Within |
-| Field-owned allocation during construction | 635,301,608 B | 635,301,752 B | 1,073,741,824 B (1 GiB) | Within |
-| Retained field allocation | 628,234,152 B | 628,234,296 B | 1,073,741,824 B (1 GiB) | Within |
-| Construction peak field-owned allocation | 635,301,608 B | 635,301,752 B | 1,073,741,824 B (1 GiB) | Within |
-| Process peak RSS | 674,414,592 B | 676,855,808 B | 2,147,483,648 B default | Within |
+The direct C++ and scoring-field test suite passed under CMake/GCC on WSL2 Ubuntu 24.04.5, 2/2 CTest targets. The inherited D3-GRID-01 maximum-field implementation evidence uses 110 × 110 × 110 nodes and 250,000 receptor scoring centers. It remains recorded below with its measured values and existing limits.
 
-The small allocation/RSS differences are observed between the Windows Zig and Linux GCC executions; no cross-platform bitwise resource identity is claimed. Linux outputs are in `runtime_logs/continuation-native-linux-cmake-ctest-output.txt`, `runtime_logs/continuation-native-direct-output.txt`, and `runtime_logs/continuation-native-field-resource-output.txt`. The limits were unchanged.
+| Maximum-field measure | Prior Windows Zig result | Continuation Linux GCC result | Limit |
+|---|---:|---:|---:|
+| Raw physical payload | 628,232,000 B | 628,232,000 B | 805,306,368 B (768 MiB) |
+| Field-owned allocation during construction | 635,301,608 B | 635,301,752 B | 1,073,741,824 B (1 GiB) |
+| Retained field allocation | 628,234,152 B | 628,234,296 B | 1,073,741,824 B (1 GiB) |
+| Construction peak field-owned allocation | 635,301,608 B | 635,301,752 B | 1,073,741,824 B (1 GiB) |
+| Process peak RSS | 674,414,592 B | 676,855,808 B | 2,147,483,648 B |
 
-These implementation-level checks do not validate a SearchRegion for 3DMX/BNZ, a final serialized fixture field, or full-pose fixture resources. No fixture-specific dimensions, payload, RSS, or memory use are inferred from the bounded maximum-field test.
+The small allocation/RSS differences between Windows Zig and Linux GCC are observations; no cross-platform bitwise resource identity is claimed. These maximum-field implementation measures are not represented as fixture-field measurements.
