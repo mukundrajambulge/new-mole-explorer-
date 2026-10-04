@@ -1,0 +1,109 @@
+{
+  "architecture": "x86_64",
+  "build_dependencies": {
+    "dpkg_query_returncode": 0,
+    "dpkg_query_stderr": "",
+    "packages": [
+      "build-essential=12.10ubuntu1",
+      "ca-certificates=20260601~24.04.1",
+      "g++=4:13.2.0-7ubuntu1",
+      "gcc=4:13.2.0-7ubuntu1",
+      "libbz2-dev:amd64=1.0.8-5.1ubuntu0.1",
+      "libc6:amd64=2.39-0ubuntu8.9",
+      "libexpat1-dev:amd64=2.6.1-2ubuntu0.6",
+      "libffi-dev:amd64=3.4.6-1build1",
+      "libgdbm-compat-dev:amd64=1.23-5.1build1",
+      "libgdbm-dev:amd64=1.23-5.1build1",
+      "liblzma-dev:amd64=5.6.1+really5.4.5-1ubuntu0.3",
+      "libncurses-dev:amd64=6.4+20240113-1ubuntu2.2",
+      "libncursesw6:amd64=6.4+20240113-1ubuntu2.2",
+      "libreadline-dev:amd64=8.2-4build1",
+      "libsqlite3-dev:amd64=3.45.1-1ubuntu2.8",
+      "libssl-dev:amd64=3.0.13-0ubuntu3.16",
+      "make=4.3-4.1build2",
+      "pkg-config:amd64=1.8.1-2build1",
+      "uuid-dev:amd64=2.39.3-9ubuntu6.6",
+      "zlib1g-dev:amd64=1:1.3.dfsg-3.1ubuntu2.2"
+    ]
+  },
+  "distribution": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+  "environment": {
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C",
+    "PYTHONHASHSEED": null,
+    "TZ": "UTC"
+  },
+  "glibc": [
+    "glibc",
+    "2.39"
+  ],
+  "kernel": {
+    "machine": "x86_64",
+    "node": "kingsclan",
+    "processor": "x86_64",
+    "release": "6.6.87.2-microsoft-standard-WSL2",
+    "system": "Linux",
+    "version": "#1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025"
+  },
+  "packages": {
+    "module_paths": {
+      "rdkit.Chem": "/root/.local/share/mole-explorer/d3-closure-exec-01-linux/venv/lib/python3.13/site-packages/rdkit/Chem/__init__.py",
+      "rdkit.Chem.rdmolfiles": "/root/.local/share/mole-explorer/d3-closure-exec-01-linux/venv/lib/python3.13/site-packages/rdkit/Chem/rdmolfiles.so",
+      "rdkit.Chem.rdmolops": "/root/.local/share/mole-explorer/d3-closure-exec-01-linux/venv/lib/python3.13/site-packages/rdkit/Chem/rdmolops.so",
+      "rdkit.rdBase": "/root/.local/share/mole-explorer/d3-closure-exec-01-linux/venv/lib/python3.13/site-packages/rdkit/rdBase.so"
+    },
+    "numpy": "2.3.3",
+    "pillow": "12.0.0",
+    "pip": "25.2",
+    "rdkit_distribution_version": "2026.3.6",
+    "rdkit_native_extensions": {
+      "rdBase": {
+        "path": "/root/.local/share/mole-explorer/d3-closure-exec-01-linux/venv/lib/python3.13/site-packages/rdkit/rdBase.so",
+        "recordHash": "sha256=t8I6-ABysgnMUgHb3Tn8I8gmhDOBkhzey2q1-coEXLM",
+        "recordSha256Hex": "b7c23af80072b209cc5201dbdd39fc23c826843381921cdecb6ab5f9ca045cb3",
+        "sha256": "b7c23af80072b209cc5201dbdd39fc23c826843381921cdecb6ab5f9ca045cb3"
+      },
+      "rdmolfiles": {
+        "path": "/root/.local/share/mole-explorer/d3-closure-exec-01-linux/venv/lib/python3.13/site-packages/rdkit/Chem/rdmolfiles.so",
+        "recordHash": "sha256=cpxj_PPRkcNGSv0w7OjqxwDgGblQKKjdY4q3xqeYUz0",
+        "recordSha256Hex": "729c63fcf3d191c3464afd30ece8eac700e019b95028a8dd638ab7c6a798533d",
+        "sha256": "729c63fcf3d191c3464afd30ece8eac700e019b95028a8dd638ab7c6a798533d"
+      },
+      "rdmolops": {
+        "path": "/root/.local/share/mole-explorer/d3-closure-exec-01-linux/venv/lib/python3.13/site-packages/rdkit/Chem/rdmolops.so",
+        "recordHash": "sha256=0MQCDx0IMfCVwWs4hUVHZklR5srfFoDQXfinEytgp08",
+        "recordSha256Hex": "d0c4020f1d0831f095c16b38854547664951e6cadf1680d05df8a7132b60a74f",
+        "sha256": "d0c4020f1d0831f095c16b38854547664951e6cadf1680d05df8a7132b60a74f"
+      }
+    },
+    "rdkit_runtime_version": "2026.03.6",
+    "rdkit_wheel": {
+      "filename": "rdkit-2026.3.6-cp313-cp313-manylinux_2_28_x86_64.whl",
+      "sha256": "3d0a2011c2a46f312010c8d8ec89b8210795663285545b2ac0909d1b9551fe41",
+      "wheelMetadata": "Metadata-Version: 2.1\nName: rdkit\nVersion: 2026.3.6\nSummary: A collection of chemoinformatics and machine-learning software written in C++ and Python\nHome-page: https://github.com/kuelumbus/rdkit-pypi\nAuthor: Christopher Kuenneth\nAuthor-email: chris@kuenneth.dev\nLicense: BSD-3-Clause\nProject-URL: RDKit, http://rdkit.org/\nProject-URL: RDKit on Github, https://github.com/rdkit/rdkit\nDescription-Content-Type: text/markdown\nLicense-File: LICENSE.md\nRequires-Dist: numpy\nRequires-Dist: Pillow\n\n# \ud83d\udd25 RDKit Python Wheels\n\nThis repository holds the code to build [RDKit](https://github.com/rdkit/rdkit) platform wheels for Linux, macOS, and Windows on Github Action and Circle CI. The wheels contain the compiled platform-specific dynamic libraries (`*.so`, `*.dylib`, and `*.dll`) and are available at [PyPI](https://pypi.org/project/rdkit/). RDKit can easily be installed using\n\n```sh\npip install rdkit\n```\n\nPlease open an issue if you find something missing or not working as expected.\n\n\n[![PyPI version shields.io](https://img.shields.io/pypi/v/rdkit.svg?style=for-the-badge&logo=PyPI&logoColor=blue)](https://pypi.python.org/pypi/rdkit/)\n[![PyPI download day](https://img.shields.io/pypi/dm/rdkit.svg?style=for-the-badge&logo=PyPI)](https://pypi.python.org/pypi/rdkit/)\n[![PyPI download month](https://img.shields.io/pypi/dw/rdkit.svg?style=for-the-badge&logo=PyPI)](https://pypi.python.org/pypi/rdkit/)\n[![PyPI download day](https://img.shields.io/pypi/dd/rdkit.svg?style=for-the-badge&logo=PyPI)](https://pypi.python.org/pypi/rdkit/)\n![GitHub Repo stars](https://img.shields.io/github/stars/kuelumbus/rdkit-pypi?style=for-the-badge&logo=github)\n## Available Builds\n\n| OS      | Arch    | Bit | Conditions                                          | 3.8            | 3.9 | 3.10 | 3.11 | 3.12 | 3.13 | 3.14 | 3.15 | CI             |\n| ------- | ------- | --- | --------------------------------------------------- | -------------- | --- | ---- | ---- | ---- | ---- | ---- | ---- | -------------- |\n| Linux   | intel   | 64  | glibc >= 2.28 (e.g., Ubuntu 18.04+, CentOS 6+, ...) | last: 2024.3.5 | last: 2025.9.2    | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | Github Actions |\n| Linux   | aarch64 | 64  | glibc >= 2.28 (e.g., Raspberry Pi, ...)             | last: 2024.3.5 | last: 2025.9.2   | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | Circle CI      |\n| macOS   | armv8   | 64  | >= macOS 11, M-Hardware                             | last: 2024.3.5 | last: 2025.9.2   | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | Github Actions | \n| Windows | intel   | 64  |                                                     | last: 2024.3.5 | last: 2025.9.2   | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | \u2714\ufe0f    | Github Actions |\n\nmacOS Intel (x86_64) wheels are no longer built. The last available versions were 2024.3.5 (Python 3.8), 2025.9.2 (Python 3.9), and 2025.9.3 (Python 3.10-3.13).\n\n## Installation\n\n### PIP\n\n```bash\npython -m pip install rdkit\npython -c \"from rdkit import Chem; print(Chem.MolToMolBlock(Chem.MolFromSmiles('C1CCC1')))\"\n```\n\n### [uv](https://docs.astral.sh/uv/getting-started/installation/)\n\n```bash\nuv add rdkit\nuv run python -c \"from rdkit import Chem; print(Chem.MolToMolBlock(Chem.MolFromSmiles('C1CCC1')))\"\n```\n\n## Local builds on Linux\n\n`cibuildwheel` requires `patchelf` (`apt install patchelf`)\n\n```bash\npython3 -m pip install cibuildwheel\n\ngit clone https://github.com/kuelumbus/rdkit-pypi.git\ncd rdkit-pypi\n\nCIBW_BUILD=cp313-manylinux_x86_64 python3 -m cibuildwheel --platform linux --output-dir wheelhouse --config-file pyproject.toml\n```\n\nReplace `*` in `cp*-manylinux_x86_64` with `310`, `311`, `312`, `313`, `314`, or `315` to build for different Python\n",
+      "wheelTag": "Wheel-Version: 1.0\nGenerator: setuptools (75.2.0)\nRoot-Is-Purelib: false\nTag: cp313-cp313-manylinux_2_28_x86_64\n\n"
+    }
+  },
+  "python": {
+    "compiler": "GCC 13.3.0",
+    "executable": "/root/.local/share/mole-explorer/d3-closure-exec-01-linux/venv/bin/python",
+    "executable_sha256": "e382ab092de7936425dbfa2af85ad78a174de551effbf37b83b8627e78ed6c1c",
+    "implementation": "CPython",
+    "openssl": "OpenSSL 3.0.13 30 Jan 2024",
+    "prefix": "/root/.local/share/mole-explorer/d3-closure-exec-01-linux/venv",
+    "sysconfig": {
+      "CC": "gcc",
+      "CFLAGS": "-fno-strict-overflow -Wsign-compare -DNDEBUG -g -O3 -Wall",
+      "CONFIG_ARGS": "'--prefix=/root/.local/share/mole-explorer/d3-closure-exec-01-linux/install/python-3.13.16' '--with-ensurepip=install'",
+      "LDFLAGS": "",
+      "MULTIARCH": "x86_64-linux-gnu",
+      "SOABI": "cpython-313-x86_64-linux-gnu"
+    },
+    "version": "3.13.16 (main, Oct  4 2026, 09:45:45) [GCC 13.3.0]"
+  },
+  "source_artifact": {
+    "path": "/root/.local/share/mole-explorer/d3-closure-exec-01-linux/artifacts/Python-3.13.16.tar.xz",
+    "sha256": "f4b1bfb3c79b5bb11b8d228a12504163b4c0dab4d679828d8f5f26b6cb6ab35d"
+  },
+  "timestamp_utc": "2026-10-04T10:10:51Z"
+}

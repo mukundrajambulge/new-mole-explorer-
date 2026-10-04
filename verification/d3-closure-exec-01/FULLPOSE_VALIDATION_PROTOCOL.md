@@ -1,6 +1,6 @@
 # Full-pose validation protocol status
 
-**Protocol execution: BLOCKED before state binding.** The integrated task requires deterministic direct-versus-grid evaluation of every pose against the same sealed receptor, ligand, SearchRegion and scoring-field state. The pinned RDKit import block prevented preparation and state sealing, so there is no eligible pose input and no cohort was materialized.
+**Protocol execution: BLOCKED before state binding.** The integrated task requires deterministic direct-versus-grid evaluation of every pose against the same sealed receptor, ligand, SearchRegion and scoring-field state. Fixture preparation stopped because the frozen source/profile does not resolve A/B alternatives at ASN68, ASP72, and ARG76. No eligible sealed states or pose inputs exist, and no cohort was materialized.
 
 The requested cohort classes remain: crystallographic pose; controlled translations; controlled rotations; combined perturbations; grid-phase/alignment cases; and cutoff-stress cases. No transform magnitudes, axes, acceptance thresholds or pose IDs were invented in the absence of the task's sealed-state inputs and canonical protocol detail.
 

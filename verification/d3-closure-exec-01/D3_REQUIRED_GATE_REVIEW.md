@@ -32,6 +32,10 @@ The integrated task explicitly requires canonical prepared states to include the
 
 AUTH04 records a single-use development fixture authorization and lists deterministic replay as a mandatory execution precondition. Integrated task §25 directs preparation again from the same inputs/profile. No preparation began because the pinned RDKit extension was blocked at import; therefore this review makes no claim about a preparation or replay result and the authorization remains unconsumed. Both instructions remain documented without adding an owner-amendment condition.
 
+## Runtime-unblock continuation update
+
+The Linux runtime relocation subsequently resolved the RDKit import issue and safe synthetic AddHs controls passed. The fixture-specific hash-gated preflight then stopped at ASN68 because the frozen AUTH04 profile resolves only MET106 and GLU108, while the exact source also contains A/B groups at ASN68, ASP72, and ARG76. No fixture graph or AddHs call occurred. The prior independent review remains evidence for its original scope; it does not review newly created fixture states or preparation outputs, because none exist.
+
 ## Runtime finding
 
 The standard Windows installer rolled back. A separately verified official CPython embeddable package starts as CPython 3.13.16 x64 in isolated mode, and the pinned wheels install into its isolated package path. An earlier import attempt was blocked at `rdBase.pyd` by Code Integrity events 3077/3033 under policy `0283ac0f-fff1-49ae-ada1-8a933130cad6`. On the resumed recheck `rdkit.rdBase` loaded, but the §18 safe control failed before molecular work because `rdkit.Chem.rdmolfiles` raised an Application Control import error. Its hash matches the installed wheel `RECORD`. This is a hard execution blocker, not a scientific rejection of 3DMX/BNZ.

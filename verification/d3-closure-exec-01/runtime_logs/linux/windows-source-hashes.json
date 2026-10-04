@@ -1,0 +1,32 @@
+[
+  {
+    "name": "3DMX.cif",
+    "bytes": 218104,
+    "sha256": "e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef"
+  },
+  {
+    "name": "3DMX_assembly_1.json",
+    "bytes": 3543,
+    "sha256": "2accfe2d4b9eabc50c37932da6af4ce6b36ad0b0ee078192fd882fd005ea9670"
+  },
+  {
+    "name": "3DMX_entry.json",
+    "bytes": 22036,
+    "sha256": "e9b303678dab19908f7708201586e732caf1f015fde0e4d36c4d7c97bfbaad1b"
+  },
+  {
+    "name": "3DMX_full_validation.pdf",
+    "bytes": 515092,
+    "sha256": "e24681b6500f8489ad93b8ce747978b1346df2f2817aa208683a1b6656e47f62"
+  },
+  {
+    "name": "3DMX_polymer_entity_1.json",
+    "bytes": 50665,
+    "sha256": "e016e357934b43d07c58e971720d800ba253b441b614dfd547933838226a508d"
+  },
+  {
+    "name": "BNZ.cif",
+    "bytes": 4633,
+    "sha256": "01bcf7c3ce9befdb4078e9832252eb5fe99e2598f320f87358ea1a9a247f7c61"
+  }
+]

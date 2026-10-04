@@ -1,13 +1,10 @@
 # Final D3 open items
 
-These items remain within D3-CLOSURE-EXEC-01; they do not create an intermediate gate or prompt.
+All open work remains inside D3-CLOSURE-EXEC-01; this list does not create a new gate or prompt.
 
-1. Obtain an enterprise-policy-approved pinned RDKit 2026.03.6 binary/runtime that loads with CPython 3.13.16 x64, or run on a policy-approved host. Do not bypass or disable Code Integrity.
-2. Complete the integrated task's deterministic fixture replay from the same byte-exact sources/profile and record canonical output/digest equality.
-3. After the approved runtime is executable, create/review/seal the exact driver and perform safe-tool behavior checks before any fixture AddHs call.
-4. Verify all six source hashes immediately before their first chemistry use, then execute preparation under the approved chemical/component policy and prove bitwise heavy-atom invariance and hydrogen-parent provenance.
-5. Seal the receptor and ligand states, D3 profile-aware envelopes and canonical SearchRegion.
-6. Build and score the same-state deterministic full-pose cohort, report per-term/overall/cutoff-stress statistics and order stability, and make one evidence-backed acceptance recommendation without inventing a threshold.
-7. Complete applicable final resource measurements and requirement/acceptance-test traceability against produced state and full-pose evidence. The Roadmap code-review element and blocked-state evidence-package audit passed; an independent scientific-acceptance review of execution outputs remains impossible until those outputs exist.
-
-No D3-FINAL-01 handoff is ready until these closure items are resolved and verified. D4 remains blocked; `DOCKING.RUN` remains unavailable.
+1. Resolve whether the one-fixture profile may be explicitly extended to select coherent maximum-occupancy A at ASN68, ASP72, and ARG76. The owner decision request is pending. Do not interpret elapsed time as approval or change the profile without a direct answer.
+2. If the owner approves the extension, update the same preparation-profile package with the exact residue/atom selection and provenance, review the driver and run-input seal, and revalidate the profile/configuration identity before any fixture molecule operation. If the owner declines, preserve the existing profile and close with the unresolved source/profile mismatch documented.
+3. Only after the source coordinate state is fully specified, prepare the receptor and BNZ under the already approved chemistry/component state; measure bitwise heavy-atom identity and hydrogen-parent provenance; seal both states; construct and validate SearchRegion; and perform full deterministic fixture replay.
+4. Run the deterministic same-state direct/grid pose cohort, per-term and aggregate statistics, ordering analysis, cutoff-stress review, and fixture-specific resource checks. Do not invent a scalar acceptance limit.
+5. Run the applicable cumulative regression after any preparation/validation implementation changes and record counts against the preserved 47-file/254-test baseline.
+6. Complete requirement traceability and final handoff only from actual sealed-state and full-pose evidence. Until then, D3-FINAL-01 is not ready; D4 remains blocked and `DOCKING.RUN` unavailable.

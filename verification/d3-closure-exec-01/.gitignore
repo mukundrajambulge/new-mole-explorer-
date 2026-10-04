@@ -1,0 +1,2 @@
+# Python syntax-check/cache artifacts are runtime-local, not closure evidence.
+tools/__pycache__/

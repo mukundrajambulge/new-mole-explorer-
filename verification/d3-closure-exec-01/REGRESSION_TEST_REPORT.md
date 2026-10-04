@@ -19,6 +19,6 @@ The captured command output and start/end/exit record are `runtime_logs/npm-test
 
 The tests ran with Node.js `v24.14.1` and npm `11.11.0` on the Windows x64 worktree host. The API count includes a regression proving that malformed atom serial field `0001X` fails with `D3_PDBQT_ATOM_SERIAL_INVALID`.
 
-These are cumulative repository regressions on the corrected TOR parser revision. No preparation driver or full-pose validation code was added, so no D3-specific chemistry, numerical, resource, or security test was possible.
+These are cumulative repository regressions on the corrected TOR parser revision. In the later runtime-unblock continuation, a task-local fail-closed source/preparation adapter was added, but the fixture adapter was not run through molecule construction or `AddHs` because the source/profile coordinate state is unresolved. No D3-specific fixture chemistry, numerical, or fixture-resource test result is claimed.
 
 Follow-on validation on 2026-10-04 passed `npm run typecheck`, `npm run lint`, and `npm run build` on the corrected TOR parser. The build completed with the existing 3Dmol.js `eval` and large-chunk advisories. Detailed scope and the preserved bounded native/PyMOL evidence are in `CUMULATIVE_REGRESSION_REPORT.md`.

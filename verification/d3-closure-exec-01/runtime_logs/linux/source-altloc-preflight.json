@@ -1,0 +1,1104 @@
+{
+  "3dmx_loops": 29,
+  "bnz_loops": 5,
+  "atom_site_rows": 1616,
+  "chem_comp_atom_rows": 426,
+  "chem_comp_bond_rows": 408,
+  "entity_poly_seq_rows": 164,
+  "selected_polymer_site_rows": 1335,
+  "selected_polymer_heavy_rows": 1335,
+  "selected_receptor_heavy_atoms_after_altloc": 0,
+  "residue_count": 0,
+  "altloc_occurrence_rows": 0,
+  "verified_source_hashes": {
+    "3DMX.cif": {
+      "byteLength": 218104,
+      "sha256": "e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef",
+      "manifestRole": "Official RCSB deposited mmCIF source coordinates",
+      "sourceUrl": "https://files.rcsb.org/download/3DMX.cif"
+    },
+    "BNZ.cif": {
+      "byteLength": 4633,
+      "sha256": "01bcf7c3ce9befdb4078e9832252eb5fe99e2598f320f87358ea1a9a247f7c61",
+      "manifestRole": "Official PDB Chemical Component Dictionary definition for BNZ",
+      "sourceUrl": "https://files.rcsb.org/ligands/view/BNZ.cif"
+    },
+    "3DMX_entry.json": {
+      "byteLength": 22036,
+      "sha256": "e9b303678dab19908f7708201586e732caf1f015fde0e4d36c4d7c97bfbaad1b",
+      "manifestRole": "RCSB entry metadata",
+      "sourceUrl": "https://data.rcsb.org/rest/v1/core/entry/3DMX"
+    },
+    "3DMX_assembly_1.json": {
+      "byteLength": 3543,
+      "sha256": "2accfe2d4b9eabc50c37932da6af4ce6b36ad0b0ee078192fd882fd005ea9670",
+      "manifestRole": "RCSB biological assembly 1 metadata",
+      "sourceUrl": "https://data.rcsb.org/rest/v1/core/assembly/3DMX/1"
+    },
+    "3DMX_polymer_entity_1.json": {
+      "byteLength": 50665,
+      "sha256": "e016e357934b43d07c58e971720d800ba253b441b614dfd547933838226a508d",
+      "manifestRole": "RCSB polymer entity 1 sequence and source metadata",
+      "sourceUrl": "https://data.rcsb.org/rest/v1/core/polymer_entity/3DMX/1"
+    },
+    "3DMX_full_validation.pdf": {
+      "byteLength": 515092,
+      "sha256": "e24681b6500f8489ad93b8ce747978b1346df2f2817aa208683a1b6656e47f62",
+      "manifestRole": "Official RCSB full validation report",
+      "sourceUrl": "https://files.rcsb.org/pub/pdb/validation_reports/dm/3dmx/3dmx_full_validation.pdf"
+    }
+  },
+  "selection_error": "ValueError: unapproved alternate state at polymer position 68:CA",
+  "polymer_altloc_rows": [
+    {
+      "label_seq": 68,
+      "auth_seq": "68",
+      "comp": "ASN",
+      "atom": "CA",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 531
+    },
+    {
+      "label_seq": 68,
+      "auth_seq": "68",
+      "comp": "ASN",
+      "atom": "CA",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 532
+    },
+    {
+      "label_seq": 68,
+      "auth_seq": "68",
+      "comp": "ASN",
+      "atom": "CB",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 535
+    },
+    {
+      "label_seq": 68,
+      "auth_seq": "68",
+      "comp": "ASN",
+      "atom": "CB",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 536
+    },
+    {
+      "label_seq": 68,
+      "auth_seq": "68",
+      "comp": "ASN",
+      "atom": "CG",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 537
+    },
+    {
+      "label_seq": 68,
+      "auth_seq": "68",
+      "comp": "ASN",
+      "atom": "CG",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 538
+    },
+    {
+      "label_seq": 68,
+      "auth_seq": "68",
+      "comp": "ASN",
+      "atom": "OD1",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 539
+    },
+    {
+      "label_seq": 68,
+      "auth_seq": "68",
+      "comp": "ASN",
+      "atom": "OD1",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 540
+    },
+    {
+      "label_seq": 68,
+      "auth_seq": "68",
+      "comp": "ASN",
+      "atom": "ND2",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 541
+    },
+    {
+      "label_seq": 68,
+      "auth_seq": "68",
+      "comp": "ASN",
+      "atom": "ND2",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 542
+    },
+    {
+      "label_seq": 72,
+      "auth_seq": "72",
+      "comp": "ASP",
+      "atom": "CA",
+      "alt": "A",
+      "occupancy": 0.8,
+      "row": 568
+    },
+    {
+      "label_seq": 72,
+      "auth_seq": "72",
+      "comp": "ASP",
+      "atom": "CA",
+      "alt": "B",
+      "occupancy": 0.2,
+      "row": 569
+    },
+    {
+      "label_seq": 72,
+      "auth_seq": "72",
+      "comp": "ASP",
+      "atom": "CB",
+      "alt": "A",
+      "occupancy": 0.8,
+      "row": 572
+    },
+    {
+      "label_seq": 72,
+      "auth_seq": "72",
+      "comp": "ASP",
+      "atom": "CB",
+      "alt": "B",
+      "occupancy": 0.2,
+      "row": 573
+    },
+    {
+      "label_seq": 72,
+      "auth_seq": "72",
+      "comp": "ASP",
+      "atom": "CG",
+      "alt": "A",
+      "occupancy": 0.8,
+      "row": 574
+    },
+    {
+      "label_seq": 72,
+      "auth_seq": "72",
+      "comp": "ASP",
+      "atom": "CG",
+      "alt": "B",
+      "occupancy": 0.2,
+      "row": 575
+    },
+    {
+      "label_seq": 72,
+      "auth_seq": "72",
+      "comp": "ASP",
+      "atom": "OD1",
+      "alt": "A",
+      "occupancy": 0.8,
+      "row": 576
+    },
+    {
+      "label_seq": 72,
+      "auth_seq": "72",
+      "comp": "ASP",
+      "atom": "OD1",
+      "alt": "B",
+      "occupancy": 0.2,
+      "row": 577
+    },
+    {
+      "label_seq": 72,
+      "auth_seq": "72",
+      "comp": "ASP",
+      "atom": "OD2",
+      "alt": "A",
+      "occupancy": 0.8,
+      "row": 578
+    },
+    {
+      "label_seq": 72,
+      "auth_seq": "72",
+      "comp": "ASP",
+      "atom": "OD2",
+      "alt": "B",
+      "occupancy": 0.2,
+      "row": 579
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "CA",
+      "alt": "A",
+      "occupancy": 0.6,
+      "row": 598
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "CA",
+      "alt": "B",
+      "occupancy": 0.4,
+      "row": 599
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "CB",
+      "alt": "A",
+      "occupancy": 0.6,
+      "row": 602
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "CB",
+      "alt": "B",
+      "occupancy": 0.4,
+      "row": 603
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "CG",
+      "alt": "A",
+      "occupancy": 0.6,
+      "row": 604
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "CG",
+      "alt": "B",
+      "occupancy": 0.4,
+      "row": 605
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "CD",
+      "alt": "A",
+      "occupancy": 0.6,
+      "row": 606
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "CD",
+      "alt": "B",
+      "occupancy": 0.4,
+      "row": 607
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "NE",
+      "alt": "A",
+      "occupancy": 0.6,
+      "row": 608
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "NE",
+      "alt": "B",
+      "occupancy": 0.4,
+      "row": 609
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "CZ",
+      "alt": "A",
+      "occupancy": 0.6,
+      "row": 610
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "CZ",
+      "alt": "B",
+      "occupancy": 0.4,
+      "row": 611
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "NH1",
+      "alt": "A",
+      "occupancy": 0.6,
+      "row": 612
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "NH1",
+      "alt": "B",
+      "occupancy": 0.4,
+      "row": 613
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "NH2",
+      "alt": "A",
+      "occupancy": 0.6,
+      "row": 614
+    },
+    {
+      "label_seq": 76,
+      "auth_seq": "76",
+      "comp": "ARG",
+      "atom": "NH2",
+      "alt": "B",
+      "occupancy": 0.4,
+      "row": 615
+    },
+    {
+      "label_seq": 106,
+      "auth_seq": "106",
+      "comp": "MET",
+      "atom": "CA",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 843
+    },
+    {
+      "label_seq": 106,
+      "auth_seq": "106",
+      "comp": "MET",
+      "atom": "CA",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 844
+    },
+    {
+      "label_seq": 106,
+      "auth_seq": "106",
+      "comp": "MET",
+      "atom": "CB",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 847
+    },
+    {
+      "label_seq": 106,
+      "auth_seq": "106",
+      "comp": "MET",
+      "atom": "CB",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 848
+    },
+    {
+      "label_seq": 106,
+      "auth_seq": "106",
+      "comp": "MET",
+      "atom": "CG",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 849
+    },
+    {
+      "label_seq": 106,
+      "auth_seq": "106",
+      "comp": "MET",
+      "atom": "CG",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 850
+    },
+    {
+      "label_seq": 106,
+      "auth_seq": "106",
+      "comp": "MET",
+      "atom": "SD",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 851
+    },
+    {
+      "label_seq": 106,
+      "auth_seq": "106",
+      "comp": "MET",
+      "atom": "SD",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 852
+    },
+    {
+      "label_seq": 106,
+      "auth_seq": "106",
+      "comp": "MET",
+      "atom": "CE",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 853
+    },
+    {
+      "label_seq": 106,
+      "auth_seq": "106",
+      "comp": "MET",
+      "atom": "CE",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 854
+    },
+    {
+      "label_seq": 108,
+      "auth_seq": "108",
+      "comp": "GLU",
+      "atom": "CA",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 860
+    },
+    {
+      "label_seq": 108,
+      "auth_seq": "108",
+      "comp": "GLU",
+      "atom": "CA",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 861
+    },
+    {
+      "label_seq": 108,
+      "auth_seq": "108",
+      "comp": "GLU",
+      "atom": "CB",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 864
+    },
+    {
+      "label_seq": 108,
+      "auth_seq": "108",
+      "comp": "GLU",
+      "atom": "CB",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 865
+    },
+    {
+      "label_seq": 108,
+      "auth_seq": "108",
+      "comp": "GLU",
+      "atom": "CG",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 866
+    },
+    {
+      "label_seq": 108,
+      "auth_seq": "108",
+      "comp": "GLU",
+      "atom": "CG",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 867
+    },
+    {
+      "label_seq": 108,
+      "auth_seq": "108",
+      "comp": "GLU",
+      "atom": "CD",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 868
+    },
+    {
+      "label_seq": 108,
+      "auth_seq": "108",
+      "comp": "GLU",
+      "atom": "CD",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 869
+    },
+    {
+      "label_seq": 108,
+      "auth_seq": "108",
+      "comp": "GLU",
+      "atom": "OE1",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 870
+    },
+    {
+      "label_seq": 108,
+      "auth_seq": "108",
+      "comp": "GLU",
+      "atom": "OE1",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 871
+    },
+    {
+      "label_seq": 108,
+      "auth_seq": "108",
+      "comp": "GLU",
+      "atom": "OE2",
+      "alt": "A",
+      "occupancy": 0.7,
+      "row": 872
+    },
+    {
+      "label_seq": 108,
+      "auth_seq": "108",
+      "comp": "GLU",
+      "atom": "OE2",
+      "alt": "B",
+      "occupancy": 0.3,
+      "row": 873
+    }
+  ],
+  "selected_polymer_models": [
+    "1"
+  ],
+  "proline_hydrogen_bonds": [
+    {
+      "_chem_comp_bond.comp_id": "PRO",
+      "_chem_comp_bond.atom_id_1": "N",
+      "_chem_comp_bond.atom_id_2": "H",
+      "_chem_comp_bond.value_order": "sing",
+      "_chem_comp_bond.pdbx_aromatic_flag": "N",
+      "_chem_comp_bond.pdbx_stereo_config": "N",
+      "_chem_comp_bond.pdbx_ordinal": "295"
+    },
+    {
+      "_chem_comp_bond.comp_id": "PRO",
+      "_chem_comp_bond.atom_id_1": "CA",
+      "_chem_comp_bond.atom_id_2": "HA",
+      "_chem_comp_bond.value_order": "sing",
+      "_chem_comp_bond.pdbx_aromatic_flag": "N",
+      "_chem_comp_bond.pdbx_stereo_config": "N",
+      "_chem_comp_bond.pdbx_ordinal": "298"
+    },
+    {
+      "_chem_comp_bond.comp_id": "PRO",
+      "_chem_comp_bond.atom_id_1": "CB",
+      "_chem_comp_bond.atom_id_2": "HB2",
+      "_chem_comp_bond.value_order": "sing",
+      "_chem_comp_bond.pdbx_aromatic_flag": "N",
+      "_chem_comp_bond.pdbx_stereo_config": "N",
+      "_chem_comp_bond.pdbx_ordinal": "302"
+    },
+    {
+      "_chem_comp_bond.comp_id": "PRO",
+      "_chem_comp_bond.atom_id_1": "CB",
+      "_chem_comp_bond.atom_id_2": "HB3",
+      "_chem_comp_bond.value_order": "sing",
+      "_chem_comp_bond.pdbx_aromatic_flag": "N",
+      "_chem_comp_bond.pdbx_stereo_config": "N",
+      "_chem_comp_bond.pdbx_ordinal": "303"
+    },
+    {
+      "_chem_comp_bond.comp_id": "PRO",
+      "_chem_comp_bond.atom_id_1": "CG",
+      "_chem_comp_bond.atom_id_2": "HG2",
+      "_chem_comp_bond.value_order": "sing",
+      "_chem_comp_bond.pdbx_aromatic_flag": "N",
+      "_chem_comp_bond.pdbx_stereo_config": "N",
+      "_chem_comp_bond.pdbx_ordinal": "305"
+    },
+    {
+      "_chem_comp_bond.comp_id": "PRO",
+      "_chem_comp_bond.atom_id_1": "CG",
+      "_chem_comp_bond.atom_id_2": "HG3",
+      "_chem_comp_bond.value_order": "sing",
+      "_chem_comp_bond.pdbx_aromatic_flag": "N",
+      "_chem_comp_bond.pdbx_stereo_config": "N",
+      "_chem_comp_bond.pdbx_ordinal": "306"
+    },
+    {
+      "_chem_comp_bond.comp_id": "PRO",
+      "_chem_comp_bond.atom_id_1": "CD",
+      "_chem_comp_bond.atom_id_2": "HD2",
+      "_chem_comp_bond.value_order": "sing",
+      "_chem_comp_bond.pdbx_aromatic_flag": "N",
+      "_chem_comp_bond.pdbx_stereo_config": "N",
+      "_chem_comp_bond.pdbx_ordinal": "307"
+    },
+    {
+      "_chem_comp_bond.comp_id": "PRO",
+      "_chem_comp_bond.atom_id_1": "CD",
+      "_chem_comp_bond.atom_id_2": "HD3",
+      "_chem_comp_bond.value_order": "sing",
+      "_chem_comp_bond.pdbx_aromatic_flag": "N",
+      "_chem_comp_bond.pdbx_stereo_config": "N",
+      "_chem_comp_bond.pdbx_ordinal": "308"
+    },
+    {
+      "_chem_comp_bond.comp_id": "PRO",
+      "_chem_comp_bond.atom_id_1": "OXT",
+      "_chem_comp_bond.atom_id_2": "HXT",
+      "_chem_comp_bond.value_order": "sing",
+      "_chem_comp_bond.pdbx_aromatic_flag": "N",
+      "_chem_comp_bond.pdbx_stereo_config": "N",
+      "_chem_comp_bond.pdbx_ordinal": "309"
+    }
+  ],
+  "source_component_counts": {
+    "ALA": 85,
+    "ARG": 151,
+    "ASN": 101,
+    "ASP": 85,
+    "GLN": 45,
+    "GLU": 78,
+    "GLY": 44,
+    "HIS": 10,
+    "ILE": 80,
+    "LEU": 121,
+    "LYS": 117,
+    "MET": 45,
+    "PHE": 55,
+    "PRO": 21,
+    "SER": 36,
+    "THR": 84,
+    "TRP": 42,
+    "TYR": 72,
+    "VAL": 63
+  },
+  "struct_conn_loops": [],
+  "component_hydrogen_parents": {
+    "ALA": [
+      [
+        "CA",
+        "HA"
+      ],
+      [
+        "CB",
+        "HB1"
+      ],
+      [
+        "CB",
+        "HB2"
+      ],
+      [
+        "CB",
+        "HB3"
+      ],
+      [
+        "N",
+        "H"
+      ],
+      [
+        "N",
+        "H2"
+      ],
+      [
+        "OXT",
+        "HXT"
+      ]
+    ],
+    "ARG": [
+      [
+        "CA",
+        "HA"
+      ],
+      [
+        "CB",
+        "HB2"
+      ],
+      [
+        "CB",
+        "HB3"
+      ],
+      [
+        "CD",
+        "HD2"
+      ],
+      [
+        "CD",
+        "HD3"
+      ],
+      [
+        "CG",
+        "HG2"
+      ],
+      [
+        "CG",
+        "HG3"
+      ],
+      [
+        "N",
+        "H"
+      ],
+      [
+        "N",
+        "H2"
+      ],
+      [
+        "NE",
+        "HE"
+      ],
+      [
+        "NH1",
+        "HH11"
+      ],
+      [
+        "NH1",
+        "HH12"
+      ],
+      [
+        "NH2",
+        "HH21"
+      ],
+      [
+        "NH2",
+        "HH22"
+      ],
+      [
+        "OXT",
+        "HXT"
+      ]
+    ],
+    "ASP": [
+      [
+        "CA",
+        "HA"
+      ],
+      [
+        "CB",
+        "HB2"
+      ],
+      [
+        "CB",
+        "HB3"
+      ],
+      [
+        "N",
+        "H"
+      ],
+      [
+        "N",
+        "H2"
+      ],
+      [
+        "OD2",
+        "HD2"
+      ],
+      [
+        "OXT",
+        "HXT"
+      ]
+    ],
+    "GLU": [
+      [
+        "CA",
+        "HA"
+      ],
+      [
+        "CB",
+        "HB2"
+      ],
+      [
+        "CB",
+        "HB3"
+      ],
+      [
+        "CG",
+        "HG2"
+      ],
+      [
+        "CG",
+        "HG3"
+      ],
+      [
+        "N",
+        "H"
+      ],
+      [
+        "N",
+        "H2"
+      ],
+      [
+        "OE2",
+        "HE2"
+      ],
+      [
+        "OXT",
+        "HXT"
+      ]
+    ],
+    "HIS": [
+      [
+        "CA",
+        "HA"
+      ],
+      [
+        "CB",
+        "HB2"
+      ],
+      [
+        "CB",
+        "HB3"
+      ],
+      [
+        "CD2",
+        "HD2"
+      ],
+      [
+        "CE1",
+        "HE1"
+      ],
+      [
+        "N",
+        "H"
+      ],
+      [
+        "N",
+        "H2"
+      ],
+      [
+        "ND1",
+        "HD1"
+      ],
+      [
+        "NE2",
+        "HE2"
+      ],
+      [
+        "OXT",
+        "HXT"
+      ]
+    ],
+    "LEU": [
+      [
+        "CA",
+        "HA"
+      ],
+      [
+        "CB",
+        "HB2"
+      ],
+      [
+        "CB",
+        "HB3"
+      ],
+      [
+        "CD1",
+        "HD11"
+      ],
+      [
+        "CD1",
+        "HD12"
+      ],
+      [
+        "CD1",
+        "HD13"
+      ],
+      [
+        "CD2",
+        "HD21"
+      ],
+      [
+        "CD2",
+        "HD22"
+      ],
+      [
+        "CD2",
+        "HD23"
+      ],
+      [
+        "CG",
+        "HG"
+      ],
+      [
+        "N",
+        "H"
+      ],
+      [
+        "N",
+        "H2"
+      ],
+      [
+        "OXT",
+        "HXT"
+      ]
+    ],
+    "LYS": [
+      [
+        "CA",
+        "HA"
+      ],
+      [
+        "CB",
+        "HB2"
+      ],
+      [
+        "CB",
+        "HB3"
+      ],
+      [
+        "CD",
+        "HD2"
+      ],
+      [
+        "CD",
+        "HD3"
+      ],
+      [
+        "CE",
+        "HE2"
+      ],
+      [
+        "CE",
+        "HE3"
+      ],
+      [
+        "CG",
+        "HG2"
+      ],
+      [
+        "CG",
+        "HG3"
+      ],
+      [
+        "N",
+        "H"
+      ],
+      [
+        "N",
+        "H2"
+      ],
+      [
+        "NZ",
+        "HZ1"
+      ],
+      [
+        "NZ",
+        "HZ2"
+      ],
+      [
+        "NZ",
+        "HZ3"
+      ],
+      [
+        "OXT",
+        "HXT"
+      ]
+    ],
+    "MET": [
+      [
+        "CA",
+        "HA"
+      ],
+      [
+        "CB",
+        "HB2"
+      ],
+      [
+        "CB",
+        "HB3"
+      ],
+      [
+        "CE",
+        "HE1"
+      ],
+      [
+        "CE",
+        "HE2"
+      ],
+      [
+        "CE",
+        "HE3"
+      ],
+      [
+        "CG",
+        "HG2"
+      ],
+      [
+        "CG",
+        "HG3"
+      ],
+      [
+        "N",
+        "H"
+      ],
+      [
+        "N",
+        "H2"
+      ],
+      [
+        "OXT",
+        "HXT"
+      ]
+    ],
+    "TYR": [
+      [
+        "CA",
+        "HA"
+      ],
+      [
+        "CB",
+        "HB2"
+      ],
+      [
+        "CB",
+        "HB3"
+      ],
+      [
+        "CD1",
+        "HD1"
+      ],
+      [
+        "CD2",
+        "HD2"
+      ],
+      [
+        "CE1",
+        "HE1"
+      ],
+      [
+        "CE2",
+        "HE2"
+      ],
+      [
+        "N",
+        "H"
+      ],
+      [
+        "N",
+        "H2"
+      ],
+      [
+        "OH",
+        "HH"
+      ],
+      [
+        "OXT",
+        "HXT"
+      ]
+    ]
+  },
+  "component_formal_charges": {
+    "ARG": [],
+    "ASP": [],
+    "GLU": [],
+    "HIS": [],
+    "LYS": [],
+    "TYR": []
+  }
+}

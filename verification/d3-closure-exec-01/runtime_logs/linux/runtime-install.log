@@ -1,0 +1,29 @@
+PYTHON=/root/.local/share/mole-explorer/d3-closure-exec-01-linux/install/python-3.13.16/bin/python3.13
+Python 3.13.16
+x86_64 3.13.16 (main, Oct  4 2026, 09:45:45) [GCC 13.3.0]
+OpenSSL 3.0.13 30 Jan 2024
+VENV=/root/.local/share/mole-explorer/d3-closure-exec-01-linux/venv
+pip 26.2.1 from /root/.local/share/mole-explorer/d3-closure-exec-01-linux/venv/lib/python3.13/site-packages/pip (python 3.13)
+Looking in links: /root/.local/share/mole-explorer/d3-closure-exec-01-linux/wheelhouse
+Processing /root/.local/share/mole-explorer/d3-closure-exec-01-linux/wheelhouse/pip-25.2-py3-none-any.whl (from -r /root/.local/share/mole-explorer/d3-closure-exec-01-linux/pip-bootstrap.lock (line 1))
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 26.2.1
+    Uninstalling pip-26.2.1:
+      Successfully uninstalled pip-26.2.1
+Successfully installed pip-25.2
+pip 25.2 from /root/.local/share/mole-explorer/d3-closure-exec-01-linux/venv/lib/python3.13/site-packages/pip (python 3.13)
+Looking in links: /root/.local/share/mole-explorer/d3-closure-exec-01-linux/wheelhouse
+Processing /root/.local/share/mole-explorer/d3-closure-exec-01-linux/wheelhouse/rdkit-2026.3.6-cp313-cp313-manylinux_2_28_x86_64.whl (from -r /root/.local/share/mole-explorer/d3-closure-exec-01-linux/runtime-requirements.lock (line 1))
+Processing /root/.local/share/mole-explorer/d3-closure-exec-01-linux/wheelhouse/numpy-2.3.3-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r /root/.local/share/mole-explorer/d3-closure-exec-01-linux/runtime-requirements.lock (line 2))
+Processing /root/.local/share/mole-explorer/d3-closure-exec-01-linux/wheelhouse/pillow-12.0.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r /root/.local/share/mole-explorer/d3-closure-exec-01-linux/runtime-requirements.lock (line 3))
+Installing collected packages: rdkit, Pillow, numpy
+
+Successfully installed Pillow-12.0.0 numpy-2.3.3 rdkit-2026.3.6
+3.13.16 (main, Oct  4 2026, 09:45:45) [GCC 13.3.0]
+x86_64
+2026.03.6
+2026.03.6
+2.3.3
+12.0.0
+e382ab092de7936425dbfa2af85ad78a174de551effbf37b83b8627e78ed6c1c  /root/.local/share/mole-explorer/d3-closure-exec-01-linux/install/python-3.13.16/bin/python3.13

@@ -2,44 +2,28 @@
 
 **Disposition:** `D3-CLOSURE-EXEC-01 HOLD — HARD SCIENTIFIC OR NUMERICAL FAILURE`
 
-**Reason:** CPython 3.13.16, `rdkit.rdBase`, and the RDKit version metadata now load from the pinned private runtime, but importing `rdkit.Chem` fails when Windows Application Control blocks the unsigned pinned `rdmolfiles.pyd`. Its on-disk SHA-256 matches the installed RDKit wheel's `RECORD`; this is not a modified or substituted extension. The required `Chem.AddHs` wrapper is therefore unavailable. The safe synthetic control stopped at import before any molecule operation. This meets the integrated task's §39 hard-stop example, “pinned toolchain cannot reproduce the approved state.” No fixture chemistry or scoring operation was attempted.
+**Current blocker:** the verified 3DMX source has three additional A/B polymer alternate-location groups that the owner-approved preparation profile does not resolve. The frozen profile approves coherent A plus common atoms only for MET106 and GLU108. Selecting A at ASN68, ASP72, and ARG76 would change the approved coordinate-state/profile content; preserving both alternatives or dropping their atoms would also change the input state. The hash-gated preflight therefore stopped before receptor graph construction and before any fixture molecule was supplied to RDKit. The chemistry workflow cannot be executed faithfully under the current authorization.
 
-## Gate review
+The Windows Application Control restriction was an execution-host restriction, not evidence of a molecular or numerical failure. The owner-authorized Linux relocation resolved that restriction: the exact pinned CPython 3.13.16 and RDKit 2026.03.6 runtime loads and passes safe synthetic controls. It does not resolve the source/profile coordinate-state conflict. No policy was weakened, no alternate chemistry engine or RDKit release was used, and the approved alternate policy was not extended.
 
-The current Execution Roadmap §3.2 requires “code review and an independent evidence review” at closure. It does not name a human reviewer or credential. The separate D3-CLOSURE-EXEC-01 §12 requires an independent pre-execution review; that review was completed by the isolated read-only reviewer lane and is recorded in `D3_REQUIRED_GATE_REVIEW.md`.
+## Completed in this continuation
 
-AUTH04 makes deterministic replay a mandatory execution precondition, and this integrated task §25 directs the repeated preparation. Neither fixture preparation nor replay began because the required `rdkit.Chem` module could not be imported. The approved preparation remains unconsumed; no replay or digest-equality result is claimed.
-
-The reviewer confirmed that this task authorizes a D3 profile-aware prepared-state envelope to bind the candidate preparation-profile digest while preserving D2 V1 object and digest semantics. The envelope is described in `PROFILE_AWARE_ENVELOPE_SCHEMA.md`; no envelope instance was created because there is no prepared state.
-
-## Completed work
-
-- Verified the approved AUTH04 parent commit and clean isolated branch before work. This closure worktree is based on `2e05be567d96592e866ab13acb161c9eb3ae2953` on `feature/d3-closure-exec-01`.
-- Read the current Roadmap and required scientific documents, then completed the independent pre-execution review.
-- Copied the six byte-exact DEC04 RCSB source artifacts into this evidence package and checked every copied byte length and SHA-256 against `SOURCE_MANIFEST.csv`. No source was parsed or used for chemistry.
-- Downloaded and verified the pinned Python installer and all four pinned wheels. The full installer rolled back; the official Python embeddable runtime was then unpacked into an isolated, task-specific directory and reports CPython 3.13.16 x64.
-- Bootstrapped pip 25.2 and installed only the pinned RDKit, NumPy, and Pillow wheels. The initial import attempt failed on `rdkit/rdBase.pyd`, with Code Integrity events 3033/3077.
-- The independent code review found a TOR parser fail-open on malformed fixed-width serials. The parser now checks the complete five-character atom serial field before conversion; a regression rejects `0001X`. This is a strict input-validation correction and does not change the scientific scoring proposal.
-- Re-ran the complete repository test command after the correction: 47 test files and 254 tests passed (web 34/156, API 13/98). `npm run typecheck`, `npm run lint`, and `npm run build` also exited 0 on the corrected revision. The build emitted the existing 3Dmol.js `eval` and large-chunk advisories.
-- Re-attempted the pinned RDKit import on 2026-10-04 04:13:04 UTC. Windows Code Integrity again blocked `rdkit\rdBase.pyd` (events 3033/3077, policy `0283ac0f-fff1-49ae-ada1-8a933130cad6`); the full transcript is `runtime_logs/rdkit-import-recheck.txt`.
-- On 2026-10-04 08:41 UTC, `rdkit.rdBase` imported successfully from the same pinned runtime; its `rdBase.pyd` hash remained `4ffc113eabdc59b79a6d8d120539d8a9ea082eb999916ebdf26df0cf13503305`. The subsequent safe-control attempt failed before AddHs because `rdkit.Chem.rdmolfiles` was blocked by Application Control. The `rdmolfiles.pyd` hash `42f89f7f7b129b0b166af7bd46225beede035d0110b5ba64d8010a50d6244627` matches its installed wheel `RECORD`. No matching Code Integrity 3033/3077 event for either RDKit module appeared in the 30-minute query at 08:48 UTC. Current import evidence is in `runtime_logs/safe-addhs-control-output.txt` and `runtime_logs/rdkit-chem-import-recheck.txt`.
-- Completed the current canonical-document source review, repository preflight, requirement and acceptance-test traceability, and the blocked-state reports required for this closure package.
+- Continued from `feature/d3-closure-exec-01` with the predecessor closure evidence intact.
+- Built and captured a private CPython 3.13.16 x86-64 runtime in existing WSL2 Ubuntu 24.04.5; installed the exact RDKit 2026.03.6 Linux wheel and hash-pinned dependencies offline. The Linux wheel is the PyPI `rdkit` artifact; its metadata identifies `kuelumbus/rdkit-pypi` as the wheel packaging project. It is not described as upstream-signed. Runtime and artifact identities are in `LINUX_RUNTIME_RECORD.md`.
+- Reviewed pinned RDKit 2026.03.6 source/API semantics for the approved `Chem.AddHs` signature, `skipQueries` default, and hydrogen-coordinate operation. The review is bounded to API/operation semantics and does not claim Windows/Linux binary equivalence.
+- Ran safe synthetic ethane AddHs and aromatic benzene AddHs controls twice in separate processes. Both controls passed with identical canonical signatures across their two runs. Query atom and query bond guards rejected their test inputs. Heavy-atom coordinates/bonds remained unchanged and only expected hydrogens were added.
+- Rehashed all six source artifacts on Windows and inside WSL; byte lengths and SHA-256 values matched the frozen manifest. The parser verifies each source hash before parsing the same bytes in memory.
+- Ran a fail-closed hash-gated 3DMX/BNZ source/profile preflight. It found alternates at ASN68 (A .70/B .30), ASP72 (A .80/B .20), and ARG76 (A .60/B .40), in addition to the already approved MET106 and GLU108 groups. It rejected the first unresolved group at ASN68 before accepting a receptor atom graph. Row-level evidence is `runtime_logs/linux/source-altloc-preflight.json`; the disposition is `SOURCE_PROFILE_MISMATCH.md`.
+- Preserved the predecessor code-review, independent blocked-state evidence-review, and 47-file/254-test regression evidence. No application scoring or capability code changed in this continuation.
 
 ## Not performed
 
-The hand-built ethane safe-control script was attempted but stopped at import before molecule construction. No CIF parsing, molecular graph construction, synthetic ethane molecular operation, `Chem.AddHs`, driver/profile sealing, fixture preparation, deterministic replay, prepared-state sealing, SearchRegion sealing, scorer or field evaluation, or full-pose analysis occurred. The independent reviewer passed the blocked-state evidence-package audit, but no scientific execution outputs exist for final D3 acceptance review. The source files in this package are verified copies only; they are not evidence of byte-exact use by a chemistry operation.
+No fixture-derived graph was supplied to RDKit and no fixture `Chem.AddHs` call occurred. No run configuration or sealed run-input record was created. No receptor or ligand preparation, heavy-atom invariance measurement, hydrogen provenance output, prepared-state/envelope sealing, SearchRegion, deterministic fixture replay, direct/grid scorer evaluation, full-pose statistics, or fixture-specific resource measurement was produced. Existing header-only pose tables remain empty. Safe synthetic controls are not fixture evidence.
 
-## Required to resume
+The single-use owner-approved preparation remains unconsumed. Regressions from the corrected TOR parser are preserved; this continuation made no application code changes and did not repeat the repository regression commands. Fixture preparation/full-pose regression tests could not run because the fixture state is unresolved.
 
-1. Use a policy-approved host/runtime in which the exact pinned `rdkit.Chem` modules load, including `rdmolfiles.pyd`, without disabling or bypassing Application Control. The runtime and wheel hashes are preserved in `PINNED_TOOLCHAIN_EXECUTION_RECORD.md`.
-2. After the approved runtime is executable, complete the preparation and required deterministic replay under the frozen source/profile conditions. Do not use synthetic replay as a substitute for fixture replay.
+## Required disposition
 
-## Closure evidence status
+Do not infer the three unlisted residue states from the unique maximum occupancy alone. A written owner decision must either extend the preparation profile to explicitly select coherent A at ASN68, ASP72, and ARG76 for this fixture, or retain the existing authorization and stop. The previous continuation requested that exact choice; until it is answered, the frozen profile and its authorization remain unchanged. This is an outstanding resolution inside D3-CLOSURE-EXEC-01, not a new D3 stage or gate.
 
-The exact Roadmap §3.2 language and source revision are recorded in `DRIVE_SOURCE_REVIEW.md` and `D3_REQUIRED_GATE_REVIEW.md`. It requires code review and an independent evidence review, without naming a human credential. The task-specific independent pre-execution review and corrected-revision code review passed. An independent audit of the blocked-state evidence package also passed; scientific closure remains unsupported because prepared states and full-pose results do not exist.
-
-The source copy hashes are listed in `BYTE_EXACT_INPUT_VERIFICATION.md`; they establish byte-exact copies only, not source use. The approved profile ID is `ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_0`; no profile, receptor, ligand, or SearchRegion digest was produced. No pose cohort or numerical statistics exist. Regression evidence and limits are summarized in `CUMULATIVE_REGRESSION_REPORT.md` and `RESOURCE_VALIDATION.md`.
-
-The exact final classification remains **`D3-CLOSURE-EXEC-01 HOLD — HARD SCIENTIFIC OR NUMERICAL FAILURE`** under §39 because the approved pinned chemistry engine's required `rdkit.Chem` module cannot load on this host. D3-FINAL-01 is not ready; D4 remains blocked and `DOCKING.RUN` remains unavailable.
-
-No D3-FINAL-01 handoff is issued. D3 remains HOLD; D4 and `DOCKING.RUN` remain unavailable.
+The only allowed successful classification is not supported. D3-FINAL-01 is not ready; D4 remains blocked and `DOCKING.RUN` remains unavailable.
