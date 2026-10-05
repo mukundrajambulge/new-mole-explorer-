@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "semanticSchemaId": "D3_CLOSURE_PROFILE_ARTIFACT_V1",
+  "profileId": "ME_DOCKING_V1_CPU_REFERENCE_NUMERIC_1_0",
+  "semanticVersion": "1.0.0",
+  "dependencyProfileDigests": [],
+  "sourceArtifacts": [
+    {
+      "path": "native/docking-reference/scoring/src/scoring.cpp",
+      "sha256": "b4a8e47fa5e3b686d05e11d8d1780935a078207129955680f06f2e08174cf822"
+    },
+    {
+      "path": "native/docking-reference/scoring/src/scoring_field.cpp",
+      "sha256": "75b3b55033500b5df78abf95f016f87146efb3344d467829df1b87d8f8681a28"
+    },
+    {
+      "path": "verification/d3-closure-exec-01/tools/full_pose_compare.cpp",
+      "sha256": "3df217a06593e3f8cf4429143952d5f5a5fd8d39776de038b0991108b3deddec"
+    }
+  ],
+  "definition": {
+    "execution": "CPU reference double-precision direct scorer and deterministic serial scoring-field builder/interpolator",
+    "canonicalAtomOrder": "stable AtomUID lexical order",
+    "gridInterpolation": "trilinear; fail closed for out-of-domain or missing channel; no clamp or extrapolation"
+  },
+  "digest": "sha256:ac3cff7abb22f0ea2127272a1923625a20fd959c5f97190a55fc0c8c65d5b10d"
+}

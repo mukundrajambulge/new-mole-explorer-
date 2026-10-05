@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "semanticSchemaId": "D3_VINA_TORSION_PROFILE_V1",
+  "profileId": "ME_D3_VINA_TORSION_AUTODOCK_VINA_1_2_7_V1",
+  "source": {
+    "software": "AutoDock Vina",
+    "version": "1.2.7",
+    "commit": "8eb40404f4f45608acb3b01427587ac049f27c1"
+  },
+  "torsdofMeaning": "PRESERVED_RAW_INPUT_ONLY",
+  "branchMeaning": "ORDERED_RAW_TOPOLOGY_WITH_EMPTY_BRANCH_FILTER_FOR_SEARCH_AXES",
+  "searchAxisRule": "A_BRANCH_IS_ACTIVE_IF_ITS_SUBTREE_HAS_AT_LEAST_ONE_ATOM_OTHER_THAN_ITS_IMMOBILE_AXIS_ENDPOINT",
+  "scorerEndpointRule": "FOR_EACH_ACTIVE_HEAVY_HEAVY_ROTOR_ENDPOINT_ADD_0_5_IF_THE_PARTNER_HAS_MORE_THAN_ONE_HEAVY_GRAPH_NEIGHBOR",
+  "scorerTorsionUnit": {
+    "tag": "f64",
+    "bytes": {
+      "0": 63,
+      "1": 224,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0
+    }
+  },
+  "allowedBondContributions": [
+    {
+      "tag": "f64",
+      "bytes": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0
+      }
+    },
+    {
+      "tag": "f64",
+      "bytes": {
+        "0": 63,
+        "1": 224,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0
+      }
+    },
+    {
+      "tag": "f64",
+      "bytes": {
+        "0": 63,
+        "1": 240,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0
+      }
+    }
+  ],
+  "canonicalizationProfile": "ME_CANONICAL_CBOR_V1_1_0",
+  "digest": "sha256:0c042369f70f8a555930aa32cf2c0211abf93ef4bc837cdb389caff50e0edc6b"
+}

@@ -1,0 +1,235 @@
+{
+  "schemaId": "D3_PROFILE_AWARE_PREPARED_STATE_ENVELOPES_V1",
+  "preparationProfile": {
+    "schemaVersion": 1,
+    "semanticSchemaId": "D3_3DMX_BNZ_PREPARATION_PROFILE_V1",
+    "profileId": "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_1",
+    "semanticVersion": "1.1.0",
+    "predecessorProfileId": "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_0",
+    "sourceManifestDigest": "sha256:77fb4a0ece40ec37be2f07a5e4bd7e8380ddba7481279efd39b7c7671963f137",
+    "selectedSourceDigests": {
+      "3DMX.cif": "sha256:e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef",
+      "BNZ.cif": "sha256:01bcf7c3ce9befdb4078e9832252eb5fe99e2598f320f87358ea1a9a247f7c61"
+    },
+    "correctedAltlocGroups": [
+      {
+        "labelSeqId": 68,
+        "residueName": "ASN",
+        "selectedLabel": "A",
+        "occupancies": {
+          "A": "0.70",
+          "B": "0.30"
+        }
+      },
+      {
+        "labelSeqId": 72,
+        "residueName": "ASP",
+        "selectedLabel": "A",
+        "occupancies": {
+          "A": "0.80",
+          "B": "0.20"
+        }
+      },
+      {
+        "labelSeqId": 76,
+        "residueName": "ARG",
+        "selectedLabel": "A",
+        "occupancies": {
+          "A": "0.60",
+          "B": "0.40"
+        }
+      },
+      {
+        "labelSeqId": 106,
+        "residueName": "MET",
+        "selectedLabel": "A",
+        "occupancies": {
+          "A": "0.70",
+          "B": "0.30"
+        }
+      },
+      {
+        "labelSeqId": 108,
+        "residueName": "GLU",
+        "selectedLabel": "A",
+        "occupancies": {
+          "A": "0.70",
+          "B": "0.30"
+        }
+      }
+    ],
+    "chemicalStateAssignments": {
+      "ASP_DEPROTONATED": [
+        10,
+        20,
+        47,
+        61,
+        70,
+        72,
+        89,
+        92,
+        127,
+        159
+      ],
+      "GLU_DEPROTONATED": [
+        5,
+        11,
+        22,
+        45,
+        62,
+        64,
+        108,
+        128
+      ],
+      "ARG_PROTONATED": [
+        8,
+        14,
+        52,
+        76,
+        80,
+        95,
+        96,
+        119,
+        125,
+        137,
+        145,
+        148,
+        154
+      ],
+      "LYS_PROTONATED": [
+        16,
+        19,
+        35,
+        43,
+        48,
+        60,
+        65,
+        83,
+        85,
+        124,
+        135,
+        147,
+        162
+      ],
+      "TYR_NEUTRAL": [
+        18,
+        24,
+        25,
+        88,
+        139,
+        161
+      ],
+      "HIS31_NEUTRAL_HID": [
+        31
+      ]
+    },
+    "termini": {
+      "n_terminus": {
+        "position": 1,
+        "residue_name": "MET",
+        "state": "PROTONATED",
+        "formal_charge": 1
+      },
+      "c_terminus": {
+        "position": 164,
+        "residue_name": "LEU",
+        "state": "DEPROTONATED",
+        "formal_charge": -1,
+        "source_atom": "OXT"
+      }
+    },
+    "componentPolicy": "CORE_DRY_V1 occurrence-level AUTH04 policy",
+    "componentDispositionCounts": {
+      "SELECT_POLYMER_RECEPTOR": 164,
+      "SELECT_AS_DOCKED_LIGAND": 1,
+      "EXCLUDE_WATER_CORE_DRY_V1": 248,
+      "EXCLUDE_NONPOLYMER_PROFILE_OMISSION": 5
+    },
+    "hydrogenMethod": {
+      "operation": "Chem.AddHs(molecule, explicitOnly=False, addCoords=True, onlyOnAtoms=None, addResidueInfo=True)",
+      "no_query_atoms_or_bonds": true,
+      "no_geometry_optimization": true,
+      "no_implicit_state_selection": true,
+      "hydrogen_names": "source CCD bond inventory plus the explicit AUTH04 terminal, ASP/GLU, and HIS31 HID adjustments"
+    },
+    "heavyAtomInvariant": {
+      "zeroAdditions": true,
+      "zeroDeletions": true,
+      "zeroRemappings": true,
+      "bitwiseInMemoryCoordinateIdentity": true,
+      "serializationRoundtripToleranceAngstromF64Bits": {
+        "tag": "f64",
+        "bytes": {
+          "0": 63,
+          "1": 80,
+          "2": 98,
+          "3": 77,
+          "4": 210,
+          "5": 241,
+          "6": 169,
+          "7": 252
+        }
+      }
+    },
+    "sealedDriverSha256": "sha256:c9d4c1ab995246377f8514d90aba3121526b8fe0abaa69f362d45861392446ec",
+    "parserSha256": "sha256:0c3f3272002232213815da93242e964b2ac640795ad5ab8281514fd32ca8da61",
+    "profileConfigSha256": "sha256:4e5981906635d1affce906fccb9ce92274ea2865bc2df157970546adb9c0b189",
+    "completenessMatrixSha256": "sha256:703ddb058982b972807d5b7dc26cda34a094f0414ded1de8980d6fe1cd7ce979",
+    "completenessValidationSha256": "sha256:0f1b4d56dea1bb820fe51d4929464cd395b1d7934f6b491507e01239ee57415b",
+    "runtime": {
+      "python": "3.13.16",
+      "rdkit": "2026.03.6",
+      "executionPlatform": "Linux x86-64, Ubuntu 24.04.5 under WSL2",
+      "preparationCommand": "tools/prepare_3dmx_bnz_hydrogens.py; run-1 and run-2"
+    },
+    "digest": "sha256:fcf52e135e2f6a57cca0328faec730ef5e78d28ad987cad0f2bd060fc9a7f098"
+  },
+  "preparationActivityToolchainDigest": "sha256:fe7e32a5206d3bb5e2685404bf94ccd5e5471fdb6d1c5a3b7ba489bb21f02ce0",
+  "preparedReceptor": {
+    "schemaVersion": 1,
+    "semanticSchemaId": "D3_PROFILE_AWARE_PREPARED_RECEPTOR_V1",
+    "d2PreparedStateDigest": "sha256:226761376a4fbb3d361d3fe6b4e677f53986e2c36cc4f4ca0d4dc0ef34dbe76d",
+    "d2ConsumerProfileId": "ME_DOCKING_V1_RECEPTOR_CORE_DRY_1_0",
+    "preparationProfileId": "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_1",
+    "preparationProfileDigest": "sha256:fcf52e135e2f6a57cca0328faec730ef5e78d28ad987cad0f2bd060fc9a7f098",
+    "sourceInputManifestDigest": "sha256:77fb4a0ece40ec37be2f07a5e4bd7e8380ddba7481279efd39b7c7671963f137",
+    "preparationActivityToolchainDigest": "sha256:fe7e32a5206d3bb5e2685404bf94ccd5e5471fdb6d1c5a3b7ba489bb21f02ce0",
+    "heavyAtomInvariantDigest": "sha256:a24667ec9d1eb3a6ad27bbc4c65ee57c2b40d0f9352b5e325a28583b10dc447a",
+    "generatedHydrogenProvenanceDigest": "sha256:f578e9a683a2fead15f28b4dc415d7b8b29e8f54e65fdc6172feda55bd709c06",
+    "sourceInputDigests": [
+      "sha256:e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef",
+      "sha256:01bcf7c3ce9befdb4078e9832252eb5fe99e2598f320f87358ea1a9a247f7c61"
+    ],
+    "digest": "sha256:50811a40f7f8b948d2648994ccf7e5c76aa3c4851f5ee0a76b615d371c172a08"
+  },
+  "preparedLigand": {
+    "schemaVersion": 1,
+    "semanticSchemaId": "D3_PROFILE_AWARE_PREPARED_LIGAND_V1",
+    "d2PreparedStateDigest": "sha256:65e8b07631df6cc83800b31bf7682b420fce282cadaf3b2427973260b5e851a1",
+    "d2ConsumerProfileId": "ME_DOCKING_V1_LIGAND_EXPLICIT_STATE_1_0",
+    "preparationProfileId": "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_1",
+    "preparationProfileDigest": "sha256:fcf52e135e2f6a57cca0328faec730ef5e78d28ad987cad0f2bd060fc9a7f098",
+    "sourceInputManifestDigest": "sha256:77fb4a0ece40ec37be2f07a5e4bd7e8380ddba7481279efd39b7c7671963f137",
+    "preparationActivityToolchainDigest": "sha256:fe7e32a5206d3bb5e2685404bf94ccd5e5471fdb6d1c5a3b7ba489bb21f02ce0",
+    "heavyAtomInvariantDigest": "sha256:a24667ec9d1eb3a6ad27bbc4c65ee57c2b40d0f9352b5e325a28583b10dc447a",
+    "generatedHydrogenProvenanceDigest": "sha256:f578e9a683a2fead15f28b4dc415d7b8b29e8f54e65fdc6172feda55bd709c06",
+    "sourceInputDigests": [
+      "sha256:e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef",
+      "sha256:01bcf7c3ce9befdb4078e9832252eb5fe99e2598f320f87358ea1a9a247f7c61"
+    ],
+    "ligandGraphIdentity": {
+      "selectedComponentId": "component:7a4119cd14727459cbe42552",
+      "heavyAtomIds": [
+        "atom:3381a1159a49ccb7169565715acf9bf1",
+        "atom:3d451c2da7d3198e386a93ffcaf91c5d",
+        "atom:89aa26341556744504307d07c7cd6c4b",
+        "atom:abebf62ea85988f2794f6dde6a6ffe82",
+        "atom:adc3ab7279c8bf56fac811b71dd088e6",
+        "atom:f9fb0bade61665c9f79247fdb6be904f"
+      ],
+      "torsionEvidenceDigest": "sha256:96a843d5349e5ce908d56595ef2c31b7d8f0f818e260db85894ab715b670c4fe",
+      "scorerTorsionProfileDigest": "sha256:0c042369f70f8a555930aa32cf2c0211abf93ef4bc837cdb389caff50e0edc6b"
+    },
+    "digest": "sha256:fd767e5d6e990ca4e61275232821357e30c2297a60986c09dbe936330f1dd355"
+  }
+}

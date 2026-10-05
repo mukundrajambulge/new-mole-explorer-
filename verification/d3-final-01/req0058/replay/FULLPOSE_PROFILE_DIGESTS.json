@@ -1,0 +1,14 @@
+{
+  "preparationProfileDigest": "sha256:fcf52e135e2f6a57cca0328faec730ef5e78d28ad987cad0f2bd060fc9a7f098",
+  "preparationActivityToolchainDigest": "sha256:fe7e32a5206d3bb5e2685404bf94ccd5e5471fdb6d1c5a3b7ba489bb21f02ce0",
+  "scoringProfileDigest": "sha256:7fa78e00645dbab69b3a989a2967cb5e35071d483987ba84f9a8686be5dedd34",
+  "typingProfileDigest": "sha256:d2a84e624596c65e2245310dc6897ec41d888f2851674b2649a7b5846f29867f",
+  "chemistryProfileDigest": "sha256:6cb2fbd5dcc5dbfdaded563a574257e79de9efa7a325f4af661666f68fee6237",
+  "numericalBackendProfileDigest": "sha256:ac3cff7abb22f0ea2127272a1923625a20fd959c5f97190a55fc0c8c65d5b10d",
+  "scorerTorsionProfileDigest": "sha256:0c042369f70f8a555930aa32cf2c0211abf93ef4bc837cdb389caff50e0edc6b",
+  "receptorTypingAssignmentDigest": "sha256:c8ed74258b49a1c2d74bad7a64daaa3d2d37c130be75870b32b5cf6d52db64b8",
+  "ligandTypingAssignmentDigest": "sha256:5296970fddc5e1307d10400d84c70617d1a22a4c8c5a13ff2279aba70bc31433",
+  "scorerTorsionAssignmentDigest": "sha256:96a843d5349e5ce908d56595ef2c31b7d8f0f818e260db85894ab715b670c4fe",
+  "receptorEnvelopeDigest": "sha256:50811a40f7f8b948d2648994ccf7e5c76aa3c4851f5ee0a76b615d371c172a08",
+  "ligandEnvelopeDigest": "sha256:fd767e5d6e990ca4e61275232821357e30c2297a60986c09dbe936330f1dd355"
+}

@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "semanticSchemaId": "D3_CLOSURE_PROFILE_ARTIFACT_V1",
+  "profileId": "ME_XS_TYPING_V1_1_0",
+  "semanticVersion": "1.1.0",
+  "dependencyProfileDigests": [
+    "sha256:6cb2fbd5dcc5dbfdaded563a574257e79de9efa7a325f4af661666f68fee6237"
+  ],
+  "sourceArtifacts": [
+    {
+      "path": "native/docking-reference/scoring/include/mole/docking/scoring.hpp",
+      "sha256": "0bf96232deaeae682b2eb0afdad080b6b7ebd86669e0c18e176ee6d622447a2d"
+    },
+    {
+      "path": "native/docking-reference/scoring/src/scoring.cpp",
+      "sha256": "b4a8e47fa5e3b686d05e11d8d1780935a078207129955680f06f2e08174cf822"
+    },
+    {
+      "path": "verification/d3-final-01/req0058/tools/seal_3dmx_bnz_states.ts",
+      "sha256": "1365633755827d15247ba9545b7596954d53bfc0f04f58dbde16d2676b2acc1b"
+    }
+  ],
+  "definition": {
+    "closedXsVocabulary": [
+      "C_H",
+      "C_P",
+      "N_P",
+      "N_D",
+      "N_A",
+      "N_DA",
+      "O_P",
+      "O_D",
+      "O_A",
+      "O_DA",
+      "S_P",
+      "P_P",
+      "F_H",
+      "Cl_H",
+      "Br_H",
+      "I_H"
+    ],
+    "elementRoleRule": "Use only explicit element, bonded-to-heteroatom, donor, and acceptor features; no element-only or partial-charge fallback.",
+    "featureProfile": "sha256:6cb2fbd5dcc5dbfdaded563a574257e79de9efa7a325f4af661666f68fee6237",
+    "hydrogens": "Explicit in sealed state; excluded from receptor-ligand heavy-atom scoring projection."
+  },
+  "digest": "sha256:d2a84e624596c65e2245310dc6897ec41d888f2851674b2649a7b5846f29867f"
+}

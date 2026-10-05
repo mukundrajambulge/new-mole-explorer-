@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "semanticSchemaId": "D3_3DMX_BNZ_PREPARATION_PROFILE_V1",
+  "profileId": "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_1",
+  "semanticVersion": "1.1.0",
+  "predecessorProfileId": "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_0",
+  "sourceManifestDigest": "sha256:77fb4a0ece40ec37be2f07a5e4bd7e8380ddba7481279efd39b7c7671963f137",
+  "selectedSourceDigests": {
+    "3DMX.cif": "sha256:e070bcf1424fd555b5faa7a2c689c586e4adc8575bdcdad9221e80a8ed806aef",
+    "BNZ.cif": "sha256:01bcf7c3ce9befdb4078e9832252eb5fe99e2598f320f87358ea1a9a247f7c61"
+  },
+  "correctedAltlocGroups": [
+    {
+      "labelSeqId": 68,
+      "residueName": "ASN",
+      "selectedLabel": "A",
+      "occupancies": {
+        "A": "0.70",
+        "B": "0.30"
+      }
+    },
+    {
+      "labelSeqId": 72,
+      "residueName": "ASP",
+      "selectedLabel": "A",
+      "occupancies": {
+        "A": "0.80",
+        "B": "0.20"
+      }
+    },
+    {
+      "labelSeqId": 76,
+      "residueName": "ARG",
+      "selectedLabel": "A",
+      "occupancies": {
+        "A": "0.60",
+        "B": "0.40"
+      }
+    },
+    {
+      "labelSeqId": 106,
+      "residueName": "MET",
+      "selectedLabel": "A",
+      "occupancies": {
+        "A": "0.70",
+        "B": "0.30"
+      }
+    },
+    {
+      "labelSeqId": 108,
+      "residueName": "GLU",
+      "selectedLabel": "A",
+      "occupancies": {
+        "A": "0.70",
+        "B": "0.30"
+      }
+    }
+  ],
+  "chemicalStateAssignments": {
+    "ASP_DEPROTONATED": [
+      10,
+      20,
+      47,
+      61,
+      70,
+      72,
+      89,
+      92,
+      127,
+      159
+    ],
+    "GLU_DEPROTONATED": [
+      5,
+      11,
+      22,
+      45,
+      62,
+      64,
+      108,
+      128
+    ],
+    "ARG_PROTONATED": [
+      8,
+      14,
+      52,
+      76,
+      80,
+      95,
+      96,
+      119,
+      125,
+      137,
+      145,
+      148,
+      154
+    ],
+    "LYS_PROTONATED": [
+      16,
+      19,
+      35,
+      43,
+      48,
+      60,
+      65,
+      83,
+      85,
+      124,
+      135,
+      147,
+      162
+    ],
+    "TYR_NEUTRAL": [
+      18,
+      24,
+      25,
+      88,
+      139,
+      161
+    ],
+    "HIS31_NEUTRAL_HID": [
+      31
+    ]
+  },
+  "termini": {
+    "n_terminus": {
+      "position": 1,
+      "residue_name": "MET",
+      "state": "PROTONATED",
+      "formal_charge": 1
+    },
+    "c_terminus": {
+      "position": 164,
+      "residue_name": "LEU",
+      "state": "DEPROTONATED",
+      "formal_charge": -1,
+      "source_atom": "OXT"
+    }
+  },
+  "componentPolicy": "CORE_DRY_V1 occurrence-level AUTH04 policy",
+  "componentDispositionCounts": {
+    "SELECT_POLYMER_RECEPTOR": 164,
+    "SELECT_AS_DOCKED_LIGAND": 1,
+    "EXCLUDE_WATER_CORE_DRY_V1": 248,
+    "EXCLUDE_NONPOLYMER_PROFILE_OMISSION": 5
+  },
+  "hydrogenMethod": {
+    "operation": "Chem.AddHs(molecule, explicitOnly=False, addCoords=True, onlyOnAtoms=None, addResidueInfo=True)",
+    "no_query_atoms_or_bonds": true,
+    "no_geometry_optimization": true,
+    "no_implicit_state_selection": true,
+    "hydrogen_names": "source CCD bond inventory plus the explicit AUTH04 terminal, ASP/GLU, and HIS31 HID adjustments"
+  },
+  "heavyAtomInvariant": {
+    "zeroAdditions": true,
+    "zeroDeletions": true,
+    "zeroRemappings": true,
+    "bitwiseInMemoryCoordinateIdentity": true,
+    "serializationRoundtripToleranceAngstromF64Bits": {
+      "tag": "f64",
+      "bytes": {
+        "0": 63,
+        "1": 80,
+        "2": 98,
+        "3": 77,
+        "4": 210,
+        "5": 241,
+        "6": 169,
+        "7": 252
+      }
+    }
+  },
+  "sealedDriverSha256": "sha256:c9d4c1ab995246377f8514d90aba3121526b8fe0abaa69f362d45861392446ec",
+  "parserSha256": "sha256:0c3f3272002232213815da93242e964b2ac640795ad5ab8281514fd32ca8da61",
+  "profileConfigSha256": "sha256:4e5981906635d1affce906fccb9ce92274ea2865bc2df157970546adb9c0b189",
+  "completenessMatrixSha256": "sha256:703ddb058982b972807d5b7dc26cda34a094f0414ded1de8980d6fe1cd7ce979",
+  "completenessValidationSha256": "sha256:0f1b4d56dea1bb820fe51d4929464cd395b1d7934f6b491507e01239ee57415b",
+  "runtime": {
+    "python": "3.13.16",
+    "rdkit": "2026.03.6",
+    "executionPlatform": "Linux x86-64, Ubuntu 24.04.5 under WSL2",
+    "preparationCommand": "tools/prepare_3dmx_bnz_hydrogens.py; run-1 and run-2"
+  },
+  "digest": "sha256:fcf52e135e2f6a57cca0328faec730ef5e78d28ad987cad0f2bd060fc9a7f098"
+}

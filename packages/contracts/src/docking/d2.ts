@@ -7,12 +7,17 @@ import type {
   MolecularIdentityDigest,
   PreparedLigandDigest,
   PreparedReceptorDigest,
+  ProfileDigest,
+  ScoringProfileDigest,
   ProvenanceRecordDigest,
   SearchRegionDigest,
   SourceArtifactId,
 } from "./identity.js";
 
 export const D2_SCHEMA_VERSION = 1 as const;
+// PreparedReceptorState advances independently so the required D3 dependency
+// references do not invalidate unrelated D1/D2 schemas or historical V1 data.
+export const D2_PREPARED_RECEPTOR_STATE_SCHEMA_VERSION = 2 as const;
 export const D2_CORE_PROFILE_ID = "ME_DOCKING_V1_CORE_EXPLICIT_STATE_1_0" as const;
 export const D2_RECEPTOR_PROFILE_ID = "ME_DOCKING_V1_RECEPTOR_CORE_DRY_1_0" as const;
 export const D2_LIGAND_PROFILE_ID = "ME_DOCKING_V1_LIGAND_EXPLICIT_STATE_1_0" as const;
@@ -199,6 +204,44 @@ export type D2PreparedReceptorStateV1 = Readonly<{
   altlocResolution: D2AltlocResolution;
   componentRoles: readonly D2ReceptorComponentRoleV1[];
   profileId: typeof D2_RECEPTOR_PROFILE_ID;
+  siteCriticalAtomUids: readonly D2AtomUID[];
+  validationDigest: ProvenanceRecordDigest;
+  provenance: D2ProvenanceRecordV1;
+  digest: PreparedReceptorDigest;
+}>;
+
+export type D2ProfileReferenceV1 = Readonly<{
+  profileId: string;
+  profileDigest: ProfileDigest;
+}>;
+
+export type D2ScoringProfileReferenceV1 = Readonly<{
+  profileId: string;
+  profileDigest: ScoringProfileDigest;
+}>;
+
+export type D2PreparedReceptorScientificDependenciesV2 = Readonly<{
+  chemicalPerceptionProfileRef: D2ProfileReferenceV1;
+  receptorAtomTypingProfileRef: D2ProfileReferenceV1;
+  scoringProfileRef: D2ScoringProfileReferenceV1;
+}>;
+
+/** Current complete receptor state. V1 remains a historical wire type only. */
+export type D2PreparedReceptorStateV2 = Readonly<{
+  schemaVersion: typeof D2_PREPARED_RECEPTOR_STATE_SCHEMA_VERSION;
+  semanticSchemaId: "D2_PREPARED_RECEPTOR_STATE_V2";
+  preparedStateId: string;
+  receptorIdentity: D2MolecularIdentityV1;
+  graphRevision: D2MolecularGraphRevisionV1;
+  chemicalState: D2ChemicalStateV1;
+  coordinateState: D2CoordinateStateV1;
+  assembly: D2ReceptorAssemblySelection;
+  modelNumber: number;
+  chainIds: readonly string[];
+  altlocResolution: D2PreparedReceptorStateV1["altlocResolution"];
+  componentRoles: readonly D2ReceptorComponentRoleV1[];
+  profileId: typeof D2_RECEPTOR_PROFILE_ID;
+  scientificDependencies: D2PreparedReceptorScientificDependenciesV2;
   siteCriticalAtomUids: readonly D2AtomUID[];
   validationDigest: ProvenanceRecordDigest;
   provenance: D2ProvenanceRecordV1;

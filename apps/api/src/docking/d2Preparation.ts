@@ -1,6 +1,7 @@
 import {
   D2_KINEMATIC_PROFILE_ID,
   D2_LIGAND_PROFILE_ID,
+  D2_PREPARED_RECEPTOR_STATE_SCHEMA_VERSION,
   D2_RECEPTOR_PROFILE_ID,
   D2_SCHEMA_VERSION,
   D2_SEARCH_REGION_PROFILE_ID,
@@ -19,6 +20,8 @@ import {
   type D2MolecularIdentityV1,
   type D2PreparedLigandStateV1,
   type D2PreparedReceptorStateV1,
+  type D2PreparedReceptorScientificDependenciesV2,
+  type D2PreparedReceptorStateV2,
   type D2ProvenanceRecordV1,
   type D2ReceptorAssemblySelection,
   type D2ReceptorComponentRoleV1,
@@ -102,12 +105,32 @@ export type D2PreparedReceptorInput = Readonly<{
   altlocResolution: D2PreparedReceptorStateV1["altlocResolution"];
   componentRoles: readonly D2ReceptorComponentRoleV1[];
   profileId: typeof D2_RECEPTOR_PROFILE_ID;
+  scientificDependencies: D2PreparedReceptorScientificDependenciesV2;
   siteCriticalAtomUids: readonly D2AtomUID[];
 }>;
 
-export const sealPreparedReceptorState = (input: D2PreparedReceptorInput): D2SealResult<D2PreparedReceptorStateV1> => {
+export const sealPreparedReceptorState = (input: D2PreparedReceptorInput): D2SealResult<D2PreparedReceptorStateV2> => {
   const diagnostics: D2Diagnostic[] = [];
   if (input.profileId !== D2_RECEPTOR_PROFILE_ID) diagnostics.push(d2Error("UNSUPPORTED_RECEPTOR_PROFILE", `Only ${D2_RECEPTOR_PROFILE_ID} is admitted by D2.`));
+  const dependencyEntries: readonly [string, unknown][] = [
+    ["chemicalPerceptionProfileRef", (input as Partial<D2PreparedReceptorInput>).scientificDependencies?.chemicalPerceptionProfileRef],
+    ["receptorAtomTypingProfileRef", (input as Partial<D2PreparedReceptorInput>).scientificDependencies?.receptorAtomTypingProfileRef],
+    ["scoringProfileRef", (input as Partial<D2PreparedReceptorInput>).scientificDependencies?.scoringProfileRef],
+  ];
+  for (const [field, reference] of dependencyEntries) {
+    if (!reference || typeof reference !== "object") {
+      diagnostics.push(d2Error("INVALID_MISSING_PREPARED_RECEPTOR_DEPENDENCY", `PreparedReceptorState requires an explicit ${field}.`, `scientificDependencies.${field}`));
+      continue;
+    }
+    const profileReference = reference as { profileId?: unknown; profileDigest?: unknown };
+    if (typeof profileReference.profileId !== "string" || !profileReference.profileId.trim() ||
+        typeof profileReference.profileDigest !== "string" || !isSha256(profileReference.profileDigest)) {
+      diagnostics.push(d2Error("INVALID_PREPARED_RECEPTOR_DEPENDENCY", `${field} requires a non-empty profile ID and canonical SHA-256 profile digest.`, `scientificDependencies.${field}`));
+    }
+  }
+  if (diagnostics.some((diagnostic) => diagnostic.code.startsWith("INVALID_MISSING_PREPARED_RECEPTOR_DEPENDENCY") || diagnostic.code === "INVALID_PREPARED_RECEPTOR_DEPENDENCY")) {
+    return sealResult(undefined, diagnostics);
+  }
   const atomUids = allGraphAtomUids(input.graphRevision);
   validateIdentityLinks(input.receptorIdentity, input.graphRevision, input.chemicalState, input.coordinateState, diagnostics);
   validateCoordinateState(input.coordinateState, input.graphRevision, diagnostics);
@@ -127,8 +150,8 @@ export const sealPreparedReceptorState = (input: D2PreparedReceptorInput): D2Sea
   if (input.graphRevision.atoms.length > MAX_RECEPTOR_ATOMS) diagnostics.push(d2Error("RESOURCE_RECEPTOR_ATOM_LIMIT", `Prepared receptor exceeds ${MAX_RECEPTOR_ATOMS} atoms.`));
   if (input.graphRevision.components.length > MAX_RECEPTOR_RESIDUES) diagnostics.push(d2Error("RESOURCE_RECEPTOR_RESIDUE_LIMIT", `Prepared receptor exceeds ${MAX_RECEPTOR_RESIDUES} component/residue entries.`));
   const payload = {
-    schemaVersion: D2_SCHEMA_VERSION,
-    semanticSchemaId: "D2_PREPARED_RECEPTOR_STATE_V1",
+    schemaVersion: D2_PREPARED_RECEPTOR_STATE_SCHEMA_VERSION,
+    semanticSchemaId: "D2_PREPARED_RECEPTOR_STATE_V2",
     receptorIdentityDigest: input.receptorIdentity.digest,
     graphRevisionDigest: input.graphRevision.digest,
     chemicalStateDigest: input.chemicalState.digest,
@@ -139,15 +162,17 @@ export const sealPreparedReceptorState = (input: D2PreparedReceptorInput): D2Sea
     altlocResolution: input.altlocResolution,
     componentRoles: input.componentRoles,
     profileId: input.profileId,
+    scientificDependencies: input.scientificDependencies,
     siteCriticalAtomUids: input.siteCriticalAtomUids,
   } as const;
-  const validationDigest = scientificDigest<"ProvenanceRecordDigest">("D2_RECEPTOR_VALIDATION", "D2_RECEPTOR_VALIDATION_V1", { profileId: input.profileId, atomCount: input.graphRevision.atoms.length, componentRoles: input.componentRoles, siteCriticalAtomUids: input.siteCriticalAtomUids });
-  const provenance = provenanceFor("SEAL_PREPARED_RECEPTOR_STATE", input.profileId, [input.receptorIdentity.digest, input.graphRevision.digest, input.chemicalState.digest, input.coordinateState.digest], [
+  const validationDigest = scientificDigest<"ProvenanceRecordDigest">("D2_RECEPTOR_VALIDATION", "D2_RECEPTOR_VALIDATION_V2", { profileId: input.profileId, scientificDependencies: input.scientificDependencies, atomCount: input.graphRevision.atoms.length, componentRoles: input.componentRoles, siteCriticalAtomUids: input.siteCriticalAtomUids });
+  const provenance = provenanceFor("SEAL_PREPARED_RECEPTOR_STATE", input.profileId, [input.receptorIdentity.digest, input.graphRevision.digest, input.chemicalState.digest, input.coordinateState.digest, input.scientificDependencies.chemicalPerceptionProfileRef.profileDigest, input.scientificDependencies.receptorAtomTypingProfileRef.profileDigest, input.scientificDependencies.scoringProfileRef.profileDigest], [
     { field: "assembly", status: "PRESERVED", explanation: "Assembly/model/chain/altloc choices are hash-active and explicit." },
     { field: "water", status: "PRESERVED", explanation: "CORE_DRY_V1 excludes water by explicit component-role validation." },
+    { field: "scientific_dependencies", status: "PRESERVED", explanation: "Chemical-perception, receptor-typing, and scoring profile references are explicit and hash-active." },
   ], [input.graphRevision.digest], input.graphRevision.sourceArtifactIds);
-  const digest = scientificDigest<"PreparedReceptorDigest">("D2_PREPARED_RECEPTOR_STATE", "D2_PREPARED_RECEPTOR_STATE_V1", payload);
-  const value: D2PreparedReceptorStateV1 = deepFreeze({ ...payload, preparedStateId: `prepared-receptor:${digest.slice(-16)}`, receptorIdentity: input.receptorIdentity, graphRevision: input.graphRevision, chemicalState: input.chemicalState, coordinateState: input.coordinateState, validationDigest, provenance, digest });
+  const digest = scientificDigest<"PreparedReceptorDigest">("D2_PREPARED_RECEPTOR_STATE_V2", "D2_PREPARED_RECEPTOR_STATE_V2", payload);
+  const value: D2PreparedReceptorStateV2 = deepFreeze({ ...payload, preparedStateId: `prepared-receptor:${digest.slice(-16)}`, receptorIdentity: input.receptorIdentity, graphRevision: input.graphRevision, chemicalState: input.chemicalState, coordinateState: input.coordinateState, validationDigest, provenance, digest });
   return sealResult(value, diagnostics, provenance);
 };
 
@@ -247,7 +272,7 @@ export const sealPreparedLigandState = (input: D2PreparedLigandInput): D2SealRes
 
 export type D2SearchRegionInput = Readonly<{
   bindingSiteRef: string;
-  preparedReceptor: D2PreparedReceptorStateV1;
+  preparedReceptor: D2PreparedReceptorStateV2;
   preparedLigand: D2PreparedLigandStateV1;
   coordinateFrame: D2CoordinateStateV1["coordinateFrame"];
   min: readonly [number, number, number];

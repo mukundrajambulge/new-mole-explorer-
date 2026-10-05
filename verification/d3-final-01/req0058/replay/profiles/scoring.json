@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "semanticSchemaId": "D3_CLOSURE_PROFILE_ARTIFACT_V1",
+  "profileId": "ME_DOCKING_V1_VINA_CLASSIC_1_0",
+  "semanticVersion": "1.0.0",
+  "dependencyProfileDigests": [
+    "sha256:d2a84e624596c65e2245310dc6897ec41d888f2851674b2649a7b5846f29867f"
+  ],
+  "sourceArtifacts": [
+    {
+      "path": "native/docking-reference/scoring/include/mole/docking/scoring.hpp",
+      "sha256": "0bf96232deaeae682b2eb0afdad080b6b7ebd86669e0c18e176ee6d622447a2d"
+    },
+    {
+      "path": "native/docking-reference/scoring/src/scoring.cpp",
+      "sha256": "b4a8e47fa5e3b686d05e11d8d1780935a078207129955680f06f2e08174cf822"
+    }
+  ],
+  "definition": {
+    "weightedTermOrder": [
+      "Gaussian1",
+      "Gaussian2",
+      "Repulsion",
+      "Hydrophobic",
+      "HydrogenBond"
+    ],
+    "coefficientF64Bits": [
+      {
+        "tag": "f64",
+        "bytes": {
+          "0": 191,
+          "1": 162,
+          "2": 55,
+          "3": 105,
+          "4": 34,
+          "5": 217,
+          "6": 72,
+          "7": 220
+        }
+      },
+      {
+        "tag": "f64",
+        "bytes": {
+          "0": 191,
+          "1": 117,
+          "2": 30,
+          "3": 117,
+          "4": 54,
+          "5": 13,
+          "6": 2,
+          "7": 71
+        }
+      },
+      {
+        "tag": "f64",
+        "bytes": {
+          "0": 63,
+          "1": 234,
+          "2": 227,
+          "3": 73,
+          "4": 123,
+          "5": 116,
+          "6": 20,
+          "7": 165
+        }
+      },
+      {
+        "tag": "f64",
+        "bytes": {
+          "0": 191,
+          "1": 161,
+          "2": 244,
+          "3": 144,
+          "4": 96,
+          "5": 52,
+          "6": 243,
+          "7": 254
+        }
+      },
+      {
+        "tag": "f64",
+        "bytes": {
+          "0": 191,
+          "1": 226,
+          "2": 204,
+          "3": 76,
+          "4": 223,
+          "5": 172,
+          "6": 163,
+          "7": 98
+        }
+      }
+    ],
+    "pairCutoffAngstromF64Bits": {
+      "tag": "f64",
+      "bytes": {
+        "0": 64,
+        "1": 32,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0
+      }
+    },
+    "torsionDivisorCoefficientF64Bits": {
+      "tag": "f64",
+      "bytes": {
+        "0": 63,
+        "1": 173,
+        "2": 238,
+        "3": 120,
+        "4": 24,
+        "5": 63,
+        "6": 145,
+        "7": 230
+      }
+    },
+    "electrostatics": false,
+    "importedPartialChargeUse": false
+  },
+  "digest": "sha256:7fa78e00645dbab69b3a989a2967cb5e35071d483987ba84f9a8686be5dedd34"
+}

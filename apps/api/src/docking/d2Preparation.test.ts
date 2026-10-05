@@ -3,14 +3,17 @@ import {
   D2_KINEMATIC_PROFILE_ID,
   D2_LIGAND_PROFILE_ID,
   D2_RECEPTOR_PROFILE_ID,
+  encodeCanonicalCbor,
   f64Bits,
   f64Value,
+  preparedReceptorMatchesScoringFieldDependencies,
   sha256Digest,
   type CanonicalMolecularStructure,
   type D2AtomUID,
   type D2ChemicalStateV1,
   type D2CoordinateStateV1,
   type D2PreparedLigandStateV1,
+  type D2PreparedReceptorScientificDependenciesV2,
 } from "@molecular/contracts";
 import { adaptCanonicalStructure, adaptSmilesIdentity, mapPdbqtKinematicEvidence, parsePdbqtKinematicEvidence } from "./d2Adapters.js";
 import { assessOrdinaryV1Capability, sealLigandKinematicModel, sealPreparedLigandState, sealPreparedReceptorState, sealSearchRegion, isPoseAdmissibleInSearchRegion } from "./d2Preparation.js";
@@ -20,6 +23,11 @@ import { assertD2FixtureCatalog, D2_FIXTURE_CATALOG } from "./d2FixtureCatalog.j
 
 const sourceSha = "a".repeat(64);
 const provenanceDigest = sha256Digest<"ProvenanceRecordDigest">(`sha256:${"b".repeat(64)}`);
+const preparedReceptorDependencies = (): D2PreparedReceptorScientificDependenciesV2 => ({
+  chemicalPerceptionProfileRef: { profileId: "ME_SUPPORTED_CHEMISTRY_V1_1_0", profileDigest: sha256Digest<"ProfileDigest">(`sha256:${"c".repeat(64)}`) },
+  receptorAtomTypingProfileRef: { profileId: "ME_XS_TYPING_V1_1_0", profileDigest: sha256Digest<"ProfileDigest">(`sha256:${"d".repeat(64)}`) },
+  scoringProfileRef: { profileId: "ME_DOCKING_V1_VINA_CLASSIC_1_0", profileDigest: sha256Digest<"ScoringProfileDigest">(`sha256:${"e".repeat(64)}`) },
+});
 const sourceArtifactFor = (format: CanonicalMolecularStructure["format"]) => ({ schemaVersion: 1 as const, sourceArtifactId: "source:d2-fixture", acquisitionKind: "LOCAL_UPLOAD" as const, originalFilename: `d2-fixture.${format}`, mediaType: "chemical/x-fixture", byteLength: 1, sha256: sourceSha, acquiredAt: "2026-09-20T00:00:00.000Z", format, formatEvidence: [], parserProfile: "d2-test" });
 
 const structureFor = (format: CanonicalMolecularStructure["format"] = "sdf"): CanonicalMolecularStructure => ({
@@ -178,13 +186,102 @@ describe("D2 representation and explicit-state sealing", () => {
   it("seals a closed SearchRegion and excludes a one-ULP-outside heavy atom", () => {
     const fixture = adaptedFixture();
     const ligand = preparedLigandFor(fixture);
-    const receptor = sealPreparedReceptorState({ receptorIdentity: fixture.identity, graphRevision: fixture.graph, chemicalState: fixture.chemical, coordinateState: fixture.coordinate, assembly: { selectionKind: "EXPLICIT_ASSEMBLY", assemblyId: "assembly:test", membershipDigest: provenanceDigest }, modelNumber: 1, chainIds: ["A"], altlocResolution: { policy: "PRESERVE_ALL", status: "NOT_APPLICABLE" }, componentRoles: [{ componentId: fixture.selectedComponentId, role: "CORE", evidenceRefs: ["fixture:role"] }], profileId: D2_RECEPTOR_PROFILE_ID, siteCriticalAtomUids: [fixture.graph.atoms[0]!.atomUid] });
+    const receptor = sealPreparedReceptorState({ receptorIdentity: fixture.identity, graphRevision: fixture.graph, chemicalState: fixture.chemical, coordinateState: fixture.coordinate, assembly: { selectionKind: "EXPLICIT_ASSEMBLY", assemblyId: "assembly:test", membershipDigest: provenanceDigest }, modelNumber: 1, chainIds: ["A"], altlocResolution: { policy: "PRESERVE_ALL", status: "NOT_APPLICABLE" }, componentRoles: [{ componentId: fixture.selectedComponentId, role: "CORE", evidenceRefs: ["fixture:role"] }], profileId: D2_RECEPTOR_PROFILE_ID, scientificDependencies: preparedReceptorDependencies(), siteCriticalAtomUids: [fixture.graph.atoms[0]!.atomUid] });
     expect(receptor.status).toBe("VALID");
     const region = sealSearchRegion({ bindingSiteRef: "site:test", preparedReceptor: receptor.value!, preparedLigand: ligand, coordinateFrame: fixture.coordinate.coordinateFrame, min: [-1, -1, -1], max: [2, 2, 2], paddingAngstrom: [0, 0, 0], derivationMode: "EXPLICIT_BOUNDS", fixedAcrossLigandStates: true });
     expect(region.status).toBe("VALID");
     expect(isPoseAdmissibleInSearchRegion(region.value!, [[2, 1, 0]])).toBe(true);
     expect(isPoseAdmissibleInSearchRegion(region.value!, [[2 + (2 * Number.EPSILON), 1, 0]])).toBe(false);
     expect(region.value!.fullExtents.map(f64Value)).toEqual([3, 3, 3]);
+  });
+
+  it("ME-DCK-V1-AT-0058 hashes explicit receptor typing/scoring dependency references and rejects mismatches", () => {
+    const fixture = adaptedFixture();
+    const base = {
+      receptorIdentity: fixture.identity,
+      graphRevision: fixture.graph,
+      chemicalState: fixture.chemical,
+      coordinateState: fixture.coordinate,
+      assembly: { selectionKind: "EXPLICIT_ASSEMBLY" as const, assemblyId: "assembly:test", membershipDigest: provenanceDigest },
+      modelNumber: 1,
+      chainIds: ["A"],
+      altlocResolution: { policy: "PRESERVE_ALL" as const, status: "NOT_APPLICABLE" as const },
+      componentRoles: [{ componentId: fixture.selectedComponentId, role: "CORE" as const, evidenceRefs: ["fixture:role"] }],
+      profileId: D2_RECEPTOR_PROFILE_ID,
+      siteCriticalAtomUids: [fixture.graph.atoms[0]!.atomUid],
+    };
+    const dependencies = preparedReceptorDependencies();
+    const first = sealPreparedReceptorState({ ...base, scientificDependencies: dependencies });
+    const replay = sealPreparedReceptorState({ ...base, scientificDependencies: dependencies });
+    const changedChemistry = sealPreparedReceptorState({ ...base, scientificDependencies: { ...dependencies, chemicalPerceptionProfileRef: { ...dependencies.chemicalPerceptionProfileRef, profileDigest: sha256Digest<"ProfileDigest">(`sha256:${"2".repeat(64)}`) } } });
+    const changedTyping = sealPreparedReceptorState({ ...base, scientificDependencies: { ...dependencies, receptorAtomTypingProfileRef: { ...dependencies.receptorAtomTypingProfileRef, profileDigest: sha256Digest<"ProfileDigest">(`sha256:${"f".repeat(64)}`) } } });
+    const changedScorer = sealPreparedReceptorState({ ...base, scientificDependencies: { ...dependencies, scoringProfileRef: { ...dependencies.scoringProfileRef, profileDigest: sha256Digest<"ScoringProfileDigest">(`sha256:${"1".repeat(64)}`) } } });
+    const changedScorerId = sealPreparedReceptorState({ ...base, scientificDependencies: { ...dependencies, scoringProfileRef: { ...dependencies.scoringProfileRef, profileId: "ME_DOCKING_V1_VINA_CLASSIC_1_1" } } });
+    expect(first.status).toBe("VALID");
+    expect(first.value!.schemaVersion).toBe(2);
+    expect(first.value!.semanticSchemaId).toBe("D2_PREPARED_RECEPTOR_STATE_V2");
+    expect(replay.value!.digest).toBe(first.value!.digest);
+    expect(first.value!.scientificDependencies).toEqual(dependencies);
+    const serializedDependencies = new TextDecoder().decode(encodeCanonicalCbor(first.value!.scientificDependencies));
+    for (const reference of Object.values(dependencies)) {
+      expect(serializedDependencies).toContain(reference.profileId);
+      expect(serializedDependencies).toContain(reference.profileDigest);
+    }
+    expect(changedChemistry.status).toBe("VALID");
+    expect(changedChemistry.value!.digest).not.toBe(first.value!.digest);
+    expect(changedTyping.status).toBe("VALID");
+    expect(changedTyping.value!.digest).not.toBe(first.value!.digest);
+    expect(changedScorer.status).toBe("VALID");
+    expect(changedScorer.value!.digest).not.toBe(first.value!.digest);
+    expect(changedScorerId.status).toBe("VALID");
+    expect(changedScorerId.value!.digest).not.toBe(first.value!.digest);
+    const matchingFieldDependencies = {
+      receptorProfileId: D2_RECEPTOR_PROFILE_ID,
+      scoringProfileId: dependencies.scoringProfileRef.profileId,
+      scoringProfileDigest: dependencies.scoringProfileRef.profileDigest,
+      typingProfileId: dependencies.receptorAtomTypingProfileRef.profileId,
+      typingProfileDigest: dependencies.receptorAtomTypingProfileRef.profileDigest,
+      chemistryProfileId: dependencies.chemicalPerceptionProfileRef.profileId,
+      chemistryProfileDigest: dependencies.chemicalPerceptionProfileRef.profileDigest,
+    } as const;
+    expect(preparedReceptorMatchesScoringFieldDependencies(first.value!, matchingFieldDependencies)).toBe(true);
+    expect(preparedReceptorMatchesScoringFieldDependencies(first.value!, {
+      ...matchingFieldDependencies,
+      scoringProfileDigest: changedScorer.value!.scientificDependencies.scoringProfileRef.profileDigest,
+    })).toBe(false);
+    expect(preparedReceptorMatchesScoringFieldDependencies(first.value!, {
+      ...matchingFieldDependencies,
+      typingProfileDigest: changedTyping.value!.scientificDependencies.receptorAtomTypingProfileRef.profileDigest,
+    })).toBe(false);
+    expect(preparedReceptorMatchesScoringFieldDependencies(first.value!, {
+      ...matchingFieldDependencies,
+      chemistryProfileDigest: changedChemistry.value!.scientificDependencies.chemicalPerceptionProfileRef.profileDigest,
+    })).toBe(false);
+  });
+
+  it("fails closed when a required PreparedReceptorState dependency reference is absent or malformed", () => {
+    const fixture = adaptedFixture();
+    const base = {
+      receptorIdentity: fixture.identity,
+      graphRevision: fixture.graph,
+      chemicalState: fixture.chemical,
+      coordinateState: fixture.coordinate,
+      assembly: { selectionKind: "EXPLICIT_ASSEMBLY" as const, assemblyId: "assembly:test", membershipDigest: provenanceDigest },
+      modelNumber: 1,
+      chainIds: ["A"],
+      altlocResolution: { policy: "PRESERVE_ALL" as const, status: "NOT_APPLICABLE" as const },
+      componentRoles: [{ componentId: fixture.selectedComponentId, role: "CORE" as const, evidenceRefs: ["fixture:role"] }],
+      profileId: D2_RECEPTOR_PROFILE_ID,
+      siteCriticalAtomUids: [fixture.graph.atoms[0]!.atomUid],
+    };
+    const missing = sealPreparedReceptorState({ ...base, scientificDependencies: { ...preparedReceptorDependencies(), scoringProfileRef: undefined } } as never);
+    const malformed = sealPreparedReceptorState({ ...base, scientificDependencies: { ...preparedReceptorDependencies(), scoringProfileRef: { profileId: " ", profileDigest: "" } } } as never);
+    expect(missing.status).toBe("INVALID");
+    expect(missing.value).toBeUndefined();
+    expect(missing.diagnostics.map((row) => row.code)).toContain("INVALID_MISSING_PREPARED_RECEPTOR_DEPENDENCY");
+    expect(malformed.status).toBe("INVALID");
+    expect(malformed.value).toBeUndefined();
+    expect(malformed.diagnostics.map((row) => row.code)).toContain("INVALID_PREPARED_RECEPTOR_DEPENDENCY");
   });
 
   it("keeps ordinary-V1 capability boundaries fail-closed", () => {

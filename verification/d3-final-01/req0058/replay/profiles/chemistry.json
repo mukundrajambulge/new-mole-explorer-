@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "semanticSchemaId": "D3_CLOSURE_PROFILE_ARTIFACT_V1",
+  "profileId": "ME_SUPPORTED_CHEMISTRY_V1_1_0",
+  "semanticVersion": "1.1.0",
+  "dependencyProfileDigests": [],
+  "sourceArtifacts": [
+    {
+      "path": "verification/d3-prep-auth-04/CHEMICAL_STATE_DECISION.md",
+      "sha256": "cb9a83e168382c04c7c90d0af501d5238b6326a7e8cdb394842898f13101c6a8"
+    },
+    {
+      "path": "verification/d3-closure-exec-01/CORRECTED_PREPARATION_PROFILE.md",
+      "sha256": "6881e9fa111533eb52052ab57f6a74e7efd6f9d02e6beef756885a96591527ac"
+    },
+    {
+      "path": "verification/d3-closure-exec-01/SOURCE_PROFILE_COMPLETENESS_MATRIX.csv",
+      "sha256": "703ddb058982b972807d5b7dc26cda34a094f0414ded1de8980d6fe1cd7ce979"
+    },
+    {
+      "path": "verification/d3-final-01/req0058/tools/seal_3dmx_bnz_states.ts",
+      "sha256": "1365633755827d15247ba9545b7596954d53bfc0f04f58dbde16d2676b2acc1b"
+    }
+  ],
+  "definition": {
+    "preparationProfileId": "ME_DOCKING_V1_3DMX_BNZ_PREP_RDKIT_2026_03_6_HONLY_1_1",
+    "targetPHF64Bits": {
+      "tag": "f64",
+      "bytes": {
+        "0": 64,
+        "1": 27,
+        "2": 153,
+        "3": 153,
+        "4": 153,
+        "5": 153,
+        "6": 153,
+        "7": 154
+      }
+    },
+    "context": "crystal-growth-condition proxy; binding/soak pH and preparation route are not reported",
+    "chemicalStateAssignments": {
+      "ASP_DEPROTONATED": [
+        10,
+        20,
+        47,
+        61,
+        70,
+        72,
+        89,
+        92,
+        127,
+        159
+      ],
+      "GLU_DEPROTONATED": [
+        5,
+        11,
+        22,
+        45,
+        62,
+        64,
+        108,
+        128
+      ],
+      "ARG_PROTONATED": [
+        8,
+        14,
+        52,
+        76,
+        80,
+        95,
+        96,
+        119,
+        125,
+        137,
+        145,
+        148,
+        154
+      ],
+      "LYS_PROTONATED": [
+        16,
+        19,
+        35,
+        43,
+        48,
+        60,
+        65,
+        83,
+        85,
+        124,
+        135,
+        147,
+        162
+      ],
+      "TYR_NEUTRAL": [
+        18,
+        24,
+        25,
+        88,
+        139,
+        161
+      ],
+      "HIS31_NEUTRAL_HID": [
+        31
+      ]
+    },
+    "termini": {
+      "n_terminus": {
+        "position": 1,
+        "residue_name": "MET",
+        "state": "PROTONATED",
+        "formal_charge": 1
+      },
+      "c_terminus": {
+        "position": 164,
+        "residue_name": "LEU",
+        "state": "DEPROTONATED",
+        "formal_charge": -1,
+        "source_atom": "OXT"
+      }
+    },
+    "atomFeatureRules": [
+      "Protein backbone N is donor except PRO N; backbone carbonyl O and terminal OXT are acceptors.",
+      "ASN ND2 donor / OD1 acceptor; GLN NE2 donor / OE1 acceptor.",
+      "ASP OD1+OD2 and GLU OE1+OE2 acceptors under the explicitly owner-approved deprotonated state.",
+      "ARG NE+NH1+NH2 and LYS NZ donors under the explicitly owner-approved protonated state.",
+      "HIS31 neutral HID: ND1 donor, NE2 acceptor; TYR OH, SER OG, THR OG1 donor and acceptor; TRP NE1 donor.",
+      "C atoms are C_P only when directly bonded to a non-carbon/non-hydrogen atom; otherwise C_H. Other atom roles come from explicit residue/CCD chemistry, never imported partial charge."
+    ],
+    "sourceChemistryInterpretation": "AUTH04-approved one-fixture chemical-state hypothesis; pH 6.9 is a crystallization-context proxy, not an experimentally established binding pH or pKa prediction."
+  },
+  "digest": "sha256:6cb2fbd5dcc5dbfdaded563a574257e79de9efa7a325f4af661666f68fee6237"
+}

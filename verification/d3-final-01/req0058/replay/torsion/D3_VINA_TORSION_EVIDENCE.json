@@ -1,0 +1,221 @@
+{
+  "status": "VALID",
+  "profileId": "ME_D3_VINA_TORSION_AUTODOCK_VINA_1_2_7_V1",
+  "profileDigest": "sha256:0c042369f70f8a555930aa32cf2c0211abf93ef4bc837cdb389caff50e0edc6b",
+  "sourceEvidence": {
+    "schemaVersion": 1,
+    "semanticSchemaId": "D3_VINA_PDBQT_EVIDENCE_V1",
+    "profileId": "ME_D3_VINA_TORSION_AUTODOCK_VINA_1_2_7_V1",
+    "profileDigest": "sha256:0c042369f70f8a555930aa32cf2c0211abf93ef4bc837cdb389caff50e0edc6b",
+    "sourceArtifactId": "source:d3-closure-bnz-rigid-torsion-representation",
+    "sourceArtifactDigest": "sha256:b4c96de77d8c7342484ee0e5f1cd1db102e8a174c13df004831c5f331187b5da",
+    "representationByteDigest": "sha256:b4c96de77d8c7342484ee0e5f1cd1db102e8a174c13df004831c5f331187b5da",
+    "graphRevisionDigest": "sha256:044cf8a72ac3906ead4b5fd2f1b1ae7ac1f6a8f07e72818ad231c317fa2012fd",
+    "producer": {
+      "status": "KNOWN",
+      "name": "D3-CLOSURE-EXEC-01 deterministic reference-ligand serialization",
+      "version": "1.0.0",
+      "settingsRefs": [
+        "sealed BNZ graph; ROOT-only; no BRANCH records; TORSDOF 0"
+      ]
+    },
+    "mapping": {
+      "status": "AUTHORITATIVE",
+      "schemaVersion": 1,
+      "semanticSchemaId": "D3_VINA_AUTHORITATIVE_ATOM_MAPPING_V1",
+      "graphRevisionDigest": "sha256:044cf8a72ac3906ead4b5fd2f1b1ae7ac1f6a8f07e72818ad231c317fa2012fd",
+      "representationArtifactDigest": "sha256:b4c96de77d8c7342484ee0e5f1cd1db102e8a174c13df004831c5f331187b5da",
+      "serialToAtomUid": {
+        "1": "atom:f9fb0bade61665c9f79247fdb6be904f",
+        "2": "atom:3381a1159a49ccb7169565715acf9bf1",
+        "3": "atom:adc3ab7279c8bf56fac811b71dd088e6",
+        "4": "atom:abebf62ea85988f2794f6dde6a6ffe82",
+        "5": "atom:89aa26341556744504307d07c7cd6c4b",
+        "6": "atom:3d451c2da7d3198e386a93ffcaf91c5d",
+        "7": "atom:578790e593f3becdcbd7f08227bc3bd9",
+        "8": "atom:07262f5216ec0079599066926cc542f1",
+        "9": "atom:48e560855f7e193ce20dd55526adb045",
+        "10": "atom:1a5b3a59dba2dd397134e6b9bed90bf7",
+        "11": "atom:f441a3a674bec82286e90ee6a5d98742",
+        "12": "atom:e62f162e18e26dd3ef944152bb0352fa"
+      },
+      "evidenceRefs": [
+        "D2_SEALED_STATE_SUMMARY.json",
+        "PREPARED_SCIENTIFIC_PAYLOAD.json",
+        "VALIDATION_POSE_COHORT.json"
+      ],
+      "digest": "sha256:6b82cc1f0ab24211447d81ca8138cafabc8d9bc1b9d20ef2afc12b79397da64d"
+    },
+    "rootAtomSerials": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "atoms": [
+      {
+        "serial": 1,
+        "element": "C",
+        "atomType": "A",
+        "atomUid": "atom:f9fb0bade61665c9f79247fdb6be904f",
+        "line": 2,
+        "branchOrdinal": null
+      },
+      {
+        "serial": 2,
+        "element": "C",
+        "atomType": "A",
+        "atomUid": "atom:3381a1159a49ccb7169565715acf9bf1",
+        "line": 3,
+        "branchOrdinal": null
+      },
+      {
+        "serial": 3,
+        "element": "C",
+        "atomType": "A",
+        "atomUid": "atom:adc3ab7279c8bf56fac811b71dd088e6",
+        "line": 4,
+        "branchOrdinal": null
+      },
+      {
+        "serial": 4,
+        "element": "C",
+        "atomType": "A",
+        "atomUid": "atom:abebf62ea85988f2794f6dde6a6ffe82",
+        "line": 5,
+        "branchOrdinal": null
+      },
+      {
+        "serial": 5,
+        "element": "C",
+        "atomType": "A",
+        "atomUid": "atom:89aa26341556744504307d07c7cd6c4b",
+        "line": 6,
+        "branchOrdinal": null
+      },
+      {
+        "serial": 6,
+        "element": "C",
+        "atomType": "A",
+        "atomUid": "atom:3d451c2da7d3198e386a93ffcaf91c5d",
+        "line": 7,
+        "branchOrdinal": null
+      },
+      {
+        "serial": 7,
+        "element": "H",
+        "atomType": "H",
+        "atomUid": "atom:578790e593f3becdcbd7f08227bc3bd9",
+        "line": 8,
+        "branchOrdinal": null
+      },
+      {
+        "serial": 8,
+        "element": "H",
+        "atomType": "H",
+        "atomUid": "atom:07262f5216ec0079599066926cc542f1",
+        "line": 9,
+        "branchOrdinal": null
+      },
+      {
+        "serial": 9,
+        "element": "H",
+        "atomType": "H",
+        "atomUid": "atom:48e560855f7e193ce20dd55526adb045",
+        "line": 10,
+        "branchOrdinal": null
+      },
+      {
+        "serial": 10,
+        "element": "H",
+        "atomType": "H",
+        "atomUid": "atom:1a5b3a59dba2dd397134e6b9bed90bf7",
+        "line": 11,
+        "branchOrdinal": null
+      },
+      {
+        "serial": 11,
+        "element": "H",
+        "atomType": "H",
+        "atomUid": "atom:f441a3a674bec82286e90ee6a5d98742",
+        "line": 12,
+        "branchOrdinal": null
+      },
+      {
+        "serial": 12,
+        "element": "H",
+        "atomType": "H",
+        "atomUid": "atom:e62f162e18e26dd3ef944152bb0352fa",
+        "line": 13,
+        "branchOrdinal": null
+      }
+    ],
+    "rawTorsdof": 0,
+    "rawBranches": [],
+    "diagnostics": [],
+    "digest": "sha256:52de5137154df1b837e8aea8d03fe2ede70abea002f5c086922d21b1ed04f6ab"
+  },
+  "searchTopology": {
+    "schemaVersion": 1,
+    "semanticSchemaId": "D3_VINA_SEARCH_TOPOLOGY_V1",
+    "profileId": "ME_D3_VINA_TORSION_AUTODOCK_VINA_1_2_7_V1",
+    "profileDigest": "sha256:0c042369f70f8a555930aa32cf2c0211abf93ef4bc837cdb389caff50e0edc6b",
+    "pdbqtEvidenceDigest": "sha256:52de5137154df1b837e8aea8d03fe2ede70abea002f5c086922d21b1ed04f6ab",
+    "rawTorsdof": 0,
+    "rawBranchCount": 0,
+    "axes": [],
+    "activeSearchTorsionCount": 0,
+    "digest": "sha256:9e730e3310ad5fb200c8c5428d4ede8b146791fd882fb1878d33e52b7076321e"
+  },
+  "scorerTorsionAssignment": {
+    "schemaVersion": 1,
+    "semanticSchemaId": "D3_VINA_SCORER_TORSION_ASSIGNMENT_V1",
+    "profileId": "ME_D3_VINA_TORSION_AUTODOCK_VINA_1_2_7_V1",
+    "profileDigest": "sha256:0c042369f70f8a555930aa32cf2c0211abf93ef4bc837cdb389caff50e0edc6b",
+    "graphRevisionDigest": "sha256:044cf8a72ac3906ead4b5fd2f1b1ae7ac1f6a8f07e72818ad231c317fa2012fd",
+    "pdbqtEvidenceDigest": "sha256:52de5137154df1b837e8aea8d03fe2ede70abea002f5c086922d21b1ed04f6ab",
+    "bondAssignments": [],
+    "nTorsVina": {
+      "tag": "f64",
+      "bytes": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0
+      }
+    },
+    "digest": "sha256:96a843d5349e5ce908d56595ef2c31b7d8f0f818e260db85894ab715b670c4fe"
+  },
+  "sourceArtifact": {
+    "schemaVersion": 1,
+    "sourceArtifactId": "source:d3-closure-bnz-rigid-torsion-representation",
+    "acquisitionKind": "DERIVED_EXPORT",
+    "originalFilename": "3dmx-bnz-rigid-torsion-evidence.pdbqt",
+    "mediaType": "chemical/x-pdbqt",
+    "byteLength": 959,
+    "sha256": "b4c96de77d8c7342484ee0e5f1cd1db102e8a174c13df004831c5f331187b5da",
+    "acquiredAt": "2026-10-05T00:00:00.000Z",
+    "format": "pdbqt",
+    "formatEvidence": [
+      {
+        "kind": "EXPLICIT_DECLARATION",
+        "value": "deterministic serialization from sealed BNZ D2 graph for zero-rotor torsion accounting only"
+      }
+    ],
+    "parserProfile": "D3_VINA_TORSION_AUTODOCK_VINA_1_2_7_V1",
+    "parentExportArtifactId": "source:3DMX-byte-exact-coordinate-state"
+  },
+  "producerSerializationNote": "Derived execution representation used only to run the pinned graph-bound torsion mapper; it was not used for atom identity, coordinates, chemical state, typing, or scoring."
+}

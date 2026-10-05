@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "semanticSchemaId": "D3_XS_TYPING_ASSIGNMENT_V1",
+  "profileId": "ME_XS_TYPING_V1_1_0",
+  "assignments": [
+    {
+      "atomUid": "atom:3381a1159a49ccb7169565715acf9bf1",
+      "typeId": "C_H",
+      "chargeModel": "AUTH04_EXPLICIT_STATE_NO_IMPORTED_PARTIAL_CHARGE",
+      "evidenceRef": "AUTH04 owner-approved chemical-state policy and residue identity list; exact attachment SHA-256 f4526524331f33e6e0055a4cddeac083dba2aedeec52421d89d161f31c95688d; ME_XS_TYPING_V1_1_0; atom:C2"
+    },
+    {
+      "atomUid": "atom:3d451c2da7d3198e386a93ffcaf91c5d",
+      "typeId": "C_H",
+      "chargeModel": "AUTH04_EXPLICIT_STATE_NO_IMPORTED_PARTIAL_CHARGE",
+      "evidenceRef": "AUTH04 owner-approved chemical-state policy and residue identity list; exact attachment SHA-256 f4526524331f33e6e0055a4cddeac083dba2aedeec52421d89d161f31c95688d; ME_XS_TYPING_V1_1_0; atom:C6"
+    },
+    {
+      "atomUid": "atom:89aa26341556744504307d07c7cd6c4b",
+      "typeId": "C_H",
+      "chargeModel": "AUTH04_EXPLICIT_STATE_NO_IMPORTED_PARTIAL_CHARGE",
+      "evidenceRef": "AUTH04 owner-approved chemical-state policy and residue identity list; exact attachment SHA-256 f4526524331f33e6e0055a4cddeac083dba2aedeec52421d89d161f31c95688d; ME_XS_TYPING_V1_1_0; atom:C5"
+    },
+    {
+      "atomUid": "atom:abebf62ea85988f2794f6dde6a6ffe82",
+      "typeId": "C_H",
+      "chargeModel": "AUTH04_EXPLICIT_STATE_NO_IMPORTED_PARTIAL_CHARGE",
+      "evidenceRef": "AUTH04 owner-approved chemical-state policy and residue identity list; exact attachment SHA-256 f4526524331f33e6e0055a4cddeac083dba2aedeec52421d89d161f31c95688d; ME_XS_TYPING_V1_1_0; atom:C4"
+    },
+    {
+      "atomUid": "atom:adc3ab7279c8bf56fac811b71dd088e6",
+      "typeId": "C_H",
+      "chargeModel": "AUTH04_EXPLICIT_STATE_NO_IMPORTED_PARTIAL_CHARGE",
+      "evidenceRef": "AUTH04 owner-approved chemical-state policy and residue identity list; exact attachment SHA-256 f4526524331f33e6e0055a4cddeac083dba2aedeec52421d89d161f31c95688d; ME_XS_TYPING_V1_1_0; atom:C3"
+    },
+    {
+      "atomUid": "atom:f9fb0bade61665c9f79247fdb6be904f",
+      "typeId": "C_H",
+      "chargeModel": "AUTH04_EXPLICIT_STATE_NO_IMPORTED_PARTIAL_CHARGE",
+      "evidenceRef": "AUTH04 owner-approved chemical-state policy and residue identity list; exact attachment SHA-256 f4526524331f33e6e0055a4cddeac083dba2aedeec52421d89d161f31c95688d; ME_XS_TYPING_V1_1_0; atom:C1"
+    }
+  ],
+  "digest": "sha256:5296970fddc5e1307d10400d84c70617d1a22a4c8c5a13ff2279aba70bc31433"
+}

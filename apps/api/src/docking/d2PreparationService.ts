@@ -10,7 +10,7 @@ import {
   type D2PreparedReceptorInput,
   type D2SearchRegionInput,
 } from "./d2Preparation.js";
-import type { D2LigandKinematicModelV1, D2PreparedLigandStateV1, D2PreparedReceptorStateV1, D2SearchRegionV1 } from "@molecular/contracts";
+import type { D2LigandKinematicModelV1, D2PreparedLigandStateV1, D2PreparedReceptorStateV2, D2SearchRegionV1 } from "@molecular/contracts";
 
 /**
  * D2's backend seam is deliberately a preparation/sealing service. It does
@@ -26,7 +26,7 @@ export class D2PreparationService {
     return this.adapt({ structure, ...(sourceArtifact ? { sourceArtifact } : {}) });
   }
 
-  sealReceptor(input: D2PreparedReceptorInput): D2SealResult<D2PreparedReceptorStateV1> {
+  sealReceptor(input: D2PreparedReceptorInput): D2SealResult<D2PreparedReceptorStateV2> {
     return sealPreparedReceptorState(input);
   }
 

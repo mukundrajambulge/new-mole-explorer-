@@ -1,4 +1,5 @@
 import { encodeCanonicalCbor, f64Bits, f64Value, type F64Bits } from "./canonical.js";
+import type { D2PreparedReceptorStateV2 } from "./d2.js";
 
 export const SCORING_FIELD_LOGICAL_SCHEMA_ID = "SCORING_FIELD_LOGICAL_V2" as const;
 export const SCORING_FIELD_STORAGE_SCHEMA_ID = "SCORING_FIELD_STORAGE_V1" as const;
@@ -72,6 +73,19 @@ export type ScoringFieldScientificDependenciesV1 = Readonly<{
   numericalBackendProfileId: string;
   numericalBackendProfileDigest: string;
 }>;
+
+/** Shared profile identities must agree before a field is built for a sealed receptor. */
+export const preparedReceptorMatchesScoringFieldDependencies = (
+  receptor: Pick<D2PreparedReceptorStateV2, "profileId" | "scientificDependencies">,
+  dependencies: Pick<ScoringFieldScientificDependenciesV1, "receptorProfileId" | "scoringProfileId" | "scoringProfileDigest" | "typingProfileId" | "typingProfileDigest" | "chemistryProfileId" | "chemistryProfileDigest">,
+): boolean =>
+  receptor.profileId === dependencies.receptorProfileId &&
+  receptor.scientificDependencies.scoringProfileRef.profileId === dependencies.scoringProfileId &&
+  receptor.scientificDependencies.scoringProfileRef.profileDigest === dependencies.scoringProfileDigest &&
+  receptor.scientificDependencies.receptorAtomTypingProfileRef.profileId === dependencies.typingProfileId &&
+  receptor.scientificDependencies.receptorAtomTypingProfileRef.profileDigest === dependencies.typingProfileDigest &&
+  receptor.scientificDependencies.chemicalPerceptionProfileRef.profileId === dependencies.chemistryProfileId &&
+  receptor.scientificDependencies.chemicalPerceptionProfileRef.profileDigest === dependencies.chemistryProfileDigest;
 
 export type ScoringFieldLogicalPayloadV2 = Readonly<{
   canonicalizationProfile: typeof SCORING_FIELD_CANONICALIZATION_PROFILE;
