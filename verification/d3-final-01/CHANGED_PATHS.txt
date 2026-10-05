@@ -1,4 +1,5 @@
 verification/d3-final-01/CHANGED_PATHS.txt
+verification/d3-final-01/.gitignore
 verification/d3-final-01/D3_FINAL_01_REPORT.md
 verification/d3-final-01/D3_FINAL_ACCEPTANCE_TEST_MATRIX.md
 verification/d3-final-01/D3_FINAL_ARCHITECTURE_FREEZE.md
@@ -7,6 +8,7 @@ verification/d3-final-01/D3_FINAL_CODE_REVIEW.md
 verification/d3-final-01/D3_FINAL_DECISION.md
 verification/d3-final-01/D3_FINAL_FIXTURE_FREEZE.md
 verification/d3-final-01/D3_FINAL_NUMERICAL_ACCEPTANCE.md
+verification/d3-final-01/D3_FINAL_INDEPENDENT_REVIEW.md
 verification/d3-final-01/D3_FINAL_PROVENANCE_AUDIT.md
 verification/d3-final-01/D3_FINAL_REGRESSION_REPORT.md
 verification/d3-final-01/D3_FINAL_REQUIREMENT_MATRIX.md

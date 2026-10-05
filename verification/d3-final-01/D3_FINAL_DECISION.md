@@ -16,7 +16,7 @@
 
 `05cdb83fbcac71fb5cf3d53a19935b5b0a54f735` is the requested closure commit, on local branch `codex/d3-closure-profile-correction`, based on `783aa166d9d5790f798bff41444d6ba0fac7bd27`. It is a descendant of fetched `new-origin/main` (`c219d5fcfcbe71537fb8e0139cdef495a9f1f504`) and is not contained in any fetched remote branch. D1/D2 accepted tags and the preserved D3-TOR/D3-GRID history are ancestors. The separate D3-SCI-04 research commit `6769f00cbfd4486a86c7512030b4cf942a9244a8` is remote-preserved but is not an ancestor; it remains research evidence.
 
-The final disposition package is sealed on `release/d3-final-acceptance`; its final commit SHA and regression results are recorded in the commit and `D3_FINAL_REGRESSION_REPORT.md`.
+The final disposition package is sealed on local branch `release/d3-final-acceptance`. The exact final tested commit SHA is reported with the signoff; detailed suite counts and results are in `D3_FINAL_REGRESSION_REPORT.md`.
 
 ## Consequences
 

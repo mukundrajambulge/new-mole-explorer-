@@ -28,7 +28,8 @@ This is a mandatory contract/evidence failure. Documentation cannot convert the 
 - Preparation profile v1.1: all source/profile entries dispositioned; two pinned runs reproduced the same scientific payload digest; heavy-atom changes are zero; D2 state and SearchRegion digests replay-validated.
 - Six same-state direct/grid poses are in-domain and retain five raw and weighted terms per pose. Recomputed E_inter MAE/RMSE equal the committed statistics exactly. The six-pose order has no ties or pairwise reversals.
 - Maximum-field payload, construction, retained allocation, and process RSS are below the frozen limits.
-- Existing workspace, native, protected PyMOL browser, typecheck, lint and build evidence passes. The final acceptance commit regression results are recorded after its exact SHA is created in `D3_FINAL_REGRESSION_REPORT.md`.
+- The final-lane workspace, D3-GRID, native, protected PyMOL browser, profile/replay, sealed full-pose, typecheck, lint and build suites pass; exact counts and the final signoff SHA are reported in the regression record and this task's final disposition.
+- The independent reviewer identified and the evidence package now records a source-authority conflict for AT-0141, AT-0146 and AT-0204: the Final Acceptance Specification labels them Gate D3 while the current Roadmap/PHD-V2-15 sequences their scope into D5/D6. The package uses the permitted Roadmap deferral classification, but does not claim these are completed D3 tests or that an approved amendment reconciled the conflict.
 - The implementation diff after the closure base contains execution/evidence harness changes under `verification/d3-closure-exec-01/tools`; no `apps`, `packages` or `native` production code was changed in that closure.
 
 ## Final boundary

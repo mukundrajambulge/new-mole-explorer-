@@ -22,8 +22,12 @@
 | AT-0108 | Claim-boundary audit | PASS; no affinity/free-energy/probability claims | SATISFIED |
 | AT-0132 | Component disposition and water-policy inspection | PASS; 418 dispositions, 248 water exclusions, dry-core profile | SATISFIED |
 | AT-0139 | Pose cohort/status separation | PASS; manifest separates cohort/stress/domain fields from score | SATISFIED |
-| AT-0141 | Q-score tie/result semantics | Not run in D3; current Roadmap places exact Q-score/ranking in D5 | DEFERRED_BY_ACCEPTED_ROADMAP |
-| AT-0146 | Final-mode count/window | No search or final-mode selection ran; Roadmap assigns to D5 | DEFERRED_BY_ACCEPTED_ROADMAP |
-| AT-0204 | Scalar direct oracle and backend-equivalence/discrete result contract | Native direct formula oracle passes. The complete alternate-backend/Q-score test belongs to later D5/D6 semantics; direct-grid approximation is separately scoped by D3-GRID v1.2. | DEFERRED_BY_ACCEPTED_ROADMAP |
+| AT-0141 | Q-score tie/result semantics | Not run in D3; current Roadmap places exact Q-score/ranking in D5. Final Acceptance Specification also labels it Gate D3. | DEFERRED_BY_ACCEPTED_ROADMAP |
+| AT-0146 | Final-mode count/window | No search or final-mode selection ran; Roadmap assigns to D5. Final Acceptance Specification also labels it Gate D3. | DEFERRED_BY_ACCEPTED_ROADMAP |
+| AT-0204 | Scalar direct oracle and backend-equivalence/discrete result contract | Native direct formula oracle passes. The complete alternate-backend/Q-score test belongs to later D5/D6 semantics; direct-grid approximation is separately scoped by D3-GRID v1.2. Final Acceptance Specification also labels it Gate D3. | DEFERRED_BY_ACCEPTED_ROADMAP |
+
+## Gate authority qualification
+
+The current Final Acceptance Specification labels AT-0141, AT-0146 and AT-0204 as Gate D3. The current Roadmap/PHD-V2-15 sequencing assigns Q-score/tie and final-mode semantics to D5 and broader numerical-equivalence work to D6. The statuses above follow that later Roadmap sequencing and use the permitted `DEFERRED_BY_ACCEPTED_ROADMAP` disposition. No approved amendment reconciling the conflicting Gate D3 labels was found. These rows therefore must not be described as completed D3 tests or as a formally reconciled amendment; the authority mismatch remains recorded. AT-0058 independently makes the final disposition HOLD.
 
 The final D3 acceptance test count remains 23. The historical AT-0103 supplement is Level 6 / Gate D6, not part of the 23 Gate D3 tests; its 70-channel phrase is superseded by 80 logical / conditional 59 physical architecture. No acceptance test is labeled pending. AT-0058 prevents D3 acceptance.

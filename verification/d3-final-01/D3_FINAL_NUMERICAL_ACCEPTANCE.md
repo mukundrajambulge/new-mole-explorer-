@@ -21,7 +21,7 @@ For `n=6`: signed bias `+0.1753649452`, MAE `0.1837806169`, RMSE `0.2009211939`,
 |---|---:|---:|---:|---|
 | G1 | +0.0079956 | 0.0097674 | 0.0164393 | Small after the frozen coefficient is applied. |
 | G2 | +0.0045839 | 0.0089206 | 0.0208747 | Raw G2 max error is 4.0486, attenuated by its small coefficient; weighted error remains about 0.021. |
-| REP | +0.1650332 | 0.1722071 | 0.2622238 | Dominant contributor; grid error is consistently positive on this six-pose cohort and makes the grid score less favorable. |
+| REP | +0.1650332 | 0.1722071 | 0.2622238 | Dominant contributor; weighted grid-minus-direct error is positive for five poses and negative for cutoff stress (−0.021521844), while the six-pose bias is positive and makes the aggregate grid score less favorable. |
 | HYD | −0.0022477 | 0.0027233 | 0.0050446 | Small after weighting. |
 | HB | 0 | 0 | 0 | Exact zero in all six pose records. |
 
