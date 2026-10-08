@@ -1726,9 +1726,9 @@
         "C6"
       ],
       "est": "Half a day",
-      "status": "TODO",
+      "status": "BLOCKED",
       "branch": "sprint/W2/4.4",
-      "note": "W2: d2BoxSeal uses placeholder chemistry + fabricated profile digests, seals VALID, trusts client sha256. Must not merge; redo needs 5.2 prep output or must seal PREVIEW_UNQUALIFIED/UNAVAILABLE. native check failed on shared CMake cache (~/mole-build/native) - use per-worktree build dir"
+      "note": "Waits for 5.2: box seal must take {jobId, bounds} from a real prep job (see design note)"
     },
     {
       "id": "4.5",
@@ -2055,7 +2055,8 @@
       "done": "10 test pairs prepare without errors, and the output is identical on re-run.",
       "refs": [],
       "est": "1 week",
-      "status": "TODO"
+      "status": "NEEDS_OWNER",
+      "note": "Design note docs/sprint/design/5.2.md ready; owner to confirm protonation default (EXPLICIT_SUBMITTED, PROPKA opt-in PREVIEW_UNQUALIFIED)"
     },
     {
       "id": "5.3",
