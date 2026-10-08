@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
@@ -102,11 +102,40 @@ export type PrepJobStoreOptions = Readonly<{
   pins?: () => PrepPinReport;
   now?: () => number;
   ttlMs?: number;
+  /** Quota: live + retained jobs on disk (default 32) and their total bytes (default 2 GiB). */
+  maxJobs?: number;
+  maxBytes?: number;
+  /** Retention of FAILED/EXPIRED jobs (default 1 h) and SUCCEEDED jobs (default 24 h). */
+  retainTerminalMs?: number;
+  retainSucceededMs?: number;
 }>;
+
+export const PREP_MAX_JOBS = 32;
+export const PREP_MAX_BYTES = 2 * 1024 * 1024 * 1024;
+
+/** Bytes under a job dir (a handful of files; bounded depth). */
+const dirBytes = (dir: string, depth = 0): number => {
+  if (depth > 4) return 0;
+  let n = 0;
+  try {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const p = join(dir, e.name);
+      if (e.isDirectory()) n += dirBytes(p, depth + 1);
+      else if (e.isFile()) n += statSync(p).size;
+    }
+  } catch {
+    return n;
+  }
+  return n;
+};
 
 export class PrepJobStore {
   readonly root: string;
-  private readonly runner: PrepRunner;
+  private runner: PrepRunner;
+  private readonly maxJobs: number;
+  private readonly maxBytes: number;
+  private readonly retainTerminalMs: number;
+  private readonly retainSucceededMs: number;
   private readonly sealer: PrepSealer | undefined;
   private readonly resolveArtifact: PrepArtifactResolver;
   private readonly pins: () => PrepPinReport;
@@ -123,6 +152,10 @@ export class PrepJobStore {
     this.pins = options.pins ?? repoPrepPins;
     this.now = options.now ?? Date.now;
     this.ttlMs = options.ttlMs ?? PREP_TTL_MS;
+    this.maxJobs = options.maxJobs ?? PREP_MAX_JOBS;
+    this.maxBytes = options.maxBytes ?? PREP_MAX_BYTES;
+    this.retainTerminalMs = options.retainTerminalMs ?? 60 * 60_000;
+    this.retainSucceededMs = options.retainSucceededMs ?? 24 * 60 * 60_000;
   }
 
   /** Load persisted jobs. In-flight work cannot survive a restart: APPLYING and uncommitted dirs become FAILED. */
@@ -147,6 +180,7 @@ export class PrepJobStore {
       }
       this.states.set(name, state);
     }
+    this.gc();
   }
 
   jobDir(jobId: string): string {
@@ -176,7 +210,65 @@ export class PrepJobStore {
     const next: PrepJobStateV1 = { ...s, ...patch, state: to };
     if (patch.error !== undefined) next.error = scrubText(patch.error, [this.jobDir(s.jobId), this.root]).slice(0, 500);
     this.persist(next);
+    if (PREP_TRANSITIONS[to].length === 0) this.dropInputs(s.jobId);
     return next;
+  }
+
+  /** Staged inputs are reproducible from the artifact store; a terminal job does not keep them. */
+  private dropInputs(jobId: string): void {
+    try {
+      rmSync(join(this.jobDir(jobId), "in"), { recursive: true, force: true });
+    } catch {
+      // best effort; gc() removes the whole directory later
+    }
+  }
+
+  private terminalAgeMs(s: PrepJobStateV1): number {
+    try {
+      return this.now() - statSync(join(this.jobDir(s.jobId), "state.json")).mtimeMs;
+    } catch {
+      return Number.POSITIVE_INFINITY;
+    }
+  }
+
+  private removeJob(jobId: string): void {
+    rmSync(this.jobDir(jobId), { recursive: true, force: true });
+    this.states.delete(jobId);
+  }
+
+  /**
+   * Garbage collection and quota. Terminal jobs are deleted after their retention; when the job count or the
+   * bytes on disk exceed the quota the oldest terminal jobs go first. Live jobs (AWAITING_CONFIRMATION,
+   * APPLYING) are never deleted; if they alone fill the quota, plan() is refused.
+   */
+  gc(): { jobs: number; bytes: number } {
+    const terminal: PrepJobStateV1[] = [];
+    for (const s0 of [...this.states.values()]) {
+      const s = this.expireIfDue(s0);
+      if (PREP_TRANSITIONS[s.state].length) continue;
+      const retain = s.state === "SUCCEEDED" ? this.retainSucceededMs : this.retainTerminalMs;
+      if (this.terminalAgeMs(s) >= retain) this.removeJob(s.jobId);
+      else terminal.push(s);
+    }
+    terminal.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+    const sizes = new Map<string, number>();
+    let bytes = 0;
+    for (const id of this.states.keys()) {
+      const n = dirBytes(this.jobDir(id));
+      sizes.set(id, n);
+      bytes += n;
+    }
+    while (terminal.length && (this.states.size > this.maxJobs || bytes > this.maxBytes)) {
+      const victim = terminal.shift()!;
+      bytes -= sizes.get(victim.jobId) ?? 0;
+      this.removeJob(victim.jobId);
+    }
+    return { jobs: this.states.size, bytes };
+  }
+
+  /** Test seam: replace the worker runner (the default is the mole-dock spawn wrapper). */
+  replaceRunner(runner: PrepRunner): void {
+    this.runner = runner;
   }
 
   private acquire(): void {
@@ -190,6 +282,8 @@ export class PrepJobStore {
   async plan(request: PrepareRequest): Promise<PrepJobStateV1> {
     this.acquire();
     try {
+      const usage = this.gc();
+      if (usage.jobs >= this.maxJobs || usage.bytes >= this.maxBytes) throw new PrepError("QUOTA_EXCEEDED", 429, "Too many preparation jobs are stored; confirm or wait for pending plans to expire.");
       const [rec, lig, tpl] = await Promise.all([
         this.resolveArtifact(request.receptorArtifactId),
         this.resolveArtifact(request.ligandArtifactId),
@@ -283,6 +377,9 @@ export class PrepJobStore {
       this.states.set(applying.jobId, staged);
       const seal = await this.sealer(this, applying.jobId);
       if (seal.status === "REJECTED") return this.transition(applying, "FAILED", { manifest, seal, error: `OUTPUT_REJECTED: ${seal.reasonCodes.join(",")}` });
+      // SUCCEEDED means the worker finished and every output re-hashed. Prepared ids (the only handles a later
+      // docking step accepts) are minted for a SEALED result only; BLOCKED/PREVIEW_UNQUALIFIED stay unsealed.
+      if (seal.status !== "SEALED") return this.transition(applying, "SUCCEEDED", { manifest, seal });
       const compact = applying.jobId.replace(/-/g, "");
       return this.transition(applying, "SUCCEEDED", { manifest, seal, preparedReceptorId: `prec_${compact}`, preparedLigandId: `plig_${compact}` });
     } catch (e) {

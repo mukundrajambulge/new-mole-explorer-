@@ -13,6 +13,7 @@ import { CommandDispatcher } from "./command/dispatcher.js";
 import { profileMark, profileTransport } from "./structures/ingestionProfiler.js";
 import { D2PreparationService } from "./docking/d2PreparationService.js";
 import type { D2SearchRegionInput } from "./docking/d2Preparation.js";
+import { createPrepService } from "./jobs/prepService.js";
 
 const config = loadConfig();
 
@@ -55,6 +56,8 @@ const ingestionService = new StructureIngestionService(new SourceArtifactStore(d
 const projectStore = new ProjectStore(dataRoot);
 const commandDispatcher = new CommandDispatcher({ dataRoot });
 const d2PreparationService = new D2PreparationService();
+// Task 5.2b: preparation jobs. The TOOLS.md pin check runs here, at start-up; a mismatch fails every prep route closed.
+export const prepService = createPrepService({ dataRoot });
 
 const readJson = async (request: IncomingMessage): Promise<Record<string, unknown>> => {
   const tooLarge = () => new IngestionError("PAYLOAD_TOO_LARGE", "The request body exceeds the size limit.");
@@ -272,6 +275,7 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       sendJson(response, 200, await projectStore.save(projectMatch[1], body as unknown as ProjectSaveRequest));
       return;
     }
+    if (await prepService.handle(request, response, url.pathname)) return;
     sendJson(response, 404, { error: { code: "NOT_FOUND", message: "Route was not found." } });
   } catch (error) {
     if (response.headersSent) throw error;
