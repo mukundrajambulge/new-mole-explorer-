@@ -301,16 +301,17 @@ export const server = createServer((request, response) => {
 
 export const startServer = (port = config.port, host = config.host) =>
   new Promise<void>((resolve, reject) => {
-    try {
-      if (config.mode === "local") issueLocalToken();
-    } catch (error) {
-      reject(error);
-      return;
-    }
     const onError = (error: Error) => reject(error);
     server.once("error", onError);
     server.listen(port, host, () => {
       server.off("error", onError);
+      try {
+        if (config.mode === "local") issueLocalToken();
+      } catch (error) {
+        server.close();
+        reject(error);
+        return;
+      }
       console.log(`Molecular API (${config.mode}) listening on http://${host}:${port}`);
       resolve();
     });

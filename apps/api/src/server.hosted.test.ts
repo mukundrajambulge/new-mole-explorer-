@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createServer as createNetServer, type AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -60,6 +60,23 @@ describe("hosted mode and startup failures", () => {
       await withEnv({ MOLE_MODE: "local", MOLE_TOKEN_DIR: join(dir, "file", "sub"), MOLECULAR_DATA_DIR: dir }, async () => {
         const mod = await import("./server.js");
         await expect(mod.startServer(0, "127.0.0.1")).rejects.toThrow();
+      });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("local EADDRINUSE leaves the existing token file untouched", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "mole-keeptok-"));
+    writeFileSync(join(dir, "token"), "original-token");
+    try {
+      await withEnv({ MOLE_MODE: "local", MOLE_TOKEN_DIR: dir, MOLECULAR_DATA_DIR: dir }, async () => {
+        const mod = await import("./server.js");
+        const blocker = createNetServer();
+        await new Promise<void>((resolve) => blocker.listen(0, "127.0.0.1", resolve));
+        await expect(mod.startServer((blocker.address() as AddressInfo).port, "127.0.0.1")).rejects.toThrow(/EADDRINUSE/);
+        await new Promise<void>((resolve) => blocker.close(() => resolve()));
+        expect(readFileSync(join(dir, "token"), "utf8")).toBe("original-token");
       });
     } finally {
       rmSync(dir, { recursive: true, force: true });
