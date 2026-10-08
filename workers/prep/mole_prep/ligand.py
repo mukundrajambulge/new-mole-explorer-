@@ -169,7 +169,6 @@ def prepare(text: str, fmt: str, template: str | None, opts: dict) -> dict:
     in_sha = sha256_text(text + ("\n#template\n" + template if template is not None else ""))
     has3d = mol.GetNumConformers() > 0 and mol.GetConformer().Is3D()
     n_before = mol.GetNumAtoms()
-    h_before = sum(1 for a in mol.GetAtoms() if a.GetAtomicNum() == 1)
     tautomer = "AS_SUBMITTED"
     if opts["ligandProtonation"] == "DIMORPHITE_PREVIEW":
         mol, smi = _apply_dimorphite(mol, opts["pH"])
@@ -180,12 +179,18 @@ def prepare(text: str, fmt: str, template: str | None, opts: dict) -> dict:
         decisions.append(_decision("LIGAND_PROTONATION", f"Dimorphite-DL state at pH {opts['pH']:.2f} (PREVIEW_UNQUALIFIED); formal charge {Chem.GetFormalCharge(mol)}", n_before, mol.GetNumAtoms(), True))
     else:
         decisions.append(_decision("LIGAND_PROTONATION", f"keep submitted protonation and formal charge ({Chem.GetFormalCharge(mol)})", n_before, n_before, False))
-    implicit = sum(a.GetTotalNumHs() - sum(1 for n in a.GetNeighbors() if n.GetAtomicNum() == 1) for a in mol.GetAtoms())
     before_h = mol.GetNumAtoms()
+    h_kept = sum(1 for a in mol.GetAtoms() if a.GetAtomicNum() == 1)  # Dimorphite strips hydrogens, so count right before AddHs
     mol = Chem.AddHs(mol, addCoords=has3d)
-    h_added = max(0, sum(1 for a in mol.GetAtoms() if a.GetAtomicNum() == 1) - h_before)
-    if implicit:
-        decisions.append(_decision("LIGAND_HYDROGENS", f"{implicit} implicit hydrogens made explicit (valence model of the submitted chemistry)", before_h, mol.GetNumAtoms(), True))
+    h_added = max(0, sum(1 for a in mol.GetAtoms() if a.GetAtomicNum() == 1) - h_kept)
+    if h_added:
+        # Any hydrogen RDKit creates (SMILES, heavy-atom-only file, template hydrogens replacing PDB ones) is generated state.
+        generated = True
+        source = "SMILES template" if template is not None else ("Dimorphite-DL state" if opts["ligandProtonation"] == "DIMORPHITE_PREVIEW" else "RDKit valence model of the submitted chemistry")
+        where = "coordinates placed by RDKit" if has3d else "coordinates from ETKDG"
+        decisions.append(_decision("LIGAND_HYDROGENS", f"{h_added} hydrogens generated from the {source}; {where} (PREVIEW_UNQUALIFIED)", before_h, mol.GetNumAtoms(), True))
+    else:
+        decisions.append(_decision("LIGAND_HYDROGENS", f"keep the {h_kept} submitted hydrogens; none generated", before_h, mol.GetNumAtoms(), False))
     if mol.GetNumAtoms() > limits.MAX_LIGAND_ATOMS:
         raise Blocked("OVERSIZE_INPUT", f"ligand has more than {limits.MAX_LIGAND_ATOMS} atoms with hydrogens")
     embedded = False
@@ -196,7 +201,8 @@ def prepare(text: str, fmt: str, template: str | None, opts: dict) -> dict:
         if AllChem.EmbedMolecule(mol, params) != 0:
             raise Blocked("EMBED_FAILED", "ETKDG could not generate 3D coordinates")
         embedded = True
-        decisions.append(_decision("LIGAND_3D_EMBED", f"no 3D coordinates submitted; ETKDGv3 embedding (seed {ETKDG_SEED})", mol.GetNumAtoms(), mol.GetNumAtoms(), True))
+        generated = True
+        decisions.append(_decision("LIGAND_3D_EMBED", f"no 3D coordinates submitted; ETKDGv3 embedding (seed {ETKDG_SEED}), generated coordinates (PREVIEW_UNQUALIFIED)", mol.GetNumAtoms(), mol.GetNumAtoms(), True))
     limits.require_finite([c for i in range(mol.GetNumAtoms()) for c in mol.GetConformer().GetAtomPosition(i)], "prepared ligand")
     # Canonical atom order (deterministic in the pinned RDKit) and no carried-over properties or names.
     ranks = list(Chem.CanonicalRankAtoms(mol, breakTies=True))

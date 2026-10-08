@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -102,8 +103,30 @@ def bases():
     shutil.rmtree(b, ignore_errors=True)
 
 
-def test_pairs_file_has_ten_real_pairs():
+GENERATING_STAGES = ("pdbfixer", "pdb2pqr+propka", "dimorphite_dl")
+
+
+def expected_qualification(m) -> str:
+    """Derived from what actually ran / was added, independently of the worker's own flag."""
+    s = m["summary"]
+    generated = (any(st["tool"] in GENERATING_STAGES for st in m["stages"]) or s["receptorHydrogensAdded"] > 0 or s["ligandHydrogensAdded"] > 0
+                 or s["ligandEmbedded3d"])
+    return "PREVIEW_UNQUALIFIED" if generated else "INTERIM"
+
+
+def expected_protonation_source(pair, m) -> str:
+    if pair.get("options", {}).get("protonation") == "PROPKA_PREVIEW":
+        return "PROPKA_PREVIEW"
+    return "MEEKO_TEMPLATES_PREVIEW" if m["summary"]["receptorHydrogensAdded"] > 0 else "EXPLICIT_SUBMITTED"
+
+
+def test_pairs_file_has_ten_real_complexes():
     assert len(PAIRS) == 10 and len({p["id"] for p in PAIRS}) == 10
+    for p in PAIRS:
+        # Real complex: ligand cut from the same entry as the receptor, receptor restricted to explicit chains.
+        assert p["ligand"]["cut"]["file"] == p["receptor"]["file"], p["id"]
+        assert p["options"].get("chainIds"), p["id"]
+        assert p["expect"] in ("INTERIM", "PREVIEW_UNQUALIFIED")
 
 
 @pytest.mark.parametrize("pair", PAIRS, ids=[p["id"] for p in PAIRS])
@@ -121,9 +144,12 @@ def test_pair_prepares_deterministically(pair, bases):
         data = open(os.path.join(d1, o["relPath"]), "rb").read()
         assert hashlib.sha256(data).hexdigest() == o["sha256"] and len(data) == o["bytes"]
         assert d1.encode() not in data and b"/tmp" not in data, f"absolute path leaked into {o['relPath']}"
-    preview = pair["options"].get("protonation") == "PROPKA_PREVIEW" or pair["options"].get("ligandProtonation") == "DIMORPHITE_PREVIEW"
-    if preview:
-        assert m1["qualification"] == "PREVIEW_UNQUALIFIED"
+    # Owner rule, asserted for EVERY pair: PREVIEW_UNQUALIFIED whenever anything was generated, INTERIM only otherwise.
+    assert m1["qualification"] == plan1["qualification"] == expected_qualification(m1) == pair["expect"], (pair["id"], m1["qualification"])
+    assert m1["summary"]["protonationSource"] == plan1["protonationSource"] == expected_protonation_source(pair, m1)
+    if m1["summary"]["ligandHydrogensAdded"]:
+        assert any(d["key"] == "LIGAND_HYDROGENS" and d["requiresAck"] and "PREVIEW_UNQUALIFIED" in d["choice"] for d in plan1["decisions"])
+    assert plan1["inputs"]["receptorSha256"] == hashlib.sha256(open(os.path.join(d1, "in", "receptor.pdb"), "rb").read()).hexdigest()
     s = m1["summary"]
     assert s["ligandAtoms"] > 0 and s["receptorAtoms"] > 0 and 0 <= s["rotatableBonds"] <= 100
     assert all(st["inSha"] and st["outSha"] for st in m1["stages"])
@@ -172,9 +198,96 @@ def test_nan_coordinates_blocked(tmp_path):
 
 
 def test_meeko_template_failure_blocked(tmp_path):
-    # 5FYL chain B C-terminus after PDBFixer cannot be built by Meeko's templates: BLOCKED, never a crash.
-    _blocked({"id": "neg-template", "receptor": {"file": "rcsb/5FYL.pdb"}, "ligand": ETHANOL, "options": {"chainIds": ["B"], "addMissingAtoms": True}},
-             str(tmp_path), "TEMPLATE_MISMATCH")
+    # 1CRN with ALA 9 relabelled GLY (its CB no longer fits any template): BLOCKED with a diagnostic, never a crash.
+    lines = open(os.path.join(FIX, "rcsb", "1CRN.pdb")).read().splitlines()
+    out = [ln[:17] + "GLY" + ln[20:] if ln.startswith("ATOM") and ln[17:20] == "ALA" and int(ln[22:26]) == 9 else ln for ln in lines]
+    assert out != lines
+    _blocked({"id": "neg-template", "receptor": {"text": "\n".join(out) + "\n"}, "ligand": ETHANOL}, str(tmp_path), "TEMPLATE_MISMATCH")
+
+
+def _mods():
+    if WORKER not in sys.path:
+        sys.path.insert(0, WORKER)
+    from mole_prep import ligand, receptor
+
+    return ligand, receptor
+
+
+def test_pdbfixer_terminal_oxt_has_ideal_geometry():
+    # Regression: PDBFixer put 5FYL chain B ASP 664 OXT 1.75 A from CA, so Meeko's C-terminal template failed.
+    _, receptor = _mods()
+    opts = {"chainIds": ["B"], "keepWaters": False, "addMissingAtoms": True}
+    atoms, _, _ = receptor.clean(open(os.path.join(FIX, "rcsb", "5FYL.pdb")).read(), opts)
+    fixed, n_missing, st, n_oxt = receptor.run_pdbfixer(receptor.write_pdb(atoms), opts)
+    assert n_missing >= 1 and n_oxt == 1 and st is not None
+    res = {a["name"].strip(): a for a in receptor.parse_pdb(fixed)[0] if a["chain"] == "B" and a["seq"] == 664}
+    dist = lambda p, q: math.dist((p["x"], p["y"], p["z"]), (q["x"], q["y"], q["z"]))  # noqa: E731
+    assert abs(dist(res["C"], res["OXT"]) - 1.25) < 0.01
+    assert dist(res["CA"], res["OXT"]) > 2.2 and dist(res["O"], res["OXT"]) > 2.0
+
+
+def test_microheterogeneity_keeps_one_residue():
+    # 1CRN SER 6 split into alt A SER (0.6) and alt B ALA (0.4): exactly one residue (SER) must survive.
+    _, receptor = _mods()
+    lines = open(os.path.join(FIX, "rcsb", "1CRN.pdb")).read().splitlines()
+    out = []
+    for ln in lines:
+        if ln.startswith("ATOM") and int(ln[22:26]) == 6:
+            assert ln[17:20] == "SER"
+            out.append(ln[:16] + "A" + ln[17:54] + "  0.60" + ln[60:])
+            if ln[12:16].strip() in ("N", "CA", "C", "O", "CB"):
+                out.append(ln[:16] + "BALA" + ln[20:54] + "  0.40" + ln[60:])
+        else:
+            out.append(ln)
+    atoms, decisions, _ = receptor.clean("\n".join(out) + "\n", {"chainIds": None, "keepWaters": False})
+    res6 = [a for a in atoms if a["seq"] == 6]
+    assert {a["res"] for a in res6} == {"SER"} and len(res6) == len({a["name"] for a in res6}) == 6
+    micro = [x for x in decisions if x["key"] == "MICROHETEROGENEITY"]
+    assert micro and micro[0]["requiresAck"] and "A:SER/B:ALA->SER" in micro[0]["choice"]
+
+
+LIG_OPTS = {"ligandProtonation": "EXPLICIT_SUBMITTED", "pH": 7.4}
+
+
+def test_ligand_generated_hydrogens_and_coordinates_are_flagged():
+    ligand, _ = _mods()
+    sdf = open(os.path.join(FIX, "ethanol.sdf")).read()  # heavy atoms only, 2D (z = 0): RDKit adds H, ETKDG embeds
+    r = ligand.prepare(sdf, "sdf", None, LIG_OPTS)
+    keys = {d["key"]: d for d in r["decisions"]}
+    assert r["generated"] and r["hAdded"] == 6 and r["embedded"]
+    assert keys["LIGAND_HYDROGENS"]["requiresAck"] and keys["LIGAND_3D_EMBED"]["requiresAck"]
+    r = ligand.prepare("CCO\n", "smi", None, LIG_OPTS)
+    assert r["generated"] and r["embedded"]
+    pdb = cut_hetatm("rcsb/1IEP.pdb", "STI", "A", 201)
+    r = ligand.prepare(pdb, "pdb", PAIRS[4]["template"], LIG_OPTS)
+    assert r["generated"] and not r["embedded"] and r["hAdded"] > 0
+
+
+def test_nothing_generated_is_interim(tmp_path):
+    # Re-prepare prepared outputs of a real complex: all H and 3D coordinates are now submitted, so nothing is generated.
+    pair = next(p for p in PAIRS if p["id"] == "1IEP-A-STI201")
+    d, plan, m = plan_apply(pair, str(tmp_path))
+    assert m["status"] == "PREPARED" and m["qualification"] == "PREVIEW_UNQUALIFIED"
+    again = {"id": "rt-1IEP", "receptor": {"text": open(os.path.join(d, "out", "receptor.clean.pdb")).read()},
+             "ligand": {"text": open(os.path.join(d, "out", "ligand.clean.sdf")).read(), "format": "sdf"}, "options": {}}
+    d2, plan2, m2 = plan_apply(again, str(tmp_path))
+    assert m2["status"] == "PREPARED", m2["diagnostics"]
+    assert m2["summary"]["receptorHydrogensAdded"] == 0 and m2["summary"]["ligandHydrogensAdded"] == 0, m2["summary"]
+    assert m2["qualification"] == plan2["qualification"] == "INTERIM" == expected_qualification(m2)
+    assert m2["summary"]["protonationSource"] == "EXPLICIT_SUBMITTED"
+
+
+def test_input_swapped_after_plan_blocked(tmp_path):
+    pair = next(p for p in PAIRS if p["id"] == "5FYL-B-NAG1665")
+    d = make_job(pair, str(tmp_path))
+    assert run(d, "plan").returncode == 0
+    plan = json.load(open(os.path.join(d, "plan.json")))
+    confirm(d, plan)
+    with open(os.path.join(d, "in", "receptor.pdb"), "a") as f:
+        f.write("REMARK 999 swapped after plan\n")
+    assert run(d, "apply").returncode == 3
+    assert json.load(open(os.path.join(d, "prep-manifest.json")))["diagnostics"][0].startswith("PLAN_DIGEST_MISMATCH")
+    assert not os.path.exists(os.path.join(d, "out"))
 
 
 def test_stale_digest_and_missing_ack_blocked(tmp_path):

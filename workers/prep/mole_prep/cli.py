@@ -83,18 +83,40 @@ def options_of(job: dict) -> dict:
 def run_pipeline(root: str, job: dict) -> dict:
     from . import ligand, receptor
 
+    from .manifest import sha256_bytes
+
     opts = options_of(job)
-    rec_text = limits.decode_ascii(limits.read_capped(limits.confined(root, job["receptor"]["relPath"]), "receptor"), "receptor")
-    lig_text = limits.decode_ascii(limits.read_capped(limits.confined(root, job["ligand"]["relPath"]), "ligand"), "ligand")
-    tpl = None
+    rec_raw = limits.read_capped(limits.confined(root, job["receptor"]["relPath"]), "receptor")
+    lig_raw = limits.read_capped(limits.confined(root, job["ligand"]["relPath"]), "ligand")
+    tpl_raw = None
     if job.get("ligandTemplate") is not None:
-        tpl = limits.decode_ascii(limits.read_capped(limits.confined(root, job["ligandTemplate"]["relPath"]), "ligand template"), "ligand template")
+        tpl_raw = limits.read_capped(limits.confined(root, job["ligandTemplate"]["relPath"]), "ligand template")
+    # Digests of exactly the bytes this run used (they enter planDigest).
+    inputs = {"receptorSha256": sha256_bytes(rec_raw), "ligandSha256": sha256_bytes(lig_raw), "ligandTemplateSha256": None if tpl_raw is None else sha256_bytes(tpl_raw)}
+    rec_text = limits.decode_ascii(rec_raw, "receptor")
+    lig_text = limits.decode_ascii(lig_raw, "ligand")
+    tpl = None if tpl_raw is None else limits.decode_ascii(tpl_raw, "ligand template")
     lig = ligand.prepare(lig_text, job["ligand"]["format"], tpl, opts)
     rec = receptor.prepare(rec_text, opts, os.path.join(root, "work"))
-    return {"rec": rec, "lig": lig, "opts": opts}
+    return {"rec": rec, "lig": lig, "opts": opts, "inputs": inputs}
 
 
-def build_plan(job: dict, result: dict | None, blocked: Blocked | None) -> dict:
+def input_digests(root: str, job: dict) -> dict:
+    """sha256 of every submitted input file as read now (None when unreadable; the pipeline then BLOCKs)."""
+    from .manifest import sha256_bytes
+
+    def one(art):
+        if art is None:
+            return None
+        try:
+            return sha256_bytes(limits.read_capped(limits.confined(root, art["relPath"]), "input"))
+        except Blocked:
+            return None
+
+    return {"receptorSha256": one(job["receptor"]), "ligandSha256": one(job["ligand"]), "ligandTemplateSha256": one(job.get("ligandTemplate"))}
+
+
+def build_plan(job: dict, result: dict | None, blocked: Blocked | None, inputs: dict | None = None) -> dict:
     from .manifest import PROFILE_ID, lock_digest, plan_digest
 
     opts = options_of(job)
@@ -105,13 +127,18 @@ def build_plan(job: dict, result: dict | None, blocked: Blocked | None) -> dict:
         "decisions": [], "warnings": [], "status": "BLOCKED", "diagnostics": [], "profileId": PROFILE_ID,
         "qualification": "PREVIEW_UNQUALIFIED" if preview else "INTERIM", "options": opts, "lockDigest": lock_digest(),
     }
+    if inputs is not None:
+        # Part of planDigest: an input swapped between --plan and --apply yields PLAN_DIGEST_MISMATCH.
+        plan["inputs"] = inputs
     if result is not None:
         rec, lig = result["rec"], result["lig"]
         plan["decisions"] = (rec["decisions"] + lig["decisions"])[:200]
         plan["warnings"] = [limits.scrub(w) for w in rec["warnings"] + lig["warnings"]][:100]
         plan["rotatableBonds"] = lig["torsions"]
         plan["tautomer"] = lig["tautomer"]
+        plan["protonationSource"] = rec["protonationSource"]
         plan["status"] = "READY"
+        # Owner rule: ANY generated hydrogens, charges states or coordinates -> PREVIEW_UNQUALIFIED.
         if preview or rec["generated"] or lig["generated"]:
             plan["qualification"] = "PREVIEW_UNQUALIFIED"
     if blocked is not None:
@@ -124,9 +151,9 @@ def _compute(root: str, job: dict):
     try:
         with contextlib.redirect_stdout(sys.stderr):
             result = run_pipeline(root, job)
-        return result, build_plan(job, result, None)
+        return result, build_plan(job, result, None, result["inputs"])
     except Blocked as b:
-        return None, build_plan(job, None, b)
+        return None, build_plan(job, None, b, input_digests(root, job))
 
 
 def cmd_plan(root: str, job: dict) -> int:
@@ -198,7 +225,7 @@ def cmd_apply(root: str, job: dict) -> int:
         "diagnostics": plan["warnings"], "planDigest": plan["planDigest"], "lockDigest": lock, "profileId": plan["profileId"],
         "profileDigest": profile_digest(opts, lock), "qualification": plan["qualification"],
         "summary": {
-            "protonationSource": opts["protonation"], "ligandProtonation": opts["ligandProtonation"], "chargeModel": "gasteiger",
+            "protonationSource": plan["protonationSource"], "ligandProtonation": opts["ligandProtonation"], "chargeModel": "gasteiger",
             "rotatableBonds": lig["torsions"], "receptorAtoms": rec["atoms"], "ligandAtoms": lig["atoms"],
             "receptorHydrogensSubmitted": rec["hSubmitted"], "receptorHydrogensAdded": rec["hAdded"], "ligandHydrogensAdded": lig["hAdded"],
             "ligandFormalCharge": lig["formalCharge"], "ligandEmbedded3d": lig["embedded"],

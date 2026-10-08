@@ -1,15 +1,57 @@
 // The only spawn path for the preparation worker (task 5.2).
 // - argv arrays only, never a shell; fixed interpreter (the ~/mole-prep venv python inside WSL Ubuntu-24.04)
 // - scrubbed environment (env -i inside WSL, WSLENV empty on the Windows side), cwd = job directory
-// - per-stage timeout (default 120 s) with process-tree kill (taskkill /T on Windows, process group on POSIX,
+// - stage-aware timeout (120 s per pipeline stage the job runs, capped at 15 min; overrides clamped) with process-tree kill (taskkill /T on Windows, process group on POSIX,
 //   plus coreutils `timeout -k` inside WSL so the Linux side dies too)
 // - stdout/stderr capped and path-scrubbed before anyone sees them
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, statSync } from "node:fs";
+import { closeSync, existsSync, openSync, readSync, statSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const PREP_STAGE_TIMEOUT_MS = 120_000;
+/** Hard cap for one worker process (plan or apply), whatever the stages or the caller ask for. */
+export const PREP_MAX_TIMEOUT_MS = 900_000;
+export const PREP_MIN_TIMEOUT_MS = 1_000;
+const JOB_FILE_CAP = 64 * 1024;
+
+/**
+ * Wall-clock budget for one worker process. Both --plan and --apply run the whole pipeline:
+ * receptor clean + PDBFixer scan, Meeko receptor, ligand (RDKit/Meeko), plus a PDBFixer build when
+ * addMissingAtoms, PDB2PQR+PROPKA when PROPKA_PREVIEW and Dimorphite-DL when DIMORPHITE_PREVIEW.
+ * Each stage gets PREP_STAGE_TIMEOUT_MS; the total and any explicit override are clamped to
+ * [PREP_MIN_TIMEOUT_MS, PREP_MAX_TIMEOUT_MS].
+ */
+export function prepTimeoutMs(options = {}, override) {
+  if (override !== undefined && override !== null) {
+    if (typeof override !== "number" || !Number.isFinite(override)) throw new Error("timeoutMs must be a finite number");
+    return Math.min(PREP_MAX_TIMEOUT_MS, Math.max(PREP_MIN_TIMEOUT_MS, Math.floor(override)));
+  }
+  const o = options && typeof options === "object" ? options : {};
+  let stages = 3;
+  if (o.addMissingAtoms === true) stages += 1;
+  if (o.protonation === "PROPKA_PREVIEW") stages += 1;
+  if (o.ligandProtonation === "DIMORPHITE_PREVIEW") stages += 1;
+  return Math.min(PREP_MAX_TIMEOUT_MS, stages * PREP_STAGE_TIMEOUT_MS);
+}
+
+/** Options from <jobDir>/job.json (capped read); {} when absent or unreadable (the worker then reports JOB_INVALID). */
+export function readJobOptions(jobDir) {
+  try {
+    const fd = openSync(join(jobDir, "job.json"), "r");
+    try {
+      const buf = Buffer.alloc(JOB_FILE_CAP + 1);
+      const n = readSync(fd, buf, 0, buf.length, 0);
+      if (n > JOB_FILE_CAP) return {};
+      const job = JSON.parse(buf.subarray(0, n).toString("utf8"));
+      return job && typeof job.options === "object" && job.options !== null ? job.options : {};
+    } finally {
+      closeSync(fd);
+    }
+  } catch {
+    return {};
+  }
+}
 export const PREP_DISTRO = "Ubuntu-24.04";
 export const STDOUT_CAP = 64 * 1024;
 export const STDERR_CAP = 16 * 1024;
@@ -165,9 +207,10 @@ export function runProcess({ command, args, options, scrub = [] }, { timeoutMs =
 }
 
 /** Run the prep worker in one job directory: mode "plan" or "apply". */
-export async function runPrep({ mode, jobDir, timeoutMs = PREP_STAGE_TIMEOUT_MS, signal, platform = process.platform, python } = {}) {
+export async function runPrep({ mode, jobDir, timeoutMs, options, signal, platform = process.platform, python } = {}) {
   let inv;
   try {
+    timeoutMs = prepTimeoutMs(options ?? (typeof jobDir === "string" && isAbsolute(jobDir) ? readJobOptions(jobDir) : {}), timeoutMs);
     inv = buildPrepInvocation({ mode, jobDir, python: python ?? resolvePrepPython({ platform }), platform, timeoutMs });
   } catch (e) {
     return { status: "FAILED", exitCode: null, stdout: "", stderr: scrubOutput(String(e?.message || e), STDERR_CAP, [jobDir]), durationMs: 0 };

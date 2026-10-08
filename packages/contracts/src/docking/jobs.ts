@@ -47,6 +47,8 @@ const boxEdge = finite.min(JOB_CAPS.boxSizeMin).max(JOB_CAPS.boxSizeMax);
 export const PREP_PROFILE_ID = "ME_PREP_INTERIM_V0" as const;
 export const PREP_PROTONATION = ["EXPLICIT_SUBMITTED", "PROPKA_PREVIEW"] as const;
 export const PREP_LIGAND_PROTONATION = ["EXPLICIT_SUBMITTED", "DIMORPHITE_PREVIEW"] as const;
+/** Where receptor hydrogens actually came from (MEEKO_TEMPLATES_PREVIEW: Meeko residue templates generated some; PREVIEW_UNQUALIFIED). */
+export const PREP_PROTONATION_SOURCE = ["EXPLICIT_SUBMITTED", "PROPKA_PREVIEW", "MEEKO_TEMPLATES_PREVIEW"] as const;
 /** INTERIM: all state came from the submitted files or explicit choices. PREVIEW_UNQUALIFIED: some state was generated (PROPKA, Dimorphite-DL, Meeko template hydrogens). */
 export const PREP_QUALIFICATION = ["INTERIM", "PREVIEW_UNQUALIFIED"] as const;
 const count = z.number().int().min(0).max(1_000_000);
@@ -67,7 +69,7 @@ export type PrepOptionsV1 = z.infer<typeof PrepOptionsV1Schema>;
 
 export const PrepSummaryV1Schema = z
   .object({
-    protonationSource: z.enum(PREP_PROTONATION),
+    protonationSource: z.enum(PREP_PROTONATION_SOURCE),
     ligandProtonation: z.enum(PREP_LIGAND_PROTONATION),
     chargeModel: z.string().min(1).max(64),
     rotatableBonds: z.number().int().min(0).max(100),
@@ -117,7 +119,7 @@ export const PrepPlanV1Schema = z
     receptorArtifactId: ArtifactIdSchema,
     ligandArtifactId: ArtifactIdSchema,
     pH: finite.min(0).max(14),
-    protonationSource: z.enum(["EXPLICIT_SUBMITTED", "PROPKA_PREVIEW"]),
+    protonationSource: z.enum(PREP_PROTONATION_SOURCE),
     chargeModel: shortText,
     tautomer: shortText,
     rotatableBonds: z.number().int().min(0).max(100),
@@ -131,6 +133,11 @@ export const PrepPlanV1Schema = z
     qualification: z.enum(PREP_QUALIFICATION).optional(),
     options: PrepOptionsV1Schema.optional(),
     lockDigest: hex64.optional(),
+    // sha256 of the submitted input bytes; part of planDigest so a swapped input fails --apply.
+    inputs: z
+      .object({ receptorSha256: hex64.nullable(), ligandSha256: hex64.nullable(), ligandTemplateSha256: hex64.nullable() })
+      .strict()
+      .optional(),
   })
   .strict();
 export type PrepPlanV1 = z.infer<typeof PrepPlanV1Schema>;
