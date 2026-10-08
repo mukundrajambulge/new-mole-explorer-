@@ -9,9 +9,19 @@ export type ApiConfig = {
   tokenDir: string;
   /** Shared credential for hosted mode (MOLE_TOKEN) until accounts exist; local mode issues a random token. */
   token?: string;
+  /** Cap for ordinary JSON bodies. */
   maxJsonBytes: number;
+  /** Cap for project save bodies (PUT /api/projects/:id). */
+  maxProjectJsonBytes: number;
+  /** Total JSON body bytes held at once across all requests; more answer 429. */
+  maxJsonBytesInFlight: number;
+  /** Cap for one uploaded or remotely fetched structure file. */
   maxUploadBytes: number;
+  /** Uploads handled at the same time; more answer 429. */
+  maxConcurrentUploads: number;
 };
+
+const MIB = 1024 * 1024;
 
 const LOOPBACK = new Set(["127.0.0.1", "localhost", "::1"]);
 const LOCAL_DEV_ORIGINS = ["http://localhost:3101", "http://127.0.0.1:3101"];
@@ -34,6 +44,10 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ApiConfig => {
   const token = env.MOLE_TOKEN;
   if (modeRaw === "hosted" && (token === undefined || token.length < 32)) throw new Error("MOLE_MODE=hosted requires MOLE_TOKEN of at least 32 characters.");
   if (listed.includes("*")) throw new Error("ALLOWED_ORIGINS must list explicit origins, not *.");
+  const maxJsonBytes = intEnv(env, "MAX_JSON_BYTES", 8 * MIB, 1024, 256 * MIB);
+  const maxProjectJsonBytes = intEnv(env, "MAX_PROJECT_JSON_BYTES", 64 * MIB, 1024, 256 * MIB);
+  // Default budget fits two maximum project saves at once; a parsed body costs a few times its bytes.
+  const maxJsonBytesInFlight = intEnv(env, "MAX_JSON_BYTES_IN_FLIGHT", 2 * maxProjectJsonBytes, Math.max(maxJsonBytes, maxProjectJsonBytes), 1024 * MIB);
   return {
     mode: modeRaw,
     host,
@@ -43,7 +57,11 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ApiConfig => {
     allowedOrigins: modeRaw === "local" ? [...LOCAL_DEV_ORIGINS, ...listed] : listed,
     tokenDir: env.MOLE_TOKEN_DIR || fileURLToPath(new URL("../../../.mole", import.meta.url)),
     ...(modeRaw === "hosted" ? { token } : {}),
-    maxJsonBytes: intEnv(env, "MAX_JSON_BYTES", 8 * 1024 * 1024, 1024, 1024 * 1024 * 1024),
-    maxUploadBytes: intEnv(env, "MAX_UPLOAD_BYTES", 512 * 1024 * 1024 + 1_000_000, 1024, 4 * 1024 * 1024 * 1024),
+    maxJsonBytes,
+    maxProjectJsonBytes,
+    maxJsonBytesInFlight,
+    // Parsers still need the decoded text as one string (streamed in, never a whole-file Buffer); keep it far below V8's ~512 Mi-char limit.
+    maxUploadBytes: intEnv(env, "MAX_UPLOAD_BYTES", 256 * MIB, 1024, 384 * MIB),
+    maxConcurrentUploads: intEnv(env, "MAX_CONCURRENT_UPLOADS", 2, 1, 16),
   };
 };
