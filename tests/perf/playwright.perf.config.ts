@@ -10,7 +10,7 @@ export default defineConfig({
   workers: 1,
   reporter: "list",
   timeout: 600_000,
-  use: { baseURL: `http://localhost:${webPort}` },
+  use: { baseURL: process.env.PERF_BASE_URL ?? `http://localhost:${webPort}` },
   webServer: [
     { command: "npm run dev:api", url: "http://localhost:8100/api/health", reuseExistingServer: true, timeout: 120_000 },
     { command: `npm run dev --workspace @molecular/web -- --port ${webPort}`, url: `http://localhost:${webPort}`, reuseExistingServer: webPort === 3101, timeout: 120_000 },

@@ -4,7 +4,8 @@ import type { SearchRegionOverlay } from "../rendering/searchRegionOverlay";
 import type { D2SearchRegionAuthority, DockingApiAdapter, D2AdaptationResult } from "./dockingApiAdapter";
 import { dockingApiAdapter } from "./dockingApiAdapter";
 import { DockingBottomPanel } from "./DockingBottomPanel";
-import { DockingInputsPanel } from "./DockingInputsPanel";
+import { DockingWizard } from "./DockingWizard";
+import type { PoseOverlay } from "./wizardLogic";
 import { DockingWorkflowPanel } from "./DockingWorkflowPanel";
 import { draftForStructure, emptyDockingAdaptation, emptySearchRegionDraft, numericSearchRegionDraft, overlayForCommitted, overlayForDraft, type DockingAdaptationState, type SearchRegionDraft } from "./dockingUiState";
 
@@ -14,7 +15,7 @@ export type DockingWorkspaceProps = {
   structure: StructureLoadResult | null;
   onImport: () => void;
   onOpenMolecular: () => void;
-  renderViewer: (overlay: SearchRegionOverlay | null) => ReactNode;
+  renderViewer: (overlay: SearchRegionOverlay | null, pose?: PoseOverlay | null) => ReactNode;
   apiAdapter?: DockingApiAdapter;
   preparationInput?: DockingPreparationInput;
 };
@@ -27,6 +28,7 @@ export const DockingWorkspace = ({ structure, onImport, onOpenMolecular, renderV
   const [committedRegion, setCommittedRegion] = useState<D2SearchRegionAuthority | null>(null);
   const [commitMessage, setCommitMessage] = useState<string | null>(null);
   const [commitBusy, setCommitBusy] = useState(false);
+  const [poseOverlay, setPoseOverlay] = useState<PoseOverlay | null>(null);
   const coordinateFrame = adaptation.snapshot?.coordinateStates[0]?.coordinateFrame ?? "unresolved-D2-coordinate-frame";
 
   useEffect(() => {
@@ -74,6 +76,5 @@ export const DockingWorkspace = ({ structure, onImport, onOpenMolecular, renderV
     });
   };
 
-  const diagnostics = adaptation.snapshot?.validationDiagnostics ?? [];
-  return <section className="docking-workspace" aria-label="Docking workspace" data-testid="docking-workspace"><header className="docking-workspace-header"><div><span className="docking-eyebrow">D2 PREPARATION WORKSPACE</span><h1>Docking</h1><p>Explicit receptor, ligand, and SearchRegion state. Execution is not available in this gate.</p></div><div className="docking-header-actions"><span className="docking-gate-badge">UI-D0 · D2</span><button type="button" onClick={onOpenMolecular}>Molecular workspace</button></div></header><div className="docking-workspace-grid"><DockingInputsPanel structure={structure} adaptation={adaptation.snapshot} adaptationPhase={adaptation.phase === "LOADING" ? "D2 adapting…" : adaptation.phase} diagnostics={diagnostics} draft={draft} coordinateFrame={coordinateFrame} committedRegion={committedRegion} commitMessage={commitMessage} commitBusy={commitBusy} onImport={onImport} onDraftChange={updateDraft} onShowDraft={() => setCommitMessage(!structure ? "BLOCKED: load explicit source evidence before projecting a SearchRegion." : draftOverlay ? "Draft SearchRegion projected; it is not scientific authority." : "BLOCKED: draft values are not finite or dimensions are not positive.")} onCommit={commit} /><section className="docking-viewer-column"><div className="docking-viewer-banner"><span>EXISTING MOLECULARCANVAS</span><strong>{committedRegion ? "Committed SearchRegion projection" : structure && draftOverlay ? "Draft SearchRegion projection" : "No SearchRegion projection"}</strong></div>{renderViewer(overlay)}</section><DockingWorkflowPanel adaptation={adaptation.snapshot} adaptationPhase={adaptation.phase} committed={Boolean(committedRegion)} /></div><DockingBottomPanel /></section>;
+  return <section className="docking-workspace" aria-label="Docking workspace" data-testid="docking-workspace"><header className="docking-workspace-header"><div><span className="docking-eyebrow">D2 PREPARATION WORKSPACE</span><h1>Docking</h1><p>Explicit receptor, ligand, and SearchRegion state. Guided flow: Inputs, Prepare, Box, Run, Results (preview, not scientifically qualified).</p></div><div className="docking-header-actions"><span className="docking-gate-badge">UI-D0 · D2</span><button type="button" onClick={onOpenMolecular}>Molecular workspace</button></div></header><div className="docking-workspace-grid"><aside className="docking-inputs-panel" aria-label="Docking inputs"><DockingWizard structure={structure} sourceArtifactId={adaptation.snapshot?.sourceArtifactId ?? structure?.sourceArtifact?.sourceArtifactId ?? structure?.structure.source.sourceArtifactId ?? null} draft={draft} coordinateFrame={coordinateFrame} committedRegion={committedRegion} commitMessage={commitMessage} commitBusy={commitBusy} onDraftChange={updateDraft} onReplaceDraft={(next) => { setDraft(next); setCommitMessage(null); setCommittedRegion(null); }} onShowDraft={() => setCommitMessage(draftOverlay ? "Draft SearchRegion projected; it is not scientific authority." : "BLOCKED: draft values are not finite or dimensions are not positive.")} onCommit={commit} onPoseOverlay={setPoseOverlay} onImport={onImport} /></aside><section className="docking-viewer-column"><div className="docking-viewer-banner"><span>EXISTING MOLECULARCANVAS</span><strong>{committedRegion ? "Committed SearchRegion projection" : structure && draftOverlay ? "Draft SearchRegion projection" : "No SearchRegion projection"}</strong></div>{renderViewer(overlay, poseOverlay)}</section><DockingWorkflowPanel adaptation={adaptation.snapshot} adaptationPhase={adaptation.phase} committed={Boolean(committedRegion)} /></div><DockingBottomPanel /></section>;
 };

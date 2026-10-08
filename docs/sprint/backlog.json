@@ -397,9 +397,9 @@
         "M1"
       ],
       "est": "1 day",
-      "status": "READY",
+      "status": "DONE",
       "branch": "sprint/W3/1.3",
-      "note": "Owner decision: merge now; the 3 review gaps are tracked as 1.3a, 1.3b, 1.3c. W4 integration: merge conflict with 1.5/A1 in server.ts - needs conflict resolution"
+      "note": "Merged after conflict round; gaps tracked as 1.3a-c"
     },
     {
       "id": "1.3a",
@@ -975,7 +975,8 @@
         "C9"
       ],
       "est": "Half a day",
-      "status": "TODO"
+      "status": "DONE",
+      "note": "W6 merged (conflict with 1.3 resolved: splitLines + line numbers)"
     },
     {
       "id": "2.7",
@@ -1048,7 +1049,9 @@
         "C10"
       ],
       "est": "1 hour",
-      "status": "TODO"
+      "status": "NEEDS_OWNER",
+      "branch": "sprint/W7/2.8",
+      "note": "Science decision: task says a -0 box must get the same digest as a 0 box, but d1Contracts.test.ts:77 asserts CoordinateStateDigest(+0) != (-0). Owner: should -0 normalise to 0 for geometry digests only, or everywhere? Also combineSelections still hashes unsorted ids"
     },
     {
       "id": "2.9",
@@ -1488,7 +1491,8 @@
         "F8"
       ],
       "est": "1 day",
-      "status": "TODO"
+      "status": "DONE",
+      "note": "Merged; tab-switch perf on merged code: 30 switches on 4V6F, same canvas, no reload, sized, lit pixels"
     },
     {
       "id": "3.9",
@@ -1739,7 +1743,9 @@
         "D10"
       ],
       "est": "1 day",
-      "status": "TODO"
+      "status": "NEEDS_OWNER",
+      "branch": "sprint/W6/4.1",
+      "note": "W6 BLOCKED: needs real CI runs on Windows MSVC and macOS clang (push the branch); agent wanted to drop /WX (denied). Owner: push sprint/W6/4.1 to see CI logs"
     },
     {
       "id": "4.2",
@@ -1812,7 +1818,9 @@
         "C5"
       ],
       "est": "2-3 hours",
-      "status": "TODO"
+      "status": "TODO",
+      "branch": "sprint/W6/4.3",
+      "note": "W6: C++ case-insensitive Cl/Br works + fixtures; review: TS normalizer unused (dead code), test hand-parses PDBQT instead of the real TS->C++ path, asserts only valid not finite score"
     },
     {
       "id": "4.4",
@@ -2178,7 +2186,8 @@
       "refs": [],
       "est": "1 week",
       "status": "TODO",
-      "note": "Owner decision 2026-10-08: default EXPLICIT_SUBMITTED (use the hydrogens in the uploaded file); PROPKA/PDB2PQR is an opt-in that seals PREVIEW_UNQUALIFIED. No new profile IDs or digests. Design: docs/sprint/design/5.2.md"
+      "note": "Part 1 merged. Part 2 on sprint/W6/5.2b PARTIAL: routes, job store, pin check, artifact upload done; BLOCKER receptor seal hardcoded BLOCKED (D2 dependency digests undefined) so SEALED unreachable; also pin check ignores the installed venv, prep-artifacts store lacks quota/GC/concurrency limit, no SEALED/PROPKA end-to-end tests.",
+      "branch": "sprint/W6/5.2b"
     },
     {
       "id": "5.3",
@@ -2400,7 +2409,8 @@
         "F12"
       ],
       "est": "1.5 weeks",
-      "status": "TODO"
+      "status": "DONE",
+      "note": "Merged; docking-wizard-mock e2e passes (17 s). Follow-up: removing DockingInputsPanel dropped the e2e that SearchRegion commit is blocked without explicit D2 prepared states - restore that coverage in the wizard (5.7b)"
     },
     {
       "id": "5.7b",

@@ -113,6 +113,10 @@ describe("mock job server lifecycle", () => {
     expect(final.status).toBe("SUCCEEDED");
     const result = DockResultSchema.parse(await (await fetch(`${base}/docking/jobs/${st.jobId}/result`)).json());
     expect(result.scoreStatus).toBe("PREVIEW_UNQUALIFIED");
+    const pose = await fetch(`${base}/docking/artifacts/${result.poses[0]!.poseArtifactId}?format=pdbqt`);
+    expect(pose.status).toBe(200);
+    expect(await pose.text()).toContain("MOCK");
+    expect((await fetch(`${base}/docking/artifacts/nope`)).status).toBe(404);
   });
 
   it("supports cancel and failure, and rejects invalid input", async () => {
