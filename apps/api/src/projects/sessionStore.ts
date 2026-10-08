@@ -333,7 +333,7 @@ export class SessionStore {
       const index: SessionIndex = { sessionFormatVersion: 2, sessionId: id, name: legacy.name || "Untitled Project", createdAt: legacy.createdAt || now, updatedAt: legacy.updatedAt || now, revision: Math.max(1, legacy.revision || 1), currentHeadRevisionId: `session-revision-migration-${randomUUID()}` };
       const draft = { ...defaultDraft(id, index.name, legacy.structure, legacy.presentation), dependencyMode: legacy.structure?.sourceArtifact ? "SELF_CONTAINED" as const : "REFERENCED" as const };
       const manifest = sealManifest(draft, index, index.currentHeadRevisionId, [], now, "MIGRATION");
-      manifest.migrationHistory = [{ fromSessionFormatVersion: 1, toSessionFormatVersion: 2, migratedAt: now, sourceFile: this.legacyPath(id) }];
+      manifest.migrationHistory = [{ fromSessionFormatVersion: 1, toSessionFormatVersion: 2, migratedAt: now, sourceFile: `${safeSessionId(id)}.json` }];
       manifest.restoreMetadata = { status: "EXACT_RESTORED", migration: "v1-to-v2", openedFromRevisionId: manifest.sessionRevisionId };
       manifest.integrity.manifestSha256 = sha256Canonical(manifestBasis(manifest));
       await this.atomicWrite(this.revisionPath(id, manifest.sessionRevisionId), JSON.stringify(manifest, null, 2));
