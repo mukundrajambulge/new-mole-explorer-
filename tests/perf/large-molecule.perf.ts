@@ -139,6 +139,31 @@ test("4V6F performance baseline", async ({ page }) => {
   const jsonAfterHover = await jsonStats();
   results.hoverJsonStringify = { calls: jsonAfterHover.calls - jsonBeforeHover.calls, chars: jsonAfterHover.chars - jsonBeforeHover.chars, largeCalls: jsonAfterHover.large - jsonBeforeHover.large };
 
+  // 3.4: drag-rotate for 5 s with the left button held. Long tasks, React commits and hover state
+  // changes must not occur while the button is down (hover picking is suspended).
+  await page.evaluate(() => {
+    const w = window as unknown as { __longTasks: number[]; __hoverMutations: number };
+    w.__longTasks = []; w.__hoverMutations = 0;
+    new PerformanceObserver((list) => { for (const e of list.getEntries()) w.__longTasks.push(e.duration); }).observe({ entryTypes: ["longtask"] });
+    const el = document.querySelector('[data-testid="molecular-viewer"]')!;
+    new MutationObserver((records) => { w.__hoverMutations += records.length; }).observe(el, { attributes: true, attributeFilter: ["data-hovered-atom"] });
+  });
+  const dragCommitsBefore = (await renderCounts()).commits;
+  const dragStepMs: number[] = [];
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  const dragStart = await now(page);
+  for (let step = 0; (await now(page)) - dragStart < 5000; step++) {
+    const a = step / 6;
+    const t0 = await now(page);
+    await page.mouse.move(box.x + box.width / 2 + Math.cos(a) * 120, box.y + box.height / 2 + Math.sin(a) * 120);
+    await page.waitForTimeout(40);
+    dragStepMs.push((await now(page)) - t0);
+  }
+  await page.mouse.up();
+  const dragMeta = await page.evaluate(() => { const w = window as unknown as { __longTasks: number[]; __hoverMutations: number }; return { longTasks: [...w.__longTasks], hoverMutations: w.__hoverMutations }; });
+  results.drag = { durationMs: 5000, steps: dragStepMs.length, stepMs: stats(dragStepMs), longTaskCount: dragMeta.longTasks.length, maxLongTaskMs: Math.max(0, ...dragMeta.longTasks), hoverStateChanges: dragMeta.hoverMutations, reactCommits: (await renderCounts()).commits - dragCommitsBefore };
+
   // 10 tab switches between rail panels.
   const names = ["Display panel", "Analyze panel"];
   const tabs: number[] = [];
@@ -158,4 +183,12 @@ test("4V6F performance baseline", async ({ page }) => {
   console.log(JSON.stringify(results));
   // 3.3 done-when: hover re-renders at most 2 components per dwell move beyond the idle baseline.
   if (label !== "baseline") expect((results.hoverRenders as { componentRendersMinusIdle: number }).componentRendersMinusIdle).toBeLessThanOrEqual(2 * 20);
+  // 3.4 done-when: hover p95 < 50 ms with a chain selected; no long task > 200 ms, no hover change or React commit while dragging.
+  if (label !== "baseline") {
+    expect(stats(hover).p95, "hover p95 with chain A selected").toBeLessThan(50);
+    const drag = results.drag as { maxLongTaskMs: number; hoverStateChanges: number; reactCommits: number };
+    expect(drag.maxLongTaskMs, "long task during drag").toBeLessThan(200);
+    expect(drag.hoverStateChanges, "hover changes while button held").toBe(0);
+    expect(drag.reactCommits, "React commits while button held").toBe(0);
+  }
 });
