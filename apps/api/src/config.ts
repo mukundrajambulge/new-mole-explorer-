@@ -7,9 +7,17 @@ export type ApiConfig = {
   allowedOrigins: readonly string[];
   /** Directory that receives the local-mode token file (<dir>/token). */
   tokenDir: string;
+  /** Cap for ordinary JSON bodies. */
   maxJsonBytes: number;
+  /** Cap for project save bodies (PUT /api/projects/:id). */
+  maxProjectJsonBytes: number;
+  /** Cap for one uploaded structure file. */
   maxUploadBytes: number;
+  /** Uploads handled at the same time; more answer 429. */
+  maxConcurrentUploads: number;
 };
+
+const MIB = 1024 * 1024;
 
 const LOOPBACK = new Set(["127.0.0.1", "localhost", "::1"]);
 const LOCAL_DEV_ORIGINS = ["http://localhost:3101", "http://127.0.0.1:3101"];
@@ -36,7 +44,10 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ApiConfig => {
     port: intEnv(env, "PORT", intEnv(env, "API_PORT", 8100, 0, 65535), 0, 65535),
     allowedOrigins: modeRaw === "local" ? [...LOCAL_DEV_ORIGINS, ...listed] : listed,
     tokenDir: env.MOLE_TOKEN_DIR || fileURLToPath(new URL("../../../.mole", import.meta.url)),
-    maxJsonBytes: intEnv(env, "MAX_JSON_BYTES", 8 * 1024 * 1024, 1024, 1024 * 1024 * 1024),
-    maxUploadBytes: intEnv(env, "MAX_UPLOAD_BYTES", 512 * 1024 * 1024 + 1_000_000, 1024, 4 * 1024 * 1024 * 1024),
+    maxJsonBytes: intEnv(env, "MAX_JSON_BYTES", 8 * MIB, 1024, 256 * MIB),
+    maxProjectJsonBytes: intEnv(env, "MAX_PROJECT_JSON_BYTES", 64 * MIB, 1024, 256 * MIB),
+    // Ingestion still decodes the whole file to one string, so the ceiling stays below ~400 MB.
+    maxUploadBytes: intEnv(env, "MAX_UPLOAD_BYTES", 256 * MIB, 1024, 384 * MIB),
+    maxConcurrentUploads: intEnv(env, "MAX_CONCURRENT_UPLOADS", 2, 1, 16),
   };
 };

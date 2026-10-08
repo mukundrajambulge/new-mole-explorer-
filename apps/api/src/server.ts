@@ -1,12 +1,13 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { loadConfig } from "./config.js";
 import { f64Value, type BootstrapResponse, type CanonicalCommand, type D2SearchRegionV1, type HealthResponse, type ProjectSaveRequest } from "@molecular/contracts";
 import { IngestionError, StructureIngestionService } from "./structures/ingestion.js";
-import { parseMultipartFile } from "./structures/multipart.js";
+import { assertDeclaredLength, consumeRequest, receiveMultipartFile } from "./structures/multipart.js";
 import { ProjectStore } from "./projects/projectStore.js";
 import { SourceArtifactStore } from "./lifecycle/sourceArtifactStore.js";
 import { CommandDispatcher } from "./command/dispatcher.js";
@@ -56,17 +57,19 @@ const projectStore = new ProjectStore(dataRoot);
 const commandDispatcher = new CommandDispatcher({ dataRoot });
 const d2PreparationService = new D2PreparationService();
 
-const readJson = async (request: IncomingMessage): Promise<Record<string, unknown>> => {
+const uploadTempDir = join(dataRoot, "tmp", "uploads");
+let activeUploads = 0;
+
+const readJson = async (request: IncomingMessage, maxBytes = config.maxJsonBytes): Promise<Record<string, unknown>> => {
   const tooLarge = () => new IngestionError("PAYLOAD_TOO_LARGE", "The request body exceeds the size limit.");
-  if (Number(request.headers["content-length"] ?? 0) > config.maxJsonBytes) throw tooLarge();
+  assertDeclaredLength(request, maxBytes, tooLarge);
   const chunks: Buffer[] = [];
   let size = 0;
-  for await (const chunk of request) {
-    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-    size += buffer.length;
-    if (size > config.maxJsonBytes) throw tooLarge();
-    chunks.push(buffer);
-  }
+  await consumeRequest(request, (chunk) => {
+    size += chunk.length;
+    if (size > maxBytes) throw tooLarge();
+    chunks.push(chunk);
+  });
   try {
     return JSON.parse(Buffer.concat(chunks).toString("utf8")) as Record<string, unknown>;
   } catch {
@@ -236,9 +239,27 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/structures/upload") {
-      const file = await parseMultipartFile(request);
-      const parentExportArtifactId = typeof request.headers["x-parent-export-artifact-id"] === "string" ? request.headers["x-parent-export-artifact-id"] : undefined;
-      sendJson(response, 200, await ingestionService.ingestLocal(file.filename, file.data, parentExportArtifactId ? { parentExportArtifactId } : {}));
+      if (activeUploads >= config.maxConcurrentUploads) {
+        response.setHeader("retry-after", "5");
+        sendJson(response, 429, { error: { code: "TOO_MANY_UPLOADS", message: "Too many uploads are in progress; try again shortly." } });
+        return;
+      }
+      activeUploads += 1;
+      try {
+        const file = await receiveMultipartFile(request, { maxFileBytes: config.maxUploadBytes, tempDir: uploadTempDir });
+        try {
+          // Text structure formats never contain NUL; reject binaries before reading them back (.pse/.pze get their own refusal).
+          if (file.binary && !/\.(pse|pze)$/i.test(file.filename)) throw new IngestionError("UNSUPPORTED_FORMAT", "Binary files are not an admitted coordinate format.");
+          const parentExportArtifactId = typeof request.headers["x-parent-export-artifact-id"] === "string" ? request.headers["x-parent-export-artifact-id"] : undefined;
+          // One exact-size read of a file already capped at maxUploadBytes (well below the ~400 MB string ceiling).
+          const bytes = await readFile(file.path);
+          sendJson(response, 200, await ingestionService.ingestLocal(file.filename, bytes, parentExportArtifactId ? { parentExportArtifactId } : {}));
+        } finally {
+          await file.dispose();
+        }
+      } finally {
+        activeUploads -= 1;
+      }
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/structures/rcsb") {
@@ -268,7 +289,7 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       return;
     }
     if (projectMatch && request.method === "PUT") {
-      const body = await readJson(request);
+      const body = await readJson(request, config.maxProjectJsonBytes);
       sendJson(response, 200, await projectStore.save(projectMatch[1], body as unknown as ProjectSaveRequest));
       return;
     }

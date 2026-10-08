@@ -20,6 +20,14 @@ describe("config", () => {
     expect(() => loadConfig({ MOLE_MODE: "hosted", ALLOWED_ORIGINS: "*" })).toThrow();
     expect(loadConfig({ MOLE_MODE: "hosted", HOST: "0.0.0.0", ALLOWED_ORIGINS: "https://a.example" }).allowedOrigins).toEqual(["https://a.example"]);
   });
+  it("defaults request size limits and bounds the upload cap", () => {
+    const c = loadConfig({});
+    expect(c.maxJsonBytes).toBe(8 * 1024 * 1024);
+    expect(c.maxProjectJsonBytes).toBe(64 * 1024 * 1024);
+    expect(c.maxUploadBytes).toBe(256 * 1024 * 1024);
+    expect(c.maxConcurrentUploads).toBe(2);
+    expect(() => loadConfig({ MAX_UPLOAD_BYTES: String(512 * 1024 * 1024) })).toThrow();
+  });
   it("rejects bad numbers and modes", () => {
     expect(() => loadConfig({ PORT: "abc" })).toThrow();
     expect(() => loadConfig({ MOLE_MODE: "x" })).toThrow();
@@ -36,7 +44,6 @@ describe("api routes", () => {
   beforeAll(async () => {
     dir = mkdtempSync(join(tmpdir(), "mole-api-"));
     process.env.MOLECULAR_DATA_DIR = dir;
-    process.env.MAX_JSON_BYTES = "2048";
     process.env.MOLE_TOKEN_DIR = join(dir, ".mole");
     const mod = await import("./server.js");
     await mod.startServer(0, "127.0.0.1");
@@ -84,7 +91,7 @@ describe("api routes", () => {
     expect((await get(`localhost:${port}`)).status).toBe(200);
   });
   it("caps JSON bodies before buffering", async () => {
-    const res = await fetch(`${base}/api/projects`, { method: "POST", headers: auth({ "content-type": "application/json" }), body: JSON.stringify({ name: "x".repeat(5000) }) });
+    const res = await fetch(`${base}/api/projects`, { method: "POST", headers: auth({ "content-type": "application/json" }), body: JSON.stringify({ name: "x".repeat(9 * 1024 * 1024) }) });
     expect(res.status).toBe(413);
     expect((await res.json()).error.code).toBe("PAYLOAD_TOO_LARGE");
   });
