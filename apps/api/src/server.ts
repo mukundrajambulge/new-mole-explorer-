@@ -91,7 +91,7 @@ const hostAllowed = (request: IncomingMessage): boolean => {
 };
 
 // Local-mode token: random per start-up, written to <tokenDir>/token (owner-only). Health stays open for liveness probes.
-let localToken: Buffer | undefined;
+let localToken: Buffer | undefined = config.token ? Buffer.from(config.token, "utf8") : undefined;
 const tokenValid = (request: IncomingMessage): boolean => {
   const supplied = request.headers["x-mole-token"];
   if (!localToken || typeof supplied !== "string") return false;
@@ -126,8 +126,8 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
     response.end();
     return;
   }
-  if (config.mode === "local" && !(request.method === "GET" && request.url?.split("?")[0] === "/api/health") && !tokenValid(request)) {
-    sendJson(response, 401, { error: { code: "TOKEN_REQUIRED", message: "A valid local API token is required." } });
+  if (!(request.method === "GET" && request.url?.split("?")[0] === "/api/health") && !tokenValid(request)) {
+    sendJson(response, 401, { error: { code: "TOKEN_REQUIRED", message: "A valid API token is required." } });
     return;
   }
 
@@ -300,12 +300,25 @@ export const server = createServer((request, response) => {
 });
 
 export const startServer = (port = config.port, host = config.host) =>
-  new Promise<void>((resolve) => {
-    if (config.mode === "local") issueLocalToken();
+  new Promise<void>((resolve, reject) => {
+    try {
+      if (config.mode === "local") issueLocalToken();
+    } catch (error) {
+      reject(error);
+      return;
+    }
+    const onError = (error: Error) => reject(error);
+    server.once("error", onError);
     server.listen(port, host, () => {
+      server.off("error", onError);
       console.log(`Molecular API (${config.mode}) listening on http://${host}:${port}`);
       resolve();
     });
   });
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) void startServer();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  startServer().catch((error: unknown) => {
+    console.error("Molecular API failed to start:", error instanceof Error ? error.message : error);
+    process.exit(1);
+  });
+}
