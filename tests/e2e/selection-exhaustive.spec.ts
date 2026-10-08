@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -10,7 +11,7 @@ const root = resolve(".");
 const campaign = JSON.parse(readFileSync(resolve("verification/selection-exhaustive/campaign-cases.json"), "utf8")) as { cases: CampaignCase[]; caseCount: number };
 const programmatic = JSON.parse(readFileSync(resolve("verification/selection-exhaustive/programmatic-results.json"), "utf8")) as { records: Programmatic[] };
 const byId = new Map(programmatic.records.map((record) => [record.test_id, record]));
-const categoryDir = (category: string) => resolve("verification/selection-exhaustive/evidence", category);
+const categoryDir = (category: string) => evidencePath("selection-exhaustive", "evidence", category);
 const csvEscape = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
 const classificationFromUi = (category: string, consoleCategory: string, result: string, diagnostics: string[], count: number | null): string => {
   const text = `${result} ${diagnostics.join(" ")}`;
@@ -31,18 +32,18 @@ const buildReports = (records: UiRecord[]) => {
   const missing = campaign.cases.map((entry) => entry.testId).filter((id) => !records.some((record) => record.test_id === id));
   const csvHeader = ["test_id","category","query","fixture","expected_classification","actual_classification","actual_count","programmatic_count","mole_hash","canonical_sha256","visual_pass","screenshot","duration_ms","notes"];
   const csvRows = records.map((record) => csvHeader.map((key) => csvEscape(record[key])).join(","));
-  writeFileSync(resolve("verification/selection-exhaustive/SELECTION_A_BF_RESULTS.json"), JSON.stringify({ schemaVersion: 1, campaign: "A→BF", generatedAt: new Date().toISOString(), expectedTestExecutions: campaign.caseCount, actualTestExecutions: records.length, missingTestIds: missing, statusCounts: statuses, records }, null, 2) + "\n");
-  writeFileSync(resolve("verification/selection-exhaustive/SELECTION_A_BF_RESULTS.csv"), [csvHeader.join(","), ...csvRows].join("\n") + "\n");
+  writeFileSync(evidencePath("selection-exhaustive", "SELECTION_A_BF_RESULTS.json"), JSON.stringify({ schemaVersion: 1, campaign: "A→BF", generatedAt: new Date().toISOString(), expectedTestExecutions: campaign.caseCount, actualTestExecutions: records.length, missingTestIds: missing, statusCounts: statuses, records }, null, 2) + "\n");
+  writeFileSync(evidencePath("selection-exhaustive", "SELECTION_A_BF_RESULTS.csv"), [csvHeader.join(","), ...csvRows].join("\n") + "\n");
   const lines = ["# Selection A→BF exhaustive report", "", `Generated: ${new Date().toISOString()}`, `Expected executions: ${campaign.caseCount}`, `Actual executions: ${records.length}`, `Missing IDs: ${missing.length}`, "", "## Status counts", "", ...Object.entries(statuses).sort().map(([key, value]) => `- ${key}: ${value}`), "", "## Category coverage", "", ...[...byCategory.entries()].sort().map(([category, list]) => `- ${category}: ${list.length}/${campaign.cases.filter((entry) => entry.category === category).length}`), "", "## Verification policy", "", "Each case has one local screenshot, a UI console result, an independent canonical evaluator result, and a SHA-256 hash over the sorted membership tuple. PyMOL exact replay is reported separately and is BLOCKED when the pinned PyMOL runtime is unavailable.", "", `Campaign status: ${missing.length === 0 && records.every((record) => record.final_status !== "DEFECT") ? "PARTIAL" : "FAIL_INCOMPLETE"}`];
-  writeFileSync(resolve("verification/selection-exhaustive/FINAL_SELECTION_A_BF_REPORT.md"), lines.join("\n") + "\n");
-  writeFileSync(resolve("verification/selection-exhaustive/FINAL_SELECTION_A_BF_REPORT.json"), JSON.stringify({ schemaVersion: 1, campaignStatus: missing.length === 0 ? "PARTIAL" : "FAIL_INCOMPLETE", expectedExecutions: campaign.caseCount, actualExecutions: records.length, missingTestIds: missing, statusCounts: statuses, categoryCoverage: Object.fromEntries([...byCategory.entries()].map(([k, v]) => [k, v.length])), pymol: { status: "BLOCKED", reason: "Pinned PyMOL module is unavailable in the current Python runtime; no equivalence was fabricated." } }, null, 2) + "\n");
+  writeFileSync(evidencePath("selection-exhaustive", "FINAL_SELECTION_A_BF_REPORT.md"), lines.join("\n") + "\n");
+  writeFileSync(evidencePath("selection-exhaustive", "FINAL_SELECTION_A_BF_REPORT.json"), JSON.stringify({ schemaVersion: 1, campaignStatus: missing.length === 0 ? "PARTIAL" : "FAIL_INCOMPLETE", expectedExecutions: campaign.caseCount, actualExecutions: records.length, missingTestIds: missing, statusCounts: statuses, categoryCoverage: Object.fromEntries([...byCategory.entries()].map(([k, v]) => [k, v.length])), pymol: { status: "BLOCKED", reason: "Pinned PyMOL module is unavailable in the current Python runtime; no equivalence was fabricated." } }, null, 2) + "\n");
 };
 
 test("exhaustive A through BF selection and action replay", async ({ page }) => {
   test.setTimeout(1_200_000);
   page.setDefaultTimeout(7000);
   page.setDefaultNavigationTimeout(15000);
-  mkdirSync(resolve("verification/selection-exhaustive/evidence"), { recursive: true });
+  mkdirSync(evidencePath("selection-exhaustive", "evidence"), { recursive: true });
   const records: UiRecord[] = [];
   const browserConsoleErrors: string[] = [];
   const pageErrors: string[] = [];
@@ -102,12 +103,12 @@ test("exhaustive A through BF selection and action replay", async ({ page }) => 
       notes = overflow.horizontal ? "horizontal-overflow" : "";
       const cat = entry.category;
       mkdirSync(categoryDir(cat), { recursive: true });
-      screenshot = `verification/selection-exhaustive/evidence/${cat}/${entry.testId}__${actualClassification}.png`;
+      screenshot = evidencePath("selection-exhaustive", "evidence", cat, `${entry.testId}__${actualClassification}.png`);
       await page.screenshot({ path: resolve(screenshot), animations: "disabled" });
     } catch (error) {
       notes = error instanceof Error ? error.message : String(error);
       mkdirSync(categoryDir(entry.category), { recursive: true });
-      screenshot = `verification/selection-exhaustive/evidence/${entry.category}/${entry.testId}__BLOCKED.png`;
+      screenshot = evidencePath("selection-exhaustive", "evidence", entry.category, `${entry.testId}__BLOCKED.png`);
       await page.screenshot({ path: resolve(screenshot), animations: "disabled" }).catch(() => undefined);
       actualClassification = "BLOCKED";
       await page.goto("/").catch(() => undefined);
@@ -125,8 +126,8 @@ test("exhaustive A through BF selection and action replay", async ({ page }) => 
     });
   }
   buildReports(records);
-  mkdirSync(resolve("verification/selection-exhaustive"), { recursive: true });
-  writeFileSync(resolve("verification/selection-exhaustive/SELECTION_BROWSER_ERRORS.json"), JSON.stringify({ browserConsoleErrors, pageErrors }, null, 2) + "\n");
+  mkdirSync(evidencePath("selection-exhaustive"), { recursive: true });
+  writeFileSync(evidencePath("selection-exhaustive", "SELECTION_BROWSER_ERRORS.json"), JSON.stringify({ browserConsoleErrors, pageErrors }, null, 2) + "\n");
   expect(records).toHaveLength(campaign.caseCount);
   expect(new Set(records.map((record) => record.test_id)).size).toBe(campaign.caseCount);
 });
