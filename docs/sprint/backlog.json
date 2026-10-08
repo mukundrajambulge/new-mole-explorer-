@@ -586,9 +586,9 @@
         "S3"
       ],
       "est": "Half a day",
-      "status": "READY",
+      "status": "DONE",
       "branch": "sprint/W4/1.5",
-      "note": "W4 READY; integrating"
+      "note": "W4 merged to main; check --smoke green"
     },
     {
       "id": "1.6",
@@ -1303,9 +1303,9 @@
         "F2"
       ],
       "est": "1 day",
-      "status": "READY",
+      "status": "DONE",
       "branch": "sprint/W4/3.3-fix",
-      "note": "W4 READY: 4V6F 20 hover dwells -> 0 React commits; integrating"
+      "note": "W4 merged to main; check --smoke green"
     },
     {
       "id": "3.4",
@@ -2581,9 +2581,9 @@
         "T9"
       ],
       "est": "Half a day",
-      "status": "READY",
+      "status": "DONE",
       "branch": "sprint/W3/6.1",
-      "note": "Owner decision: keep npm run build in the fast job (908b966). Measure under-10-min on the first CI run after push"
+      "note": "W4 merged to main; check --smoke green"
     },
     {
       "id": "6.2",
