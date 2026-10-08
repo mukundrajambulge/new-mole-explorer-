@@ -35,15 +35,38 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
 
+  smoke_e2e:
+    name: Smoke e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ms-playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --project=smoke --reporter=github
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-artifacts
+          path: test-results
+          if-no-files-found: ignore
+
   full_acceptance:
     name: Full browser acceptance
-    needs: fast
+    needs: [fast, smoke_e2e]
     if: >-
       needs.fast.result == 'success' &&
       (
