@@ -319,7 +319,6 @@ export class ThreeDMolViewerAdapter {
       if (this.buttonHeld) return;
       this.buttonHeld = true;
       this.viewer?.setHoverDuration(SUSPENDED_MS);
-      hoverStore.set(null);
     };
     const up = () => {
       if (!this.buttonHeld) return;
