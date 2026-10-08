@@ -17,11 +17,26 @@ import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
 import type { AlignmentOverlay } from "../analysis/alignmentPresentation";
 import { stateForObject, structureForWorkspaceObjectState, workspaceScopedStableAtomId, type WorkspaceObject } from "../workspace/workspaceModel";
 import { hoverStore } from "./hoverStore";
+import { LARGE_PICK_ATOM_THRESHOLD, PickGrid, type PickableAtom, type Vec3 } from "./hoverPickGrid";
 import { compactAtomSpecContext, compactAtomSpecs, isCompactStructure } from "../structures/compactCanonical";
 
 type HoverSource = { compact: NonNullable<CanonicalMolecularStructure["compact"]> | null; ordinals: ReadonlyMap<string, number> | null; coords: Map<string, { x: number; y: number; z: number }> | null };
 
 const diagnosticTypeForStyle = (style: string): RepresentationType => style === "ribbon" ? "RIBBON" : style === "putty" || style === "trace" || style === "cartoon" ? "CARTOON" : style === "nonbonded-crosses" ? "NONBONDED" : style === "nonbonded-spheres" ? "NB_SPHERES" : style === "line" ? "LINES" : style === "stick" || style === "licorice" || style === "ball-and-stick" ? "STICKS" : "SPHERES";
+
+/** 3Dmol GLViewer members that are private in its typings but needed to suspend and narrow hover picking. */
+type ViewerPickInternals = {
+  current_hover: unknown;
+  hoverTimeout?: ReturnType<typeof setTimeout>;
+  hoverables: unknown[];
+  clickables: unknown[];
+  models: Array<{ atoms?: PickableAtom[] } | undefined>;
+  camera: unknown;
+  modelGroup: { matrixWorld: { elements: ArrayLike<number>; getMaxScaleOnAxis(): number } };
+  raycaster: { setFromCamera(mouse: Vec3, camera: unknown): void; ray: { origin: Vec3; direction: Vec3 }; intersectObjects(group: unknown, objects: unknown[]): unknown[] };
+  setHover(selected: null): void;
+  targetedObjects(x: number, y: number, objects: unknown): unknown[];
+};
 
 const mountedAdapters = new WeakMap<HTMLElement, ThreeDMolViewerAdapter>();
 type Viewport = NonNullable<CameraState["viewport"]>;
@@ -248,6 +263,9 @@ export class ThreeDMolViewerAdapter {
   private hoverShapes: GLShape[] = [];
   private buttonHeld = false;
   private buttonHoldCleanup: (() => void) | null = null;
+  /** Narrows 3Dmol's hover/click raycast on structures above LARGE_PICK_ATOM_THRESHOLD; null below it. */
+  private pickGrid: PickGrid | null = null;
+  private pickGridKey = "";
   /** True when something rewrote model styles, so the selection overlay must be re-applied. */
   private selectionStyleDirty = true;
   private appliedSelectionIds: readonly string[] | null = null;
@@ -304,13 +322,20 @@ export class ThreeDMolViewerAdapter {
     this.viewer = createViewer(container, { backgroundColor: "#05070a", antialias: true, disableFog: true, cartoonQuality: 8 });
     this.cameraController = new CameraController(this.viewer);
     this.bindButtonHoldSuspension(container);
+    this.installPickNarrowing(this.viewer);
     this.performance.viewerCreations += 1;
     container.dataset.rendererGeneration = String(this.rendererGeneration);
     this.resizeObserver = new ResizeObserver(() => { this.viewer?.resize(); this.render(); });
     this.resizeObserver.observe(container);
   }
 
-  /** Hover picking is suspended while a mouse button is held (rotate/pan/zoom drag) and resumes on release. */
+  /**
+   * Hover picking is suspended while a mouse button is held (rotate/pan/zoom drag) and resumes on release.
+   * Once 3Dmol has an active hover it raycasts every hoverable on each mousemove (handleHoverContinue runs
+   * before its drag check), so a drag that starts on a hovered atom cost ~1 s per frame on 4V6F.
+   * Capture-phase pointerdown runs before 3Dmol's own mousedown: it drops 3Dmol's active hover
+   * (current_hover = null) and pending hover timer, clears our hover store, and parks the hover delay.
+   */
   private bindButtonHoldSuspension(container: HTMLElement): void {
     this.buttonHoldCleanup?.();
     const HOVER_IDLE_MS = 500;
@@ -318,7 +343,14 @@ export class ThreeDMolViewerAdapter {
     const down = () => {
       if (this.buttonHeld) return;
       this.buttonHeld = true;
-      this.viewer?.setHoverDuration(SUSPENDED_MS);
+      const viewer = this.viewer;
+      if (!viewer) return;
+      viewer.setHoverDuration(SUSPENDED_MS);
+      const internals = viewer as unknown as Partial<ViewerPickInternals>;
+      clearTimeout(internals.hoverTimeout);
+      // Our unhover callbacks are muted while buttonHeld, so the store is cleared explicitly below.
+      if (internals.current_hover != null) internals.setHover?.(null);
+      if (hoverStore.get() !== null) this.interactionHandlers.onHover?.(null);
     };
     const up = () => {
       if (!this.buttonHeld) return;
@@ -329,15 +361,62 @@ export class ThreeDMolViewerAdapter {
     container.addEventListener("pointerdown", down, true);
     window.addEventListener("mouseup", up, true);
     window.addEventListener("pointerup", up, true);
+    window.addEventListener("pointercancel", up, true);
     window.addEventListener("blur", up);
     this.buttonHoldCleanup = () => {
       container.removeEventListener("mousedown", down, true);
       container.removeEventListener("pointerdown", down, true);
       window.removeEventListener("mouseup", up, true);
       window.removeEventListener("pointerup", up, true);
+      window.removeEventListener("pointercancel", up, true);
       window.removeEventListener("blur", up);
       this.buttonHeld = false;
     };
+  }
+
+  /**
+   * Pick narrowing on this viewer instance. While a button is held, hover raycasts return no hits
+   * (backstop for the suspension above). On large structures, hover and click raycasts test only atoms
+   * in grid cells near the ray, with 3Dmol's own exact intersector on that subset.
+   */
+  private installPickNarrowing(viewer: GLViewer): void {
+    const internals = viewer as unknown as ViewerPickInternals;
+    const original = internals.targetedObjects;
+    if (typeof original !== "function") return;
+    internals.targetedObjects = (x: number, y: number, objects: unknown) => {
+      const hover = objects === internals.hoverables;
+      if (hover && this.buttonHeld) return [];
+      const grid = this.pickGrid;
+      if (!grid || (!hover && objects !== internals.clickables) || this.currentPickGridKey(internals) !== this.pickGridKey) return original.call(viewer, x, y, objects);
+      internals.raycaster.setFromCamera({ x, y, z: -1 }, internals.camera);
+      const { origin, direction } = internals.raycaster.ray;
+      const matrix = internals.modelGroup.matrixWorld;
+      const candidates = grid.candidates(origin, direction, matrix.elements, matrix.getMaxScaleOnAxis(), hover ? "hoverable" : "clickable");
+      return candidates.length ? internals.raycaster.intersectObjects(internals.modelGroup, candidates) : [];
+    };
+  }
+
+  /** Per-model work only (no atom scan): atom array length of each model, so appends and reloads invalidate the grid. */
+  private currentPickGridKey(internals: ViewerPickInternals): string {
+    let key = "";
+    for (const model of internals.models ?? []) key += `${model?.atoms?.length ?? 0},`;
+    return key;
+  }
+
+  /** Rebuilt whenever picking is (re)bound: after model loads, progressive appends and workspace changes. Never on the hover path. */
+  private rebuildPickGrid(): void {
+    this.pickGrid = null;
+    this.pickGridKey = "";
+    const internals = this.viewer as unknown as ViewerPickInternals | null;
+    if (!internals || !Array.isArray(internals.models)) return;
+    let total = 0;
+    const lists: PickableAtom[][] = [];
+    for (const model of internals.models) if (model?.atoms) { lists.push(model.atoms); total += model.atoms.length; }
+    if (total > LARGE_PICK_ATOM_THRESHOLD) {
+      this.pickGrid = PickGrid.build(lists);
+      this.pickGridKey = this.currentPickGridKey(internals);
+    }
+    if (this.container) this.container.dataset.pickGridCells = String(this.pickGrid?.cellCount ?? 0);
   }
 
   setInteractionHandlers(handlers: ViewerInteractionHandlers): void {
@@ -779,6 +858,7 @@ export class ThreeDMolViewerAdapter {
     this.resizeObserver?.disconnect(); this.resizeObserver = null;
     this.hoverUnsubscribe?.(); this.hoverUnsubscribe = null; this.hoverShapes = [];
     this.buttonHoldCleanup?.(); this.buttonHoldCleanup = null;
+    this.pickGrid = null; this.pickGridKey = "";
     this.selectionStyleDirty = true; this.appliedSelectionIds = null; this.matchedSelection = new Set();
     if (this.viewer) { this.releaseWebGl(this.viewer); this.viewer = null; }
     this.cameraController = null;
@@ -1228,6 +1308,7 @@ export class ThreeDMolViewerAdapter {
     const all = this.canonicalSelection(() => true);
     this.viewer.setClickable(all, true, onClick);
     this.viewer.setHoverable(all, true, onHover, onUnhover);
+    this.rebuildPickGrid();
   }
 
   private bindWorkspacePicking(): void {
@@ -1243,6 +1324,7 @@ export class ThreeDMolViewerAdapter {
         this.interactionHandlers.onHover?.(result);
       }, () => { if (!this.buttonHeld) this.interactionHandlers.onHover?.(null); });
     }
+    this.rebuildPickGrid();
   }
 
   private applyProjection(projection: RenderProjection): void {

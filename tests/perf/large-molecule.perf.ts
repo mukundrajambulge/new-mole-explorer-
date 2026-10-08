@@ -187,7 +187,7 @@ test("4V6F performance baseline", async ({ page }) => {
   if (label !== "baseline") expect((results.hoverRenders as { componentRendersMinusIdle: number }).componentRendersMinusIdle).toBeLessThanOrEqual(2 * 20);
   // 3.4 done-when: hover p95 < 50 ms with a chain selected; no long task > 200 ms, no hover change or React commit while dragging.
   if (label !== "baseline") {
-    expect(stats(hover).p95, "hover p95 with chain A selected").toBeLessThan(55); // move + 2 frames at 60 Hz is quantized at ~50 ms
+    expect(stats(hover).p95, "hover p95 with chain A selected").toBeLessThan(50);
     const drag = results.drag as { maxLongTaskMs: number; hoverStateChanges: number; reactCommits: number };
     // One 4V6F frame costs ~1-2 s under headless software GL (SwiftShader), so the 200 ms bound is only enforceable on a GPU runner (PERF_GPU=1).
     if (process.env.PERF_GPU === "1") expect(drag.maxLongTaskMs, "long task during drag").toBeLessThan(200);
