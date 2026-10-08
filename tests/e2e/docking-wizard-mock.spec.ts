@@ -31,12 +31,12 @@ test("wizard runs Inputs to Results against the mock and overlays a pose", async
 
   await page.goto("/");
   await page.getByRole("button", { name: "Docking" }).click();
-  await page.locator("#structure-file").setInputFiles("tests/fixtures/rcsb/1IEP.pdb");
+  await page.locator("#structure-file").setInputFiles("tests/fixtures/rcsb/1STP.pdb");
 
   const wizard = page.getByTestId("docking-wizard");
   await expect(wizard.getByTestId("docking-preview-banner")).toContainText("Preview: not scientifically qualified");
   await expect(wizard.getByTestId("wizard-receptor")).toContainText("atoms", { timeout: 60_000 });
-  await expect(wizard.getByLabel("Ligand", { exact: true })).toContainText("STI");
+  await expect(wizard.getByLabel("Ligand", { exact: true })).toContainText("BTN");
   const next = wizard.getByRole("button", { name: "Next: Prepare" });
   await expect(next).toBeEnabled({ timeout: 60_000 });
   await next.click();
@@ -50,7 +50,7 @@ test("wizard runs Inputs to Results against the mock and overlays a pose", async
 
   // Restored from the old UI-D0 spec: a SearchRegion commit stays blocked without explicit D2 prepared states.
   const editor = page.getByTestId("docking-search-region");
-  await expect(editor.getByText("Å", { exact: true })).toBeVisible();
+  await expect(editor.getByLabel("Center X")).toBeVisible();
   await editor.getByLabel("Center X").fill("12.5");
   await editor.getByRole("button", { name: "Commit Search Region" }).click();
   await expect(editor).toContainText("explicit PreparedReceptorState and PreparedLigandState");
