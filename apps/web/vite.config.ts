@@ -7,7 +7,7 @@ export default defineConfig({
     port: 3101,
     strictPort: true,
     proxy: {
-      "/api": "http://localhost:8100",
+      "/api": { target: "http://localhost:8100", changeOrigin: true },
     },
   },
 });

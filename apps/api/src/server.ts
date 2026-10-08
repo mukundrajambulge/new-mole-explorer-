@@ -1,5 +1,7 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
+import { loadConfig } from "./config.js";
 import { f64Value, type BootstrapResponse, type CanonicalCommand, type D2SearchRegionV1, type HealthResponse, type ProjectSaveRequest } from "@molecular/contracts";
 import { IngestionError, StructureIngestionService } from "./structures/ingestion.js";
 import { parseMultipartFile } from "./structures/multipart.js";
@@ -10,10 +12,10 @@ import { profileMark, profileTransport } from "./structures/ingestionProfiler.js
 import { D2PreparationService } from "./docking/d2PreparationService.js";
 import type { D2SearchRegionInput } from "./docking/d2Preparation.js";
 
-const port = Number(process.env.API_PORT ?? 8100);
+const config = loadConfig();
 
 const sendJson = (response: ServerResponse, status: number, body: unknown) => {
-  response.writeHead(status, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
+  response.writeHead(status, { "content-type": "application/json; charset=utf-8" });
   profileTransport("START", { status });
   profileMark("SERIALIZATION", "START", { status });
   const serialized = JSON.stringify(body);
@@ -53,8 +55,16 @@ const commandDispatcher = new CommandDispatcher({ dataRoot });
 const d2PreparationService = new D2PreparationService();
 
 const readJson = async (request: IncomingMessage): Promise<Record<string, unknown>> => {
+  const tooLarge = () => new IngestionError("PAYLOAD_TOO_LARGE", "The request body exceeds the size limit.");
+  if (Number(request.headers["content-length"] ?? 0) > config.maxJsonBytes) throw tooLarge();
   const chunks: Buffer[] = [];
-  for await (const chunk of request) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  let size = 0;
+  for await (const chunk of request) {
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    size += buffer.length;
+    if (size > config.maxJsonBytes) throw tooLarge();
+    chunks.push(buffer);
+  }
   try {
     return JSON.parse(Buffer.concat(chunks).toString("utf8")) as Record<string, unknown>;
   } catch {
@@ -71,8 +81,27 @@ const errorResponse = (response: ServerResponse, error: unknown) => {
   sendJson(response, 500, { error: { code: "INTERNAL_ERROR", message: "The request could not be completed." } });
 };
 
+const LOCAL_HOSTNAMES = new Set(["127.0.0.1", "localhost", "[::1]"]);
+const hostAllowed = (request: IncomingMessage): boolean => {
+  const match = /^(\[::1\]|[a-z0-9.-]+)(?::(\d{1,5}))?$/i.exec(request.headers.host ?? "");
+  if (!match || !LOCAL_HOSTNAMES.has(match[1].toLowerCase())) return false;
+  return match[2] === undefined || Number(match[2]) === request.socket.localPort;
+};
+
 const route = async (request: IncomingMessage, response: ServerResponse) => {
-  response.setHeader("access-control-allow-origin", "*");
+  if (config.mode === "local" && !hostAllowed(request)) {
+    sendJson(response, 403, { error: { code: "HOST_NOT_ALLOWED", message: "This host is not allowed." } });
+    return;
+  }
+  const origin = request.headers.origin;
+  if (origin !== undefined) {
+    if (!config.allowedOrigins.includes(origin)) {
+      sendJson(response, 403, { error: { code: "ORIGIN_NOT_ALLOWED", message: "This origin is not allowed." } });
+      return;
+    }
+    response.setHeader("access-control-allow-origin", origin);
+    response.setHeader("vary", "origin");
+  }
   response.setHeader("access-control-allow-methods", "GET,POST,PUT,OPTIONS");
   response.setHeader("access-control-allow-headers", "content-type,x-parent-export-artifact-id,x-idempotency-key,x-correlation-id");
   if (request.method === "OPTIONS") {
@@ -222,12 +251,20 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       sendJson(response, 200, await projectStore.save(projectMatch[1], body as unknown as ProjectSaveRequest));
       return;
     }
-    sendJson(response, 404, { error: "NOT_FOUND" });
+    sendJson(response, 404, { error: { code: "NOT_FOUND", message: "Route was not found." } });
   } catch (error) {
     errorResponse(response, error);
   }
 };
 
-createServer(route).listen(port, () => {
-  console.log(`Molecular API listening on http://localhost:${port}`);
-});
+export const server = createServer(route);
+
+export const startServer = (port = config.port, host = config.host) =>
+  new Promise<void>((resolve) => {
+    server.listen(port, host, () => {
+      console.log(`Molecular API (${config.mode}) listening on http://${host}:${port}`);
+      resolve();
+    });
+  });
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) void startServer();
