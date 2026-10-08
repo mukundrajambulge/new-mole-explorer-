@@ -1,12 +1,13 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { randomBytes, timingSafeEqual } from "node:crypto";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { StringDecoder } from "node:string_decoder";
 import { pathToFileURL } from "node:url";
 import { loadConfig } from "./config.js";
 import { f64Value, type BootstrapResponse, type CanonicalCommand, type D2SearchRegionV1, type HealthResponse, type ProjectSaveRequest } from "@molecular/contracts";
-import { IngestionError, StructureIngestionService } from "./structures/ingestion.js";
-import { parseMultipartFile } from "./structures/multipart.js";
+import { assertLocalFilenameAdmitted, IngestionError, LARGE_STRUCTURE_WARNING_BYTES, readTextFile, StructureIngestionService } from "./structures/ingestion.js";
+import { assertDeclaredLength, consumeRequest, receiveMultipartFile } from "./structures/multipart.js";
 import { ProjectStore } from "./projects/projectStore.js";
 import { SourceArtifactStore } from "./lifecycle/sourceArtifactStore.js";
 import { CommandDispatcher } from "./command/dispatcher.js";
@@ -51,26 +52,87 @@ const bootstrap: BootstrapResponse = {
 };
 
 const dataRoot = process.env.MOLECULAR_DATA_DIR ?? join(process.cwd(), ".molecular-data");
-const ingestionService = new StructureIngestionService(new SourceArtifactStore(dataRoot));
+const uploadTempDir = join(dataRoot, "tmp", "uploads");
+const remoteTempDir = join(dataRoot, "tmp", "remote");
+
+// Uploads stream to disk in parallel, but decoding and parsing a large file holds its text and
+// parse state in memory, so large files take turns: peak memory is one large parse, not two.
+let largeParseQueue: Promise<unknown> = Promise.resolve();
+const withParseSlot = <T>(bytes: number, run: () => Promise<T>): Promise<T> => {
+  if (bytes < LARGE_STRUCTURE_WARNING_BYTES) return run();
+  const turn = largeParseQueue.then(run);
+  largeParseQueue = turn.catch(() => undefined);
+  return turn;
+};
+
+const ingestionService = new StructureIngestionService(new SourceArtifactStore(dataRoot), { maxBytes: config.maxUploadBytes, tempDir: remoteTempDir, parseGate: withParseSlot });
 const projectStore = new ProjectStore(dataRoot);
 const commandDispatcher = new CommandDispatcher({ dataRoot });
 const d2PreparationService = new D2PreparationService();
 
-const readJson = async (request: IncomingMessage): Promise<Record<string, unknown>> => {
-  const tooLarge = () => new IngestionError("PAYLOAD_TOO_LARGE", "The request body exceeds the size limit.");
-  if (Number(request.headers["content-length"] ?? 0) > config.maxJsonBytes) throw tooLarge();
-  const chunks: Buffer[] = [];
-  let size = 0;
-  for await (const chunk of request) {
-    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-    size += buffer.length;
-    if (size > config.maxJsonBytes) throw tooLarge();
-    chunks.push(buffer);
+// Structure transfers (uploads and RCSB fetches) share one small pool of slots; more answer 429.
+let activeTransfers = 0;
+const withTransferSlot = async <T>(response: ServerResponse, run: () => Promise<T>): Promise<T> => {
+  if (activeTransfers >= config.maxConcurrentUploads) {
+    response.setHeader("retry-after", "5");
+    throw new IngestionError("SERVER_BUSY", "Too many structure transfers are in progress; try again shortly.");
   }
+  activeTransfers += 1;
   try {
-    return JSON.parse(Buffer.concat(chunks).toString("utf8")) as Record<string, unknown>;
-  } catch {
-    throw new IngestionError("INVALID_INPUT", "The request body was not valid JSON.");
+    return await run();
+  } finally {
+    activeTransfers -= 1;
+  }
+};
+
+// JSON bodies share one byte budget, held until the response closes (the parsed body lives that long).
+// A body reserves its declared length up front, or its bytes as they arrive; over budget answers 429.
+let jsonBytesInFlight = 0;
+const readJson = async (request: IncomingMessage, response: ServerResponse, maxBytes = config.maxJsonBytes): Promise<Record<string, unknown>> => {
+  const tooLarge = () => new IngestionError("PAYLOAD_TOO_LARGE", "The request body exceeds the size limit.");
+  assertDeclaredLength(request, maxBytes, tooLarge);
+  let reserved = 0;
+  let released = false;
+  const reserve = (bytes: number) => {
+    if (bytes <= reserved) return;
+    if (jsonBytesInFlight + bytes - reserved > config.maxJsonBytesInFlight) {
+      response.setHeader("retry-after", "5");
+      throw new IngestionError("SERVER_BUSY", "The server is busy with other large requests; try again shortly.");
+    }
+    jsonBytesInFlight += bytes - reserved;
+    reserved = bytes;
+  };
+  const release = () => {
+    if (released) return;
+    released = true;
+    jsonBytesInFlight -= reserved;
+    reserved = 0;
+  };
+  response.once("close", release);
+  try {
+    const declared = Number(request.headers["content-length"] ?? Number.NaN);
+    if (Number.isInteger(declared) && declared > 0) reserve(declared);
+    // Decode chunk by chunk so the raw bytes are never also held as one concatenated Buffer.
+    const decoder = new StringDecoder("utf8");
+    const parts: string[] = [];
+    let size = 0;
+    await consumeRequest(request, (chunk) => {
+      size += chunk.length;
+      if (size > maxBytes) throw tooLarge();
+      reserve(size);
+      parts.push(decoder.write(chunk));
+    });
+    parts.push(decoder.end());
+    const text = parts.join("");
+    parts.length = 0;
+    try {
+      return JSON.parse(text) as Record<string, unknown>;
+    } catch {
+      throw new IngestionError("INVALID_INPUT", "The request body was not valid JSON.");
+    }
+  } catch (error) {
+    release();
+    throw error;
   }
 };
 
@@ -154,14 +216,14 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/docking/d2/adapt") {
-      const body = await readJson(request);
+      const body = await readJson(request, response);
       if (!body.structure || typeof body.structure !== "object") throw new IngestionError("INVALID_INPUT", "D2 adaptation requires a canonical structure.");
       const result = d2PreparationService.adaptStructure(body.structure as never, body.sourceArtifact && typeof body.sourceArtifact === "object" ? body.sourceArtifact as never : undefined);
       sendJson(response, 200, result);
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/docking/d2/search-region") {
-      const body = await readJson(request);
+      const body = await readJson(request, response);
       if (!body.input || typeof body.input !== "object") throw new IngestionError("INVALID_INPUT", "D2 SearchRegion commit requires an explicit preparation input.");
       const result = d2PreparationService.sealSearchRegion(body.input as unknown as D2SearchRegionInput);
       const value = result.value as D2SearchRegionV1 | undefined;
@@ -185,14 +247,14 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/commands/batch") {
-      const body = await readJson(request);
+      const body = await readJson(request, response);
       if (typeof body.rawCommand !== "string") throw new IngestionError("INVALID_INPUT", "A bounded batch requires rawCommand text.");
       const result = commandDispatcher.dispatchBatch({ rawCommand: body.rawCommand, surface: "BATCH", requestedMode: body.requestedMode === "ASYNC" || body.requestedMode === "AUTO" ? body.requestedMode : "SYNC", correlationId: typeof body.correlationId === "string" ? body.correlationId : request.headers["x-correlation-id"]?.toString(), idempotencyKey: typeof body.idempotencyKey === "string" ? body.idempotencyKey : request.headers["x-idempotency-key"]?.toString() });
       sendJson(response, result.status === "FAILED" ? 422 : 200, result);
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/commands") {
-      const body = await readJson(request);
+      const body = await readJson(request, response);
       const rawCommand = typeof body.rawCommand === "string" ? body.rawCommand : undefined;
       const canonicalCommand = body.command && typeof body.command === "object" ? body.command as unknown as CanonicalCommand : undefined;
       const requestedMode = body.requestedMode === "ASYNC" || body.requestedMode === "AUTO" ? body.requestedMode : body.requestedMode === "SYNC" ? "SYNC" : undefined;
@@ -201,7 +263,7 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/v1/commands/execute") {
-      const body = await readJson(request);
+      const body = await readJson(request, response);
       const canonicalCommand = body.command && typeof body.command === "object" ? body.command as unknown as CanonicalCommand : body.commandType ? body as unknown as CanonicalCommand : undefined;
       const result = commandDispatcher.dispatch({ command: canonicalCommand, surface: "REST", requestedMode: body.requestedMode === "ASYNC" || body.requestedMode === "AUTO" ? body.requestedMode : "SYNC", correlationId: typeof body.correlationId === "string" ? body.correlationId : request.headers["x-correlation-id"]?.toString(), idempotencyKey: typeof body.idempotencyKey === "string" ? body.idempotencyKey : request.headers["x-idempotency-key"]?.toString() });
       sendJson(response, result.status === "FAILED" ? 422 : 200, result);
@@ -209,7 +271,7 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
     }
     const commandReplayMatch = url.pathname.match(/^\/api\/commands\/history\/([^/]+)\/replay$/);
     if (commandReplayMatch && request.method === "POST") {
-      const body = await readJson(request);
+      const body = await readJson(request, response);
       const mode = body.mode === "REVIEW" || body.mode === "REPRODUCTION_ATTEMPT" ? body.mode : "COMMAND_REPLAY";
       sendJson(response, 200, commandDispatcher.replay(decodeURIComponent(commandReplayMatch[1]!), mode));
       return;
@@ -236,19 +298,35 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/structures/upload") {
-      const file = await parseMultipartFile(request);
-      const parentExportArtifactId = typeof request.headers["x-parent-export-artifact-id"] === "string" ? request.headers["x-parent-export-artifact-id"] : undefined;
-      sendJson(response, 200, await ingestionService.ingestLocal(file.filename, file.data, parentExportArtifactId ? { parentExportArtifactId } : {}));
+      await withTransferSlot(response, async () => {
+        const file = await receiveMultipartFile(request, { maxFileBytes: config.maxUploadBytes, tempDir: uploadTempDir });
+        try {
+          // Refuse by filename, then binaries (text structure formats never contain NUL), before reading anything back.
+          assertLocalFilenameAdmitted(file.filename);
+          if (file.binary) throw new IngestionError("UNSUPPORTED_FORMAT", "Binary files are not an admitted coordinate format.");
+          const parentExportArtifactId = typeof request.headers["x-parent-export-artifact-id"] === "string" ? request.headers["x-parent-export-artifact-id"] : undefined;
+          const result = await withParseSlot(file.size, async () => {
+            // Streaming decode + hash of the server's own temp file; the whole file is never a Buffer.
+            const text = await readTextFile(file.path);
+            return ingestionService.ingestLocalText(file.filename, file.path, text, parentExportArtifactId ? { parentExportArtifactId } : {});
+          });
+          sendJson(response, 200, result);
+        } finally {
+          await file.dispose();
+        }
+      });
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/structures/rcsb") {
-      const body = await readJson(request);
-      if (typeof body.pdbId !== "string") throw new IngestionError("INVALID_INPUT", "A PDB ID is required.");
-      sendJson(response, 200, await ingestionService.ingestRcsb(body.pdbId));
+      const body = await readJson(request, response);
+      const pdbId = body.pdbId;
+      if (typeof pdbId !== "string") throw new IngestionError("INVALID_INPUT", "A PDB ID is required.");
+      // The remote body streams to disk under a transfer slot and decodes under the parse slot.
+      sendJson(response, 200, await withTransferSlot(response, () => ingestionService.ingestRcsb(pdbId)));
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/projects") {
-      const body = await readJson(request);
+      const body = await readJson(request, response);
       sendJson(response, 201, await projectStore.create(typeof body.name === "string" ? body.name : undefined));
       return;
     }
@@ -268,7 +346,7 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       return;
     }
     if (projectMatch && request.method === "PUT") {
-      const body = await readJson(request);
+      const body = await readJson(request, response, config.maxProjectJsonBytes);
       sendJson(response, 200, await projectStore.save(projectMatch[1], body as unknown as ProjectSaveRequest));
       return;
     }
@@ -301,6 +379,9 @@ export const server = createServer((request, response) => {
 
 export const startServer = (port = config.port, host = config.host) =>
   new Promise<void>((resolve, reject) => {
+    // Partial uploads from a previous crash are never resumed.
+    rmSync(uploadTempDir, { recursive: true, force: true });
+    rmSync(remoteTempDir, { recursive: true, force: true });
     const onError = (error: Error) => reject(error);
     server.once("error", onError);
     server.listen(port, host, () => {
