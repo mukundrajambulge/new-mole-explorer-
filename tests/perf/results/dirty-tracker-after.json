@@ -1,9 +1,23 @@
 {
   "schemaVersion": 1,
-  "label": "after-3.2-dirty-tracker-unit",
-  "note": "4V6F e2e perf not rerun (fixture unavailable in this worktree). Unit evidence: 300000 hover updates through trackWorkspaceRevision.",
-  "hoverUpdates": 300000,
-  "totalMs": 550.9,
-  "jsonStringifyCalls": 0,
-  "before": "baseline hover mean 299 ms, p95 240 ms, max 8118 ms (large-molecule-baseline.json), with a JSON.stringify of the workspace per projection change"
+  "task": "3.2",
+  "date": "2026-10-08",
+  "fixture": "4V6F (307,345 atoms)",
+  "method": "tests/perf/large-molecule.perf.ts wraps JSON.stringify in the page and counts calls and output size during 20 dwell hovers (800 ms rest each, so 3Dmol's ~500 ms hover callback fires and hover state really changes). Before = main at b9f284d; after = 3.2 merged with that main. Single runs; timings vary by 2x between runs on this machine.",
+  "hoverSerialization": {
+    "before": [{ "calls": 234, "largeCallsOver100kChars": 46, "chars": 2731108776 }, { "calls": 235, "largeCallsOver100kChars": 46, "chars": 2731108791 }],
+    "after": { "calls": 187, "largeCallsOver100kChars": 0, "chars": 11499 }
+  },
+  "timingsMs": {
+    "before": [
+      { "selectChainA": 14342, "colorRedChainA": 15447, "dwellHoverMedian": 4782, "tabSwitchMedian": 2504 },
+      { "selectChainA": 18504, "colorRedChainA": 19414, "dwellHoverMedian": 7104, "tabSwitchMedian": 5203 }
+    ],
+    "after": { "selectChainA": 14764, "colorRedChainA": 14931, "dwellHoverMedian": 4184, "dwellHoverP95": 7122, "tabSwitchMedian": 2595, "heapEndMb": 1549.4 }
+  },
+  "selectProfile": "CPU profile of select chain A: before 18.4 s with 1.1 s in the App.tsx fingerprint JSON.stringify; after 15.4 s with none.",
+  "notes": [
+    "Hover is still slow (seconds per hover) for reasons outside 3.2: frame readback (transferToImageBitmap) and atomForCompact dominate. Follow-up perf tasks.",
+    "The 3.1 baseline hoverMs measures mouse-move cost only: moves never rest long enough to trigger 3Dmol hover."
+  ]
 }
