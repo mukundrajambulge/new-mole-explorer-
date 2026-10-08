@@ -376,6 +376,8 @@ void test_profile_site_and_provenance_rejection() {
 void test_halogen_element_case() {
   const char* spellings[][2] = {{"Cl", "CL"}, {"Br", "BR"}, {"I", "I"}};
   const char* types[] = {"Cl_H", "Br_H", "I_H"};
+  const auto unknown = mole::docking::assign_xs_type({"XX", std::nullopt, false, false});
+  require(unknown.status == mole::docking::TypingStatus::Unsupported, "unknown element yields a diagnostic, not a type");
   for (int i = 0; i < 3; ++i) {
     for (const char* sp : spellings[i]) {
       const auto a = mole::docking::assign_xs_type({sp, std::nullopt, false, false});
@@ -397,6 +399,7 @@ std::vector<Atom> read_pdbqt_fixture(const std::string& path, const std::string&
   std::vector<Atom> atoms;
   std::string line;
   while (std::getline(in, line)) {
+    while (!line.empty() && (line.back() == 0x0D || line.back() == ' ')) line.pop_back();
     if (line.rfind("ATOM", 0) != 0 || line.size() < 54) continue;
     const double x = std::stod(line.substr(30, 8));
     const double y = std::stod(line.substr(38, 8));

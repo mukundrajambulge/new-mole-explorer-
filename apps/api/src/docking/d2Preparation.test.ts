@@ -30,7 +30,7 @@ const preparedReceptorDependencies = (): D2PreparedReceptorScientificDependencie
 });
 const sourceArtifactFor = (format: CanonicalMolecularStructure["format"]) => ({ schemaVersion: 1 as const, sourceArtifactId: "source:d2-fixture", acquisitionKind: "LOCAL_UPLOAD" as const, originalFilename: `d2-fixture.${format}`, mediaType: "chemical/x-fixture", byteLength: 1, sha256: sourceSha, acquiredAt: "2026-09-20T00:00:00.000Z", format, formatEvidence: [], parserProfile: "d2-test" });
 
-const structureFor = (format: CanonicalMolecularStructure["format"] = "sdf"): CanonicalMolecularStructure => ({
+const structureFor = (format: CanonicalMolecularStructure["format"] = "sdf", thirdElement = "O"): CanonicalMolecularStructure => ({
   id: "fixture-structure",
   name: "d2-fixture",
   format,
@@ -49,7 +49,7 @@ const structureFor = (format: CanonicalMolecularStructure["format"] = "sdf"): Ca
   atoms: [
     { stableId: "source-atom-1", serial: 1, atomName: "C1", element: "C", residueName: "LIG", residueNumber: 1, chain: "A", x: 0, y: 0, z: 0, recordType: "HETATM", isPolymer: false, isLigand: true, isWater: false, isIon: false },
     { stableId: "source-atom-2", serial: 2, atomName: "N1", element: "N", residueName: "LIG", residueNumber: 1, chain: "A", x: 1, y: 0, z: 0, recordType: "HETATM", isPolymer: false, isLigand: true, isWater: false, isIon: false },
-    { stableId: "source-atom-3", serial: 3, atomName: "O1", element: "O", residueName: "LIG", residueNumber: 1, chain: "A", x: 2, y: 1, z: 0, recordType: "HETATM", isPolymer: false, isLigand: true, isWater: false, isIon: false },
+    { stableId: "source-atom-3", serial: 3, atomName: "O1", element: thirdElement, residueName: "LIG", residueNumber: 1, chain: "A", x: 2, y: 1, z: 0, recordType: "HETATM", isPolymer: false, isLigand: true, isWater: false, isIon: false },
   ],
   bonds: [
     { id: "source-bond-1", atom1: "source-atom-1", atom2: "source-atom-2", order: "SINGLE", source: "PDB_CONECT" },
@@ -61,8 +61,8 @@ const structureFor = (format: CanonicalMolecularStructure["format"] = "sdf"): Ca
   stateOrder: ["source-state-1"],
 });
 
-const adaptedFixture = () => {
-  const result = adaptCanonicalStructure({ structure: structureFor(), sourceArtifact: sourceArtifactFor("sdf") });
+const adaptedFixture = (thirdElement = "O") => {
+  const result = adaptCanonicalStructure({ structure: structureFor("sdf", thirdElement), sourceArtifact: sourceArtifactFor("sdf") });
   expect(result.status).toBe("VALID");
   expect(result.value).toBeDefined();
   const value = result.value!;
@@ -87,6 +87,25 @@ const kinematicFor = (fixture: ReturnType<typeof adaptedFixture>) => sealLigandK
   fragments: [{ fragmentId: "root", atomUids: [fixture.graph.atoms[0]!.atomUid] }, { fragmentId: "tail", atomUids: fixture.graph.atoms.slice(1).map((atom) => atom.atomUid) }],
   rotatableEdges: [{ bondUid: fixture.graph.bonds[0]!.bondUid, atom1Uid: fixture.graph.bonds[0]!.atom1Uid, atom2Uid: fixture.graph.bonds[0]!.atom2Uid, parentFragmentId: "root", childFragmentId: "tail", movingAtomUids: fixture.graph.atoms.slice(1).map((atom) => atom.atomUid), axisOrigin: [f64Bits(0), f64Bits(0), f64Bits(0)], axisDirection: [f64Bits(1), f64Bits(0), f64Bits(0)], domain: "FULL_TURN", periodicity: 1, terminalHydrogenOnly: false, ringBond: false, restrictedBond: false, searchTorsion: true, scorerTorsion: false, evidenceRefs: ["fixture"] }],
   profileId: D2_KINEMATIC_PROFILE_ID,
+});
+
+const sealWithFixture = (fixture: ReturnType<typeof adaptedFixture>) => {
+  const kinematic = kinematicFor(fixture);
+  return sealPreparedLigandState({ molecularIdentity: fixture.identity, graphRevision: fixture.graph, chemicalState: fixture.chemical, coordinateState: fixture.coordinate, selectedComponentId: fixture.selectedComponentId, atomTyping: fixture.graph.atoms.map((atom) => ({ atomUid: atom.atomUid, typeId: `${atom.element}_GENERIC_EXPLICIT`, chargeModel: "FIXTURE_EXPLICIT", evidenceRef: "fixture:typing" })), kinematicModel: kinematic.value!, profileId: D2_LIGAND_PROFILE_ID });
+};
+
+describe("D2 halogen element spelling (single route: adapter upper-cases, native scorer is case-insensitive)", () => {
+  it.each(["Cl", "CL", "Br", "I"])("seals a ligand containing %s as an upper-case supported element", (el) => {
+    const fixture = adaptedFixture(el);
+    expect(fixture.graph.atoms[2]!.element).toBe(el.toUpperCase());
+    const result = sealWithFixture(fixture);
+    expect(result.status).toBe("VALID");
+  });
+  it("negative control: unknown element yields UNSUPPORTED_LIGAND_ELEMENT", () => {
+    const result = sealWithFixture(adaptedFixture("Xx"));
+    expect(result.status).not.toBe("VALID");
+    expect(JSON.stringify(result.diagnostics)).toContain("UNSUPPORTED_LIGAND_ELEMENT");
+  });
 });
 
 const preparedLigandFor = (fixture: ReturnType<typeof adaptedFixture>): D2PreparedLigandStateV1 => {
