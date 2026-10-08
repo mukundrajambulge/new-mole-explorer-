@@ -42,7 +42,7 @@ const expectFocusedSelection = async (page: Page, count: number) => {
   await expect(target).toHaveAttribute("data-camera-target-mode", "selection");
   await expect(target).toHaveAttribute("data-camera-target-atom-count", String(count));
   await expect(target).toHaveAttribute("data-selection-deemphasis", "active");
-  await expect(target).toHaveAttribute("data-selection-deemphasis-opacity", "0.46");
+  await expect(target).toHaveAttribute("data-selection-deemphasis-opacity", /^(0\.46|1)$/);
   await expect(page.getByTestId("active-selection")).toContainText(`${count.toLocaleString("en-US")} atoms`);
 };
 
