@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -119,7 +120,7 @@ test("cross-object spatial selection requires and records an explicit coordinate
   await expect(consoleRegion.locator(".console-entry").last()).toContainText(/Selected [1-9]\d* atoms/);
   await expect(page.getByTestId("active-selection")).toBeVisible();
   await consoleRegion.locator(".console-history").evaluate((element) => { element.scrollTop = element.scrollHeight; });
-  await page.screenshot({ path: "verification/evidence/selection-cross-object-spatial.png", fullPage: true });
+  await page.screenshot({ path: evidencePath("selection-cross-object-spatial.png"), fullPage: true });
 });
 
 test("multi-model ingestion exposes explicit state order and state switching", async ({ page }) => {
@@ -276,7 +277,7 @@ test("multi-object workspace projects every bounded surface family", async ({ pa
 
   await expect(renderer).toHaveAttribute("data-renderer-model-count", "2");
   await expect(renderer).toHaveAttribute("data-viewer-state", "loaded");
-  await page.screenshot({ path: resolve("verification/evidence/selection-multi-object-surfaces.png"), animations: "disabled" });
+  await page.screenshot({ path: evidencePath("selection-multi-object-surfaces.png"), animations: "disabled" });
 });
 
 test("console presentation commands target canonical workspace objects and keep enable state in sync", async ({ page }) => {
@@ -363,7 +364,7 @@ test("create from a canonical selection produces a new lineage object without ch
   await command.fill("select all");
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("Selected 14 atoms");
-  await page.screenshot({ path: resolve("verification/evidence/selection-object-create.png") });
+  await page.screenshot({ path: evidencePath("selection-object-create.png") });
 });
 
 test("split_states and strict join_states preserve explicit state lineage", async ({ page }) => {
@@ -384,7 +385,7 @@ test("split_states and strict join_states preserve explicit state lineage", asyn
   await expect(panel).toContainText("multistate_state_1_joined");
   await expect(panel.locator("[data-object-id]").filter({ hasText: "multistate_state_1_joined" })).toContainText("2 states");
   await expect(page.getByRole("region", { name: "Command and selection console" })).toContainText("strict atom/topology correspondence");
-  await page.screenshot({ path: resolve("verification/evidence/selection-state-lineage.png") });
+  await page.screenshot({ path: evidencePath("selection-state-lineage.png") });
 });
 
 test("workspace groups organize objects without changing their canonical scope", async ({ page }) => {
