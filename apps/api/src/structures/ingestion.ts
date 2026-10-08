@@ -59,7 +59,7 @@ export class IngestionError extends Error {
 
 type AtomSeed = Omit<CanonicalAtom, "stableId">;
 type BondSeed = { atom1Serial: number; atom2Serial: number; order: BondOrder; source: CanonicalBond["source"] };
-type SecondarySpan = { kind: Exclude<SecondaryStructureKind, "LOOP">; chain: string; start: number; end: number };
+type SecondarySpan = { kind: Exclude<SecondaryStructureKind, "LOOP">; chain: string; start: number; end: number; labelSystem?: boolean };
 type CoordinateSeed = { sourceIndex: number; x: number; y: number; z: number };
 type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[]; coordinateStates?: Array<{ sourceModelNumber: number; coordinates: CoordinateSeed[] }>; secondaryStructureSource?: string; polymerTypingSource?: string; unitCell?: CanonicalUnitCell; partialChargeValues?: Record<string, number>; partialChargeBySourceIndex?: Record<number, number> };
 
@@ -546,11 +546,59 @@ const readCifBlocks = (cif: CifTokens): { loops: CifLoop[]; items: Map<string, s
   return { loops, items };
 };
 
+/**
+ * First non-null value among `names` for this row. Fallback is per row: a "."
+ * or "?" in the preferred column falls through to the next name for that row
+ * only, instead of the first present column deciding for every row.
+ */
 const cifValue = (row: string[], headers: string[], names: string[]): string | undefined => {
-  const index = names.map((name) => headers.indexOf(name)).find((value) => value >= 0);
-  if (index === undefined) return undefined;
-  const value = row[index];
-  return value && value !== "." && value !== "?" ? value : undefined;
+  for (const name of names) {
+    const index = headers.indexOf(name);
+    if (index < 0) continue;
+    const value = row[index];
+    if (value && value !== "." && value !== "?") return value;
+  }
+  return undefined;
+};
+
+const parseCifInteger = (value: string | undefined): number | undefined => (value !== undefined && /^[+-]?\d+$/.test(value) ? Number.parseInt(value, 10) : undefined);
+
+type CifResidueIdentity = { system: "auth" | "label" | "partial"; chain?: string; residueNumber?: number; insertionCode?: string };
+type CifIdentityColumns = { authAsym: string; authSeq: string; insCode?: string; labelAsym: string; labelSeq: string };
+
+/**
+ * One row's residue identity in a single naming system. The author triple
+ * (asym, seq, PDB insertion code) wins whenever the row has both auth asym and
+ * auth seq; otherwise the label pair is used. The two systems are never mixed
+ * within a row, and the choice is made per row. Rows that are complete in
+ * neither system ("partial") still take all fields from a single system.
+ */
+const cifResidueIdentity = (row: string[], headers: string[], columns: CifIdentityColumns): CifResidueIdentity => {
+  const authChain = cifValue(row, headers, [columns.authAsym]);
+  const authSeq = parseCifInteger(cifValue(row, headers, [columns.authSeq]));
+  const insertionCode = columns.insCode ? cifValue(row, headers, [columns.insCode]) : undefined;
+  if (authChain !== undefined && authSeq !== undefined) return { system: "auth", chain: authChain, residueNumber: authSeq, ...(insertionCode ? { insertionCode } : {}) };
+  const labelChain = cifValue(row, headers, [columns.labelAsym]);
+  const labelSeq = parseCifInteger(cifValue(row, headers, [columns.labelSeq]));
+  if (labelChain !== undefined && labelSeq !== undefined) return { system: "label", chain: labelChain, residueNumber: labelSeq };
+  // Incomplete in both systems: take every field from one system only (the one
+  // with more resolved fields, auth on a tie), never an auth chain with a label number.
+  const authCount = (authChain !== undefined ? 1 : 0) + (authSeq !== undefined ? 1 : 0);
+  const labelCount = (labelChain !== undefined ? 1 : 0) + (labelSeq !== undefined ? 1 : 0);
+  if (authCount >= labelCount) return { system: "partial", ...(authChain !== undefined ? { chain: authChain } : {}), ...(authSeq !== undefined ? { residueNumber: authSeq } : {}), ...(insertionCode ? { insertionCode } : {}) };
+  return { system: "partial", ...(labelChain !== undefined ? { chain: labelChain } : {}), ...(labelSeq !== undefined ? { residueNumber: labelSeq } : {}) };
+};
+
+const ATOM_SITE_IDENTITY: CifIdentityColumns = { authAsym: "_atom_site.auth_asym_id", authSeq: "_atom_site.auth_seq_id", insCode: "_atom_site.pdbx_PDB_ins_code", labelAsym: "_atom_site.label_asym_id", labelSeq: "_atom_site.label_seq_id" };
+const structConnIdentity = (partner: 1 | 2): CifIdentityColumns => ({ authAsym: `_struct_conn.ptnr${partner}_auth_asym_id`, authSeq: `_struct_conn.ptnr${partner}_auth_seq_id`, insCode: `_struct_conn.pdbx_ptnr${partner}_PDB_ins_code`, labelAsym: `_struct_conn.ptnr${partner}_label_asym_id`, labelSeq: `_struct_conn.ptnr${partner}_label_seq_id` });
+const spanIdentity = (category: string, end: "beg" | "end"): CifIdentityColumns => ({ authAsym: `${category}.${end}_auth_asym_id`, authSeq: `${category}.${end}_auth_seq_id`, insCode: `${category}.pdbx_${end}_PDB_ins_code`, labelAsym: `${category}.${end}_label_asym_id`, labelSeq: `${category}.${end}_label_seq_id` });
+
+/** A secondary-structure span from one CIF row; both ends must resolve completely in the same system and chain. */
+const cifSpan = (row: string[], headers: string[], category: string, kind: SecondarySpan["kind"]): SecondarySpan | undefined => {
+  const begin = cifResidueIdentity(row, headers, spanIdentity(category, "beg"));
+  const finish = cifResidueIdentity(row, headers, spanIdentity(category, "end"));
+  if (begin.system === "partial" || begin.system !== finish.system || begin.chain === undefined || begin.chain !== finish.chain || begin.residueNumber === undefined || finish.residueNumber === undefined) return undefined;
+  return { kind, chain: begin.chain, start: begin.residueNumber, end: finish.residueNumber, ...(begin.system === "label" ? { labelSystem: true } : {}) };
 };
 
 const parseBondOrder = (value: string | undefined): BondOrder => {
@@ -616,8 +664,12 @@ const parseMmcif = (content: string): ParsedSource => {
     const labelEntityId = cifValue(row, atomLoop.headers, ["_atom_site.label_entity_id"]);
     const atomName = cifValue(row, atomLoop.headers, ["_atom_site.auth_atom_id"]) ?? labelAtomId ?? "X";
     const residueName = cifValue(row, atomLoop.headers, ["_atom_site.auth_comp_id"]) ?? labelCompId ?? "UNK";
-    const chain = cifValue(row, atomLoop.headers, ["_atom_site.auth_asym_id"]) ?? labelAsymId ?? "_";
-    const residueNumber = parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.auth_seq_id"]) ?? labelSeqValue, 0);
+    // Waters and ligands have label_seq_id "." but their own auth_seq_id, so the
+    // author identity keeps them as separate residues on the PDB chain.
+    const identity = cifResidueIdentity(row, atomLoop.headers, ATOM_SITE_IDENTITY);
+    const chain = identity.chain ?? "_";
+    const residueNumber = identity.residueNumber ?? 0;
+    const labelSeqId = parseCifInteger(labelSeqValue);
     const element = normalizeElement(cifValue(row, atomLoop.headers, ["_atom_site.type_symbol"]) ?? "", atomName);
     const entityId = labelEntityId;
     const polymerType = entityId ? polymerEntityTypes.get(entityId) : undefined;
@@ -627,9 +679,9 @@ const parseMmcif = (content: string): ParsedSource => {
       element,
       residueName,
       residueNumber,
-      insertionCode: cifValue(row, atomLoop.headers, ["_atom_site.pdbx_PDB_ins_code"]),
+      insertionCode: identity.insertionCode,
       ...(labelAsymId ? { labelAsymId } : {}),
-      ...(labelSeqValue !== undefined && Number.isFinite(Number.parseInt(labelSeqValue, 10)) ? { labelSeqId: Number.parseInt(labelSeqValue, 10) } : {}),
+      ...(labelSeqId !== undefined ? { labelSeqId } : {}),
       ...(labelCompId ? { labelCompId } : {}),
       ...(labelAtomId ? { labelAtomId } : {}),
       ...(labelEntityId ? { labelEntityId } : {}),
@@ -666,26 +718,22 @@ const parseMmcif = (content: string): ParsedSource => {
     if (loop.headers.some((header) => header.startsWith("_struct_conf."))) {
       for (const row of loop.rows) {
         const type = (cifValue(row, loop.headers, ["_struct_conf.conf_type_id"]) ?? "").toUpperCase();
-        const kind = type.includes("HELX") ? "HELIX" : null;
-        const chain = cifValue(row, loop.headers, ["_struct_conf.beg_auth_asym_id", "_struct_conf.beg_label_asym_id"]);
-        const endChain = cifValue(row, loop.headers, ["_struct_conf.end_auth_asym_id", "_struct_conf.end_label_asym_id"]) ?? chain;
-        const start = parseInteger(cifValue(row, loop.headers, ["_struct_conf.beg_auth_seq_id", "_struct_conf.beg_label_seq_id"]), Number.NaN);
-        const end = parseInteger(cifValue(row, loop.headers, ["_struct_conf.end_auth_seq_id", "_struct_conf.end_label_seq_id"]), Number.NaN);
-        if (kind && chain && chain === endChain && Number.isFinite(start) && Number.isFinite(end)) secondarySpans.push({ kind, chain, start, end });
+        const span = type.includes("HELX") ? cifSpan(row, loop.headers, "_struct_conf", "HELIX") : undefined;
+        if (span) secondarySpans.push(span);
       }
     }
     if (loop.headers.some((header) => header.startsWith("_struct_sheet_range."))) {
       for (const row of loop.rows) {
-        const chain = cifValue(row, loop.headers, ["_struct_sheet_range.beg_auth_asym_id", "_struct_sheet_range.beg_label_asym_id"]);
-        const endChain = cifValue(row, loop.headers, ["_struct_sheet_range.end_auth_asym_id", "_struct_sheet_range.end_label_asym_id"]) ?? chain;
-        const start = parseInteger(cifValue(row, loop.headers, ["_struct_sheet_range.beg_auth_seq_id", "_struct_sheet_range.beg_label_seq_id"]), Number.NaN);
-        const end = parseInteger(cifValue(row, loop.headers, ["_struct_sheet_range.end_auth_seq_id", "_struct_sheet_range.end_label_seq_id"]), Number.NaN);
-        if (chain && chain === endChain && Number.isFinite(start) && Number.isFinite(end)) secondarySpans.push({ kind: "SHEET", chain, start, end });
+        const span = cifSpan(row, loop.headers, "_struct_sheet_range", "SHEET");
+        if (span) secondarySpans.push(span);
       }
     }
   }
+  const inSpan = (candidate: SecondarySpan, atom: AtomSeed): boolean => candidate.labelSystem
+    ? candidate.chain === atom.labelAsymId && atom.labelSeqId !== undefined && atom.labelSeqId >= candidate.start && atom.labelSeqId <= candidate.end
+    : candidate.chain === atom.chain && atom.residueNumber >= candidate.start && atom.residueNumber <= candidate.end;
   for (const atom of atoms) {
-    const span = secondarySpans.find((candidate) => candidate.chain === atom.chain && atom.residueNumber >= candidate.start && atom.residueNumber <= candidate.end);
+    const span = secondarySpans.find((candidate) => inSpan(candidate, atom));
     if (span) atom.secondaryStructure = span.kind;
   }
 
@@ -716,12 +764,21 @@ const parseMmcif = (content: string): ParsedSource => {
     return candidates?.map((atom) => atom.serial) ?? [];
   };
   const serialForLabel = (asym: string, seq: number, atomName: string): number[] => atomsByLabel.get(`${asym}\u0000${seq}\u0000${atomName.trim()}`)?.map((atom) => atom.serial) ?? [];
+  // struct_conn partners resolve in the system their row is complete in: auth
+  // ids (with the PDB insertion code) first, label ids otherwise.
+  const structConnPartner = (row: string[], headers: string[], partner: 1 | 2): number[] => {
+    const identity = cifResidueIdentity(row, headers, structConnIdentity(partner));
+    if (identity.system === "label") return serialForLabel(identity.chain!, identity.residueNumber!, cifValue(row, headers, [`_struct_conn.ptnr${partner}_label_atom_id`, `_struct_conn.ptnr${partner}_auth_atom_id`]) ?? "X");
+    const atomName = cifValue(row, headers, [`_struct_conn.ptnr${partner}_auth_atom_id`, `_struct_conn.ptnr${partner}_label_atom_id`]) ?? "X";
+    const residueName = cifValue(row, headers, [`_struct_conn.ptnr${partner}_auth_comp_id`, `_struct_conn.ptnr${partner}_label_comp_id`]);
+    return serialFor(identity.chain ?? "_", identity.residueNumber ?? 0, atomName, residueName, identity.insertionCode);
+  };
   const bonds: BondSeed[] = [];
   for (const loop of loops) {
     if (loop.headers.some((header) => header.startsWith("_struct_conn."))) {
       for (const row of loop.rows) {
-        const atom1 = serialFor(cifValue(row, loop.headers, ["_struct_conn.ptnr1_auth_asym_id", "_struct_conn.ptnr1_label_asym_id"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_struct_conn.ptnr1_auth_seq_id", "_struct_conn.ptnr1_label_seq_id"]), 0), cifValue(row, loop.headers, ["_struct_conn.ptnr1_label_atom_id", "_struct_conn.ptnr1_auth_atom_id"]) ?? "X", cifValue(row, loop.headers, ["_struct_conn.ptnr1_auth_comp_id", "_struct_conn.ptnr1_label_comp_id"]), cifValue(row, loop.headers, ["_struct_conn.pdbx_ptnr1_PDB_ins_code"]));
-        const atom2 = serialFor(cifValue(row, loop.headers, ["_struct_conn.ptnr2_auth_asym_id", "_struct_conn.ptnr2_label_asym_id"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_struct_conn.ptnr2_auth_seq_id", "_struct_conn.ptnr2_label_seq_id"]), 0), cifValue(row, loop.headers, ["_struct_conn.ptnr2_label_atom_id", "_struct_conn.ptnr2_auth_atom_id"]) ?? "X", cifValue(row, loop.headers, ["_struct_conn.ptnr2_auth_comp_id", "_struct_conn.ptnr2_label_comp_id"]), cifValue(row, loop.headers, ["_struct_conn.pdbx_ptnr2_PDB_ins_code"]));
+        const atom1 = structConnPartner(row, loop.headers, 1);
+        const atom2 = structConnPartner(row, loop.headers, 2);
         if (atom1[0] !== undefined && atom2[0] !== undefined) bonds.push({ atom1Serial: atom1[0], atom2Serial: atom2[0], order: parseBondOrder(cifValue(row, loop.headers, ["_struct_conn.pdbx_value_order"])), source: "MMCIF_STRUCT_CONN" });
       }
     }
