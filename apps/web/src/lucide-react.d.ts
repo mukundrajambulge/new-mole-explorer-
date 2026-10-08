@@ -9,6 +9,7 @@ declare module "lucide-react" {
   export const Atom: LucideIcon;
   export const BarChart3: LucideIcon;
   export const Beaker: LucideIcon;
+  export const RotateCcw: LucideIcon;
   export const Box: LucideIcon;
   export const CircleHelp: LucideIcon;
   export const CircleUserRound: LucideIcon;
