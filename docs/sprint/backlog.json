@@ -213,9 +213,9 @@
         "T3"
       ],
       "est": "2-3 hours",
-      "status": "READY",
+      "status": "DONE",
       "branch": "sprint/W1/0.7",
-      "note": "W2 READY; integrating"
+      "note": "W2 merged to main 7902d1b; check --smoke green"
     },
     {
       "id": "0.8",
@@ -322,8 +322,8 @@
         "S1"
       ],
       "est": "1 hour",
-      "status": "READY",
-      "note": "W2 READY; integrating"
+      "status": "DONE",
+      "note": "W2 merged to main 7902d1b; check --smoke green"
     },
     {
       "id": "1.2",
@@ -749,8 +749,8 @@
         "C3"
       ],
       "est": "1 day",
-      "status": "READY",
-      "note": "W2 READY; integrating"
+      "status": "DONE",
+      "note": "W2 merged to main 7902d1b; check --smoke green"
     },
     {
       "id": "2.4",
@@ -1726,7 +1726,7 @@
         "C6"
       ],
       "est": "Half a day",
-      "status": "NEEDS_OWNER",
+      "status": "TODO",
       "branch": "sprint/W2/4.4",
       "note": "W2: d2BoxSeal uses placeholder chemistry + fabricated profile digests, seals VALID, trusts client sha256. Must not merge; redo needs 5.2 prep output or must seal PREVIEW_UNQUALIFIED/UNAVAILABLE. native check failed on shared CMake cache (~/mole-build/native) - use per-worktree build dir"
     },
