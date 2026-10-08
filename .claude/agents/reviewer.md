@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Default reviewer: acceptance, correctness, scope and rules, in one pass.
+description: "Default reviewer: acceptance, correctness, scope and rules, in one pass."
 tools: Read, Bash, Grep, Glob
 model: sonnet
 ---

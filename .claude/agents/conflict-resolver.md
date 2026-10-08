@@ -1,6 +1,6 @@
 ---
 name: conflict-resolver
-description: Called only when integration hits a merge conflict.
+description: "Called only when integration hits a merge conflict."
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: sonnet
 ---

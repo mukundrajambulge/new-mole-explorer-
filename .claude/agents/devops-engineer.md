@@ -1,6 +1,6 @@
 ---
 name: devops-engineer
-description: Lanes L1/L8: repo, CI, Playwright config, Docker, Caddy, deploy, auth.
+description: "Lanes L1/L8: repo, CI, Playwright config, Docker, Caddy, deploy, auth."
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: sonnet
 ---

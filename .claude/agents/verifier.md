@@ -1,6 +1,6 @@
 ---
 name: verifier
-description: Cheap runner: executes given commands and reports compact results. Never edits.
+description: "Cheap runner: executes given commands and reports compact results. Never edits."
 tools: Read, Bash, Grep, Glob
 model: haiku
 ---

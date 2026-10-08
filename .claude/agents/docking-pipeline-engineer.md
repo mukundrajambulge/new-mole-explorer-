@@ -1,6 +1,6 @@
 ---
 name: docking-pipeline-engineer
-description: Lane L6: prep worker, mole-dock + Vina, job runner, docking routes.
+description: "Lane L6: prep worker, mole-dock + Vina, job runner, docking routes."
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: sonnet
 ---

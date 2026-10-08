@@ -1,6 +1,6 @@
 ---
 name: native-cpp-engineer
-description: Lane L5: C++ scorer (native/) and TS<->C++ docking contracts.
+description: "Lane L5: C++ scorer (native/) and TS<->C++ docking contracts."
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: opus
 ---

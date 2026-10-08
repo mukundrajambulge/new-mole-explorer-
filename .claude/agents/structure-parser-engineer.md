@@ -1,6 +1,6 @@
 ---
 name: structure-parser-engineer
-description: Lane L3: PDB/mmCIF parsing and real RCSB fixtures.
+description: "Lane L3: PDB/mmCIF parsing and real RCSB fixtures."
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: opus
 ---

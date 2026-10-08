@@ -1,6 +1,6 @@
 ---
 name: api-engineer
-description: Lane L2: API security, validation, reliability (apps/api).
+description: "Lane L2: API security, validation, reliability (apps/api)."
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: sonnet
 ---

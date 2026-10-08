@@ -1,6 +1,6 @@
 ---
 name: science-validator
-description: Lane L9: Vina comparisons, redocking RMSD, D4 prototype.
+description: "Lane L9: Vina comparisons, redocking RMSD, D4 prototype."
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: sonnet
 ---

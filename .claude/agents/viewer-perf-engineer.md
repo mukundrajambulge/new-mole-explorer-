@@ -1,6 +1,6 @@
 ---
 name: viewer-perf-engineer
-description: Lane L4: React/3Dmol speed and correctness on 4V6F.
+description: "Lane L4: React/3Dmol speed and correctness on 4V6F."
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: sonnet
 ---

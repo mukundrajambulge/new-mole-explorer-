@@ -1,6 +1,6 @@
 ---
 name: docking-ui-engineer
-description: Lane L7: docking wizard UI (apps/web/src/docking).
+description: "Lane L7: docking wizard UI (apps/web/src/docking)."
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: sonnet
 ---

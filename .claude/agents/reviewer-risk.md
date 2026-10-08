@@ -1,6 +1,6 @@
 ---
 name: reviewer-risk
-description: Deep reviewer for high-risk tasks: security, science and performance.
+description: "Deep reviewer for high-risk tasks: security, science and performance."
 tools: Read, Bash, Grep, Glob
 model: opus
 ---
