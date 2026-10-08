@@ -1,4 +1,6 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { randomBytes, timingSafeEqual } from "node:crypto";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { loadConfig } from "./config.js";
@@ -88,11 +90,27 @@ const hostAllowed = (request: IncomingMessage): boolean => {
   return match[2] === undefined || Number(match[2]) === request.socket.localPort;
 };
 
+// Local-mode token: random per start-up, written to <tokenDir>/token (owner-only). Health stays open for liveness probes.
+let localToken: Buffer | undefined;
+const tokenValid = (request: IncomingMessage): boolean => {
+  const supplied = request.headers["x-mole-token"];
+  if (!localToken || typeof supplied !== "string") return false;
+  const given = Buffer.from(supplied, "utf8");
+  return given.length === localToken.length && timingSafeEqual(given, localToken);
+};
+const issueLocalToken = () => {
+  const token = randomBytes(32).toString("hex");
+  mkdirSync(config.tokenDir, { recursive: true });
+  writeFileSync(join(config.tokenDir, "token"), token, { mode: 0o600 });
+  localToken = Buffer.from(token, "utf8");
+};
+
 const route = async (request: IncomingMessage, response: ServerResponse) => {
   if (config.mode === "local" && !hostAllowed(request)) {
     sendJson(response, 403, { error: { code: "HOST_NOT_ALLOWED", message: "This host is not allowed." } });
     return;
   }
+  response.setHeader("vary", "origin");
   const origin = request.headers.origin;
   if (origin !== undefined) {
     if (!config.allowedOrigins.includes(origin)) {
@@ -100,13 +118,16 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       return;
     }
     response.setHeader("access-control-allow-origin", origin);
-    response.setHeader("vary", "origin");
   }
   response.setHeader("access-control-allow-methods", "GET,POST,PUT,OPTIONS");
-  response.setHeader("access-control-allow-headers", "content-type,x-parent-export-artifact-id,x-idempotency-key,x-correlation-id");
+  response.setHeader("access-control-allow-headers", "content-type,x-mole-token,x-parent-export-artifact-id,x-idempotency-key,x-correlation-id");
   if (request.method === "OPTIONS") {
     response.writeHead(204);
     response.end();
+    return;
+  }
+  if (config.mode === "local" && !(request.method === "GET" && request.url?.split("?")[0] === "/api/health") && !tokenValid(request)) {
+    sendJson(response, 401, { error: { code: "TOKEN_REQUIRED", message: "A valid local API token is required." } });
     return;
   }
 
@@ -261,6 +282,7 @@ export const server = createServer(route);
 
 export const startServer = (port = config.port, host = config.host) =>
   new Promise<void>((resolve) => {
+    if (config.mode === "local") issueLocalToken();
     server.listen(port, host, () => {
       console.log(`Molecular API (${config.mode}) listening on http://${host}:${port}`);
       resolve();

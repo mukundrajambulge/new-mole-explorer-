@@ -1,8 +1,12 @@
+import { fileURLToPath } from "node:url";
+
 export type ApiConfig = {
   mode: "local" | "hosted";
   host: string;
   port: number;
   allowedOrigins: readonly string[];
+  /** Directory that receives the local-mode token file (<dir>/token). */
+  tokenDir: string;
   maxJsonBytes: number;
   maxUploadBytes: number;
 };
@@ -31,6 +35,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ApiConfig => {
     host,
     port: intEnv(env, "PORT", intEnv(env, "API_PORT", 8100, 0, 65535), 0, 65535),
     allowedOrigins: modeRaw === "local" ? [...LOCAL_DEV_ORIGINS, ...listed] : listed,
+    tokenDir: env.MOLE_TOKEN_DIR || fileURLToPath(new URL("../../../.mole", import.meta.url)),
     maxJsonBytes: intEnv(env, "MAX_JSON_BYTES", 8 * 1024 * 1024, 1024, 1024 * 1024 * 1024),
     maxUploadBytes: intEnv(env, "MAX_UPLOAD_BYTES", 512 * 1024 * 1024 + 1_000_000, 1024, 4 * 1024 * 1024 * 1024),
   };
