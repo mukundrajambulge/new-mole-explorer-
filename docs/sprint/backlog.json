@@ -2005,7 +2005,8 @@
       "done": "The versions file is reviewed and the environment builds reproducibly.",
       "refs": [],
       "est": "1 day",
-      "status": "TODO"
+      "status": "NEEDS_OWNER",
+      "note": "WSL setup (runbook step 9) incomplete: no ~/mole-tools/vina, no ~/mole-prep venv, no docker. Re-mark TODO after bash scripts/wsl-setup.sh"
     },
     {
       "id": "5.2",
