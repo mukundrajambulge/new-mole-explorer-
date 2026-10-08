@@ -211,7 +211,29 @@ describe("PDB hybrid-36 serials", () => {
     expect(result.atoms.map((atom) => atom.residueNumber).slice(0, 3)).toEqual([9999, 10000, 10001]);
   });
 
+  it("decodes hybrid-36 CONECT serials", async () => {
+    const content = [line("99999", "1"), line("A0000", "2"), "CONECT99999A0000"].join("\n");
+    const result = (await ingest("h.pdb", content)).structure;
+    expect(result.bonds.length).toBe(1);
+  });
+
   it("does not exist without the fixtures being present", () => {
     expect(existsSync(new URL("1CRN.pdb", rcsbDir))).toBe(true);
+  });
+});
+
+describe("PDB reader details", () => {
+  const atom = (serial: number, residue: number, ins = " ", chain = "A") => `ATOM  ${String(serial).padStart(5)}  CA  ALA ${chain}${String(residue).padStart(4)}${ins}      1.000   2.000   3.000  1.00 20.00           C`;
+  it("rejects atoms outside MODEL blocks with a line-numbered diagnostic", async () => {
+    const content = ["MODEL        1", atom(1, 1), "ENDMDL", atom(2, 2), "END"].join("\n");
+    await expect(ingest("o.pdb", content)).rejects.toThrow(/line 4.*outside any MODEL/);
+  });
+
+  it("assigns helix and sheet by residue identity including insertion codes", async () => {
+    const helix = "HELIX    1   1 ALA A    2  ALA A    3  1                                   2";
+    const sheet = "SHEET    1   A 1 ALA A   5  ALA A   5  0";
+    const content = [helix, sheet, atom(1, 1), atom(2, 2), atom(3, 2, "A"), atom(4, 3), atom(5, 4), atom(6, 5)].join("\n");
+    const kinds = (await ingest("s.pdb", content)).structure.atoms.map((a) => a.secondaryStructure);
+    expect(kinds).toEqual([undefined, "HELIX", "HELIX", "HELIX", undefined, "SHEET"]);
   });
 });
