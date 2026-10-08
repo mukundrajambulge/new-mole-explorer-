@@ -1,12 +1,12 @@
 # Sprint state (generated: do not edit; run `node scripts/sprint/sprint.mjs state`)
 
-Status: DONE: 13 · TODO: 73 · NEEDS_OWNER: 1 · DEFERRED: 8
-Done by tier: core 13/45 · strong 0/35 · stretch 0/7
+Status: DONE: 14 · TODO: 73 · DEFERRED: 8
+Done by tier: core 14/45 · strong 0/35 · stretch 0/7
 Calibration: 8632 output tokens per 1% of the 5-hour window; estimate multiplier 0.68
 Last waves: W1 86k (21%→31%), W2 157k (38%→56%)
 
 ## Needs the owner
-- 1.2 Only allow known websites (CORS allow-list) plus a local token: NEEDS_OWNER (W2: token works but tests/e2e/r10-command-environment.spec.ts calls :8100 without x-mole-token -> 401; fix spec (outside owned files) then re-review)
+- nothing
 
 ## Next ready tasks (critical path first)
 - ★ 1.6 [L2 S/medium] Crash-proof replies

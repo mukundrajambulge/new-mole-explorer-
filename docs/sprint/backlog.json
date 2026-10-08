@@ -358,9 +358,9 @@
         "S1"
       ],
       "est": "3 hours",
-      "status": "NEEDS_OWNER",
+      "status": "DONE",
       "branch": "sprint/W2/1.2",
-      "note": "W2: token works but tests/e2e/r10-command-environment.spec.ts calls :8100 without x-mole-token -> 401; fix spec (outside owned files) then re-review"
+      "note": "W2 fix round; merged to main; check --smoke green; r10 spec not run alone"
     },
     {
       "id": "1.3",
