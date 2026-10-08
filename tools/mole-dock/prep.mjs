@@ -5,7 +5,8 @@
 //   plus coreutils `timeout -k` inside WSL so the Linux side dies too)
 // - stdout/stderr capped and path-scrubbed before anyone sees them
 import { spawn, spawnSync } from "node:child_process";
-import { closeSync, existsSync, openSync, readSync, statSync } from "node:fs";
+import { closeSync, existsSync, mkdtempSync, openSync, readSync, rmSync, statSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -55,7 +56,7 @@ export function readJobOptions(jobDir) {
 export const PREP_DISTRO = "Ubuntu-24.04";
 export const STDOUT_CAP = 64 * 1024;
 export const STDERR_CAP = 16 * 1024;
-const MODES = new Set(["plan", "apply"]);
+const MODES = new Set(["plan", "apply", "versions"]);
 const SAFE_POSIX_PATH = /^\/[A-Za-z0-9._/-]+$/;
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 export const WORKER_LAUNCHER = join(REPO_ROOT, "workers", "prep", "run_prep.py");
@@ -111,7 +112,7 @@ export function resolvePrepPython({ platform = process.platform, env = process.e
 
 /** Build {command, args, options} without spawning. Exported for tests. */
 export function buildPrepInvocation({ mode, jobDir, python, platform = process.platform, timeoutMs = PREP_STAGE_TIMEOUT_MS, launcher = WORKER_LAUNCHER }) {
-  if (!MODES.has(mode)) throw new Error("mode must be plan or apply");
+  if (!MODES.has(mode)) throw new Error("mode must be plan, apply or versions");
   if (!isAbsolute(jobDir) || !existsSync(jobDir) || !statSync(jobDir).isDirectory()) throw new Error("JOB_DIR_INVALID");
   if (!SAFE_POSIX_PATH.test(python)) throw new Error("interpreter must be an absolute POSIX path");
   const secs = String(Math.max(1, Math.ceil(timeoutMs / 1000)));
@@ -206,7 +207,7 @@ export function runProcess({ command, args, options, scrub = [] }, { timeoutMs =
   });
 }
 
-/** Run the prep worker in one job directory: mode "plan" or "apply". */
+/** Run the prep worker in one job directory: mode "plan", "apply" or "versions" (empty dir, no job files). */
 export async function runPrep({ mode, jobDir, timeoutMs, options, signal, platform = process.platform, python } = {}) {
   let inv;
   try {
@@ -219,4 +220,55 @@ export async function runPrep({ mode, jobDir, timeoutMs, options, signal, platfo
   const r = await runProcess(inv, { timeoutMs: timeoutMs + 10_000, signal, platform });
   // coreutils timeout exits 124 (TERM) or 137 (KILL) when the in-distro limit fired.
   return r.status === "FAILED" && (r.exitCode === 124 || r.exitCode === 137) ? { ...r, status: "TIMEOUT" } : r;
+}
+
+export const PREP_VERSIONS_TIMEOUT_MS = 60_000;
+const VERSION_RE = /^[A-Za-z0-9._+-]{1,32}$/;
+
+/** Shape-check one `run_prep.py --versions` stdout line. Exported for tests. */
+export function parseVersionsReport(stdout) {
+  const line = String(stdout ?? "").trim();
+  if (!line || line.includes("\n") || line.length > 4096) return null;
+  let report;
+  try {
+    report = JSON.parse(line);
+  } catch {
+    return null;
+  }
+  const tools = report && typeof report.tools === "object" && report.tools !== null && !Array.isArray(report.tools) ? report.tools : null;
+  if (!tools || typeof report.lockDigest !== "string" || !/^[0-9a-f]{64}$/.test(report.lockDigest) || typeof report.workerVersion !== "string" || !VERSION_RE.test(report.workerVersion)) return null;
+  const clean = {};
+  const entries = Object.entries(tools);
+  if (entries.length > 64) return null;
+  for (const [k, v] of entries) {
+    if (!/^[a-z0-9_]{1,64}$/.test(k) || typeof v !== "string" || !VERSION_RE.test(v)) return null;
+    clean[k] = v;
+  }
+  return { profileId: String(report.profileId ?? "").slice(0, 64), workerVersion: report.workerVersion, lockDigest: report.lockDigest, python: String(report.python ?? "").slice(0, 16), tools: clean };
+}
+
+/**
+ * Ask the installed worker which toolchain it runs (`run_prep.py --versions`) in a fresh, empty temp
+ * directory, through the same fixed-interpreter, scrubbed-env, no-shell spawn path as plan/apply.
+ * Resolves (never rejects) with {ok:true, report} or {ok:false, error}; apps/api/src/jobs/prepPins.ts
+ * compares the report against TOOLS.md and the lock.
+ */
+export async function probePrepVersions({ platform = process.platform, python, timeoutMs = PREP_VERSIONS_TIMEOUT_MS } = {}) {
+  let dir;
+  try {
+    dir = mkdtempSync(join(tmpdir(), "mole-prep-versions-"));
+    const r = await runPrep({ mode: "versions", jobDir: dir, timeoutMs, platform, ...(python ? { python } : {}) });
+    if (r.status !== "OK") return { ok: false, error: `VERSIONS_${r.status}${r.stderr ? `: ${r.stderr.slice(0, 300)}` : ""}` };
+    const report = parseVersionsReport(r.stdout);
+    return report ? { ok: true, report } : { ok: false, error: "VERSIONS_OUTPUT_INVALID" };
+  } catch (e) {
+    return { ok: false, error: scrubOutput(`VERSIONS_FAILED: ${e?.message || e}`, 300, dir ? [dir] : []) };
+  } finally {
+    // WSL may hold the cwd handle for a moment after exit; the directory is empty, so a leftover is harmless.
+    try {
+      if (dir) rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+    } catch {
+      /* best effort */
+    }
+  }
 }

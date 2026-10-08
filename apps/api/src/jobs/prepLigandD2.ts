@@ -83,7 +83,7 @@ const parsePdbqt = (text: string): { recs: Rec[]; branches: Branch[]; fragParent
 const withoutSeal = <T extends { stateId: string; digest: string }>(o: T): Omit<T, "stateId" | "digest"> =>
   Object.fromEntries(Object.entries(o).filter(([k]) => k !== "stateId" && k !== "digest")) as Omit<T, "stateId" | "digest">;
 
-const explicitSubmittedState = (adapted: D2AdaptedRepresentation, planDigest: string): { chemical: D2ChemicalStateV1; coordinate: D2CoordinateStateV1 } | undefined => {
+export const explicitSubmittedState = (adapted: D2AdaptedRepresentation, planDigest: string): { chemical: D2ChemicalStateV1; coordinate: D2CoordinateStateV1 } | undefined => {
   const c0 = adapted.chemicalState;
   const k0 = adapted.coordinateStates[0];
   if (!c0 || !k0) return undefined;

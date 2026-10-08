@@ -1,0 +1,1 @@
+{"schemaVersion":1,"jobId":"7f2fd051-ddc4-4c25-a8d0-3aa82dbfe28b","receptor":{"artifactId":"rinterim","relPath":"in/receptor.pdb","format":"pdb"},"ligand":{"artifactId":"lethanolh","relPath":"in/ligand.sdf","format":"sdf"},"options":{"pH":7.4,"protonation":"PROPKA_PREVIEW","ligandProtonation":"EXPLICIT_SUBMITTED","chainIds":null,"keepWaters":false,"addMissingAtoms":false}}

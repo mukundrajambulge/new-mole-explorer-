@@ -1,0 +1,90 @@
+{
+ "chargeModel": "gasteiger",
+ "decisions": [
+  {
+   "atomsAfter": 1231,
+   "atomsBefore": 12310,
+   "choice": "keep model 1 of 10",
+   "key": "MODEL",
+   "requiresAck": true
+  },
+  {
+   "atomsAfter": 1231,
+   "atomsBefore": 1231,
+   "choice": "PDB2PQR+PROPKA at pH 7.40 (PREVIEW_UNQUALIFIED; PDB2PQR also rebuilds missing heavy atoms); hydrogens 629 -> 629",
+   "key": "RECEPTOR_PROTONATION",
+   "requiresAck": true
+  },
+  {
+   "atomsAfter": 1231,
+   "atomsBefore": 1231,
+   "choice": "Gasteiger charges from Meeko residue templates",
+   "key": "RECEPTOR_CHARGES",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 9,
+   "atomsBefore": 9,
+   "choice": "explicit bond orders from the submitted SDF file",
+   "key": "LIGAND_BOND_ORDERS",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 9,
+   "atomsBefore": 9,
+   "choice": "keep submitted protonation and formal charge (0)",
+   "key": "LIGAND_PROTONATION",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 9,
+   "atomsBefore": 9,
+   "choice": "keep the 6 submitted hydrogens; none generated",
+   "key": "LIGAND_HYDROGENS",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 9,
+   "atomsBefore": 9,
+   "choice": "Gasteiger partial charges (Meeko)",
+   "key": "LIGAND_CHARGES",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 9,
+   "atomsBefore": 9,
+   "choice": "1 rotatable bonds (Meeko default rules; amides rigid)",
+   "key": "LIGAND_TORSIONS",
+   "requiresAck": false
+  }
+ ],
+ "diagnostics": [],
+ "inputs": {
+  "ligandSha256": "b099b5f66f4460e846fe91dd3e2a8e9e3a710daed833988e5bcf199b3b92b1e1",
+  "ligandTemplateSha256": null,
+  "receptorSha256": "21099cb88231455fdfab4095dddfadcc85cc4213e105cf5f9cfff2ca21993378"
+ },
+ "jobId": "7f2fd051-ddc4-4c25-a8d0-3aa82dbfe28b",
+ "ligandArtifactId": "lethanolh",
+ "lockDigest": "e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9",
+ "options": {
+  "addMissingAtoms": false,
+  "chainIds": null,
+  "keepWaters": false,
+  "ligandProtonation": "EXPLICIT_SUBMITTED",
+  "ligandTemplate": false,
+  "pH": 7.4,
+  "protonation": "PROPKA_PREVIEW"
+ },
+ "pH": 7.4,
+ "planDigest": "fd3f0e1a95be41a04752b747b1c4eb2c248780c2fb54f1f4417f3046bd11f4c0",
+ "profileId": "ME_PREP_INTERIM_V0",
+ "protonationSource": "PROPKA_PREVIEW",
+ "qualification": "PREVIEW_UNQUALIFIED",
+ "receptorArtifactId": "rinterim",
+ "rotatableBonds": 1,
+ "schemaVersion": 1,
+ "status": "READY",
+ "tautomer": "AS_SUBMITTED",
+ "warnings": []
+}

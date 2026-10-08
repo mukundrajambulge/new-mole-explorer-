@@ -54,7 +54,7 @@ afterEach(async () => {
 const makeStore = (opts: { runner?: PrepRunner; now?: () => number; pins?: typeof repoPrepPins } = {}) => {
   const root = mkdtempSync(join(tmpdir(), "prepjobs-"));
   roots.push(root);
-  const store = new PrepJobStore({ root, resolveArtifact: resolver, runner: opts.runner ?? replayRunner(), sealer: prepSummarySealer, ...(opts.now ? { now: opts.now } : {}), ...(opts.pins ? { pins: opts.pins } : {}) });
+  const store = new PrepJobStore({ root, resolveArtifact: resolver, runner: opts.runner ?? replayRunner(), sealer: prepSummarySealer, installedTools: async () => [], ...(opts.now ? { now: opts.now } : {}), ...(opts.pins ? { pins: opts.pins } : {}) });
   store.init();
   return store;
 };
@@ -115,11 +115,13 @@ describe("prep job store and routes (5.2b)", () => {
     }
     expect(final.state, final.error).toBe("SUCCEEDED");
     expect(final.seal?.verifiedOutputs).toBe(6);
-    // Real fixture: Meeko template hydrogens make it PREVIEW_UNQUALIFIED; missing D2 evidence keeps it BLOCKED.
+    // Real fixture: Meeko template hydrogens (X-ray receptor, no submitted H) make it PREVIEW_UNQUALIFIED.
+    // Generated chemistry is never D2-sealed, so neither component needs the receptor dependency digests.
     expect(final.seal?.qualification).toBe("PREVIEW_UNQUALIFIED");
-    expect(final.seal?.status).toBe("BLOCKED");
-    expect(final.seal?.reasonCodes).toEqual(expect.arrayContaining(["D2_PROFILE_DIGEST_UNAVAILABLE", "GENERATED_CHEMICAL_STATE"]));
+    expect(final.seal?.status).toBe("PREVIEW_UNQUALIFIED");
+    expect(final.seal?.reasonCodes).toEqual(["GENERATED_CHEMICAL_STATE"]);
     expect(final.seal?.components?.ligand.status).toBe("PREVIEW_UNQUALIFIED");
+    expect(final.seal?.components?.receptor.status).toBe("PREVIEW_UNQUALIFIED");
     // Unsealed outputs never get prepared ids.
     expect(final.preparedReceptorId).toBeUndefined();
     expect(final.preparedLigandId).toBeUndefined();

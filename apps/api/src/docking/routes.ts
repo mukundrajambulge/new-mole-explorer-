@@ -5,7 +5,8 @@ import type { PrepArtifactStore } from "../jobs/prepArtifacts.js";
 
 /**
  * Preparation routes (task 5.2b, design 5.2 step 7). Mounted by server.ts under "/api":
- *   POST {prefix}/docking/prep/artifacts?format=sdf   raw bytes (<= 20 MB); the server computes the sha256
+ *   POST {prefix}/docking/prep/artifacts?format=sdf   raw bytes (<= 20 MB), streamed to disk; the server computes
+ *                                            the sha256; 2 concurrent uploads, then 429 BUSY; quota -> 429 QUOTA_EXCEEDED
  *   POST {prefix}/docking/prep/artifacts/from-source  {sourceArtifactId}: maps an uploaded/fetched PDB structure
  *   POST {prefix}/docking/prep/plan          PrepareRequest (artifact ids + options only)
  *   POST {prefix}/docking/prep/:id/confirm   PrepConfirmationV1; 409 on planDigest mismatch; single-use
@@ -88,8 +89,14 @@ const handlePrep = async (o: PrepRoutesOptions, req: IncomingMessage, res: Serve
       if (!o.artifacts) return fail(res, 404, "NOT_FOUND", "Not found.");
       if (method === "POST" && parts.length === 1) {
         const format = new URL(req.url ?? "/", "http://localhost").searchParams.get("format") ?? "";
-        const bytes = await readRaw(req, PREP_MAX_ARTIFACT_BYTES);
-        return send(res, 201, o.artifacts.put(bytes, format));
+        const declared = req.headers["content-length"] === undefined ? undefined : Number(req.headers["content-length"]);
+        if (declared !== undefined && !(Number.isSafeInteger(declared) && declared >= 0)) return fail(res, 400, "INVALID_INPUT", "The content-length header is invalid.");
+        if (declared !== undefined && declared > PREP_MAX_ARTIFACT_BYTES) {
+          res.setHeader("connection", "close");
+          return fail(res, 413, "OVERSIZE_INPUT", "An input artifact exceeds 20 MB.");
+        }
+        // Streamed to a temp file under the artifact root (hashed per chunk, capped, concurrency-limited, quota-checked).
+        return send(res, 201, await o.artifacts.putStream(req, format, declared));
       }
       if (method === "POST" && parts.length === 2 && parts[1] === "from-source" && o.dataRoot) {
         const body = await readBody(req);

@@ -43,6 +43,9 @@ Machine-checked at API startup by `apps/api/src/jobs/prepPins.ts` (any mismatch 
 | Field | Value |
 |---|---|
 | Profile ID | `ME_PREP_INTERIM_V0` |
+| Worker version | `0.1.0` (`mole_prep.manifest.WORKER_VERSION`; manifest stage `mole_prep.receptor_clean`) |
+| Installed check | `run_prep.py --versions` (via `tools/mole-dock/prep.mjs` `probePrepVersions`) must report this lock digest, this worker version and, for every tool, the version in the lock and in the table above; checked before the first plan, any drift fails closed (PROVENANCE_REPLAY) |
+| Manifest check | every `prep-manifest.json` `stages[].version` must equal the table above (PDB2PQR/PROPKA as `x/y`; PDBFixer's `params.openmm` against OpenMM); drift rejects the seal (`TOOL_VERSION_DRIFT:<tool>`) |
 | Entry point | `workers/prep/run_prep.py` (`python -I`, `--plan` / `--apply`), spawned only by `tools/mole-dock/prep.mjs` |
 | Interpreter | `~/mole-prep/bin/python` (WSL Ubuntu-24.04), env `PYTHONHASHSEED=0`, one thread |
 | Seed | ETKDGv3 `randomSeed` `61453` (`0xF00D`, `workers/prep/mole_prep/ligand.py`) |

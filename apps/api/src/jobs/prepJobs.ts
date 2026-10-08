@@ -14,7 +14,7 @@ import {
   type PrepPlanV1,
   type PrepSealSummaryV1,
 } from "@molecular/contracts";
-import { REPO_ROOT, repoPrepPins, type PrepPinReport } from "./prepPins.js";
+import { createInstalledToolCheck, REPO_ROOT, repoPrepPins, type InstalledToolCheck, type PrepPinReport } from "./prepPins.js";
 
 /**
  * Preparation job store (task 5.2b, design 5.2 step 5).
@@ -100,6 +100,8 @@ export type PrepJobStoreOptions = Readonly<{
   runner?: PrepRunner;
   sealer?: PrepSealer;
   pins?: () => PrepPinReport;
+  /** Installed-toolchain check (the venv versions the worker reports vs TOOLS.md); default probes WSL once. */
+  installedTools?: InstalledToolCheck;
   now?: () => number;
   ttlMs?: number;
   /** Quota: live + retained jobs on disk (default 32) and their total bytes (default 2 GiB). */
@@ -136,7 +138,8 @@ export class PrepJobStore {
   private readonly maxBytes: number;
   private readonly retainTerminalMs: number;
   private readonly retainSucceededMs: number;
-  private readonly sealer: PrepSealer | undefined;
+  private sealer: PrepSealer | undefined;
+  private installedTools: InstalledToolCheck;
   private readonly resolveArtifact: PrepArtifactResolver;
   private readonly pins: () => PrepPinReport;
   private readonly now: () => number;
@@ -148,6 +151,7 @@ export class PrepJobStore {
     this.root = resolve(options.root);
     this.runner = options.runner ?? molePrepRunner;
     this.sealer = options.sealer;
+    this.installedTools = options.installedTools ?? createInstalledToolCheck();
     this.resolveArtifact = options.resolveArtifact;
     this.pins = options.pins ?? repoPrepPins;
     this.now = options.now ?? Date.now;
@@ -269,6 +273,16 @@ export class PrepJobStore {
     this.runner = runner;
   }
 
+  /** Test seam: replace the sealer (the server default is prepSummarySealer with server constants only). */
+  replaceSealer(sealer: PrepSealer): void {
+    this.sealer = sealer;
+  }
+
+  /** Test seam: replace the installed-toolchain check (the default spawns the worker's --versions in WSL). */
+  replaceInstalledToolCheck(check: InstalledToolCheck): void {
+    this.installedTools = check;
+  }
+
   private acquire(): void {
     if (this.busy) throw new PrepError("BUSY", 429, "Another preparation job is running; try again shortly.");
     const pins = this.pins();
@@ -280,6 +294,8 @@ export class PrepJobStore {
   async plan(request: PrepareRequest): Promise<PrepJobStateV1> {
     this.acquire();
     try {
+      const drift = await this.installedTools();
+      if (drift.length) throw new PrepError("PROVENANCE_REPLAY", 503, `Preparation is unavailable: the installed toolchain does not match TOOLS.md (${drift.join(",").slice(0, 200)}).`);
       const usage = this.gc(1);
       if (usage.jobs >= this.maxJobs || usage.bytes >= this.maxBytes) throw new PrepError("QUOTA_EXCEEDED", 429, "Too many preparation jobs are stored; confirm or wait for pending plans to expire.");
       const [rec, lig, tpl] = await Promise.all([
