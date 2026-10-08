@@ -2009,8 +2009,8 @@
       "done": "The versions file is reviewed and the environment builds reproducibly.",
       "refs": [],
       "est": "1 day",
-      "status": "NEEDS_OWNER",
-      "note": "W1 PARTIAL: sandbox blocked wsl for agents. Need: run scripts/lock-prep.sh in WSL for full hashed transitive lock, install+pin PDBFixer, verify licences via pip show. Agent summary overstated branch content; reviewer flagged.",
+      "status": "DONE",
+      "note": "Finished in main session 2026-10-08: hashed 19-pkg lock, PDBFixer 1.12.0, scipy+gemmi (undeclared Meeko deps), licences from metadata; OpenMM licence string non-standard, confirm upstream.",
       "branch": "sprint/W1/5.1-fix"
     },
     {
