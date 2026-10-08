@@ -1138,9 +1138,9 @@
         "F16"
       ],
       "est": "1 day",
-      "status": "NEEDS_OWNER",
+      "status": "DONE",
       "branch": "sprint/W1/3.2",
-      "note": "W1: dirtyTracker + unit tests pass; needs 4V6F perf run proving hover does no JSON.stringify in App (fixture missing in agent worktree; fetch via scripts/fetch-fixtures.mjs)."
+      "note": "Finished in main session: 4V6F dwell-hover profile 46 large JSON.stringify (2.73 GB) -> 0. Hover still seconds/hover (frame readback, atomForCompact): follow-up perf tasks. 3.1 baseline hoverMs measures moves only (no 3Dmol hover fires)."
     },
     {
       "id": "3.3",
