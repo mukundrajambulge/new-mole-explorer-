@@ -4,3 +4,6 @@ apps/api/src/docking/fixtures/d3-ir-02/** -text
 # Workflow scripts are loaded by Claude Code, which rejects CR characters
 .claude/workflows/*.js text eol=lf
 .claude/agents/*.md text eol=lf
+
+# Byte-exact fixtures: sha256 in manifest.json must survive checkout
+tests/fixtures/rcsb/** -text

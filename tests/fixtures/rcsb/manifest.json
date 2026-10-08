@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "source": "RCSB PDB",
+  "files": [
+    {
+      "name": "1CRN.pdb",
+      "pdbId": "1CRN",
+      "format": "pdb",
+      "url": "https://files.rcsb.org/download/1CRN.pdb",
+      "downloaded": "2026-10-08",
+      "sha256": "42199a30a0701864a2a5cc76cd7f35cc544cd0e65fbcf63e03c166543249b811",
+      "bytes": 49491,
+      "tracked": true,
+      "purpose": "small protein, disulfides"
+    },
+    {
+      "name": "1CRN.cif",
+      "pdbId": "1CRN",
+      "format": "mmcif",
+      "url": "https://files.rcsb.org/download/1CRN.cif",
+      "downloaded": "2026-10-08",
+      "sha256": "23787562c427d7c1abe5420e86d5f1d0a6c7007dec1e8ce85645a6d69c32e8ba",
+      "bytes": 69506,
+      "tracked": true,
+      "purpose": "small protein, disulfides"
+    },
+    {
+      "name": "4DJW.pdb",
+      "pdbId": "4DJW",
+      "format": "pdb",
+      "url": "https://files.rcsb.org/download/4DJW.pdb",
+      "downloaded": "2026-10-08",
+      "sha256": "38c3762d303aa60be8af354897dd15e1ef6fc7cf1d9d1c6e057bed3af5445f0d",
+      "bytes": 1125981,
+      "tracked": true,
+      "purpose": "ligands and waters"
+    },
+    {
+      "name": "4DJW.cif",
+      "pdbId": "4DJW",
+      "format": "mmcif",
+      "url": "https://files.rcsb.org/download/4DJW.cif",
+      "downloaded": "2026-10-08",
+      "sha256": "c816a3b9e947cc71bf5390b2d10aeb117f0b6a2e7b16efbba3bf4c56c8d044f2",
+      "bytes": 1289288,
+      "tracked": true,
+      "purpose": "ligands and waters"
+    },
+    {
+      "name": "1D3Z.pdb",
+      "pdbId": "1D3Z",
+      "format": "pdb",
+      "url": "https://files.rcsb.org/download/1D3Z.pdb",
+      "downloaded": "2026-10-08",
+      "sha256": "21099cb88231455fdfab4095dddfadcc85cc4213e105cf5f9cfff2ca21993378",
+      "bytes": 1015821,
+      "tracked": true,
+      "purpose": "NMR, 10 models"
+    },
+    {
+      "name": "1D3Z.cif",
+      "pdbId": "1D3Z",
+      "format": "mmcif",
+      "url": "https://files.rcsb.org/download/1D3Z.cif",
+      "downloaded": "2026-10-08",
+      "sha256": "7242859f3508ff1711e5b38a78b14c960f137c096f36302406223c93b909c407",
+      "bytes": 1116383,
+      "tracked": true,
+      "purpose": "NMR, 10 models"
+    },
+    {
+      "name": "1HZH.pdb",
+      "pdbId": "1HZH",
+      "format": "pdb",
+      "url": "https://files.rcsb.org/download/1HZH.pdb",
+      "downloaded": "2026-10-08",
+      "sha256": "d47d146ee087cfced727df65176c75d7f3472069a304e6c7063d78c863e58951",
+      "bytes": 950778,
+      "tracked": true,
+      "purpose": "intact antibody with insertion codes and branched glycans"
+    },
+    {
+      "name": "1HZH.cif",
+      "pdbId": "1HZH",
+      "format": "mmcif",
+      "url": "https://files.rcsb.org/download/1HZH.cif",
+      "downloaded": "2026-10-08",
+      "sha256": "5793921cc7dcc2317e1892edcbf32b2a8e11a7bef81d2eb25d94c6165f0b01ab",
+      "bytes": 1125841,
+      "tracked": true,
+      "purpose": "intact antibody with insertion codes and branched glycans"
+    },
+    {
+      "name": "6VXX.pdb",
+      "pdbId": "6VXX",
+      "format": "pdb",
+      "url": "https://files.rcsb.org/download/6VXX.pdb",
+      "downloaded": "2026-10-08",
+      "sha256": "0de64835498d4e8b52e35b59685a284b65e38c3e32bd14c769b05352ea87ee72",
+      "bytes": 2175660,
+      "tracked": true,
+      "purpose": "glycoprotein, branched N-glycans"
+    },
+    {
+      "name": "6VXX.cif",
+      "pdbId": "6VXX",
+      "format": "mmcif",
+      "url": "https://files.rcsb.org/download/6VXX.cif",
+      "downloaded": "2026-10-08",
+      "sha256": "74ceac62dc45e34818f7c6f32fc12690f250ad803b999c1d7399a362ecd86984",
+      "bytes": 2560152,
+      "tracked": true,
+      "purpose": "glycoprotein, branched N-glycans"
+    },
+    {
+      "name": "5FYL.pdb",
+      "pdbId": "5FYL",
+      "format": "pdb",
+      "url": "https://files.rcsb.org/download/5FYL.pdb",
+      "downloaded": "2026-10-08",
+      "sha256": "fe76a99a239ba10c50c70b7feb8b7f41e2a5089d964fc3a6e025fe25ab5b95b7",
+      "bytes": 2177604,
+      "tracked": true,
+      "purpose": "many long semicolon text fields"
+    },
+    {
+      "name": "5FYL.cif",
+      "pdbId": "5FYL",
+      "format": "mmcif",
+      "url": "https://files.rcsb.org/download/5FYL.cif",
+      "downloaded": "2026-10-08",
+      "sha256": "91b13609bd4808bc9f5ac501c5e6157407dad5d2a76804fba50081c4192d7d60",
+      "bytes": 2393175,
+      "tracked": true,
+      "purpose": "many long semicolon text fields"
+    },
+    {
+      "name": "4V6F.cif",
+      "pdbId": "4V6F",
+      "format": "mmcif",
+      "url": "https://files.rcsb.org/download/4V6F.cif",
+      "downloaded": "2026-10-08",
+      "sha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+      "bytes": 38137644,
+      "tracked": false,
+      "purpose": "large ribosome entry, fetched not committed"
+    }
+  ]
+}

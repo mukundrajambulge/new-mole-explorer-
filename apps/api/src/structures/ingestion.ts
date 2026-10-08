@@ -74,6 +74,21 @@ const parseInteger = (value: string | undefined, fallback: number): number => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+/**
+ * Hybrid-36 decoding (PDB serials: width 5, residue numbers: width 4).
+ * Plain integers pass through; "A0000"/"a0000" style values continue after 99999 / 9999.
+ */
+const parseHybrid36 = (raw: string | undefined, width: number, fallback: number): number => {
+  const value = (raw ?? "").trim();
+  if (!value) return fallback;
+  if (/^[+-]?\d+$/.test(value)) return Number.parseInt(value, 10);
+  if (value.length !== width || !/^[A-Za-z][0-9A-Za-z]*$/.test(value)) return fallback;
+  const base = Number.parseInt(value, 36);
+  if (!Number.isFinite(base)) return fallback;
+  const offset = 36 ** (width - 1);
+  return /^[A-Z]/.test(value) ? base - 10 * offset + 10 ** width : base + 16 * offset + 10 ** width;
+};
+
 const parseOptionalNumber = (value: string | undefined): number | null | undefined => {
   const normalized = value?.trim();
   if (!normalized || normalized === "." || normalized === "?") return undefined;
@@ -118,7 +133,7 @@ const classifyAtom = (recordType: "ATOM" | "HETATM", residueName: string, elemen
   return { isPolymer, isLigand, isWater, isIon };
 };
 
-const atomCorrespondenceKey = (atom: AtomSeed): string => [atom.serial, atom.atomName, atom.residueName, atom.residueNumber, atom.insertionCode ?? "", atom.chain, atom.altLoc ?? ""].join("\u0000");
+const atomCorrespondenceKey = (atom: AtomSeed): string => [atom.atomName, atom.residueName, atom.residueNumber, atom.insertionCode ?? "", atom.chain, atom.altLoc ?? ""].join("\u0000");
 const componentAtomKey = (component: string, atomName: string): string => `${component.trim().toUpperCase()}\u0000${atomName.trim()}`;
 
 const parsePdb = (content: string): ParsedSource => {
@@ -158,10 +173,10 @@ const parsePdb = (content: string): ParsedSource => {
       continue;
     }
     if (record === "CONECT") {
-      const sourceSerial = parseInteger(line.slice(6, 11).trim(), -1);
+      const sourceSerial = parseHybrid36(line.slice(6, 11), 5, -1);
       if (sourceSerial < 0) continue;
       for (let offset = 11; offset < line.length; offset += 5) {
-        const targetSerial = parseInteger(line.slice(offset, offset + 5).trim(), -1);
+        const targetSerial = parseHybrid36(line.slice(offset, offset + 5), 5, -1);
         if (targetSerial >= 0 && sourceSerial !== targetSerial) bonds.push({ atom1Serial: sourceSerial, atom2Serial: targetSerial, order: "SINGLE", source: "PDB_CONECT" });
       }
       continue;
@@ -171,14 +186,14 @@ const parsePdb = (content: string): ParsedSource => {
     const atomName = line.slice(12, 16).trim() || "X";
     const residueName = line.slice(17, 20).trim() || "UNK";
     const chain = line.slice(21, 22).trim() || "_";
-    const residueNumber = parseInteger(line.slice(22, 26).trim(), 0);
+    const residueNumber = parseHybrid36(line.slice(22, 26), 4, 0);
     const insertionCode = line.slice(26, 27).trim() || undefined;
     const x = parseNumber(line.slice(30, 38).trim(), "x coordinate");
     const y = parseNumber(line.slice(38, 46).trim(), "y coordinate");
     const z = parseNumber(line.slice(46, 54).trim(), "z coordinate");
     const element = normalizeElement(line.slice(76, 78), atomName);
     const atom = {
-      serial: parseInteger(line.slice(6, 11).trim(), atoms.length + 1),
+      serial: parseHybrid36(line.slice(6, 11), 5, atoms.length + 1),
       atomName,
       element,
       residueName,
@@ -390,78 +405,120 @@ const parsePdbqt = (content: string): ParsedSource => {
   return { format: "pdbqt", atoms, bonds: [], coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }], ...(Object.keys(partialChargeBySourceIndex).length ? { partialChargeBySourceIndex } : {}) };
 };
 
-const tokenizeCif = (content: string): string[] => {
+type CifTokens = { tokens: string[]; literal: boolean[] };
+
+/**
+ * mmCIF tokenizer. Handles ';' text fields (only at line start), quotes that
+ * open at a token start and close only when followed by whitespace, and comments.
+ * `literal[i]` is true for quoted/text-field tokens, which never act as keywords.
+ */
+const tokenizeCif = (content: string): CifTokens => {
   profileMark("CIF_TOKENIZE", "START", { contentBytes: Buffer.byteLength(content, "utf8") });
   const tokens: string[] = [];
-  let token = "";
-  let quote = "";
-  let comment = false;
-  for (let index = 0; index < content.length; index += 1) {
-    const character = content[index];
-    if (comment) {
-      if (character === "\n") comment = false;
+  const literal: boolean[] = [];
+  const length = content.length;
+  const isSpace = (code: number) => code === 32 || code === 9 || code === 10 || code === 13;
+  let index = 0;
+  while (index < length) {
+    const code = content.charCodeAt(index);
+    if (isSpace(code)) {
+      index += 1;
       continue;
     }
-    if (quote) {
-      if (character === quote) {
-        tokens.push(token);
-        token = "";
-        quote = "";
-      } else token += character;
+    if (code === 35) {
+      while (index < length && content.charCodeAt(index) !== 10) index += 1;
       continue;
     }
-    if (character === "#" && token.length === 0) {
-      comment = true;
+    if (code === 59 && (index === 0 || content.charCodeAt(index - 1) === 10)) {
+      const close = content.indexOf("\n;", index);
+      const end = close < 0 ? length : close;
+      let text = content.slice(index + 1, end);
+      if (text.endsWith("\r")) text = text.slice(0, -1);
+      tokens.push(text);
+      literal.push(true);
+      index = close < 0 ? length : close + 2;
       continue;
     }
-    if (character === "'" || character === '"') {
-      if (token.length > 0) token += character;
-      else quote = character;
-      continue;
-    }
-    if (/\s/.test(character)) {
-      if (token) {
-        tokens.push(token);
-        token = "";
+    if (code === 39 || code === 34) {
+      let cursor = index + 1;
+      while (cursor < length) {
+        if (content.charCodeAt(cursor) === code && (cursor + 1 >= length || isSpace(content.charCodeAt(cursor + 1)))) break;
+        if (content.charCodeAt(cursor) === 10) break;
+        cursor += 1;
       }
+      tokens.push(content.slice(index + 1, cursor));
+      literal.push(true);
+      index = cursor < length && content.charCodeAt(cursor) === code ? cursor + 1 : cursor;
       continue;
     }
-    token += character;
+    let cursor = index + 1;
+    while (cursor < length && !isSpace(content.charCodeAt(cursor))) cursor += 1;
+    tokens.push(content.slice(index, cursor));
+    literal.push(false);
+    index = cursor;
   }
-  if (token) tokens.push(token);
   profileMark("CIF_TOKENIZE", "END", { tokenCount: tokens.length });
-  return tokens;
+  return { tokens, literal };
 };
 
 type CifLoop = { headers: string[]; rows: string[][] };
 
-const readCifLoops = (tokens: string[]): CifLoop[] => {
+const isCifKeyword = (cif: CifTokens, index: number): boolean => {
+  if (cif.literal[index]) return false;
+  const token = cif.tokens[index]!;
+  return token.startsWith("_") || token.startsWith("data_") || token.toLowerCase() === "loop_" || token.startsWith("data_");
+};
+
+/**
+ * Reads loop_ categories and key/value items. Single-row categories written as
+ * `_cell.length_a 10.0` pairs are also exposed as one-row loops (when the
+ * category has no loop of its own) so every consumer sees one shape.
+ */
+const readCifBlocks = (cif: CifTokens): { loops: CifLoop[]; items: Map<string, string> } => {
   profileMark("CIF_LOOP_RETENTION", "START");
+  const { tokens, literal } = cif;
   const loops: CifLoop[] = [];
+  const items = new Map<string, string>();
   let cursor = 0;
   while (cursor < tokens.length) {
-    if (tokens[cursor]?.toLowerCase() !== "loop_") {
+    const token = tokens[cursor]!;
+    if (!literal[cursor] && token.toLowerCase() === "loop_") {
       cursor += 1;
+      const headers: string[] = [];
+      while (cursor < tokens.length && !literal[cursor] && tokens[cursor]!.startsWith("_")) {
+        headers.push(tokens[cursor]!);
+        cursor += 1;
+      }
+      if (headers.length === 0) continue;
+      const rows: string[][] = [];
+      while (cursor < tokens.length && !isCifKeyword(cif, cursor)) {
+        if (cursor + headers.length > tokens.length) break;
+        rows.push(tokens.slice(cursor, cursor + headers.length));
+        cursor += headers.length;
+      }
+      loops.push({ headers, rows });
+      continue;
+    }
+    if (!literal[cursor] && token.startsWith("_") && cursor + 1 < tokens.length && !isCifKeyword(cif, cursor + 1)) {
+      if (!items.has(token)) items.set(token, tokens[cursor + 1]!);
+      cursor += 2;
       continue;
     }
     cursor += 1;
-    const headers: string[] = [];
-    while (tokens[cursor]?.startsWith("_")) {
-      headers.push(tokens[cursor]);
-      cursor += 1;
-    }
-    if (headers.length === 0) continue;
-    const rows: string[][] = [];
-    while (cursor < tokens.length && tokens[cursor]?.toLowerCase() !== "loop_" && !tokens[cursor]?.startsWith("data_")) {
-      if (tokens[cursor]?.startsWith("_")) break;
-      if (cursor + headers.length > tokens.length) break;
-      rows.push(tokens.slice(cursor, cursor + headers.length));
-      cursor += headers.length;
-    }
-    loops.push({ headers, rows });
   }
+  const loopCategories = new Set(loops.map((loop) => loop.headers[0]!.split(".")[0]!));
+  const grouped = new Map<string, { headers: string[]; row: string[] }>();
+  for (const [name, value] of items) {
+    const category = name.split(".")[0]!;
+    if (loopCategories.has(category)) continue;
+    const group = grouped.get(category) ?? { headers: [], row: [] };
+    group.headers.push(name);
+    group.row.push(value);
+    grouped.set(category, group);
+  }
+  for (const group of grouped.values()) loops.push({ headers: group.headers, rows: [group.row] });
   profileMark("CIF_LOOP_RETENTION", "END", { loopCount: loops.length, retainedRows: loops.reduce((count, loop) => count + loop.rows.length, 0), retainedTokens: tokens.length });
-  return loops;
+  return { loops, items };
 };
 
 const cifValue = (row: string[], headers: string[], names: string[]): string | undefined => {
@@ -469,15 +526,6 @@ const cifValue = (row: string[], headers: string[], names: string[]): string | u
   if (index === undefined) return undefined;
   const value = row[index];
   return value && value !== "." && value !== "?" ? value : undefined;
-};
-
-const cifScalar = (tokens: readonly string[], name: string): string | undefined => {
-  for (let index = 0; index < tokens.length - 1; index += 1) {
-    if (tokens[index] !== name) continue;
-    const value = tokens[index + 1];
-    if (value && !value.startsWith("_") && value.toLowerCase() !== "loop_" && !value.toLowerCase().startsWith("data_")) return value;
-  }
-  return undefined;
 };
 
 const parseBondOrder = (value: string | undefined): BondOrder => {
@@ -500,11 +548,18 @@ const classifyEntityPolymerType = (value: string | undefined): CanonicalPolymerT
 
 const parseMmcif = (content: string): ParsedSource => {
   const cifTokens = tokenizeCif(content);
-  const loops = readCifLoops(cifTokens);
-  const unitCell = makeUnitCell({ a: cifScalar(cifTokens, "_cell.length_a"), b: cifScalar(cifTokens, "_cell.length_b"), c: cifScalar(cifTokens, "_cell.length_c"), alpha: cifScalar(cifTokens, "_cell.angle_alpha"), beta: cifScalar(cifTokens, "_cell.angle_beta"), gamma: cifScalar(cifTokens, "_cell.angle_gamma"), spaceGroup: cifScalar(cifTokens, "_symmetry.space_group_name_H-M") ?? cifScalar(cifTokens, "_space_group.name_H-M_alt"), zValue: cifScalar(cifTokens, "_cell.Z_PDB") }, "MMCIF_CELL");
+  const { loops, items } = readCifBlocks(cifTokens);
+  const cifScalar = (name: string): string | undefined => {
+    const value = items.get(name);
+    if (value !== undefined) return value === "." || value === "?" ? undefined : value;
+    const loop = loops.find((candidate) => candidate.headers.includes(name));
+    return loop?.rows[0] ? cifValue(loop.rows[0], loop.headers, [name]) : undefined;
+  };
+  const unitCell = makeUnitCell({ a: cifScalar("_cell.length_a"), b: cifScalar("_cell.length_b"), c: cifScalar("_cell.length_c"), alpha: cifScalar("_cell.angle_alpha"), beta: cifScalar("_cell.angle_beta"), gamma: cifScalar("_cell.angle_gamma"), spaceGroup: cifScalar("_symmetry.space_group_name_H-M") ?? cifScalar("_space_group.name_H-M_alt"), zValue: cifScalar("_cell.Z_PDB") }, "MMCIF_CELL");
   // Loop rows retain the individual token strings they reference; release the
   // top-level token index before the atom graph is built.
-  cifTokens.length = 0;
+  cifTokens.tokens.length = 0;
+  cifTokens.literal.length = 0;
   const atomLoop = loops.find((loop) => loop.headers.some((header) => header.startsWith("_atom_site.")));
   if (!atomLoop) throw new IngestionError("INVALID_INPUT", "No _atom_site loop was found in the mmCIF input.");
   const polymerEntityTypes = new Map<string, CanonicalPolymerType>();
@@ -528,12 +583,18 @@ const parseMmcif = (content: string): ParsedSource => {
     const zValue = cifValue(row, atomLoop.headers, ["_atom_site.Cartn_z"]);
     if (!xValue || !yValue || !zValue) continue;
     const record = (cifValue(row, atomLoop.headers, ["_atom_site.group_PDB"]) ?? "ATOM").toUpperCase() === "HETATM" ? "HETATM" : "ATOM";
-    const atomName = cifValue(row, atomLoop.headers, ["_atom_site.label_atom_id", "_atom_site.auth_atom_id"]) ?? "X";
-    const residueName = cifValue(row, atomLoop.headers, ["_atom_site.label_comp_id", "_atom_site.auth_comp_id"]) ?? "UNK";
-    const chain = cifValue(row, atomLoop.headers, ["_atom_site.label_asym_id", "_atom_site.auth_asym_id"]) ?? "_";
-    const residueNumber = parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.label_seq_id", "_atom_site.auth_seq_id"]), 0);
+    // auth_* is the primary identity (it is what PDB files carry); label_* is kept alongside.
+    const labelAtomId = cifValue(row, atomLoop.headers, ["_atom_site.label_atom_id"]);
+    const labelCompId = cifValue(row, atomLoop.headers, ["_atom_site.label_comp_id"]);
+    const labelAsymId = cifValue(row, atomLoop.headers, ["_atom_site.label_asym_id"]);
+    const labelSeqValue = cifValue(row, atomLoop.headers, ["_atom_site.label_seq_id"]);
+    const labelEntityId = cifValue(row, atomLoop.headers, ["_atom_site.label_entity_id"]);
+    const atomName = cifValue(row, atomLoop.headers, ["_atom_site.auth_atom_id"]) ?? labelAtomId ?? "X";
+    const residueName = cifValue(row, atomLoop.headers, ["_atom_site.auth_comp_id"]) ?? labelCompId ?? "UNK";
+    const chain = cifValue(row, atomLoop.headers, ["_atom_site.auth_asym_id"]) ?? labelAsymId ?? "_";
+    const residueNumber = parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.auth_seq_id"]) ?? labelSeqValue, 0);
     const element = normalizeElement(cifValue(row, atomLoop.headers, ["_atom_site.type_symbol"]) ?? "", atomName);
-    const entityId = cifValue(row, atomLoop.headers, ["_atom_site.label_entity_id"]);
+    const entityId = labelEntityId;
     const polymerType = entityId ? polymerEntityTypes.get(entityId) : undefined;
     const atom = {
       serial: parseInteger(cifValue(row, atomLoop.headers, ["_atom_site.id"]), rowIndex + 1),
@@ -542,6 +603,11 @@ const parseMmcif = (content: string): ParsedSource => {
       residueName,
       residueNumber,
       insertionCode: cifValue(row, atomLoop.headers, ["_atom_site.pdbx_PDB_ins_code"]),
+      ...(labelAsymId ? { labelAsymId } : {}),
+      ...(labelSeqValue !== undefined && Number.isFinite(Number.parseInt(labelSeqValue, 10)) ? { labelSeqId: Number.parseInt(labelSeqValue, 10) } : {}),
+      ...(labelCompId ? { labelCompId } : {}),
+      ...(labelAtomId ? { labelAtomId } : {}),
+      ...(labelEntityId ? { labelEntityId } : {}),
       chain,
       segmentId: cifValue(row, atomLoop.headers, ["_atom_site.pdbx_PDB_segment_id"]),
       x: parseNumber(xValue, "x coordinate"),
@@ -576,19 +642,19 @@ const parseMmcif = (content: string): ParsedSource => {
       for (const row of loop.rows) {
         const type = (cifValue(row, loop.headers, ["_struct_conf.conf_type_id"]) ?? "").toUpperCase();
         const kind = type.includes("HELX") ? "HELIX" : null;
-        const chain = cifValue(row, loop.headers, ["_struct_conf.beg_label_asym_id", "_struct_conf.beg_auth_asym_id"]);
-        const endChain = cifValue(row, loop.headers, ["_struct_conf.end_label_asym_id", "_struct_conf.end_auth_asym_id"]) ?? chain;
-        const start = parseInteger(cifValue(row, loop.headers, ["_struct_conf.beg_label_seq_id", "_struct_conf.beg_auth_seq_id"]), Number.NaN);
-        const end = parseInteger(cifValue(row, loop.headers, ["_struct_conf.end_label_seq_id", "_struct_conf.end_auth_seq_id"]), Number.NaN);
+        const chain = cifValue(row, loop.headers, ["_struct_conf.beg_auth_asym_id", "_struct_conf.beg_label_asym_id"]);
+        const endChain = cifValue(row, loop.headers, ["_struct_conf.end_auth_asym_id", "_struct_conf.end_label_asym_id"]) ?? chain;
+        const start = parseInteger(cifValue(row, loop.headers, ["_struct_conf.beg_auth_seq_id", "_struct_conf.beg_label_seq_id"]), Number.NaN);
+        const end = parseInteger(cifValue(row, loop.headers, ["_struct_conf.end_auth_seq_id", "_struct_conf.end_label_seq_id"]), Number.NaN);
         if (kind && chain && chain === endChain && Number.isFinite(start) && Number.isFinite(end)) secondarySpans.push({ kind, chain, start, end });
       }
     }
     if (loop.headers.some((header) => header.startsWith("_struct_sheet_range."))) {
       for (const row of loop.rows) {
-        const chain = cifValue(row, loop.headers, ["_struct_sheet_range.beg_label_asym_id", "_struct_sheet_range.beg_auth_asym_id"]);
-        const endChain = cifValue(row, loop.headers, ["_struct_sheet_range.end_label_asym_id", "_struct_sheet_range.end_auth_asym_id"]) ?? chain;
-        const start = parseInteger(cifValue(row, loop.headers, ["_struct_sheet_range.beg_label_seq_id", "_struct_sheet_range.beg_auth_seq_id"]), Number.NaN);
-        const end = parseInteger(cifValue(row, loop.headers, ["_struct_sheet_range.end_label_seq_id", "_struct_sheet_range.end_auth_seq_id"]), Number.NaN);
+        const chain = cifValue(row, loop.headers, ["_struct_sheet_range.beg_auth_asym_id", "_struct_sheet_range.beg_label_asym_id"]);
+        const endChain = cifValue(row, loop.headers, ["_struct_sheet_range.end_auth_asym_id", "_struct_sheet_range.end_label_asym_id"]) ?? chain;
+        const start = parseInteger(cifValue(row, loop.headers, ["_struct_sheet_range.beg_auth_seq_id", "_struct_sheet_range.beg_label_seq_id"]), Number.NaN);
+        const end = parseInteger(cifValue(row, loop.headers, ["_struct_sheet_range.end_auth_seq_id", "_struct_sheet_range.end_label_seq_id"]), Number.NaN);
         if (chain && chain === endChain && Number.isFinite(start) && Number.isFinite(end)) secondarySpans.push({ kind: "SHEET", chain, start, end });
       }
     }
@@ -601,6 +667,7 @@ const parseMmcif = (content: string): ParsedSource => {
   const atomsByComponentAtom = new Map<string, AtomSeed[]>();
   const atomsByResidueAtom = new Map<string, AtomSeed[]>();
   const atomsByResidueComponentAtom = new Map<string, AtomSeed[]>();
+  const atomsByLabel = new Map<string, AtomSeed[]>();
   const appendAtom = (map: Map<string, AtomSeed[]>, key: string, atom: AtomSeed) => {
     const bucket = map.get(key);
     if (bucket) bucket.push(atom);
@@ -608,32 +675,35 @@ const parseMmcif = (content: string): ParsedSource => {
   };
   for (const atom of atoms) {
     const componentKey = componentAtomKey(atom.residueName, atom.atomName);
-    const residueKey = `${atom.chain}\u0000${atom.residueNumber}\u0000${atom.atomName.trim()}`;
-    const residueComponentKey = `${atom.chain}\u0000${atom.residueNumber}\u0000${componentKey}`;
+    const residueKey = `${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}\u0000${atom.atomName.trim()}`;
+    const residueComponentKey = `${atom.chain}\u0000${atom.residueNumber}\u0000${atom.insertionCode ?? ""}\u0000${componentKey}`;
+    if (atom.labelAsymId !== undefined && atom.labelSeqId !== undefined) appendAtom(atomsByLabel, `${atom.labelAsymId}\u0000${atom.labelSeqId}\u0000${(atom.labelAtomId ?? atom.atomName).trim()}`, atom);
     appendAtom(atomsByComponentAtom, componentKey, atom);
     appendAtom(atomsByResidueAtom, residueKey, atom);
     appendAtom(atomsByResidueComponentAtom, residueComponentKey, atom);
   }
-  const serialFor = (chain: string, residue: number, atomName: string, residueName?: string): number[] => {
+  const serialFor = (chain: string, residue: number, atomName: string, residueName?: string, insertionCode?: string): number[] => {
+    const ins = insertionCode ?? "";
     const key = residueName
-      ? `${chain}\u0000${residue}\u0000${componentAtomKey(residueName, atomName)}`
-      : `${chain}\u0000${residue}\u0000${atomName.trim()}`;
+      ? `${chain}\u0000${residue}\u0000${ins}\u0000${componentAtomKey(residueName, atomName)}`
+      : `${chain}\u0000${residue}\u0000${ins}\u0000${atomName.trim()}`;
     const candidates = residueName ? atomsByResidueComponentAtom.get(key) : atomsByResidueAtom.get(key);
     return candidates?.map((atom) => atom.serial) ?? [];
   };
+  const serialForLabel = (asym: string, seq: number, atomName: string): number[] => atomsByLabel.get(`${asym}\u0000${seq}\u0000${atomName.trim()}`)?.map((atom) => atom.serial) ?? [];
   const bonds: BondSeed[] = [];
   for (const loop of loops) {
     if (loop.headers.some((header) => header.startsWith("_struct_conn."))) {
       for (const row of loop.rows) {
-        const atom1 = serialFor(cifValue(row, loop.headers, ["_struct_conn.ptnr1_label_asym_id", "_struct_conn.ptnr1_auth_asym_id"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_struct_conn.ptnr1_label_seq_id", "_struct_conn.ptnr1_auth_seq_id"]), 0), cifValue(row, loop.headers, ["_struct_conn.ptnr1_label_atom_id", "_struct_conn.ptnr1_auth_atom_id"]) ?? "X", cifValue(row, loop.headers, ["_struct_conn.ptnr1_label_comp_id", "_struct_conn.ptnr1_auth_comp_id"]));
-        const atom2 = serialFor(cifValue(row, loop.headers, ["_struct_conn.ptnr2_label_asym_id", "_struct_conn.ptnr2_auth_asym_id"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_struct_conn.ptnr2_label_seq_id", "_struct_conn.ptnr2_auth_seq_id"]), 0), cifValue(row, loop.headers, ["_struct_conn.ptnr2_label_atom_id", "_struct_conn.ptnr2_auth_atom_id"]) ?? "X", cifValue(row, loop.headers, ["_struct_conn.ptnr2_label_comp_id", "_struct_conn.ptnr2_auth_comp_id"]));
+        const atom1 = serialFor(cifValue(row, loop.headers, ["_struct_conn.ptnr1_auth_asym_id", "_struct_conn.ptnr1_label_asym_id"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_struct_conn.ptnr1_auth_seq_id", "_struct_conn.ptnr1_label_seq_id"]), 0), cifValue(row, loop.headers, ["_struct_conn.ptnr1_label_atom_id", "_struct_conn.ptnr1_auth_atom_id"]) ?? "X", cifValue(row, loop.headers, ["_struct_conn.ptnr1_auth_comp_id", "_struct_conn.ptnr1_label_comp_id"]), cifValue(row, loop.headers, ["_struct_conn.pdbx_ptnr1_PDB_ins_code"]));
+        const atom2 = serialFor(cifValue(row, loop.headers, ["_struct_conn.ptnr2_auth_asym_id", "_struct_conn.ptnr2_label_asym_id"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_struct_conn.ptnr2_auth_seq_id", "_struct_conn.ptnr2_label_seq_id"]), 0), cifValue(row, loop.headers, ["_struct_conn.ptnr2_label_atom_id", "_struct_conn.ptnr2_auth_atom_id"]) ?? "X", cifValue(row, loop.headers, ["_struct_conn.ptnr2_auth_comp_id", "_struct_conn.ptnr2_label_comp_id"]), cifValue(row, loop.headers, ["_struct_conn.pdbx_ptnr2_PDB_ins_code"]));
         if (atom1[0] !== undefined && atom2[0] !== undefined) bonds.push({ atom1Serial: atom1[0], atom2Serial: atom2[0], order: parseBondOrder(cifValue(row, loop.headers, ["_struct_conn.pdbx_value_order"])), source: "MMCIF_STRUCT_CONN" });
       }
     }
     if (loop.headers.some((header) => header.startsWith("_geom_bond."))) {
       for (const row of loop.rows) {
-        const atom1 = serialFor(cifValue(row, loop.headers, ["_geom_bond.atom_site_asym_id_1"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_geom_bond.atom_site_label_seq_id_1"]), 0), cifValue(row, loop.headers, ["_geom_bond.atom_site_label_atom_id_1"]) ?? "X");
-        const atom2 = serialFor(cifValue(row, loop.headers, ["_geom_bond.atom_site_asym_id_2"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_geom_bond.atom_site_label_seq_id_2"]), 0), cifValue(row, loop.headers, ["_geom_bond.atom_site_label_atom_id_2"]) ?? "X");
+        const atom1 = serialForLabel(cifValue(row, loop.headers, ["_geom_bond.atom_site_asym_id_1"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_geom_bond.atom_site_label_seq_id_1"]), 0), cifValue(row, loop.headers, ["_geom_bond.atom_site_label_atom_id_1"]) ?? "X");
+        const atom2 = serialForLabel(cifValue(row, loop.headers, ["_geom_bond.atom_site_asym_id_2"]) ?? "_", parseInteger(cifValue(row, loop.headers, ["_geom_bond.atom_site_label_seq_id_2"]), 0), cifValue(row, loop.headers, ["_geom_bond.atom_site_label_atom_id_2"]) ?? "X");
         if (atom1[0] !== undefined && atom2[0] !== undefined) bonds.push({ atom1Serial: atom1[0], atom2Serial: atom2[0], order: parseBondOrder(cifValue(row, loop.headers, ["_geom_bond.value_order"])), source: "MMCIF_GEOM_BOND" });
       }
     }
@@ -644,7 +714,7 @@ const parseMmcif = (content: string): ParsedSource => {
         const atomName2 = cifValue(row, loop.headers, ["_chem_comp_bond.atom_id_2"]);
         if (!component || !atomName1 || !atomName2) continue;
         for (const atom1 of atomsByComponentAtom.get(componentAtomKey(component, atomName1)) ?? []) {
-          const atom2 = atomsByResidueComponentAtom.get(`${atom1.chain}\u0000${atom1.residueNumber}\u0000${componentAtomKey(component, atomName2)}`)?.[0];
+          const atom2 = atomsByResidueComponentAtom.get(`${atom1.chain}\u0000${atom1.residueNumber}\u0000${atom1.insertionCode ?? ""}\u0000${componentAtomKey(component, atomName2)}`)?.[0];
           if (atom2) bonds.push({ atom1Serial: atom1.serial, atom2Serial: atom2.serial, order: parseBondOrder(cifValue(row, loop.headers, ["_chem_comp_bond.value_order"])), source: "MMCIF_CHEM_COMP_BOND" });
         }
       }
