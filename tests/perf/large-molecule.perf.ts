@@ -33,6 +33,27 @@ test("4V6F performance baseline", async ({ page }) => {
   if (!fixture) throw new Error("4V6F fixture missing: set PERF_4V6F or place it at tests/fixtures/rcsb/4V6F.cif");
   const results: Record<string, unknown> = { schemaVersion: 1, label, date: new Date().toISOString(), fixture: "4V6F" };
   // Profiler for 3.2: count JSON.stringify calls (and output size) in the page during the hover phase.
+  // React render counter: a minimal DevTools hook that walks each committed fiber tree and counts
+  // function/memo components that performed work (flag 1) in that commit.
+  await page.addInitScript(() => {
+    const counts = { commits: 0, components: 0, names: {} as Record<string, number> };
+    (window as unknown as { __renderCounts: typeof counts }).__renderCounts = counts;
+    type Fiber = { tag: number; flags: number; type?: { displayName?: string; name?: string } | null; child: Fiber | null; sibling: Fiber | null };
+    const walk = (f: Fiber | null) => {
+      for (let n = f; n; n = n.sibling) {
+        if ((n.tag === 0 || n.tag === 11 || n.tag === 14 || n.tag === 15) && (n.flags & 1) === 1) {
+          counts.components += 1;
+          const name = n.type?.displayName ?? n.type?.name ?? "anonymous";
+          counts.names[name] = (counts.names[name] ?? 0) + 1;
+        }
+        walk(n.child);
+      }
+    };
+    (window as unknown as { __REACT_DEVTOOLS_GLOBAL_HOOK__: unknown }).__REACT_DEVTOOLS_GLOBAL_HOOK__ = {
+      supportsFiber: true, renderers: new Map(), inject: () => 1, onCommitFiberUnmount() {}, onScheduleFiberRoot() {}, checkDCE() {},
+      onCommitFiberRoot: (_id: number, root: { current: Fiber }) => { counts.commits += 1; walk(root.current); },
+    };
+  });
   await page.addInitScript(() => {
     const w = window as unknown as { __jsonStats: { calls: number; chars: number; large: number } };
     w.__jsonStats = { calls: 0, chars: 0, large: 0 };
@@ -85,12 +106,36 @@ test("4V6F performance baseline", async ({ page }) => {
   // ~500 ms (default hover duration), so those moves never change hover state. Dwell phase: rest
   // 800 ms on 20 points so hover state really changes, and count serialization while it does.
   const dwell: number[] = [];
+  const renderCounts = () => page.evaluate(() => { const c = (window as unknown as { __renderCounts: { commits: number; components: number; names: Record<string, number> } }).__renderCounts; return { commits: c.commits, components: c.components, names: { ...c.names } }; });
+  // Let background work from the select/color commands finish (no React commits for 6 s) so the
+  // dwell counts only what hover causes.
+  for (let quietMs = 0, last = (await renderCounts()).commits, waited = 0; quietMs < 6000 && waited < 180_000; waited += 1000) {
+    await page.waitForTimeout(1000);
+    const c = (await renderCounts()).commits;
+    quietMs = c === last ? quietMs + 1000 : 0;
+    last = c;
+  }
+  const renderBefore = await renderCounts();
+  const hoveredValues = new Set<string>();
   for (let i = 0; i < 20; i++) {
     const x = box.x + box.width * (0.35 + (0.3 * ((i * 7) % 20)) / 20);
     const y = box.y + box.height * (0.35 + (0.3 * ((i * 11) % 20)) / 20);
     dwell.push(await timed(page, async () => { await page.mouse.move(x, y); await page.waitForTimeout(800); }));
+    hoveredValues.add((await viewer.getAttribute("data-hovered-atom")) ?? "");
   }
   results.hoverDwellMs = stats(dwell);
+  const renderAfter = await renderCounts();
+  const perComponent: Record<string, number> = {};
+  for (const [name, n] of Object.entries(renderAfter.names)) { const d = n - (renderBefore.names[name] ?? 0); if (d > 0) perComponent[name] = d; }
+  // Done-when for 3.3: hover must not re-render the app. Hover state must really have changed.
+  results.hoverRenders = { distinctHoveredAtoms: hoveredValues.size, dwellMoves: 20, commits: renderAfter.commits - renderBefore.commits, componentRenders: renderAfter.components - renderBefore.components, perComponent };
+  // Idle control: same duration, no pointer input, so unrelated background commits can be subtracted.
+  const idleBefore = await renderCounts();
+  await page.waitForTimeout(20 * 800 + 2000);
+  const idleAfter = await renderCounts();
+  const idleComponents = idleAfter.components - idleBefore.components;
+  results.idleRenders = { commits: idleAfter.commits - idleBefore.commits, componentRenders: idleComponents };
+  (results.hoverRenders as Record<string, number>).componentRendersMinusIdle = (results.hoverRenders as { componentRenders: number }).componentRenders - idleComponents;
   const jsonAfterHover = await jsonStats();
   results.hoverJsonStringify = { calls: jsonAfterHover.calls - jsonBeforeHover.calls, chars: jsonAfterHover.chars - jsonBeforeHover.chars, largeCalls: jsonAfterHover.large - jsonBeforeHover.large };
 
@@ -111,4 +156,6 @@ test("4V6F performance baseline", async ({ page }) => {
   mkdirSync(dir, { recursive: true });
   writeFileSync(resolve(dir, `large-molecule-${label}.json`), JSON.stringify(results, null, 2) + "\n");
   console.log(JSON.stringify(results));
+  // 3.3 done-when: hover re-renders at most 2 components per dwell move beyond the idle baseline.
+  if (label !== "baseline") expect((results.hoverRenders as { componentRendersMinusIdle: number }).componentRendersMinusIdle).toBeLessThanOrEqual(2 * 20);
 });
