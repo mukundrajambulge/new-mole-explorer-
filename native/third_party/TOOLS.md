@@ -35,3 +35,16 @@ Direct pins: `workers/prep/requirements.in`. Full transitive lock with sha256 ha
 
 Licence check: no GPL code; the two LGPL tools (Meeko, PROPKA) and OpenMM are only ever run as separate
 processes and are not linked into or bundled with our code.
+
+## Preparation worker (task 5.2, profile ME_PREP_INTERIM_V0)
+
+Machine-checked at API startup by `apps/api/src/jobs/prepPins.ts` (any mismatch fails closed: no prep jobs).
+
+| Field | Value |
+|---|---|
+| Profile ID | `ME_PREP_INTERIM_V0` |
+| Entry point | `workers/prep/run_prep.py` (`python -I`, `--plan` / `--apply`), spawned only by `tools/mole-dock/prep.mjs` |
+| Interpreter | `~/mole-prep/bin/python` (WSL Ubuntu-24.04), env `PYTHONHASHSEED=0`, one thread |
+| Seed | ETKDGv3 `randomSeed` `61453` (`0xF00D`, `workers/prep/mole_prep/ligand.py`) |
+| Lock digest | `e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9` (sha256 of `workers/prep/requirements.lock.txt`, LF-normalised) |
+| Default protonation | `EXPLICIT_SUBMITTED`; PROPKA / Dimorphite-DL are opt-in and seal as PREVIEW_UNQUALIFIED |

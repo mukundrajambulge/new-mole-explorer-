@@ -188,6 +188,21 @@ export const PrepManifestV1Schema = z
 export type PrepManifestV1 = z.infer<typeof PrepManifestV1Schema>;
 
 export const PREP_JOB_STATES = ["AWAITING_CONFIRMATION", "APPLYING", "SUCCEEDED", "FAILED", "EXPIRED"] as const;
+/**
+ * Server-side seal outcome for a SUCCEEDED job (task 5.2b). REJECTED: an output or the manifest failed
+ * re-hashing. BLOCKED: D2 evidence is missing (never filled with placeholders). PREVIEW_UNQUALIFIED: every
+ * input is present but some chemistry was generated (PROPKA, Dimorphite-DL, template hydrogens). SEALED: D2 sealed.
+ */
+export const PREP_SEAL_STATUSES = ["SEALED", "PREVIEW_UNQUALIFIED", "BLOCKED", "REJECTED"] as const;
+export const PrepSealSummaryV1Schema = z
+  .object({
+    status: z.enum(PREP_SEAL_STATUSES),
+    qualification: z.enum(PREP_QUALIFICATION),
+    reasonCodes: z.array(z.string().min(1).max(64)).max(JOB_CAPS.diagnosticsMax),
+    verifiedOutputs: z.number().int().min(0).max(JOB_CAPS.outputsMax),
+  })
+  .strict();
+export type PrepSealSummaryV1 = z.infer<typeof PrepSealSummaryV1Schema>;
 export const PrepJobStateV1Schema = z
   .object({
     schemaVersion: z.literal(1),
@@ -197,6 +212,7 @@ export const PrepJobStateV1Schema = z
     manifest: PrepManifestV1Schema.optional(),
     preparedReceptorId: ArtifactIdSchema.optional(),
     preparedLigandId: ArtifactIdSchema.optional(),
+    seal: PrepSealSummaryV1Schema.optional(),
     error: shortText.optional(),
     createdAt: z.string().max(40),
     expiresAt: z.string().max(40),
