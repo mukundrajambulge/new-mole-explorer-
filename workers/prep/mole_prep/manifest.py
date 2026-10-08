@@ -25,9 +25,9 @@ def sha256_text(text: str) -> str:
 
 
 def lock_digest() -> str:
-    """sha256 of the hash-pinned lock file this worker ships with."""
+    """sha256 of the hash-pinned lock file this worker ships with (LF-normalised, so checkouts agree)."""
     with open(_LOCK, "rb") as f:
-        return sha256_bytes(f.read())
+        return sha256_bytes(f.read().replace(b"\r\n", b"\n"))
 
 
 def tool_version(dist: str) -> str:

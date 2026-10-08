@@ -239,7 +239,7 @@ def prepare(text: str, opts: dict, workdir: str) -> dict:
     protonation = opts["protonation"]
     if protonation == "PROPKA_PREVIEW":
         protonated, patoms = run_pdb2pqr(current, opts["pH"], workdir)
-        decisions.append(_decision("RECEPTOR_PROTONATION", f"PDB2PQR+PROPKA at pH {opts['pH']:.2f} (PREVIEW_UNQUALIFIED); hydrogens {_count_h(parse_pdb(current)[0])} -> {_count_h(patoms)}", n_atoms, len(patoms), True))
+        decisions.append(_decision("RECEPTOR_PROTONATION", f"PDB2PQR+PROPKA at pH {opts['pH']:.2f} (PREVIEW_UNQUALIFIED; PDB2PQR also rebuilds missing heavy atoms); hydrogens {_count_h(parse_pdb(current)[0])} -> {_count_h(patoms)}", n_atoms, len(patoms), True))
         stages.append(stage("pdb2pqr+propka", f"{tool_version('pdb2pqr')}/{tool_version('propka')}", {"ff": "AMBER", "titration": "propka", "pH": round(opts["pH"], 2)},
                             sha256_text(current), sha256_text(protonated), ["RECEPTOR_PROTONATION"]))
         generated = True
@@ -254,7 +254,7 @@ def prepare(text: str, opts: dict, workdir: str) -> dict:
         polymer = Polymer.from_pdb_string(current, ResidueChemTemplates.create_from_defaults(), MoleculePreparation())
         rigid, _flex = PDBQTWriterLegacy.write_from_polymer(polymer)
         prepared_pdb = polymer.to_pdb()
-    except PolymerCreationError as e:
+    except (PolymerCreationError, RuntimeError, ValueError, KeyError) as e:
         raise Blocked("TEMPLATE_MISMATCH", f"Meeko residue templates rejected the receptor: {limits.scrub(str(e))[:300]}") from None
     out_atoms, _ = parse_pdb(prepared_pdb, "meeko output")
     h_out = _count_h(out_atoms)

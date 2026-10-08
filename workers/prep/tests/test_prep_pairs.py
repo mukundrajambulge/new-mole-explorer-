@@ -171,6 +171,12 @@ def test_nan_coordinates_blocked(tmp_path):
     _blocked({"id": "neg-nan", "receptor": {"text": "\n".join(lines) + "\n"}, "ligand": ETHANOL}, str(tmp_path), "NON_FINITE_COORDINATES")
 
 
+def test_meeko_template_failure_blocked(tmp_path):
+    # 5FYL chain B C-terminus after PDBFixer cannot be built by Meeko's templates: BLOCKED, never a crash.
+    _blocked({"id": "neg-template", "receptor": {"file": "rcsb/5FYL.pdb"}, "ligand": ETHANOL, "options": {"chainIds": ["B"], "addMissingAtoms": True}},
+             str(tmp_path), "TEMPLATE_MISMATCH")
+
+
 def test_stale_digest_and_missing_ack_blocked(tmp_path):
     pair = PAIRS[0]
     d = make_job(pair, str(tmp_path))

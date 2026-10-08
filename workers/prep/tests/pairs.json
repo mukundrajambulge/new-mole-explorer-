@@ -8,13 +8,13 @@
     {"id": "4DJW-0KP", "receptor": {"file": "rcsb/4DJW.pdb"}, "ligand": {"cut": {"file": "rcsb/4DJW.pdb", "resName": "0KP", "chain": "A", "resSeq": 501}, "format": "pdb"},
      "template": "CN1C(=N)NC(c2ccccc2)(c2cccc(-c3cccnc3)c2)C1=O", "options": {"chainIds": ["A"], "addMissingAtoms": true}},
     {"id": "4DJW-ring-propka", "receptor": {"file": "rcsb/4DJW.pdb"}, "ligand": {"file": "ring-ligand.pdb", "format": "pdb"}, "template": "c1ccccc1",
-     "options": {"chainIds": ["A"], "addMissingAtoms": true, "protonation": "PROPKA_PREVIEW", "pH": 7.4}},
+     "options": {"chainIds": ["A"], "protonation": "PROPKA_PREVIEW", "pH": 7.4}},
     {"id": "1HZH-GAL", "receptor": {"file": "rcsb/1HZH.pdb"}, "ligand": {"cut": {"file": "rcsb/1HZH.pdb", "resName": "GAL", "chain": "A", "resSeq": 6}, "format": "pdb"},
      "template": "C1OC(CO)C(O)C(O)C1O", "options": {"chainIds": ["L"], "addMissingAtoms": true}},
     {"id": "1HZH-FUC", "receptor": {"file": "rcsb/1HZH.pdb"}, "ligand": {"cut": {"file": "rcsb/1HZH.pdb", "resName": "FUC", "chain": "B", "resSeq": 9}, "format": "pdb"},
      "template": "C1OC(C)C(O)C(O)C1O", "options": {"chainIds": ["M"], "addMissingAtoms": true}},
     {"id": "5FYL-BMA", "receptor": {"file": "rcsb/5FYL.pdb"}, "ligand": {"cut": {"file": "rcsb/5FYL.pdb", "resName": "BMA", "chain": "A", "resSeq": 3}, "format": "pdb"},
-     "template": "C1OC(CO)C(O)C(O)C1O", "options": {"chainIds": ["B"], "addMissingAtoms": true}},
+     "template": "C1OC(CO)C(O)C(O)C1O", "options": {"chainIds": ["L"], "addMissingAtoms": true}},
     {"id": "5FYL-0KP", "receptor": {"file": "rcsb/5FYL.pdb"}, "ligand": {"cut": {"file": "rcsb/4DJW.pdb", "resName": "0KP", "chain": "B", "resSeq": 501}, "format": "pdb"},
      "template": "CN1C(=N)NC(c2ccccc2)(c2cccc(-c3cccnc3)c2)C1=O", "options": {"chainIds": ["L"], "addMissingAtoms": true}}
   ]
