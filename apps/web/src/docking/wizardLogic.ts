@@ -150,3 +150,15 @@ export const formatScore = (v: number | null): string => (v === null ? "n/a" : v
  * Ids that fit are sent unchanged; longer ones are shortened to their last 60 characters (the end holds the sha256).
  */
 export const toJobArtifactId = (id: string): string => (id.length <= 64 ? id : `a${id.slice(-60)}`.slice(0, 64));
+
+/**
+ * Component identity for a ligand picked from the loaded structure. It must differ from the receptor id
+ * (both come from the same source artifact), so it is derived from the component key. Fits the 64 character id contract.
+ */
+export const ligandComponentId = (sourceArtifactId: string, componentKey: string): string => {
+  let h = 5381;
+  for (let i = 0; i < componentKey.length; i += 1) h = ((h * 33) ^ componentKey.charCodeAt(i)) >>> 0;
+  const label = componentKey.replace(/[^A-Za-z0-9]/g, "").slice(0, 12);
+  const tail = sourceArtifactId.replace(/[^A-Za-z0-9_-]/g, "").slice(-34);
+  return `lig${h.toString(16).padStart(8, "0")}${label}-${tail}`.slice(0, 64);
+};

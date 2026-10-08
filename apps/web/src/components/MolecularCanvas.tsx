@@ -35,6 +35,7 @@ type MolecularCanvasProps = {
   analysisOverlays: readonly AnalysisOverlay[];
   alignmentOverlays: readonly AlignmentOverlay[];
   searchRegionOverlay?: SearchRegionOverlay | null;
+  poseOverlay?: { text: string; format: "sdf" | "pdbqt"; hbonds: readonly { from: readonly [number, number, number]; to: readonly [number, number, number] }[] } | null;
   onRenderLifecycle?: (state: ViewerLifecycle) => void;
 };
 
@@ -66,6 +67,7 @@ export const MolecularCanvas = ({
   analysisOverlays,
   alignmentOverlays,
   searchRegionOverlay = null,
+  poseOverlay = null,
   onRenderLifecycle,
 }: MolecularCanvasProps) => {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -233,6 +235,10 @@ export const MolecularCanvas = ({
   useEffect(() => {
     adapterRef.current?.setSearchRegionOverlay(searchRegionOverlay);
   }, [searchRegionOverlay]);
+
+  useEffect(() => {
+    adapterRef.current?.setPoseOverlay(poseOverlay);
+  }, [poseOverlay]);
 
   useEffect(() => {
     const adapter = adapterRef.current;

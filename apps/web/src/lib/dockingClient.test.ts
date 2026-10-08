@@ -19,7 +19,7 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 describe("dockingClient against the 5.0 mock server", () => {
   it("runs prepare, confirm, job and result with validated replies", async () => {
     const c = createDockingClient(base, true);
-    const plan = await c.planPrep({ receptorArtifactId: "rec-1", ligandArtifactId: "lig-1", pH: 7.4, protonation: "EXPLICIT_SUBMITTED", keepWaters: false }, sig());
+    const plan = await c.planPrep({ receptorArtifactId: "rec-1", ligandArtifactId: "lig-1", pH: 7.4, protonation: "EXPLICIT_SUBMITTED", keepWaters: false, ligandProtonation: "EXPLICIT_SUBMITTED", addMissingAtoms: false }, sig());
     expect(plan.state).toBe("AWAITING_CONFIRMATION");
     await c.confirmPrep({ jobId: plan.jobId, planDigest: plan.plan!.planDigest, acks: [] }, sig());
     let prep = await c.getPrep(plan.jobId, sig());

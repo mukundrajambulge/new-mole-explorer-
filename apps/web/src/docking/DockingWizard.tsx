@@ -6,7 +6,7 @@ import type { D2SearchRegionAuthority } from "./dockingApiAdapter";
 import { numericSearchRegionDraft, type SearchRegionDraft } from "./dockingUiState";
 import { SearchRegionEditor } from "./SearchRegionEditor";
 import {
-  WIZARD_STEPS, boxAroundAtoms, boxProblem, formatScore, hbondLines, isStaleForStructure, parsePoseAtoms, resultAsJson, rmsd, splitByRole, toJobArtifactId,
+  WIZARD_STEPS, boxAroundAtoms, boxProblem, formatScore, hbondLines, isStaleForStructure, parsePoseAtoms, resultAsJson, rmsd, splitByRole, toJobArtifactId, ligandComponentId,
   type PoseAtom, type PoseOverlay, type WizardStep,
 } from "./wizardLogic";
 
@@ -31,6 +31,7 @@ export type DockingWizardProps = {
   onShowDraft: () => void;
   onCommit: () => void;
   onPoseOverlay: (overlay: PoseOverlay | null) => void;
+  onImport?: () => void;
   client?: DockingJobsClient;
 };
 
@@ -39,7 +40,7 @@ type PoseTexts = { sdf?: string; pdbqt?: string };
 
 const Err = ({ message }: { message: string | null }) => message ? <div className="docking-inline-diagnostic" role="alert" data-testid="wizard-error">{message}</div> : null;
 
-export const DockingWizard = ({ structure, sourceArtifactId, draft, coordinateFrame, committedRegion, commitMessage, commitBusy, onDraftChange, onReplaceDraft, onShowDraft, onCommit, onPoseOverlay, client = defaultClient }: DockingWizardProps) => {
+export const DockingWizard = ({ structure, sourceArtifactId, draft, coordinateFrame, committedRegion, commitMessage, commitBusy, onDraftChange, onReplaceDraft, onShowDraft, onCommit, onPoseOverlay, onImport, client = defaultClient }: DockingWizardProps) => {
   const structureHash = structure?.structure.scientificHash ?? null;
   const hashRef = useRef<string | null>(structureHash);
   hashRef.current = structureHash;
@@ -99,7 +100,7 @@ export const DockingWizard = ({ structure, sourceArtifactId, draft, coordinateFr
 
   const ligandCandidate = split?.ligands.find((l) => l.key === ligandKey) ?? null;
   const receptorId = sourceArtifactId ? toJobArtifactId(sourceArtifactId) : null;
-  const ligandId = uploaded ? uploaded.artifactId : sourceArtifactId && ligandCandidate ? toJobArtifactId(sourceArtifactId) : null;
+  const ligandId = uploaded ? uploaded.artifactId : sourceArtifactId && ligandCandidate ? ligandComponentId(sourceArtifactId, ligandCandidate.key) : null;
   const inputsReady = Boolean(structure && receptorId && ligandId && split && split.receptor.atomCount > 0);
 
   const onUpload = async (file: File | undefined) => {
@@ -127,7 +128,7 @@ export const DockingWizard = ({ structure, sourceArtifactId, draft, coordinateFr
     const { signal, stale } = begin();
     setPrepBusy(true); setError(null); setPrep(null); setAcks([]);
     try {
-      const state = await client.planPrep({ receptorArtifactId: receptorId, ligandArtifactId: ligandId, pH: pHNum, protonation, keepWaters }, signal);
+      const state = await client.planPrep({ receptorArtifactId: receptorId, ligandArtifactId: ligandId, pH: pHNum, protonation, keepWaters, ligandProtonation: "EXPLICIT_SUBMITTED", addMissingAtoms: false }, signal);
       if (!stale()) setPrep(state);
     } catch (e) {
       if (!isAbortError(e) && !stale()) setError(errText(e, "Preparation planning failed."));
@@ -295,7 +296,7 @@ export const DockingWizard = ({ structure, sourceArtifactId, draft, coordinateFr
       <Err message={error} />
 
       {step === "Inputs" && <div data-testid="wizard-inputs">
-        {!structure || !split ? <p className="docking-help">Import a structure first (File, Import).</p> : <>
+        {!structure || !split ? <p className="docking-help">Import a structure first.{onImport && <> <button type="button" onClick={onImport}>Import structure</button></>}</p> : <>
           <div className="docking-state-row" data-testid="wizard-receptor"><span>Receptor (polymer)</span><strong>{split.receptor.atomCount > 0 ? `${split.receptor.atomCount.toLocaleString("en-US")} atoms · chains ${split.receptor.chains.join(", ")}` : "No polymer atoms found"}</strong></div>
           <label className="docking-field"><span>Ligand</span>
             <select aria-label="Ligand" value={uploaded ? "__upload" : ligandKey} onChange={(e) => { if (e.target.value !== "__upload") { setUploaded(null); setLigandKey(e.target.value); setPrep(null); } }}>

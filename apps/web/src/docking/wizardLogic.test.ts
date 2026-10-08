@@ -2,7 +2,18 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import type { CanonicalAtom, CanonicalMolecularStructure } from "@molecular/contracts";
-import { boxAroundAtoms, boxProblem, hbondLines, isStaleForStructure, parsePoseAtoms, rmsd, splitByRole, toJobArtifactId } from "./wizardLogic";
+import { boxAroundAtoms, boxProblem, hbondLines, isStaleForStructure, parsePoseAtoms, rmsd, splitByRole, toJobArtifactId, ligandComponentId } from "./wizardLogic";
+
+describe("ligandComponentId", () => {
+  const src = `source_pdb_${"a".repeat(64)}`;
+  it("differs from the receptor id, per component, and fits the contract", () => {
+    const a = ligandComponentId(src, "A:STI:1");
+    expect(a).not.toBe(toJobArtifactId(src));
+    expect(a).not.toBe(ligandComponentId(src, "B:STI:1"));
+    expect(a).toMatch(/^[A-Za-z0-9][A-Za-z0-9_-]*$/);
+    expect(a.length).toBeLessThanOrEqual(64);
+  });
+});
 
 const pdb = readFileSync(fileURLToPath(new URL("../../../../tests/fixtures/rcsb/4DJW.pdb", import.meta.url)), "utf8");
 

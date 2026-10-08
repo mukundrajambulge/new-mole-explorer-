@@ -17,11 +17,28 @@ import {
  * produces clearly fake numbers and never claims scientific validity.
  * Routes: POST /docking/prep/plan, POST /docking/prep/:id/confirm,
  * GET /docking/prep/:id, POST /docking/jobs, GET /docking/jobs/:id,
- * GET /docking/jobs/:id/events (SSE), GET /docking/jobs/:id/result,
+ * GET /docking/artifacts/:id (MOCK pose PDBQT), GET /docking/jobs/:id/events (SSE), GET /docking/jobs/:id/result,
  * POST /docking/jobs/:id/cancel.
  */
 
 const BODY_CAP = 64 * 1024;
+
+/** MOCK pose: a fixed 6 atom ring placed at the requested box center, shifted per rank. Not a docking result. */
+const mockPosePdbqt = (rank: number, center: readonly [number, number, number]): string => {
+  const lines = ["REMARK MOCK POSE (fake test data, not a docking result)", "MODEL 1"];
+  for (let i = 0; i < 6; i += 1) {
+    const a = (i / 6) * 2 * Math.PI;
+    const x = center[0] + 1.4 * Math.cos(a) + 0.5 * (rank - 1);
+    const y = center[1] + 1.4 * Math.sin(a);
+    const z = center[2];
+    const el = i === 0 ? "OA" : i === 3 ? "NA" : "C";
+    const num = String(i + 1).padStart(5);
+    const name = (i === 0 ? "O" : i === 3 ? "N" : "C").padEnd(4);
+    lines.push(`HETATM${num} ${name} MCK A   1    ${x.toFixed(3).padStart(8)}${y.toFixed(3).padStart(8)}${z.toFixed(3).padStart(8)}  1.00  0.00    +0.000 ${el.padEnd(2)}`);
+  }
+  lines.push("ENDMDL");
+  return lines.join("\n") + "\n";
+};
 const ID = /^[A-Za-z0-9-]{1,64}$/;
 
 type Job = { status: JobStatus; events: JobEvent[]; listeners: Set<ServerResponse>; timer?: NodeJS.Timeout; result?: DockResult };
@@ -32,6 +49,7 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
   const stepMs = options.stepMs ?? 300;
   const preps = new Map<string, { state: PrepJobStateV1; confirmed: boolean }>();
   const jobs = new Map<string, Job>();
+  const poseTexts = new Map<string, string>();
 
   const now = () => new Date().toISOString();
   const send = (res: ServerResponse, code: number, body: unknown) => {
@@ -76,7 +94,7 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
     }
   };
 
-  const runJob = (job: Job, seed: number) => {
+  const runJob = (job: Job, seed: number, center: readonly [number, number, number]) => {
     const steps: Array<() => void> = [
       () => setStatus(job, "PREPARING", 0.1, "preparing inputs (mock)"),
       () => setStatus(job, "RUNNING", 0.4, "search (mock)"),
@@ -90,11 +108,12 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
             vinaScore: -9 + rank * 0.5,
             meScore: -9 + rank * 0.5,
             meTerms: { gauss1: -1.0 * rank, gauss2: -2.0, repulsion: 0.1, hydrophobic: -0.5, hbond: -0.3 },
-            poseArtifactId: `mock-pose-${rank}`,
+            poseArtifactId: `mock-pose-${job.status.jobId.slice(0, 8)}-${rank}`,
           })),
           manifestRef: { artifactId: `mock-manifest-${job.status.jobId.slice(0, 8)}` },
           scoreStatus: "PREVIEW_UNQUALIFIED",
         };
+        for (const pose of job.result.poses) poseTexts.set(pose.poseArtifactId, mockPosePdbqt(pose.rank, center));
         setStatus(job, "SUCCEEDED", 1);
       },
     ];
@@ -177,6 +196,14 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
       return err(res, 404, "not found");
     }
 
+    if (parts[1] === "artifacts" && method === "GET" && parts.length === 3) {
+      const text = ID.test(parts[2] ?? "") ? poseTexts.get(parts[2]!) : undefined;
+      if (!text) return err(res, 404, "not found");
+      if (url.searchParams.get("format") === "sdf") return err(res, 404, "mock server only has PDBQT poses");
+      res.writeHead(200, { "content-type": "text/plain", "access-control-allow-origin": "*" });
+      return res.end(text);
+    }
+
     if (parts[1] !== "jobs") return err(res, 404, "not found");
     if (method === "POST" && parts.length === 2) {
       const parsed = DockJobRequestSchema.safeParse(await readBody(req));
@@ -186,7 +213,7 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
       const job: Job = { status: { jobId, status: "QUEUED", progress: 0, createdAt: t, updatedAt: t }, events: [], listeners: new Set() };
       jobs.set(jobId, job);
       emit(job, { type: "status", status: "QUEUED" });
-      runJob(job, parsed.data.seed);
+      runJob(job, parsed.data.seed, parsed.data.boxCenter);
       return send(res, 202, job.status);
     }
     const id = parts[2];
