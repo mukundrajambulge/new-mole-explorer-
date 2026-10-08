@@ -22,7 +22,7 @@ const sha256 = (b: Buffer): string => createHash("sha256").update(b).digest("hex
 export const looksLikePdb = (bytes: Buffer): boolean => {
   const head = bytes.subarray(0, 64 * 1024).toString("latin1");
   if (/^\s*data_/m.test(head.slice(0, 200)) || head.includes("_atom_site.")) return false;
-  return /^(ATOM  |HETATM)/m.test(head);
+  return /^(ATOM {2}|HETATM)/m.test(head);
 };
 
 export class PrepArtifactStore {

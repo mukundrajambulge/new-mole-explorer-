@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync, statSync } from "node:fs";
-import { PREP_PROFILE_ID, type PrepManifestV1, type PrepSealSummaryV1 } from "@molecular/contracts";
+import { PREP_PROFILE_ID, type D2PreparedLigandStateV1, type PrepComponentSealV1, type PrepManifestV1, type PrepSealSummaryV1 } from "@molecular/contracts";
+import { sealLigandFromPdbqt, type LigandD2Outcome } from "./prepLigandD2.js";
 import { adaptCanonicalStructure, type D2AdaptedRepresentation } from "../docking/d2Adapters.js";
 import { StructureIngestionService } from "../structures/ingestion.js";
 import { SourceArtifactStore } from "../lifecycle/sourceArtifactStore.js";
@@ -20,6 +21,8 @@ import { confinedPath, PREP_MAX_ARTIFACT_BYTES, PrepError, readCappedJson, type 
 export type PrepSealOutcome = PrepSealSummaryV1 & Readonly<{
   receptor?: Readonly<{ graphDigest: string; identityDigest: string; atoms: number }>;
   ligand?: Readonly<{ graphDigest: string; identityDigest: string; atoms: number; bonds: number; typedAtoms: number }>;
+  /** The D2 PreparedLigandState sealed by sealPreparedLigandState (INTERIM jobs only). */
+  ligandState?: D2PreparedLigandStateV1;
 }>;
 
 const REQUIRED_OUTPUTS: readonly (readonly [PrepManifestV1["outputs"][number]["role"], string])[] = [
@@ -47,32 +50,6 @@ const sha256 = (b: Buffer): string => createHash("sha256").update(b).digest("hex
 const reject = (codes: string[], verified: number, qualification: PrepSealSummaryV1["qualification"]): PrepSealOutcome => ({ status: "REJECTED", qualification, reasonCodes: codes.slice(0, 100), verifiedOutputs: verified });
 
 type LigandCanonical = { atoms: { element: string; x: number; y: number; z: number }[]; bonds: { a: number; b: number; order: number }[] };
-
-/** Ligand atom typing evidence: one PDBQT ATOM record per canonical atom, matched by element and coordinates. */
-const ligandTypingCoverage = (pdbqt: string, lig: LigandCanonical): number => {
-  const records: { el: string; x: number; y: number; z: number; type: string }[] = [];
-  for (const line of pdbqt.split("\n")) {
-    if (!line.startsWith("ATOM") && !line.startsWith("HETATM")) continue;
-    const x = Number(line.slice(30, 38));
-    const y = Number(line.slice(38, 46));
-    const z = Number(line.slice(46, 54));
-    const type = line.slice(77, 79).trim();
-    const name = line.slice(12, 16).trim();
-    if (!type || ![x, y, z].every(Number.isFinite)) continue;
-    records.push({ el: name.replace(/[^A-Za-z]/g, "").slice(0, 1).toUpperCase(), x, y, z, type });
-  }
-  const used = new Set<number>();
-  let typed = 0;
-  for (const atom of lig.atoms) {
-    const el = atom.element.slice(0, 1).toUpperCase();
-    const idx = records.findIndex((r, i) => !used.has(i) && r.el === el && Math.abs(r.x - atom.x) < 2e-3 && Math.abs(r.y - atom.y) < 2e-3 && Math.abs(r.z - atom.z) < 2e-3);
-    if (idx >= 0) {
-      used.add(idx);
-      typed++;
-    }
-  }
-  return typed;
-};
 
 const adapt = async (ingestion: StructureIngestionService, filename: string, bytes: Buffer): Promise<D2AdaptedRepresentation | undefined> => {
   try {
@@ -155,36 +132,56 @@ export const sealFromPrepManifest = async (store: PrepJobStore, jobId: string, p
   } catch {
     blockers.push("CANONICAL_JSON_UNREADABLE");
   }
-  let typedAtoms = 0;
+  const chargeModel = manifest.summary?.chargeModel;
+  if (!chargeModel) blockers.push("CHARGE_MODEL_MISSING");
   if (ligand && ligCanon && Array.isArray(ligCanon.atoms) && Array.isArray(ligCanon.bonds)) {
     if (ligCanon.atoms.length !== ligand.graph!.atoms.length || ligCanon.bonds.length !== ligand.graph!.bonds.length) blockers.push("LIGAND_CANONICAL_MISMATCH");
-    typedAtoms = ligandTypingCoverage(get("out/ligand.pdbqt").toString("ascii"), ligCanon);
-    // D2 needs typeId + chargeModel + evidenceRef for every ligand atom; Meeko merges nonpolar hydrogens,
-    // so those atoms carry no typing evidence. Never fill them in.
-    if (typedAtoms !== ligCanon.atoms.length) blockers.push("LIGAND_TYPING_EVIDENCE_INCOMPLETE");
   } else if (ligand) blockers.push("LIGAND_CANONICAL_INVALID");
-  if (!manifest.summary?.chargeModel) blockers.push("CHARGE_MODEL_MISSING");
   if (receptor && recCanon && Array.isArray(recCanon.atoms) && recCanon.atoms.length !== manifest.summary?.receptorAtoms) blockers.push("RECEPTOR_CANONICAL_MISMATCH");
-  // The worker does not export a D2 kinematic model (fragments, moving sets, axes) for the ligand.
-  blockers.push("LIGAND_KINEMATIC_EVIDENCE_UNAVAILABLE");
-  if (Object.values(SERVER_D2_DEPENDENCY_DIGESTS).some((d) => !d)) blockers.push("D2_PROFILE_DIGEST_UNAVAILABLE");
-  if (qualification === "PREVIEW_UNQUALIFIED") blockers.push("GENERATED_CHEMICAL_STATE");
+
+  // Ligand: the existing D2 kinematic + ligand seal functions, fed from the verified PDBQT. Generated chemistry
+  // (template hydrogens, 3D embedding, Dimorphite-DL) is never D2-sealed: D2 core admits explicit state only.
+  let ligandSeal: PrepComponentSealV1;
+  let typedAtoms = 0;
+  let ligandD2: LigandD2Outcome | undefined;
+  if (qualification === "PREVIEW_UNQUALIFIED") {
+    blockers.push("GENERATED_CHEMICAL_STATE");
+    ligandSeal = { status: "PREVIEW_UNQUALIFIED", reasonCodes: ["GENERATED_CHEMICAL_STATE"] };
+  } else if (!ligand || !chargeModel || blockers.length) {
+    ligandSeal = { status: "BLOCKED", reasonCodes: ["LIGAND_SEAL_INPUTS_INVALID"] };
+  } else {
+    const pdbqt = get("out/ligand.pdbqt");
+    const sm = manifest.summary;
+    const explicit = sm && sm.ligandProtonation === "EXPLICIT_SUBMITTED" && sm.ligandHydrogensAdded === 0 && !sm.ligandEmbedded3d && state.plan?.tautomer === "AS_SUBMITTED" && manifest.planDigest === state.plan.planDigest;
+    ligandD2 = sealLigandFromPdbqt({ adapted: ligand, pdbqt: pdbqt.toString("ascii"), pdbqtSha256: sha256(pdbqt), chargeModel, ...(explicit ? { explicitSubmittedPlanDigest: state.plan!.planDigest } : {}) });
+    typedAtoms = ligandD2.typedAtoms;
+    ligandSeal = { status: ligandD2.status, reasonCodes: [...ligandD2.reasonCodes].slice(0, 50), ...(ligandD2.ligand ? { digest: ligandD2.ligand.digest } : {}) };
+    for (const c of ligandD2.reasonCodes) blockers.push(c);
+  }
+  // Receptor: sealPreparedReceptorState needs chemical-perception, receptor-typing and scoring profile digests.
+  // None exists as a server constant and 5.2 may not add one (owner decision), so the receptor stays BLOCKED.
+  const receptorCodes = Object.values(SERVER_D2_DEPENDENCY_DIGESTS).some((d) => !d) ? ["D2_PROFILE_DIGEST_UNAVAILABLE"] : [];
+  if (!receptor) receptorCodes.push("RECEPTOR_D2_ADAPTATION_FAILED");
+  for (const c of receptorCodes) blockers.push(c);
+  const receptorSeal: PrepComponentSealV1 = { status: "BLOCKED", reasonCodes: receptorCodes.length ? receptorCodes : ["RECEPTOR_SEAL_UNWIRED"] };
+  if (!receptorCodes.length) blockers.push("RECEPTOR_SEAL_UNWIRED");
+
   const hard = blockers.filter((b) => b !== "GENERATED_CHEMICAL_STATE");
-  // SEALED needs the D2 receptor/kinematic/ligand seal calls, which stay unwired until the kinematic evidence
-  // and server dependency digests exist; until then a blocker-free INTERIM result still fails closed.
-  const status: PrepSealSummaryV1["status"] = hard.length ? "BLOCKED" : qualification === "PREVIEW_UNQUALIFIED" ? "PREVIEW_UNQUALIFIED" : "BLOCKED";
+  const status: PrepSealSummaryV1["status"] = hard.length ? "BLOCKED" : qualification === "PREVIEW_UNQUALIFIED" ? "PREVIEW_UNQUALIFIED" : "SEALED";
   return {
     status,
     qualification,
-    reasonCodes: blockers.slice(0, 100),
+    reasonCodes: [...new Set(blockers)].slice(0, 100),
     verifiedOutputs: verified,
+    components: { receptor: receptorSeal, ligand: ligandSeal },
     ...(receptor ? { receptor: { graphDigest: receptor.graph!.digest, identityDigest: receptor.identity!.digest, atoms: receptor.graph!.atoms.length } } : {}),
     ...(ligand ? { ligand: { graphDigest: ligand.graph!.digest, identityDigest: ligand.identity!.digest, atoms: ligand.graph!.atoms.length, bonds: ligand.graph!.bonds.length, typedAtoms } } : {}),
+    ...(ligandD2?.ligand ? { ligandState: ligandD2.ligand } : {}),
   };
 };
 
 /** Store sealer: keeps only the schema summary on the job state. */
 export const prepSummarySealer = async (store: PrepJobStore, jobId: string): Promise<PrepSealSummaryV1> => {
   const o = await sealFromPrepManifest(store, jobId);
-  return { status: o.status, qualification: o.qualification, reasonCodes: [...o.reasonCodes], verifiedOutputs: o.verifiedOutputs };
+  return { status: o.status, qualification: o.qualification, reasonCodes: [...o.reasonCodes], verifiedOutputs: o.verifiedOutputs, ...(o.components ? { components: o.components } : {}) };
 };

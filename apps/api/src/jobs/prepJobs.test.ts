@@ -74,12 +74,14 @@ const serve = async (store: PrepJobStore) => {
   const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}/api/docking/prep`;
   const call = async (method: string, path: string, body?: unknown, raw?: string) => {
     const r = await fetch(base + path, { method, headers: { "content-type": "application/json" }, ...(body !== undefined || raw !== undefined ? { body: raw ?? JSON.stringify(body) } : {}) });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test JSON is checked by assertions
     return { status: r.status, json: (await r.json()) as Record<string, any> };
   };
   return call;
 };
 
 const PLAN_BODY = { receptorArtifactId: "r1crn", ligandArtifactId: "lethanol", pH: 7.4 };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- test JSON is checked by assertions
 const acksOf = (state: Record<string, any>) => (state.plan.decisions as { key: string; requiresAck: boolean }[]).filter((d) => d.requiresAck).map((d) => d.key);
 
 describe("prep job store and routes (5.2b)", () => {
@@ -116,7 +118,11 @@ describe("prep job store and routes (5.2b)", () => {
     // Real fixture: Meeko template hydrogens make it PREVIEW_UNQUALIFIED; missing D2 evidence keeps it BLOCKED.
     expect(final.seal?.qualification).toBe("PREVIEW_UNQUALIFIED");
     expect(final.seal?.status).toBe("BLOCKED");
-    expect(final.seal?.reasonCodes).toEqual(expect.arrayContaining(["LIGAND_TYPING_EVIDENCE_INCOMPLETE", "LIGAND_KINEMATIC_EVIDENCE_UNAVAILABLE", "D2_PROFILE_DIGEST_UNAVAILABLE", "GENERATED_CHEMICAL_STATE"]));
+    expect(final.seal?.reasonCodes).toEqual(expect.arrayContaining(["D2_PROFILE_DIGEST_UNAVAILABLE", "GENERATED_CHEMICAL_STATE"]));
+    expect(final.seal?.components?.ligand.status).toBe("PREVIEW_UNQUALIFIED");
+    // Unsealed outputs never get prepared ids.
+    expect(final.preparedReceptorId).toBeUndefined();
+    expect(final.preparedLigandId).toBeUndefined();
     const again = await call("POST", `/${id}/confirm`, { jobId: id, planDigest: a.json.plan.planDigest, acks });
     expect(again.status).toBe(409);
     expect(again.json.error.code).toBe("ALREADY_CONFIRMED");
@@ -127,7 +133,8 @@ describe("prep job store and routes (5.2b)", () => {
     // sealFromPrepManifest maps the real outputs through the D2 adapter deterministically.
     const s1 = await sealFromPrepManifest(store, id);
     const s2 = await sealFromPrepManifest(store, id);
-    expect(s1.ligand).toMatchObject({ atoms: 9, bonds: 8, typedAtoms: 4 });
+    expect(s1.ligand).toMatchObject({ atoms: 9, bonds: 8 });
+    expect(s1.ligandState).toBeUndefined();
     expect(s1.ligand?.graphDigest).toMatch(/^sha256:[0-9a-f]{64}$/);
     expect(s1.receptor?.atoms).toBeGreaterThan(300);
     expect(s2).toEqual(s1);

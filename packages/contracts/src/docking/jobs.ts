@@ -194,12 +194,23 @@ export const PREP_JOB_STATES = ["AWAITING_CONFIRMATION", "APPLYING", "SUCCEEDED"
  * input is present but some chemistry was generated (PROPKA, Dimorphite-DL, template hydrogens). SEALED: D2 sealed.
  */
 export const PREP_SEAL_STATUSES = ["SEALED", "PREVIEW_UNQUALIFIED", "BLOCKED", "REJECTED"] as const;
+/** Per-component D2 seal result. digest: the sealed D2 state digest (sha256:...), present only when SEALED. */
+export const PrepComponentSealV1Schema = z
+  .object({
+    status: z.enum(["SEALED", "PREVIEW_UNQUALIFIED", "BLOCKED"]),
+    reasonCodes: z.array(z.string().min(1).max(64)).max(50),
+    digest: z.string().regex(/^sha256:[0-9a-f]{64}$/).optional(),
+  })
+  .strict();
+export type PrepComponentSealV1 = z.infer<typeof PrepComponentSealV1Schema>;
 export const PrepSealSummaryV1Schema = z
   .object({
     status: z.enum(PREP_SEAL_STATUSES),
     qualification: z.enum(PREP_QUALIFICATION),
     reasonCodes: z.array(z.string().min(1).max(64)).max(JOB_CAPS.diagnosticsMax),
     verifiedOutputs: z.number().int().min(0).max(JOB_CAPS.outputsMax),
+    /** SEALED overall needs both components SEALED; prepared ids are minted only then. */
+    components: z.object({ receptor: PrepComponentSealV1Schema, ligand: PrepComponentSealV1Schema }).strict().optional(),
   })
   .strict();
 export type PrepSealSummaryV1 = z.infer<typeof PrepSealSummaryV1Schema>;
@@ -216,6 +227,8 @@ export const PrepJobStateV1Schema = z
     error: shortText.optional(),
     createdAt: z.string().max(40),
     expiresAt: z.string().max(40),
+    /** Last persisted transition (server clock); drives retention/garbage collection. */
+    updatedAt: z.string().max(40).optional(),
   })
   .strict();
 export type PrepJobStateV1 = z.infer<typeof PrepJobStateV1Schema>;

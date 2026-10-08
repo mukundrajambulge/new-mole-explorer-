@@ -199,19 +199,20 @@ export class PrepJobStore {
     return s;
   }
 
-  private persist(s: PrepJobStateV1): void {
-    const parsed = PrepJobStateV1Schema.parse(s);
+  private persist(s: PrepJobStateV1): PrepJobStateV1 {
+    const parsed = PrepJobStateV1Schema.parse({ ...s, updatedAt: new Date(this.now()).toISOString() });
     writeAtomic(join(this.jobDir(parsed.jobId), "state.json"), JSON.stringify(parsed, null, 1) + "\n");
     this.states.set(parsed.jobId, parsed);
+    return parsed;
   }
 
   private transition(s: PrepJobStateV1, to: PrepJobStateName, patch: Partial<PrepJobStateV1> = {}): PrepJobStateV1 {
     if (!PREP_TRANSITIONS[s.state].includes(to)) throw new PrepError("INVALID_TRANSITION", 409, `Preparation job cannot move from ${s.state} to ${to}.`);
     const next: PrepJobStateV1 = { ...s, ...patch, state: to };
     if (patch.error !== undefined) next.error = scrubText(patch.error, [this.jobDir(s.jobId), this.root]).slice(0, 500);
-    this.persist(next);
+    const saved = this.persist(next);
     if (PREP_TRANSITIONS[to].length === 0) this.dropInputs(s.jobId);
-    return next;
+    return saved;
   }
 
   /** Staged inputs are reproducible from the artifact store; a terminal job does not keep them. */
@@ -224,11 +225,8 @@ export class PrepJobStore {
   }
 
   private terminalAgeMs(s: PrepJobStateV1): number {
-    try {
-      return this.now() - statSync(join(this.jobDir(s.jobId), "state.json")).mtimeMs;
-    } catch {
-      return Number.POSITIVE_INFINITY;
-    }
+    const at = Date.parse(s.updatedAt ?? s.createdAt);
+    return Number.isFinite(at) ? this.now() - at : Number.POSITIVE_INFINITY;
   }
 
   private removeJob(jobId: string): void {
@@ -241,7 +239,7 @@ export class PrepJobStore {
    * bytes on disk exceed the quota the oldest terminal jobs go first. Live jobs (AWAITING_CONFIRMATION,
    * APPLYING) are never deleted; if they alone fill the quota, plan() is refused.
    */
-  gc(): { jobs: number; bytes: number } {
+  gc(reserve = 0): { jobs: number; bytes: number } {
     const terminal: PrepJobStateV1[] = [];
     for (const s0 of [...this.states.values()]) {
       const s = this.expireIfDue(s0);
@@ -258,7 +256,7 @@ export class PrepJobStore {
       sizes.set(id, n);
       bytes += n;
     }
-    while (terminal.length && (this.states.size > this.maxJobs || bytes > this.maxBytes)) {
+    while (terminal.length && (this.states.size + reserve > this.maxJobs || bytes > this.maxBytes)) {
       const victim = terminal.shift()!;
       bytes -= sizes.get(victim.jobId) ?? 0;
       this.removeJob(victim.jobId);
@@ -282,7 +280,7 @@ export class PrepJobStore {
   async plan(request: PrepareRequest): Promise<PrepJobStateV1> {
     this.acquire();
     try {
-      const usage = this.gc();
+      const usage = this.gc(1);
       if (usage.jobs >= this.maxJobs || usage.bytes >= this.maxBytes) throw new PrepError("QUOTA_EXCEEDED", 429, "Too many preparation jobs are stored; confirm or wait for pending plans to expire.");
       const [rec, lig, tpl] = await Promise.all([
         this.resolveArtifact(request.receptorArtifactId),
