@@ -1,10 +1,9 @@
 import type { IncomingMessage } from "node:http";
-import { createHash, randomUUID } from "node:crypto";
-import { createReadStream, createWriteStream, type WriteStream } from "node:fs";
+import { randomUUID } from "node:crypto";
+import { createWriteStream, type WriteStream } from "node:fs";
 import { mkdir, unlink } from "node:fs/promises";
 import { once } from "node:events";
 import { join } from "node:path";
-import { StringDecoder } from "node:string_decoder";
 import { IngestionError } from "./ingestion.js";
 
 /** Room for the multipart envelope (boundaries, part headers) on top of the file cap. */
@@ -245,28 +244,4 @@ export const receiveMultipartFile = async (request: IncomingMessage, limits: Upl
     await dispose();
     throw error;
   }
-};
-
-export type UploadText = { content: string; sha256: string; byteLength: number };
-
-/**
- * Decode an uploaded text file in one streaming pass that also hashes the exact bytes on disk.
- * The whole file is never held as a Buffer; only the decoded text the parsers need is kept.
- * Callers cap the file well below V8's ~512 Mi-character string limit.
- */
-export const readUploadText = async (path: string): Promise<UploadText> => {
-  const hash = createHash("sha256");
-  const decoder = new StringDecoder("utf8");
-  const parts: string[] = [];
-  let byteLength = 0;
-  for await (const chunk of createReadStream(path, { highWaterMark: 1024 * 1024 })) {
-    const bytes = chunk as Buffer;
-    byteLength += bytes.length;
-    hash.update(bytes);
-    parts.push(decoder.write(bytes));
-  }
-  parts.push(decoder.end());
-  const content = parts.join("");
-  parts.length = 0;
-  return { content, sha256: hash.digest("hex"), byteLength };
 };

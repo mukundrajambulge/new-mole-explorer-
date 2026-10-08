@@ -437,9 +437,13 @@ ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
     await expect(new StructureIngestionService().ingestLocal("wrong.xyz", Buffer.from(pdbFixture))).rejects.toMatchObject({ code: "FORMAT_MISMATCH" });
   });
 
-  it("acquires remote response bytes through arrayBuffer without text re-encoding", async () => {
+  it("streams remote response bytes without whole-body buffering or text re-encoding", async () => {
     const bytes = Buffer.from(cifFixture.replace("data_test", "data_remote"), "utf8");
-    const response = { status: 200, ok: true, headers: new Headers({ "content-type": "chemical/x-mmcif", etag: "r09-test" }), arrayBuffer: async () => bytes, text: () => { throw new Error("remote text path must not be used"); } } as unknown as Response;
+    const response = new Response(new Uint8Array(bytes), { status: 200, headers: { "content-type": "chemical/x-mmcif", etag: "r09-test" } });
+    Object.assign(response, {
+      arrayBuffer: () => { throw new Error("remote arrayBuffer path must not be used"); },
+      text: () => { throw new Error("remote text path must not be used"); },
+    });
     vi.stubGlobal("fetch", vi.fn(async () => response));
     const result = await new StructureIngestionService().ingestRcsb("1abc");
     expect(result.sourceArtifact?.sha256).toBe((await import("../lifecycle/canonicalSerialization.js")).sha256Bytes(bytes));

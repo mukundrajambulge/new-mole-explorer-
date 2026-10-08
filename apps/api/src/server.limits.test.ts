@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 const MIB = 1024 * 1024;
 const BOUNDARY = "----mole-limits-test";
@@ -110,6 +110,75 @@ describe("request size limits", () => {
     expect(huge.status).toBe(413);
   }, 30_000);
 
+  it("caps the JSON bytes held at once: a third 60 MB project save while two are in flight answers 429", async () => {
+    const created = await send({ method: "POST", path: "/api/projects", headers: { "content-type": "application/json" }, head: Buffer.from("{}") }).reply;
+    const path = `/api/projects/${encodeURIComponent((JSON.parse(created.body) as { id: string }).id)}`;
+    const declared = { "content-type": "application/json", "content-length": 60 * MIB };
+    // Two saves declare 60 MiB each but stall after 1 MiB, holding 120 of the default 128 MiB budget.
+    const held = [send({ method: "PUT", path, headers: declared, bodyBytes: MIB, hold: true }), send({ method: "PUT", path, headers: declared, bodyBytes: MIB, hold: true })];
+    let third: Reply | undefined;
+    for (let attempt = 0; attempt < 20 && third?.status !== 429; attempt += 1) {
+      third = await send({ method: "PUT", path, headers: declared, bodyBytes: 60 * MIB }).reply;
+    }
+    expect(third?.status).toBe(429);
+    expect(code(third!)).toBe("SERVER_BUSY");
+    held.forEach((request) => request.abort());
+    await Promise.allSettled(held.map((request) => request.reply));
+    // The budget is released when the stalled saves go away: a full-size body is accepted again (and fails only as bad JSON).
+    let after: Reply | undefined;
+    for (let attempt = 0; attempt < 50 && after?.status !== 400; attempt += 1) {
+      if (attempt > 0) await new Promise((resolve) => setTimeout(resolve, 20));
+      after = await send({ method: "PUT", path, headers: declared, bodyBytes: 60 * MIB }).reply;
+    }
+    expect(after?.status).toBe(400);
+    expect(code(after!)).toBe("INVALID_INPUT");
+  }, 60_000);
+
+  describe("RCSB fetches stream to disk under the upload cap", () => {
+    const remoteDir = () => join(dir, "tmp", "remote");
+    const remotePending = () => (existsSync(remoteDir()) ? readdirSync(remoteDir()).length : 0);
+    const fetchRcsb = (pdbId: string) => send({ method: "POST", path: "/api/structures/rcsb", headers: { "content-type": "application/json" }, head: Buffer.from(JSON.stringify({ pdbId })) }).reply;
+    /** A remote body produced 1 MiB at a time, so the test never holds it whole either. */
+    const streamedBody = (bytes: number) => {
+      const chunk = new Uint8Array(MIB).fill(0x20);
+      let left = bytes;
+      return new ReadableStream<Uint8Array>({
+        pull(controller) {
+          if (left <= 0) { controller.close(); return; }
+          const piece = left >= chunk.length ? chunk : chunk.subarray(0, left);
+          left -= piece.length;
+          controller.enqueue(piece);
+        },
+      });
+    };
+    afterEach(() => { vi.unstubAllGlobals(); });
+
+    it("ingests a real RCSB mmCIF and keeps its exact byte digest", async () => {
+      const fixture = readFileSync(join(process.cwd(), "..", "..", "tests", "fixtures", "rcsb", "1CRN.cif"));
+      const fetchMock = vi.fn(async () => new Response(new Uint8Array(fixture), { status: 200, headers: { "content-type": "chemical/x-mmcif" } }));
+      vi.stubGlobal("fetch", fetchMock);
+      const res = await fetchRcsb("1crn");
+      expect(res.status, res.body.slice(0, 300)).toBe(200);
+      const result = JSON.parse(res.body) as { sourceArtifact?: { byteLength?: number; sha256?: string } };
+      expect(result.sourceArtifact?.byteLength).toBe(fixture.length);
+      expect(result.sourceArtifact?.sha256).toBe(createHash("sha256").update(fixture).digest("hex"));
+      expect(remotePending()).toBe(0);
+    }, 30_000);
+
+    it("answers 413 for a remote body over 256 MB, declared or streamed, and leaves no temp file", async () => {
+      vi.stubGlobal("fetch", vi.fn(async () => new Response(streamedBody(300 * MIB), { status: 200, headers: { "content-length": String(300 * MIB) } })));
+      const declared = await fetchRcsb("2BIG");
+      expect(declared.status).toBe(413);
+      expect(code(declared)).toBe("PAYLOAD_TOO_LARGE");
+      vi.stubGlobal("fetch", vi.fn(async () => new Response(streamedBody(300 * MIB), { status: 200 })));
+      const streamed = await fetchRcsb("3BIG");
+      expect(streamed.status).toBe(413);
+      expect(code(streamed)).toBe("PAYLOAD_TOO_LARGE");
+      expect(JSON.parse(streamed.body).error.message).not.toMatch(/[\\/]/);
+      expect(remotePending()).toBe(0);
+    }, 120_000);
+  });
+
   it("ingests a real fixture uploaded as a stream and removes the temp file", async () => {
     const fixture = readFileSync(join(process.cwd(), "..", "..", "tests", "fixtures", "mini-protein.pdb"));
     const head = Buffer.from(`--${BOUNDARY}\r\ncontent-disposition: form-data; name="file"; filename="mini-protein.pdb"\r\n\r\n`);
@@ -149,7 +218,11 @@ describe("request size limits", () => {
     await waitFor(() => pending() === 2);
     const third = await upload("c.pdb", 1024).reply;
     expect(third.status).toBe(429);
-    expect(code(third)).toBe("TOO_MANY_UPLOADS");
+    expect(code(third)).toBe("SERVER_BUSY");
+    // RCSB fetches share the same transfer slots, so they cannot run past the limit either.
+    const rcsb = await send({ method: "POST", path: "/api/structures/rcsb", headers: { "content-type": "application/json" }, head: Buffer.from("{\"pdbId\":\"1CRN\"}") }).reply;
+    expect(rcsb.status).toBe(429);
+    expect(code(rcsb)).toBe("SERVER_BUSY");
     first.abort();
     second.abort();
     await Promise.allSettled([first.reply, second.reply]);

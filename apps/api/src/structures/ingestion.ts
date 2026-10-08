@@ -1,5 +1,12 @@
-import { createHash } from "node:crypto";
-import { basename } from "node:path";
+import { createHash, randomUUID } from "node:crypto";
+import { createReadStream, createWriteStream } from "node:fs";
+import { mkdir, unlink } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { basename, join } from "node:path";
+import { Readable, Transform } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import { StringDecoder } from "node:string_decoder";
+import type { ReadableStream as WebReadableStream } from "node:stream/web";
 import type {
   BondOrder,
   CanonicalAtom,
@@ -96,9 +103,9 @@ const ION_RESIDUES = new Set(["LI", "NA", "K", "RB", "CS", "MG", "CA", "SR", "BA
 
 export class IngestionError extends Error {
   constructor(
-    public readonly code: "UNSUPPORTED_FORMAT" | "FORMAT_MISMATCH" | "INVALID_INPUT" | "PARSE_FAILED" | "REMOTE_FETCH_FAILED" | "REMOTE_NOT_FOUND" | "PAYLOAD_TOO_LARGE" | "PROJECT_NOT_FOUND" | "PROJECT_INVALID" | "IMPORT_POLICY_CONFLICT" | "NAME_COLLISION" | "REVISION_CONFLICT" | "UNSUPPORTED_STATE_SCOPE" | "EXPORT_WOULD_LOSE_SEMANTICS" | "WRITER_FAILED" | "INTEGRITY_MISMATCH" | "SCHEMA_UNSUPPORTED" | "MIGRATION_FAILED" | "MISSING_DEPENDENCY" | "STALE_REFERENCE" | "SESSION_RESTORE_FAILED" | "SCENE_RESTORE_FAILED" | "SECURITY_REJECTED",
+    public readonly code: "UNSUPPORTED_FORMAT" | "FORMAT_MISMATCH" | "INVALID_INPUT" | "PARSE_FAILED" | "REMOTE_FETCH_FAILED" | "REMOTE_NOT_FOUND" | "PAYLOAD_TOO_LARGE" | "PROJECT_NOT_FOUND" | "PROJECT_INVALID" | "IMPORT_POLICY_CONFLICT" | "NAME_COLLISION" | "REVISION_CONFLICT" | "UNSUPPORTED_STATE_SCOPE" | "EXPORT_WOULD_LOSE_SEMANTICS" | "WRITER_FAILED" | "INTEGRITY_MISMATCH" | "SCHEMA_UNSUPPORTED" | "MIGRATION_FAILED" | "MISSING_DEPENDENCY" | "STALE_REFERENCE" | "SESSION_RESTORE_FAILED" | "SCENE_RESTORE_FAILED" | "SECURITY_REJECTED" | "SERVER_BUSY",
     message: string,
-    public readonly status = code === "PAYLOAD_TOO_LARGE" ? 413 : code === "REMOTE_NOT_FOUND" || code === "PROJECT_NOT_FOUND" ? 404 : code === "REVISION_CONFLICT" || code === "NAME_COLLISION" ? 409 : code === "REMOTE_FETCH_FAILED" ? 502 : 400,
+    public readonly status = code === "PAYLOAD_TOO_LARGE" ? 413 : code === "SERVER_BUSY" ? 429 : code === "REMOTE_NOT_FOUND" || code === "PROJECT_NOT_FOUND" ? 404 : code === "REVISION_CONFLICT" || code === "NAME_COLLISION" ? 409 : code === "REMOTE_FETCH_FAILED" ? 502 : 400,
   ) {
     super(message);
     this.name = "IngestionError";
@@ -1011,13 +1018,46 @@ type IngestAcquisition = { mediaType?: string; accession?: string; providerMetad
 /** Decoded parser text plus the digest of the exact received bytes and how to seal them. */
 type DecodedSource = { content: string; sha256: string; byteLength: number; seal: (input: SourceArtifactSeal) => Promise<SourceArtifact> };
 
+export type TextFile = { content: string; sha256: string; byteLength: number };
+
+/**
+ * Decode a text file in one streaming pass that also hashes the exact bytes on disk.
+ * The whole file is never held as a Buffer; only the decoded text the parsers need is kept.
+ * Callers cap the file well below V8's ~512 Mi-character string limit.
+ */
+export const readTextFile = async (path: string): Promise<TextFile> => {
+  const hash = createHash("sha256");
+  const decoder = new StringDecoder("utf8");
+  const parts: string[] = [];
+  let byteLength = 0;
+  for await (const chunk of createReadStream(path, { highWaterMark: 1024 * 1024 })) {
+    const bytes = chunk as Buffer;
+    byteLength += bytes.length;
+    hash.update(bytes);
+    parts.push(decoder.write(bytes));
+  }
+  parts.push(decoder.end());
+  const content = parts.join("");
+  parts.length = 0;
+  return { content, sha256: hash.digest("hex"), byteLength };
+};
+
+/** Bounds for remote acquisition: byte cap, where the body is streamed, and a gate for the decode + parse step. */
+export type RemoteAcquisitionLimits = {
+  maxBytes?: number;
+  tempDir?: string;
+  parseGate?: <T>(byteLength: number, run: () => Promise<T>) => Promise<T>;
+};
+
+const mibText = (bytes: number) => `${Math.floor(bytes / (1024 * 1024))} MiB`;
+
 export class StructureIngestionService {
   private readonly structures = new Map<string, CanonicalMolecularStructure>();
   /** Coalesce and retain successful online acquisitions for the lifetime of the API process. */
   private readonly rcsbCache = new Map<string, StructureLoadResult>();
   private readonly rcsbInflight = new Map<string, Promise<StructureLoadResult>>();
 
-  constructor(private readonly sourceArtifacts = new SourceArtifactStore()) {}
+  constructor(private readonly sourceArtifacts = new SourceArtifactStore(), private readonly remoteLimits: RemoteAcquisitionLimits = {}) {}
 
   async ingestLocal(filename: string, buffer: Buffer, options: { parentExportArtifactId?: string } = {}): Promise<StructureLoadResult> {
     assertLocalFilenameAdmitted(filename);
@@ -1064,16 +1104,24 @@ export class StructureIngestionService {
       allResponsesNotFound = false;
       if (!response.ok) continue;
       try {
-        const responseBytes = Buffer.from(await response.arrayBuffer());
         const providerMetadata = Object.fromEntries(["etag", "last-modified", "content-length", "content-type"].flatMap((header) => {
           const value = response.headers.get(header);
           return value ? [[header, value] as const] : [];
         }));
-        return await this.ingest("RCSB", `${normalizedId}.cif`, responseBytes, source.uri, source.provider, {
-          mediaType: response.headers.get("content-type")?.split(";", 1)[0]?.trim() || "chemical/x-mmcif",
-          accession: normalizedId,
-          providerMetadata,
-        });
+        const download = await this.downloadRemoteBody(response);
+        try {
+          const gate = this.remoteLimits.parseGate ?? (<T>(_bytes: number, run: () => Promise<T>) => run());
+          return await gate(download.size, async () => {
+            const text = await readTextFile(download.path);
+            return this.ingestDecoded("RCSB", `${normalizedId}.cif`, { ...text, seal: (input) => this.sourceArtifacts.sealFile(input, download.path, text.sha256, text.byteLength) }, source.uri, source.provider, {
+              mediaType: response.headers.get("content-type")?.split(";", 1)[0]?.trim() || "chemical/x-mmcif",
+              accession: normalizedId,
+              providerMetadata,
+            });
+          });
+        } finally {
+          await download.dispose();
+        }
       } catch (error) {
         if (error instanceof IngestionError) throw error;
         continue;
@@ -1084,8 +1132,43 @@ export class StructureIngestionService {
   }
 
   /**
+   * Stream a remote body to a private temp file, counting bytes as they arrive, so a large or
+   * lying remote never becomes one in-memory Buffer. Above the cap the body is dropped with 413.
+   */
+  private async downloadRemoteBody(response: Response): Promise<{ path: string; size: number; dispose: () => Promise<void> }> {
+    const maxBytes = Math.min(this.remoteLimits.maxBytes ?? MAX_STRUCTURE_BYTES, MAX_STRUCTURE_BYTES);
+    const tooLarge = () => new IngestionError("PAYLOAD_TOO_LARGE", `Remote structures must be ${mibText(maxBytes)} or smaller.`);
+    const body = response.body;
+    if (!body) throw new IngestionError("INVALID_INPUT", "The structure input is empty.");
+    const declared = Number(response.headers.get("content-length") ?? Number.NaN);
+    if (Number.isFinite(declared) && declared > maxBytes) {
+      await body.cancel().catch(() => undefined);
+      throw tooLarge();
+    }
+    const directory = this.remoteLimits.tempDir ?? join(tmpdir(), "mole-remote");
+    await mkdir(directory, { recursive: true });
+    const path = join(directory, `${randomUUID()}.part`);
+    const dispose = () => unlink(path).catch(() => undefined);
+    let size = 0;
+    const counter = new Transform({
+      transform(chunk: Buffer, _encoding, callback) {
+        size += chunk.length;
+        if (size > maxBytes) callback(tooLarge());
+        else callback(null, chunk);
+      },
+    });
+    try {
+      await pipeline(Readable.fromWeb(body as WebReadableStream<Uint8Array>), counter, createWriteStream(path, { flags: "wx" }));
+    } catch (error) {
+      await dispose();
+      throw error;
+    }
+    return { path, size, dispose };
+  }
+
+  /**
    * Ingest an upload the server streamed to `path`. `text` must come from the server's own
-   * streaming read of that file (see readUploadText), so no whole-file Buffer is ever held and
+   * streaming read of that file (see readTextFile), so no whole-file Buffer is ever held and
    * the source artifact is copied on disk rather than kept in memory.
    */
   async ingestLocalText(filename: string, path: string, text: { content: string; sha256: string; byteLength: number }, options: { parentExportArtifactId?: string } = {}): Promise<StructureLoadResult> {
