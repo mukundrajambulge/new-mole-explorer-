@@ -1,8 +1,9 @@
+import { evidencePath } from "./evidence";
 import { expect, test, type Page } from "@playwright/test";
 import { resolve } from "node:path";
 
 const fixture = resolve("tests/fixtures/mini-protein.pdb");
-const evidence = (name: string) => resolve("verification/evidence/r08/ui", name);
+const evidence = (name: string) => evidencePath("r08/ui", name);
 
 const loadFixture = async (page: Page) => {
   await page.goto("/");

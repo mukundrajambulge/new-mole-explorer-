@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test, type Page } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -6,7 +7,7 @@ const mini = resolve("tests/fixtures/mini-protein.pdb");
 const explicitHydrogen = resolve("tests/fixtures/r07-b3-explicit-h.pdb");
 const ligand = resolve("tests/fixtures/g1c-small-molecule.pdb");
 const multiState = resolve("tests/fixtures/multistate.pdb");
-const evidenceDir = resolve("verification/evidence/r07-operational-closure");
+const evidenceDir = evidencePath("r07-operational-closure");
 
 const capture = (page: Page, name: string) => page.screenshot({ path: resolve(evidenceDir, name), animations: "disabled", fullPage: true });
 

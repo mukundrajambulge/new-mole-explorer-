@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -64,7 +65,7 @@ test("final acceptance covers camera, ligand color, selection, and representatio
   await runCommand(page, "select object mini-protein.pdb and resi 1");
   await expect(page.getByTestId("active-selection")).toContainText("4 atoms");
   await expect(target).toHaveAttribute("data-selection-indicator", "visible");
-  await page.screenshot({ path: resolve("verification/evidence/final-pymol-acceptance/16-cross-feature/01-camera-color-selection.png"), animations: "disabled" });
+  await page.screenshot({ path: evidencePath("final-pymol-acceptance/16-cross-feature/01-camera-color-selection.png"), animations: "disabled" });
   await runCommand(page, "select none");
   await expect(target).toHaveAttribute("data-selection-indicator", "none");
 });
@@ -89,5 +90,5 @@ test("final acceptance covers R07 edit undo/redo, R08 alignment, R09 scene save,
   await runCommand(page, "python print(\"hello\")");
   await expect(page.getByRole("region", { name: "Command and selection console" }).locator(".console-entry").last()).toContainText("UNSAFE_COMMAND_REJECTED");
   await expect(target).toHaveAttribute("data-viewer-state", "loaded");
-  await page.screenshot({ path: resolve("verification/evidence/final-pymol-acceptance/16-cross-feature/02-r07-r08-r09-r10.png"), animations: "disabled" });
+  await page.screenshot({ path: evidencePath("final-pymol-acceptance/16-cross-feature/02-r07-r08-r09-r10.png"), animations: "disabled" });
 });

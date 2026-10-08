@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test, type Page } from "@playwright/test";
 
 const viewer = (page: Page) => page.getByTestId("molecular-viewer");
@@ -50,14 +51,14 @@ test("MANUAL GATE 01 keeps 4DJW responsive and VDW visible", async ({ page }) =>
 
   await page.getByRole("button", { name: "Expand console", exact: true }).click();
   await page.getByRole("button", { name: "Collapse console", exact: true }).click();
-  await page.screenshot({ path: "verification/evidence/manual-gate-01/vdw-surface-visible.png", animations: "disabled" });
+  await page.screenshot({ path: evidencePath("manual-gate-01/vdw-surface-visible.png"), animations: "disabled" });
 
   await page.getByRole("button", { name: "View", exact: true }).click();
   await page.getByRole("button", { name: "Rotate", exact: true }).click();
   await dragCanvas(page, [0.42, 0.45], [0.76, 0.58]);
   await expect(target).toHaveAttribute("data-camera-action", "ROTATE");
   await expect(target).toHaveAttribute("data-surface-state", "ready");
-  await page.screenshot({ path: "verification/evidence/manual-gate-01/vdw-after-rotation.png", animations: "disabled" });
+  await page.screenshot({ path: evidencePath("manual-gate-01/vdw-after-rotation.png"), animations: "disabled" });
 
   await page.getByRole("button", { name: "Zoom", exact: true }).click();
   await dragCanvas(page, [0.55, 0.58], [0.55, 0.34]);
@@ -87,5 +88,5 @@ test("MANUAL GATE 01 keeps 4DJW responsive and VDW visible", async ({ page }) =>
   await expect(target).toHaveAttribute("data-camera-projection", "orthographic");
   await expect(target).toHaveAttribute("data-renderer-model-loads", initial.models ?? "1");
   await expect(target).toHaveAttribute("data-renderer-surface-rebuilds", afterRapidSwitch ?? "{}");
-  await page.screenshot({ path: "verification/evidence/manual-gate-01/view-orthographic.png", animations: "disabled" });
+  await page.screenshot({ path: evidencePath("manual-gate-01/view-orthographic.png"), animations: "disabled" });
 });

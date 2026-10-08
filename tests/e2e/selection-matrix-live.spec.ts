@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -228,5 +229,5 @@ test("representative selection families run through the real console input", asy
     attempts: evidence,
   }, null, 2) + "\n", "utf8");
   await expect(viewer).toHaveAttribute("data-viewer-state", "loaded");
-  await page.screenshot({ path: resolve("verification/evidence/selection-console-matrix.png"), animations: "disabled" });
+  await page.screenshot({ path: evidencePath("selection-console-matrix.png"), animations: "disabled" });
 });

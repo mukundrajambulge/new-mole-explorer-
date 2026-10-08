@@ -1,7 +1,8 @@
+import { evidencePath } from "./evidence";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { resolve } from "node:path";
 
-const evidenceDir = resolve("verification/evidence/manual-gate-03-selection");
+const evidenceDir = evidencePath("manual-gate-03-selection");
 
 const viewer = (page: Page) => page.getByTestId("molecular-viewer");
 

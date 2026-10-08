@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -28,7 +29,7 @@ const importFile = async (page: import("@playwright/test").Page, path: string, a
   if (add) { await fileRibbon(page); const chooser = page.waitForEvent("filechooser"); await page.getByRole("button", { name: "Add Structure", exact: true }).click(); await (await chooser).setFiles(path); await closeFileRibbon(page); }
   else await page.locator('input[type="file"]').setInputFiles(path);
 };
-const capture = (page: import("@playwright/test").Page, folder: string, name: string) => page.screenshot({ path: `verification/evidence/r09/${folder}/${name}`, fullPage: true });
+const capture = (page: import("@playwright/test").Page, folder: string, name: string) => page.screenshot({ path: evidencePath(`r09/${folder}/${name}`), fullPage: true });
 
 test("AT-R09-01/02/03/04/05/06/07 acquisition, multi-object session and explicit collision policy", async ({ page }) => {
   await newProject(page);
