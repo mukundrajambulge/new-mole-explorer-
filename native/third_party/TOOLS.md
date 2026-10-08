@@ -29,4 +29,7 @@ The lock currently holds direct pins only; the full transitive freeze must still
 | PROPKA | 3.5.1 | MIT | |
 | PDBFixer | NOT INSTALLED (pin pending) | MIT | Add to `scripts/wsl-setup.sh`, then pin. |
 
-Licences are from upstream metadata as known at writing; reviewer to confirm against `pip show` in WSL.
+STATUS: UNVERIFIED. Licences above are NOT yet confirmed with `pip show` (this sandbox cannot run WSL directly).
+To finish: run `scripts/lock-prep.sh` in WSL (writes the hashed transitive lock, adds a PDBFixer pin
+to `requirements.in`, prints Name/Version/License for each tool), then correct this table.
+`scripts/wsl-setup.sh` installs with `--require-hashes` from that lock and verifies the Vina sha256.

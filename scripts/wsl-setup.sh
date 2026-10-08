@@ -11,11 +11,12 @@ mkdir -p ~/mole-tools && cd ~/mole-tools
 # Check the exact asset name on https://github.com/ccsb-scripps/AutoDock-Vina/releases/tag/v1.2.7
 curl -fL -o vina "https://github.com/ccsb-scripps/AutoDock-Vina/releases/download/v1.2.7/vina_1.2.7_linux_x86_64"
 chmod +x vina
-sha256sum vina | tee vina.sha256   # record this value in native/third_party/TOOLS.md
+echo "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644  vina" | sha256sum -c -   # must match native/third_party/TOOLS.md
 
 python3 -m venv ~/mole-prep
 . ~/mole-prep/bin/activate
 pip install --upgrade pip
-pip install rdkit meeko dimorphite_dl pdb2pqr propka pytest
-pip freeze > ~/mole-prep/requirements.lock.txt
+# Reproducible install from the hashed lock (regenerate with scripts/lock-prep.sh)
+pip install --require-hashes -r "$(dirname "$0")/../workers/prep/requirements.lock.txt"
+pip install pytest
 echo "Done. Close all WSL windows and run 'wsl --shutdown' once so systemd and the docker group take effect."
