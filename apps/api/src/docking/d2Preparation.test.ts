@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   D2_KINEMATIC_PROFILE_ID,
@@ -93,6 +94,24 @@ const sealWithFixture = (fixture: ReturnType<typeof adaptedFixture>) => {
   const kinematic = kinematicFor(fixture);
   return sealPreparedLigandState({ molecularIdentity: fixture.identity, graphRevision: fixture.graph, chemicalState: fixture.chemical, coordinateState: fixture.coordinate, selectedComponentId: fixture.selectedComponentId, atomTyping: fixture.graph.atoms.map((atom) => ({ atomUid: atom.atomUid, typeId: `${atom.element}_GENERIC_EXPLICIT`, chargeModel: "FIXTURE_EXPLICIT", evidenceRef: "fixture:typing" })), kinematicModel: kinematic.value!, profileId: D2_LIGAND_PROFILE_ID });
 };
+
+describe("D2 halogen ligand from shared native fixture (TS adapter -> elements consumed by the C++ scorer test)", () => {
+  const fixtureDir = new URL("../../../../tests/fixtures/", import.meta.url);
+  const oracle = Object.fromEntries(readFileSync(new URL("halogen-oracle.txt", fixtureDir), "utf8").trim().split(/\r?\n/).map((l) => { const [k, ...v] = l.split(" "); return [k!, v]; }));
+  const pdbqtTypes = readFileSync(new URL("halogen-ligand.pdbqt", fixtureDir), "utf8").split(/\r?\n/).filter((l) => l.startsWith("ATOM")).map((l) => l.trim().split(/\s+/).at(-1)!);
+  const mixedCase = (t: string) => t.charAt(0) + t.slice(1).toLowerCase();
+  it("adapter emits exactly the element spellings the native oracle test scores", () => {
+    const base = structureFor("sdf");
+    const coords = readFileSync(new URL("halogen-ligand.pdbqt", fixtureDir), "utf8").split(/\r?\n/).filter((l) => l.startsWith("ATOM")).map((l) => [Number(l.slice(30, 38)), Number(l.slice(38, 46)), Number(l.slice(46, 54))] as const);
+    const atoms = pdbqtTypes.map((t, i) => ({ ...base.atoms[0]!, stableId: `source-atom-${i + 1}`, serial: i + 1, atomName: `${t}${i}`, element: mixedCase(t), x: coords[i]![0], y: coords[i]![1], z: coords[i]![2] }));
+    const bonds = [1, 2, 3].map((i) => ({ id: `source-bond-${i}`, atom1: "source-atom-1", atom2: `source-atom-${i + 1}`, order: "SINGLE" as const, source: "PDB_CONECT" as const }));
+    const result = adaptCanonicalStructure({ structure: { ...base, atoms, bonds }, sourceArtifact: sourceArtifactFor("sdf") });
+    expect(result.status).toBe("VALID");
+    const elements = result.value!.graph!.atoms.map((a) => a.element);
+    expect(elements).toEqual(oracle.ligand_elements);
+    expect(elements.every((e) => Number.isFinite(Number(oracle.expected_empirical_score![0])) && e === e.toUpperCase())).toBe(true);
+  });
+});
 
 describe("D2 halogen element spelling (single route: adapter upper-cases, native scorer is case-insensitive)", () => {
   it.each(["Cl", "CL", "Br", "I"])("seals a ligand containing %s as an upper-case supported element", (el) => {
