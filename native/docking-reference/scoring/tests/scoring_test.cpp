@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <fstream>
 #include <cstdlib>
 #include <iostream>
 #include <limits>
@@ -388,7 +389,55 @@ void test_halogen_element_case() {
   }
 }
 
+// Reads atoms from a PDBQT fixture as the TypeScript boundary hands them over:
+// element upper-cased (CL, BR) from the AutoDock atom-type column.
+std::vector<Atom> read_pdbqt_fixture(const std::string& path, const std::string& prefix) {
+  std::ifstream in(path);
+  require(in.good(), "fixture readable: " + path);
+  std::vector<Atom> atoms;
+  std::string line;
+  while (std::getline(in, line)) {
+    if (line.rfind("ATOM", 0) != 0 || line.size() < 54) continue;
+    const double x = std::stod(line.substr(30, 8));
+    const double y = std::stod(line.substr(38, 8));
+    const double z = std::stod(line.substr(46, 8));
+    const std::string t = line.substr(line.find_last_of(' ') + 1);
+    if (t == "HD") continue;  // hydrogens are not scoring atoms
+    std::string el = t;
+    std::string type = "H";
+    if (t == "CL") type = "Cl_H";
+    else if (t == "BR") type = "Br_H";
+    else if (t == "I") type = "I_H";
+    else if (t == "C") type = "C_H";
+    else if (t == "N") type = "N_P";
+    else if (t == "OA") { type = "O_A"; el = "O"; }
+    else if (t == "SA") { type = "S_P"; el = "S"; }
+    else if (t == "HD") el = "H";
+    atoms.push_back(atom(prefix + std::to_string(atoms.size()), type, el, Vec3{x, y, z}, 0, t != "HD"));
+  }
+  return atoms;
+}
+
+void test_halogen_fixture_scores_against_multitype_receptor() {
+  const std::string dir = MOLE_FIXTURE_DIR;
+  const auto receptor = read_pdbqt_fixture(dir + "/multitype-receptor.pdbqt", "r");
+  const auto ligand = read_pdbqt_fixture(dir + "/halogen-ligand.pdbqt", "l");
+  require(receptor.size() == 4 && ligand.size() == 4, "fixtures parsed");
+  for (const auto& a : ligand) {
+    if (a.element == "C") continue;
+    const auto t = mole::docking::assign_xs_type({a.element, std::nullopt, false, false});
+    require(t.status == mole::docking::TypingStatus::Supported, "uppercase element types: " + a.element);
+  }
+  Request request = base_request();
+  request.receptor_atoms = receptor;
+  request.ligand_atoms = ligand;
+  set_n_tors(request, 1.0);
+  const auto scored = mole::docking::score_direct(request);
+  require(scored.valid, "Cl/Br/I ligand scores against multi-type receptor: " + scored.diagnostic);
+}
+
 int main() {
+  test_halogen_fixture_scores_against_multitype_receptor();
   test_halogen_element_case();
   test_xs_type_table();
   test_independent_pair_oracle_and_decomposition();

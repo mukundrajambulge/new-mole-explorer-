@@ -20,7 +20,7 @@ const checks = [
   { name: "typecheck", cmd: "npm", args: ["run", "--silent", "typecheck"] },
   ...(argv.has("--quick") ? [] : [{ name: "lint", cmd: "npm", args: ["run", "--silent", "lint"] }]),
   { name: "unit", cmd: "npm", args: ["test", "--silent"] },
-  ...(argv.has("--native") ? [{ name: "native", ...wsl("cmake -S native/docking-reference/scoring -B ~/mole-build/native -G Ninja -DCMAKE_BUILD_TYPE=Release >/dev/null && cmake --build ~/mole-build/native >/dev/null && ctest --test-dir ~/mole-build/native --output-on-failure") }] : []),
+  ...(argv.has("--native") ? [{ name: "native", ...wsl("cmake -S native/docking-reference/scoring -B test-results/native-build -G Ninja -DCMAKE_BUILD_TYPE=Release >/dev/null && cmake --build test-results/native-build >/dev/null && ctest --test-dir test-results/native-build --output-on-failure") }] : []),
   ...(argv.has("--python") ? [{ name: "python", ...wsl(". ~/mole-prep/bin/activate && pytest -q workers/prep") }] : []),
   ...(argv.has("--smoke") ? [{ name: "smoke-e2e", cmd: "npx", args: ["playwright", "test", "--project=smoke", "--reporter=line"] }] : []),
 ];

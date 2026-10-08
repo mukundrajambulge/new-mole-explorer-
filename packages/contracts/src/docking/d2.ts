@@ -336,3 +336,10 @@ export type D2SearchRegionV1 = Readonly<{
 
 export const D2_SUPPORTED_CORE_ELEMENTS = Object.freeze(["H", "C", "N", "O", "F", "P", "S", "CL", "BR", "I"] as const);
 export type D2SupportedCoreElement = (typeof D2_SUPPORTED_CORE_ELEMENTS)[number];
+
+/** Normalises an element symbol to IUPAC case ("CL" -> "Cl"); null if not a supported core element. */
+export const normalizeD2ElementSymbol = (symbol: string): string | null => {
+  const upper = symbol.trim().toUpperCase();
+  if (!(D2_SUPPORTED_CORE_ELEMENTS as readonly string[]).includes(upper)) return null;
+  return upper.charAt(0) + upper.slice(1).toLowerCase();
+};
