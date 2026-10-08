@@ -1,7 +1,7 @@
 # Sprint state (generated: do not edit; run `node scripts/sprint/sprint.mjs state`)
 
-Status: DONE: 21 · TODO: 67 · READY: 1 · BLOCKED: 1 · DEFERRED: 8
-Done by tier: core 21/45 · strong 0/38 · stretch 0/7
+Status: DONE: 22 · TODO: 66 · READY: 1 · BLOCKED: 1 · DEFERRED: 8
+Done by tier: core 22/45 · strong 0/38 · stretch 0/7
 Calibration: 7516 output tokens per 1% of the 5-hour window; estimate multiplier 1.07
 Last waves: W2 157k (38%→56%), W3 241k (6%→34%), W4 131k (3%→28%)
 
@@ -9,7 +9,7 @@ Last waves: W2 157k (38%→56%), W3 241k (6%→34%), W4 131k (3%→28%)
 - 4.4 Send numbers over JSON correctly: BLOCKED (Waits for 5.2: box seal must take {jobId, bounds} from a real prep job (see design note))
 
 ## Next ready tasks (critical path first)
-- ★ 3.4 [L4 M/medium] Separate hover markers from selection styling in the viewer
+- ★ 3.8 [L4 M/medium] One viewer that survives tab switches
 - ★ 5.2 [L6 L/high] Preparation worker (visible, versioned, user-confirmed)
 - 0.8 [L1 S/low] Pin the Node.js version
 - 0.9 [L1 S/low] Write ONE honest status document

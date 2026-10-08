@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "label": "after-3.4-fix",
+  "date": "2026-10-08T17:32:56.239Z",
+  "fixture": "4V6F",
+  "atoms": 307345,
+  "pickGridCells": 17686,
+  "dwellHoverSelectionMs": {
+    "n": 2,
+    "min": 17.50000001490116,
+    "median": 21.700000002980232,
+    "p95": 21.700000002980232,
+    "max": 21.700000002980232
+  },
+  "hoverClearedOnPointerDown": true,
+  "drag": {
+    "moves": 12,
+    "hoverContinueCalls": 0,
+    "hoverSelectionCalls": 0,
+    "hoverRaycastMs": 0,
+    "inputCpuMsPerMove": {
+      "n": 12,
+      "min": 0.6000000089406967,
+      "median": 1.2999999970197678,
+      "p95": 2.9000000059604645,
+      "max": 2.9000000059604645
+    },
+    "showMsPerMove": {
+      "n": 12,
+      "min": 1419,
+      "median": 1688.2999999970198,
+      "p95": 1839.9000000059605,
+      "max": 1839.9000000059605
+    },
+    "stepWallMs": {
+      "n": 12,
+      "min": 1472,
+      "median": 1746,
+      "p95": 2143,
+      "max": 2143
+    }
+  }
+}
