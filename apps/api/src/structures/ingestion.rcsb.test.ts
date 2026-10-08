@@ -140,6 +140,17 @@ describe("mmCIF syntax rules", () => {
     expect(Object.keys(result.hierarchy.residues)).toHaveLength(5);
   });
 
+  it("never pairs an auth chain with a label number when both systems are incomplete", async () => {
+    const rows = [
+      "ATOM 1 C CA ALA . 5 ? B ? 1.0 0.0 0.0 1",
+      "ATOM 2 C CA ALA A 6 ? ? ? 2.0 0.0 0.0 1",
+      "ATOM 3 C CA ALA . . 9 ? ? 3.0 0.0 0.0 1",
+    ];
+    const atoms = (await ingest("p.cif", doc(rows))).structure.atoms;
+    expect(atoms.map((atom) => `${atom.chain}${atom.residueNumber}`)).toEqual(["B0", "A6", "_9"]);
+    expect(atoms[0]).toMatchObject({ labelSeqId: 5 });
+  });
+
   it("resolves struct_conn partners by label ids when the row has no auth ids", async () => {
     const rows = ["ATOM 1 S SG CYS A 1 101 B ? 1.0 0.0 0.0 1", "ATOM 2 S SG CYS A 2 102 B ? 3.0 0.0 0.0 1"];
     const conn = ["id", "conn_type_id", "ptnr1_label_asym_id", "ptnr1_label_seq_id", "ptnr1_label_atom_id", "ptnr1_auth_asym_id", "ptnr1_auth_seq_id", "ptnr2_label_asym_id", "ptnr2_label_seq_id", "ptnr2_label_atom_id", "ptnr2_auth_asym_id", "ptnr2_auth_seq_id"];

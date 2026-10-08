@@ -570,8 +570,8 @@ type CifIdentityColumns = { authAsym: string; authSeq: string; insCode?: string;
  * One row's residue identity in a single naming system. The author triple
  * (asym, seq, PDB insertion code) wins whenever the row has both auth asym and
  * auth seq; otherwise the label pair is used. The two systems are never mixed
- * within a complete identity, and the choice is made per row. Rows that are
- * complete in neither system fall back field by field ("partial").
+ * within a row, and the choice is made per row. Rows that are complete in
+ * neither system ("partial") still take all fields from a single system.
  */
 const cifResidueIdentity = (row: string[], headers: string[], columns: CifIdentityColumns): CifResidueIdentity => {
   const authChain = cifValue(row, headers, [columns.authAsym]);
@@ -581,9 +581,12 @@ const cifResidueIdentity = (row: string[], headers: string[], columns: CifIdenti
   const labelChain = cifValue(row, headers, [columns.labelAsym]);
   const labelSeq = parseCifInteger(cifValue(row, headers, [columns.labelSeq]));
   if (labelChain !== undefined && labelSeq !== undefined) return { system: "label", chain: labelChain, residueNumber: labelSeq };
-  const chain = authChain ?? labelChain;
-  const residueNumber = authSeq ?? labelSeq;
-  return { system: "partial", ...(chain !== undefined ? { chain } : {}), ...(residueNumber !== undefined ? { residueNumber } : {}), ...(insertionCode ? { insertionCode } : {}) };
+  // Incomplete in both systems: take every field from one system only (the one
+  // with more resolved fields, auth on a tie), never an auth chain with a label number.
+  const authCount = (authChain !== undefined ? 1 : 0) + (authSeq !== undefined ? 1 : 0);
+  const labelCount = (labelChain !== undefined ? 1 : 0) + (labelSeq !== undefined ? 1 : 0);
+  if (authCount >= labelCount) return { system: "partial", ...(authChain !== undefined ? { chain: authChain } : {}), ...(authSeq !== undefined ? { residueNumber: authSeq } : {}), ...(insertionCode ? { insertionCode } : {}) };
+  return { system: "partial", ...(labelChain !== undefined ? { chain: labelChain } : {}), ...(labelSeq !== undefined ? { residueNumber: labelSeq } : {}) };
 };
 
 const ATOM_SITE_IDENTITY: CifIdentityColumns = { authAsym: "_atom_site.auth_asym_id", authSeq: "_atom_site.auth_seq_id", insCode: "_atom_site.pdbx_PDB_ins_code", labelAsym: "_atom_site.label_asym_id", labelSeq: "_atom_site.label_seq_id" };
