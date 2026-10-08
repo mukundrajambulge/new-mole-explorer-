@@ -1224,7 +1224,8 @@
         "F3"
       ],
       "est": "1 day",
-      "status": "TODO"
+      "status": "TODO",
+      "note": "Owner report 2026-10-08: page freezes ('not responding') when rotating. Done-when extended in W4: drag-rotate 4V6F 5 s, no long task >200 ms, no hover picking/re-render while mouse button held"
     },
     {
       "id": "3.5",
