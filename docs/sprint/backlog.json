@@ -1341,7 +1341,7 @@
       ],
       "est": "1 day",
       "status": "TODO",
-      "note": "W4 PARTIAL: hover p95 240->49 ms, no hover/React work during drag; but drag max long task 2689 ms in software-GL headless (200 ms assert only with PERF_GPU=1). Needs cheaper rendering during drag or GPU measurement; hover assert loosened to 55 ms - restore 50",
+      "note": "ROOT CAUSE measured in browser (Iris Xe GPU, 4V6F): once 3Dmol has an active hover (viewer.current_hover != null), EVERY mousemove calls handleHoverContinue = raycast over 307k atoms (~180 ms) + setHover renders (~60 ms x2) -> ~1 s per frame while dragging. Without a prior hover, drag is ~33 ms/frame. 3.4 branch only raises hoverDuration on mousedown, which does not clear current_hover. Fix: on pointerdown call viewer.setHover(null) (clears current_hover), keep hover suspended until pointerup; also make hover picking cheaper on huge structures (throttle or a spatial grid / CA-only hoverables).",
       "branch": "sprint/W4/3.4"
     },
     {
