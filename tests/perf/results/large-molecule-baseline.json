@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "label": "baseline",
+  "date": "2026-10-08T03:56:16.445Z",
+  "fixture": "4V6F",
+  "loadMs": 47961.59999999404,
+  "atoms": 307345,
+  "heapAfterLoadMb": 1783.5,
+  "selectChainAMs": 38793.79999999702,
+  "colorRedChainAMs": 25134.29999999702,
+  "hoverMs": {
+    "n": 50,
+    "min": 34.70000000298023,
+    "median": 47.20000000298023,
+    "p95": 240.3999999910593,
+    "max": 8117.5999999940395,
+    "mean": 299.36199999988077
+  },
+  "tabSwitchMs": {
+    "n": 10,
+    "min": 2071.7000000029802,
+    "median": 3482.5,
+    "p95": 28680.5,
+    "max": 28680.5,
+    "mean": 5589.040000000596
+  },
+  "viewerStateAfterTabs": "loaded",
+  "heapEndMb": 2459.8
+}
