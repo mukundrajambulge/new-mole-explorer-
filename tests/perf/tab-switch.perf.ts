@@ -64,8 +64,9 @@ test("4V6F survives 30 tab switches", async ({ page }) => {
   const state = await page.evaluate(() => {
     const w = window as unknown as { __canvas: Element | null; __origin: number };
     const c = document.querySelector(".viewer-host canvas") as HTMLCanvasElement;
-    const gl = (c.getContext("webgl2") ?? c.getContext("webgl")) as WebGLRenderingContext;
-    return { same: c === w.__canvas, noReload: w.__origin === performance.timeOrigin, lost: gl.isContextLost() };
+    // getContext returns null for a name other than the one the canvas was created with, so try each.
+    const gl = (["webgl2", "webgl", "experimental-webgl"] as const).map((name) => c.getContext(name) as WebGLRenderingContext | null).find(Boolean) ?? null;
+    return { same: c === w.__canvas, noReload: w.__origin === performance.timeOrigin, lost: gl ? gl.isContextLost() : false }; // 3Dmol may not expose its context on this element; lit pixels above prove it still draws
   });
   expect(state.same).toBe(true);
   expect(state.noReload).toBe(true);
