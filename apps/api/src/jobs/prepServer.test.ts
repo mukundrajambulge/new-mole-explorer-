@@ -1,13 +1,13 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { PrepJobStateV1Schema, type PrepJobStateV1 } from "@molecular/contracts";
+import { PrepJobStateV1Schema, sha256Digest, type D2PreparedReceptorScientificDependenciesV2, type PrepJobStateV1 } from "@molecular/contracts";
 import { PrepJobStore, type PrepRunner } from "./prepJobs.js";
 import { REPO_ROOT } from "./prepPins.js";
-import { sealFromPrepManifest } from "./prepSeal.js";
+import { createPrepSummarySealer, prepSummarySealer, sealFromPrepManifest } from "./prepSeal.js";
 
 // Task 5.2b fix round: the prep routes through the real server (server.ts), plus the seal on a real INTERIM job.
 // fixtures/prep-1d3z-ethanolh is real worker output (workers/prep via tools/mole-dock/prep.mjs in WSL) for
@@ -19,18 +19,38 @@ const RECEPTOR = readFileSync(resolve(REPO_ROOT, "tests", "fixtures", "rcsb", "1
 const LIGAND = readFileSync(join(here, "fixtures", "prep-1crn-ethanol", "out", "ligand.clean.sdf"));
 const readJson = (p: string) => JSON.parse(readFileSync(p, "utf8")) as Record<string, unknown>;
 
-const replay: PrepRunner = async (mode, dir) => {
+// fixtures/prep-1d3z-ethanolh-propka: the same real inputs prepared by the real worker with the PROPKA opt-in
+// (protonation PROPKA_PREVIEW), so plan and manifest are PREVIEW_UNQUALIFIED.
+const FX_PROPKA = join(here, "fixtures", "prep-1d3z-ethanolh-propka");
+
+/** Replays real worker output into the job dir, rebinding jobId/planDigest like the worker would. */
+const replayFrom = (fx: string, tamperManifest?: (m: Record<string, unknown>) => void): PrepRunner => async (mode, dir) => {
   const job = readJson(join(dir, "job.json"));
   if (mode === "plan") {
-    writeFileSync(join(dir, "plan.json"), JSON.stringify({ ...readJson(join(FX, "plan.json")), jobId: job.jobId, receptorArtifactId: (job.receptor as { artifactId: string }).artifactId, ligandArtifactId: (job.ligand as { artifactId: string }).artifactId }));
+    writeFileSync(join(dir, "plan.json"), JSON.stringify({ ...readJson(join(fx, "plan.json")), jobId: job.jobId, receptorArtifactId: (job.receptor as { artifactId: string }).artifactId, ligandArtifactId: (job.ligand as { artifactId: string }).artifactId }));
     return { status: "OK", stderr: "" };
   }
   const plan = readJson(join(dir, "plan.json"));
   if (readJson(join(dir, "confirmation.json")).planDigest !== plan.planDigest) return { status: "BLOCKED", stderr: "" };
-  cpSync(join(FX, "out"), join(dir, "out"), { recursive: true });
-  writeFileSync(join(dir, "prep-manifest.json"), JSON.stringify({ ...readJson(join(FX, "prep-manifest.json")), jobId: job.jobId, planDigest: plan.planDigest }));
+  cpSync(join(fx, "out"), join(dir, "out"), { recursive: true });
+  const manifest = { ...readJson(join(fx, "prep-manifest.json")), jobId: job.jobId, planDigest: plan.planDigest };
+  tamperManifest?.(manifest);
+  writeFileSync(join(dir, "prep-manifest.json"), JSON.stringify(manifest));
   return { status: "OK", stderr: "" };
 };
+const replay = replayFrom(FX);
+
+/**
+ * TEST-ONLY receptor dependency references (the same shape d2Preparation.test.ts uses). No server constant
+ * exists for these digests, so production keeps the receptor BLOCKED; injecting them through the sealer seam
+ * exercises the real sealPreparedReceptorState on real worker output. Never reachable from a request.
+ */
+const TEST_ONLY_RECEPTOR_DEPENDENCIES: D2PreparedReceptorScientificDependenciesV2 = {
+  chemicalPerceptionProfileRef: { profileId: "ME_SUPPORTED_CHEMISTRY_V1_1_0", profileDigest: sha256Digest<"ProfileDigest">(`sha256:${"c".repeat(64)}`) },
+  receptorAtomTypingProfileRef: { profileId: "ME_XS_TYPING_V1_1_0", profileDigest: sha256Digest<"ProfileDigest">(`sha256:${"d".repeat(64)}`) },
+  scoringProfileRef: { profileId: "ME_DOCKING_V1_VINA_CLASSIC_1_0", profileDigest: sha256Digest<"ScoringProfileDigest">(`sha256:${"e".repeat(64)}`) },
+};
+const UNPUBLISHED = ["D2_PROFILE_DIGEST_UNAVAILABLE:ME_SUPPORTED_CHEMISTRY_V1_1_0", "D2_PROFILE_DIGEST_UNAVAILABLE:ME_XS_TYPING_V1_1_0", "D2_PROFILE_DIGEST_UNAVAILABLE:ME_DOCKING_V1_VINA_CLASSIC_1_0"];
 
 describe("prep routes mounted in the real server (5.2b)", () => {
   let dir: string;
@@ -58,6 +78,8 @@ describe("prep routes mounted in the real server (5.2b)", () => {
     expect(mod.prepService.pins.ok).toBe(true);
     store = mod.prepService.store;
     store.replaceRunner(replay);
+    // The installed-venv probe spawns WSL; its logic is covered in prepJobs.test.ts. Here the venv is "pinned".
+    store.replaceInstalledToolCheck(async () => []);
     await mod.startServer(0, "127.0.0.1");
     token = readFileSync(join(dir, ".mole", "token"), "utf8");
     base = `http://127.0.0.1:${(mod.server.address() as AddressInfo).port}`;
@@ -109,14 +131,14 @@ describe("prep routes mounted in the real server (5.2b)", () => {
     expect(reused.status).toBe(409);
     expect(reused.json.error.code).toBe("ALREADY_CONFIRMED");
 
-    // The ligand goes through sealLigandKinematicModel + sealPreparedLigandState for real. The receptor needs
-    // dependency profile digests that do not exist (no new digests in 5.2), so the job stays unsealed overall
-    // and no prepared ids are minted.
+    // The ligand goes through sealLigandKinematicModel + sealPreparedLigandState for real. The receptor seal
+    // needs three dependency profile digests that no server constant publishes (5.2 may not add one), so the
+    // production sealer names each one and the job stays unsealed overall: no prepared ids are minted.
     expect(final.seal).toMatchObject({ status: "BLOCKED", qualification: "INTERIM", verifiedOutputs: 6 });
     expect(final.seal?.components?.ligand.status).toBe("SEALED");
     expect(final.seal?.components?.ligand.digest).toMatch(/^sha256:[0-9a-f]{64}$/);
-    expect(final.seal?.components?.receptor).toMatchObject({ status: "BLOCKED", reasonCodes: ["D2_PROFILE_DIGEST_UNAVAILABLE"] });
-    expect(final.seal?.reasonCodes).toEqual(["D2_PROFILE_DIGEST_UNAVAILABLE"]);
+    expect(final.seal?.components?.receptor).toEqual({ status: "BLOCKED", reasonCodes: UNPUBLISHED });
+    expect(final.seal?.reasonCodes).toEqual(UNPUBLISHED);
     expect(final.preparedReceptorId).toBeUndefined();
     expect(final.preparedLigandId).toBeUndefined();
     expect(existsSync(join(store.jobDir(id), "in"))).toBe(false);
@@ -130,6 +152,133 @@ describe("prep routes mounted in the real server (5.2b)", () => {
     expect(s1.ligandState?.kinematicModel.searchTorsionCount).toBe(1);
     writeFileSync(join(store.jobDir(id), "out", "ligand.pdbqt"), "REMARK tampered\n");
     expect((await sealFromPrepManifest(store, id)).reasonCodes).toContain("OUTPUT_TAMPERED");
+  }, 60_000);
+
+  /** Upload the real inputs, plan with `options`, confirm with the plan's acks and wait for the final state. */
+  const runJob = async (options: Record<string, unknown> = {}) => {
+    const rec = await call("POST", "/api/docking/prep/artifacts?format=pdb", undefined, { raw: RECEPTOR, type: "application/octet-stream" });
+    const lig = await call("POST", "/api/docking/prep/artifacts?format=sdf", undefined, { raw: LIGAND, type: "application/octet-stream" });
+    const a = await call("POST", "/api/docking/prep/plan", { receptorArtifactId: rec.json.artifactId, ligandArtifactId: lig.json.artifactId, pH: 7.4, ...options });
+    expect(a.status, JSON.stringify(a.json.error)).toBe(201);
+    const planned = PrepJobStateV1Schema.parse(a.json);
+    const id = planned.jobId;
+    const acks = planned.plan!.decisions.filter((d) => d.requiresAck).map((d) => d.key);
+    expect((await call("POST", `/api/docking/prep/${id}/confirm`, { jobId: id, planDigest: planned.plan!.planDigest, acks })).status).toBe(202);
+    let final = PrepJobStateV1Schema.parse((await call("GET", `/api/docking/prep/${id}`)).json);
+    for (let i = 0; i < 200 && final.state === "APPLYING"; i++) {
+      await new Promise((r) => setTimeout(r, 100));
+      final = PrepJobStateV1Schema.parse((await call("GET", `/api/docking/prep/${id}`)).json);
+    }
+    return { planned, final, id };
+  };
+
+  it("a real INTERIM complex (1D3Z + explicit-H ethanol) prepares to SEALED end to end over HTTP once the receptor dependency digests exist", async () => {
+    store.replaceRunner(replay);
+    store.replaceSealer(createPrepSummarySealer({ receptorDependencies: TEST_ONLY_RECEPTOR_DEPENDENCIES }));
+    try {
+      const { planned, final, id } = await runJob();
+      expect(planned.plan?.qualification).toBe("INTERIM");
+      expect(final.state, final.error).toBe("SUCCEEDED");
+      expect(final.seal).toMatchObject({ status: "SEALED", qualification: "INTERIM", reasonCodes: [], verifiedOutputs: 6 });
+      expect(final.seal?.components?.receptor.status).toBe("SEALED");
+      expect(final.seal?.components?.ligand.status).toBe("SEALED");
+      expect(final.seal?.components?.receptor.digest).toMatch(/^sha256:[0-9a-f]{64}$/);
+      // Prepared ids are minted only for a SEALED job.
+      const compact = id.replace(/-/g, "");
+      expect(final.preparedReceptorId).toBe(`prec_${compact}`);
+      expect(final.preparedLigandId).toBe(`plig_${compact}`);
+
+      // The receptor state is the real sealPreparedReceptorState output, deterministic and bound to the plan.
+      const s1 = await sealFromPrepManifest(store, id, { receptorDependencies: TEST_ONLY_RECEPTOR_DEPENDENCIES });
+      const s2 = await sealFromPrepManifest(store, id, { receptorDependencies: TEST_ONLY_RECEPTOR_DEPENDENCIES });
+      const rs = s1.receptorState!;
+      expect(rs.digest).toBe(final.seal?.components?.receptor.digest);
+      expect(s2.receptorState?.digest).toBe(rs.digest);
+      expect(rs.semanticSchemaId).toBe("D2_PREPARED_RECEPTOR_STATE_V2");
+      expect(rs.profileId).toBe("ME_DOCKING_V1_RECEPTOR_CORE_DRY_1_0");
+      expect(rs.modelNumber).toBe(1);
+      expect(rs.chainIds).toEqual(["A"]);
+      expect(rs.graphRevision.atoms).toHaveLength(1231);
+      expect(rs.chemicalState).toMatchObject({ resolution: "EXPLICIT_SUBMITTED", protonationStatus: "EXPLICIT" });
+      expect(rs.chemicalState.sourceEvidenceRefs).toContain(`prep-plan:${planned.plan!.planDigest}`);
+      expect(rs.componentRoles.every((r) => r.role === "CORE")).toBe(true);
+      expect(rs.scientificDependencies).toEqual(TEST_ONLY_RECEPTOR_DEPENDENCIES);
+      // The dependency references are hash-active: a different scorer digest gives a different receptor state.
+      const other = await sealFromPrepManifest(store, id, { receptorDependencies: { ...TEST_ONLY_RECEPTOR_DEPENDENCIES, scoringProfileRef: { profileId: "ME_DOCKING_V1_VINA_CLASSIC_1_0", profileDigest: sha256Digest<"ScoringProfileDigest">(`sha256:${"1".repeat(64)}`) } } });
+      expect(other.status).toBe("SEALED");
+      expect(other.receptorState?.digest).not.toBe(rs.digest);
+      // A reference bound to the wrong profile ID is not accepted as the dependency.
+      const wrongId = await sealFromPrepManifest(store, id, { receptorDependencies: { ...TEST_ONLY_RECEPTOR_DEPENDENCIES, receptorAtomTypingProfileRef: { profileId: "ME_XS_TYPING_V9", profileDigest: TEST_ONLY_RECEPTOR_DEPENDENCIES.receptorAtomTypingProfileRef.profileDigest } } });
+      expect(wrongId.status).toBe("BLOCKED");
+      expect(wrongId.reasonCodes).toEqual(["D2_PROFILE_DIGEST_UNAVAILABLE:ME_XS_TYPING_V1_1_0"]);
+      // Production (server constants only) blocks the very same job and names every missing digest.
+      expect((await sealFromPrepManifest(store, id)).components?.receptor).toEqual({ status: "BLOCKED", reasonCodes: UNPUBLISHED });
+    } finally {
+      store.replaceSealer(prepSummarySealer);
+    }
+  }, 60_000);
+
+  it("the PROPKA opt-in (real worker output) seals PREVIEW_UNQUALIFIED: generated protonation is never D2-sealed", async () => {
+    store.replaceRunner(replayFrom(FX_PROPKA));
+    try {
+      for (const sealer of [prepSummarySealer, createPrepSummarySealer({ receptorDependencies: TEST_ONLY_RECEPTOR_DEPENDENCIES })]) {
+        store.replaceSealer(sealer);
+        const { planned, final } = await runJob({ protonation: "PROPKA_PREVIEW" });
+        expect(planned.plan?.qualification).toBe("PREVIEW_UNQUALIFIED");
+        expect(planned.plan?.protonationSource).toBe("PROPKA_PREVIEW");
+        expect(final.state, final.error).toBe("SUCCEEDED");
+        expect(final.manifest?.stages.some((s) => s.tool === "pdb2pqr+propka" && s.version === "3.7.1/3.5.1")).toBe(true);
+        expect(final.seal).toEqual({
+          status: "PREVIEW_UNQUALIFIED",
+          qualification: "PREVIEW_UNQUALIFIED",
+          reasonCodes: ["GENERATED_CHEMICAL_STATE"],
+          verifiedOutputs: 6,
+          components: { receptor: { status: "PREVIEW_UNQUALIFIED", reasonCodes: ["GENERATED_CHEMICAL_STATE"] }, ligand: { status: "PREVIEW_UNQUALIFIED", reasonCodes: ["GENERATED_CHEMICAL_STATE"] } },
+        });
+        expect(final.preparedReceptorId).toBeUndefined();
+        expect(final.preparedLigandId).toBeUndefined();
+      }
+    } finally {
+      store.replaceRunner(replay);
+      store.replaceSealer(prepSummarySealer);
+    }
+  }, 60_000);
+
+  it("tool drift fails closed: a manifest stage version off TOOLS.md fails the job; a drifted venv refuses plans (503)", async () => {
+    store.replaceRunner(replayFrom(FX, (m) => {
+      const stages = m.stages as { tool: string; version: string }[];
+      stages.find((s) => s.tool === "meeko.ligand")!.version = "0.8.1";
+    }));
+    try {
+      const { final } = await runJob();
+      expect(final.state).toBe("FAILED");
+      expect(final.error).toContain("OUTPUT_REJECTED");
+      expect(final.seal).toMatchObject({ status: "REJECTED" });
+      expect(final.seal?.reasonCodes).toContain("TOOL_VERSION_DRIFT:meeko.ligand");
+      expect(final.preparedReceptorId).toBeUndefined();
+    } finally {
+      store.replaceRunner(replay);
+    }
+    store.replaceInstalledToolCheck(async () => ["INSTALLED_DRIFT:rdkit"]);
+    try {
+      const rec = await call("POST", "/api/docking/prep/artifacts?format=pdb", undefined, { raw: RECEPTOR, type: "application/octet-stream" });
+      const lig = await call("POST", "/api/docking/prep/artifacts?format=sdf", undefined, { raw: LIGAND, type: "application/octet-stream" });
+      const r = await call("POST", "/api/docking/prep/plan", { receptorArtifactId: rec.json.artifactId, ligandArtifactId: lig.json.artifactId, pH: 7.4 });
+      expect(r.status).toBe(503);
+      expect(r.json.error.code).toBe("PROVENANCE_REPLAY");
+      expect(r.json.error.message).toContain("INSTALLED_DRIFT:rdkit");
+    } finally {
+      store.replaceInstalledToolCheck(async () => []);
+    }
+  }, 60_000);
+
+  it("streams uploads: oversize bodies answer 413 and leave no temp file", async () => {
+    const big = Buffer.alloc(20 * 1024 * 1024 + 1, 0x41);
+    const r = await call("POST", "/api/docking/prep/artifacts?format=sdf", undefined, { raw: big, type: "application/octet-stream" });
+    expect(r.status).toBe(413);
+    expect(r.json.error.code).toBe("OVERSIZE_INPUT");
+    const leftovers = readdirSync(join(dir, "prep-artifacts")).filter((n) => n.endsWith(".tmp"));
+    expect(leftovers).toEqual([]);
   }, 60_000);
 
   it("rejects traversal, oversize bodies and client digests over HTTP; DOCKING.RUN stays unavailable", async () => {
@@ -161,7 +310,7 @@ describe("prep job garbage collection and quota (5.2b)", () => {
       let t = Date.now();
       const resolveArtifact = async (id: string) => (id === "r" ? { format: "pdb", bytes: RECEPTOR } : id === "l" ? { format: "sdf", bytes: LIGAND } : undefined);
       const make = (maxJobs: number) => {
-        const s = new PrepJobStore({ root, resolveArtifact, runner: replay, now: () => t, maxJobs, retainTerminalMs: 60_000, pins: () => ({ ok: true, lockDigest: "", mismatches: [] }) });
+        const s = new PrepJobStore({ root, resolveArtifact, runner: replay, now: () => t, maxJobs, retainTerminalMs: 60_000, pins: () => ({ ok: true, lockDigest: "", mismatches: [] }), installedTools: async () => [] });
         s.init();
         return s;
       };

@@ -8,7 +8,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { PrepJobStateV1Schema } from "@molecular/contracts";
 import { createPrepRoutes } from "../docking/routes.js";
 import { confinedPath, PrepJobStore, type PrepArtifactResolver, type PrepRunner } from "./prepJobs.js";
-import { checkPrepPins, readPinFiles, REPO_ROOT, repoPrepPins } from "./prepPins.js";
+import { checkInstalledTools, checkPrepPins, checkStageVersions, createInstalledToolCheck, readPinFiles, REPO_ROOT, repoPrepPins, type InstalledPrepTools, type InstalledToolsProbeResult } from "./prepPins.js";
 import { prepSummarySealer, sealFromPrepManifest } from "./prepSeal.js";
 
 // Task 5.2b: job store, routes and sealing. The worker itself is replaced by a runner that replays a real
@@ -252,5 +252,54 @@ describe("prep job store and routes (5.2b)", () => {
     const bad = makeStore({ pins: () => ({ ok: false, lockDigest: "", mismatches: ["LOCK_DIGEST"] }) });
     await expect(bad.plan(PLAN_BODY as never)).rejects.toMatchObject({ code: "PROVENANCE_REPLAY" });
     expect(existsSync(join(FX, "prep-manifest.json"))).toBe(true);
+  });
+
+  it("checks the installed venv (worker --versions) and every manifest stage version against TOOLS.md; drift fails closed", async () => {
+    const files = readPinFiles();
+    const pins = repoPrepPins();
+    expect(pins.workerVersion).toBe("0.1.0");
+    expect(pins.tools).toMatchObject({ rdkit: "2026.3.6", meeko: "0.8.0", dimorphitedl: "2.1.0", pdbfixer: "1.12.0", openmm: "8.6.1", pdb2pqr: "3.7.1", propka: "3.5.1" });
+    // The shape `run_prep.py --versions` reports in the pinned ~/mole-prep venv (Python 3.12.3).
+    const installed: InstalledPrepTools = {
+      profileId: "ME_PREP_INTERIM_V0",
+      workerVersion: "0.1.0",
+      lockDigest: pins.lockDigest,
+      python: "3.12.3",
+      tools: { dimorphite_dl: "2.1.0", gemmi: "0.7.5", meeko: "0.8.0", mole_prep: "0.1.0", numpy: "2.5.3", openmm: "8.6.1", pdb2pqr: "3.7.1", pdbfixer: "1.12.0", propka: "3.5.1", rdkit: "2026.3.6", scipy: "1.18.1" },
+    };
+    expect(checkInstalledTools(installed, files, pins)).toEqual([]);
+    expect(checkInstalledTools({ ...installed, tools: { ...installed.tools, meeko: "0.9.0" } }, files, pins)).toEqual(expect.arrayContaining(["INSTALLED_DRIFT:meeko", "INSTALLED_UNLOCKED:meeko"]));
+    expect(checkInstalledTools({ ...installed, tools: { ...installed.tools, numpy: "2.6.0" } }, files, pins)).toEqual(["INSTALLED_UNLOCKED:numpy"]);
+    const noRdkit = Object.fromEntries(Object.entries(installed.tools).filter(([k]) => k !== "rdkit"));
+    expect(checkInstalledTools({ ...installed, tools: noRdkit }, files, pins)).toEqual(["INSTALLED_MISSING:rdkit"]);
+    expect(checkInstalledTools({ ...installed, lockDigest: "0".repeat(64) }, files, pins)).toEqual(["INSTALLED_LOCK_DIGEST"]);
+    expect(checkInstalledTools({ ...installed, workerVersion: "0.2.0" }, files, pins)).toContain("INSTALLED_WORKER_VERSION");
+    expect(checkInstalledTools({ ...installed, python: "3.13.0" }, files, pins)).toEqual(["INSTALLED_PYTHON"]);
+
+    // The cached check: a probe that cannot run refuses (and re-probes next time); a verdict is kept.
+    let calls = 0;
+    let next: InstalledToolsProbeResult = { ok: false, error: "VERSIONS_TIMEOUT" };
+    const check = createInstalledToolCheck(async () => (calls++, next));
+    expect(await check()).toEqual(["INSTALLED_TOOLS_UNVERIFIED"]);
+    next = { ok: true, report: { ...installed, tools: { ...installed.tools, rdkit: "2026.9.1" } } };
+    expect(await check()).toEqual(expect.arrayContaining(["INSTALLED_DRIFT:rdkit"]));
+    next = { ok: true, report: installed };
+    expect(await check()).toEqual(expect.arrayContaining(["INSTALLED_DRIFT:rdkit"]));
+    expect(calls).toBe(2);
+    const drifted = new PrepJobStore({ root: mkdtempSync(join(tmpdir(), "prepjobs-")), resolveArtifact: resolver, runner: replayRunner(), installedTools: check });
+    roots.push(drifted.root);
+    drifted.init();
+    await expect(drifted.plan(PLAN_BODY as never)).rejects.toMatchObject({ code: "PROVENANCE_REPLAY", httpStatus: 503 });
+
+    // Manifest stages of every real fixture run the pinned tools; any version off TOOLS.md is named.
+    for (const fx of ["prep-1crn-ethanol", "prep-1d3z-ethanolh", "prep-1d3z-ethanolh-propka"]) {
+      const m = readJson(join(here, "fixtures", fx, "prep-manifest.json")) as { stages: { tool: string; version: string; params: Record<string, unknown> }[] };
+      expect(checkStageVersions(m.stages, pins), fx).toEqual([]);
+    }
+    const stages = (readJson(join(here, "fixtures", "prep-1d3z-ethanolh-propka", "prep-manifest.json")) as { stages: { tool: string; version: string }[] }).stages;
+    expect(checkStageVersions(stages.map((s) => (s.tool === "pdb2pqr+propka" ? { ...s, version: "3.7.1/3.6.0" } : s)), pins)).toEqual(["TOOL_VERSION_DRIFT:pdb2pqr+propka"]);
+    expect(checkStageVersions([...stages, { tool: "openbabel", version: "3.1.1" }], pins)).toEqual(["TOOL_VERSION_DRIFT:openbabel"]);
+    expect(checkStageVersions([{ tool: "pdbfixer", version: "1.12.0", params: { openmm: "8.7.0" } }], pins)).toEqual(["TOOL_VERSION_DRIFT:openmm"]);
+    expect(checkStageVersions(stages, { ok: true, lockDigest: pins.lockDigest, mismatches: [] })).toEqual(["TOOL_PINS_UNAVAILABLE"]);
   });
 });

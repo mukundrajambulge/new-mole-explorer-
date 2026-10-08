@@ -91,10 +91,7 @@ const handlePrep = async (o: PrepRoutesOptions, req: IncomingMessage, res: Serve
         const format = new URL(req.url ?? "/", "http://localhost").searchParams.get("format") ?? "";
         const declared = req.headers["content-length"] === undefined ? undefined : Number(req.headers["content-length"]);
         if (declared !== undefined && !(Number.isSafeInteger(declared) && declared >= 0)) return fail(res, 400, "INVALID_INPUT", "The content-length header is invalid.");
-        if (declared !== undefined && declared > PREP_MAX_ARTIFACT_BYTES) {
-          res.setHeader("connection", "close");
-          return fail(res, 413, "OVERSIZE_INPUT", "An input artifact exceeds 20 MB.");
-        }
+        if (declared !== undefined && declared > PREP_MAX_ARTIFACT_BYTES) throw new PrepError("OVERSIZE_INPUT", 413, "An input artifact exceeds 20 MB.");
         // Streamed to a temp file under the artifact root (hashed per chunk, capped, concurrency-limited, quota-checked).
         return send(res, 201, await o.artifacts.putStream(req, format, declared));
       }
@@ -126,6 +123,8 @@ const handlePrep = async (o: PrepRoutesOptions, req: IncomingMessage, res: Serve
     }
     return fail(res, 404, "NOT_FOUND", "Not found.");
   } catch (e) {
+    // Discard (never buffer) whatever is left of a rejected body so the client still reads the answer.
+    if (!req.readableEnded) req.resume();
     if (e instanceof PrepError) return fail(res, e.httpStatus, e.code, e.message);
     return fail(res, 500, "INTERNAL_ERROR", "The request could not be completed.");
   }
