@@ -1,7 +1,9 @@
 import {
   D2_RECEPTOR_PROFILE_ID,
+  f64Value,
   SCIENTIFIC_PROFILE_IDS,
   type D2AltlocResolution,
+  type D2AtomUID,
   type D2PreparedReceptorScientificDependenciesV2,
   type D2PreparedReceptorStateV2,
   type D2ReceptorComponentRoleV1,
@@ -109,4 +111,144 @@ export const sealReceptorFromPrep = (input: Readonly<{
   });
   if (!sealed.value) return { status: "BLOCKED", reasonCodes: [...new Set(sealed.diagnostics.filter((d) => d.blocking).map((d) => `D2:${d.code}`.slice(0, 64)).concat("D2_RECEPTOR_SEAL_BLOCKED"))].slice(0, 50) };
   return { status: "SEALED", reasonCodes: [], receptor: sealed.value };
+};
+
+/**
+ * Binds the docked receptor.pdbqt to the sealed receptor graph (adapted from receptor.clean.pdb) and binds the
+ * worker's receptor.canonical.json to that PDBQT (5.2b review fix). Without it a SEALED receptor state could sit
+ * next to a PDBQT that Vina docks but that describes another structure. Rules (all fail closed, named codes):
+ * - the PDBQT is rigid (no ROOT/BRANCH/TORSDOF) with 1..PDBQT_MAX_RECORDS well-formed ATOM/HETATM records;
+ * - every record maps to exactly one distinct graph atom with the same chain, residue (name:number:icode),
+ *   atom name, element (from the AutoDock type) and coordinates (PDBQT precision, 3 decimals);
+ * - every heavy graph atom appears in the PDBQT; an absent graph atom may only be a hydrogen on carbon
+ *   (AutoDock merges nonpolar hydrogens), so no polar hydrogen and no heavy atom can be dropped;
+ * - canonical.json lists the same records in the same order (name, residue, chain, coordinates, type, charge)
+ *   and the manifest summary reports the same receptor atom count.
+ */
+export const PDBQT_MAX_RECORDS = 200_000;
+
+type ReceptorRec = { name: string; res: string; chain: string; seq: number; icode: string; x: number; y: number; z: number; charge: number; type: string };
+
+const AD_ELEMENT: Readonly<Record<string, string>> = Object.freeze({ A: "C", C: "C", N: "N", NA: "N", NS: "N", OA: "O", OS: "O", O: "O", SA: "S", S: "S", H: "H", HD: "H", HS: "H" });
+const adElement = (type: string): string => (AD_ELEMENT[type] ?? type).toUpperCase();
+const RIGID_ONLY = /^(ROOT|ENDROOT|BRANCH|ENDBRANCH|TORSDOF|BEGIN_RES|END_RES)/;
+
+const parseRigidPdbqt = (text: string): ReceptorRec[] | undefined => {
+  const recs: ReceptorRec[] = [];
+  for (const line of text.split(/\r?\n/)) {
+    if (RIGID_ONLY.test(line)) return undefined;
+    if (!line.startsWith("ATOM") && !line.startsWith("HETATM")) continue;
+    if (recs.length >= PDBQT_MAX_RECORDS) return undefined;
+    const rec: ReceptorRec = { name: line.slice(12, 16).trim(), res: line.slice(17, 20).trim(), chain: line.slice(21, 22).trim(), seq: Number(line.slice(22, 26)), icode: line.slice(26, 27).trim(), x: Number(line.slice(30, 38)), y: Number(line.slice(38, 46)), z: Number(line.slice(46, 54)), charge: Number(line.slice(70, 76)), type: line.slice(77, 79).trim() };
+    if (!rec.name || !rec.type || !Number.isSafeInteger(rec.seq) || ![rec.x, rec.y, rec.z, rec.charge].every(Number.isFinite)) return undefined;
+    recs.push(rec);
+  }
+  return recs.length ? recs : undefined;
+};
+
+const coordKey = (x: number, y: number, z: number): string => `${Math.round(x * 1000)},${Math.round(y * 1000)},${Math.round(z * 1000)}`;
+const near = (a: number, b: number, tol: number): boolean => Math.abs(a - b) <= tol;
+const CELL = 1.5;
+const cellKey = (x: number, y: number, z: number): string => `${Math.floor(x / CELL)},${Math.floor(y / CELL)},${Math.floor(z / CELL)}`;
+const push = <K, V>(m: Map<K, V[]>, k: K, v: V): void => {
+  const list = m.get(k);
+  if (list) list.push(v);
+  else m.set(k, [v]);
+};
+
+export type ReceptorPdbqtBinding = Readonly<{ codes: readonly string[]; mappedAtoms: number; mergedHydrogens: number }>;
+
+const canonicalMatches = (catoms: readonly unknown[], recs: readonly ReceptorRec[]): boolean => {
+  if (catoms.length !== recs.length) return false;
+  for (let i = 0; i < recs.length; i++) {
+    const r = recs[i]!;
+    const c = catoms[i] as Record<string, unknown> | null;
+    if (!c || typeof c !== "object") return false;
+    if (c.name !== r.name || c.res !== r.res || (c.chain ?? "") !== r.chain || c.seq !== r.seq || c.adType !== r.type) return false;
+    if (typeof c.x !== "number" || typeof c.y !== "number" || typeof c.z !== "number" || typeof c.charge !== "number") return false;
+    if (!near(c.x, r.x, 1.5e-3) || !near(c.y, r.y, 1.5e-3) || !near(c.z, r.z, 1.5e-3) || !near(c.charge, r.charge, 1.5e-3)) return false;
+  }
+  return true;
+};
+
+export const bindReceptorPdbqt = (input: Readonly<{ adapted: D2AdaptedRepresentation; pdbqt: string; canonical: unknown; summaryAtoms: number | undefined }>): ReceptorPdbqtBinding => {
+  const graph = input.adapted.graph;
+  const coordinate = input.adapted.coordinateStates[0];
+  const fail = (code: string): ReceptorPdbqtBinding => ({ codes: [code], mappedAtoms: 0, mergedHydrogens: 0 });
+  if (!graph || !coordinate) return fail("RECEPTOR_D2_STATE_MISSING");
+  const recs = parseRigidPdbqt(input.pdbqt);
+  if (!recs) return fail("RECEPTOR_PDBQT_INVALID");
+  const codes = new Set<string>();
+
+  // canonical.json <-> PDBQT, record by record; summary count <-> PDBQT.
+  const canon = input.canonical as { atoms?: unknown } | null | undefined;
+  if (!canon || typeof canon !== "object" || !Array.isArray(canon.atoms) || !canonicalMatches(canon.atoms, recs)) codes.add("RECEPTOR_CANONICAL_MISMATCH");
+  if (input.summaryAtoms !== recs.length) codes.add("RECEPTOR_SUMMARY_MISMATCH");
+
+  // PDBQT <-> graph: exact 3-decimal coordinate lookup, then chain/residue/name/element identity.
+  const byCoord = new Map<string, D2AtomUID[]>();
+  const heavyByCell = new Map<string, D2AtomUID[]>();
+  const xyz = new Map<D2AtomUID, readonly [number, number, number]>();
+  const atomsById = new Map(graph.atoms.map((a) => [a.atomUid, a]));
+  for (const atom of graph.atoms) {
+    const c = coordinate.coordinates[atom.atomUid];
+    if (!c) return fail("RECEPTOR_COORDINATES_MISSING");
+    const p = [f64Value(c[0]!), f64Value(c[1]!), f64Value(c[2]!)] as const;
+    xyz.set(atom.atomUid, p);
+    push(byCoord, coordKey(p[0], p[1], p[2]), atom.atomUid);
+    if (atom.element.toUpperCase() !== "H") push(heavyByCell, cellKey(p[0], p[1], p[2]), atom.atomUid);
+  }
+  const mapped = new Set<D2AtomUID>();
+  for (const r of recs) {
+    const el = adElement(r.type);
+    const residueId = `${r.res}:${r.seq}:${r.icode}`;
+    const hit = (byCoord.get(coordKey(r.x, r.y, r.z)) ?? []).find((uid) => {
+      if (mapped.has(uid)) return false;
+      const a = atomsById.get(uid)!;
+      return a.element.toUpperCase() === el && a.atomName.trim() === r.name && a.aliases.some((al) => (al.chainId ?? "") === r.chain && al.residueId === residueId);
+    });
+    if (hit === undefined) codes.add("RECEPTOR_PDBQT_UNMAPPED");
+    else mapped.add(hit);
+  }
+
+  // Unmapped graph atoms may only be hydrogens on carbon: the bonded heavy atom, else the nearest heavy atom
+  // within 1.3 A (PDB files without CONECT for protein hydrogens).
+  const heavyNeighbours = new Map<D2AtomUID, D2AtomUID[]>();
+  for (const b of graph.bonds) {
+    const e1 = atomsById.get(b.atom1Uid)?.element.toUpperCase();
+    const e2 = atomsById.get(b.atom2Uid)?.element.toUpperCase();
+    if (e1 === "H" && e2 !== "H") push(heavyNeighbours, b.atom1Uid, b.atom2Uid);
+    if (e2 === "H" && e1 !== "H") push(heavyNeighbours, b.atom2Uid, b.atom1Uid);
+  }
+  const parentOf = (uid: D2AtomUID): D2AtomUID | undefined => {
+    const bonded = heavyNeighbours.get(uid);
+    if (bonded) return bonded.length === 1 ? bonded[0] : undefined;
+    const [x, y, z] = xyz.get(uid)!;
+    const cx = Math.floor(x / CELL), cy = Math.floor(y / CELL), cz = Math.floor(z / CELL);
+    let best: D2AtomUID | undefined;
+    let bestD = 1.3 * 1.3;
+    for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = -1; dz <= 1; dz++) {
+      for (const n of heavyByCell.get(`${cx + dx},${cy + dy},${cz + dz}`) ?? []) {
+        const p = xyz.get(n)!;
+        const d = (p[0] - x) ** 2 + (p[1] - y) ** 2 + (p[2] - z) ** 2;
+        if (d < bestD) {
+          bestD = d;
+          best = n;
+        }
+      }
+    }
+    return best;
+  };
+  let merged = 0;
+  for (const a of graph.atoms) {
+    if (mapped.has(a.atomUid)) continue;
+    if (a.element.toUpperCase() !== "H") {
+      codes.add("RECEPTOR_PDBQT_HEAVY_ATOM_MISSING");
+      continue;
+    }
+    const parent = parentOf(a.atomUid);
+    if (parent === undefined || atomsById.get(parent)!.element.toUpperCase() !== "C") codes.add("RECEPTOR_PDBQT_POLAR_H_MISSING");
+    else merged++;
+  }
+  return { codes: [...codes], mappedAtoms: mapped.size, mergedHydrogens: merged };
 };

@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
@@ -203,6 +204,9 @@ describe("prep routes mounted in the real server (5.2b)", () => {
       expect(rs.chemicalState.sourceEvidenceRefs).toContain(`prep-plan:${planned.plan!.planDigest}`);
       expect(rs.componentRoles.every((r) => r.role === "CORE")).toBe(true);
       expect(rs.scientificDependencies).toEqual(TEST_ONLY_RECEPTOR_DEPENDENCIES);
+      // The docked receptor.pdbqt is bound to the sealed graph: all 746 records map, the 485 graph-only atoms are
+      // nonpolar hydrogens AutoDock merged (1231 = 746 + 485).
+      expect(s1.receptor).toMatchObject({ atoms: 1231, pdbqtAtoms: 746, mergedHydrogens: 485 });
       // The dependency references are hash-active: a different scorer digest gives a different receptor state.
       const other = await sealFromPrepManifest(store, id, { receptorDependencies: { ...TEST_ONLY_RECEPTOR_DEPENDENCIES, scoringProfileRef: { profileId: "ME_DOCKING_V1_VINA_CLASSIC_1_0", profileDigest: sha256Digest<"ScoringProfileDigest">(`sha256:${"1".repeat(64)}`) } } });
       expect(other.status).toBe("SEALED");
@@ -217,6 +221,65 @@ describe("prep routes mounted in the real server (5.2b)", () => {
       store.replaceSealer(prepSummarySealer);
     }
   }, 60_000);
+
+  it("a re-hashed receptor.pdbqt or canonical.json that does not describe receptor.clean.pdb blocks the receptor seal", async () => {
+    type Edit = { pdbqt?: (lines: string[]) => string[]; canonical?: (atoms: Record<string, unknown>[]) => void; summaryDelta?: number };
+    /** Replays the real output, edits receptor files and re-hashes them in the manifest (an integrity-valid lie). */
+    const lying = (edit: Edit): PrepRunner => async (mode, jobDir) => {
+      const r = await replay(mode, jobDir);
+      if (mode !== "apply" || r.status !== "OK") return r;
+      const rehash = (rel: string, data: Buffer) => {
+        writeFileSync(join(jobDir, rel), data);
+        const m = readJson(join(jobDir, "prep-manifest.json")) as { outputs: { relPath: string; sha256: string; bytes: number }[]; summary: { receptorAtoms: number } };
+        const o = m.outputs.find((x) => x.relPath === rel)!;
+        o.sha256 = createHash("sha256").update(data).digest("hex");
+        o.bytes = data.length;
+        m.summary.receptorAtoms += rel === "out/receptor.pdbqt" ? edit.summaryDelta ?? 0 : 0;
+        writeFileSync(join(jobDir, "prep-manifest.json"), JSON.stringify(m));
+      };
+      if (edit.pdbqt) rehash("out/receptor.pdbqt", Buffer.from(edit.pdbqt(readFileSync(join(jobDir, "out", "receptor.pdbqt"), "latin1").split("\n")).join("\n"), "latin1"));
+      if (edit.canonical) {
+        const c = readJson(join(jobDir, "out", "receptor.canonical.json")) as { atoms: Record<string, unknown>[] };
+        edit.canonical(c.atoms);
+        rehash("out/receptor.canonical.json", Buffer.from(JSON.stringify(c)));
+      }
+      return r;
+    };
+    const firstPolarH = (lines: string[]) => lines.findIndex((l) => l.startsWith("ATOM") && l.slice(77, 79).trim() === "HD");
+    const cases: [string, Edit, string[]][] = [
+      // A heavy atom moved 0.5 A in the PDBQT and canonical.json alike: it no longer is the sealed atom.
+      ["moved atom", {
+        pdbqt: (l) => l.map((x, i) => (i === 3 ? `${x.slice(0, 30)}${(Number(x.slice(30, 38)) + 0.5).toFixed(3).padStart(8)}${x.slice(38)}` : x)),
+        canonical: (a) => { a[3]!.x = (a[3]!.x as number) + 0.5; },
+      }, ["RECEPTOR_PDBQT_UNMAPPED", "RECEPTOR_PDBQT_HEAVY_ATOM_MISSING"]],
+      // A polar hydrogen dropped consistently from PDBQT, canonical.json and the summary count.
+      ["dropped polar H", {
+        pdbqt: (l) => l.filter((_x, i) => i !== firstPolarH(l)),
+        canonical: (a) => { a.splice(a.findIndex((x) => x.adType === "HD"), 1); },
+        summaryDelta: -1,
+      }, ["RECEPTOR_PDBQT_POLAR_H_MISSING"]],
+      // canonical.json disagrees with the PDBQT on one partial charge.
+      ["canonical charge", { canonical: (a) => { a[0]!.charge = 0.5; } }, ["RECEPTOR_CANONICAL_MISMATCH"]],
+      // A flexible-residue PDBQT is not the rigid receptor the seal describes.
+      ["flexible PDBQT", { pdbqt: (l) => ["ROOT", ...l] }, ["RECEPTOR_PDBQT_INVALID"]],
+    ];
+    store.replaceSealer(createPrepSummarySealer({ receptorDependencies: TEST_ONLY_RECEPTOR_DEPENDENCIES }));
+    try {
+      for (const [label, edit, expected] of cases) {
+        store.replaceRunner(lying(edit));
+        const { final } = await runJob();
+        expect(final.state, label).toBe("SUCCEEDED");
+        expect(final.seal?.status, label).toBe("BLOCKED");
+        expect(final.seal?.verifiedOutputs, label).toBe(6);
+        expect(final.seal?.components?.receptor, label).toEqual({ status: "BLOCKED", reasonCodes: ["RECEPTOR_SEAL_INPUTS_INVALID"] });
+        expect([...(final.seal?.reasonCodes ?? [])].sort(), label).toEqual([...expected, "RECEPTOR_SEAL_INPUTS_INVALID"].sort());
+        expect(final.preparedReceptorId, label).toBeUndefined();
+      }
+    } finally {
+      store.replaceRunner(replay);
+      store.replaceSealer(prepSummarySealer);
+    }
+  }, 120_000);
 
   it("the PROPKA opt-in (real worker output) seals PREVIEW_UNQUALIFIED: generated protonation is never D2-sealed", async () => {
     store.replaceRunner(replayFrom(FX_PROPKA));

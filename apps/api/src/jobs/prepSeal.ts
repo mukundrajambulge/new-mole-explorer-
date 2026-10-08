@@ -6,8 +6,8 @@ import { adaptCanonicalStructure, type D2AdaptedRepresentation } from "../dockin
 import { StructureIngestionService } from "../structures/ingestion.js";
 import { SourceArtifactStore } from "../lifecycle/sourceArtifactStore.js";
 import { checkStageVersions, repoPrepPins, type PrepPinReport } from "./prepPins.js";
-import { sealReceptorFromPrep, SERVER_D2_RECEPTOR_DEPENDENCIES, type ReceptorD2Outcome, type ReceptorDependencyRefs } from "./prepReceptorD2.js";
-import { confinedPath, PREP_MAX_ARTIFACT_BYTES, PrepError, readCappedJson, type PrepJobStore } from "./prepJobs.js";
+import { bindReceptorPdbqt, sealReceptorFromPrep, SERVER_D2_RECEPTOR_DEPENDENCIES, type ReceptorD2Outcome, type ReceptorDependencyRefs } from "./prepReceptorD2.js";
+import { confinedPath, PREP_MAX_ARTIFACT_BYTES, PrepError, type PrepJobStore } from "./prepJobs.js";
 
 /**
  * sealFromPrepManifest (task 5.2b, design 5.2 step 6).
@@ -23,7 +23,8 @@ import { confinedPath, PREP_MAX_ARTIFACT_BYTES, PrepError, readCappedJson, type 
  */
 
 export type PrepSealOutcome = PrepSealSummaryV1 & Readonly<{
-  receptor?: Readonly<{ graphDigest: string; identityDigest: string; atoms: number }>;
+  /** pdbqtAtoms: receptor.pdbqt records bound to graph atoms; mergedHydrogens: graph H on carbon absent from the PDBQT. */
+  receptor?: Readonly<{ graphDigest: string; identityDigest: string; atoms: number; pdbqtAtoms: number; mergedHydrogens: number }>;
   ligand?: Readonly<{ graphDigest: string; identityDigest: string; atoms: number; bonds: number; typedAtoms: number }>;
   /** The D2 PreparedLigandState sealed by sealPreparedLigandState (INTERIM jobs only). */
   ligandState?: D2PreparedLigandStateV1;
@@ -50,7 +51,18 @@ export type PrepSealOptions = Readonly<{
   receptorDependencies?: ReceptorDependencyRefs;
 }>;
 
-const RECEPTOR_INPUT_BLOCKERS = new Set(["RECEPTOR_D2_ADAPTATION_FAILED", "RECEPTOR_CANONICAL_MISMATCH", "CANONICAL_JSON_UNREADABLE"]);
+const RECEPTOR_INPUT_BLOCKERS = new Set([
+  "RECEPTOR_D2_ADAPTATION_FAILED",
+  "RECEPTOR_CANONICAL_MISMATCH",
+  "RECEPTOR_SUMMARY_MISMATCH",
+  "CANONICAL_JSON_UNREADABLE",
+  "RECEPTOR_D2_STATE_MISSING",
+  "RECEPTOR_COORDINATES_MISSING",
+  "RECEPTOR_PDBQT_INVALID",
+  "RECEPTOR_PDBQT_UNMAPPED",
+  "RECEPTOR_PDBQT_HEAVY_ATOM_MISSING",
+  "RECEPTOR_PDBQT_POLAR_H_MISSING",
+]);
 
 const canonical =(v: unknown): string => JSON.stringify(v, (_k, x: unknown) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.entries(x as Record<string, unknown>).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))) : x));
 const sha256 = (b: Buffer): string => createHash("sha256").update(b).digest("hex");
@@ -136,11 +148,12 @@ export const sealFromPrepManifest = async (store: PrepJobStore, jobId: string, o
   const ligand = await adapt(ingestion, "ligand.clean.sdf", get("out/ligand.clean.sdf"));
   if (!receptor) blockers.push("RECEPTOR_D2_ADAPTATION_FAILED");
   if (!ligand) blockers.push("LIGAND_D2_ADAPTATION_FAILED");
-  let recCanon: { atoms?: unknown[]; bonds?: unknown } | undefined;
+  // Parsed from the hash-verified bytes (not re-read from disk), so what is checked is what was hashed.
+  let recCanon: unknown;
   let ligCanon: LigandCanonical | undefined;
   try {
-    recCanon = readCappedJson(confinedPath(dir, "out/receptor.canonical.json")) as typeof recCanon;
-    ligCanon = readCappedJson(confinedPath(dir, "out/ligand.canonical.json")) as LigandCanonical;
+    recCanon = JSON.parse(get("out/receptor.canonical.json").toString("utf8")) as unknown;
+    ligCanon = JSON.parse(get("out/ligand.canonical.json").toString("utf8")) as LigandCanonical;
   } catch {
     blockers.push("CANONICAL_JSON_UNREADABLE");
   }
@@ -149,7 +162,12 @@ export const sealFromPrepManifest = async (store: PrepJobStore, jobId: string, o
   if (ligand && ligCanon && Array.isArray(ligCanon.atoms) && Array.isArray(ligCanon.bonds)) {
     if (ligCanon.atoms.length !== ligand.graph!.atoms.length || ligCanon.bonds.length !== ligand.graph!.bonds.length) blockers.push("LIGAND_CANONICAL_MISMATCH");
   } else if (ligand) blockers.push("LIGAND_CANONICAL_INVALID");
-  if (receptor && recCanon && Array.isArray(recCanon.atoms) && recCanon.atoms.length !== manifest.summary?.receptorAtoms) blockers.push("RECEPTOR_CANONICAL_MISMATCH");
+  // Receptor: bind the docked receptor.pdbqt to the graph adapted from receptor.clean.pdb, and canonical.json
+  // plus the summary count to that PDBQT (prepReceptorD2.bindReceptorPdbqt). Any mismatch blocks the receptor.
+  const binding = receptor && recCanon !== undefined
+    ? bindReceptorPdbqt({ adapted: receptor, pdbqt: get("out/receptor.pdbqt").toString("latin1"), canonical: recCanon, summaryAtoms: manifest.summary?.receptorAtoms })
+    : undefined;
+  for (const c of binding?.codes ?? []) blockers.push(c);
 
   // Ligand: the existing D2 kinematic + ligand seal functions, fed from the verified PDBQT. Generated chemistry
   // (template hydrogens, 3D embedding, Dimorphite-DL) is never D2-sealed: D2 core admits explicit state only.
@@ -198,7 +216,7 @@ export const sealFromPrepManifest = async (store: PrepJobStore, jobId: string, o
     reasonCodes: [...new Set(blockers)].slice(0, 100),
     verifiedOutputs: verified,
     components: { receptor: receptorSeal, ligand: ligandSeal },
-    ...(receptor ? { receptor: { graphDigest: receptor.graph!.digest, identityDigest: receptor.identity!.digest, atoms: receptor.graph!.atoms.length } } : {}),
+    ...(receptor ? { receptor: { graphDigest: receptor.graph!.digest, identityDigest: receptor.identity!.digest, atoms: receptor.graph!.atoms.length, pdbqtAtoms: binding?.mappedAtoms ?? 0, mergedHydrogens: binding?.mergedHydrogens ?? 0 } } : {}),
     ...(ligand ? { ligand: { graphDigest: ligand.graph!.digest, identityDigest: ligand.identity!.digest, atoms: ligand.graph!.atoms.length, bonds: ligand.graph!.bonds.length, typedAtoms } } : {}),
     ...(ligandD2?.ligand ? { ligandState: ligandD2.ligand } : {}),
     ...(receptorD2?.receptor ? { receptorState: receptorD2.receptor } : {}),
