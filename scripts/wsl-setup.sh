@@ -2,6 +2,7 @@
 # Run inside WSL Ubuntu 24.04:  wsl -d Ubuntu-24.04  then  bash scripts/wsl-setup.sh
 # Installs the native toolchain, Docker, AutoDock Vina 1.2.7 and the Python preparation environment.
 set -euo pipefail
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
 sudo apt-get update
 sudo apt-get install -y build-essential cmake ninja-build git curl unzip python3-venv python3-pip docker.io
 sudo usermod -aG docker "$USER"
@@ -17,6 +18,6 @@ python3 -m venv ~/mole-prep
 . ~/mole-prep/bin/activate
 pip install --upgrade pip
 # Reproducible install from the hashed lock (regenerate with scripts/lock-prep.sh)
-pip install --require-hashes -r "$(dirname "$0")/../workers/prep/requirements.lock.txt"
+pip install --require-hashes -r "$REPO/workers/prep/requirements.lock.txt"
 pip install pytest
 echo "Done. Close all WSL windows and run 'wsl --shutdown' once so systemd and the docker group take effect."
