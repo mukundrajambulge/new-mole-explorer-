@@ -2178,7 +2178,8 @@
       "refs": [],
       "est": "1 week",
       "status": "TODO",
-      "note": "Owner decision 2026-10-08: default EXPLICIT_SUBMITTED (use the hydrogens in the uploaded file); PROPKA/PDB2PQR is an opt-in that seals PREVIEW_UNQUALIFIED. No new profile IDs or digests. Design: docs/sprint/design/5.2.md"
+      "note": "Part 1 merged (prep worker CLI plan/apply, 10 real complexes deterministic, generated H/coords PREVIEW_UNQUALIFIED, spawn wrapper). Part 2 (job store, routes, prepSeal, pin check) running as 5.2b in W6.",
+      "branch": "sprint/W5/5.2"
     },
     {
       "id": "5.3",
