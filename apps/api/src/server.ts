@@ -17,10 +17,10 @@ import type { D2SearchRegionInput } from "./docking/d2Preparation.js";
 const config = loadConfig();
 
 const sendJson = (response: ServerResponse, status: number, body: unknown) => {
-  response.writeHead(status, { "content-type": "application/json; charset=utf-8" });
-  profileTransport("START", { status });
   profileMark("SERIALIZATION", "START", { status });
   const serialized = JSON.stringify(body);
+  response.writeHead(status, { "content-type": "application/json; charset=utf-8" });
+  profileTransport("START", { status });
   profileMark("SERIALIZATION", "END", { status, serializedBytes: Buffer.byteLength(serialized, "utf8") });
   profileTransport("END", { status, serializedBytes: Buffer.byteLength(serialized, "utf8") });
   response.end(serialized);
@@ -274,11 +274,30 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
     }
     sendJson(response, 404, { error: { code: "NOT_FOUND", message: "Route was not found." } });
   } catch (error) {
+    if (response.headersSent) throw error;
     errorResponse(response, error);
   }
 };
 
-export const server = createServer(route);
+// Last-resort handler: answer 500 if nothing was sent yet, otherwise drop the connection. Never rethrows.
+const fail = (response: ServerResponse, error: unknown) => {
+  try {
+    console.error(error);
+    if (!response.headersSent && !response.writableEnded) {
+      sendJson(response, 500, { error: { code: "INTERNAL_ERROR", message: "The request could not be completed." } });
+    } else {
+      response.destroy();
+    }
+  } catch {
+    response.destroy();
+  }
+};
+
+process.on("unhandledRejection", (reason) => console.error("unhandledRejection", reason));
+
+export const server = createServer((request, response) => {
+  route(request, response).catch((error) => fail(response, error));
+});
 
 export const startServer = (port = config.port, host = config.host) =>
   new Promise<void>((resolve) => {

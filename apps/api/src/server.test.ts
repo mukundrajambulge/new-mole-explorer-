@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { loadConfig } from "./config.js";
 
 describe("config", () => {
@@ -115,5 +115,22 @@ describe("api routes", () => {
     expect(ok.headers.get("vary")).toMatch(/origin/i);
     expect(ok.headers.get("access-control-allow-headers")).toContain("x-mole-token");
     expect((await fetch(`${base}/api/projects`, { method: "OPTIONS", headers: { origin: "http://evil.example" } })).status).toBe(403);
+  });
+
+  it("answers 500 when serialization throws and keeps serving", async () => {
+    const real = JSON.stringify;
+    const spy = vi.spyOn(JSON, "stringify").mockImplementationOnce(() => { throw new Error("boom"); });
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    try {
+      const bad = await fetch(`${base}/api/health`);
+      expect(bad.status).toBe(500);
+      expect((await bad.json() as { error: { code: string } }).error.code).toBe("INTERNAL_ERROR");
+      const ok = await fetch(`${base}/api/health`);
+      expect(ok.status).toBe(200);
+    } finally {
+      spy.mockRestore();
+      vi.restoreAllMocks();
+      expect(JSON.stringify).toBe(real);
+    }
   });
 });
