@@ -37,7 +37,9 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ApiConfig => {
   return {
     mode: modeRaw,
     host,
-    port: intEnv(env, "PORT", intEnv(env, "API_PORT", 8100, 0, 65535), 0, 65535),
+    // API_PORT wins. Generic PORT is only honoured in hosted mode: in local dev, tools such as the
+    // preview launcher set PORT for the web app (3101), which the API must not take over.
+    port: intEnv(env, "API_PORT", modeRaw === "hosted" ? intEnv(env, "PORT", 8100, 0, 65535) : 8100, 0, 65535),
     allowedOrigins: modeRaw === "local" ? [...LOCAL_DEV_ORIGINS, ...listed] : listed,
     tokenDir: env.MOLE_TOKEN_DIR || fileURLToPath(new URL("../../../.mole", import.meta.url)),
     ...(modeRaw === "hosted" ? { token } : {}),
