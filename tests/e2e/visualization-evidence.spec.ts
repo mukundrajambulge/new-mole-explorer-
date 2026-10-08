@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -7,5 +8,5 @@ test("VIS evidence captures the local Cartoon plus ligand Sticks presentation", 
   await page.locator('input[type="file"]').setInputFiles(resolve("tests/fixtures/mini-protein.pdb"));
   await expect(page.getByTitle("mini-protein.pdb")).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-renderer-cartoon-contributors", "8", { timeout: 15000 });
-  await page.screenshot({ path: resolve("verification/evidence/uploaded-cartoon-ligand-sticks.png"), animations: "disabled" });
+  await page.screenshot({ path: evidencePath("uploaded-cartoon-ligand-sticks.png"), animations: "disabled" });
 });

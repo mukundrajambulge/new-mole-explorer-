@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -11,7 +12,7 @@ const viewports = [
 
 test("responsive scientific workspace stays within viewport and keeps the rail adjacent", async ({ page }) => {
   test.setTimeout(180_000);
-  mkdirSync(resolve("verification/selection-exhaustive/ui"), { recursive: true });
+  mkdirSync(evidencePath("selection-exhaustive", "ui"), { recursive: true });
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto("/");
   await page.locator('input[type="file"]').setInputFiles(resolve("tests/fixtures/mini-protein.pdb"));
@@ -38,13 +39,13 @@ test("responsive scientific workspace stays within viewport and keeps the rail a
     const noHorizontalOverflow = Number(metrics.scrollWidth) <= width + 1;
     const railAtRight = Boolean(rail && rail.right <= width + 1 && rail.width > 0);
     const panelLeftOfRail = Boolean(panel && buttons && panel.right <= buttons.left + 2);
-    const screenshot = `verification/selection-exhaustive/ui/viewport-${label}.png`;
+    const screenshot = evidencePath("selection-exhaustive", "ui", `viewport-${label}.png`);
     await page.screenshot({ path: resolve(screenshot), animations: "disabled" });
     records.push({ viewport: label, width, height, geometry: metrics, noHorizontalOverflow, railAtRight, panelLeftOfRail, screenshot, visualPass: noHorizontalOverflow && railAtRight && panelLeftOfRail });
     await selectPanelButton.click();
   }
-  writeFileSync(resolve("verification/selection-exhaustive/responsive-ui-results.json"), JSON.stringify({ schemaVersion: 1, viewports: records }, null, 2) + "\n");
-  writeFileSync(resolve("verification/selection-exhaustive/RESPONSIVE_UI_REPORT.md"), [
+  writeFileSync(evidencePath("selection-exhaustive", "responsive-ui-results.json"), JSON.stringify({ schemaVersion: 1, viewports: records }, null, 2) + "\n");
+  writeFileSync(evidencePath("selection-exhaustive", "RESPONSIVE_UI_REPORT.md"), [
     "# Responsive UI report", "", "The live browser was checked at every requested viewport. Each viewport has one screenshot and DOM geometry checks for horizontal overflow, a visible right tool rail, and a panel that opens immediately to the rail's left.", "",
     ...records.map((record) => `- ${record.viewport}: ${record.visualPass ? "PASS" : "FAIL"} · overflow=${record.noHorizontalOverflow} · rail=${record.railAtRight} · panel-left=${record.panelLeftOfRail}`),
     "", `Overall desktop/compact responsive status: ${records.every((record) => record.visualPass) ? "PASS" : "FAIL"}`,

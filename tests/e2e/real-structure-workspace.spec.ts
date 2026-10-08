@@ -1,7 +1,8 @@
+import { evidencePath } from "./evidence";
 import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 
-const evidenceDir = resolve("verification/final-rearchitecture/evidence");
+const evidenceDir = evidencePath();
 
 test("4DJW live selection and a second RCSB object share one workspace", async ({ page }) => {
   test.setTimeout(120000);

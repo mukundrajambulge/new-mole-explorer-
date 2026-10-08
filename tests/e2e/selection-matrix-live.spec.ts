@@ -1,3 +1,5 @@
+import { evidencePath } from "./evidence";
+import { evidencePath } from "./evidence";
 import { expect, test } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -216,7 +218,7 @@ test("representative selection families run through the real console input", asy
     });
   }
 
-  writeFileSync(resolve("verification/selection/selection-live-evidence.json"), JSON.stringify({
+  writeFileSync(evidencePath("selection", "selection-live-evidence.json"), JSON.stringify({
     schemaVersion: 1,
     fixture: "tests/fixtures/mini-protein.pdb",
     generatedBy: "tests/e2e/selection-matrix-live.spec.ts",
@@ -228,5 +230,5 @@ test("representative selection families run through the real console input", asy
     attempts: evidence,
   }, null, 2) + "\n", "utf8");
   await expect(viewer).toHaveAttribute("data-viewer-state", "loaded");
-  await page.screenshot({ path: resolve("verification/evidence/selection-console-matrix.png"), animations: "disabled" });
+  await page.screenshot({ path: evidencePath("selection-console-matrix.png"), animations: "disabled" });
 });

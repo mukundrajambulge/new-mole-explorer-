@@ -1,7 +1,8 @@
+import { evidencePath } from "./evidence";
 import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 
-const evidenceDir = resolve("verification/p0-boot/evidence");
+const evidenceDir = evidencePath();
 
 type RuntimeCapture = { pageErrors: string[]; consoleErrors: string[] };
 

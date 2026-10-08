@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test, type Page } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -35,7 +36,7 @@ test("source-backed mmCIF polymer typing drives nucleic selection", async ({ pag
   const consoleRegion = page.getByRole("region", { name: "Command and selection console" });
   await expect(consoleRegion).toContainText("Selected 2 atoms");
   await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
-  await page.screenshot({ path: "verification/evidence/selection-polymer-nucleic-mmcif.png", animations: "disabled" });
+  await page.screenshot({ path: evidencePath("selection-polymer-nucleic-mmcif.png"), animations: "disabled" });
 });
 
 test("canonical mmCIF segment identity drives segi and bysegi selection", async ({ page }) => {
@@ -109,7 +110,7 @@ test("source-backed unit-cell parameters drive bounded bycell selection", async 
   await expect(entries.nth(before)).toContainText("Selected 2 atoms");
   await expect(page.getByTestId("active-selection")).toContainText("VALID NONEMPTY");
   await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-selection-indicator", "visible");
-  await page.screenshot({ path: resolve("verification/evidence/selection-bycell.png"), animations: "disabled" });
+  await page.screenshot({ path: evidencePath("selection-bycell.png"), animations: "disabled" });
 });
 
 test("canonical sidechain selection matches the pinned backbone partition fixture", async ({ page }) => {
@@ -254,7 +255,7 @@ test("presentation-dependent selectors use the current RenderProjection", async 
   await page.getByRole("button", { name: /Run/ }).click();
   await expect(consoleRegion.locator(".console-entry").last()).toContainText(/Applied red to 8 RIBBON atoms/i);
   await runSelection("select ribbon_color red", 8, "VALID NONEMPTY");
-  await page.screenshot({ path: resolve("verification/evidence/selection-ribbon-color.png"), animations: "disabled" });
+  await page.screenshot({ path: evidencePath("selection-ribbon-color.png"), animations: "disabled" });
   const canonicalMetrics = (value: string) => value.replace(/Selection\s+\d+/i, "").replace(/\s+/g, "");
   expect(canonicalMetrics(await atomMetrics.innerText())).toBe(canonicalMetrics(before));
   await expect(viewer).toHaveAttribute("data-viewer-state", "loaded");
@@ -303,5 +304,5 @@ test("analysis and measurement controls remain reachable in the left rail", asyn
   await page.getByRole("button", { name: "Measure panel" }).click();
   await expect(page.getByTestId("measurements-panel").getByRole("button", { name: "Distance", exact: true })).toBeVisible();
   await expect(page.getByTestId("measurements-panel").getByRole("button", { name: "Dihedral", exact: true })).toBeVisible();
-  await page.screenshot({ path: resolve("verification/evidence/analysis-interaction-scroll.png"), animations: "disabled" });
+  await page.screenshot({ path: evidencePath("analysis-interaction-scroll.png"), animations: "disabled" });
 });

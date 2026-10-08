@@ -32,6 +32,21 @@ const timed = async (page: Page, fn: () => Promise<unknown>) => {
 test("4V6F performance baseline", async ({ page }) => {
   if (!fixture) throw new Error("4V6F fixture missing: set PERF_4V6F or place it at tests/fixtures/rcsb/4V6F.cif");
   const results: Record<string, unknown> = { schemaVersion: 1, label, date: new Date().toISOString(), fixture: "4V6F" };
+  // Profiler for 3.2: count JSON.stringify calls (and output size) in the page during the hover phase.
+  await page.addInitScript(() => {
+    const w = window as unknown as { __jsonStats: { calls: number; chars: number; large: number } };
+    w.__jsonStats = { calls: 0, chars: 0, large: 0 };
+    const original = JSON.stringify;
+    JSON.stringify = function (this: unknown, ...args: Parameters<typeof JSON.stringify>) {
+      const out = original.apply(this, args);
+      w.__jsonStats.calls += 1;
+      const n = typeof out === "string" ? out.length : 0;
+      w.__jsonStats.chars += n;
+      if (n > 100_000) w.__jsonStats.large += 1;
+      return out;
+    } as typeof JSON.stringify;
+  });
+  const jsonStats = () => page.evaluate(() => ({ ...(window as unknown as { __jsonStats: { calls: number; chars: number; large: number } }).__jsonStats }));
   await page.setViewportSize({ width: 1600, height: 900 });
   await page.goto("/");
   const viewer = page.getByTestId("molecular-viewer");
@@ -59,12 +74,25 @@ test("4V6F performance baseline", async ({ page }) => {
   // 50 hovers over the canvas with chain A selected.
   const box = (await viewer.boundingBox())!;
   const hover: number[] = [];
+  const jsonBeforeHover = await jsonStats();
   for (let i = 0; i < 50; i++) {
     const x = box.x + box.width * (0.3 + (0.4 * ((i * 37) % 50)) / 50);
     const y = box.y + box.height * (0.3 + (0.4 * ((i * 53) % 50)) / 50);
     hover.push(await timed(page, () => page.mouse.move(x, y)));
   }
   results.hoverMs = stats(hover);
+  // hoverMs above measures mouse-move cost only: 3Dmol fires hover callbacks after the pointer rests
+  // ~500 ms (default hover duration), so those moves never change hover state. Dwell phase: rest
+  // 800 ms on 20 points so hover state really changes, and count serialization while it does.
+  const dwell: number[] = [];
+  for (let i = 0; i < 20; i++) {
+    const x = box.x + box.width * (0.35 + (0.3 * ((i * 7) % 20)) / 20);
+    const y = box.y + box.height * (0.35 + (0.3 * ((i * 11) % 20)) / 20);
+    dwell.push(await timed(page, async () => { await page.mouse.move(x, y); await page.waitForTimeout(800); }));
+  }
+  results.hoverDwellMs = stats(dwell);
+  const jsonAfterHover = await jsonStats();
+  results.hoverJsonStringify = { calls: jsonAfterHover.calls - jsonBeforeHover.calls, chars: jsonAfterHover.chars - jsonBeforeHover.chars, largeCalls: jsonAfterHover.large - jsonBeforeHover.large };
 
   // 10 tab switches between rail panels.
   const names = ["Display panel", "Analyze panel"];

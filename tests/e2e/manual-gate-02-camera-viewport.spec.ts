@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const viewer = (page: Page) => page.getByTestId("molecular-viewer");
@@ -77,7 +78,7 @@ test("MANUAL GATE 02 camera, viewport, structure integrity, and full-canvas clos
   await expect(target).toHaveAttribute("data-camera-action", "FIT");
   await expect(target).toHaveAttribute("data-camera-target-mode", "workspace-visible");
   await page.getByRole("button", { name: "Expand console", exact: true }).click();
-  await page.screenshot({ path: "verification/evidence/manual-gate-02/01-4djw-only-fit-console-expanded.png", animations: "disabled" });
+  await page.screenshot({ path: evidencePath("manual-gate-02/01-4djw-only-fit-console-expanded.png"), animations: "disabled" });
 
   await page.getByRole("button", { name: "Collapse console", exact: true }).click();
   await expect(page.getByRole("button", { name: "Expand console", exact: true })).toBeVisible();
@@ -86,7 +87,7 @@ test("MANUAL GATE 02 camera, viewport, structure integrity, and full-canvas clos
   expect(Math.abs(collapsedGeometry.host.width - expandedGeometry.host.width)).toBeLessThanOrEqual(1);
   expect(Math.abs(collapsedGeometry.host.height - expandedGeometry.host.height)).toBeLessThanOrEqual(1);
   const cameraPanBeforePan = await readJson<{ x: number; y: number }>(target, "data-camera-pan");
-  await page.screenshot({ path: "verification/evidence/manual-gate-02/02-4djw-only-fit-console-collapsed.png", animations: "disabled" });
+  await page.screenshot({ path: evidencePath("manual-gate-02/02-4djw-only-fit-console-collapsed.png"), animations: "disabled" });
 
   await page.getByRole("button", { name: "View", exact: true }).click();
   await page.getByRole("button", { name: "Pan", exact: true }).click();
@@ -98,14 +99,14 @@ test("MANUAL GATE 02 camera, viewport, structure integrity, and full-canvas clos
   await expect(target).toHaveAttribute("data-camera-action", "CENTER");
   const centeredPan = await readJson<{ x: number; y: number }>(target, "data-camera-pan");
   expect(Math.abs(centeredPan.x - cameraPanBeforePan.x) + Math.abs(centeredPan.y - cameraPanBeforePan.y)).toBeLessThan(0.001);
-  await page.screenshot({ path: "verification/evidence/manual-gate-02/03-4djw-centered-after-pan.png", animations: "disabled" });
+  await page.screenshot({ path: evidencePath("manual-gate-02/03-4djw-centered-after-pan.png"), animations: "disabled" });
 
   await runCommand(page, "select id 1");
   await expect(page.getByTestId("active-selection")).toContainText("1 atom");
   await displayPanel(page).getByRole("button", { name: "Center", exact: true }).click();
   await expect(target).toHaveAttribute("data-camera-target-mode", "workspace-visible");
   await expect(target).toHaveAttribute("data-camera-target-atom-count", "6194");
-  await page.screenshot({ path: "verification/evidence/manual-gate-02/04-4djw-one-atom-selection-global-center.png", animations: "disabled" });
+  await page.screenshot({ path: evidencePath("manual-gate-02/04-4djw-one-atom-selection-global-center.png"), animations: "disabled" });
 
   await page.getByRole("button", { name: "Rotate", exact: true }).click();
   const rotationViews: string[] = [];
@@ -122,7 +123,7 @@ test("MANUAL GATE 02 camera, viewport, structure integrity, and full-canvas clos
     expect(view).toBeTruthy();
     rotationViews.push(view!);
     previousRotationView = view;
-    await page.screenshot({ path: `verification/evidence/manual-gate-02/${name}`, animations: "disabled" });
+    await page.screenshot({ path: evidencePath(`manual-gate-02/${name}`), animations: "disabled" });
   }
   expect(new Set(rotationViews).size).toBe(3);
   await expect(target).toHaveAttribute("data-scientific-revision", initial.revision ?? "");
@@ -134,7 +135,7 @@ test("MANUAL GATE 02 camera, viewport, structure integrity, and full-canvas clos
   await displayPanel(page).getByRole("button", { name: "Fit", exact: true }).click();
   await expect(target).toHaveAttribute("data-camera-action", "FIT");
   await expect(target).toHaveAttribute("data-camera-projection", "orthographic");
-  await page.screenshot({ path: "verification/evidence/manual-gate-02/08-4djw-orthographic-fit.png", animations: "disabled" });
+  await page.screenshot({ path: evidencePath("manual-gate-02/08-4djw-orthographic-fit.png"), animations: "disabled" });
 
   await page.goto("/molstudio");
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -144,7 +145,7 @@ test("MANUAL GATE 02 camera, viewport, structure integrity, and full-canvas clos
   await expect(viewer(page)).toHaveAttribute("data-camera-action", "FIT");
   await expect(viewer(page)).toHaveAttribute("data-camera-target-object-count", "1");
   await assertFullCanvas(page);
-  await page.screenshot({ path: "verification/evidence/manual-gate-02/09-1crn-only-fit.png", animations: "disabled" });
+  await page.screenshot({ path: evidencePath("manual-gate-02/09-1crn-only-fit.png"), animations: "disabled" });
 
   await page.goto("/molstudio");
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -159,12 +160,12 @@ test("MANUAL GATE 02 camera, viewport, structure integrity, and full-canvas clos
   const twoObjectTargetCount = Number(await target.getAttribute("data-camera-target-atom-count"));
   expect(twoObjectTargetCount).toBeGreaterThan(6194);
   await assertFullCanvas(page);
-  await page.screenshot({ path: "verification/evidence/manual-gate-02/10-two-objects-fit.png", animations: "disabled" });
+  await page.screenshot({ path: evidencePath("manual-gate-02/10-two-objects-fit.png"), animations: "disabled" });
 
   await expect(target).toHaveAttribute("data-camera-target-object-count", "2");
   await expect(target).toHaveAttribute("data-camera-safe-viewport");
   await assertFullCanvas(page);
-  await page.screenshot({ path: "verification/evidence/manual-gate-02/11-console-overlay-full-canvas.png", animations: "disabled" });
+  await page.screenshot({ path: evidencePath("manual-gate-02/11-console-overlay-full-canvas.png"), animations: "disabled" });
 
   await page.setViewportSize({ width: 1366, height: 768 });
   await expect.poll(async () => (await geometry(page)).canvas.width).toBeGreaterThan(500);
@@ -174,6 +175,6 @@ test("MANUAL GATE 02 camera, viewport, structure integrity, and full-canvas clos
   expect(resized.width).toBeGreaterThan(500);
   expect(resized.height).toBeGreaterThan(300);
   await assertFullCanvas(page);
-  await page.screenshot({ path: "verification/evidence/manual-gate-02/12-post-resize-fit-1366x768.png", animations: "disabled" });
+  await page.screenshot({ path: evidencePath("manual-gate-02/12-post-resize-fit-1366x768.png"), animations: "disabled" });
   await expect(target).toHaveAttribute("data-scientific-revision", twoObjectRevision ?? "");
 });
