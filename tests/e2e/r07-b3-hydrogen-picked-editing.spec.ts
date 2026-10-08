@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test, type Page } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -35,7 +36,7 @@ test("R07-B3 add hydrogens and attach atom reconcile the authoritative child rev
   await expect(viewer).not.toHaveAttribute("data-renderer-generation", initialGeneration!);
   await expect(page.getByRole("region", { name: "Command and selection console" }).locator(".console-entry").last()).toContainText("COMMITTED");
   await expect(viewer).toHaveAttribute("data-renderer-model-loads", modelLoads!);
-  await page.screenshot({ path: "verification/evidence/r07-b3/hydrogen-addition.png", fullPage: true });
+  await page.screenshot({ path: evidencePath("r07-b3/hydrogen-addition.png"), fullPage: true });
 
   await runCommand(page, "unpick");
   await runCommand(page, "attach O, id 2");
@@ -53,7 +54,7 @@ test("R07-B3 refill retires old explicit hydrogen identities atomically and exac
   await runCommand(page, "h_fill id 1");
   await expect(viewer).toHaveAttribute("data-canonical-atom-count", "5");
   await expect(viewer).toHaveAttribute("data-canonical-bond-count", "4");
-  await page.screenshot({ path: "verification/evidence/r07-b3/hydrogen-refill.png", fullPage: true });
+  await page.screenshot({ path: evidencePath("r07-b3/hydrogen-refill.png"), fullPage: true });
   await runCommand(page, "undo");
   await expect(viewer).toHaveAttribute("data-canonical-atom-count", "2");
   await expect(viewer).toHaveAttribute("data-scientific-revision", rootRevision!);

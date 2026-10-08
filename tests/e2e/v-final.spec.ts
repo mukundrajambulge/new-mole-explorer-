@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test, type Page } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -117,7 +118,7 @@ test("V-FINAL Center routes through the camera controller and labels remain cano
 
 test("V-FINAL captures the clean local upload evidence state", async ({ page }) => {
   await loadFixture(page);
-  await page.screenshot({ path: resolve("verification/evidence/visualization-final/uploaded-protein-cartoon-ligand-sticks.png"), animations: "disabled" });
+  await page.screenshot({ path: evidencePath("visualization-final/uploaded-protein-cartoon-ligand-sticks.png"), animations: "disabled" });
   await page.getByRole("combobox", { name: "Ligand representation" }).selectOption("space-filling");
-  await page.screenshot({ path: resolve("verification/evidence/visualization-final/space-filling-ligand-only.png"), animations: "disabled" });
+  await page.screenshot({ path: evidencePath("visualization-final/space-filling-ligand-only.png"), animations: "disabled" });
 });

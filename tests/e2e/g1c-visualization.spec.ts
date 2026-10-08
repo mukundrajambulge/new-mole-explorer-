@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test, type Page } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -123,7 +124,7 @@ test("G1C-UI-003 keeps the real viewer canvas measurable when side panels collap
   expect(canvasMetrics.height).toBeGreaterThan(0);
   expect(canvasMetrics.backingWidth).toBeGreaterThan(0);
   expect(canvasMetrics.backingHeight).toBeGreaterThan(0);
-  await page.screenshot({ path: resolve("verification/evidence/closure-responsive-canvas.png") });
+  await page.screenshot({ path: evidencePath("closure-responsive-canvas.png") });
 });
 
 test("G1C-PERF-001 changes presentation without recreating the canonical model", async ({ page }) => {

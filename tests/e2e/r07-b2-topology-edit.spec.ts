@@ -1,3 +1,4 @@
+import { evidencePath } from "./evidence";
 import { expect, test, type Page } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -42,7 +43,7 @@ test("R07-B2 delete selected reconciles canonical topology, viewer model, and ex
   await expect(viewer).toHaveAttribute("data-canonical-bond-count", "0");
   expect(await viewer.getAttribute("data-renderer-generation")).not.toBe(initialGeneration);
   await expect(viewer).toHaveAttribute("data-renderer-model-loads", initialModelLoads!);
-  await page.screenshot({ path: "verification/evidence/r07-b2/delete-selected.png", fullPage: true });
+  await page.screenshot({ path: evidencePath("r07-b2/delete-selected.png"), fullPage: true });
   await page.locator('button[data-action-id="HISTORY.UNDO"]').evaluate((element) => (element as HTMLButtonElement).click());
   await expect(viewer).toHaveAttribute("data-canonical-atom-count", "4");
   await expect(viewer).toHaveAttribute("data-canonical-bond-count", "2");
@@ -63,7 +64,7 @@ test("R07-B2 console bond, unbond, and bond-order commands use canonical endpoin
   await runCommand(page, "set_bond order, double, id 1, id 2");
   await expect(viewer).toHaveAttribute("data-canonical-bond-count", "2");
   await expect(viewer).toHaveAttribute("data-canonical-bond-orders", /DOUBLE/);
-  await page.screenshot({ path: "verification/evidence/r07-b2/bond-order-replacement.png", fullPage: true });
+  await page.screenshot({ path: evidencePath("r07-b2/bond-order-replacement.png"), fullPage: true });
 });
 
 test("R07-B2 rejects self-bond and cross-object topology without partial success", async ({ page }) => {

@@ -42,6 +42,16 @@ describe("PDB and mmCIF of the same RCSB entry agree", () => {
     }, 120_000);
   }
 
+  it("types every polymer atom of the single-entity entries from _entity_poly", async () => {
+    for (const id of ["1CRN", "1D3Z", "4DJW", "6VXX"]) {
+      const cif = (await ingest(`${id}.cif`, read(`${id}.cif`))).structure;
+      expect(cif.polymerTypingSource, id).toMatch(/_entity_poly\.type/);
+      const polymerAtoms = cif.atoms.filter((atom) => atom.recordType === "ATOM");
+      expect(polymerAtoms.length, id).toBeGreaterThan(0);
+      expect(polymerAtoms.every((atom) => atom.polymerType === "PROTEIN"), id).toBe(true);
+    }
+  }, 120_000);
+
   it("keeps label_* identity next to auth_* identity", async () => {
     const cif = (await ingest("4DJW.cif", read("4DJW.cif"))).structure;
     const water = cif.atoms.find((atom) => atom.isWater)!;
@@ -94,6 +104,33 @@ describe("mmCIF syntax rules", () => {
     expect(result.atoms).toHaveLength(1);
     expect(result.atoms[0]).toMatchObject({ atomName: "CA", x: 1, y: 2, z: 3 });
     expect(result.unitCell).toMatchObject({ a: 10, b: 11, c: 12 });
+  });
+
+  it("types polymers from a single-row _entity_poly category", async () => {
+    const extra = "_entity_poly.entity_id 1\n_entity_poly.type 'polypeptide(L)'\n_entity_poly.pdbx_seq_one_letter_code\n;AA\n;\n";
+    const header = [...cifHeader, "_atom_site.label_entity_id"];
+    const content = `data_p\n${extra}loop_\n${header.join("\n")}\n${atomRow(1, "CA")} 1\n${atomRow(2, "CB")} 1\n`;
+    const result = (await ingest("p.cif", content)).structure;
+    expect(result.polymerTypingSource).toMatch(/_entity_poly\.type/);
+    expect(result.atoms.map((atom) => atom.polymerType)).toEqual(["PROTEIN", "PROTEIN"]);
+  });
+
+  it("handles CRLF line endings in text fields and unterminated quotes", async () => {
+    const extra = "_struct.title\r\n;first line\r\n_atom_site.id 'still text'\r\n;\r\n_struct.pdbx_descriptor 'open quote\r\n";
+    const content = doc([atomRow(1, "CA"), atomRow(2, "CB")], extra).replace(/\n/g, "\r\n").replace(/\r\r\n/g, "\r\n");
+    const result = (await ingest("crlf.cif", content)).structure;
+    expect(result.atoms.map((atom) => atom.atomName)).toEqual(["CA", "CB"]);
+  });
+
+  it("treats reserved words case-insensitively and reads only the first data block", async () => {
+    const content = doc([atomRow(1, "CA")]).replace("loop_", "LOOP_") + `DATA_second\nloop_\n${cifHeader.join("\n")}\n${atomRow(9, "CB")}\n`;
+    const result = (await ingest("b.cif", content)).structure;
+    expect(result.atoms.map((atom) => atom.atomName)).toEqual(["CA"]);
+  });
+
+  it("rejects a loop whose values do not fill whole rows", async () => {
+    const content = doc([atomRow(1, "CA"), "ATOM 2 C CB ALA A 1 1 A ?"]);
+    await expect(ingest("bad.cif", content)).rejects.toThrow(/not a multiple/);
   });
 
   it("keeps model numbers as coordinate states", async () => {
