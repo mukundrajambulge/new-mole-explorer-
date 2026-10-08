@@ -305,7 +305,7 @@ export const MolecularCanvas = ({
         {(error || viewerError) && <div className="viewer-message viewer-message--error"><Icon name="circleHelp" size={17} /> {error ?? viewerError}</div>}
         {dragActive && <div className="drop-overlay"><Icon name="upload" size={24} /><strong>Drop a supported coordinate file</strong><span>Backend validation will keep the current structure safe.</span></div>}
         <div className="canvas-axis-readout" aria-label="Orientation axes"><span className="axis-readout-y">Y</span><span className="axis-readout-x">X</span><span className="axis-readout-z">Z</span></div>
-        <button className="canvas-reset" onClick={() => onAction("VIEW.RESET")} aria-label="Reset view" data-action-id="VIEW.RESET"><Icon name="plus" size={16} /></button>
+        <button className="canvas-reset" onClick={() => onAction("VIEW.RESET")} aria-label="Reset view" title="Reset view" data-action-id="VIEW.RESET"><Icon name="home" size={16} /></button>
         <div className="canvas-tool-readout"><span className="tool-readout-icon"><Icon name={toolIcon(activeTool)} size={13} /></span>{measurementMode ? `MEASURE ${measurementMode}` : activeTool.toUpperCase()}</div>
       </div>
     </section>

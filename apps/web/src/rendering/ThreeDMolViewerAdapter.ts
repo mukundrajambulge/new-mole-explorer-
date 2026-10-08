@@ -4,6 +4,7 @@ import { COMPACT_ATOM_FLAG_ION, COMPACT_ATOM_FLAG_LIGAND, COMPACT_ATOM_FLAG_POLY
 import { colorRegistry } from "./colorRegistry";
 import { resolveAtomColor, resolveProjectedAtomColor } from "./colorSchemes";
 import { DEFAULT_CAMERA, type CameraState, type RenderProjection } from "./renderProjection";
+import { isCartoonFamily, selectionDeemphasisStyleFor, selectionOverlayStyle } from "./selectionStyles";
 import { buildRenderProjectionDiagnostics, emptyRenderProjectionDiagnostics, type RenderProjectionDiagnostics } from "./renderDirectives";
 import type { RepresentationType } from "./presentationState";
 import { labelPlanForState, resolveSafeLabel } from "../interaction/labels";
@@ -134,51 +135,6 @@ const styleFor = (representation: StyleRepresentation, projection: RenderProject
   }
 };
 
-/**
- * Selection is a presentation overlay, not a second atom-by-atom scene.  The
- * overlay deliberately uses the active representation primitive so large
- * selections remain visible without allocating one GLShape per atom.
- */
-const selectionOverlayStyle = (projection: RenderProjection, representationOverride?: RenderProjection["representation"]): AtomStyleSpec => {
-  const color = "#55d9ff";
-  const colorfunc = () => color;
-  const representation = representationOverride ?? projection.representation;
-  if (representation === "cartoon" || representation === "ribbon" || representation === "trace" || representation === "putty") {
-    return { cartoon: { color, colorfunc, opacity: 0.86, arrows: true, thickness: Math.max(0.24, projection.representationState.parameters.cartoonThickness + 0.08) } } as AtomStyleSpec;
-  }
-  if (representation === "line" || representation === "lines") {
-    return { line: { color, colorfunc, linewidth: Math.max(2.2, projection.representationState.parameters.lineWidth + 1), opacity: 0.95 } } as AtomStyleSpec;
-  }
-  if (representation === "nonbonded-crosses") {
-    return { cross: { color, colorfunc, scale: 0.48, radius: 0.16, opacity: 0.95 } } as AtomStyleSpec;
-  }
-  if (representation === "spheres" || representation === "space-filling" || representation === "nonbonded-spheres") {
-    return { sphere: { color, colorfunc, scale: Math.max(1.05, projection.representationState.parameters.sphereScale * 1.18), opacity: 0.82 } } as AtomStyleSpec;
-  }
-  if (representation === "ball-and-stick") {
-    return { stick: { color, colorfunc, radius: Math.max(0.28, projection.representationState.parameters.stickRadius + 0.06), opacity: 0.86 }, sphere: { color, colorfunc, scale: 1.12, opacity: 0.78 } } as AtomStyleSpec;
-  }
-  return { stick: { color, colorfunc, radius: Math.max(0.26, projection.representationState.parameters.stickRadius + 0.05), opacity: 0.86 } } as AtomStyleSpec;
-};
-
-/**
- * Selection context is intentionally a light model-style overlay.  It keeps
- * the authoritative base representation and colours intact while making the
- * unselected context recede enough for the selected content to read first.
- */
-const selectionDeemphasisStyleFor = (projection: RenderProjection): AtomStyleSpec => {
-  if (projection.representation === "cartoon" || projection.representation === "ribbon" || projection.representation === "trace" || projection.representation === "putty") {
-    // 3Dmol's cartoon spline builder requires a complete polymer stream. A
-    // complete-model pass is safe; selected content is restored with the cyan
-    // overlay immediately afterward.
-    return { cartoon: { opacity: 0.46 } } as AtomStyleSpec;
-  }
-  if (projection.representation === "line" || projection.representation === "lines") return { line: { opacity: 0.46 } } as AtomStyleSpec;
-  if (projection.representation === "spheres" || projection.representation === "space-filling" || projection.representation === "nonbonded-spheres") return { sphere: { opacity: 0.46 } } as AtomStyleSpec;
-  if (projection.representation === "ball-and-stick") return { stick: { opacity: 0.46 }, sphere: { opacity: 0.46 } } as AtomStyleSpec;
-  if (projection.representation === "nonbonded-crosses") return { cross: { opacity: 0.46 } } as AtomStyleSpec;
-  return { stick: { opacity: 0.46 } } as AtomStyleSpec;
-};
 
 const orderNumber = (order: CanonicalMolecularStructure["bonds"][number]["order"]): number => order === "DOUBLE" ? 2 : order === "TRIPLE" ? 3 : order === "AROMATIC" ? 4 : 1;
 const secondaryCode = (value: CanonicalMolecularStructure["atoms"][number]["secondaryStructure"]): string | undefined => value === "HELIX" ? "h" : value === "SHEET" ? "s" : value === "LOOP" ? "c" : undefined;
@@ -1621,7 +1577,7 @@ export class ThreeDMolViewerAdapter {
     }
     for (const marker of markerPoints) {
       const color = marker.id === projection.interaction.pickedAtomId ? "#e5ae32" : projection.interaction.measurementPickAtomIds.includes(marker.id) ? "#f5c451" : "#31d8c4";
-      this.interactionShapes.push(this.viewer.addSphere({ center: marker.point, radius: color === "#e5ae32" ? 0.28 : 0.23, color, wireframe: true, opacity: 0.86 }));
+      this.interactionShapes.push(this.viewer.addSphere({ center: marker.point, radius: color === "#e5ae32" ? 0.42 : 0.23, color, wireframe: color !== "#e5ae32", opacity: 0.9 }));
     }
     this.projectSurfaceSelectionEmphasis(matchedSelectionIds.size > 0);
     if (this.container) {
@@ -1630,7 +1586,7 @@ export class ThreeDMolViewerAdapter {
       this.container.dataset.selectionHighlightLimit = "none";
       this.container.dataset.selectionHighlightMode = matchedSelectionIds.size === 1 ? "atom-halo-overlay" : matchedSelectionIds.size ? "representation-overlay" : "none";
       this.container.dataset.selectionDeemphasis = matchedSelectionIds.size ? "active" : "none";
-      this.container.dataset.selectionDeemphasisOpacity = matchedSelectionIds.size ? "0.46" : "1";
+      this.container.dataset.selectionDeemphasisOpacity = matchedSelectionIds.size && !isCartoonFamily(projection.representation) ? "0.46" : "1";
     }
   }
 
@@ -1711,7 +1667,7 @@ export class ThreeDMolViewerAdapter {
       this.container.dataset.selectionHighlightLimit = "none";
       this.container.dataset.selectionHighlightMode = matchedSelectionIds.size === 1 ? "atom-halo-overlay" : matchedSelectionIds.size ? "representation-overlay" : "none";
       this.container.dataset.selectionDeemphasis = matchedSelectionIds.size ? "active" : "none";
-      this.container.dataset.selectionDeemphasisOpacity = matchedSelectionIds.size ? "0.46" : "1";
+      this.container.dataset.selectionDeemphasisOpacity = matchedSelectionIds.size && !isCartoonFamily(projection.representation) ? "0.46" : "1";
     }
     const workspaceAtoms = this.workspaceObjects.length ? this.workspaceObjects.flatMap((object) => object.enabled ? structureForWorkspaceObjectState(object).atoms.map((atom) => ({ ...atom, stableId: workspaceScopedStableAtomId(object.objectId, atom.stableId) })) : []) : this.structure.atoms;
     const addMarker = (stableId: string, color: string, radius: number, wireframe: boolean, opacity: number) => {
