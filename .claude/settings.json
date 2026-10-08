@@ -1,0 +1,62 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm ci)",
+      "Bash(npm ci *)",
+      "Bash(node scripts/sprint/*)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git switch *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git merge *)",
+      "Bash(git rev-parse *)",
+      "Bash(git rev-list *)",
+      "Bash(git branch --list *)",
+      "Bash(git worktree list *)",
+      "Bash(wsl -d Ubuntu-24.04 *)"
+    ],
+    "deny": [
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git tag -d *)",
+      "Bash(git branch -D *)",
+      "Bash(git filter-repo *)",
+      "Bash(git reset --hard main*)",
+      "Bash(rm -rf verification*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/guard-write.mjs"
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/guard-read.mjs"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/guard-bash.mjs"
+          }
+        ]
+      }
+    ]
+  }
+}

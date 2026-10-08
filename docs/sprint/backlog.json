@@ -1,0 +1,3173 @@
+{
+  "version": 2,
+  "base": "main",
+  "lanes": {
+    "L1": {
+      "agentType": "devops-engineer",
+      "owns": ".gitignore, .github/**, playwright*.config.ts, tests/e2e/**, .nvmrc, root package.json scripts, docs/STATUS.md"
+    },
+    "L2": {
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)"
+    },
+    "L3": {
+      "agentType": "structure-parser-engineer",
+      "owns": "apps/api/src/structures/ingestion*.ts, apps/api/src/structures/*.test.ts, tests/fixtures/rcsb/**, scripts/fetch-fixtures.mjs, docs/FORMATS.md"
+    },
+    "L4": {
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**"
+    },
+    "L5": {
+      "agentType": "native-cpp-engineer",
+      "owns": "native/**, packages/contracts/src/docking/** (except jobs.ts), apps/api/src/docking/d2*.ts, apps/api/src/docking/d3*.ts"
+    },
+    "L6": {
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts"
+    },
+    "L7": {
+      "agentType": "docking-ui-engineer",
+      "owns": "apps/web/src/docking/**, apps/web/src/lib/dockingClient.ts, docs/user-guide/**"
+    },
+    "L8": {
+      "agentType": "devops-engineer",
+      "owns": "deploy/**, Dockerfile*, docker-compose*.yml, .github/workflows/deploy.yml, apps/api/src/auth/**"
+    },
+    "L9": {
+      "agentType": "science-validator",
+      "owns": "tests/science/**, native/docking-reference/search/**"
+    }
+  },
+  "tasks": [
+    {
+      "id": "0.1",
+      "title": "Make a full safety backup",
+      "phase": "P0",
+      "wave": "HUMAN",
+      "lane": "OWNER",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "agentType": null,
+      "what": "Before cleaning anything, save a complete copy that can always be restored.",
+      "how": "- git bundle create ../mole-backup-2026-10.bundle --all, then git bundle verify ../mole-backup-2026-10.bundle\n              \n- Upload the bundle and verification/desktop-worktree-preservation.zip (443 MB) to the Drive folder \"Backups\".\n              \n- Save the output of git branch -a -vv and git worktree list to Drive.",
+      "done": "The bundle verifies, both files are visible in Drive, and you can name the restore command.",
+      "refs": [],
+      "est": "1 hour",
+      "status": "TODO",
+      "when": "Day 1"
+    },
+    {
+      "id": "0.2",
+      "title": "Shrink Git and stop big files from sneaking in",
+      "phase": "P0",
+      "wave": "HUMAN",
+      "lane": "OWNER",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "agentType": null,
+      "what": "Compress Git's storage, and tell Git to ignore zips, outputs and test results.",
+      "how": "- git gc --prune=now\n- Add *.zip, outputs/, test-results/, playwright-report/, *.bundle and verification/**/_generated/ to .gitignore.\n              \n- Move the zip out of the repo folder once it is safely in Drive.",
+      "done": "git count-objects -vH shows packs ≥ 1 and size-pack well below 966 MB, and git status does not list the zip.",
+      "refs": [
+        "R1",
+        "R2"
+      ],
+      "est": "30 minutes",
+      "status": "TODO",
+      "when": "Day 1"
+    },
+    {
+      "id": "0.3",
+      "title": "Deal with the 717 changed evidence files",
+      "phase": "P0",
+      "wave": "HUMAN",
+      "lane": "OWNER",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "agentType": null,
+      "what": "These files changed only because tests re-took screenshots. Keep the old accepted versions.",
+      "how": "- Check that every changed path is under verification/ or outputs/: git status --porcelain | grep -v -E \" (verification|outputs)/\" must print nothing.\n              \n- Move the untracked new lm-imp-001 material (folders 19-, 20- and the .ts scripts) to a branch wip/lm-imp-001-evidence and commit it there.\n              \n- git restore verification/ to put the accepted screenshots back.",
+      "done": "git status is clean on the working branch.",
+      "refs": [
+        "R3"
+      ],
+      "est": "1 hour",
+      "status": "TODO",
+      "when": "Day 1"
+    },
+    {
+      "id": "0.4",
+      "title": "Bring main up to date",
+      "phase": "P0",
+      "wave": "HUMAN",
+      "lane": "OWNER",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "agentType": null,
+      "what": "Make your local main the same as GitHub's main.",
+      "how": "- git fetch new-origin --tags\n- git switch main, then git merge --ff-only new-origin/main",
+      "done": "git rev-list --left-right --count new-origin/main...main prints 0 0.",
+      "refs": [
+        "R4"
+      ],
+      "est": "15 minutes",
+      "status": "TODO",
+      "when": "Day 1"
+    },
+    {
+      "id": "0.5",
+      "title": "Merge D3 (C++ engine) and P0 work into main",
+      "phase": "P0",
+      "wave": "HUMAN",
+      "lane": "OWNER",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "agentType": null,
+      "what": "Put the accepted D3 docking work and the current workstation work on one line.",
+      "how": "- git switch -c integrate/d3-p0 main\n              \n- Merge c93643f (P0 reconcile), then the tag mole-explorer-docking-d3-accepted-2026-10-05 (a7518a7).\n              \n- Resolve conflicts, keeping both sides' code. Conflicts in evidence files: keep the tag's version.\n              \n- Run npm ci, npm run typecheck, npm run lint and npm test, plus a local cmake/ctest of native/docking-reference/scoring.\n              \n- Open a pull request to main, review it, then merge. Tag it mole-explorer-integrated-baseline-2026-10.",
+      "done": "git merge-base --is-ancestor mole-explorer-docking-d3-accepted-2026-10-05 main succeeds, and all checks are green.",
+      "refs": [
+        "R5"
+      ],
+      "est": "Half a day",
+      "status": "TODO",
+      "when": "Day 1"
+    },
+    {
+      "id": "0.6",
+      "title": "Remove old branches and worktrees",
+      "phase": "P0",
+      "wave": "W1",
+      "lane": "L1",
+      "tier": "core",
+      "critical": false,
+      "deps": [],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "low",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": ".gitignore, .github/**, playwright*.config.ts, tests/e2e/**, .nvmrc, root package.json scripts, docs/STATUS.md",
+      "contextFiles": [
+        "package.json",
+        ".github/workflows/ci.yml",
+        "playwright.config.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Keep only branches that still matter.",
+      "how": "- List merged branches: git branch --merged main. Delete them with git branch -d (never -D).\n              \n- Run git worktree prune, and remove finished worktrees under .codex/worktrees with git worktree remove.\n              \n- Tags are kept forever, so accepted baselines stay safe.",
+      "done": "At most about 10 local branches remain, each with a clear purpose.",
+      "refs": [
+        "R4"
+      ],
+      "est": "1 hour",
+      "status": "TODO"
+    },
+    {
+      "id": "0.7",
+      "title": "Stop tests from writing into tracked folders",
+      "phase": "P0",
+      "wave": "W1",
+      "lane": "L1",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "low",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": ".gitignore, .github/**, playwright*.config.ts, tests/e2e/**, .nvmrc, root package.json scripts, docs/STATUS.md",
+      "contextFiles": [
+        "tests/e2e/closure-evidence.spec.ts",
+        "tests/e2e/final-pymol-acceptance.spec.ts",
+        "package.json",
+        ".github/workflows/ci.yml",
+        "playwright.config.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Screenshots taken by tests should go to a throw-away folder.",
+      "how": "- Add a helper tests/e2e/evidence.ts exporting evidencePath(name), which returns process.env.EVIDENCE_DIR ?? \"test-results/evidence\".\n              \n- Replace the 22 resolve(\"verification/evidence/...\") calls with it.\n              \n- When evidence is needed for a gate, run with EVIDENCE_DIR=... and upload the folder to Drive.",
+      "done": "Running the e2e suite leaves git status clean.",
+      "refs": [
+        "T3"
+      ],
+      "est": "2-3 hours",
+      "status": "TODO"
+    },
+    {
+      "id": "0.8",
+      "title": "Pin the Node.js version",
+      "phase": "P0",
+      "wave": "W1",
+      "lane": "L1",
+      "tier": "core",
+      "critical": false,
+      "deps": [],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "low",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": ".gitignore, .github/**, playwright*.config.ts, tests/e2e/**, .nvmrc, root package.json scripts, docs/STATUS.md",
+      "contextFiles": [
+        "apps/app/package.json",
+        ".github/workflows/ci.yml",
+        "package.json",
+        "playwright.config.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Make every machine use the same Node version, so results agree.",
+      "how": "- Add a .nvmrc file containing 22, and \"engines\": {\"node\": \">=22 <23\"} in the root package.json.\n              \n- In CI, use node-version-file: .nvmrc.",
+      "done": "CI and local machines use the same major version.",
+      "refs": [
+        "T9"
+      ],
+      "est": "15 minutes",
+      "status": "TODO"
+    },
+    {
+      "id": "0.9",
+      "title": "Write ONE honest status document",
+      "phase": "P0",
+      "wave": "W1",
+      "lane": "L1",
+      "tier": "core",
+      "critical": false,
+      "deps": [],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "low",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": ".gitignore, .github/**, playwright*.config.ts, tests/e2e/**, .nvmrc, root package.json scripts, docs/STATUS.md",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        "packages/contracts/src/index.ts",
+        "docs/api.md",
+        "README.md",
+        "package.json",
+        ".github/workflows/ci.yml",
+        "playwright.config.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "A single short page that says what really works today. Every new session (human or AI) reads it first.",
+      "how": "- Create docs/STATUS.md with what works, what is partial, what is missing (copy the 10-station table from the report), the current phase and step of this plan, and the latest tag.\n              \n- Add \"SUPERSEDED by D3-FINAL-01 tag a7518a7\" at the top of verification/d3-final-01/D3_FINAL_DECISION.md.\n              \n- Update the top line of the Drive Master Plan with today's date and a link to STATUS.md.\n              \n- Point the README at STATUS.md.",
+      "done": "Nothing in the documents contradicts STATUS.md.",
+      "refs": [
+        "R6",
+        "R7"
+      ],
+      "est": "2-3 hours",
+      "status": "TODO"
+    },
+    {
+      "id": "1.1",
+      "title": "Two run modes: local and hosted",
+      "phase": "P1",
+      "wave": "W1",
+      "lane": "L2",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "high",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/server.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "One setting decides how open the server is. Local mode is locked to your own computer.",
+      "how": "- Add apps/api/src/config.ts that reads MOLE_MODE=local|hosted, HOST (default 127.0.0.1), PORT, ALLOWED_ORIGINS, MAX_JSON_BYTES and MAX_UPLOAD_BYTES.\n              \n- Change server.ts:231 to listen(config.port, config.host).",
+      "done": "From another machine on the Wi-Fi, curl http://<laptop-ip>:8100/api/health fails.",
+      "refs": [
+        "S1"
+      ],
+      "est": "1 hour",
+      "status": "TODO"
+    },
+    {
+      "id": "1.2",
+      "title": "Only allow known websites (CORS allow-list) plus a local token",
+      "phase": "P1",
+      "wave": "W1",
+      "lane": "L2",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "1.1"
+      ],
+      "size": "S",
+      "risk": "high",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/server.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Random websites can no longer talk to your server.",
+      "how": "- Replace access-control-allow-origin: *: echo the request's Origin only if it is in ALLOWED_ORIGINS (default http://localhost:3101), and add Vary: Origin.\n              \n- Reject state-changing requests (POST/PUT) whose Origin is present and not allowed (403).\n              \n- Local mode: at start-up, generate a random token and write it to .mole/token. The Vite proxy (vite.config.ts) adds x-mole-token to /api requests, and the API rejects requests without it (401).",
+      "done": "A test page on another origin cannot call the API. The app still works normally.",
+      "refs": [
+        "S1"
+      ],
+      "est": "3 hours",
+      "status": "TODO"
+    },
+    {
+      "id": "1.3",
+      "title": "Size limits on every request",
+      "phase": "P1",
+      "wave": "W2",
+      "lane": "L2",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "1.6"
+      ],
+      "size": "M",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        "apps/api/src/structures/multipart.ts",
+        "apps/api/src/structures/ingestion.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "No single request can use unlimited memory.",
+      "how": "- readJson: check content-length first, then count bytes while reading. Stop and answer 413 above MAX_JSON_BYTES (default 8 MB; project saves 64 MB).\n              \n- Uploads: stream the multipart body to a temp file on disk (for example with busboy) instead of memory.\n              \n- Upload cap of 256 MB, and at most 2 uploads at the same time (answer 429 otherwise).\n              \n- Read the file for parsing in a streaming way, and never call toString() on the whole file above about 400 MB.",
+      "done": "Tests: a 9 MB JSON body returns 413, a 300 MB upload returns 413, and the server memory stays below about 1 GB while 2 uploads of 200 MB run.",
+      "refs": [
+        "M1"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "1.4",
+      "title": "Stop sending the whole file text back",
+      "phase": "P1",
+      "wave": "W2",
+      "lane": "L2",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "1.3"
+      ],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        "apps/api/src/structures/multipart.ts",
+        "apps/api/src/structures/ingestion.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Upload responses currently repeat the file text. Send it only when asked.",
+      "how": "- First check whether the viewer uses renderSource.content; it may, for 3Dmol.\n              \n- If it does, add GET /api/artifacts/:id/raw (streamed) and let the viewer fetch it there.\n              \n- Then remove content from the upload response.",
+      "done": "Upload responses are small, and rendering still works (existing e2e passes).",
+      "refs": [
+        "M1"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "1.5",
+      "title": "Safe file paths everywhere",
+      "phase": "P1",
+      "wave": "W2",
+      "lane": "L2",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "1.6"
+      ],
+      "size": "S",
+      "risk": "high",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/projects/sessionStore.ts",
+        "apps/api/src/server.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "The server only ever reads and writes inside its own data folder.",
+      "how": "- Add safeJoin(root, ...parts): resolve the path, check it starts with root + sep, and throw otherwise.\n              \n- Use it in sourceArtifactStore, sessionStore and every readFile/writeFile.\n              \n- Never trust rawStorageRef from the client: rebuild it from sourceArtifactId and check it against /^source_[a-z_]+_[0-9a-f]{64}$/.\n              \n- Check ?revision= against /^session-revision-(migration-)?[0-9a-f-]+$/.\n              \n- Map file-system errors to a generic \"not found\" or \"integrity failed\" message with no paths.",
+      "done": "Tests with ../ in rawStorageRef and in revision return 400, and no absolute path appears in any error.",
+      "refs": [
+        "S2",
+        "S3"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "1.6",
+      "title": "Crash-proof replies",
+      "phase": "P1",
+      "wave": "W1",
+      "lane": "L2",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "1.1"
+      ],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/server.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Errors are always answered properly, and the server never shuts down because of one bad request.",
+      "how": "- In sendJson, call JSON.stringify first, then writeHead.\n              \n- Wrap the listener: createServer((q, r) => route(q, r).catch(e => fail(r, e))), where fail checks r.headersSent and destroys the socket if needed.\n              \n- Add process.on(\"unhandledRejection\") logging, so nothing dies silently.",
+      "done": "A test that forces stringify to throw gets a 500, and the server keeps serving.",
+      "refs": [
+        "M3"
+      ],
+      "est": "2 hours",
+      "status": "TODO"
+    },
+    {
+      "id": "1.7",
+      "title": "Check the shape of every request",
+      "phase": "P1",
+      "wave": "W3",
+      "lane": "L2",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "1.3"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/projects/sessionStore.ts",
+        "apps/api/src/server.ts",
+        "apps/api/src/command/dispatcher.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Wrong or missing data gives a clear \"400 Bad Request\" instead of a crash.",
+      "how": "- Add zod schemas in packages/contracts/src/api/*.ts for every route body and query (projects, commands, docking, uploads metadata).\n              \n- Add a small parseOr400(schema, value) helper.\n              \n- Catch URIError from decodeURIComponent and return 400.",
+      "done": "A fuzz test (empty body, null, partial objects, broken %) never returns 500.",
+      "refs": [
+        "M9"
+      ],
+      "est": "1-2 days",
+      "status": "TODO"
+    },
+    {
+      "id": "1.8",
+      "title": "Do not trust \"sealed\" objects sent by the browser",
+      "phase": "P1",
+      "wave": "W3",
+      "lane": "L2",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "1.7"
+      ],
+      "size": "S",
+      "risk": "high",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        "apps/api/src/docking/d2Preparation.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "The server remembers what it sealed, and the browser refers to it by ID.",
+      "how": "- Add a SealedStateStore (in memory with a size limit, plus a disk copy) keyed by digest.\n              \n- /api/docking/d2/adapt stores the receptor and ligand states and returns their digests.\n              \n- /search-region accepts only digests, loads the objects itself, and recomputes them on load.",
+      "done": "A forged digest is rejected with a diagnostic.",
+      "refs": [
+        "S4"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "1.9",
+      "title": "Fix the vulnerable development tools",
+      "phase": "P1",
+      "wave": "W4",
+      "lane": "L2",
+      "tier": "strong",
+      "critical": false,
+      "deps": [],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "low",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "package.json",
+        "apps/api/src/server.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Upgrade the tools that have known security holes.",
+      "how": "- Upgrade vite to ≥ 6.4.4 (or 7), vitest to ≥ 3, and concurrently to the latest version.\n              \n- Remove duplicate tool declarations from the workspace package.json files, keeping them in the root only.\n              \n- Run all checks.",
+      "done": "npm audit shows 0 critical and 0 high.",
+      "refs": [
+        "S5"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "1.10",
+      "title": "HTTP route tests",
+      "phase": "P1",
+      "wave": "W3",
+      "lane": "L2",
+      "tier": "core",
+      "critical": false,
+      "deps": [
+        "1.3",
+        "1.5"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/server.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Automatic tests that prove all of the above stays fixed.",
+      "how": "- Add apps/api/src/server.test.ts: start the server on port 0 with a temp data folder.\n              \n- Test CORS, the token, 413, path traversal, malformed input, the crash path and normal happy paths.",
+      "done": "About 30+ route tests run in CI.",
+      "refs": [
+        "T7"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "2.1",
+      "title": "Build a real-file test collection",
+      "phase": "P2",
+      "wave": "W1",
+      "lane": "L3",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "structure-parser-engineer",
+      "owns": "apps/api/src/structures/ingestion*.ts, apps/api/src/structures/*.test.ts, tests/fixtures/rcsb/**, scripts/fetch-fixtures.mjs, docs/FORMATS.md",
+      "contextFiles": [
+        "apps/api/src/structures/ingestion.ts",
+        "apps/api/src/structures/ingestion.test.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Collect real RCSB files that exercise every tricky case, and store them with the tests.",
+      "how": "- Create tests/fixtures/rcsb/ with PDB and mmCIF copies of:\n              \n- 1CRN (small);\n- 4DJW (ligands, waters);\n- an NMR entry such as 1D3Z (multi-model);\n              \n- a glycoprotein (branched sugars);\n- an antibody with insertion codes;\n              \n- an entry with long ; text fields.\n              \n- Add manifest.json with each file's source URL, download date and sha256.\n              \n- Keep 4V6F out of Git: fetch it with a scripts/fetch-fixtures.mjs script that checks the sha256.",
+      "done": "Fixtures are committed (each under 5 MB), and the manifest verifies.",
+      "refs": [
+        "C1",
+        "C2",
+        "C3"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "2.2",
+      "title": "Tests no longer need the internet",
+      "phase": "P2",
+      "wave": "W3",
+      "lane": "L3",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "2.1"
+      ],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "low",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "structure-parser-engineer",
+      "owns": "apps/api/src/structures/ingestion*.ts, apps/api/src/structures/*.test.ts, tests/fixtures/rcsb/**, scripts/fetch-fixtures.mjs, docs/FORMATS.md",
+      "contextFiles": [
+        "apps/api/src/structures/ingestion.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Tests use the stored files instead of the live RCSB website.",
+      "how": "- Add an RCSB_BASE_URL setting in ingestion (default https://files.rcsb.org).\n              \n- During e2e, start a tiny static server over tests/fixtures/rcsb and point the setting at it.",
+      "done": "The e2e suite passes with networking turned off.",
+      "refs": [
+        "T2"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "2.3",
+      "title": "Fix the mmCIF tokenizer",
+      "phase": "P2",
+      "wave": "W1",
+      "lane": "L3",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "2.1"
+      ],
+      "size": "M",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "structure-parser-engineer",
+      "owns": "apps/api/src/structures/ingestion*.ts, apps/api/src/structures/*.test.ts, tests/fixtures/rcsb/**, scripts/fetch-fixtures.mjs, docs/FORMATS.md",
+      "contextFiles": [
+        "apps/api/src/structures/ingestion.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Teach the reader the full mmCIF text rules.",
+      "how": "- In tokenizeCif: a line starting with ; opens a text field until the next line that starts with ;.\n              \n- A quote only closes a value when whitespace or end of line follows it.\n              \n- Read single-row categories (_entity_poly.type value) as key-value pairs, not only as loops.",
+      "done": "All fixtures parse, and polymer typing is present for single-entity files.",
+      "refs": [
+        "C3"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "2.4",
+      "title": "Correct residue and chain identity in mmCIF",
+      "phase": "P2",
+      "wave": "W2",
+      "lane": "L3",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "2.3"
+      ],
+      "size": "M",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "structure-parser-engineer",
+      "owns": "apps/api/src/structures/ingestion*.ts, apps/api/src/structures/*.test.ts, tests/fixtures/rcsb/**, scripts/fetch-fixtures.mjs, docs/FORMATS.md",
+      "contextFiles": [
+        "apps/api/src/structures/ingestion.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Waters and ligands keep their own residue numbers, and chains match the PDB version.",
+      "how": "- Use the author fields as the primary identity: auth_asym_id, auth_seq_id, pdbx_PDB_ins_code, auth_comp_id.\n              \n- Keep the label_* fields as extra properties, so both naming systems are preserved (this is needed in step 4.5).\n              \n- Fall back per row, never per column.",
+      "done": "A golden test: the same entry loaded as PDB and as mmCIF gives the same chains, residue count, atom count and ligand list.",
+      "refs": [
+        "C2"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "2.5",
+      "title": "Accept NMR multi-model mmCIF files",
+      "phase": "P2",
+      "wave": "W2",
+      "lane": "L3",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "2.4"
+      ],
+      "size": "S",
+      "risk": "high",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "structure-parser-engineer",
+      "owns": "apps/api/src/structures/ingestion*.ts, apps/api/src/structures/*.test.ts, tests/fixtures/rcsb/**, scripts/fetch-fixtures.mjs, docs/FORMATS.md",
+      "contextFiles": [
+        "apps/api/src/structures/ingestion.ts",
+        "apps/api/src/structures/ingestion.test.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Match atoms between models without using the serial number.",
+      "how": "- Build atomCorrespondenceKey from chain, residue number, insertion code, residue name, atom name and alternate location, without serial.\n              \n- Fix the test that used fake repeated serials.",
+      "done": "The NMR fixture loads with every model.",
+      "refs": [
+        "C1"
+      ],
+      "est": "2-3 hours",
+      "status": "TODO"
+    },
+    {
+      "id": "2.6",
+      "title": "Smaller PDB reader fixes",
+      "phase": "P2",
+      "wave": "W3",
+      "lane": "L3",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "2.1"
+      ],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "structure-parser-engineer",
+      "owns": "apps/api/src/structures/ingestion*.ts, apps/api/src/structures/*.test.ts, tests/fixtures/rcsb/**, scripts/fetch-fixtures.mjs, docs/FORMATS.md",
+      "contextFiles": [
+        "apps/api/src/structures/ingestion.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Large-file numbering, atoms outside models, and faster helix/sheet lookup.",
+      "how": "- Decode hybrid-36 serial numbers.\n- Atoms outside MODEL blocks give a clear diagnostic instead of being dropped.\n              \n- Build a map from (chain, residue, insertion code) to secondary structure once, instead of searching per atom.",
+      "done": "Unit tests exist for each case.",
+      "refs": [
+        "C9"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "2.7",
+      "title": "One honest file-format table",
+      "phase": "P2",
+      "wave": "W4",
+      "lane": "L3",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "2.5"
+      ],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "low",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "structure-parser-engineer",
+      "owns": "apps/api/src/structures/ingestion*.ts, apps/api/src/structures/*.test.ts, tests/fixtures/rcsb/**, scripts/fetch-fixtures.mjs, docs/FORMATS.md",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        "packages/contracts/src/index.ts",
+        "docs/api.md",
+        "README.md",
+        "apps/api/src/structures/ingestion.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Write down exactly which formats work and how well. The server advertises only these.",
+      "how": "- Create docs/FORMATS.md: format, parser, multi-model support, bonds, charges, tests and status.\n              \n- Generate the bootstrap capability text from STRUCTURE_FORMATS.\n              \n- Set the gate label to \"integrated-2026-10\" instead of \"G1C\".",
+      "done": "Roadmap item OD-02 is closed.",
+      "refs": [
+        "R6"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "2.8",
+      "title": "Selection and fingerprint fixes",
+      "phase": "P2",
+      "wave": "W3",
+      "lane": "L3",
+      "tier": "core",
+      "critical": false,
+      "deps": [],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "structure-parser-engineer",
+      "owns": "apps/api/src/structures/ingestion*.ts, apps/api/src/structures/*.test.ts, tests/fixtures/rcsb/**, scripts/fetch-fixtures.mjs, docs/FORMATS.md",
+      "contextFiles": [
+        "apps/web/src/selection/selectionEngine.ts",
+        "packages/contracts/src/docking/canonical.ts",
+        "apps/api/src/structures/ingestion.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "No duplicate atoms in selections, and minus zero equals zero.",
+      "how": "- combineSelections add: [...new Set([...a, ...b])].\n- Hash a sorted ID list.\n              \n- In f64Bits geometry inputs: value === 0 ? 0 : value.",
+      "done": "Tests: select add twice keeps the same count, and a -0 box gets the same digest as a 0 box.",
+      "refs": [
+        "C4",
+        "C10"
+      ],
+      "est": "1 hour",
+      "status": "TODO"
+    },
+    {
+      "id": "2.9",
+      "title": "Honest command registry",
+      "phase": "P2",
+      "wave": "W4",
+      "lane": "L2",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "1.7"
+      ],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/command/dispatcher.ts",
+        "apps/api/src/command/registry.ts",
+        "apps/api/src/server.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "The server only claims commands it can actually run.",
+      "how": "- Mark commands with no server handler as CLIENT_ONLY or UNAVAILABLE in registry.ts.\n              \n- Have bootstrap report COMMAND.CANONICAL as PARTIAL.\n              \n- setting.set, get and unset with a diagnostic return FAILED with INVALID_ARGUMENT.\n              \n- Remove the fake view.get camera.",
+      "done": "A test checks that every SUPPORTED command has a handler.",
+      "refs": [
+        "C11"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "2.10",
+      "title": "Stop memory and disk leaks",
+      "phase": "P2",
+      "wave": "W4",
+      "lane": "L2",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "1.3"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/structures/ingestion.ts",
+        "apps/api/src/lifecycle/sourceArtifactStore.ts",
+        "apps/api/src/command/dispatcher.ts",
+        "apps/api/src/projects/sessionStore.ts",
+        "apps/api/src/server.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "The server throws away what it no longer needs.",
+      "how": "- Delete the unused structures map.\n- Replace the artifact memory map and the RCSB cache with an LRU (for example lru-cache, max 512 MB in total).\n              \n- Prune finished jobs after 24 hours.\n- Parse before sealing an upload to disk.\n              \n- Check existence with fs.stat instead of readFile.\n- Rotate the command history at 50 MB.",
+      "done": "Soak test: loading 200 structures keeps memory flat (±20%).",
+      "refs": [
+        "M2",
+        "M4"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "2.11",
+      "title": "Safe saves and trustworthy history",
+      "phase": "P2",
+      "wave": "W5",
+      "lane": "L2",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "2.10"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/projects/sessionStore.ts",
+        "apps/api/src/command/dispatcher.ts",
+        "apps/api/src/command/compiler.ts",
+        "apps/api/src/server.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Saves never overwrite each other, and history is never lost or duplicated.",
+      "how": "- Add a per-project async mutex around save, and make expectedRevision required (409 on conflict).\n              \n- executionId includes a random nonce, and an existing record is never overwritten.\n              \n- Store the idempotency key with a request hash: a repeated key with a different body returns 422, and temporary failures are not cached.\n              \n- Read history line by line and log damaged lines.",
+      "done": "A concurrency test with 2 saves gives one success and one 409, and the same command twice gives 2 records.",
+      "refs": [
+        "M5",
+        "M6",
+        "M7",
+        "M8"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "2.12",
+      "title": "Make docking preparation fast on big proteins",
+      "phase": "P2",
+      "wave": "W4",
+      "lane": "L3",
+      "tier": "strong",
+      "critical": false,
+      "deps": [],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "structure-parser-engineer",
+      "owns": "apps/api/src/structures/ingestion*.ts, apps/api/src/structures/*.test.ts, tests/fixtures/rcsb/**, scripts/fetch-fixtures.mjs, docs/FORMATS.md",
+      "contextFiles": [
+        "apps/api/src/docking/d2Adapters.ts",
+        "apps/api/src/docking/d2Preparation.ts",
+        "apps/api/src/structures/ingestion.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Remove the square-growth search in D2 adapt.",
+      "how": "- In d2Adapters.ts, build Map<componentKey, firstAtom> in one pass.\n              \n- Check the 250k limit before adapting.\n- Do the same in sealSearchRegion.",
+      "done": "D2 adapt on a 100k-atom fixture takes under 2 s.",
+      "refs": [
+        "M11"
+      ],
+      "est": "2 hours",
+      "status": "TODO"
+    },
+    {
+      "id": "3.1",
+      "title": "Measure first (performance baseline)",
+      "phase": "P3",
+      "wave": "W1",
+      "lane": "L4",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "low",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/App.tsx"
+      ],
+      "checkFlags": "--quick",
+      "what": "Record how slow things are now, so we can prove improvement.",
+      "how": "- Add tests/perf/large-molecule.perf.ts (Playwright with performance.now() marks), using 4V6F from the fixture script.\n              \n- Measure 50 hovers, select chain A, color red, chain A, 10 tab switches, and memory (performance.memory).\n              \n- Save the results JSON to Drive.",
+      "done": "The baseline numbers are recorded.",
+      "refs": [],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "3.2",
+      "title": "Replace the JSON fingerprint with revision counters",
+      "phase": "P3",
+      "wave": "W1",
+      "lane": "L4",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "3.1"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/rendering/presentationState.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Instead of turning everything into text, keep a simple number that goes up when something really changes.",
+      "how": "- Add a workspaceRevision counter that increments in every action that changes saved data.\n              \n- \"Dirty\" means workspaceRevision !== savedRevision.\n- Remove the JSON.stringify fingerprint (App.tsx:162-167).",
+      "done": "Hover no longer triggers any serialization (checked with a profiler).",
+      "refs": [
+        "F1",
+        "F16"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "3.3",
+      "title": "Keep hover out of the main state",
+      "phase": "P3",
+      "wave": "W2",
+      "lane": "L4",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "3.2"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/rendering/presentationState.ts",
+        "apps/web/src/workspace/workspaceModel.ts",
+        "apps/web/src/components/StructurePanel.tsx"
+      ],
+      "checkFlags": "--quick",
+      "what": "Hovering an atom should only move a small marker, not re-draw the whole app.",
+      "how": "- Move hover into a tiny separate store (for example zustand or useSyncExternalStore) that only the viewer adapter and the hover label subscribe to.\n              \n- Selection and pick stay in the main state.",
+      "done": "React DevTools shows that only 1-2 components re-render on hover.",
+      "refs": [
+        "F1",
+        "F2"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "3.4",
+      "title": "Separate hover markers from selection styling in the viewer",
+      "phase": "P3",
+      "wave": "W2",
+      "lane": "L4",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "3.3"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/rendering/ThreeDMolViewerAdapter.ts",
+        "apps/web/src/App.tsx"
+      ],
+      "checkFlags": "--quick",
+      "what": "Hovering draws a small sphere; it does not re-style 300k atoms.",
+      "how": "- In ThreeDMolViewerAdapter, projectInteractionHighlights only re-styles when the identity of selectedAtomIds changes.\n              \n- Hover uses shapes only. Keep an id-to-ordinal map instead of cloning atoms.",
+      "done": "Hover on 4V6F with a chain selected has p95 < 50 ms.",
+      "refs": [
+        "F3"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "3.5",
+      "title": "Memoize the inspector and selection lists",
+      "phase": "P3",
+      "wave": "W3",
+      "lane": "L4",
+      "tier": "core",
+      "critical": false,
+      "deps": [
+        "3.3"
+      ],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/workspace/workspaceModel.ts",
+        "apps/web/src/components/StructurePanel.tsx"
+      ],
+      "checkFlags": "--quick",
+      "what": "Compute expensive things once, not on every re-draw.",
+      "how": "- useMemo for inspectorStructure keyed on (object, stateId).\n- Look up a single atom through a Map.\n              \n- Selection owner IDs are computed once per resultId.\n- Wrap the panels in React.memo with stable callbacks.",
+      "done": "No per-render copying of atoms (profiler).",
+      "refs": [
+        "F2"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "3.6",
+      "title": "Remove the square-growth loops",
+      "phase": "P3",
+      "wave": "W4",
+      "lane": "L4",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "3.5"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/rendering/ThreeDMolViewerAdapter.ts",
+        "apps/web/src/rendering/surfaceGenerator.ts",
+        "apps/web/src/editing/editFoundation.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Mechanical fixes: use push, Sets and Maps.",
+      "how": "- Fix every place listed in finding F5: App.tsx 889, 1013, 1024, 1084; the adapter at 1139, 1177, 1181, 1229, 1600; surfaceGenerator.ts 31; editFoundation.ts 509, 884, 1330, 1334.\n              \n- Add an ESLint no-restricted-syntax rule warning on [...x, y] inside loops, where practical.",
+      "done": "align or remove on 100k atoms takes under 1 s, and an edit on 10k atoms under 200 ms.",
+      "refs": [
+        "F5"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "3.7",
+      "title": "Cheaper console commands and analysis",
+      "phase": "P3",
+      "wave": "W6",
+      "lane": "L4",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "3.6"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/workspace/workspaceModel.ts",
+        "apps/web/src/analysis/structuralAnalysis.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Commands and analysis reuse cached data and stop early.",
+      "how": "- Cache workspaceSelectionStructure on (objectIds, scientificHash, stateId).\n              \n- Use Sets in presentationSelectionContext, and a hash instead of JSON.stringify of IDs.\n              \n- In structuralAnalysis.ts, compare pairs by index (j > i) with no string set, and stop at the limit.\n              \n- Move selection evaluation and analysis for structures above 50k atoms into a Web Worker.",
+      "done": "color red, chain A on 4V6F takes under 500 ms, and analysis on 4V6F does not freeze the tab.",
+      "refs": [
+        "F4",
+        "F6"
+      ],
+      "est": "2-3 days",
+      "status": "TODO"
+    },
+    {
+      "id": "3.8",
+      "title": "One viewer that survives tab switches",
+      "phase": "P3",
+      "wave": "W3",
+      "lane": "L4",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "3.4"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/components/MolecularCanvas.tsx",
+        "apps/web/src/rendering/ThreeDMolViewerAdapter.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "The 3D viewer is created once and moved between tabs, never rebuilt.",
+      "how": "- Render MolecularCanvas once at a stable place in the tree. The Molecular and Docking layouts place it with a React portal (or CSS grid areas).\n              \n- In destroy(), call getExtension('WEBGL_lose_context')?.loseContext().\n              \n- Remove the duplicate resize observer.",
+      "done": "30 tab switches with 4V6F: no reload and no black canvas.",
+      "refs": [
+        "F8"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "3.9",
+      "title": "Correct workspace switching and loading",
+      "phase": "P3",
+      "wave": "W4",
+      "lane": "L4",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "3.8"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/App.tsx"
+      ],
+      "checkFlags": "--quick",
+      "what": "Styles are never lost, and the newest load always wins.",
+      "how": "- Add commitActiveProjection(), called before every change of the active object (Add Structure, create, split_states, join_states).\n              \n- Add one resetWorkspaceState() used by runLoad, commitBiologicalData, createProject and openProject.\n              \n- Give each load a sequence number and an AbortController.",
+      "done": "Tests: style survives Add Structure, a slow-then-fast load shows the fast one, and fitting results are cleared.",
+      "refs": [
+        "F7",
+        "F9"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "3.10",
+      "title": "A robust API client",
+      "phase": "P3",
+      "wave": "W5",
+      "lane": "L4",
+      "tier": "strong",
+      "critical": false,
+      "deps": [],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/lib/apiClient.ts",
+        "apps/web/src/App.tsx"
+      ],
+      "checkFlags": "--quick",
+      "what": "Every request can time out and be cancelled, and replies are decoded explicitly.",
+      "how": "- request(path, {signal, timeoutMs}) using AbortSignal.any([signal, AbortSignal.timeout(ms)]).\n              \n- Handle 204 and empty bodies, and wrap network errors in ApiError(\"NETWORK\").\n              \n- Write one decoder per endpoint (no \"structure\" in payload guessing).",
+      "done": "Hung requests time out with a clear message, and old projects open with atoms.",
+      "refs": [
+        "F14"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "3.11",
+      "title": "Lighter memory for edits and trajectories",
+      "phase": "P3",
+      "wave": "W6",
+      "lane": "L4",
+      "tier": "stretch",
+      "critical": false,
+      "deps": [
+        "3.9"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/editing/editFoundation.ts",
+        "apps/web/src/workspace/workspaceModel.ts",
+        "apps/web/src/biological/adapters.ts",
+        "apps/web/src/App.tsx"
+      ],
+      "checkFlags": "--quick",
+      "what": "Do not copy whole molecules, and limit undo history.",
+      "how": "- registerRoot: share the compact typed arrays (freeze the wrapper only, no JSON clone).\n              \n- History stores the changes per edit, with a cap of 50 steps.\n              \n- Parse DCD in a Worker into Float32Array frames, and check frames x atoms against the limit.\n              \n- Keep trajectory data out of the dirty tracking.",
+      "done": "4V6F memory after load is at most 1.3x the compact size, and 50 edits do not grow memory linearly.",
+      "refs": [
+        "F15",
+        "F18"
+      ],
+      "est": "2-3 days",
+      "status": "TODO"
+    },
+    {
+      "id": "3.12",
+      "title": "Test hooks only in test builds",
+      "phase": "P3",
+      "wave": "W5",
+      "lane": "L4",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "3.8"
+      ],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "low",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/components/MolecularCanvas.tsx",
+        "apps/web/src/rendering/ThreeDMolViewerAdapter.ts",
+        "apps/web/src/App.tsx"
+      ],
+      "checkFlags": "--quick",
+      "what": "Remove the huge data attributes from the real app.",
+      "how": "- Write data-* diagnostics only when import.meta.env.VITE_TEST_HOOKS === \"1\".\n              \n- Set that variable in the Playwright webServer command.",
+      "done": "The production build has no data-canonical-atom-ids attribute.",
+      "refs": [
+        "F17"
+      ],
+      "est": "2 hours",
+      "status": "TODO"
+    },
+    {
+      "id": "3.13",
+      "title": "Small UI fixes",
+      "phase": "P3",
+      "wave": "W7",
+      "lane": "L4",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "3.9"
+      ],
+      "size": "M",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/components/StructurePanel.tsx",
+        "apps/web/src/docking/DockingBottomPanel.tsx",
+        "apps/web/src/App.tsx",
+        "apps/web/src/components/ConsolePanel.tsx",
+        "apps/app/src/index.html",
+        "apps/web/src/components/MolecularCanvas.tsx"
+      ],
+      "checkFlags": "--quick",
+      "what": "Polish the remaining rough edges.",
+      "how": "- Pocket button disabled check.\n- Docking Console tab: hide it or wire it up.\n- Replace window.prompt with a project dialog.\n              \n- Wrap sessionStorage in try/catch.\n- Use relative links on the landing page.\n- Clear notice timers.\n              \n- Delay revokeObjectURL.\n- Real console timestamps, with a 1,000-entry cap.",
+      "done": "Each item is checked off.",
+      "refs": [
+        "F20"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "3.14",
+      "title": "Start splitting App.tsx (gradually)",
+      "phase": "P3",
+      "wave": "W7",
+      "lane": "L4",
+      "tier": "stretch",
+      "critical": false,
+      "deps": [
+        "3.13"
+      ],
+      "size": "L",
+      "risk": "medium",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "viewer-perf-engineer",
+      "owns": "apps/web/src/App.tsx, apps/web/src/rendering/**, apps/web/src/components/**, apps/web/src/selection/**, apps/web/src/workspace/**, apps/web/src/editing/**, apps/web/src/analysis/**, apps/web/src/biological/**, apps/web/src/lib/apiClient.ts, tests/perf/**",
+      "contextFiles": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/rendering/presentationState.ts",
+        "apps/web/src/rendering/cameraController.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Move logic out of the 1,827-line file step by step, without changing behaviour.",
+      "how": "- Extract commands/interpreter.ts (L1222-1579) with unit tests.\n              \n- Introduce a workspaceStore (zustand) and move state groups there one PR at a time.\n              \n- Store the camera in a neutral form (eye, center, up, fov) with a converter for old projects.",
+      "done": "App.tsx under 800 lines, and the interpreter is covered by tests.",
+      "refs": [
+        "F19"
+      ],
+      "est": "1 week (spread out)",
+      "status": "TODO"
+    },
+    {
+      "id": "4.1",
+      "title": "Build and test the C++ in CI",
+      "phase": "P4",
+      "wave": "W1",
+      "lane": "L5",
+      "tier": "core",
+      "critical": false,
+      "deps": [],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "native-cpp-engineer",
+      "owns": "native/**, packages/contracts/src/docking/** (except jobs.ts), apps/api/src/docking/d2*.ts, apps/api/src/docking/d3*.ts",
+      "contextFiles": [
+        ".github/workflows/ci.yml",
+        "native/docking-reference/scoring/CMakeLists.txt"
+      ],
+      "checkFlags": "--quick --native",
+      "what": "GitHub compiles and tests the engine on every change.",
+      "how": "- New job native in ci.yml with a matrix of ubuntu-latest (gcc), windows-latest (MSVC) and macos-latest (clang).\n              \n- Run cmake -S native/docking-reference/scoring -B build -DCMAKE_BUILD_TYPE=Release, cmake --build build and ctest --test-dir build --output-on-failure.\n              \n- Fix peak_rss_bytes for macOS.",
+      "done": "All three platforms are green on main.",
+      "refs": [
+        "D1",
+        "D10"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "4.2",
+      "title": "Platform safety fixes",
+      "phase": "P4",
+      "wave": "W2",
+      "lane": "L5",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "4.1"
+      ],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "native-cpp-engineer",
+      "owns": "native/**, packages/contracts/src/docking/** (except jobs.ts), apps/api/src/docking/d2*.ts, apps/api/src/docking/d3*.ts",
+      "contextFiles": [
+        "native/docking-reference/scoring/src/scoring_field.cpp",
+        "native/docking-reference/scoring/CMakeLists.txt"
+      ],
+      "checkFlags": "--quick --native",
+      "what": "The determinism guard works on Windows and ARM.",
+      "how": "- Guard with #if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2).\n              \n- Add an __aarch64__ FPCR.FZ check.\n- Move the 64 KiB buffers to the heap.\n              \n- Validate the field once at construction, not on every sample.",
+      "done": "A test forces FTZ on and expects a failure on every platform in CI.",
+      "refs": [
+        "D6",
+        "D9"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "4.3",
+      "title": "Halogens and element spelling",
+      "phase": "P4",
+      "wave": "W1",
+      "lane": "L5",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "4.1"
+      ],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "native-cpp-engineer",
+      "owns": "native/**, packages/contracts/src/docking/** (except jobs.ts), apps/api/src/docking/d2*.ts, apps/api/src/docking/d3*.ts",
+      "contextFiles": [
+        "native/docking-reference/scoring/src/scoring.cpp",
+        "packages/contracts/src/docking/d2.ts",
+        "apps/api/src/docking/d3VinaTorsion.ts",
+        "native/docking-reference/scoring/CMakeLists.txt"
+      ],
+      "checkFlags": "--quick --native",
+      "what": "Cl and Br ligands work.",
+      "how": "- Normalise element symbols at the TypeScript/C++ boundary to IUPAC case (Cl, Br), or make the C++ case-insensitive.\n              \n- Add ligand fixtures containing Cl, Br and I, and a multi-type receptor fixture.",
+      "done": "The chlorinated ligand scores, and the test is in CI.",
+      "refs": [
+        "C5"
+      ],
+      "est": "2-3 hours",
+      "status": "TODO"
+    },
+    {
+      "id": "4.4",
+      "title": "Send numbers over JSON correctly",
+      "phase": "P4",
+      "wave": "W2",
+      "lane": "L5",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "high",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "native-cpp-engineer",
+      "owns": "native/**, packages/contracts/src/docking/** (except jobs.ts), apps/api/src/docking/d2*.ts, apps/api/src/docking/d3*.ts",
+      "contextFiles": [
+        "packages/contracts/src/docking/canonical.ts",
+        "apps/api/src/server.ts",
+        "apps/api/src/docking/d2Preparation.ts",
+        "native/docking-reference/scoring/CMakeLists.txt"
+      ],
+      "checkFlags": "--quick --native",
+      "what": "Coordinates arrive at the server intact.",
+      "how": "- Define the wire format {\"f64\": \"<16 hex chars>\"} with encode/decode helpers in contracts, used by both web and API.\n              \n- Validate with zod. If any diagnostic is non-finite, skip f64Bits() so it does not throw.",
+      "done": "A real ligand box from the UI seals as VALID, and null gives a diagnostic instead of a 500.",
+      "refs": [
+        "C6"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "4.5",
+      "title": "mmCIF works for docking preparation",
+      "phase": "P4",
+      "wave": "W3",
+      "lane": "L5",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "2.4",
+        "4.4"
+      ],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "native-cpp-engineer",
+      "owns": "native/**, packages/contracts/src/docking/** (except jobs.ts), apps/api/src/docking/d2*.ts, apps/api/src/docking/d3*.ts",
+      "contextFiles": [
+        "apps/api/src/docking/d2Adapters.ts",
+        "apps/api/src/server.ts",
+        "native/docking-reference/scoring/CMakeLists.txt"
+      ],
+      "checkFlags": "--quick --native",
+      "what": "After step 2.4 keeps both naming systems, tell D2 so.",
+      "how": "- Ingestion sets mmcifNamespaceMode = \"PRESERVED_AUTH_AND_LABEL\" when both sets of fields are present.\n              \n- The route passes it through.",
+      "done": "1CRN fetched as mmCIF adapts successfully.",
+      "refs": [
+        "C7"
+      ],
+      "est": "2 hours",
+      "status": "TODO"
+    },
+    {
+      "id": "4.6",
+      "title": "One rule for rotatable bonds",
+      "phase": "P4",
+      "wave": "W3",
+      "lane": "L5",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "4.3"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "native-cpp-engineer",
+      "owns": "native/**, packages/contracts/src/docking/** (except jobs.ts), apps/api/src/docking/d2*.ts, apps/api/src/docking/d3*.ts",
+      "contextFiles": [
+        "apps/api/src/docking/d2Preparation.ts",
+        "apps/api/src/docking/d3VinaTorsion.ts",
+        "native/docking-reference/scoring/CMakeLists.txt"
+      ],
+      "checkFlags": "--quick --native",
+      "what": "All parts of the code count torsions the same way.",
+      "how": "- Derive the D2 LigandKinematicModel from the D3 Vina topology (active axes, scorer N_tors).\n              \n- Enforce MAX_SEARCH_TORSIONS = 32 in the D3 importer.\n- Read search_torsion_count in C++ or remove it.",
+      "done": "A cross-check test runs over all torsion fixtures.",
+      "refs": [
+        "C8"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "4.7",
+      "title": "Compare with real Vina",
+      "phase": "P4",
+      "wave": "W4",
+      "lane": "L9",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "4.3",
+        "5.2"
+      ],
+      "size": "M",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "science-validator",
+      "owns": "tests/science/**, native/docking-reference/search/**",
+      "contextFiles": [
+        "native/docking-reference/scoring/include/mole/docking/scoring.hpp"
+      ],
+      "checkFlags": "--quick",
+      "what": "Prove the scorer gives the same numbers as the real program on real complexes.",
+      "how": "- Pick 15 protein-ligand complexes from PoseBusters or Astex that are not in your D9 holdout.\n              \n- Prepare them with the Phase 5 preparation pipeline, run pinned Vina 1.2.7 --score_only, and compare the total and each term.\n              \n- Agree a tolerance with the PHD-V2 profile, for example |Δ| ≤ 0.01 kcal/mol for direct scoring.",
+      "done": "15/15 within tolerance, and the test runs nightly.",
+      "refs": [
+        "D10"
+      ],
+      "est": "2 days",
+      "status": "TODO"
+    },
+    {
+      "id": "4.8",
+      "title": "Ready for search: gradients and out-of-box penalty",
+      "phase": "P4",
+      "wave": "W4",
+      "lane": "L5",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "4.1"
+      ],
+      "size": "M",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "native-cpp-engineer",
+      "owns": "native/**, packages/contracts/src/docking/** (except jobs.ts), apps/api/src/docking/d2*.ts, apps/api/src/docking/d3*.ts",
+      "contextFiles": [
+        "native/docking-reference/scoring/include/mole/docking/scoring_field.hpp",
+        "native/docking-reference/scoring/CMakeLists.txt"
+      ],
+      "checkFlags": "--quick --native",
+      "what": "The optimizer needs to know which way is better, and atoms leaving the box must be pushed back, not rejected.",
+      "how": "- Add evaluate_with_gradient(point), the analytic gradient of trilinear interpolation.\n              \n- Add a clamped mode: clamp the point into the grid and add slope × distance outside (Vina's rule, slope configurable in the profile).\n              \n- Keep the strict mode for D3 oracle tests.",
+      "done": "Gradients match finite differences (relative error < 1e-6) at 10,000 random points, including near boundaries.",
+      "refs": [
+        "D3"
+      ],
+      "est": "3 days",
+      "status": "TODO"
+    },
+    {
+      "id": "4.9",
+      "title": "Make the grid build fast",
+      "phase": "P4",
+      "wave": "W5",
+      "lane": "L5",
+      "tier": "stretch",
+      "critical": false,
+      "deps": [
+        "4.8"
+      ],
+      "size": "L",
+      "risk": "medium",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "native-cpp-engineer",
+      "owns": "native/**, packages/contracts/src/docking/** (except jobs.ts), apps/api/src/docking/d2*.ts, apps/api/src/docking/d3*.ts",
+      "contextFiles": [
+        "native/docking-reference/scoring/tests/scoring_field_test.cpp",
+        "native/docking-reference/scoring/src/scoring.cpp",
+        "native/docking-reference/scoring/CMakeLists.txt"
+      ],
+      "checkFlags": "--quick --native",
+      "what": "Build the scoring grid in seconds, not minutes.",
+      "how": "- Use integer-coded XS types instead of strings, and precomputed pair tables per type pair (1/32 Å steps, as in Vina).\n              \n- Build only the ligand's atom types, and build the search tree from heavy (scoring) atoms only.\n              \n- Split the work by x-slab across threads (deterministic: each point is independent).\n              \n- Fix the max-size test so atoms really are inside the box.",
+      "done": "A typical 30 Å box on a 5k-atom pocket builds in under 5 s on 8 cores, with identical numbers to the single-thread build.",
+      "refs": [
+        "D4",
+        "D7"
+      ],
+      "est": "1 week",
+      "status": "TODO"
+    },
+    {
+      "id": "4.10",
+      "title": "Fingerprints that match on every computer",
+      "phase": "P4",
+      "wave": "W6",
+      "lane": "L5",
+      "tier": "stretch",
+      "critical": false,
+      "deps": [
+        "4.1"
+      ],
+      "size": "M",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "native-cpp-engineer",
+      "owns": "native/**, packages/contracts/src/docking/** (except jobs.ts), apps/api/src/docking/d2*.ts, apps/api/src/docking/d3*.ts",
+      "contextFiles": [
+        "native/docking-reference/scoring/src/scoring.cpp",
+        "native/docking-reference/scoring/tests/scoring_field_test.cpp",
+        "native/docking-reference/scoring/CMakeLists.txt"
+      ],
+      "checkFlags": "--quick --native",
+      "what": "The same input gives the same identity on Windows, Linux and Mac.",
+      "how": "- Owner decision (PHD-V2): either (a) identity from inputs + profile + code version only, with the field data hashed for integrity but not for identity, or (b) correctly-rounded math (CORE-MATH exp, sqrt instead of hypot).\n              \n- Add a CI step that compares digests across the three platforms on a real receptor.",
+      "done": "Cross-platform digest test is green.",
+      "refs": [
+        "D2"
+      ],
+      "est": "2-3 days",
+      "status": "TODO"
+    },
+    {
+      "id": "4.11",
+      "title": "Cache safety and TypeScript parity at real size",
+      "phase": "P4",
+      "wave": "W6",
+      "lane": "L5",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "4.8"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "native-cpp-engineer",
+      "owns": "native/**, packages/contracts/src/docking/** (except jobs.ts), apps/api/src/docking/d2*.ts, apps/api/src/docking/d3*.ts",
+      "contextFiles": [
+        "packages/contracts/src/docking/scoringField.ts",
+        "native/docking-reference/scoring/src/scoring.cpp",
+        "native/docking-reference/scoring/CMakeLists.txt"
+      ],
+      "checkFlags": "--quick --native",
+      "what": "Cached grids are re-checked, and the TypeScript check does not run out of memory.",
+      "how": "- On cache load, re-hash the payload bytes and reject an empty digest.\n              \n- Rewrite scoringFieldLogicalPayloadV2 to stream typed arrays into the hash instead of one object per value.\n              \n- Define a shared total-atom limit in contracts used by both sides.\n              \n- State the grid-vs-direct accuracy per atom for D4 acceptance.",
+      "done": "The parity test runs on the real 3DMX fixture.",
+      "refs": [
+        "D5",
+        "D8",
+        "D7",
+        "D11"
+      ],
+      "est": "2 days",
+      "status": "TODO"
+    },
+    {
+      "id": "5.1",
+      "title": "Lock the tool versions (DEC-2, DEC-3)",
+      "phase": "P5",
+      "wave": "W1",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "Write down exactly which external tools and versions are used, and check their licences.",
+      "how": "- Create native/third_party/TOOLS.md listing Vina 1.2.7 (binary sha256, Apache-2.0), RDKit, Meeko, Dimorphite-DL, PDBFixer and PDB2PQR/PROPKA, each with an exact version and licence.\n              \n- Create a Python environment lock file (uv.lock or conda-lock.yml) in workers/prep/.\n              \n- Licence check: LGPL Meeko is used as a separate process, which is fine.",
+      "done": "The versions file is reviewed and the environment builds reproducibly.",
+      "refs": [],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "5.2",
+      "title": "Preparation worker (visible, versioned, user-confirmed)",
+      "phase": "P5",
+      "wave": "W2",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "5.1"
+      ],
+      "size": "L",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "A separate program prepares receptor and ligand, and the user sees and confirms every choice. This keeps the D2 rule \"no silent preparation\".",
+      "how": "- workers/prep/prepare.py: input JSON (file, pH, options), output JSON plus PDBQT files.\n              \n- Receptor: PDBFixer (missing atoms, optional) → PROPKA/PDB2PQR protonation at the chosen pH → Meeko mk_prepare_receptor.\n              \n- Ligand: RDKit read (SDF, MOL2 or SMILES) → Dimorphite-DL protonation → ETKDG 3D embedding only if there are no 3D coordinates → Meeko → PDBQT.\n              \n- Write a report: protonation states changed, charges, rotatable bonds, warnings.\n              \n- Profile ID ME_PREP_INTERIM_V0 plus a digest of all versions and options.",
+      "done": "10 test pairs prepare without errors, and the output is identical on re-run.",
+      "refs": [],
+      "est": "1 week",
+      "status": "TODO"
+    },
+    {
+      "id": "5.3",
+      "title": "The mole-dock command-line program",
+      "phase": "P5",
+      "wave": "W3",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "5.2"
+      ],
+      "size": "L",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        ".github/workflows/ci.yml",
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "One program that takes a docking job as JSON and returns poses and scores as JSON.",
+      "how": "- mole-dock run --input job.json --out <dir>.\n              \n- Input: receptor and ligand PDBQT, box center and size, exhaustiveness (default 8), number of poses (9), seed.\n              \n- It runs pinned Vina, then re-scores each pose with your C++ scorer (a new CMake target, mole-score) to get the term decomposition, and writes result.json (poses, Vina score, ME score and terms, versions, digests, seed, timings) plus poses.sdf.\n              \n- Exit codes 0 / 2 (bad input) / 3 (engine error).",
+      "done": "Redocking 5 known complexes (for example 1STP biotin) gives a best pose RMSD ≤ 2 Å in at least 4 of 5.",
+      "refs": [
+        "D1"
+      ],
+      "est": "1 week",
+      "status": "TODO"
+    },
+    {
+      "id": "5.0",
+      "title": "Docking job API contract (zod schemas) for UI and backend",
+      "phase": "P5",
+      "wave": "W2",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "Define the shared request/response/status/event schemas for docking jobs, so the UI (L7) and backend (L6) can be built in parallel.",
+      "how": "packages/contracts/src/docking/jobs.ts: PrepareRequest, PrepareReport, DockJobRequest (receptor/ligand prepared ids, box center/size, exhaustiveness, numPoses, seed), JobStatus (QUEUED|PREPARING|RUNNING|SUCCEEDED|FAILED|CANCELLED + progress), DockResult (poses with vina and ME scores + terms, manifest ref), SSE event union. Export types and zod schemas. Add a tiny mock server for UI development.",
+      "done": "Schemas exported with unit tests (valid and invalid examples); the mock server serves the full job lifecycle.",
+      "refs": [],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "5.4",
+      "title": "Job runner inside the API",
+      "phase": "P5",
+      "wave": "W4",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "5.3",
+        "5.0"
+      ],
+      "size": "L",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        "apps/api/src/command/dispatcher.ts",
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "Docking runs as real background jobs that can be watched, cancelled and recovered after a crash.",
+      "how": "- Add apps/api/src/jobs/ using SQLite in WAL mode (better-sqlite3), matching the D7 design.\n              \n- Tables jobs, attempts and artifacts. States QUEUED → PREPARING → RUNNING → SUCCEEDED, FAILED or CANCELLED.\n              \n- A worker pool of N = cores/2 that spawns prepare.py or mole-dock as child processes with a timeout (15 min default) and kills the process tree on cancel.\n              \n- A lease with heartbeat. On restart, expired RUNNING jobs become FAILED (retryable).\n              \n- Idempotency: an input digest plus a client key.\n              \n- Replace the fake async jobs of the command dispatcher with this runner.",
+      "done": "Tests: cancel stops the process within 2 s, killing the API mid-job then restarting gives a correct state, and two identical submits make one job.",
+      "refs": [
+        "M10"
+      ],
+      "est": "1 week",
+      "status": "TODO"
+    },
+    {
+      "id": "5.5",
+      "title": "Docking API endpoints",
+      "phase": "P5",
+      "wave": "W5",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "5.4",
+        "1.7"
+      ],
+      "size": "M",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "The web page can start, watch, cancel and download jobs.",
+      "how": "- POST /api/docking/prepare (returns a job), POST /api/docking/jobs (202 with jobId), GET /api/docking/jobs/:id, GET /api/docking/jobs/:id/events (Server-Sent Events progress), POST /api/docking/jobs/:id/cancel, and GET /api/docking/jobs/:id/artifacts/:name.\n              \n- All of them use zod validation and size limits from Phase 1.",
+      "done": "Route tests cover every state.",
+      "refs": [],
+      "est": "3 days",
+      "status": "TODO"
+    },
+    {
+      "id": "5.6",
+      "title": "Capability flag and honest labels",
+      "phase": "P5",
+      "wave": "W5",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "5.5"
+      ],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "Docking is switched on only where intended, and every result says it is not yet scientifically qualified.",
+      "how": "- Change DOCKING.RUN to PREVIEW_UNQUALIFIED when FEATURE_DOCKING_RUN=1, otherwise UNAVAILABLE.\n              \n- Show a UI banner: \"Preview. Results are not scientifically qualified. Scores are empirical ranking scores, not binding affinities.\"\n              \n- Put the same text in result.json.",
+      "done": "With the flag off, nothing about running is reachable (test).",
+      "refs": [
+        "R8"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "5.7a",
+      "title": "Docking wizard shell + Inputs/Prepare steps (against the job contract, mock server)",
+      "phase": "P5",
+      "wave": "W4",
+      "lane": "L7",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "5.0",
+        "3.8"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "docking-ui-engineer",
+      "owns": "apps/web/src/docking/**, apps/web/src/lib/dockingClient.ts, docs/user-guide/**",
+      "contextFiles": [
+        "apps/web/src/docking/DockingInputsPanel.tsx",
+        "apps/web/src/App.tsx",
+        "apps/web/src/docking/DockingWorkspace.tsx",
+        "apps/web/src/lib/apiClient.ts",
+        "apps/web/src/docking/dockingApiAdapter.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "A clear 5-step wizard: Inputs → Prepare → Box → Run → Results.",
+      "how": "- Inputs: split receptor and ligand by component role (fixes the identical cards), and allow uploading a separate ligand file.\n              \n- Prepare: pH and options; show the preparation report and a \"Confirm\" button.\n              \n- Box: the existing editor plus \"box around ligand\"; uses the fixed JSON numbers.\n              \n- Run: exhaustiveness, poses and seed; a progress bar and Cancel.\n              \n- Results: a table (rank, Vina score, ME score, RMSD to best). Clicking a row overlays the pose in the viewer, with H-bond lines as an option. Download SDF, PDBQT or JSON.\n              \n- Show real error messages, cache adaptation per structure, abort requests on leaving, and ignore stale replies.",
+      "done": "The e2e test runs the full flow on the 1STP fixture in under 2 minutes.",
+      "refs": [
+        "F11",
+        "F12"
+      ],
+      "est": "1.5 weeks",
+      "status": "TODO"
+    },
+    {
+      "id": "5.7b",
+      "title": "Box + Run steps: progress, cancel, error states",
+      "phase": "P5",
+      "wave": "W5",
+      "lane": "L7",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "5.7a"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "docking-ui-engineer",
+      "owns": "apps/web/src/docking/**, apps/web/src/lib/dockingClient.ts, docs/user-guide/**",
+      "contextFiles": [
+        "apps/web/src/docking/dockingApiAdapter.ts",
+        "apps/web/src/docking/DockingWorkspace.tsx"
+      ],
+      "checkFlags": "--quick",
+      "what": "A clear 5-step wizard: Inputs → Prepare → Box → Run → Results.",
+      "how": "- Inputs: split receptor and ligand by component role (fixes the identical cards), and allow uploading a separate ligand file.\n              \n- Prepare: pH and options; show the preparation report and a \"Confirm\" button.\n              \n- Box: the existing editor plus \"box around ligand\"; uses the fixed JSON numbers.\n              \n- Run: exhaustiveness, poses and seed; a progress bar and Cancel.\n              \n- Results: a table (rank, Vina score, ME score, RMSD to best). Clicking a row overlays the pose in the viewer, with H-bond lines as an option. Download SDF, PDBQT or JSON.\n              \n- Show real error messages, cache adaptation per structure, abort requests on leaving, and ignore stale replies.",
+      "done": "The e2e test runs the full flow on the 1STP fixture in under 2 minutes.",
+      "refs": [
+        "F10",
+        "F13"
+      ],
+      "est": "1.5 weeks",
+      "status": "TODO"
+    },
+    {
+      "id": "5.7c",
+      "title": "Results: ranked table, pose overlay, downloads, preview banner; wire to the real API",
+      "phase": "P5",
+      "wave": "W6",
+      "lane": "L7",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "5.7b",
+        "5.5"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "docking-ui-engineer",
+      "owns": "apps/web/src/docking/**, apps/web/src/lib/dockingClient.ts, docs/user-guide/**",
+      "contextFiles": [
+        "apps/web/src/docking/DockingWorkspace.tsx",
+        "apps/web/src/docking/dockingApiAdapter.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "A clear 5-step wizard: Inputs → Prepare → Box → Run → Results.",
+      "how": "- Inputs: split receptor and ligand by component role (fixes the identical cards), and allow uploading a separate ligand file.\n              \n- Prepare: pH and options; show the preparation report and a \"Confirm\" button.\n              \n- Box: the existing editor plus \"box around ligand\"; uses the fixed JSON numbers.\n              \n- Run: exhaustiveness, poses and seed; a progress bar and Cancel.\n              \n- Results: a table (rank, Vina score, ME score, RMSD to best). Clicking a row overlays the pose in the viewer, with H-bond lines as an option. Download SDF, PDBQT or JSON.\n              \n- Show real error messages, cache adaptation per structure, abort requests on leaving, and ignore stale replies.",
+      "done": "The e2e test runs the full flow on the 1STP fixture in under 2 minutes.",
+      "refs": [],
+      "est": "1.5 weeks",
+      "status": "TODO"
+    },
+    {
+      "id": "5.8",
+      "title": "Provenance from day one",
+      "phase": "P5",
+      "wave": "W5",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "5.4"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "Every job records exactly what produced it, so the D6 replay work can build on it.",
+      "how": "- manifest.json per job: input digests, preparation profile and digest, tool versions and checksums, Git commit, seed, parameters, machine info, timings and outputs.\n              \n- Store it with the artifacts and show it in a \"Details\" tab.",
+      "done": "Re-running a job from its manifest gives the same poses (same machine).",
+      "refs": [],
+      "est": "2 days",
+      "status": "TODO"
+    },
+    {
+      "id": "5.9",
+      "title": "User guide: your first docking",
+      "phase": "P5",
+      "wave": "W7",
+      "lane": "L7",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "5.7c"
+      ],
+      "size": "M",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "docking-ui-engineer",
+      "owns": "apps/web/src/docking/**, apps/web/src/lib/dockingClient.ts, docs/user-guide/**",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        "packages/contracts/src/index.ts",
+        "docs/api.md",
+        "README.md",
+        "apps/web/src/docking/DockingWorkspace.tsx",
+        "apps/web/src/docking/dockingApiAdapter.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "A short illustrated guide in plain words.",
+      "how": "- Write docs/user-guide/FIRST_DOCKING.md with screenshots, what each setting means, how to read the results, and the limits.\n              \n- Delete or merge the 3-line stub pages.",
+      "done": "A classmate can dock 1STP using only the guide.",
+      "refs": [
+        "R6"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "6.1",
+      "title": "Fast checks on every pull request",
+      "phase": "P6",
+      "wave": "W2",
+      "lane": "L1",
+      "tier": "core",
+      "critical": true,
+      "deps": [
+        "0.7"
+      ],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "low",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": ".gitignore, .github/**, playwright*.config.ts, tests/e2e/**, .nvmrc, root package.json scripts, docs/STATUS.md",
+      "contextFiles": [
+        ".github/workflows/ci.yml",
+        "apps/app/package.json",
+        "package.json",
+        "playwright.config.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Lint, types, unit tests, native tests and a 5-minute browser smoke test.",
+      "how": "- Add a CI job smoke-e2e that runs tests/e2e/smoke/*.spec.ts (boot, load the 1CRN fixture, render, select, docking screen opens).\n              \n- Remove the unused browser install from the fast job, and cache ~/.cache/ms-playwright.",
+      "done": "PR checks finish in under 10 minutes.",
+      "refs": [
+        "T1",
+        "T9"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "6.2",
+      "title": "Protect main",
+      "phase": "P6",
+      "wave": "W2",
+      "lane": "L1",
+      "tier": "core",
+      "critical": false,
+      "deps": [
+        "6.1"
+      ],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "low",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": ".gitignore, .github/**, playwright*.config.ts, tests/e2e/**, .nvmrc, root package.json scripts, docs/STATUS.md",
+      "contextFiles": [
+        "package.json",
+        ".github/workflows/ci.yml",
+        "playwright.config.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Nobody can merge to main unless checks are green.",
+      "how": "- In GitHub, require pull requests and status checks (fast, native, smoke-e2e) on main, and forbid force-push.\n              \n- Write a short PR template with a checklist (see \"Definition of Done\").",
+      "done": "The branch protection rule is active.",
+      "refs": [],
+      "est": "30 minutes",
+      "status": "TODO"
+    },
+    {
+      "id": "6.3",
+      "title": "Reliable browser tests",
+      "phase": "P6",
+      "wave": "W3",
+      "lane": "L1",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "6.1"
+      ],
+      "size": "M",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": ".gitignore, .github/**, playwright*.config.ts, tests/e2e/**, .nvmrc, root package.json scripts, docs/STATUS.md",
+      "contextFiles": [
+        "playwright.config.ts",
+        "tests/e2e/real-structure-workspace.spec.ts",
+        "tests/e2e/final-rearchitecture-shell.spec.ts",
+        "tests/e2e/p0-boot-runtime.spec.ts",
+        "playwright.r07b2.config.ts",
+        "playwright.ui-d0.config.ts",
+        "playwright.p0.config.ts",
+        "package.json"
+      ],
+      "checkFlags": "--quick",
+      "what": "No sleeps, sensible timeouts, one config.",
+      "how": "- Replace the 8 waitForTimeout calls with waits on data-viewer-state=\"ready\" or expect.poll.\n              \n- Set retries: process.env.CI ? 1 : 0, a default test timeout of 60 s, and remove 300 s timeouts except the 4V6F perf test.\n              \n- Merge the 4 Playwright configs into one with projects (smoke, full, perf).\n              \n- Shard the full suite over 4 CI machines.",
+      "done": "The full suite runs in under 20 minutes and has a flaky rate under 1% over 20 nightly runs.",
+      "refs": [
+        "T4",
+        "T5"
+      ],
+      "est": "1-2 days",
+      "status": "TODO"
+    },
+    {
+      "id": "6.4",
+      "title": "Check the test code too",
+      "phase": "P6",
+      "wave": "W3",
+      "lane": "L1",
+      "tier": "strong",
+      "critical": false,
+      "deps": [],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "low",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": ".gitignore, .github/**, playwright*.config.ts, tests/e2e/**, .nvmrc, root package.json scripts, docs/STATUS.md",
+      "contextFiles": [
+        "apps/app/package.json",
+        ".github/workflows/ci.yml",
+        "package.json",
+        "playwright.config.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Type-check and lint tests and scripts.",
+      "how": "- Add a tests/tsconfig.json and include it in npm run typecheck.\n- Lint tests/ and scripts/.\n              \n- Give the landing app real scripts (or remove its fake ones).",
+      "done": "Typecheck covers e2e, and no fake scripts remain.",
+      "refs": [
+        "T6",
+        "T9"
+      ],
+      "est": "Half a day",
+      "status": "TODO"
+    },
+    {
+      "id": "6.5",
+      "title": "Fill the important test gaps",
+      "phase": "P6",
+      "wave": "W6",
+      "lane": "L1",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "1.10"
+      ],
+      "size": "L",
+      "risk": "low",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": ".gitignore, .github/**, playwright*.config.ts, tests/e2e/**, .nvmrc, root package.json scripts, docs/STATUS.md",
+      "contextFiles": [
+        "package.json",
+        ".github/workflows/ci.yml",
+        "playwright.config.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Unit tests for the modules that matter most.",
+      "how": "- Priority order: compactCanonical (api and web), compactSelectionEngine, contracts validators (add a test script to packages/contracts), d2Adapters, chemistryRoles, sessionCodec and apiClient.\n              \n- Add coverage reporting with targets of 80% for api and contracts and 60% for web.",
+      "done": "Coverage targets are reached and shown in CI.",
+      "refs": [
+        "T7"
+      ],
+      "est": "1 week (spread)",
+      "status": "TODO"
+    },
+    {
+      "id": "6.6",
+      "title": "Picture comparison for key views",
+      "phase": "P6",
+      "wave": "W6",
+      "lane": "L1",
+      "tier": "stretch",
+      "critical": false,
+      "deps": [
+        "6.1",
+        "5.7c"
+      ],
+      "size": "M",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": ".gitignore, .github/**, playwright*.config.ts, tests/e2e/**, .nvmrc, root package.json scripts, docs/STATUS.md",
+      "contextFiles": [
+        "tests/e2e/closure-evidence.spec.ts",
+        "package.json",
+        ".github/workflows/ci.yml",
+        "playwright.config.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "Detect when a molecule is drawn wrong.",
+      "how": "- Use toHaveScreenshot() with a tolerance for about 6 views (1CRN cartoon, sticks, surface, selection highlight, docking pose overlay, 4DJW ligand).\n              \n- Run them in the Linux CI container only, so fonts and GPU are consistent.",
+      "done": "A deliberate colour bug is caught.",
+      "refs": [
+        "T8"
+      ],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "6.7",
+      "title": "Nightly heavy checks",
+      "phase": "P6",
+      "wave": "W7",
+      "lane": "L1",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "6.3"
+      ],
+      "size": "M",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": ".gitignore, .github/**, playwright*.config.ts, tests/e2e/**, .nvmrc, root package.json scripts, docs/STATUS.md",
+      "contextFiles": [
+        "package.json",
+        ".github/workflows/ci.yml",
+        "playwright.config.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "The slow things run every night, not on every PR.",
+      "how": "- A nightly workflow runs the full e2e, the 4V6F perf budgets (Phase 3), the Vina comparison (4.7), redocking sanity (5.3) and the cross-platform digest test (4.10).\n              \n- Post a summary to the Drive folder or email.",
+      "done": "Nightly runs green for 7 days in a row.",
+      "refs": [],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "7.1",
+      "title": "Write the deployment decision record (OPS-00 light)",
+      "phase": "P7",
+      "wave": "HUMAN",
+      "lane": "OWNER",
+      "tier": "core",
+      "critical": false,
+      "deps": [],
+      "agentType": null,
+      "what": "One page that answers who, where, how much, and what data rules apply.",
+      "how": "- Cover: audience (invited beta), provider and region, budget per month, data policy (uploads private to the user and deleted after 30 days unless saved), limits per user (for example 20 jobs per day), and a simple threat model (who could attack, and what we protect).",
+      "done": "Signed off by you (closes OD-07).",
+      "refs": [],
+      "est": "1 day",
+      "status": "TODO",
+      "when": "By Day 10"
+    },
+    {
+      "id": "7.2",
+      "title": "Package everything in containers",
+      "phase": "P7",
+      "wave": "W5",
+      "lane": "L8",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "5.4"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": "deploy/**, Dockerfile*, docker-compose*.yml, .github/workflows/deploy.yml, apps/api/src/auth/**",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        ".env.example"
+      ],
+      "checkFlags": "--quick",
+      "what": "Each part runs in its own sealed box that starts the same everywhere.",
+      "how": "- Dockerfiles: web (Vite build served by Caddy), api (Node 22, non-root), worker (Ubuntu + Vina binary + Python preparation environment + mole-score, non-root, read-only file system) and db (Postgres).\n              \n- docker-compose.yml for staging.\n- Container images are built in CI and tagged with the commit.",
+      "done": "docker compose up gives a working app on a clean VM.",
+      "refs": [],
+      "est": "3 days",
+      "status": "TODO"
+    },
+    {
+      "id": "7.3",
+      "title": "Accounts and login",
+      "phase": "P7",
+      "wave": "W6",
+      "lane": "L8",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "7.2",
+        "1.7"
+      ],
+      "size": "L",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "devops-engineer",
+      "owns": "deploy/**, Dockerfile*, docker-compose*.yml, .github/workflows/deploy.yml, apps/api/src/auth/**",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        ".env.example"
+      ],
+      "checkFlags": "--quick",
+      "what": "Users sign in, and only see their own projects and jobs.",
+      "how": "- Use OAuth \"Sign in with Google\" (for example via openid-client), with an invite list (allowed emails).\n              \n- Sessions are httpOnly, Secure, SameSite=Lax cookies, with a CSRF token on POST/PUT.\n              \n- Add an owner_id to projects, artifacts and jobs, and check it on every request.\n- Add an admin role.",
+      "done": "Tests show user A cannot read user B's anything (ID guessing returns 404).",
+      "refs": [
+        "S1"
+      ],
+      "est": "1 week",
+      "status": "TODO"
+    },
+    {
+      "id": "7.4",
+      "title": "Durable storage",
+      "phase": "P7",
+      "wave": "W7",
+      "lane": "L8",
+      "tier": "stretch",
+      "critical": false,
+      "deps": [
+        "7.3"
+      ],
+      "size": "L",
+      "risk": "medium",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": "deploy/**, Dockerfile*, docker-compose*.yml, .github/workflows/deploy.yml, apps/api/src/auth/**",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        ".env.example"
+      ],
+      "checkFlags": "--quick",
+      "what": "Data survives restarts and can grow.",
+      "how": "- Move metadata (projects, revisions, jobs) from files and SQLite to Postgres, with migrations (for example node-pg-migrate).\n              \n- Store artifacts in S3-compatible object storage (OCI Object Storage, or MinIO for staging).\n              \n- Add quotas per user.",
+      "done": "Restarting all containers loses nothing.",
+      "refs": [],
+      "est": "1 week",
+      "status": "TODO"
+    },
+    {
+      "id": "7.5",
+      "title": "Isolated workers and a shared queue",
+      "phase": "P7",
+      "wave": "W7",
+      "lane": "L8",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "7.2",
+        "5.5"
+      ],
+      "size": "L",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "devops-engineer",
+      "owns": "deploy/**, Dockerfile*, docker-compose*.yml, .github/workflows/deploy.yml, apps/api/src/auth/**",
+      "contextFiles": [
+        "apps/api/src/command/dispatcher.ts",
+        "apps/api/src/server.ts",
+        ".env.example"
+      ],
+      "checkFlags": "--quick",
+      "what": "Docking jobs run in locked-down boxes and cannot harm the server or each other.",
+      "how": "- Use a Postgres job queue (SELECT … FOR UPDATE SKIP LOCKED) or pg-boss, with leases and fencing tokens.\n              \n- Each worker container has CPU and memory limits, no outbound internet, a read-only root, and a temporary scratch folder.\n              \n- Scale workers separately from the API.",
+      "done": "A job that uses too much memory is killed, and other jobs are unaffected.",
+      "refs": [
+        "M10"
+      ],
+      "est": "1 week",
+      "status": "TODO"
+    },
+    {
+      "id": "7.6",
+      "title": "HTTPS front door and protections",
+      "phase": "P7",
+      "wave": "W6",
+      "lane": "L8",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "7.2"
+      ],
+      "size": "M",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "devops-engineer",
+      "owns": "deploy/**, Dockerfile*, docker-compose*.yml, .github/workflows/deploy.yml, apps/api/src/auth/**",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        ".env.example"
+      ],
+      "checkFlags": "--quick",
+      "what": "Encrypted connections, rate limits and safe browser headers.",
+      "how": "- Caddy with automatic HTTPS (Let's Encrypt), and a request size cap at the proxy.\n              \n- Rate limits per IP and per user.\n              \n- Security headers: CSP, HSTS, X-Content-Type-Options and Referrer-Policy.",
+      "done": "An SSL Labs grade of A, and the security headers scan passes.",
+      "refs": [],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "7.7",
+      "title": "Watching the system (observability)",
+      "phase": "P7",
+      "wave": "W7",
+      "lane": "L8",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "7.2"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": "deploy/**, Dockerfile*, docker-compose*.yml, .github/workflows/deploy.yml, apps/api/src/auth/**",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        ".env.example"
+      ],
+      "checkFlags": "--quick",
+      "what": "You know when something breaks, before users tell you.",
+      "how": "- Structured JSON logs (pino) with request and job IDs.\n              \n- Metrics: queue length, job duration, failures, memory.\n              \n- An uptime check on /api/health, error tracking (for example Sentry), and email alerts.",
+      "done": "A forced error appears in the dashboard within 1 minute.",
+      "refs": [],
+      "est": "2 days",
+      "status": "TODO"
+    },
+    {
+      "id": "7.8",
+      "title": "Backups and a restore drill",
+      "phase": "P7",
+      "wave": "W8",
+      "lane": "L8",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "7.4"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": "deploy/**, Dockerfile*, docker-compose*.yml, .github/workflows/deploy.yml, apps/api/src/auth/**",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        ".env.example"
+      ],
+      "checkFlags": "--quick",
+      "what": "Prove you can recover from a disaster.",
+      "how": "- Nightly Postgres dump plus object-storage versioning.\n- Test a restore onto a fresh VM once.",
+      "done": "The restore drill succeeds and is documented.",
+      "refs": [],
+      "est": "1 day",
+      "status": "TODO"
+    },
+    {
+      "id": "7.9",
+      "title": "Automatic deployment",
+      "phase": "P7",
+      "wave": "W8",
+      "lane": "L8",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "7.2",
+        "6.2"
+      ],
+      "size": "M",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "devops-engineer",
+      "owns": "deploy/**, Dockerfile*, docker-compose*.yml, .github/workflows/deploy.yml, apps/api/src/auth/**",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        ".env.example"
+      ],
+      "checkFlags": "--quick",
+      "what": "Merging to main updates staging automatically, and a version tag updates production after your approval.",
+      "how": "- A GitHub Actions workflow builds and pushes images, deploys to staging, runs smoke tests against staging, and has a manual approval step for production.\n              \n- Rollback means redeploying the previous tag.",
+      "done": "One-click deploy and rollback have both been tested.",
+      "refs": [],
+      "est": "2 days",
+      "status": "TODO"
+    },
+    {
+      "id": "7.10",
+      "title": "Security review and beta launch",
+      "phase": "P7",
+      "wave": "W8",
+      "lane": "L8",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "7.3",
+        "7.6",
+        "7.5"
+      ],
+      "size": "M",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "devops-engineer",
+      "owns": "deploy/**, Dockerfile*, docker-compose*.yml, .github/workflows/deploy.yml, apps/api/src/auth/**",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        ".env.example"
+      ],
+      "checkFlags": "--quick",
+      "what": "A final check, then invite the first users.",
+      "how": "- Run through the OWASP ASVS level 1 checklist and a dependency audit.\n              \n- Test login, ID guessing, upload abuse, and jobs exceeding limits.\n              \n- Invite 10 users, add a feedback form, and review the logs weekly.",
+      "done": "No open critical or high findings, and 10 users have docked successfully.",
+      "refs": [],
+      "est": "3 days",
+      "status": "TODO"
+    },
+    {
+      "id": "8.1",
+      "title": "D4 part 1: ligand movement model",
+      "phase": "P8",
+      "wave": "W7",
+      "lane": "L9",
+      "tier": "stretch",
+      "critical": false,
+      "deps": [
+        "4.8",
+        "4.6"
+      ],
+      "size": "L",
+      "risk": "high",
+      "model": "opus",
+      "effort": "high",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "science-validator",
+      "owns": "tests/science/**, native/docking-reference/search/**",
+      "contextFiles": [
+        "native/docking-reference/scoring/include/mole/docking/scoring.hpp"
+      ],
+      "checkFlags": "--quick",
+      "what": "Turn \"position + rotation + torsion angles\" into atom coordinates.",
+      "how": "- A torsion tree from the D3 topology. Applying a pose means translation, a quaternion rotation, then rotating each branch around its bond axis.\n              \n- Add the intramolecular ligand energy (pairs more than 3 bonds apart, as in Vina).\n              \n- Write derivatives with respect to every degree of freedom.",
+      "done": "Finite-difference gradient tests pass, and round-trip pose → coordinates → pose is exact.",
+      "refs": [],
+      "est": "2 weeks",
+      "status": "TODO"
+    },
+    {
+      "id": "8.2",
+      "title": "D4 part 2: random search and optimizer",
+      "phase": "P8",
+      "wave": "AFTER",
+      "lane": "-",
+      "tier": "deferred",
+      "critical": false,
+      "deps": [],
+      "agentType": null,
+      "what": "The search itself, made reproducible.",
+      "done": "Same seed gives identical results on 1 or 8 threads, and SEARCH-FX passes.",
+      "refs": [],
+      "est": "3 weeks",
+      "status": "DEFERRED"
+    },
+    {
+      "id": "8.3",
+      "title": "Side-by-side with Vina",
+      "phase": "P8",
+      "wave": "AFTER",
+      "lane": "-",
+      "tier": "deferred",
+      "critical": false,
+      "deps": [],
+      "agentType": null,
+      "what": "Run both engines on the same inputs and compare honestly.",
+      "done": "A written comparison report, plus your decision on readiness.",
+      "refs": [],
+      "est": "1 week",
+      "status": "DEFERRED"
+    },
+    {
+      "id": "8.4",
+      "title": "D5: poses, symmetry-aware RMSD and clustering",
+      "phase": "P8",
+      "wave": "AFTER",
+      "lane": "-",
+      "tier": "deferred",
+      "critical": false,
+      "deps": [],
+      "agentType": null,
+      "what": "Choose and rank final results correctly.",
+      "done": "POSE-FX passes and ordering is deterministic.",
+      "refs": [],
+      "est": "2 weeks",
+      "status": "DEFERRED"
+    },
+    {
+      "id": "8.5",
+      "title": "D6: replay and provenance",
+      "phase": "P8",
+      "wave": "AFTER",
+      "lane": "-",
+      "tier": "deferred",
+      "critical": false,
+      "deps": [],
+      "agentType": null,
+      "what": "Any result can be reproduced from its record.",
+      "done": "Cross-process replay reproduces results, and tampering is detected.",
+      "refs": [],
+      "est": "1.5 weeks",
+      "status": "DEFERRED"
+    },
+    {
+      "id": "8.6",
+      "title": "Switch the default engine",
+      "phase": "P8",
+      "wave": "AFTER",
+      "lane": "-",
+      "tier": "deferred",
+      "critical": false,
+      "deps": [],
+      "agentType": null,
+      "what": "When your engine is ready, make it the default.",
+      "done": "Gates are tagged, and the default engine is mole.",
+      "refs": [],
+      "est": "1 day",
+      "status": "DEFERRED"
+    },
+    {
+      "id": "9.1",
+      "title": "D7/D8: implementation acceptance, automated",
+      "phase": "P9",
+      "wave": "AFTER",
+      "lane": "-",
+      "tier": "deferred",
+      "critical": false,
+      "deps": [],
+      "agentType": null,
+      "what": "Prove every requirement is implemented and tested, using generated reports instead of hand-made ones.",
+      "done": "The generated matrix has 0 unexplained gaps.",
+      "refs": [],
+      "est": "2 weeks",
+      "status": "DEFERRED"
+    },
+    {
+      "id": "9.2",
+      "title": "Clear the pending approvals",
+      "phase": "P9",
+      "wave": "HUMAN",
+      "lane": "OWNER",
+      "tier": "core",
+      "critical": false,
+      "deps": [],
+      "agentType": null,
+      "what": "Close the user-approval items that have been open since September.",
+      "how": "- Hold one review session for R07-R10, the PyMOL campaign and the oracle status, and record each decision in Drive.",
+      "done": "OD-04, OD-05 and OD-06 are closed.",
+      "refs": [
+        "R9"
+      ],
+      "est": "1 day",
+      "status": "TODO",
+      "when": "Week 3"
+    },
+    {
+      "id": "9.3",
+      "title": "D9: frozen benchmark",
+      "phase": "P9",
+      "wave": "AFTER",
+      "lane": "-",
+      "tier": "deferred",
+      "critical": false,
+      "deps": [],
+      "agentType": null,
+      "what": "The official scientific test, set up so you cannot accidentally fool yourself.",
+      "done": "The Q1-Q7 decision is recorded, together with the raw data.",
+      "refs": [],
+      "est": "3 weeks",
+      "status": "DEFERRED"
+    },
+    {
+      "id": "9.4",
+      "title": "D10 and OPS-06: version 1.0 launch",
+      "phase": "P9",
+      "wave": "AFTER",
+      "lane": "-",
+      "tier": "deferred",
+      "critical": false,
+      "deps": [],
+      "agentType": null,
+      "what": "Release with exactly the claims the evidence supports.",
+      "done": "v1.0.0 is tagged and production is running.",
+      "refs": [],
+      "est": "1 week",
+      "status": "DEFERRED"
+    }
+  ]
+}

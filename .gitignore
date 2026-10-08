@@ -12,3 +12,11 @@ test-results/
 # Autonomous PyMOL campaign raw RCSB downloads remain local evidence; manifests/checksums are tracked
 verification/autonomous-pymol/corpus/*.cif
 verification/autonomous-pymol/evidence/bulk/
+
+# Sprint hygiene (Day 0): large or generated artifacts never enter git
+outputs/
+build/
+*.zip
+*.bundle
+.mole/
+docs/sprint/next-wave.json
