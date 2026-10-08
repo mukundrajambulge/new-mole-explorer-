@@ -1,0 +1,21 @@
+{
+  "comment": "10 real receptor/ligand pairs from tests/fixtures (task 5.2). 'cut' ligands are HETATM lines copied verbatim from the RCSB file. Bond-order templates are SMILES derived from the HETNAM/IUPAC name in the same RCSB file (0KP) or the CCD residue minus its glycosidic O1 (sugars, all single bonds); stereo is read from the 3D coordinates.",
+  "pairs": [
+    {"id": "1CRN-ethanol", "receptor": {"file": "rcsb/1CRN.pdb"}, "ligand": {"file": "ethanol.sdf", "format": "sdf"}, "options": {}},
+    {"id": "1CRN-ring", "receptor": {"file": "rcsb/1CRN.pdb"}, "ligand": {"file": "ring-ligand.pdb", "format": "pdb"}, "template": "c1ccccc1", "options": {}},
+    {"id": "1D3Z-g1c", "receptor": {"file": "rcsb/1D3Z.pdb"}, "ligand": {"file": "g1c-small-molecule.pdb", "format": "pdb"}, "template": "CCO", "options": {}},
+    {"id": "1D3Z-ethanol-dimorphite", "receptor": {"file": "rcsb/1D3Z.pdb"}, "ligand": {"file": "ethanol.sdf", "format": "sdf"}, "options": {"ligandProtonation": "DIMORPHITE_PREVIEW"}},
+    {"id": "4DJW-0KP", "receptor": {"file": "rcsb/4DJW.pdb"}, "ligand": {"cut": {"file": "rcsb/4DJW.pdb", "resName": "0KP", "chain": "A", "resSeq": 501}, "format": "pdb"},
+     "template": "CN1C(=N)NC(c2ccccc2)(c2cccc(-c3cccnc3)c2)C1=O", "options": {"chainIds": ["A"], "addMissingAtoms": true}},
+    {"id": "4DJW-ring-propka", "receptor": {"file": "rcsb/4DJW.pdb"}, "ligand": {"file": "ring-ligand.pdb", "format": "pdb"}, "template": "c1ccccc1",
+     "options": {"chainIds": ["A"], "addMissingAtoms": true, "protonation": "PROPKA_PREVIEW", "pH": 7.4}},
+    {"id": "1HZH-GAL", "receptor": {"file": "rcsb/1HZH.pdb"}, "ligand": {"cut": {"file": "rcsb/1HZH.pdb", "resName": "GAL", "chain": "A", "resSeq": 6}, "format": "pdb"},
+     "template": "C1OC(CO)C(O)C(O)C1O", "options": {"chainIds": ["L"], "addMissingAtoms": true}},
+    {"id": "1HZH-FUC", "receptor": {"file": "rcsb/1HZH.pdb"}, "ligand": {"cut": {"file": "rcsb/1HZH.pdb", "resName": "FUC", "chain": "B", "resSeq": 9}, "format": "pdb"},
+     "template": "C1OC(C)C(O)C(O)C1O", "options": {"chainIds": ["M"], "addMissingAtoms": true}},
+    {"id": "5FYL-BMA", "receptor": {"file": "rcsb/5FYL.pdb"}, "ligand": {"cut": {"file": "rcsb/5FYL.pdb", "resName": "BMA", "chain": "A", "resSeq": 3}, "format": "pdb"},
+     "template": "C1OC(CO)C(O)C(O)C1O", "options": {"chainIds": ["B"], "addMissingAtoms": true}},
+    {"id": "5FYL-0KP", "receptor": {"file": "rcsb/5FYL.pdb"}, "ligand": {"cut": {"file": "rcsb/4DJW.pdb", "resName": "0KP", "chain": "B", "resSeq": 501}, "format": "pdb"},
+     "template": "CN1C(=N)NC(c2ccccc2)(c2cccc(-c3cccnc3)c2)C1=O", "options": {"chainIds": ["L"], "addMissingAtoms": true}}
+  ]
+}
