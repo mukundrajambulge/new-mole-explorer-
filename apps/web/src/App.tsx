@@ -40,6 +40,7 @@ import { unsafeConsoleDiagnostic } from "./commands/safeBoundary";
 import { dispatchUiCommand } from "./commands/uiDispatcher";
 import { tokenizeCommandBatch } from "./commands/batchTokenizer";
 import { copyWorkspaceObject, createWorkspaceGroup, createWorkspaceObject, createWorkspaceObjectFromSelection, cycleWorkspaceObjectState, joinWorkspaceObjectStates, renameWorkspaceObject, resolveGlobalFrameState, setWorkspaceObjectAllStates, setWorkspaceObjectEnabled, setWorkspaceObjectState, splitWorkspaceObjectStates, structureForWorkspaceObjectState, updateWorkspaceGroup, workspaceScopedStableAtomId, workspaceSelectionStructure, type WorkspaceGroup, type WorkspaceObject } from "./workspace/workspaceModel";
+import { createDirtyTracker, isDirty, trackWorkspaceRevision } from "./workspace/dirtyTracker";
 import { createAddBondCommand, createAddHydrogensCommand, createAttachAtomCommand, createCoordinateEditCommand, createDeleteAtomsCommand, createDeleteBondCommand, createRefillHydrogensCommand, createRemoveHydrogensCommand, createReplaceAtomCommand, createReplaceBondSemanticsCommand, ScientificHistoryService, type ScientificRevision } from "./editing/editFoundation";
 import { buildSessionDraft, restoreSession } from "./lifecycle/sessionCodec";
 import { exportStructure, type ExportArtifact, type ExportFormat, type ExportLossPolicy, type ExportStateScope } from "./lifecycle/export";
@@ -151,35 +152,17 @@ export const App = () => {
   const alignmentOverlays = useMemo(() => overlaysForAlignment(fittingResults), [fittingResults]);
   const viewerWorkspaceObjects = useMemo(() => workspaceObjects.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object), [activeObjectId, projection, workspaceObjects]);
   const activeHistoryState = activeObjectId ? historyServiceRef.current.historyState(activeObjectId) : null;
-  // Dirty tracking uses a revision counter bumped when a saved slice changes by
-  // reference.  Hover only rewrites interaction.hoveredAtomId, so a hover-only
-  // projection change keeps the previous persisted projection and bumps nothing.
-  const persistedProjectionRef = useRef(projection);
-  {
-    const prev = persistedProjectionRef.current;
-    if (prev !== projection) {
-      let same = prev.interaction.selectedAtomIds === projection.interaction.selectedAtomIds
-        && prev.interaction.pickedAtomId === projection.interaction.pickedAtomId
-        && prev.interaction.measurementPickAtomIds === projection.interaction.measurementPickAtomIds;
-      if (same) {
-        for (const key of Object.keys(projection) as (keyof RenderProjection)[]) {
-          if (key !== "interaction" && prev[key] !== projection[key]) { same = false; break; }
-        }
-      }
-      if (!same) persistedProjectionRef.current = projection;
-    }
-  }
-  const persistedProjection = persistedProjectionRef.current;
-  const [workspaceRevision, setWorkspaceRevision] = useState(0);
+  // Dirty tracking: a revision counter bumped during render (same render as the
+  // change) when a saved slice changes by reference.  Hover is excluded inside
+  // trackWorkspaceRevision, so hover never serializes or bumps.
+  const dirtyTrackerRef = useRef(createDirtyTracker());
   const activeSelectionResultId = activeSelection?.resultId;
-  useEffect(() => {
-    setWorkspaceRevision((value) => value + 1);
-  }, [activeObjectId, activeSelectionResultId, analysisResults, biologicalData, coordinateFramePolicy, fittingResults, globalFrameIndex, measurements, namedSelections, persistedProjection, sceneCollection, workspaceGroups, workspaceObjects]);
+  const workspaceRevision = trackWorkspaceRevision(dirtyTrackerRef.current, projection as never, [activeObjectId, activeSelectionResultId, analysisResults, biologicalData, coordinateFramePolicy, fittingResults, globalFrameIndex, measurements, namedSelections, sceneCollection, workspaceGroups, workspaceObjects]);
 
   useEffect(() => {
     if (!project) return;
     if (savedRevisionRef.current === null) { savedRevisionRef.current = workspaceRevision; return; }
-    if (savedRevisionRef.current !== workspaceRevision) setDirty(true);
+    if (isDirty(workspaceRevision, savedRevisionRef.current)) setDirty(true);
   }, [project, workspaceRevision]);
 
   const presentationSelectionContext = (): SelectionPresentationContext | undefined => {

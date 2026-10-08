@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "label": "after-3.2-dirty-tracker-unit",
+  "note": "4V6F e2e perf not rerun (fixture unavailable in this worktree). Unit evidence: 300000 hover updates through trackWorkspaceRevision.",
+  "hoverUpdates": 300000,
+  "totalMs": 550.9,
+  "jsonStringifyCalls": 0,
+  "before": "baseline hover mean 299 ms, p95 240 ms, max 8118 ms (large-molecule-baseline.json), with a JSON.stringify of the workspace per projection change"
+}
