@@ -18,11 +18,26 @@ import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
 import type { AlignmentOverlay } from "../analysis/alignmentPresentation";
 import { stateForObject, structureForWorkspaceObjectState, workspaceScopedStableAtomId, type WorkspaceObject } from "../workspace/workspaceModel";
 import { hoverStore } from "./hoverStore";
+import { LARGE_PICK_ATOM_THRESHOLD, PickGrid, type PickableAtom, type Vec3 } from "./hoverPickGrid";
 import { compactAtomSpecContext, compactAtomSpecs, isCompactStructure } from "../structures/compactCanonical";
 
 type HoverSource = { compact: NonNullable<CanonicalMolecularStructure["compact"]> | null; ordinals: ReadonlyMap<string, number> | null; coords: Map<string, { x: number; y: number; z: number }> | null };
 
 const diagnosticTypeForStyle = (style: string): RepresentationType => style === "ribbon" ? "RIBBON" : style === "putty" || style === "trace" || style === "cartoon" ? "CARTOON" : style === "nonbonded-crosses" ? "NONBONDED" : style === "nonbonded-spheres" ? "NB_SPHERES" : style === "line" ? "LINES" : style === "stick" || style === "licorice" || style === "ball-and-stick" ? "STICKS" : "SPHERES";
+
+/** 3Dmol GLViewer members that are private in its typings but needed to suspend and narrow hover picking. */
+type ViewerPickInternals = {
+  current_hover: unknown;
+  hoverTimeout?: ReturnType<typeof setTimeout>;
+  hoverables: unknown[];
+  clickables: unknown[];
+  models: Array<{ atoms?: PickableAtom[] } | undefined>;
+  camera: unknown;
+  modelGroup: { matrixWorld: { elements: ArrayLike<number>; getMaxScaleOnAxis(): number } };
+  raycaster: { setFromCamera(mouse: Vec3, camera: unknown): void; ray: { origin: Vec3; direction: Vec3 }; intersectObjects(group: unknown, objects: unknown[]): unknown[] };
+  setHover(selected: null): void;
+  targetedObjects(x: number, y: number, objects: unknown): unknown[];
+};
 
 const mountedAdapters = new WeakMap<HTMLElement, ThreeDMolViewerAdapter>();
 type Viewport = NonNullable<CameraState["viewport"]>;
@@ -202,6 +217,15 @@ export class ThreeDMolViewerAdapter {
   private measurementShapes: GLShape[] = [];
   private interactionShapes: GLShape[] = [];
   private hoverShapes: GLShape[] = [];
+  private buttonHeld = false;
+  private buttonHoldCleanup: (() => void) | null = null;
+  /** Narrows 3Dmol's hover/click raycast on structures above LARGE_PICK_ATOM_THRESHOLD; null below it. */
+  private pickGrid: PickGrid | null = null;
+  private pickGridKey = "";
+  /** True when something rewrote model styles, so the selection overlay must be re-applied. */
+  private selectionStyleDirty = true;
+  private appliedSelectionIds: readonly string[] | null = null;
+  private matchedSelection: ReadonlySet<string> = new Set();
   private hoverUnsubscribe: (() => void) | null = null;
   private hoverSources = new WeakMap<object, Map<string, HoverSource>>();
   private analysisShapes: GLShape[] = [];
@@ -253,10 +277,102 @@ export class ThreeDMolViewerAdapter {
     this.hoverUnsubscribe = hoverStore.subscribe(() => this.projectHoverMarker());
     this.viewer = createViewer(container, { backgroundColor: "#05070a", antialias: true, disableFog: true, cartoonQuality: 8 });
     this.cameraController = new CameraController(this.viewer);
+    this.bindButtonHoldSuspension(container);
+    this.installPickNarrowing(this.viewer);
     this.performance.viewerCreations += 1;
     container.dataset.rendererGeneration = String(this.rendererGeneration);
     this.resizeObserver = new ResizeObserver(() => { this.viewer?.resize(); this.render(); });
     this.resizeObserver.observe(container);
+  }
+
+  /**
+   * Hover picking is suspended while a mouse button is held (rotate/pan/zoom drag) and resumes on release.
+   * Once 3Dmol has an active hover it raycasts every hoverable on each mousemove (handleHoverContinue runs
+   * before its drag check), so a drag that starts on a hovered atom cost ~1 s per frame on 4V6F.
+   * Capture-phase pointerdown runs before 3Dmol's own mousedown: it drops 3Dmol's active hover
+   * (current_hover = null) and pending hover timer, clears our hover store, and parks the hover delay.
+   */
+  private bindButtonHoldSuspension(container: HTMLElement): void {
+    this.buttonHoldCleanup?.();
+    const HOVER_IDLE_MS = 500;
+    const SUSPENDED_MS = 2_000_000_000;
+    const down = () => {
+      if (this.buttonHeld) return;
+      this.buttonHeld = true;
+      const viewer = this.viewer;
+      if (!viewer) return;
+      viewer.setHoverDuration(SUSPENDED_MS);
+      const internals = viewer as unknown as Partial<ViewerPickInternals>;
+      clearTimeout(internals.hoverTimeout);
+      // Our unhover callbacks are muted while buttonHeld, so the store is cleared explicitly below.
+      if (internals.current_hover != null) internals.setHover?.(null);
+      if (hoverStore.get() !== null) this.interactionHandlers.onHover?.(null);
+    };
+    const up = () => {
+      if (!this.buttonHeld) return;
+      this.buttonHeld = false;
+      this.viewer?.setHoverDuration(HOVER_IDLE_MS);
+    };
+    container.addEventListener("mousedown", down, true);
+    container.addEventListener("pointerdown", down, true);
+    window.addEventListener("mouseup", up, true);
+    window.addEventListener("pointerup", up, true);
+    window.addEventListener("pointercancel", up, true);
+    window.addEventListener("blur", up);
+    this.buttonHoldCleanup = () => {
+      container.removeEventListener("mousedown", down, true);
+      container.removeEventListener("pointerdown", down, true);
+      window.removeEventListener("mouseup", up, true);
+      window.removeEventListener("pointerup", up, true);
+      window.removeEventListener("pointercancel", up, true);
+      window.removeEventListener("blur", up);
+      this.buttonHeld = false;
+    };
+  }
+
+  /**
+   * Pick narrowing on this viewer instance. While a button is held, hover raycasts return no hits
+   * (backstop for the suspension above). On large structures, hover and click raycasts test only atoms
+   * in grid cells near the ray, with 3Dmol's own exact intersector on that subset.
+   */
+  private installPickNarrowing(viewer: GLViewer): void {
+    const internals = viewer as unknown as ViewerPickInternals;
+    const original = internals.targetedObjects;
+    if (typeof original !== "function") return;
+    internals.targetedObjects = (x: number, y: number, objects: unknown) => {
+      const hover = objects === internals.hoverables;
+      if (hover && this.buttonHeld) return [];
+      const grid = this.pickGrid;
+      if (!grid || (!hover && objects !== internals.clickables) || this.currentPickGridKey(internals) !== this.pickGridKey) return original.call(viewer, x, y, objects);
+      internals.raycaster.setFromCamera({ x, y, z: -1 }, internals.camera);
+      const { origin, direction } = internals.raycaster.ray;
+      const matrix = internals.modelGroup.matrixWorld;
+      const candidates = grid.candidates(origin, direction, matrix.elements, matrix.getMaxScaleOnAxis(), hover ? "hoverable" : "clickable");
+      return candidates.length ? internals.raycaster.intersectObjects(internals.modelGroup, candidates) : [];
+    };
+  }
+
+  /** Per-model work only (no atom scan): atom array length of each model, so appends and reloads invalidate the grid. */
+  private currentPickGridKey(internals: ViewerPickInternals): string {
+    let key = "";
+    for (const model of internals.models ?? []) key += `${model?.atoms?.length ?? 0},`;
+    return key;
+  }
+
+  /** Rebuilt whenever picking is (re)bound: after model loads, progressive appends and workspace changes. Never on the hover path. */
+  private rebuildPickGrid(): void {
+    this.pickGrid = null;
+    this.pickGridKey = "";
+    const internals = this.viewer as unknown as ViewerPickInternals | null;
+    if (!internals || !Array.isArray(internals.models)) return;
+    let total = 0;
+    const lists: PickableAtom[][] = [];
+    for (const model of internals.models) if (model?.atoms) { lists.push(model.atoms); total += model.atoms.length; }
+    if (total > LARGE_PICK_ATOM_THRESHOLD) {
+      this.pickGrid = PickGrid.build(lists);
+      this.pickGridKey = this.currentPickGridKey(internals);
+    }
+    if (this.container) this.container.dataset.pickGridCells = String(this.pickGrid?.cellCount ?? 0);
   }
 
   setInteractionHandlers(handlers: ViewerInteractionHandlers): void {
@@ -546,6 +662,7 @@ export class ThreeDMolViewerAdapter {
       }
     }
     if (objectSceneChanged || objectSelectionChanged) {
+      this.selectionStyleDirty = true;
       // Clear any prior selection overlay before projecting the next one.
       // This is a model-style reset; canonical atoms, surfaces, and camera
       // state remain intact.
@@ -696,6 +813,9 @@ export class ThreeDMolViewerAdapter {
     if (this.container && mountedAdapters.get(this.container) === this) mountedAdapters.delete(this.container);
     this.resizeObserver?.disconnect(); this.resizeObserver = null;
     this.hoverUnsubscribe?.(); this.hoverUnsubscribe = null; this.hoverShapes = [];
+    this.buttonHoldCleanup?.(); this.buttonHoldCleanup = null;
+    this.pickGrid = null; this.pickGridKey = "";
+    this.selectionStyleDirty = true; this.appliedSelectionIds = null; this.matchedSelection = new Set();
     if (this.viewer) { this.releaseWebGl(this.viewer); this.viewer = null; }
     this.cameraController = null;
     this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.alignmentShapes = []; this.alignmentOverlays = []; this.auxiliaryModels = []; this.workspaceObjects = []; this.workspaceSurfaceHandles.clear(); this.workspaceSurfaceRebuilds.clear(); this.styledModels.clear(); this.surfaceFallbackModels.clear(); this.surfaceReadyModels.clear(); this.primaryModel = null; this.primaryObjectEnabled = true; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceKinds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.rendererAtomCount = 0; this.progressiveStage = "idle"; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.cameraPan = { x: 0, y: 0 }; this.cameraTargetMetadata = { atoms: 0, models: 0, objects: 0, mode: "none" }; this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
@@ -815,6 +935,7 @@ export class ThreeDMolViewerAdapter {
   }
 
   private applyCompactModelStyle(model: ViewerModel, structure: CanonicalMolecularStructure, projection: RenderProjection, forceReset = false): void {
+    this.selectionStyleDirty = true;
     if (!isCompactStructure(structure)) return;
     if (forceReset) model.setStyle({}, {});
     const polymerRepresentation = projection.representation === "cartoon" || projection.representation === "ribbon" || projection.representation === "trace" || projection.representation === "putty" ? projection.representation : projection.representation;
@@ -932,6 +1053,7 @@ export class ThreeDMolViewerAdapter {
   }
 
   private renderWorkspaceModel(model: ReturnType<GLViewer["addModel"]>, object: WorkspaceObject, forceReset = false): void {
+    this.selectionStyleDirty = true;
     this.performance.workspaceStyleRebuilds += 1;
     const structure = structureForWorkspaceObjectState(object);
     if (!object.enabled) { model.setStyle({}, { cartoon: { hidden: true }, stick: { hidden: true }, sphere: { hidden: true }, line: { hidden: true } }); this.styledModels.delete(model); this.surfaceFallbackModels.delete(model); this.surfaceReadyModels.delete(model); return; }
@@ -979,6 +1101,7 @@ export class ThreeDMolViewerAdapter {
     }
   }
   private renderSurfaceFallback(model: ViewerModel, structure: CanonicalMolecularStructure, projection: RenderProjection, targetStableAtomIds: readonly string[]): void {
+    this.selectionStyleDirty = true;
     model.setStyle({}, {});
     const targetIds = new Set(targetStableAtomIds.length ? targetStableAtomIds : structure.atoms.map((atom) => atom.stableId));
     const target = { predicate: (atom: AtomSpec) => typeof atom.properties?.canonicalStableId === "string" && targetIds.has(atom.properties.canonicalStableId) };
@@ -988,6 +1111,7 @@ export class ThreeDMolViewerAdapter {
     this.surfaceReadyModels.delete(model);
   }
   private clearSurfaceFallback(model: ViewerModel): void {
+    this.selectionStyleDirty = true;
     if (this.surfaceFallbackModels.has(model)) model.setStyle({}, {});
     this.surfaceFallbackModels.delete(model);
     this.styledModels.delete(model);
@@ -1131,14 +1255,16 @@ export class ThreeDMolViewerAdapter {
       if (result) this.interactionHandlers.onPick?.(result);
     };
     const onHover = (atom: AtomSpec) => {
+      if (this.buttonHeld) return;
       if (!this.primaryObjectEnabled) return;
       const result = this.reverseIdentityMap.resolveAtomHit({ index: atom.index, serial: atom.serial, properties: atom.properties as Record<string, unknown> | undefined });
       this.interactionHandlers.onHover?.(result);
     };
-    const onUnhover = () => this.interactionHandlers.onHover?.(null);
+    const onUnhover = () => { if (!this.buttonHeld) this.interactionHandlers.onHover?.(null); };
     const all = this.canonicalSelection(() => true);
     this.viewer.setClickable(all, true, onClick);
     this.viewer.setHoverable(all, true, onHover, onUnhover);
+    this.rebuildPickGrid();
   }
 
   private bindWorkspacePicking(): void {
@@ -1149,14 +1275,16 @@ export class ThreeDMolViewerAdapter {
         if (result) this.interactionHandlers.onPick?.(result);
       });
       model.setHoverable({}, true, (atom: AtomSpec) => {
-        if (!object.enabled) return;
+        if (!object.enabled || this.buttonHeld) return;
         const result = this.reverseIdentityMap.resolveAtomHit({ index: atom.index, serial: atom.serial, properties: atom.properties as Record<string, unknown> | undefined });
         this.interactionHandlers.onHover?.(result);
-      }, () => this.interactionHandlers.onHover?.(null));
+      }, () => { if (!this.buttonHeld) this.interactionHandlers.onHover?.(null); });
     }
+    this.rebuildPickGrid();
   }
 
   private applyProjection(projection: RenderProjection): void {
+    this.selectionStyleDirty = true;
     this.performance.projectionRebuilds += 1;
     const viewer = this.viewer!; const structure = this.structure!;
     if (isCompactStructure(structure)) {
@@ -1539,18 +1667,16 @@ export class ThreeDMolViewerAdapter {
     }
   }
 
-  private projectCompactInteractionHighlights(projection: RenderProjection): void {
-    if (!this.viewer || !this.structure || !isCompactStructure(this.structure)) return;
+  private restyleCompactSelection(projection: RenderProjection): Set<string> {
+    const matchedSelectionIds = new Set<string>();
+    if (!this.viewer || !this.structure || !isCompactStructure(this.structure)) return matchedSelectionIds;
     const selectedIds = new Set(projection.interaction.selectedAtomIds);
-    const indicatorIds = [projection.interaction.pickedAtomId, ...projection.interaction.measurementPickAtomIds].filter((value): value is string => Boolean(value));
     const entries = this.workspaceObjects.length
       ? [
         ...(this.workspaceObjects[0] && this.primaryModel ? [{ model: this.primaryModel, object: this.workspaceObjects[0], structure: structureForWorkspaceObjectState(this.workspaceObjects[0]) }] : []),
         ...this.auxiliaryModels.map(({ model, object }) => ({ model, object, structure: structureForWorkspaceObjectState(object) })),
       ]
       : (this.primaryModel ? [{ model: this.primaryModel, object: null, structure: this.structure }] : []);
-    const matchedSelectionIds = new Set<string>();
-    const markerPoints: Array<{ id: string; point: Coordinate3 }> = [];
     for (const entry of entries) {
       if (!entry.structure.compact || (entry.object && !entry.object.enabled)) continue;
       const objectId = entry.object?.objectId ?? "";
@@ -1569,15 +1695,7 @@ export class ThreeDMolViewerAdapter {
         entry.model.setStyle({}, selectionDeemphasisStyleFor(entry.object?.projection ?? projection), true);
         entry.model.setStyle({ predicate: (atom) => typeof atom.properties?.canonicalStableId === "string" && matchedLocalIds.has(atom.properties.canonicalStableId) }, selectionOverlayStyle(entry.object?.projection ?? projection), true);
       }
-      for (const indicatorId of indicatorIds) {
-        const localId = objectId && indicatorId.startsWith(`${objectId}::`) ? indicatorId.slice(objectId.length + 2) : indicatorId;
-        const ordinal = this.compactAtomOrdinalMapFor(entry.structure).get(localId) ?? -1;
-        if (ordinal >= 0) markerPoints.push({ id: indicatorId, point: { x: entry.structure.compact.x[ordinal]!, y: entry.structure.compact.y[ordinal]!, z: entry.structure.compact.z[ordinal]! } });
-      }
-    }
-    for (const marker of markerPoints) {
-      const color = marker.id === projection.interaction.pickedAtomId ? "#e5ae32" : projection.interaction.measurementPickAtomIds.includes(marker.id) ? "#f5c451" : "#31d8c4";
-      this.interactionShapes.push(this.viewer.addSphere({ center: marker.point, radius: color === "#e5ae32" ? 0.42 : 0.23, color, wireframe: color !== "#e5ae32", opacity: 0.9 }));
+
     }
     this.projectSurfaceSelectionEmphasis(matchedSelectionIds.size > 0);
     if (this.container) {
@@ -1588,30 +1706,50 @@ export class ThreeDMolViewerAdapter {
       this.container.dataset.selectionDeemphasis = matchedSelectionIds.size ? "active" : "none";
       this.container.dataset.selectionDeemphasisOpacity = matchedSelectionIds.size && !isCartoonFamily(projection.representation) ? "0.46" : "1";
     }
+    return matchedSelectionIds;
   }
 
+  /** Selection restyling touches every atom, so it only runs when the identity of selectedAtomIds changes
+   *  or something else rewrote the model styles (selectionStyleDirty). Marker spheres are cheap and always redrawn. */
   private projectInteractionHighlights(projection: RenderProjection): void {
-    this.projectInteractionHighlightsCore(projection);
-    this.drawHoverMarker();
-  }
-
-  private projectInteractionHighlightsCore(projection: RenderProjection): void {
     if (!this.viewer || !this.structure) return;
     this.interactionShapes.forEach((shape) => this.viewer?.removeShape(shape));
     this.interactionShapes = [];
-    const pickedId = projection.interaction.pickedAtomId;
-    const selectedIds = new Set(projection.interaction.selectedAtomIds);
-    if (isCompactStructure(this.structure)) {
-      this.projectCompactInteractionHighlights(projection);
-      return;
+    const selected = projection.interaction.selectedAtomIds;
+    if (this.selectionStyleDirty || this.appliedSelectionIds !== selected) {
+      this.matchedSelection = isCompactStructure(this.structure) ? this.restyleCompactSelection(projection) : this.restyleSelection(projection);
+      this.appliedSelectionIds = selected;
+      this.selectionStyleDirty = false;
     }
+    this.drawInteractionMarkers(projection);
+    this.drawHoverMarker();
+  }
+
+  private drawInteractionMarkers(projection: RenderProjection): void {
+    const viewer = this.viewer;
+    if (!viewer || !this.structure) return;
+    const compact = isCompactStructure(this.structure);
+    const add = (id: string, color: string, radius: number, opacity: number, solid = false) => {
+      const center = this.hoverCoordinate(id);
+      if (center) this.interactionShapes.push(viewer.addSphere({ center, radius, color, wireframe: !solid, opacity }));
+    };
+    const pickedId = projection.interaction.pickedAtomId;
+    // UI-1: the picked atom gets a solid marker so it stays visible inside a cartoon.
+    if (pickedId) add(pickedId, "#e5ae32", 0.42, 0.9, true);
+    if (!compact && this.matchedSelection.size === 1) for (const id of this.matchedSelection) add(id, "#55d9ff", 0.34, 0.88);
+    for (const id of projection.interaction.measurementPickAtomIds) add(id, "#f5c451", 0.23, compact ? 0.86 : 0.95);
+  }
+
+  private restyleSelection(projection: RenderProjection): Set<string> {
+    const matchedSelectionIds = new Set<string>();
+    if (!this.viewer || !this.structure) return matchedSelectionIds;
+    const selectedIds = new Set(projection.interaction.selectedAtomIds);
     const selectionEntries = this.workspaceObjects.length
       ? [
         ...(this.workspaceObjects[0] && this.primaryModel ? [{ model: this.primaryModel, object: this.workspaceObjects[0], structure: structureForWorkspaceObjectState(this.workspaceObjects[0]) }] : []),
         ...this.auxiliaryModels.map(({ model, object }) => ({ model, object, structure: structureForWorkspaceObjectState(object) })),
       ]
       : (this.primaryModel ? [{ model: this.primaryModel, object: null, structure: this.structure }] : []);
-    const matchedSelectionIds = new Set<string>();
     const selectedLocalIdsFor = (objectId: string | null): Set<string> => {
       const local = new Set<string>();
       for (const selectedId of selectedIds) {
@@ -1644,7 +1782,7 @@ export class ThreeDMolViewerAdapter {
           entry.model.setStyle({ predicate: (atom) => typeof atom.properties?.canonicalStableId === "string" && nonSelectedIds.has(atom.properties.canonicalStableId) }, selectionDeemphasisStyleFor(entryProjection), true);
         }
       }
-      const overlayGroups = new Map<RenderProjection["representation"], string[]>();
+      const overlayGroups = new Map<RenderProjection["representation"], Set<string>>();
       for (const atom of entry.structure.atoms) {
         if (!matchingLocalIds.has(atom.stableId)) continue;
         // A topology selection must never promote a polymer atom into a
@@ -1653,10 +1791,11 @@ export class ThreeDMolViewerAdapter {
         const representation = (entryProjection.representation === "cartoon" || entryProjection.representation === "ribbon" || entryProjection.representation === "trace" || entryProjection.representation === "putty")
           ? atom.isPolymer ? "sticks" : atom.isWater || atom.isIon ? "spheres" : "sticks"
           : entryProjection.representation;
-        overlayGroups.set(representation, [...(overlayGroups.get(representation) ?? []), atom.stableId]);
+        let group = overlayGroups.get(representation);
+        if (!group) { group = new Set(); overlayGroups.set(representation, group); }
+        group.add(atom.stableId);
       }
-      for (const [representation, stableIds] of overlayGroups) {
-        const ids = new Set(stableIds);
+      for (const [representation, ids] of overlayGroups) {
         entry.model.setStyle({ predicate: (atom) => typeof atom.properties?.canonicalStableId === "string" && ids.has(atom.properties.canonicalStableId) }, selectionOverlayStyle(entryProjection, representation), true);
       }
     }
@@ -1669,17 +1808,7 @@ export class ThreeDMolViewerAdapter {
       this.container.dataset.selectionDeemphasis = matchedSelectionIds.size ? "active" : "none";
       this.container.dataset.selectionDeemphasisOpacity = matchedSelectionIds.size && !isCartoonFamily(projection.representation) ? "0.46" : "1";
     }
-    const workspaceAtoms = this.workspaceObjects.length ? this.workspaceObjects.flatMap((object) => object.enabled ? structureForWorkspaceObjectState(object).atoms.map((atom) => ({ ...atom, stableId: workspaceScopedStableAtomId(object.objectId, atom.stableId) })) : []) : this.structure.atoms;
-    const addMarker = (stableId: string, color: string, radius: number, wireframe: boolean, opacity: number) => {
-      const atoms = workspaceAtoms.filter((candidate) => candidate.stableId === stableId || candidate.stableId.endsWith(`::${stableId}`));
-      for (const atom of atoms) this.interactionShapes.push(this.viewer!.addSphere({ center: atom, radius, color, wireframe, opacity }));
-    };
-    if (pickedId) addMarker(pickedId, "#e5ae32", 0.28, true, 0.8);
-    if (matchedSelectionIds.size === 1) {
-      const selectedAtom = workspaceAtoms.find((candidate) => matchedSelectionIds.has(candidate.stableId) || [...matchedSelectionIds].some((id) => id.endsWith(`::${candidate.stableId}`)));
-      if (selectedAtom) this.interactionShapes.push(this.viewer.addSphere({ center: selectedAtom, radius: 0.34, color: "#55d9ff", wireframe: true, opacity: 0.88 }));
-    }
-    for (const measurementId of projection.interaction.measurementPickAtomIds) addMarker(measurementId, "#f5c451", 0.23, true, 0.95);
+    return matchedSelectionIds;
   }
 
   private projectSurfaceSelectionEmphasis(active: boolean): void {

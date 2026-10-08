@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "label": "after-3.4",
+  "date": "2026-10-08T14:28:48.728Z",
+  "fixture": "4V6F",
+  "loadMs": 46627.5,
+  "atoms": 307345,
+  "heapAfterLoadMb": 1203.5,
+  "selectChainAMs": 30959.09999999404,
+  "colorRedChainAMs": 17247.69999998808,
+  "hoverMs": {
+    "n": 50,
+    "min": 35,
+    "median": 46.6000000089407,
+    "p95": 49.3999999910593,
+    "max": 53.599999994039536,
+    "mean": 46.43799999982119
+  },
+  "hoverDwellMs": {
+    "n": 20,
+    "min": 816.3000000119209,
+    "median": 4974.79999999702,
+    "p95": 5740.29999999702,
+    "max": 5740.29999999702,
+    "mean": 4473.150000000745
+  },
+  "hoverRenders": {
+    "distinctHoveredAtoms": 18,
+    "dwellMoves": 20,
+    "commits": 0,
+    "componentRenders": 0,
+    "perComponent": {},
+    "componentRendersMinusIdle": 0
+  },
+  "idleRenders": {
+    "commits": 0,
+    "componentRenders": 0
+  },
+  "hoverJsonStringify": {
+    "calls": 4,
+    "chars": 60,
+    "largeCalls": 0
+  },
+  "drag": {
+    "durationMs": 5000,
+    "steps": 3,
+    "stepMs": {
+      "n": 3,
+      "min": 1791.5,
+      "median": 1929.5,
+      "p95": 2747.7999999970198,
+      "max": 2747.7999999970198,
+      "mean": 2156.2666666656733
+    },
+    "longTaskCount": 3,
+    "maxLongTaskMs": 2689,
+    "hoverStateChanges": 0,
+    "reactCommits": 0
+  },
+  "tabSwitchMs": {
+    "n": 10,
+    "min": 1126.2999999970198,
+    "median": 1786.800000011921,
+    "p95": 14859.79999999702,
+    "max": 14859.79999999702,
+    "mean": 2815.090000002086
+  },
+  "viewerStateAfterTabs": "loaded",
+  "heapEndMb": 1015.2
+}
