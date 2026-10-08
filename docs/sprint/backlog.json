@@ -55,8 +55,9 @@
       "done": "The bundle verifies, both files are visible in Drive, and you can name the restore command.",
       "refs": [],
       "est": "1 hour",
-      "status": "TODO",
-      "when": "Day 1"
+      "status": "DONE",
+      "when": "Day 1",
+      "note": "Day 0 2026-10-08"
     },
     {
       "id": "0.2",
@@ -76,8 +77,9 @@
         "R2"
       ],
       "est": "30 minutes",
-      "status": "TODO",
-      "when": "Day 1"
+      "status": "DONE",
+      "when": "Day 1",
+      "note": "Day 0 2026-10-08"
     },
     {
       "id": "0.3",
@@ -96,8 +98,9 @@
         "R3"
       ],
       "est": "1 hour",
-      "status": "TODO",
-      "when": "Day 1"
+      "status": "DONE",
+      "when": "Day 1",
+      "note": "Day 0 2026-10-08"
     },
     {
       "id": "0.4",
@@ -116,8 +119,9 @@
         "R4"
       ],
       "est": "15 minutes",
-      "status": "TODO",
-      "when": "Day 1"
+      "status": "BLOCKED",
+      "when": "Day 1",
+      "note": "main updated locally (+38); push denied: GitHub login on this laptop has no write access - owner must re-authenticate"
     },
     {
       "id": "0.5",
@@ -136,8 +140,9 @@
         "R5"
       ],
       "est": "Half a day",
-      "status": "TODO",
-      "when": "Day 1"
+      "status": "DONE",
+      "when": "Day 1",
+      "note": "Day 0 2026-10-08"
     },
     {
       "id": "0.6",
@@ -171,7 +176,8 @@
         "R4"
       ],
       "est": "1 hour",
-      "status": "TODO"
+      "status": "DONE",
+      "note": "Day 0 2026-10-08"
     },
     {
       "id": "0.7",
