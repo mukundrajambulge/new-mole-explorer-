@@ -54,6 +54,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/guard-bash.mjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/guard-git.mjs"
           }
         ]
       }

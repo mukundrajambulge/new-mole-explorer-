@@ -1,5 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { dirname } from "node:path";
+import { SESSION_REVISION_ID_PATTERN, SOURCE_ARTIFACT_ID_PATTERN, safeJoin } from "./safeJoin.js";
 import { randomUUID } from "node:crypto";
 import type {
   JsonRecord,
@@ -145,6 +146,8 @@ const validateDraft = (draft: SessionDraft): void => {
   for (const object of draft.objects) {
     if (!object.objectId || objectIds.has(object.objectId)) throw new IngestionError("NAME_COLLISION", `Session object identity ${object.objectId || "<empty>"} is duplicated.`);
     objectIds.add(object.objectId);
+    const artifact = object.loadResult?.sourceArtifact;
+    if (artifact?.rawStorageRef !== undefined && (!SOURCE_ARTIFACT_ID_PATTERN.test(String(artifact.sourceArtifactId)) || artifact.rawStorageRef !== `source-artifacts/${artifact.sourceArtifactId}.bin`)) throw new IngestionError("INVALID_INPUT", "The source artifact reference is invalid.");
     if (!object.loadResult?.structure?.scientificHash || !object.scientificRevisionId) throw new IngestionError("PROJECT_INVALID", `Session object ${object.objectId} has no scientific revision reference.`);
     if (!object.stateOrder.length || !object.stateOrder.includes(object.currentStateId)) throw new IngestionError("PROJECT_INVALID", `Session object ${object.objectId} has an invalid coordinate state reference.`);
   }
@@ -199,13 +202,16 @@ export class SessionStore {
   private readonly sessionsDir: string;
 
   constructor(private readonly rootDir: string, private readonly sourceArtifacts = new SourceArtifactStore(rootDir)) {
-    this.sessionsDir = join(rootDir, "sessions");
+    this.sessionsDir = safeJoin(rootDir, "sessions");
   }
 
-  private sessionDir(id: string): string { return join(this.sessionsDir, safeSessionId(id)); }
-  private indexPath(id: string): string { return join(this.sessionDir(id), "index.json"); }
-  private revisionPath(id: string, revisionId: string): string { return join(this.sessionDir(id), "revisions", `${revisionId}.json`); }
-  private legacyPath(id: string): string { return join(this.rootDir, `${safeSessionId(id)}.json`); }
+  private sessionDir(id: string): string { return safeJoin(this.sessionsDir, safeSessionId(id)); }
+  private indexPath(id: string): string { return safeJoin(this.sessionDir(id), "index.json"); }
+  private revisionPath(id: string, revisionId: string): string {
+    if (!SESSION_REVISION_ID_PATTERN.test(revisionId)) throw new IngestionError("INVALID_INPUT", "The session revision ID is invalid.");
+    return safeJoin(this.sessionDir(id), "revisions", `${revisionId}.json`);
+  }
+  private legacyPath(id: string): string { return safeJoin(this.rootDir, `${safeSessionId(id)}.json`); }
 
   private async atomicWrite(path: string, content: string): Promise<void> {
     await mkdir(dirname(path), { recursive: true });
@@ -255,6 +261,7 @@ export class SessionStore {
   async open(id: string, revisionId?: string): Promise<ProjectRecord> {
     const index = await this.ensureMigrated(id);
     const selectedRevisionId = revisionId?.trim() || index.currentHeadRevisionId;
+    if (!SESSION_REVISION_ID_PATTERN.test(selectedRevisionId)) throw new IngestionError("INVALID_INPUT", "The session revision ID is invalid.");
     const manifest = await this.readManifest(id, selectedRevisionId);
     let restoreStatus: RestoreStatus = "EXACT_RESTORED";
     for (const object of manifest.objects) {
@@ -269,6 +276,7 @@ export class SessionStore {
       try {
         await this.sourceArtifacts.verify(artifact);
       } catch (error) {
+        if (error instanceof IngestionError) throw error;
         const message = error instanceof Error ? error.message : "A source artifact failed integrity verification.";
         if (manifest.dependencyMode === "SELF_CONTAINED" || !message.includes("is not available locally")) throw new IngestionError("INTEGRITY_MISMATCH", message);
         restoreStatus = "DEGRADED_RESTORED";
@@ -301,7 +309,7 @@ export class SessionStore {
     const index = await this.ensureMigrated(id);
     const { readdir } = await import("node:fs/promises");
     let names: string[] = [];
-    try { names = await readdir(join(this.sessionDir(id), "revisions")); } catch { return []; }
+    try { names = await readdir(safeJoin(this.sessionDir(id), "revisions")); } catch { return []; }
     const revisions = await Promise.all(names.filter((name) => name.endsWith(".json")).map(async (name) => {
       const manifest = await this.readManifest(id, name.slice(0, -5));
       return { sessionRevisionId: manifest.sessionRevisionId, parentSessionRevisionIds: manifest.parentSessionRevisionIds, savedAt: manifest.savedAt, revisionType: manifest.revisionType, name: manifest.name } satisfies SessionRevisionSummary;
@@ -325,7 +333,7 @@ export class SessionStore {
       const index: SessionIndex = { sessionFormatVersion: 2, sessionId: id, name: legacy.name || "Untitled Project", createdAt: legacy.createdAt || now, updatedAt: legacy.updatedAt || now, revision: Math.max(1, legacy.revision || 1), currentHeadRevisionId: `session-revision-migration-${randomUUID()}` };
       const draft = { ...defaultDraft(id, index.name, legacy.structure, legacy.presentation), dependencyMode: legacy.structure?.sourceArtifact ? "SELF_CONTAINED" as const : "REFERENCED" as const };
       const manifest = sealManifest(draft, index, index.currentHeadRevisionId, [], now, "MIGRATION");
-      manifest.migrationHistory = [{ fromSessionFormatVersion: 1, toSessionFormatVersion: 2, migratedAt: now, sourceFile: this.legacyPath(id) }];
+      manifest.migrationHistory = [{ fromSessionFormatVersion: 1, toSessionFormatVersion: 2, migratedAt: now, sourceFile: `${safeSessionId(id)}.json` }];
       manifest.restoreMetadata = { status: "EXACT_RESTORED", migration: "v1-to-v2", openedFromRevisionId: manifest.sessionRevisionId };
       manifest.integrity.manifestSha256 = sha256Canonical(manifestBasis(manifest));
       await this.atomicWrite(this.revisionPath(id, manifest.sessionRevisionId), JSON.stringify(manifest, null, 2));

@@ -13,7 +13,8 @@ const smoke = argv.includes("--smoke");
 const [wave, base, ...branches] = argv.filter((a) => a !== "--smoke");
 if (!wave || !base) { console.error("usage: integrate.mjs <wave> <base> <branch...> [--smoke]"); process.exit(2); }
 const INTEG = `sprint/${wave}/integration`;
-const dir = resolve("..", `mw-integration-${wave}`);
+// Inside the repo (git-ignored), so integration worktrees never clutter the Desktop.
+const dir = resolve(".claude", "worktrees", `integration-${wave}`);
 const sh = (cmd, args, cwd = dir) => spawnSync(cmd, args, { cwd, encoding: "utf8", shell: process.platform === "win32", maxBuffer: 64 * 1024 * 1024 });
 const git = (...a) => sh("git", a);
 const lines = (r) => `${r.stdout || ""}${r.stderr || ""}`.split(/\r?\n/);
