@@ -1,12 +1,12 @@
 # Sprint state (generated: do not edit; run `node scripts/sprint/sprint.mjs state`)
 
-Status: DONE: 5 · BLOCKED: 1 · TODO: 81 · DEFERRED: 8
-Done by tier: core 5/45 · strong 0/35 · stretch 0/7
+Status: DONE: 6 · TODO: 81 · DEFERRED: 8
+Done by tier: core 6/45 · strong 0/35 · stretch 0/7
 Calibration: not yet (next wave is a calibration wave); estimate multiplier 1
 Last waves: none
 
 ## Needs the owner
-- 0.4 Bring main up to date: BLOCKED (main updated locally (+38); push denied: GitHub login on this laptop has no write access - owner must re-authenticate)
+- nothing
 
 ## Next ready tasks (critical path first)
 - ★ 0.7 [L1 S/low] Stop tests from writing into tracked folders
