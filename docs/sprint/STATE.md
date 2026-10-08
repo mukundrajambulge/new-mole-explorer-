@@ -1,11 +1,12 @@
 # Sprint state (generated: do not edit; run `node scripts/sprint/sprint.mjs state`)
 
-Status: DONE: 22 · TODO: 66 · READY: 1 · BLOCKED: 1 · DEFERRED: 8
+Status: DONE: 22 · TODO: 65 · READY: 1 · NEEDS_OWNER: 1 · BLOCKED: 1 · DEFERRED: 8
 Done by tier: core 22/45 · strong 0/38 · stretch 0/7
-Calibration: 7516 output tokens per 1% of the 5-hour window; estimate multiplier 1.07
-Last waves: W2 157k (38%→56%), W3 241k (6%→34%), W4 131k (3%→28%)
+Calibration: 7348 output tokens per 1% of the 5-hour window; estimate multiplier 1.13
+Last waves: W3 241k (6%→34%), W4 131k (3%→28%), W6 336k (3%→44%)
 
 ## Needs the owner
+- 4.1 Build and test the C++ in CI: NEEDS_OWNER (W6 BLOCKED: needs real CI runs on Windows MSVC and macOS clang (push the branch); agent wanted to drop /WX (denied). Owner: push sprint/W6/4.1 to see CI logs)
 - 4.4 Send numbers over JSON correctly: BLOCKED (Waits for 5.2: box seal must take {jobId, bounds} from a real prep job (see design note))
 
 ## Next ready tasks (critical path first)
