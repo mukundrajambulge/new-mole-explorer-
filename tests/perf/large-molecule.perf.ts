@@ -6,7 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const candidates = [process.env.PERF_4V6F, "tests/fixtures/rcsb/4V6F.cif", "verification/large-molecule-4v6f/01-source/4v6f.cif"].filter(Boolean) as string[];
+const candidates = [process.env.PERF_4V6F, "tests/fixtures/rcsb/4V6F.cif"].filter(Boolean) as string[];
 const fixture = candidates.map((p) => resolve(p)).find((p) => existsSync(p));
 const label = process.env.PERF_LABEL ?? "baseline";
 
@@ -30,7 +30,7 @@ const timed = async (page: Page, fn: () => Promise<unknown>) => {
 };
 
 test("4V6F performance baseline", async ({ page }) => {
-  test.skip(!fixture, "4V6F not available (set PERF_4V6F or run the fixture fetch script)");
+  if (!fixture) throw new Error("4V6F fixture missing: set PERF_4V6F or place it at tests/fixtures/rcsb/4V6F.cif");
   const results: Record<string, unknown> = { schemaVersion: 1, label, date: new Date().toISOString(), fixture: "4V6F" };
   await page.setViewportSize({ width: 1600, height: 900 });
   await page.goto("/");
@@ -67,13 +67,14 @@ test("4V6F performance baseline", async ({ page }) => {
   results.hoverMs = stats(hover);
 
   // 10 tab switches between rail panels.
-  const names = ["Select panel", "Objects"];
+  const names = ["Display panel", "Analyze panel"];
   const tabs: number[] = [];
   for (let i = 0; i < 10; i++) {
-    const btn = page.getByRole("button", { name: names[i % 2] }).first();
-    if (!(await btn.count())) continue;
+    const btn = page.getByRole("button", { name: names[i % 2], exact: true });
+    await expect(btn).toBeVisible();
     tabs.push(await timed(page, () => btn.click()));
   }
+  expect(tabs).toHaveLength(10);
   results.tabSwitchMs = stats(tabs);
   results.viewerStateAfterTabs = await viewer.getAttribute("data-viewer-state");
   results.heapEndMb = await heapMb(page);
