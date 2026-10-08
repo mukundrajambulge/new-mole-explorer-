@@ -40,6 +40,7 @@ import { unsafeConsoleDiagnostic } from "./commands/safeBoundary";
 import { dispatchUiCommand } from "./commands/uiDispatcher";
 import { tokenizeCommandBatch } from "./commands/batchTokenizer";
 import { copyWorkspaceObject, createWorkspaceGroup, createWorkspaceObject, createWorkspaceObjectFromSelection, cycleWorkspaceObjectState, joinWorkspaceObjectStates, renameWorkspaceObject, resolveGlobalFrameState, setWorkspaceObjectAllStates, setWorkspaceObjectEnabled, setWorkspaceObjectState, splitWorkspaceObjectStates, structureForWorkspaceObjectState, updateWorkspaceGroup, workspaceScopedStableAtomId, workspaceSelectionStructure, type WorkspaceGroup, type WorkspaceObject } from "./workspace/workspaceModel";
+import { createDirtyTracker, isDirty, trackWorkspaceRevision } from "./workspace/dirtyTracker";
 import { createAddBondCommand, createAddHydrogensCommand, createAttachAtomCommand, createCoordinateEditCommand, createDeleteAtomsCommand, createDeleteBondCommand, createRefillHydrogensCommand, createRemoveHydrogensCommand, createReplaceAtomCommand, createReplaceBondSemanticsCommand, ScientificHistoryService, type ScientificRevision } from "./editing/editFoundation";
 import { buildSessionDraft, restoreSession } from "./lifecycle/sessionCodec";
 import { exportStructure, type ExportArtifact, type ExportFormat, type ExportLossPolicy, type ExportStateScope } from "./lifecycle/export";
@@ -142,7 +143,7 @@ export const App = () => {
   const pendingImportModeRef = useRef<"replace" | "add">("replace");
   const historyServiceRef = useRef(new ScientificHistoryService());
   const sceneStoreRef = useRef(new SceneStore());
-  const savedFingerprintRef = useRef<string | null>(null);
+  const savedRevisionRef = useRef<number | null>(null);
   // The active object's presentation is authoritative in `projection`.
   // Workspace objects keep durable snapshots for inactive objects and are
   // updated by explicit workspace actions; the active overlay below feeds the
@@ -151,26 +152,18 @@ export const App = () => {
   const alignmentOverlays = useMemo(() => overlaysForAlignment(fittingResults), [fittingResults]);
   const viewerWorkspaceObjects = useMemo(() => workspaceObjects.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object), [activeObjectId, projection, workspaceObjects]);
   const activeHistoryState = activeObjectId ? historyServiceRef.current.historyState(activeObjectId) : null;
-  // Selection membership is already content-addressed by the immutable
-  // SelectionResult.  Including every stable AtomUID in this dirty-state
-  // fingerprint made large compact selections needlessly stringify hundreds
-  // of thousands of IDs after every console command.
+  // Dirty tracking: a revision counter bumped during render (same render as the
+  // change) when a saved slice changes by reference.  Hover is excluded inside
+  // trackWorkspaceRevision, so hover never serializes or bumps.
+  const dirtyTrackerRef = useRef(createDirtyTracker());
   const activeSelectionResultId = activeSelection?.resultId;
-  const activeSelectionMembershipHash = activeSelection?.membershipHash;
-  const activeSelectionCount = activeSelection?.count;
-  const activeSelectionMolecularRevision = activeSelection?.molecularRevision;
-  const workspaceFingerprint = useMemo(() => {
-    const activeSelectionFingerprint = activeSelectionResultId !== undefined
-      ? { resultId: activeSelectionResultId, membershipHash: activeSelectionMembershipHash, count: activeSelectionCount, molecularRevision: activeSelectionMolecularRevision }
-      : null;
-    return JSON.stringify({ workspaceObjects, workspaceGroups, activeObjectId, globalFrameIndex, coordinateFramePolicy, activeSelection: activeSelectionFingerprint, namedSelections, measurements, analysisResults, fittingResults, sceneCollection, projection, biologicalData });
-  }, [activeObjectId, activeSelectionCount, activeSelectionMembershipHash, activeSelectionMolecularRevision, activeSelectionResultId, analysisResults, biologicalData, coordinateFramePolicy, fittingResults, globalFrameIndex, measurements, namedSelections, projection, sceneCollection, workspaceGroups, workspaceObjects]);
+  const workspaceRevision = trackWorkspaceRevision(dirtyTrackerRef.current, projection as never, [activeObjectId, activeSelectionResultId, analysisResults, biologicalData, coordinateFramePolicy, fittingResults, globalFrameIndex, measurements, namedSelections, sceneCollection, workspaceGroups, workspaceObjects]);
 
   useEffect(() => {
     if (!project) return;
-    if (savedFingerprintRef.current === null) { savedFingerprintRef.current = workspaceFingerprint; return; }
-    if (savedFingerprintRef.current !== workspaceFingerprint) setDirty(true);
-  }, [project, workspaceFingerprint]);
+    if (savedRevisionRef.current === null) { savedRevisionRef.current = workspaceRevision; return; }
+    if (isDirty(workspaceRevision, savedRevisionRef.current)) setDirty(true);
+  }, [project, workspaceRevision]);
 
   const presentationSelectionContext = (): SelectionPresentationContext | undefined => {
     if (!viewerWorkspaceObjects.length) return undefined;
@@ -661,7 +654,7 @@ export const App = () => {
     try {
       const created = await apiClient.createProject();
       setProject(created);
-      savedFingerprintRef.current = null;
+      savedRevisionRef.current = null;
       setDirty(false);
       sceneStoreRef.current = new SceneStore();
       setSceneCollection(sceneStoreRef.current.value);
@@ -726,7 +719,7 @@ export const App = () => {
       sceneStoreRef.current = new SceneStore(opened.session?.sceneCollection);
       setSceneCollection(sceneStoreRef.current.value);
       setProject(opened);
-      savedFingerprintRef.current = null;
+      savedRevisionRef.current = null;
       setDirty(false);
       setLoadError(null);
       setLoadState("idle");
@@ -743,7 +736,7 @@ export const App = () => {
       const draft = buildSessionDraft({ project: target, workspaceObjects: workspaceForSave, workspaceGroups: workspaceGroupsRef.current, activeObjectId, globalFrameIndex, coordinateFramePolicy, activeSelection: activeSelectionResultRef.current, namedSelectionStore: namedSelectionsRef.current, measurements, analysisResults, fittingResults, sceneStore: sceneStoreRef.current, history: historyServiceRef.current, projection });
       const saved = await apiClient.saveProject(target.id, { name: target.name, structure: structure ?? null, presentation: toProjectPresentation(projection), session: draft, expectedRevision: project ? project.revision : target.revision });
       setProject(saved);
-      savedFingerprintRef.current = workspaceFingerprint;
+      savedRevisionRef.current = workspaceRevision;
       setDirty(false);
       setLoadError(null);
       setLoadState("idle");
