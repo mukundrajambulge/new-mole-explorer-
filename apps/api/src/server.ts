@@ -1,6 +1,6 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { randomBytes, timingSafeEqual } from "node:crypto";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -323,6 +323,8 @@ export const server = createServer((request, response) => {
 export const startServer = (port = config.port, host = config.host) =>
   new Promise<void>((resolve) => {
     if (config.mode === "local") issueLocalToken();
+    // Partial uploads from a previous crash are never resumed.
+    rmSync(uploadTempDir, { recursive: true, force: true });
     server.listen(port, host, () => {
       console.log(`Molecular API (${config.mode}) listening on http://${host}:${port}`);
       resolve();

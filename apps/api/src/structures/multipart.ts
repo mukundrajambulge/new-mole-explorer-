@@ -27,7 +27,7 @@ export const consumeRequest = (request: IncomingMessage, onChunk: (chunk: Buffer
     const cleanup = () => {
       request.off("data", onData);
       request.off("end", onEnd);
-      request.off("error", fail);
+      request.off("error", onError);
       request.off("close", onClose);
     };
     const fail = (error: unknown) => {
@@ -63,10 +63,12 @@ export const consumeRequest = (request: IncomingMessage, onChunk: (chunk: Buffer
         resolve();
       });
     };
-    const onClose = () => { if (!ended) fail(invalid("The request body was incomplete.")); };
+    // A client that disconnects mid-body is a bad request, not a server fault.
+    const onError = () => fail(invalid("The request body was incomplete."));
+    const onClose = () => { if (!ended) onError(); };
     request.on("data", onData);
     request.on("end", onEnd);
-    request.on("error", fail);
+    request.on("error", onError);
     request.on("close", onClose);
   });
 

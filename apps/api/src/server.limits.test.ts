@@ -101,10 +101,10 @@ describe("request size limits", () => {
   it("allows project saves up to the larger 64 MB cap", async () => {
     const created = await send({ method: "POST", path: "/api/projects", headers: { "content-type": "application/json" }, head: Buffer.from("{}") }).reply;
     const id = (JSON.parse(created.body) as { id: string }).id;
-    const body = Buffer.from(JSON.stringify({ pad: "x".repeat(9 * MIB) }));
-    const saved = await send({ method: "PUT", path: `/api/projects/${encodeURIComponent(id)}`, headers: { "content-type": "application/json" }, head: body }).reply;
-    expect(saved.status).not.toBe(413);
-    expect(saved.status).toBeLessThan(500);
+    // 9 MB of unterminated JSON: past the size gate, so the parser (not the cap) rejects it.
+    const saved = await send({ method: "PUT", path: `/api/projects/${encodeURIComponent(id)}`, headers: { "content-type": "application/json" }, head: Buffer.from("{\"pad\":\""), bodyBytes: 9 * MIB, fill: 0x78 }).reply;
+    expect(saved.status).toBe(400);
+    expect(code(saved)).toBe("INVALID_INPUT");
     const huge = await send({ method: "PUT", path: `/api/projects/${encodeURIComponent(id)}`, headers: { "content-type": "application/json" }, bodyBytes: 65 * MIB }).reply;
     expect(huge.status).toBe(413);
   }, 30_000);
