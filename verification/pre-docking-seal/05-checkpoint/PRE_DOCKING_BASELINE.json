@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "checkpoint": "pre-docking-upstream-core",
+  "sealBranch": "seal/pre-docking-pymol-core-2026-09-19",
+  "testedSourceSha": "28a8dca64a4711ca4b9e00e13e19601e56404709",
+  "plannedTag": "mole-explorer-pre-docking-core-2026-09-19",
+  "startingBranch": "fix/lm-imp-001-canonical-large-ingestion",
+  "startingSha": "1b44780c214e83c4d864bb94ecd49132d59b09c3",
+  "remote": "https://github.com/mukundrajambulge/new-mole-explorer-.git",
+  "acceptance": {
+    "unitAndApi": "215/215",
+    "e2e": "147/147",
+    "selectionMatrix": "PASS",
+    "r10": "PASS",
+    "apiHealth": "PASS",
+    "webShell": "PASS",
+    "molstudio": "PASS",
+    "large4v6fSmoke": "PASS",
+    "pymolOracle": "BLOCKED_ENVIRONMENT",
+    "af001": "PERFORMANCE_CONCERN_SEMANTICALLY_CORRECT"
+  },
+  "fixtureBoundary": {
+    "path": "verification/large-molecule-4v6f/01-source/4v6f.cif",
+    "sha256": "a48b6f9865ed1dff0e45d1992b9d20633582de6675c16d0b9a4abc75d595e56f",
+    "committed": false,
+    "reason": "Preserve the accepted user-owned frozen fixture outside the scoped core commit."
+  },
+  "dockingExecution": "NOT_STARTED"
+}
