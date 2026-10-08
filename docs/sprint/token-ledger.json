@@ -1,0 +1,15 @@
+{
+  "waves": [
+    {
+      "wave": "W1",
+      "spent": 85693,
+      "est": 165050,
+      "windowBefore": 21,
+      "windowAfter": 31
+    }
+  ],
+  "calibration": {
+    "tokensPerWindowPct": 8569,
+    "estMultiplier": 0.52
+  }
+}

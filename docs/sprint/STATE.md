@@ -2,8 +2,8 @@
 
 Status: DONE: 8 · TODO: 77 · NEEDS_OWNER: 2 · DEFERRED: 8
 Done by tier: core 8/45 · strong 0/35 · stretch 0/7
-Calibration: not yet (next wave is a calibration wave); estimate multiplier 1
-Last waves: none
+Calibration: 8569 output tokens per 1% of the 5-hour window; estimate multiplier 0.52
+Last waves: W1 86k (21%→31%)
 
 ## Needs the owner
 - 3.2 Replace the JSON fingerprint with revision counters: NEEDS_OWNER (W1: dirtyTracker + unit tests pass; needs 4V6F perf run proving hover does no JSON.stringify in App (fixture missing in agent worktree; fetch via scripts/fetch-fixtures.mjs).)
