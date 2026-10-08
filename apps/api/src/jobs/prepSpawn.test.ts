@@ -7,7 +7,24 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 // Unit tests for tools/mole-dock/prep.mjs (task 5.2): the only spawn path for the prep worker.
 // No WSL needed: argv construction is checked structurally and the runner is exercised with node itself.
-type Mod = Record<string, any>;
+interface RunResult {
+  status: string;
+  exitCode: number | null;
+  stdout: string;
+  stderr: string;
+}
+interface Invocation {
+  command: string;
+  args: string[];
+  options: { cwd: string; shell: boolean; env: Record<string, string> };
+}
+interface Mod {
+  buildPrepInvocation(o: { mode: string; jobDir: string; python: string; platform?: string }): Invocation;
+  toWslPath(p: string): string;
+  scrubOutput(text: string, cap: number, extra: string[]): string;
+  runProcess(inv: { command: string; args: string[]; options: object; scrub: string[] }, o: { timeoutMs: number }): Promise<RunResult>;
+  runPrep(o: { mode: string; jobDir: string }): Promise<RunResult>;
+}
 const modUrl = pathToFileURL(resolve(dirname(fileURLToPath(import.meta.url)),"../../../../tools/mole-dock/prep.mjs")).href;
 const load = async (): Promise<Mod> => (await import(modUrl)) as Mod;
 
@@ -72,7 +89,12 @@ describe("mole-dock prep spawn wrapper", () => {
       expect(man.outputs.length).toBe(6);
       expect(a.stderr).not.toContain(job);
     } finally {
-      rmSync(job, { recursive: true, force: true });
+      // Files written through WSL drvfs can stay locked briefly on Windows; a leaked temp dir is harmless.
+      try {
+        rmSync(job, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 });
+      } catch {
+        /* ignore */
+      }
     }
   }, 120_000);
 

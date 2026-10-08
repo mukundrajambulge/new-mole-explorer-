@@ -10,3 +10,11 @@ Regenerate (WSL Ubuntu-24.04, repo root, needs network): `bash scripts/lock-prep
 
 Install: `scripts/wsl-setup.sh` creates `~/mole-prep` with `pip install --require-hashes -r requirements.lock.txt`.
 Tests: `node scripts/sprint/check.mjs --python` (lock completeness, pins vs TOOLS.md, Vina sha256, imports).
+
+## Worker CLI (task 5.2, profile ME_PREP_INTERIM_V0)
+Spawned only by `tools/mole-dock/prep.mjs` (argv, no shell, `env -i`, cwd = job dir, 120 s timeout, tree kill):
+`python -I workers/prep/run_prep.py --plan` reads `job.json` and writes `plan.json` (every choice with before/after
+atom counts, `planDigest = sha256(canonical plan JSON || lock digest)`); `--apply` re-runs the plan, checks the
+`confirmation.json` digest and acks, and writes `out/*` plus `prep-manifest.json`. Exit 0 ok, 3 BLOCKED, 2 bad job, 1 internal.
+Defaults keep submitted protonation; PROPKA (receptor), Dimorphite-DL (ligand) and Meeko template hydrogens mark the
+result PREVIEW_UNQUALIFIED. PDB ligands need a SMILES bond-order template, otherwise BLOCKED (MISSING_BOND_ORDERS).
