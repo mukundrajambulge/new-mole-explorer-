@@ -29,6 +29,11 @@ const merged = [], deferred = [];
 for (const b of branches) {
   const m = git("merge", "--no-ff", "--no-edit", b);
   if (m.status !== 0) { git("merge", "--abort"); deferred.push({ branch: b, reason: "merge conflict" }); continue; }
+  // A branch that adds dependencies needs a fresh install before its checks can load them.
+  if (git("diff", "--quiet", "HEAD~1", "HEAD", "--", "package-lock.json").status !== 0) {
+    const reinstall = sh("npm", ["ci", "--no-audit", "--no-fund", "--loglevel=error"]);
+    if (reinstall.status !== 0) { git("reset", "--hard", "HEAD~1"); sh("npm", ["ci", "--no-audit", "--no-fund", "--loglevel=error"]); deferred.push({ branch: b, reason: "npm ci failed after merge" }); continue; }
+  }
   const c = sh("node", ["scripts/sprint/check.mjs", "--quick"]);
   if (c.status !== 0) {
     git("reset", "--hard", "HEAD~1"); // only ever on the integration branch inside its own worktree
