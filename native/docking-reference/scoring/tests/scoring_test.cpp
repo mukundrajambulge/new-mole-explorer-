@@ -372,7 +372,24 @@ void test_profile_site_and_provenance_rejection() {
 
 }  // namespace
 
+void test_halogen_element_case() {
+  const char* spellings[][2] = {{"Cl", "CL"}, {"Br", "BR"}, {"I", "I"}};
+  const char* types[] = {"Cl_H", "Br_H", "I_H"};
+  for (int i = 0; i < 3; ++i) {
+    for (const char* sp : spellings[i]) {
+      const auto a = mole::docking::assign_xs_type({sp, std::nullopt, false, false});
+      require(a.status == mole::docking::TypingStatus::Supported && a.type_id == types[i],
+              "halogen element spelling is case-insensitive");
+      Request request = base_request();
+      request.receptor_atoms = {atom("r1", "C_H", "C", Vec3{0.0, 0.0, 0.0}, 0)};
+      request.ligand_atoms = {atom("l1", types[i], sp, Vec3{4.0, 0.0, 0.0}, 0)};
+      require(mole::docking::score_direct(request).valid, "halogen ligand scores with any element case");
+    }
+  }
+}
+
 int main() {
+  test_halogen_element_case();
   test_xs_type_table();
   test_independent_pair_oracle_and_decomposition();
   test_hydrophobic_piecewise_and_cutoff();
