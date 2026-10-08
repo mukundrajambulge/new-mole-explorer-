@@ -1049,7 +1049,9 @@
         "C10"
       ],
       "est": "1 hour",
-      "status": "TODO"
+      "status": "NEEDS_OWNER",
+      "branch": "sprint/W7/2.8",
+      "note": "Science decision: task says a -0 box must get the same digest as a 0 box, but d1Contracts.test.ts:77 asserts CoordinateStateDigest(+0) != (-0). Owner: should -0 normalise to 0 for geometry digests only, or everywhere? Also combineSelections still hashes unsorted ids"
     },
     {
       "id": "2.9",
@@ -1489,7 +1491,8 @@
         "F8"
       ],
       "est": "1 day",
-      "status": "TODO"
+      "status": "DONE",
+      "note": "Merged; tab-switch perf on merged code: 30 switches on 4V6F, same canvas, no reload, sized, lit pixels"
     },
     {
       "id": "3.9",
@@ -2406,7 +2409,8 @@
         "F12"
       ],
       "est": "1.5 weeks",
-      "status": "TODO"
+      "status": "DONE",
+      "note": "Merged; docking-wizard-mock e2e passes (17 s). Follow-up: removing DockingInputsPanel dropped the e2e that SearchRegion commit is blocked without explicit D2 prepared states - restore that coverage in the wizard (5.7b)"
     },
     {
       "id": "5.7b",
