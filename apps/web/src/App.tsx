@@ -91,8 +91,9 @@ const initialRibbonCategory = (): RibbonCategory => {
 };
 
 const ViewerSlot = ({ host, overlay, publish }: { host: HTMLElement; overlay: SearchRegionOverlay | null; publish?: (overlay: SearchRegionOverlay | null) => void }) => {
+  // Resize after a move is handled by the ResizeObserver on .viewer-host (MolecularCanvas), which fires after layout.
   const slotRef = useRef<HTMLDivElement>(null);
-  useLayoutEffect(() => { slotRef.current?.appendChild(host); window.dispatchEvent(new Event("resize")); return () => { if (host.parentNode === slotRef.current) host.remove(); }; }, [host]);
+  useLayoutEffect(() => { slotRef.current?.appendChild(host); return () => { if (host.parentNode === slotRef.current) host.remove(); }; }, [host]);
   useEffect(() => { publish?.(overlay); }, [overlay, publish]);
   return <div ref={slotRef} style={{ display: "contents" }} />;
 };

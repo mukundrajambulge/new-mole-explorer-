@@ -1,11 +1,9 @@
 // 3.8: one persistent viewer. 30 Molecular/Docking switches on 4V6F: same canvas element, no reload,
 // context alive, canvas sized, and pixels not blank after every switch.
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-// tests/fixtures/rcsb/4V6F.* is gitignored (38 MB); fresh worktrees fall back to the tracked copy.
-const fixture = [process.env.PERF_4V6F ?? "", "tests/fixtures/rcsb/4V6F.cif", "verification/large-molecule-4v6f/01-source/4v6f.cif"].filter(Boolean).map((p) => resolve(p)).find((p) => existsSync(p)) ?? resolve("tests/fixtures/rcsb/4V6F.cif");
+const fixture = resolve("tests/fixtures/rcsb/4V6F.cif");
 
 // Screenshot the viewer (composited output, independent of preserveDrawingBuffer) and count lit pixels.
 const litPixels = async (page: Page, viewer: Locator): Promise<number> => {
@@ -29,17 +27,6 @@ test("4V6F survives 30 tab switches", async ({ page }) => {
   await page.setViewportSize({ width: 1600, height: 900 });
   page.on("console", (m) => { if (m.type() === "error") console.log("PAGE_ERROR", m.text().slice(0, 400)); });
   page.on("pageerror", (e) => console.log("PAGE_EXC", String(e).slice(0, 400)));
-  // The API only allows the :3101 origin; when PERF_WEB_PORT gives this run its own dev server, present :3101.
-  if (process.env.PERF_WEB_PORT && process.env.PERF_WEB_PORT !== "3101") {
-    await page.route("**/api/**", (route) => route.continue({ headers: { ...route.request().headers(), origin: "http://localhost:3101" } }));
-    // Large multipart bodies through this dev server's proxy get reset by the API; send the upload straight to the API.
-    const tokenDir = process.env.MOLE_TOKEN_DIR ?? ".mole";
-    await page.route("**/api/structures/upload", async (route) => {
-      const token = readFileSync(resolve(tokenDir, "token"), "utf8").trim();
-      const response = await route.fetch({ url: "http://localhost:8100/api/structures/upload", headers: { ...route.request().headers(), origin: "http://localhost:3101", host: "localhost:8100", "x-mole-token": token }, postData: route.request().postDataBuffer() ?? undefined, timeout: 300_000 });
-      await route.fulfill({ response });
-    });
-  }
   await page.goto("/");
   const viewer = page.getByTestId("molecular-viewer");
   await page.locator('input[type="file"]').setInputFiles(fixture);
@@ -67,6 +54,12 @@ test("4V6F survives 30 tab switches", async ({ page }) => {
     expect(await litPixels(page, viewer), `non-black canvas after switch ${i + 1}`).toBeGreaterThan(200);
   }
   await page.getByRole("button", { name: "Molecular", exact: true }).first().click();
+  await page.waitForTimeout(250);
+  // Container resize with no window event (panel-collapse case): the host observer must resize the canvas.
+  const before = await page.evaluate(() => (document.querySelector(".viewer-host canvas") as HTMLCanvasElement).clientWidth);
+  await page.evaluate(() => { const h = document.querySelector(".viewer-host") as HTMLElement; h.style.width = "50%"; });
+  await expect.poll(() => page.evaluate(() => { const c = document.querySelector(".viewer-host canvas") as HTMLCanvasElement; return c.clientWidth; }), { timeout: 5000 }).toBeLessThan(before);
+  await page.evaluate(() => { (document.querySelector(".viewer-host") as HTMLElement).style.width = ""; });
   await page.waitForTimeout(250);
   const state = await page.evaluate(() => {
     const w = window as unknown as { __canvas: Element | null; __origin: number };
