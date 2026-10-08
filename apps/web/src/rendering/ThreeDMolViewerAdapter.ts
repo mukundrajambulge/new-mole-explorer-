@@ -16,7 +16,10 @@ import { puttyProfileFor, puttyRadiusForResidue, puttyResidueRadii } from "./put
 import type { AnalysisOverlay } from "../analysis/structuralAnalysis";
 import type { AlignmentOverlay } from "../analysis/alignmentPresentation";
 import { stateForObject, structureForWorkspaceObjectState, workspaceScopedStableAtomId, type WorkspaceObject } from "../workspace/workspaceModel";
+import { hoverStore } from "./hoverStore";
 import { compactAtomSpecContext, compactAtomSpecs, isCompactStructure } from "../structures/compactCanonical";
+
+type HoverSource = { compact: NonNullable<CanonicalMolecularStructure["compact"]> | null; ordinals: ReadonlyMap<string, number> | null; coords: Map<string, { x: number; y: number; z: number }> | null };
 
 const diagnosticTypeForStyle = (style: string): RepresentationType => style === "ribbon" ? "RIBBON" : style === "putty" || style === "trace" || style === "cartoon" ? "CARTOON" : style === "nonbonded-crosses" ? "NONBONDED" : style === "nonbonded-spheres" ? "NB_SPHERES" : style === "line" ? "LINES" : style === "stick" || style === "licorice" || style === "ball-and-stick" ? "STICKS" : "SPHERES";
 
@@ -242,6 +245,9 @@ export class ThreeDMolViewerAdapter {
   private interactionHandlers: ViewerInteractionHandlers = {};
   private measurementShapes: GLShape[] = [];
   private interactionShapes: GLShape[] = [];
+  private hoverShapes: GLShape[] = [];
+  private hoverUnsubscribe: (() => void) | null = null;
+  private hoverSources = new WeakMap<object, Map<string, HoverSource>>();
   private analysisShapes: GLShape[] = [];
   private analysisOverlays: readonly AnalysisOverlay[] = [];
   private alignmentShapes: GLShape[] = [];
@@ -287,6 +293,8 @@ export class ThreeDMolViewerAdapter {
     if (this.viewer) this.destroy();
     this.container = container;
     mountedAdapters.set(container, this);
+    this.hoverUnsubscribe?.();
+    this.hoverUnsubscribe = hoverStore.subscribe(() => this.projectHoverMarker());
     this.viewer = createViewer(container, { backgroundColor: "#05070a", antialias: true, disableFog: true, cartoonQuality: 8 });
     this.cameraController = new CameraController(this.viewer);
     this.performance.viewerCreations += 1;
@@ -405,6 +413,7 @@ export class ThreeDMolViewerAdapter {
     this.viewer!.removeAllModels();
     this.viewer!.removeAllSurfaces();
     this.viewer!.removeAllShapes();
+    this.hoverShapes = [];
     this.surfaceCoordinator.invalidate();
     this.surfaceIds = [];
     this.surfaceKinds = [];
@@ -456,6 +465,8 @@ export class ThreeDMolViewerAdapter {
     } else {
       this.frameToCanonicalBounds(true);
     }
+    if (!objectId) this.prepareHoverIndex();
+    this.drawHoverMarker();
     this.render();
     if (!compactContext || compactContext.atomCount <= previewAtomCount) return Promise.resolve();
     const progressive = this.appendCompactAtomsProgressively(renderModel, compactContext, previewAtomCount, generation).then(() => {
@@ -491,6 +502,8 @@ export class ThreeDMolViewerAdapter {
     this.clearStandaloneSurfaceHandles();
     this.surfaceReadyModels.clear();
     this.renderPrimaryWorkspaceModel();
+    this.prepareHoverIndex();
+    this.drawHoverMarker();
     this.renderAuxiliaryModels();
     this.applyWorkspaceSurfaces(objects);
     this.bindWorkspacePicking();
@@ -557,6 +570,7 @@ export class ThreeDMolViewerAdapter {
     const previousProjection = this.projection;
     this.workspaceObjects = effectiveObjects;
     this.primaryObjectEnabled = effectiveObjects[0]?.enabled ?? true;
+    this.prepareHoverIndex();
     if (objectSceneChanged || modelStateChanged) { this.baselineView = null; this.baselinePivot = null; }
     const interactionCameraChanged = interactionProjection ? cameraProjectionChanged(previousProjection, interactionProjection) : false;
     const interactionBackgroundChanged = interactionProjection ? !previousProjection || previousProjection.background !== interactionProjection.background : false;
@@ -725,11 +739,93 @@ export class ThreeDMolViewerAdapter {
     this.progressiveLoad = null;
     if (this.container && mountedAdapters.get(this.container) === this) mountedAdapters.delete(this.container);
     this.resizeObserver?.disconnect(); this.resizeObserver = null;
-    if (this.viewer) { this.viewer.clear(); this.viewer = null; }
+    this.hoverUnsubscribe?.(); this.hoverUnsubscribe = null; this.hoverShapes = [];
+    if (this.viewer) { this.releaseWebGl(this.viewer); this.viewer = null; }
     this.cameraController = null;
     this.measurementShapes = []; this.interactionShapes = []; this.analysisShapes = []; this.analysisOverlays = []; this.alignmentShapes = []; this.alignmentOverlays = []; this.auxiliaryModels = []; this.workspaceObjects = []; this.workspaceSurfaceHandles.clear(); this.workspaceSurfaceRebuilds.clear(); this.styledModels.clear(); this.surfaceFallbackModels.clear(); this.surfaceReadyModels.clear(); this.primaryModel = null; this.primaryObjectEnabled = true; this.dotSurfaceShapes = []; this.surfaceIds = []; this.surfaceKinds = []; this.surfaceCoordinator.invalidate(); this.activeSurfaceKey = null; this.activeSurfaceGeometryKey = null; this.surfaceCache.clear(); this.measurements = []; this.container?.replaceChildren(); this.container = null; this.hasModel = false; this.rendererAtomCount = 0; this.progressiveStage = "idle"; this.structure = null; this.projection = null; this.cameraState = DEFAULT_CAMERA; this.cameraPivot = null; this.baselineView = null; this.baselinePivot = null; this.autoSlab = paddedClippingSlab(null); this.cameraPan = { x: 0, y: 0 }; this.cameraTargetMetadata = { atoms: 0, models: 0, objects: 0, mode: "none" }; this.lastCameraAction = "NONE"; this.interactionHandlers = {}; this.diagnostics = emptyRenderProjectionDiagnostics();
   }
   getDiagnostics(): RenderProjectionDiagnostics { return this.diagnostics; }
+
+  private hoverSourceFor(object: WorkspaceObject | null): HoverSource | null {
+    const base = object ? object.loadResult.structure : this.structure;
+    if (!base) return null;
+    const stateId = object ? stateForObject(object)?.id ?? "" : "";
+    let byState = this.hoverSources.get(base);
+    if (!byState) { byState = new Map(); this.hoverSources.set(base, byState); }
+    const cached = byState.get(stateId);
+    if (cached) return cached;
+    const structure = object ? this.renderLoadResultForState(object).structure : base;
+    let source: HoverSource;
+    if (structure.compact) source = { compact: structure.compact, ordinals: this.compactAtomOrdinalMapFor(structure), coords: null };
+    else {
+      const coords = new Map<string, { x: number; y: number; z: number }>();
+      for (const atom of structure.atoms) coords.set(atom.stableId, { x: atom.x, y: atom.y, z: atom.z });
+      source = { compact: null, ordinals: null, coords };
+    }
+    byState.set(stateId, source);
+    return source;
+  }
+
+  private hoverLookup(object: WorkspaceObject | null, hoverId: string): { x: number; y: number; z: number } | null {
+    if (object && !object.enabled) return null;
+    const source = this.hoverSourceFor(object);
+    if (!source) return null;
+    const objectId = object?.objectId ?? "";
+    const localId = objectId && hoverId.startsWith(`${objectId}::`) ? hoverId.slice(objectId.length + 2) : hoverId;
+    if (source.compact) {
+      const ordinal = source.ordinals!.get(localId);
+      return ordinal === undefined ? null : { x: source.compact.x[ordinal]!, y: source.compact.y[ordinal]!, z: source.compact.z[ordinal]! };
+    }
+    return source.coords!.get(localId) ?? null;
+  }
+
+  /** Pre-build hover lookups when the scene changes so the hover path does no per-atom work. */
+  private prepareHoverIndex(): void {
+    if (!this.workspaceObjects.length) { this.hoverSourceFor(null); return; }
+    this.hoverSourceFor(this.workspaceObjects[0]!);
+    for (const aux of this.auxiliaryModels) this.hoverSourceFor(aux.object);
+  }
+
+  private hoverCoordinate(hoverId: string): { x: number; y: number; z: number } | null {
+    if (!this.workspaceObjects.length) return this.hoverLookup(null, hoverId);
+    const primary = this.hoverLookup(this.workspaceObjects[0]!, hoverId);
+    if (primary) return primary;
+    for (const aux of this.auxiliaryModels) {
+      const found = this.hoverLookup(aux.object, hoverId);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  // Hover-only redraw: replaces one marker sphere; never re-projects selection.
+  private projectHoverMarker(): void {
+    if (!this.viewer) return;
+    const hadShapes = this.hoverShapes.length > 0;
+    this.drawHoverMarker();
+    if (hadShapes || this.hoverShapes.length) this.render();
+  }
+
+  // Removes any previous marker and redraws it for the current hover id. Also
+  // called after every interaction re-projection so the marker survives it.
+  private drawHoverMarker(): void {
+    const viewer = this.viewer;
+    if (!viewer) { this.hoverShapes = []; return; }
+    for (const shape of this.hoverShapes) viewer.removeShape(shape);
+    this.hoverShapes = [];
+    const hoverId = hoverStore.get();
+    const center = hoverId && this.structure ? this.hoverCoordinate(hoverId) : null;
+    if (center) this.hoverShapes.push(viewer.addSphere({ center, radius: 0.18, color: "#31d8c4", wireframe: true, opacity: 0.7 }));
+    if (this.container) this.container.dataset.hoveredAtom = hoverId ?? "";
+  }
+
+  private releaseWebGl(viewer: GLViewer): void {
+    try {
+      const canvas = (viewer as unknown as { getCanvas?: () => HTMLCanvasElement }).getCanvas?.();
+      viewer.clear();
+      const gl = (canvas?.getContext("webgl2") ?? canvas?.getContext("webgl")) as WebGLRenderingContext | null | undefined;
+      gl?.getExtension("WEBGL_lose_context")?.loseContext();
+    } catch { /* context already released */ }
+  }
 
   private ensureMounted(): void { if (!this.viewer) throw new Error("3Dmol viewer adapter is not mounted."); }
   private appendCompactAtomsProgressively(model: ViewerModel, context: NonNullable<ReturnType<typeof compactAtomSpecContext>>, start: number, generation: number): Promise<void> {
@@ -1490,7 +1586,7 @@ export class ThreeDMolViewerAdapter {
   private projectCompactInteractionHighlights(projection: RenderProjection): void {
     if (!this.viewer || !this.structure || !isCompactStructure(this.structure)) return;
     const selectedIds = new Set(projection.interaction.selectedAtomIds);
-    const indicatorIds = [projection.interaction.hoveredAtomId, projection.interaction.pickedAtomId, ...projection.interaction.measurementPickAtomIds].filter((value): value is string => Boolean(value));
+    const indicatorIds = [projection.interaction.pickedAtomId, ...projection.interaction.measurementPickAtomIds].filter((value): value is string => Boolean(value));
     const entries = this.workspaceObjects.length
       ? [
         ...(this.workspaceObjects[0] && this.primaryModel ? [{ model: this.primaryModel, object: this.workspaceObjects[0], structure: structureForWorkspaceObjectState(this.workspaceObjects[0]) }] : []),
@@ -1539,10 +1635,14 @@ export class ThreeDMolViewerAdapter {
   }
 
   private projectInteractionHighlights(projection: RenderProjection): void {
+    this.projectInteractionHighlightsCore(projection);
+    this.drawHoverMarker();
+  }
+
+  private projectInteractionHighlightsCore(projection: RenderProjection): void {
     if (!this.viewer || !this.structure) return;
     this.interactionShapes.forEach((shape) => this.viewer?.removeShape(shape));
     this.interactionShapes = [];
-    const hoverId = projection.interaction.hoveredAtomId;
     const pickedId = projection.interaction.pickedAtomId;
     const selectedIds = new Set(projection.interaction.selectedAtomIds);
     if (isCompactStructure(this.structure)) {
@@ -1618,7 +1718,6 @@ export class ThreeDMolViewerAdapter {
       const atoms = workspaceAtoms.filter((candidate) => candidate.stableId === stableId || candidate.stableId.endsWith(`::${stableId}`));
       for (const atom of atoms) this.interactionShapes.push(this.viewer!.addSphere({ center: atom, radius, color, wireframe, opacity }));
     };
-    if (hoverId) addMarker(hoverId, "#31d8c4", 0.18, true, 0.7);
     if (pickedId) addMarker(pickedId, "#e5ae32", 0.28, true, 0.8);
     if (matchedSelectionIds.size === 1) {
       const selectedAtom = workspaceAtoms.find((candidate) => matchedSelectionIds.has(candidate.stableId) || [...matchedSelectionIds].some((id) => id.endsWith(`::${candidate.stableId}`)));
@@ -1760,7 +1859,7 @@ export class ThreeDMolViewerAdapter {
     this.container.dataset.cameraAction = this.lastCameraAction;
     this.writeCameraDiagnostics();
     this.container.dataset.pickedAtom = this.projection?.interaction.pickedAtomId ?? "";
-    this.container.dataset.hoveredAtom = this.projection?.interaction.hoveredAtomId ?? "";
+    this.container.dataset.hoveredAtom = hoverStore.get() ?? "";
     this.container.dataset.selectedAtoms = String(this.projection?.interaction.selectedAtomIds.length ?? 0);
     this.container.dataset.measurementPicks = this.projection?.interaction.measurementPickAtomIds.join(",") ?? "";
     this.container.dataset.labelMode = this.projection?.labels.mode ?? "off";

@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 // Read it per request so the start order of web and API does not matter.
 const tokenFile = process.env.MOLE_TOKEN_DIR ? `${process.env.MOLE_TOKEN_DIR}/token` : fileURLToPath(new URL("../../.mole/token", import.meta.url));
 const readToken = (): string | undefined => {
+  if (process.env.MOLE_TOKEN) return process.env.MOLE_TOKEN;
   try {
     return readFileSync(tokenFile, "utf8").trim() || undefined;
   } catch {

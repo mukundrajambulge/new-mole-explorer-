@@ -7,6 +7,8 @@ export type ApiConfig = {
   allowedOrigins: readonly string[];
   /** Directory that receives the local-mode token file (<dir>/token). */
   tokenDir: string;
+  /** Shared credential for hosted mode (MOLE_TOKEN) until accounts exist; local mode issues a random token. */
+  token?: string;
   maxJsonBytes: number;
   maxUploadBytes: number;
 };
@@ -29,6 +31,8 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ApiConfig => {
   if (modeRaw === "local" && !LOOPBACK.has(host)) throw new Error("MOLE_MODE=local only binds to a loopback address; set MOLE_MODE=hosted to expose the server.");
   const listed = (env.ALLOWED_ORIGINS ?? "").split(",").map((origin) => origin.trim()).filter(Boolean);
   if (modeRaw === "hosted" && listed.length === 0) throw new Error("MOLE_MODE=hosted requires ALLOWED_ORIGINS.");
+  const token = env.MOLE_TOKEN;
+  if (modeRaw === "hosted" && (token === undefined || token.length < 32)) throw new Error("MOLE_MODE=hosted requires MOLE_TOKEN of at least 32 characters.");
   if (listed.includes("*")) throw new Error("ALLOWED_ORIGINS must list explicit origins, not *.");
   return {
     mode: modeRaw,
@@ -36,6 +40,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ApiConfig => {
     port: intEnv(env, "PORT", intEnv(env, "API_PORT", 8100, 0, 65535), 0, 65535),
     allowedOrigins: modeRaw === "local" ? [...LOCAL_DEV_ORIGINS, ...listed] : listed,
     tokenDir: env.MOLE_TOKEN_DIR || fileURLToPath(new URL("../../../.mole", import.meta.url)),
+    ...(modeRaw === "hosted" ? { token } : {}),
     maxJsonBytes: intEnv(env, "MAX_JSON_BYTES", 8 * 1024 * 1024, 1024, 1024 * 1024 * 1024),
     maxUploadBytes: intEnv(env, "MAX_UPLOAD_BYTES", 512 * 1024 * 1024 + 1_000_000, 1024, 4 * 1024 * 1024 * 1024),
   };

@@ -18,6 +18,7 @@ import { BiologicalDataViewer } from "./components/BiologicalDataViewer";
 import { ImportDialog } from "./components/ImportDialog";
 import { NavRail } from "./components/NavRail";
 import { DockingWorkspace } from "./docking/DockingWorkspace";
+import { hoverStore } from "./rendering/hoverStore";
 import type { SearchRegionOverlay } from "./rendering/searchRegionOverlay";
 import { ACTION_IDS, ACTION_REGISTRY, type ActionId, type ActionDefinition } from "./domain/registry";
 import { ApiClientError, apiClient } from "./lib/apiClient";
@@ -269,7 +270,7 @@ export const App = () => {
   const clearSelection = useCallback(() => {
     activePickResultRef.current = null;
     setActiveSelection(null);
-    setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] }));
+    setProjection((current) => setInteractionState(current, { pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] }));
   }, []);
 
   const resetScientificHistory = useCallback(() => {
@@ -497,7 +498,7 @@ export const App = () => {
     activeSelectionResultRef.current = null;
     activePickResultRef.current = null;
     setActiveSelectionState(null);
-    setProjection((current) => setInteractionState(current, { hoveredAtomId: null, pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] }));
+    setProjection((current) => setInteractionState(current, { pickedAtomId: null, selectedAtomIds: [], measurementPickAtomIds: [] }));
   };
 
   const setWorkspaceObjectEnabledById = (objectId: string, enabled: boolean) => {
@@ -855,10 +856,12 @@ export const App = () => {
     }
   };
 
-  const handleHover = (pick: PickResult | null) => setProjection((current) => {
-    const object = pick?.pickKind === "ATOM" ? workspaceObjectsRef.current.find((candidate) => candidate.objectId === pick.atomRef.objectId) : undefined;
-    return setInteractionState(current, { hoveredAtomId: pick?.pickKind === "ATOM" ? object ? workspaceScopedStableAtomId(object.objectId, pick.atomRef.stableAtomId) : pick.atomRef.stableAtomId : null });
-  });
+  const handleHover = (pick: PickResult | null) => {
+    // Hover lives in hoverStore: no React state, no projection change, no re-render.
+    if (pick?.pickKind !== "ATOM") { hoverStore.set(null); return; }
+    const object = workspaceObjectsRef.current.find((candidate) => candidate.objectId === pick.atomRef.objectId);
+    hoverStore.set(object ? workspaceScopedStableAtomId(object.objectId, pick.atomRef.stableAtomId) : pick.atomRef.stableAtomId);
+  };
   const clearMeasurementPicks = () => { measurementAccumulatorRef.current.clear(); setMeasurementSlots([]); setProjection((current) => setInteractionState(current, { pickedAtomId: null, measurementPickAtomIds: [] })); };
   const updateMeasurementVisibility = (id: string, visible: boolean) => setMeasurements((current) => current.map((measurement) => measurement.id === id ? { ...measurement, presentation: { ...measurement.presentation, visible }, status: visible ? "CURRENT" : "HIDDEN" } : measurement));
   const deleteMeasurement = (id: string) => setMeasurements((current) => current.filter((measurement) => measurement.id !== id));
@@ -1010,7 +1013,8 @@ export const App = () => {
     setActiveSelectionState(reboundSelection);
     const projectedSelectionIds = nextObjects.length > 1 ? survivingIds.map((stableId) => workspaceScopedStableAtomId(revision.objectId, stableId)) : survivingIds;
     const baseProjection = revision.objectId === activeObjectId ? projection : nextTarget.projection;
-    const nextProjection = setInteractionState(baseProjection, { selectedAtomIds: projectedSelectionIds, pickedAtomId: survivingIds[0] ?? null, hoveredAtomId: null, measurementPickAtomIds: [] });
+    hoverStore.set(null);
+    const nextProjection = setInteractionState(baseProjection, { selectedAtomIds: projectedSelectionIds, pickedAtomId: survivingIds[0] ?? null, measurementPickAtomIds: [] });
     const oldNamedSnapshots = namedSelectionsRef.current?.list() ?? [];
     const reboundNamedSelections = new NamedSelectionStore(revision.loadResult.structure);
     for (const snapshot of oldNamedSnapshots) {

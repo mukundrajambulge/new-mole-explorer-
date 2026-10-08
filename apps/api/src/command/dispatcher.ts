@@ -1,5 +1,5 @@
 import { appendFileSync, mkdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { safeJoin } from "../projects/safeJoin.js";
 import type { ActionRecord, CanonicalCommand, CommandDiagnostic, CommandJob, CommandJobState, CommandReplayMode, CommandResult, JsonRecord, JsonValue } from "@molecular/contracts";
 import { COMMAND_REGISTRY_VERSION, COMMAND_SCHEMA_VERSION, SAFE_PYMOL_COMPAT_PROFILE } from "@molecular/contracts";
 import { compileSafeCommand, compileSafeCommands, sha256, type CommandBindingContext } from "./compiler.js";
@@ -24,7 +24,7 @@ export class ActionRecordStore {
   constructor(dataRoot?: string) {
     if (!dataRoot) return;
     mkdirSync(dataRoot, { recursive: true });
-    this.filePath = join(dataRoot, "command-history.jsonl");
+    this.filePath = safeJoin(dataRoot, "command-history.jsonl");
     try {
       const lines = readFileSync(this.filePath, "utf8").split(/\r?\n/).filter(Boolean);
       for (const line of lines) {

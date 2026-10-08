@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "label": "after",
+  "date": "2026-10-08T14:02:53.429Z",
+  "fixture": "4V6F",
+  "loadMs": 55444.10000000894,
+  "atoms": 307345,
+  "heapAfterLoadMb": 1261.3,
+  "selectChainAMs": 47313.20000000298,
+  "colorRedChainAMs": 27652.40000000596,
+  "hoverMs": {
+    "n": 50,
+    "min": 29.899999991059303,
+    "median": 46.1000000089407,
+    "p95": 58.20000000298023,
+    "max": 386,
+    "mean": 52.41599999964237
+  },
+  "hoverDwellMs": {
+    "n": 20,
+    "min": 843.5,
+    "median": 5362.600000008941,
+    "p95": 7529.300000011921,
+    "max": 7529.300000011921,
+    "mean": 5252.315000001341
+  },
+  "hoverRenders": {
+    "distinctHoveredAtoms": 18,
+    "dwellMoves": 20,
+    "commits": 0,
+    "componentRenders": 0,
+    "perComponent": {},
+    "componentRendersMinusIdle": 0
+  },
+  "idleRenders": {
+    "commits": 0,
+    "componentRenders": 0
+  },
+  "hoverJsonStringify": {
+    "calls": 5,
+    "chars": 75,
+    "largeCalls": 0
+  },
+  "tabSwitchMs": {
+    "n": 10,
+    "min": 1122.3999999910593,
+    "median": 1772,
+    "p95": 15786.20000000298,
+    "max": 15786.20000000298,
+    "mean": 2944.919999997318
+  },
+  "viewerStateAfterTabs": "loaded",
+  "heapEndMb": 984.3
+}
