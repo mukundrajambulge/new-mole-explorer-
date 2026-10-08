@@ -15,15 +15,18 @@ and completes the prep-environment section (exact versions, licences, lock file)
 | Install | `scripts/wsl-setup.sh` -> `~/mole-tools/vina` (WSL Ubuntu-24.04) |
 | Recorded | 2026-10-08 |
 
-## Prep environment (`~/mole-prep`, Python 3.12.3): observed, not yet locked
+## Prep environment (`~/mole-prep`, Python 3.12.3)
 
-Versions installed by `scripts/wsl-setup.sh` on 2026-10-08. Task 5.1 adds licences and the lock file.
+Pins in `workers/prep/requirements.in`; lock in `workers/prep/requirements.lock.txt` (see `workers/prep/README.md`).
+The lock currently holds direct pins only; the full transitive freeze must still be generated in WSL.
 
-| Package | Version |
-|---|---|
-| RDKit | 2026.3.6 |
-| Meeko | 0.8.0 |
-| Dimorphite-DL | 2.1.0 |
-| PDB2PQR | 3.7.1 |
-| PROPKA | 3.5.1 |
-| PDBFixer | not installed |
+| Package | Version | Licence | Notes |
+|---|---|---|---|
+| RDKit | 2026.3.6 | BSD-3-Clause | |
+| Meeko | 0.8.0 | LGPL-2.1 | Run only as a separate process (no linking): acceptable. |
+| Dimorphite-DL | 2.1.0 | Apache-2.0 | |
+| PDB2PQR | 3.7.1 | BSD-3-Clause | |
+| PROPKA | 3.5.1 | MIT | |
+| PDBFixer | NOT INSTALLED (pin pending) | MIT | Add to `scripts/wsl-setup.sh`, then pin. |
+
+Licences are from upstream metadata as known at writing; reviewer to confirm against `pip show` in WSL.

@@ -1,0 +1,6 @@
+# PARTIAL LOCK: direct pins only; transitive freeze pending (see README.md).
+rdkit==2026.3.6
+meeko==0.8.0
+dimorphite_dl==2.1.0
+pdb2pqr==3.7.1
+propka==3.5.1
