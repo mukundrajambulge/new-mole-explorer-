@@ -19,6 +19,8 @@ import { stateForObject, structureForWorkspaceObjectState, workspaceScopedStable
 import { hoverStore } from "./hoverStore";
 import { compactAtomSpecContext, compactAtomSpecs, isCompactStructure } from "../structures/compactCanonical";
 
+type HoverSource = { compact: NonNullable<CanonicalMolecularStructure["compact"]> | null; ordinals: ReadonlyMap<string, number> | null; coords: Map<string, { x: number; y: number; z: number }> | null };
+
 const diagnosticTypeForStyle = (style: string): RepresentationType => style === "ribbon" ? "RIBBON" : style === "putty" || style === "trace" || style === "cartoon" ? "CARTOON" : style === "nonbonded-crosses" ? "NONBONDED" : style === "nonbonded-spheres" ? "NB_SPHERES" : style === "line" ? "LINES" : style === "stick" || style === "licorice" || style === "ball-and-stick" ? "STICKS" : "SPHERES";
 
 const mountedAdapters = new WeakMap<HTMLElement, ThreeDMolViewerAdapter>();
@@ -245,7 +247,7 @@ export class ThreeDMolViewerAdapter {
   private interactionShapes: GLShape[] = [];
   private hoverShapes: GLShape[] = [];
   private hoverUnsubscribe: (() => void) | null = null;
-  private hoverAtomIndexes = new WeakMap<object, Map<string, { x: number; y: number; z: number }>>();
+  private hoverSources = new WeakMap<object, Map<string, HoverSource>>();
   private analysisShapes: GLShape[] = [];
   private analysisOverlays: readonly AnalysisOverlay[] = [];
   private alignmentShapes: GLShape[] = [];
@@ -411,6 +413,7 @@ export class ThreeDMolViewerAdapter {
     this.viewer!.removeAllModels();
     this.viewer!.removeAllSurfaces();
     this.viewer!.removeAllShapes();
+    this.hoverShapes = [];
     this.surfaceCoordinator.invalidate();
     this.surfaceIds = [];
     this.surfaceKinds = [];
@@ -462,6 +465,8 @@ export class ThreeDMolViewerAdapter {
     } else {
       this.frameToCanonicalBounds(true);
     }
+    if (!objectId) this.prepareHoverIndex();
+    this.drawHoverMarker();
     this.render();
     if (!compactContext || compactContext.atomCount <= previewAtomCount) return Promise.resolve();
     const progressive = this.appendCompactAtomsProgressively(renderModel, compactContext, previewAtomCount, generation).then(() => {
@@ -497,6 +502,8 @@ export class ThreeDMolViewerAdapter {
     this.clearStandaloneSurfaceHandles();
     this.surfaceReadyModels.clear();
     this.renderPrimaryWorkspaceModel();
+    this.prepareHoverIndex();
+    this.drawHoverMarker();
     this.renderAuxiliaryModels();
     this.applyWorkspaceSurfaces(objects);
     this.bindWorkspacePicking();
@@ -563,6 +570,7 @@ export class ThreeDMolViewerAdapter {
     const previousProjection = this.projection;
     this.workspaceObjects = effectiveObjects;
     this.primaryObjectEnabled = effectiveObjects[0]?.enabled ?? true;
+    this.prepareHoverIndex();
     if (objectSceneChanged || modelStateChanged) { this.baselineView = null; this.baselinePivot = null; }
     const interactionCameraChanged = interactionProjection ? cameraProjectionChanged(previousProjection, interactionProjection) : false;
     const interactionBackgroundChanged = interactionProjection ? !previousProjection || previousProjection.background !== interactionProjection.background : false;
@@ -738,30 +746,52 @@ export class ThreeDMolViewerAdapter {
   }
   getDiagnostics(): RenderProjectionDiagnostics { return this.diagnostics; }
 
+  private hoverSourceFor(object: WorkspaceObject | null): HoverSource | null {
+    const base = object ? object.loadResult.structure : this.structure;
+    if (!base) return null;
+    const stateId = object ? stateForObject(object)?.id ?? "" : "";
+    let byState = this.hoverSources.get(base);
+    if (!byState) { byState = new Map(); this.hoverSources.set(base, byState); }
+    const cached = byState.get(stateId);
+    if (cached) return cached;
+    const structure = object ? this.renderLoadResultForState(object).structure : base;
+    let source: HoverSource;
+    if (structure.compact) source = { compact: structure.compact, ordinals: this.compactAtomOrdinalMapFor(structure), coords: null };
+    else {
+      const coords = new Map<string, { x: number; y: number; z: number }>();
+      for (const atom of structure.atoms) coords.set(atom.stableId, { x: atom.x, y: atom.y, z: atom.z });
+      source = { compact: null, ordinals: null, coords };
+    }
+    byState.set(stateId, source);
+    return source;
+  }
+
+  private hoverLookup(object: WorkspaceObject | null, hoverId: string): { x: number; y: number; z: number } | null {
+    if (object && !object.enabled) return null;
+    const source = this.hoverSourceFor(object);
+    if (!source) return null;
+    const objectId = object?.objectId ?? "";
+    const localId = objectId && hoverId.startsWith(`${objectId}::`) ? hoverId.slice(objectId.length + 2) : hoverId;
+    if (source.compact) {
+      const ordinal = source.ordinals!.get(localId);
+      return ordinal === undefined ? null : { x: source.compact.x[ordinal]!, y: source.compact.y[ordinal]!, z: source.compact.z[ordinal]! };
+    }
+    return source.coords!.get(localId) ?? null;
+  }
+
+  /** Pre-build hover lookups when the scene changes so the hover path does no per-atom work. */
+  private prepareHoverIndex(): void {
+    if (!this.workspaceObjects.length) { this.hoverSourceFor(null); return; }
+    this.hoverSourceFor(this.workspaceObjects[0]!);
+    for (const aux of this.auxiliaryModels) this.hoverSourceFor(aux.object);
+  }
+
   private hoverCoordinate(hoverId: string): { x: number; y: number; z: number } | null {
-    const entries = this.workspaceObjects.length
-      ? [
-        ...(this.workspaceObjects[0] ? [{ object: this.workspaceObjects[0] as WorkspaceObject | null, structure: structureForWorkspaceObjectState(this.workspaceObjects[0]) }] : []),
-        ...this.auxiliaryModels.map(({ object }) => ({ object: object as WorkspaceObject | null, structure: structureForWorkspaceObjectState(object) })),
-      ]
-      : (this.structure ? [{ object: null as WorkspaceObject | null, structure: this.structure }] : []);
-    for (const entry of entries) {
-      if (entry.object && !entry.object.enabled) continue;
-      const objectId = entry.object?.objectId ?? "";
-      const localId = objectId && hoverId.startsWith(`${objectId}::`) ? hoverId.slice(objectId.length + 2) : hoverId;
-      const compact = entry.structure.compact;
-      if (compact) {
-        const ordinal = this.compactAtomOrdinalMapFor(entry.structure).get(localId) ?? -1;
-        if (ordinal >= 0) return { x: compact.x[ordinal]!, y: compact.y[ordinal]!, z: compact.z[ordinal]! };
-        continue;
-      }
-      let index = this.hoverAtomIndexes.get(entry.structure);
-      if (!index) {
-        index = new Map();
-        for (const atom of entry.structure.atoms) index.set(atom.stableId, { x: atom.x, y: atom.y, z: atom.z });
-        this.hoverAtomIndexes.set(entry.structure, index);
-      }
-      const found = index.get(localId);
+    if (!this.workspaceObjects.length) return this.hoverLookup(null, hoverId);
+    const primary = this.hoverLookup(this.workspaceObjects[0]!, hoverId);
+    if (primary) return primary;
+    for (const aux of this.auxiliaryModels) {
+      const found = this.hoverLookup(aux.object, hoverId);
       if (found) return found;
     }
     return null;
@@ -769,16 +799,23 @@ export class ThreeDMolViewerAdapter {
 
   // Hover-only redraw: replaces one marker sphere; never re-projects selection.
   private projectHoverMarker(): void {
-    if (!this.viewer || !this.structure) return;
-    const viewer = this.viewer;
+    if (!this.viewer) return;
     const hadShapes = this.hoverShapes.length > 0;
+    this.drawHoverMarker();
+    if (hadShapes || this.hoverShapes.length) this.render();
+  }
+
+  // Removes any previous marker and redraws it for the current hover id. Also
+  // called after every interaction re-projection so the marker survives it.
+  private drawHoverMarker(): void {
+    const viewer = this.viewer;
+    if (!viewer) { this.hoverShapes = []; return; }
     for (const shape of this.hoverShapes) viewer.removeShape(shape);
     this.hoverShapes = [];
     const hoverId = hoverStore.get();
-    const center = hoverId ? this.hoverCoordinate(hoverId) : null;
+    const center = hoverId && this.structure ? this.hoverCoordinate(hoverId) : null;
     if (center) this.hoverShapes.push(viewer.addSphere({ center, radius: 0.18, color: "#31d8c4", wireframe: true, opacity: 0.7 }));
     if (this.container) this.container.dataset.hoveredAtom = hoverId ?? "";
-    if (hadShapes || center) this.render();
   }
 
   private releaseWebGl(viewer: GLViewer): void {
@@ -1598,6 +1635,11 @@ export class ThreeDMolViewerAdapter {
   }
 
   private projectInteractionHighlights(projection: RenderProjection): void {
+    this.projectInteractionHighlightsCore(projection);
+    this.drawHoverMarker();
+  }
+
+  private projectInteractionHighlightsCore(projection: RenderProjection): void {
     if (!this.viewer || !this.structure) return;
     this.interactionShapes.forEach((shape) => this.viewer?.removeShape(shape));
     this.interactionShapes = [];
