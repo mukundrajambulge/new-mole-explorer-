@@ -7,7 +7,17 @@ const rcsbDir = new URL("../../../../tests/fixtures/rcsb/", import.meta.url);
 const read = (name: string) => readFileSync(new URL(name, rcsbDir));
 const ingest = (name: string, content: Buffer | string) => new StructureIngestionService().ingestLocal(name, Buffer.isBuffer(content) ? content : Buffer.from(content));
 
-const cifHeader = ["group_PDB", "id", "type_symbol", "label_atom_id", "label_comp_id", "label_asym_id", "label_seq_id", "auth_seq_id", "auth_asym_id", "pdbx_PDB_ins_code", "Cartn_x", "Cartn_y", "Cartn_z", "pdbx_PDB_model_num"].map((name) => `_atom_site.${name}`);
+type Structure = Awaited<ReturnType<typeof ingest>>["structure"];
+type Atom = Structure["atoms"][number];
+/** Distinct residues (chain|number|insertion code|name) that hold at least one matching atom, in file order. */
+const residueList = (structure: Structure, keep: (atom: Atom) => boolean): string[] => {
+  const seen = new Set<string>();
+  for (const atom of structure.atoms) if (keep(atom)) seen.add([atom.chain, atom.residueNumber, atom.insertionCode ?? "", atom.residueName].join("|"));
+  return [...seen];
+};
+const ligandList = (structure: Structure) => residueList(structure, (atom) => atom.isLigand);
+
+const cifHeader =["group_PDB", "id", "type_symbol", "label_atom_id", "label_comp_id", "label_asym_id", "label_seq_id", "auth_seq_id", "auth_asym_id", "pdbx_PDB_ins_code", "Cartn_x", "Cartn_y", "Cartn_z", "pdbx_PDB_model_num"].map((name) => `_atom_site.${name}`);
 
 describe("RCSB fixture manifest", () => {
   const manifest = JSON.parse(readFileSync(new URL("manifest.json", rcsbDir), "utf8")) as { files: Array<{ name: string; sha256: string; bytes: number; url: string; downloaded: string; tracked: boolean }> };
@@ -39,8 +49,26 @@ describe("PDB and mmCIF of the same RCSB entry agree", () => {
       const atomSummary = (structure: typeof pdb) => structure.atoms.map((atom) => [atom.atomName, atom.residueName, atom.residueNumber, atom.insertionCode ?? "", atom.chain, atom.element, atom.altLoc ?? "", atom.recordType, atom.x, atom.y, atom.z].join("|"));
       expect(atomSummary(cif)).toEqual(atomSummary(pdb));
       expect(cif.coordinateStates?.map((state) => state.sourceModelNumber)).toEqual(pdb.coordinateStates?.map((state) => state.sourceModelNumber));
+      expect(Object.keys(cif.hierarchy.residues).length).toBe(Object.keys(pdb.hierarchy.residues).length);
+      expect(cif.counts.residues).toBe(pdb.counts.residues);
+      expect(cif.counts.chains).toBe(pdb.counts.chains);
+      expect(cif.counts.waterAtoms).toBe(pdb.counts.waterAtoms);
+      expect(cif.counts.ionAtoms).toBe(pdb.counts.ionAtoms);
+      expect(ligandList(cif)).toEqual(ligandList(pdb));
+      expect(residueList(cif, (atom) => atom.isWater)).toEqual(residueList(pdb, (atom) => atom.isWater));
     }, 120_000);
   }
+
+  it("keeps each water and ligand as its own residue on its author chain", async () => {
+    const pdb = (await ingest("4DJW.pdb", read("4DJW.pdb"))).structure;
+    const cif = (await ingest("4DJW.cif", read("4DJW.cif"))).structure;
+    const waters = residueList(cif, (atom) => atom.isWater);
+    expect(waters.length).toBeGreaterThan(10);
+    expect(new Set(waters).size).toBe(waters.length);
+    expect(ligandList(cif).length).toBeGreaterThan(0);
+    const polymerChains = new Set(pdb.atoms.filter((atom) => atom.isPolymer).map((atom) => atom.chain));
+    for (const atom of cif.atoms) if (atom.isWater || atom.isLigand) expect(polymerChains.has(atom.chain), `${atom.residueName} ${atom.chain}`).toBe(true);
+  });
 
   it("types every polymer atom of the single-entity entries from _entity_poly", async () => {
     for (const id of ["1CRN", "1D3Z", "4DJW", "6VXX"]) {
@@ -96,6 +124,40 @@ describe("mmCIF syntax rules", () => {
     const row = "ATOM 1 C CA ALA X 7 107 B C 1.0 0.0 0.0 1";
     const atom = (await ingest("a.cif", doc([row]))).structure.atoms[0]!;
     expect(atom).toMatchObject({ chain: "B", residueNumber: 107, insertionCode: "C", labelAsymId: "X", labelSeqId: 7 });
+  });
+
+  it("falls back from auth to label per row, never mixing the two systems in one row", async () => {
+    const rows = [
+      "ATOM 1 C CA ALA A 1 101 B ? 1.0 0.0 0.0 1",
+      "ATOM 2 C CA ALA A 2 ? ? ? 2.0 0.0 0.0 1",
+      "ATOM 3 C CA ALA A 3 ? B ? 3.0 0.0 0.0 1",
+      "HETATM 4 O O HOH C . 201 B ? 4.0 0.0 0.0 1",
+      "HETATM 5 O O HOH C . 202 B ? 5.0 0.0 0.0 1",
+    ];
+    const result = (await ingest("r.cif", doc(rows))).structure;
+    expect(result.atoms.map((atom) => `${atom.chain}${atom.residueNumber}`)).toEqual(["B101", "A2", "A3", "B201", "B202"]);
+    expect(result.atoms.slice(3).map((atom) => [atom.labelAsymId, atom.labelSeqId])).toEqual([["C", undefined], ["C", undefined]]);
+    expect(Object.keys(result.hierarchy.residues)).toHaveLength(5);
+  });
+
+  it("never pairs an auth chain with a label number when both systems are incomplete", async () => {
+    const rows = [
+      "ATOM 1 C CA ALA . 5 ? B ? 1.0 0.0 0.0 1",
+      "ATOM 2 C CA ALA A 6 ? ? ? 2.0 0.0 0.0 1",
+      "ATOM 3 C CA ALA . . 9 ? ? 3.0 0.0 0.0 1",
+    ];
+    const atoms = (await ingest("p.cif", doc(rows))).structure.atoms;
+    expect(atoms.map((atom) => `${atom.chain}${atom.residueNumber}`)).toEqual(["B0", "A6", "_9"]);
+    expect(atoms[0]).toMatchObject({ labelSeqId: 5 });
+  });
+
+  it("resolves struct_conn partners by label ids when the row has no auth ids", async () => {
+    const rows = ["ATOM 1 S SG CYS A 1 101 B ? 1.0 0.0 0.0 1", "ATOM 2 S SG CYS A 2 102 B ? 3.0 0.0 0.0 1"];
+    const conn = ["id", "conn_type_id", "ptnr1_label_asym_id", "ptnr1_label_seq_id", "ptnr1_label_atom_id", "ptnr1_auth_asym_id", "ptnr1_auth_seq_id", "ptnr2_label_asym_id", "ptnr2_label_seq_id", "ptnr2_label_atom_id", "ptnr2_auth_asym_id", "ptnr2_auth_seq_id"];
+    const values = ["disulf1", "disulf", "A", "1", "SG", "?", "?", "A", "2", "SG", "?", "?"];
+    const extra = conn.map((name, index) => `_struct_conn.${name} ${values[index]}`).join("\n") + "\n";
+    const result = (await ingest("c.cif", doc(rows, extra))).structure;
+    expect(result.bonds.filter((bond) => bond.source === "MMCIF_STRUCT_CONN")).toHaveLength(1);
   });
 
   it("reads single-row categories written as key/value pairs", async () => {
