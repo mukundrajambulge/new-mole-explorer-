@@ -26,6 +26,24 @@ const checks = [
 ];
 
 let failed = 0;
+// Playwright reuses any server already on these ports, so a stray dev server from another tree would be
+// tested instead of this one (happened in W5-W7). Refuse to run smoke until the ports are free.
+if (argv.has("--smoke")) {
+  const { createConnection } = await import("node:net");
+  const busy = (port) => new Promise((done) => {
+    const s = createConnection({ host: "127.0.0.1", port });
+    s.once("connect", () => { s.destroy(); done(true); });
+    s.once("error", () => done(false));
+  });
+  const taken = [];
+  for (const port of [3101, 8100]) if (await busy(port)) taken.push(port);
+  if (taken.length) {
+    const i = checks.findIndex((c) => c.name === "smoke-e2e");
+    checks.splice(i, 1);
+    failed++;
+    console.log(`FAIL smoke-e2e: port(s) ${taken.join(", ")} already in use; stop other dev servers so smoke tests this tree, not another one`);
+  }
+}
 for (const c of checks) {
   const t0 = process.hrtime.bigint();
   const r = spawnSync(c.cmd, c.args, { encoding: "utf8", shell: !c.noShell && process.platform === "win32", maxBuffer: 64 * 1024 * 1024 });

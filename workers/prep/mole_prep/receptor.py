@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import io
+import math
 import os
 import shutil
 import subprocess
@@ -121,17 +122,36 @@ def clean(text: str, opts: dict) -> tuple[list[dict], list[dict], list[str]]:
         decisions.append(_decision("HETERO", f"remove {len(groups)} hetero groups: {shown}", before, len(atoms), True))
     alts = [a for a in atoms if a["alt"] != " "]
     if alts:
+        # Group by residue identity (chain, resSeq, iCode), not resName: microheterogeneity (alt A SER / alt B ALA)
+        # must resolve to ONE residue, never two overlapping copies.
         occ: dict = {}
+        names: dict = {}
         for a in alts:
-            k = (a["chain"], a["seq"], a["icode"], a["res"])
+            k = (a["chain"], a["seq"], a["icode"])
             occ.setdefault(k, {}).setdefault(a["alt"], 0.0)
             occ[k][a["alt"]] += a["occ"]
+            names.setdefault(k, {}).setdefault(a["alt"], a["res"])
         chosen = {k: sorted(v.items(), key=lambda kv: (-round(kv[1], 4), kv[0]))[0][0] for k, v in occ.items()}
+        hetero_res = sorted(k for k, v in names.items() if len(set(v.values())) > 1)
         before = len(atoms)
-        atoms = [a for a in atoms if a["alt"] == " " or chosen[(a["chain"], a["seq"], a["icode"], a["res"])] == a["alt"]]
+        atoms = [a for a in atoms if a["alt"] == " " or chosen[(a["chain"], a["seq"], a["icode"])] == a["alt"]]
+        for a in atoms:  # shared (blank-altloc) atoms take the residue name of the kept alternate
+            k = (a["chain"], a["seq"], a["icode"])
+            if k in chosen:
+                a["res"] = names[k][chosen[k]]
         decisions.append(_decision("ALTLOC", f"keep highest-occupancy altloc (ties: first label) in {len(chosen)} residues", before, len(atoms), True))
+        if hetero_res:
+            shown = ", ".join(f"{c.strip() or '_'}:{s}{i.strip()}={'/'.join(f'{al}:{names[(c, s, i)][al]}' for al in sorted(names[(c, s, i)]))}->{names[(c, s, i)][chosen[(c, s, i)]]}"
+                              for c, s, i in hetero_res[:10])
+            decisions.append(_decision("MICROHETEROGENEITY", f"{len(hetero_res)} residues with alternate residue types; kept one per residue: {shown}", before, len(atoms), True))
     if not atoms:
         raise Blocked("EMPTY_RECEPTOR", "no polymer atoms remain after the selected choices")
+    seen_atoms = set()
+    for a in atoms:
+        k = (a["chain"], a["seq"], a["icode"], a["name"].strip())
+        if k in seen_atoms:
+            raise Blocked("MALFORMED_INPUT", f"duplicate atom {k[3]} in residue {a['res']} {k[0].strip() or '_'}:{k[1]}{k[2].strip()}")
+        seen_atoms.add(k)
     bad_res = sorted({a["res"] for a in atoms if a["res"] not in limits.PROTEIN_RESIDUES})
     if bad_res:
         raise Blocked("UNSUPPORTED_RESIDUE", f"non-standard polymer residues: {','.join(bad_res[:20])}")
@@ -160,7 +180,7 @@ def run_pdbfixer(pdb_text: str, opts: dict):
     n_term = sum(len(v) for v in fixer.missingTerminals.values())
     total = n_missing + n_term
     if not opts.get("addMissingAtoms") or total == 0:
-        return pdb_text, total, None
+        return pdb_text, total, None, 0
     from openmm.app import PDBFile
 
     fixer.addMissingAtoms(seed=0)
@@ -169,10 +189,52 @@ def run_pdbfixer(pdb_text: str, opts: dict):
     atoms, _ = parse_pdb(buf.getvalue(), "pdbfixer output")
     for a in atoms:
         a["het"] = False
+    submitted = {(a["chain"], a["seq"], a["icode"], a["name"].strip()) for a in parse_pdb(pdb_text, "receptor")[0]}
+    n_oxt = rebuild_terminal_oxt(atoms, submitted)
     out = write_pdb(atoms)
-    st = stage("pdbfixer", tool_version("pdbfixer"), {"addMissingAtoms": True, "missingResidues": "not built", "seed": 0, "openmm": tool_version("openmm")},
-               sha256_text(pdb_text), sha256_text(out), [f"added {total} missing heavy/terminal atoms"])
-    return out, total, st
+    notes = [f"added {total} missing heavy/terminal atoms"]
+    if n_oxt:
+        notes.append(f"{n_oxt} added C-terminal OXT placed by ideal carboxylate geometry")
+    st = stage("pdbfixer", tool_version("pdbfixer"), {"addMissingAtoms": True, "missingResidues": "not built", "seed": 0, "openmm": tool_version("openmm"),
+                                                      "oxt": "ideal sp2 (C-O 1.25 A, 120 deg)"},
+               sha256_text(pdb_text), sha256_text(out), notes)
+    return out, total, st, n_oxt
+
+
+OXT_BOND = 1.25
+
+
+def rebuild_terminal_oxt(atoms: list[dict], submitted: set) -> int:
+    """Place every generated OXT in the CA-C-O plane, opposite the CA/O bisector (ideal carboxylate).
+
+    PDBFixer's addMissingAtoms can leave OXT ~1.7 A from CA (bent ~80 deg); Meeko's C-terminal template then
+    perceives an O-CA bond and RDKit rejects the residue (TEMPLATE_MISMATCH). Only atoms PDBFixer added are moved.
+    """
+    by_res: dict = {}
+    for a in atoms:
+        by_res.setdefault((a["chain"], a["seq"], a["icode"]), {})[a["name"].strip()] = a
+    moved = 0
+    for key, res in by_res.items():
+        oxt, c, ca, o = res.get("OXT"), res.get("C"), res.get("CA"), res.get("O")
+        if oxt is None or c is None or ca is None or o is None or (*key, "OXT") in submitted:
+            continue
+        u = []
+        for other in (ca, o):
+            v = [other[k] - c[k] for k in ("x", "y", "z")]
+            n = math.sqrt(sum(t * t for t in v))
+            if n < 1e-6:
+                break
+            u.append([t / n for t in v])
+        if len(u) != 2:
+            continue
+        d = [-(u[0][i] + u[1][i]) for i in range(3)]
+        n = math.sqrt(sum(t * t for t in d))
+        if n < 1e-6:
+            continue
+        for i, k in enumerate(("x", "y", "z")):
+            oxt[k] = round(c[k] + OXT_BOND * d[i] / n, 3)
+        moved += 1
+    return moved
 
 
 def run_pdb2pqr(pdb_text: str, ph: float, workdir: str):
@@ -225,11 +287,13 @@ def prepare(text: str, opts: dict, workdir: str) -> dict:
     generated = False
     current = cleaned
     n_atoms = len(atoms)
-    fixed, n_missing, st = run_pdbfixer(current, opts)
+    fixed, n_missing, st, n_oxt = run_pdbfixer(current, opts)
     if n_missing:
         added = opts.get("addMissingAtoms")
         after = len(parse_pdb(fixed, "pdbfixer output")[0]) if added else n_atoms
-        decisions.append(_decision("MISSING_HEAVY_ATOMS", f"{n_missing} missing heavy/terminal atoms: " + ("added by PDBFixer (seed 0)" if added else "not added (opt-in)"), n_atoms, after, True))
+        decisions.append(_decision("MISSING_HEAVY_ATOMS", f"{n_missing} missing heavy/terminal atoms: " + ("added by PDBFixer (seed 0), generated coordinates (PREVIEW_UNQUALIFIED)" if added else "not added (opt-in)"), n_atoms, after, True))
+        if added and n_oxt:
+            decisions.append(_decision("TERMINAL_OXT", f"{n_oxt} generated C-terminal OXT placed by ideal carboxylate geometry (C-O {OXT_BOND} A, in CA-C-O plane)", after, after, True))
         if added:
             generated = True
             stages.append(st)
@@ -261,16 +325,23 @@ def prepare(text: str, opts: dict, workdir: str) -> dict:
     heavy_in = n_atoms - h_in
     heavy_out = len(out_atoms) - h_out
     if heavy_out != heavy_in:
-        decisions.append(_decision("RECEPTOR_TEMPLATE_HEAVY_ATOMS", f"Meeko templates changed heavy atoms {heavy_in} -> {heavy_out}", n_atoms, len(out_atoms), True))
+        generated = True
+        decisions.append(_decision("RECEPTOR_TEMPLATE_HEAVY_ATOMS", f"Meeko templates changed heavy atoms {heavy_in} -> {heavy_out} (PREVIEW_UNQUALIFIED)", n_atoms, len(out_atoms), True))
+    if protonation == "PROPKA_PREVIEW":
+        source = "PROPKA_PREVIEW"
+    elif h_out != h_in:
+        source = "MEEKO_TEMPLATES_PREVIEW"
+    else:
+        source = "EXPLICIT_SUBMITTED"
     if h_out != h_in:
         generated = True
-        decisions.append(_decision("RECEPTOR_TEMPLATE_HYDROGENS", f"Meeko residue templates set hydrogens {h_in} -> {h_out} (generated, PREVIEW_UNQUALIFIED)", n_atoms, len(out_atoms), True))
+        decisions.append(_decision("RECEPTOR_TEMPLATE_HYDROGENS", f"Meeko residue templates set hydrogens {h_in} -> {h_out} (generated, PREVIEW_UNQUALIFIED; protonation source {source})", n_atoms, len(out_atoms), True))
     decisions.append(_decision("RECEPTOR_CHARGES", "Gasteiger charges from Meeko residue templates", len(out_atoms), len(out_atoms), False))
     stages.append(stage("meeko.receptor", tool_version("meeko"), {"templates": "default", "charge_model": "gasteiger(template)", "allow_bad_res": False},
                         sha256_text(current), sha256_text(rigid), ["RECEPTOR_CHARGES"]))
     pdbqt_atoms = parse_pdbqt_atoms(rigid)
     return {
-        "decisions": decisions, "warnings": warnings, "stages": stages, "generated": generated,
+        "decisions": decisions, "warnings": warnings, "stages": stages, "generated": generated, "protonationSource": source,
         "pdbqt": rigid, "clean_pdb": prepared_pdb if prepared_pdb.endswith("\n") else prepared_pdb + "\n",
         "canonical": {"schemaVersion": 1, "subject": "receptor", "atoms": pdbqt_atoms, "bonds": None, "bondsSource": "UNAVAILABLE (residue templates; not exported in 5.2 part 1)"},
         "atoms": len(pdbqt_atoms), "hSubmitted": h_sub, "hAdded": max(0, h_out - h_in) if protonation != "PROPKA_PREVIEW" else max(0, h_out - h_sub),

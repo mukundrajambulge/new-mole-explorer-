@@ -135,6 +135,17 @@
       "purpose": "many long semicolon text fields"
     },
     {
+      "name": "1IEP.pdb",
+      "pdbId": "1IEP",
+      "format": "pdb",
+      "url": "https://files.rcsb.org/download/1IEP.pdb",
+      "downloaded": "2026-10-08",
+      "sha256": "577386b4b8bc58a570facba0c8a843386842caef5ed7b60106c685d0f68d4218",
+      "bytes": 434565,
+      "tracked": true,
+      "purpose": "ABL kinase + imatinib (STI) complex, chains A/B; prep pairs and redock sanity target"
+    },
+    {
       "name": "4V6F.cif",
       "pdbId": "4V6F",
       "format": "mmcif",

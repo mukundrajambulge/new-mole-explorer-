@@ -19,7 +19,11 @@ interface Invocation {
   options: { cwd: string; shell: boolean; env: Record<string, string> };
 }
 interface Mod {
-  buildPrepInvocation(o: { mode: string; jobDir: string; python: string; platform?: string }): Invocation;
+  buildPrepInvocation(o: { mode: string; jobDir: string; python: string; platform?: string; timeoutMs?: number }): Invocation;
+  prepTimeoutMs(options: object, override?: number): number;
+  readJobOptions(jobDir: string): object;
+  PREP_STAGE_TIMEOUT_MS: number;
+  PREP_MAX_TIMEOUT_MS: number;
   toWslPath(p: string): string;
   scrubOutput(text: string, cap: number, extra: string[]): string;
   runProcess(inv: { command: string; args: string[]; options: object; scrub: string[] }, o: { timeoutMs: number }): Promise<RunResult>;
@@ -52,6 +56,30 @@ describe("mole-dock prep spawn wrapper", () => {
       expect(() => m.buildPrepInvocation({ mode: "rm", jobDir: job, python: "/p/python" })).toThrow();
       expect(() => m.buildPrepInvocation({ mode: "plan", jobDir: "relative/dir", python: "/p/python" })).toThrow(/JOB_DIR_INVALID/);
       expect(() => m.buildPrepInvocation({ mode: "plan", jobDir: job, python: "~/mole-prep/bin/python" })).toThrow();
+    } finally {
+      rmSync(job, { recursive: true, force: true });
+    }
+  });
+
+  it("sizes the process timeout per pipeline stage, caps it and clamps overrides", async () => {
+    const m = await load();
+    const stage = m.PREP_STAGE_TIMEOUT_MS;
+    expect(m.prepTimeoutMs({})).toBe(3 * stage);
+    expect(m.prepTimeoutMs({ addMissingAtoms: true, protonation: "PROPKA_PREVIEW" })).toBe(5 * stage);
+    expect(m.prepTimeoutMs({ addMissingAtoms: true, protonation: "PROPKA_PREVIEW", ligandProtonation: "DIMORPHITE_PREVIEW" })).toBeLessThanOrEqual(m.PREP_MAX_TIMEOUT_MS);
+    expect(m.prepTimeoutMs({}, 10 * 60 * 60 * 1000)).toBe(m.PREP_MAX_TIMEOUT_MS);
+    expect(m.prepTimeoutMs({}, 1)).toBe(1000);
+    expect(m.prepTimeoutMs({ addMissingAtoms: true }, 5000)).toBe(5000);
+    expect(() => m.prepTimeoutMs({}, Number.NaN)).toThrow();
+    const job = mkdtempSync(join(tmpdir(), "prepjob-"));
+    try {
+      expect(m.readJobOptions(job)).toEqual({});
+      writeFileSync(join(job, "job.json"), JSON.stringify({ options: { addMissingAtoms: true, protonation: "PROPKA_PREVIEW" } }));
+      expect(m.prepTimeoutMs(m.readJobOptions(job))).toBe(5 * stage);
+      writeFileSync(join(job, "job.json"), "x".repeat(70 * 1024));
+      expect(m.readJobOptions(job)).toEqual({});
+      const inv = m.buildPrepInvocation({ mode: "apply", jobDir: job, python: "/home/u/mole-prep/bin/python", platform: process.platform, timeoutMs: 5 * stage });
+      expect(inv.args[inv.args.indexOf("-k") + 2]).toBe(String((5 * stage) / 1000));
     } finally {
       rmSync(job, { recursive: true, force: true });
     }

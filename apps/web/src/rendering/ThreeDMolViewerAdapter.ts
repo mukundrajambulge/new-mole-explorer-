@@ -233,6 +233,8 @@ export class ThreeDMolViewerAdapter {
   private alignmentShapes: GLShape[] = [];
   private alignmentOverlays: readonly AlignmentOverlay[] = [];
   private searchRegionShape: GLShape | null = null;
+  private poseModel: ViewerModel | null = null;
+  private poseShapes: GLShape[] = [];
   private searchRegionOverlay: SearchRegionOverlay | null = null;
   private dotSurfaceShapes: GLShape[] = [];
   private surfaceIds: number[] = [];
@@ -281,8 +283,7 @@ export class ThreeDMolViewerAdapter {
     this.installPickNarrowing(this.viewer);
     this.performance.viewerCreations += 1;
     container.dataset.rendererGeneration = String(this.rendererGeneration);
-    this.resizeObserver = new ResizeObserver(() => { this.viewer?.resize(); this.render(); });
-    this.resizeObserver.observe(container);
+    // Resizing is driven solely by setViewport (MolecularCanvas owns the one ResizeObserver).
   }
 
   /**
@@ -419,6 +420,25 @@ export class ThreeDMolViewerAdapter {
     this.projectSearchRegionOverlay();
   }
 
+  /** Adds (or removes, with null) one docked-pose model plus optional H-bond lines. Never touches the receptor model. */
+  setPoseOverlay(pose: { text: string; format: "sdf" | "pdbqt"; hbonds: readonly { from: readonly [number, number, number]; to: readonly [number, number, number] }[] } | null): void {
+    const viewer = this.viewer;
+    if (!viewer) return;
+    if (this.poseModel) viewer.removeModel(this.poseModel);
+    this.poseModel = null;
+    this.poseShapes.forEach((shape) => viewer.removeShape(shape));
+    this.poseShapes = [];
+    if (pose && this.structure) {
+      this.poseModel = viewer.addModel(pose.text, pose.format);
+      this.poseModel.setStyle({}, { stick: { colorscheme: "magentaCarbon", radius: 0.2 } });
+      for (const h of pose.hbonds) {
+        this.poseShapes.push(viewer.addLine({ start: { x: h.from[0], y: h.from[1], z: h.from[2] }, end: { x: h.to[0], y: h.to[1], z: h.to[2] }, color: "#ffd84d", dashed: true, linewidth: 2 }));
+      }
+    }
+    this.container?.setAttribute("data-pose-overlay", pose ? "1" : "0");
+    this.render();
+  }
+
   private projectSearchRegionOverlay(): void {
     if (this.searchRegionShape) this.viewer?.removeShape(this.searchRegionShape);
     this.searchRegionShape = null;
@@ -485,6 +505,8 @@ export class ThreeDMolViewerAdapter {
     this.viewer!.removeAllModels();
     this.viewer!.removeAllSurfaces();
     this.viewer!.removeAllShapes();
+    this.poseModel = null;
+    this.poseShapes = [];
     this.hoverShapes = [];
     this.surfaceCoordinator.invalidate();
     this.surfaceIds = [];
