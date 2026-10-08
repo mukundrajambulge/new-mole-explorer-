@@ -11,3 +11,5 @@ Open the Docking workspace. The wizard under the viewer has five steps. Every sc
 Errors from the docking service are shown as received. Loading a different structure discards in-flight work and old replies. Leaving the workspace aborts open requests.
 
 Configuration: VITE_DOCKING_API_BASE_URL (default /api) and VITE_DOCKING_MOCK=1 when pointing at the mock server (apps/api/src/jobs/mockServer.ts).
+
+The wizard is the only Inputs UI (it sits in the left column of the Docking workspace). A ligand picked from the structure gets its own component id, different from the receptor id. The pose overlay uses the shared viewer; with the mock server the pose is a fake ring placed at the box center, labelled MOCK. Run the mock with `node --import tsx apps/api/src/jobs/mockServer.ts` (port 8101).

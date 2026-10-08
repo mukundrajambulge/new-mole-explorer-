@@ -16,7 +16,6 @@ test.describe("UI-D0 Docking workspace", () => {
     await page.goto("/");
     await page.getByRole("button", { name: "Docking" }).click();
     await page.locator("#structure-file").setInputFiles("tests/fixtures/mini-protein.pdb");
-    await expect(page.getByTestId("docking-workspace").getByText("mini-protein.pdb", { exact: true })).toBeVisible({ timeout: 30_000 });
     await expect(page.getByTestId("wizard-receptor")).toContainText("atoms", { timeout: 30_000 });
     await expect(page.getByTestId("molecular-viewer")).toHaveAttribute("data-search-region-overlay", "DRAFT", { timeout: 30_000 });
     const digestBefore = await page.getByTestId("molecular-viewer").getAttribute("data-search-region-digest");

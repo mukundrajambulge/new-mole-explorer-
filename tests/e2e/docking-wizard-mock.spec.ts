@@ -36,7 +36,7 @@ test("wizard runs Inputs to Results against the mock and overlays a pose", async
   const wizard = page.getByTestId("docking-wizard");
   await expect(wizard.getByTestId("docking-preview-banner")).toContainText("Preview: not scientifically qualified");
   await expect(wizard.getByTestId("wizard-receptor")).toContainText("atoms", { timeout: 60_000 });
-  await expect(wizard.getByLabel("Ligand")).toContainText("STI");
+  await expect(wizard.getByLabel("Ligand", { exact: true })).toContainText("STI");
   const next = wizard.getByRole("button", { name: "Next: Prepare" });
   await expect(next).toBeEnabled({ timeout: 60_000 });
   await next.click();
