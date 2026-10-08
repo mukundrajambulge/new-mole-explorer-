@@ -1,3 +1,4 @@
+import { request as httpRequest } from "node:http";
 import { mkdtempSync, rmSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
@@ -60,6 +61,23 @@ describe("api routes", () => {
     expect(bad.status).toBe(403);
     expect(bad.headers.get("access-control-allow-origin")).toBeNull();
     expect((await bad.json()).error.code).toBe("ORIGIN_NOT_ALLOWED");
+  });
+  it("rejects foreign Host headers in local mode (DNS rebinding)", async () => {
+    const port = Number(new URL(base).port);
+    const get = (host: string) => new Promise<{ status: number; body: string }>((resolve, reject) => {
+      const req = httpRequest({ host: "127.0.0.1", port, path: "/api/health", headers: { host } }, (res) => {
+        let body = "";
+        res.on("data", (c) => { body += c; });
+        res.on("end", () => resolve({ status: res.statusCode ?? 0, body }));
+      });
+      req.on("error", reject);
+      req.end();
+    });
+    const bad = await get(`rebind.evil.example:${port}`);
+    expect(bad.status).toBe(403);
+    expect(JSON.parse(bad.body).error.code).toBe("HOST_NOT_ALLOWED");
+    expect((await get(`localhost:${port + 1}`)).status).toBe(403);
+    expect((await get(`localhost:${port}`)).status).toBe(200);
   });
   it("caps JSON bodies before buffering", async () => {
     const res = await fetch(`${base}/api/projects`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: "x".repeat(5000) }) });

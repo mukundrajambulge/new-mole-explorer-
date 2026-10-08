@@ -81,7 +81,18 @@ const errorResponse = (response: ServerResponse, error: unknown) => {
   sendJson(response, 500, { error: { code: "INTERNAL_ERROR", message: "The request could not be completed." } });
 };
 
+const LOCAL_HOSTNAMES = new Set(["127.0.0.1", "localhost", "[::1]"]);
+const hostAllowed = (request: IncomingMessage): boolean => {
+  const match = /^(\[::1\]|[a-z0-9.-]+)(?::(\d{1,5}))?$/i.exec(request.headers.host ?? "");
+  if (!match || !LOCAL_HOSTNAMES.has(match[1].toLowerCase())) return false;
+  return match[2] === undefined || Number(match[2]) === request.socket.localPort;
+};
+
 const route = async (request: IncomingMessage, response: ServerResponse) => {
+  if (config.mode === "local" && !hostAllowed(request)) {
+    sendJson(response, 403, { error: { code: "HOST_NOT_ALLOWED", message: "This host is not allowed." } });
+    return;
+  }
   const origin = request.headers.origin;
   if (origin !== undefined) {
     if (!config.allowedOrigins.includes(origin)) {
