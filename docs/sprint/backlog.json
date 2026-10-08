@@ -397,9 +397,123 @@
         "M1"
       ],
       "est": "1 day",
-      "status": "NEEDS_OWNER",
+      "status": "READY",
       "branch": "sprint/W3/1.3",
-      "note": "W3: memory test pads REMARK lines (not dense mmCIF); parse slot released before stringify of large result; slow-client DoS (no idle timeout, slots held for full body)"
+      "note": "Owner decision: merge now; the 3 review gaps are tracked as 1.3a, 1.3b, 1.3c. W4 integration: merge conflict with 1.5/A1 in server.ts - needs conflict resolution"
+    },
+    {
+      "id": "1.3a",
+      "title": "Prove the memory limit with a dense structure",
+      "phase": "P1",
+      "wave": "W2",
+      "lane": "L2",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "1.3"
+      ],
+      "size": "S",
+      "risk": "high",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        "apps/api/src/structures/multipart.ts",
+        "apps/api/src/structures/ingestion.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "The 1.3 memory test pads a small file with REMARK lines, so it does not prove the 1 GB limit for real structures.",
+      "how": "- Replace the padded upload with a dense mmCIF (repeat real atom_site rows, or a large real fixture) of about 200 MB.",
+      "done": "Two 200 MB dense uploads keep server memory under about 1 GB.",
+      "refs": [
+        "M1"
+      ],
+      "est": "1 day",
+      "status": "TODO",
+      "note": "Split from the 1.3 review (2026-10-08)"
+    },
+    {
+      "id": "1.3b",
+      "title": "Keep the parse slot until the reply is sent",
+      "phase": "P1",
+      "wave": "W2",
+      "lane": "L2",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "1.3"
+      ],
+      "size": "S",
+      "risk": "high",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        "apps/api/src/structures/multipart.ts",
+        "apps/api/src/structures/ingestion.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "withParseSlot frees the slot before JSON.stringify of a large result, so two big results can overlap in memory.",
+      "how": "- Hold the parse slot until sendJson finishes, or stream the response.",
+      "done": "A test shows the second large upload waits until the first reply is fully sent.",
+      "refs": [
+        "M1"
+      ],
+      "est": "1 day",
+      "status": "TODO",
+      "note": "Split from the 1.3 review (2026-10-08)"
+    },
+    {
+      "id": "1.3c",
+      "title": "Idle timeouts for slow clients",
+      "phase": "P1",
+      "wave": "W2",
+      "lane": "L2",
+      "tier": "strong",
+      "critical": false,
+      "deps": [
+        "1.3"
+      ],
+      "size": "S",
+      "risk": "high",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "api-engineer",
+      "owns": "apps/api/src/server.ts, apps/api/src/config.ts, apps/api/src/projects/**, apps/api/src/command/**, apps/api/src/structures/multipart.ts, apps/api/src/structures/sourceArtifactStore.ts, packages/contracts/src/api/**, apps/web/vite.config.ts (proxy token only)",
+      "contextFiles": [
+        "apps/api/src/server.ts",
+        "apps/api/src/structures/multipart.ts",
+        "apps/api/src/structures/ingestion.ts"
+      ],
+      "checkFlags": "--quick",
+      "what": "A client that declares a large body and trickles bytes holds an upload slot until the 300 s request timeout.",
+      "how": "- Add an idle/body timeout (for example 15 s without data) and release the slot; answer 408.",
+      "done": "A trickling client gets 408 within the idle timeout, and other uploads are not blocked.",
+      "refs": [
+        "M1"
+      ],
+      "est": "1 day",
+      "status": "TODO",
+      "note": "Split from the 1.3 review (2026-10-08)"
     },
     {
       "id": "1.4",
@@ -472,9 +586,9 @@
         "S3"
       ],
       "est": "Half a day",
-      "status": "TODO",
-      "branch": "sprint/W3/1.5",
-      "note": "W3 fix not started (token cap): rawStorageRef PUT tests must assert INVALID_INPUT with an otherwise valid body"
+      "status": "READY",
+      "branch": "sprint/W4/1.5",
+      "note": "W4 READY; integrating"
     },
     {
       "id": "1.6",
@@ -1189,7 +1303,9 @@
         "F2"
       ],
       "est": "1 day",
-      "status": "TODO"
+      "status": "READY",
+      "branch": "sprint/W4/3.3-fix",
+      "note": "W4 READY: 4V6F 20 hover dwells -> 0 React commits; integrating"
     },
     {
       "id": "3.4",
@@ -1225,7 +1341,8 @@
       ],
       "est": "1 day",
       "status": "TODO",
-      "note": "Owner report 2026-10-08: page freezes ('not responding') when rotating. Done-when extended in W4: drag-rotate 4V6F 5 s, no long task >200 ms, no hover picking/re-render while mouse button held"
+      "note": "W4 PARTIAL: hover p95 240->49 ms, no hover/React work during drag; but drag max long task 2689 ms in software-GL headless (200 ms assert only with PERF_GPU=1). Needs cheaper rendering during drag or GPU measurement; hover assert loosened to 55 ms - restore 50",
+      "branch": "sprint/W4/3.4"
     },
     {
       "id": "3.5",
@@ -2060,8 +2177,8 @@
       "done": "10 test pairs prepare without errors, and the output is identical on re-run.",
       "refs": [],
       "est": "1 week",
-      "status": "NEEDS_OWNER",
-      "note": "Design note docs/sprint/design/5.2.md ready; owner to confirm protonation default (EXPLICIT_SUBMITTED, PROPKA opt-in PREVIEW_UNQUALIFIED)"
+      "status": "TODO",
+      "note": "Owner decision 2026-10-08: default EXPLICIT_SUBMITTED (use the hydrogens in the uploaded file); PROPKA/PDB2PQR is an opt-in that seals PREVIEW_UNQUALIFIED. No new profile IDs or digests. Design: docs/sprint/design/5.2.md"
     },
     {
       "id": "5.3",
@@ -2464,9 +2581,9 @@
         "T9"
       ],
       "est": "Half a day",
-      "status": "NEEDS_OWNER",
+      "status": "READY",
       "branch": "sprint/W3/6.1",
-      "note": "W3 PARTIAL: <10 min unmeasured (needs a hosted CI run = push); removed npm run build from fast job - decide keep/replace"
+      "note": "Owner decision: keep npm run build in the fast job (908b966). Measure under-10-min on the first CI run after push"
     },
     {
       "id": "6.2",
