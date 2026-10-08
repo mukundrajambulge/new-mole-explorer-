@@ -7,6 +7,8 @@ export type ApiConfig = {
   allowedOrigins: readonly string[];
   /** Directory that receives the local-mode token file (<dir>/token). */
   tokenDir: string;
+  /** Shared credential for hosted mode (MOLE_TOKEN) until accounts exist; local mode issues a random token. */
+  token?: string;
   /** Cap for ordinary JSON bodies. */
   maxJsonBytes: number;
   /** Cap for project save bodies (PUT /api/projects/:id). */
@@ -39,6 +41,8 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ApiConfig => {
   if (modeRaw === "local" && !LOOPBACK.has(host)) throw new Error("MOLE_MODE=local only binds to a loopback address; set MOLE_MODE=hosted to expose the server.");
   const listed = (env.ALLOWED_ORIGINS ?? "").split(",").map((origin) => origin.trim()).filter(Boolean);
   if (modeRaw === "hosted" && listed.length === 0) throw new Error("MOLE_MODE=hosted requires ALLOWED_ORIGINS.");
+  const token = env.MOLE_TOKEN;
+  if (modeRaw === "hosted" && (token === undefined || token.length < 32)) throw new Error("MOLE_MODE=hosted requires MOLE_TOKEN of at least 32 characters.");
   if (listed.includes("*")) throw new Error("ALLOWED_ORIGINS must list explicit origins, not *.");
   const maxJsonBytes = intEnv(env, "MAX_JSON_BYTES", 8 * MIB, 1024, 256 * MIB);
   const maxProjectJsonBytes = intEnv(env, "MAX_PROJECT_JSON_BYTES", 64 * MIB, 1024, 256 * MIB);
@@ -47,9 +51,12 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ApiConfig => {
   return {
     mode: modeRaw,
     host,
-    port: intEnv(env, "PORT", intEnv(env, "API_PORT", 8100, 0, 65535), 0, 65535),
+    // API_PORT wins. Generic PORT is only honoured in hosted mode: in local dev, tools such as the
+    // preview launcher set PORT for the web app (3101), which the API must not take over.
+    port: intEnv(env, "API_PORT", modeRaw === "hosted" ? intEnv(env, "PORT", 8100, 0, 65535) : 8100, 0, 65535),
     allowedOrigins: modeRaw === "local" ? [...LOCAL_DEV_ORIGINS, ...listed] : listed,
     tokenDir: env.MOLE_TOKEN_DIR || fileURLToPath(new URL("../../../.mole", import.meta.url)),
+    ...(modeRaw === "hosted" ? { token } : {}),
     maxJsonBytes,
     maxProjectJsonBytes,
     maxJsonBytesInFlight,

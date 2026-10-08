@@ -35,17 +35,58 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
 
+  native:
+    name: Native tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y --no-install-recommends ninja-build cmake
+      - run: cmake -S native/docking-reference/scoring -B build/native -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - run: cmake --build build/native
+      - run: ctest --test-dir build/native --output-on-failure
+
+  smoke_e2e:
+    name: Smoke e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ms-playwright-${{ runner.os }}-${{ hashFiles('node_modules/playwright-core/package.json') }}
+      - id: pw-cache
+        run: echo "hit=$([ -d ~/.cache/ms-playwright ] && ls ~/.cache/ms-playwright | grep -q chromium && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - if: steps.pw-cache.outputs.hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.pw-cache.outputs.hit == 'true'
+        run: npx playwright install-deps chromium
+      - run: npx playwright test --project=smoke --reporter=github
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-artifacts
+          path: test-results
+          if-no-files-found: ignore
+
   full_acceptance:
     name: Full browser acceptance
-    needs: fast
+    needs: [fast, native, smoke_e2e]
     if: >-
       needs.fast.result == 'success' &&
+      needs.native.result == 'success' &&
+      needs.smoke_e2e.result == 'success' &&
       (
         (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')) ||
         (github.event_name == 'workflow_dispatch' && inputs.full_acceptance == true)

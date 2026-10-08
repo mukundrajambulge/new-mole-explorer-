@@ -23,3 +23,6 @@ docs/sprint/next-wave.json
 
 # Large RCSB fixtures are fetched by scripts/fetch-fixtures.mjs, never committed
 tests/fixtures/rcsb/4V6F.*
+
+# Agent worktrees (temporary)
+.claude/worktrees/

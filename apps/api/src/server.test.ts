@@ -18,7 +18,7 @@ describe("config", () => {
   it("hosted requires explicit origins and rejects wildcard", () => {
     expect(() => loadConfig({ MOLE_MODE: "hosted", HOST: "0.0.0.0" })).toThrow();
     expect(() => loadConfig({ MOLE_MODE: "hosted", ALLOWED_ORIGINS: "*" })).toThrow();
-    expect(loadConfig({ MOLE_MODE: "hosted", HOST: "0.0.0.0", ALLOWED_ORIGINS: "https://a.example" }).allowedOrigins).toEqual(["https://a.example"]);
+    expect(loadConfig({ MOLE_MODE: "hosted", HOST: "0.0.0.0", ALLOWED_ORIGINS: "https://a.example", MOLE_TOKEN: "x".repeat(32) }).allowedOrigins).toEqual(["https://a.example"]);
   });
   it("defaults request size limits and bounds the upload cap", () => {
     const c = loadConfig({});
@@ -29,8 +29,13 @@ describe("config", () => {
     expect(() => loadConfig({ MAX_UPLOAD_BYTES: String(512 * 1024 * 1024) })).toThrow();
   });
   it("rejects bad numbers and modes", () => {
-    expect(() => loadConfig({ PORT: "abc" })).toThrow();
+    expect(() => loadConfig({ API_PORT: "abc" })).toThrow();
     expect(() => loadConfig({ MOLE_MODE: "x" })).toThrow();
+  });
+  it("ignores the generic PORT in local mode but honours it in hosted mode", () => {
+    expect(loadConfig({ PORT: "3101" }).port).toBe(8100);
+    expect(loadConfig({ PORT: "3101", API_PORT: "8200" }).port).toBe(8200);
+    expect(loadConfig({ MOLE_MODE: "hosted", HOST: "0.0.0.0", ALLOWED_ORIGINS: "https://a.example", MOLE_TOKEN: "x".repeat(32), PORT: "9000" }).port).toBe(9000);
   });
 });
 

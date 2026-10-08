@@ -13,10 +13,24 @@
       "est": 184028,
       "windowBefore": 38,
       "windowAfter": 56
+    },
+    {
+      "wave": "W3",
+      "spent": 241449,
+      "est": 198628,
+      "windowBefore": 6,
+      "windowAfter": 34
+    },
+    {
+      "wave": "W4",
+      "spent": 130737,
+      "est": 113000,
+      "windowBefore": 3,
+      "windowAfter": 28
     }
   ],
   "calibration": {
-    "tokensPerWindowPct": 8632,
-    "estMultiplier": 0.68
+    "tokensPerWindowPct": 7516,
+    "estMultiplier": 1.07
   }
 }

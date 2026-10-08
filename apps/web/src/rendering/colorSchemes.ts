@@ -96,6 +96,12 @@ export const resolveProjectedAtomColor = (
     return resolveAtomColor(componentOverride.mode, atom, structure);
   }
   if (color.mode === "named" && explicitGlobalColor) return { status: "READY", color: explicitGlobalColor };
+  // "Carbons by chain" (PyMOL/ChimeraX convention): a cartoon takes the CA carbon colour,
+  // so element schemes would turn the whole ribbon grey. CPK/Jmol data stay unchanged;
+  // heteroatoms keep their element colours.
+  if ((color.mode === "classic-cpk" || color.mode === "element" || color.mode === "modern-jmol") && atom.isPolymer && atom.element.toUpperCase() === "C" && representationTypeFor(representation) === "CARTOON") {
+    return resolveAtomColor("chain", atom, structure);
+  }
   return resolveAtomColor(color.mode, atom, structure, color.customHex);
 };
 

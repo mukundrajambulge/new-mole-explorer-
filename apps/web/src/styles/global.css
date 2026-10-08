@@ -428,9 +428,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
 .canvas-axis-readout::before { top: 21px; left: 20px; width: 20px; height: 1px; background: #eb4a55; transform: rotate(0deg); }
 .canvas-axis-readout::after { top: 4px; left: 20px; width: 19px; height: 1px; background: #32c678; transform: rotate(90deg); }
 .canvas-axis-readout span { position: absolute; }.axis-readout-y { top: -3px; left: 18px; color: #32c678; }.axis-readout-x { top: 18px; right: -2px; color: #eb4a55; }.axis-readout-z { bottom: 0; left: 4px; color: #5797ff; }
-.canvas-reset { position: absolute; top: 49px; right: 15px; display: grid; place-items: center; width: 35px; height: 35px; color: #27313d; background: #f1f4f7; border-radius: 4px; box-shadow: 0 3px 11px rgba(0,0,0,.22); }
+.canvas-reset { position: absolute; top: 66px; right: 15px; display: grid; place-items: center; width: 35px; height: 35px; color: #27313d; background: #f1f4f7; border-radius: 4px; box-shadow: 0 3px 11px rgba(0,0,0,.22); }
 .canvas-reset:hover { background: white; }
-.canvas-reset svg { transform: rotate(45deg); }
 .canvas-tool-readout { position: absolute; left: 15px; bottom: 13px; display: flex; align-items: center; gap: 7px; padding: 5px 8px; color: #8d9bad; border: 1px solid rgba(145, 170, 200, .14); border-radius: 5px; background: rgba(7, 11, 16, .7); font-size: 9px; letter-spacing: .08em; }
 .tool-readout-icon { color: var(--cyan); }
 
@@ -500,8 +499,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
 .runtime-error-card small { color: #b9827d; font-family: ui-monospace, monospace; font-size: 10px; }
 
 @media (max-width: 1280px) {
-  :root { --left-width: 230px; --right-width: 242px; }
-  .workspace-grid { --left-width: 230px; --right-width: 242px; }
+  :root { --left-width: 230px; --right-width: 52px; }
+  .workspace-grid { --left-width: 230px; --right-width: 52px; }
+  .workspace-grid.workspace-grid--right-expanded { --right-width: 300px; }
   .menu-links { gap: 13px; }
   .menu-brand { min-width: 95px; }
   .tool-button { min-width: 46px; padding-left: 4px; padding-right: 4px; }
@@ -517,7 +517,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
   .brand-mark { width: 36px; height: 36px; }
   .menu-context { display: none; }
   .context-toolbar { margin-left: 7px; margin-right: 7px; }
-  .workspace-grid { --left-width: 210px; --right-width: 220px; gap: 6px; padding-left: 7px; padding-right: 7px; }
+  .workspace-grid { --left-width: 210px; --right-width: 52px; gap: 6px; padding-left: 7px; padding-right: 7px; }
+  .workspace-grid.workspace-grid--right-expanded { --right-width: 280px; }
   .console-layer { right: calc(var(--right-width) + 18px); left: calc(var(--left-width) + 13px); }
   .console-mode { display: none; }
   .status-bar { gap: 11px; padding-left: 10px; padding-right: 10px; }
@@ -535,7 +536,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outl
   .side-column { display: none; }
   /* Hidden side columns must not leave the canvas auto-placed in the zero-width first track. */
   .workspace-grid { grid-template-columns: minmax(0, 1fr) var(--right-width); padding-left: 6px; padding-right: 6px; }
-  .workspace-grid--right-expanded { --right-width: min(360px, calc(100vw - 62px)); }
+  .workspace-grid.workspace-grid--right-expanded { --right-width: min(360px, calc(100vw - 62px)); }
   .console-layer { right: 18px; left: 18px; }
   .menu-links { gap: 9px; }
   .menu-links button { font-size: 11px; }

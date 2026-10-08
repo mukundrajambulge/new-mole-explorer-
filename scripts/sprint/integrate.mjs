@@ -13,7 +13,8 @@ const smoke = argv.includes("--smoke");
 const [wave, base, ...branches] = argv.filter((a) => a !== "--smoke");
 if (!wave || !base) { console.error("usage: integrate.mjs <wave> <base> <branch...> [--smoke]"); process.exit(2); }
 const INTEG = `sprint/${wave}/integration`;
-const dir = resolve("..", `mw-integration-${wave}`);
+// Inside the repo (git-ignored), so integration worktrees never clutter the Desktop.
+const dir = resolve(".claude", "worktrees", `integration-${wave}`);
 const sh = (cmd, args, cwd = dir) => spawnSync(cmd, args, { cwd, encoding: "utf8", shell: process.platform === "win32", maxBuffer: 64 * 1024 * 1024 });
 const git = (...a) => sh("git", a);
 const lines = (r) => `${r.stdout || ""}${r.stderr || ""}`.split(/\r?\n/);
@@ -29,6 +30,11 @@ const merged = [], deferred = [];
 for (const b of branches) {
   const m = git("merge", "--no-ff", "--no-edit", b);
   if (m.status !== 0) { git("merge", "--abort"); deferred.push({ branch: b, reason: "merge conflict" }); continue; }
+  // A branch that adds dependencies needs a fresh install before its checks can load them.
+  if (git("diff", "--quiet", "HEAD~1", "HEAD", "--", "package-lock.json").status !== 0) {
+    const reinstall = sh("npm", ["ci", "--no-audit", "--no-fund", "--loglevel=error"]);
+    if (reinstall.status !== 0) { git("reset", "--hard", "HEAD~1"); sh("npm", ["ci", "--no-audit", "--no-fund", "--loglevel=error"]); deferred.push({ branch: b, reason: "npm ci failed after merge" }); continue; }
+  }
   const c = sh("node", ["scripts/sprint/check.mjs", "--quick"]);
   if (c.status !== 0) {
     git("reset", "--hard", "HEAD~1"); // only ever on the integration branch inside its own worktree

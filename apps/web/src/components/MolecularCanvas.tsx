@@ -78,6 +78,8 @@ export const MolecularCanvas = ({
   const pickRef = useRef(onPick);
   const hoverRef = useRef(onHover);
   const pointerGestureRef = useRef(false);
+  /** Background pick candidate: armed on pointerdown, fires on pointerup only when the pointer did not drag. */
+  const backgroundPickRef = useRef<{ x: number; y: number } | null>(null);
   const renderLoadInProgressRef = useRef(false);
   pickRef.current = onPick;
   hoverRef.current = onHover;
@@ -248,7 +250,7 @@ export const MolecularCanvas = ({
 
   const gestureMode = activeTool === "Rotate" ? "rotate" : activeTool === "Pan" ? "pan" : activeTool === "Zoom" ? "zoom" : null;
   const beginPointerGesture = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!gestureMode && event.button === 0 && event.target instanceof HTMLCanvasElement) onBackgroundPick();
+    if (!gestureMode && event.button === 0 && event.target instanceof HTMLCanvasElement) backgroundPickRef.current = { x: event.clientX, y: event.clientY };
     if (!gestureMode || event.button !== 0 || (event.target instanceof HTMLElement && Boolean(event.target.closest("button")))) return;
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -261,6 +263,9 @@ export const MolecularCanvas = ({
     adapterRef.current?.updateGesture(event.clientX, event.clientY);
   };
   const endPointerGesture = (event: React.PointerEvent<HTMLDivElement>) => {
+    const armed = backgroundPickRef.current;
+    backgroundPickRef.current = null;
+    if (armed && event.type === "pointerup" && Math.hypot(event.clientX - armed.x, event.clientY - armed.y) <= 4) onBackgroundPick();
     if (!pointerGestureRef.current) return;
     pointerGestureRef.current = false;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
@@ -305,7 +310,7 @@ export const MolecularCanvas = ({
         {(error || viewerError) && <div className="viewer-message viewer-message--error"><Icon name="circleHelp" size={17} /> {error ?? viewerError}</div>}
         {dragActive && <div className="drop-overlay"><Icon name="upload" size={24} /><strong>Drop a supported coordinate file</strong><span>Backend validation will keep the current structure safe.</span></div>}
         <div className="canvas-axis-readout" aria-label="Orientation axes"><span className="axis-readout-y">Y</span><span className="axis-readout-x">X</span><span className="axis-readout-z">Z</span></div>
-        <button className="canvas-reset" onClick={() => onAction("VIEW.RESET")} aria-label="Reset view" data-action-id="VIEW.RESET"><Icon name="plus" size={16} /></button>
+        <button className="canvas-reset" onClick={() => onAction("VIEW.RESET")} aria-label="Reset view" title="Reset view" data-action-id="VIEW.RESET"><Icon name="home" size={16} /></button>
         <div className="canvas-tool-readout"><span className="tool-readout-icon"><Icon name={toolIcon(activeTool)} size={13} /></span>{measurementMode ? `MEASURE ${measurementMode}` : activeTool.toUpperCase()}</div>
       </div>
     </section>

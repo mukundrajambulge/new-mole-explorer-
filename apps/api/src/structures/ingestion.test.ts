@@ -255,7 +255,7 @@ _atom_site.Cartn_y
 _atom_site.Cartn_z
 _atom_site.pdbx_PDB_model_num
 ATOM 1 C CA ALA A 1 1.0 2.0 3.0 1
-ATOM 1 C CA ALA A 1 4.0 5.0 6.0 2
+ATOM 2 C CA ALA A 1 4.0 5.0 6.0 2
 `;
     const result = await new StructureIngestionService().ingestLocal("states.mmcif", Buffer.from(content));
     expect(result.structure.coordinateStates).toHaveLength(2);
