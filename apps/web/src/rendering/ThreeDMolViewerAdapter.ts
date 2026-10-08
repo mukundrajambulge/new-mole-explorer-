@@ -283,8 +283,7 @@ export class ThreeDMolViewerAdapter {
     this.installPickNarrowing(this.viewer);
     this.performance.viewerCreations += 1;
     container.dataset.rendererGeneration = String(this.rendererGeneration);
-    this.resizeObserver = new ResizeObserver(() => { this.viewer?.resize(); this.render(); });
-    this.resizeObserver.observe(container);
+    // Resizing is driven solely by setViewport (MolecularCanvas owns the one ResizeObserver).
   }
 
   /**
