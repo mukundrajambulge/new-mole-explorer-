@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { BondOrder, ProjectRecord, StructureLoadResult } from "@molecular/contracts";
 import { CapabilityNotice } from "./components/CapabilityNotice";
 import { ConsolePanel, type ConsoleCommandResult } from "./components/ConsolePanel";
@@ -87,6 +88,15 @@ const parseEditBondOrder = (value: string | undefined): Exclude<BondOrder, "UNKN
 const initialRibbonCategory = (): RibbonCategory => {
   const saved = window.sessionStorage.getItem("molecular-workstation.ribbon") as RibbonCategory | null;
   return saved && RIBBON_CATEGORIES.includes(saved) ? saved : "Display";
+};
+
+type PoseOverlay = Parameters<typeof MolecularCanvas>[0]["poseOverlay"];
+const ViewerSlot = ({ host, overlay, pose = null, publish }: { host: HTMLElement; overlay: SearchRegionOverlay | null; pose?: PoseOverlay; publish?: (overlay: SearchRegionOverlay | null, pose: PoseOverlay) => void }) => {
+  // Resize after a move is handled by the ResizeObserver on .viewer-host (MolecularCanvas), which fires after layout.
+  const slotRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => { const slot = slotRef.current; slot?.appendChild(host); return () => { if (slot && host.parentNode === slot) host.remove(); }; }, [host]);
+  useEffect(() => { publish?.(overlay, pose); }, [overlay, pose, publish]);
+  return <div ref={slotRef} style={{ display: "contents" }} />;
 };
 
 export const App = () => {
@@ -1795,15 +1805,30 @@ export const App = () => {
   const inspectorAtomId = projection.interaction.pickedAtomId ?? projection.interaction.selectedAtomIds[0];
   const inspectorCanonicalAtomId = inspectorAtomId?.includes("::") ? inspectorAtomId.slice(inspectorAtomId.indexOf("::") + 2) : inspectorAtomId;
   const selectedAtom = inspectorCanonicalAtomId ? inspectorStructure?.atoms.find((atom) => atom.stableId === inspectorCanonicalAtomId) ?? null : null;
-  const renderMolecularCanvas = (searchRegionOverlay: SearchRegionOverlay | null = null, poseOverlay: Parameters<typeof MolecularCanvas>[0]["poseOverlay"] = null) => <MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={openImportDialog} onFileDrop={importFile} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearSelection} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} alignmentOverlays={alignmentOverlays} searchRegionOverlay={searchRegionOverlay} poseOverlay={poseOverlay} onRenderLifecycle={setRenderLifecycle} />;
+  // One persistent viewer: MolecularCanvas lives in a detached host element that is
+  // portalled once and moved (never rebuilt) into whichever layout slot is visible.
+  const viewerHost = useMemo(() => { const el = document.createElement("div"); el.className = "viewer-portal-host"; el.style.display = "contents"; return el; }, []);
+  const [dockingOverlay, setDockingOverlay] = useState<SearchRegionOverlay | null>(null);
+  const [dockingPose, setDockingPose] = useState<PoseOverlay>(null);
+  const dockingOverlayKey = useRef("[null,null]");
+  const publishDockingOverlay = useCallback((overlay: SearchRegionOverlay | null, pose: PoseOverlay = null) => {
+    const key = JSON.stringify([overlay, pose]);
+    if (key === dockingOverlayKey.current) return;
+    dockingOverlayKey.current = key;
+    setDockingOverlay(overlay);
+    setDockingPose(pose);
+  }, []);
+  const persistentCanvas = createPortal(<MolecularCanvas structure={structure} workspaceObjects={viewerWorkspaceObjects} globalFrameIndex={globalFrameIndex} projection={projection} activeSelectionMembershipHash={activeSelection?.membershipHash} activeTool={activeTool} cameraCommand={cameraCommand} loading={loadState === "loading"} error={loadError} onAction={handleAction} onImport={openImportDialog} onFileDrop={importFile} onPick={handlePick} onHover={handleHover} onBackgroundPick={clearSelection} measurements={measurements} measurementMode={measurementMode} analysisOverlays={analysisOverlays} alignmentOverlays={alignmentOverlays} searchRegionOverlay={activeWorkspace === "DOCKING" ? dockingOverlay : null} poseOverlay={activeWorkspace === "DOCKING" ? dockingPose : null} onRenderLifecycle={setRenderLifecycle} />, viewerHost);
+  const renderMolecularCanvas = (overlay: SearchRegionOverlay | null = null, publish = false, pose: PoseOverlay = null) => <ViewerSlot host={viewerHost} overlay={overlay} pose={pose} publish={publish ? publishDockingOverlay : undefined} />;
 
   return (
     <div className="app-shell">
       <input id="structure-file" ref={fileInputRef} className="visually-hidden-input" type="file" accept=".pdb,.cif,.mmcif,.pqr,.sdf,.mol,.xyz,.mol2,.pdbqt,.fasta,.fa,.fna,.faa,.fastq,.fq,.gb,.gbk,.genbank,.embl,.emb,.dx,.mrc,.map,.ccp4,.dcd,.xtc,.trr,.gro,.psf,.prmtop,.prm7,.smi,.smiles,text/plain" onChange={(event) => { const file = event.target.files?.[0]; if (file) importFile(file); event.target.value = ""; }} />
+      {persistentCanvas}
       <NavRail activeItem={activeWorkspace === "DOCKING" ? "Docking" : "Molecular"} onAction={handleAction} />
       <main className="app-main">
         <MenuBar activeCategory={activeRibbon} onCategory={selectRibbon} />
-        {activeWorkspace === "DOCKING" ? <DockingWorkspace structure={structure} onImport={openImportDialog} onOpenMolecular={() => setActiveWorkspace("MOLECULAR")} renderViewer={(overlay, pose) => renderMolecularCanvas(overlay, pose)} /> : <>
+        {activeWorkspace === "DOCKING" ? <DockingWorkspace structure={structure} onImport={openImportDialog} onOpenMolecular={() => setActiveWorkspace("MOLECULAR")} renderViewer={(overlay, pose) => renderMolecularCanvas(overlay, true, pose ?? null)} /> : <>
           <ContextToolbar activeTool={activeTool} activeCategory={activeRibbon} collapsed={ribbonCollapsed} representation={projection.representation} colorMode={projection.color.mode} onAction={handleAction} onImport={openImportDialog} onFetchRcsb={fetchRcsb} onColorMode={setColorMode} onStyleChange={applyStyle} onToggleCollapsed={() => setRibbonCollapsed((value) => !value)} />
           <div className={`workspace-grid ${leftCollapsed ? "workspace-grid--left-collapsed" : ""} ${activeRailPanel ? "workspace-grid--right-expanded" : ""}`}>
             <StructurePanel collapsed={leftCollapsed} onToggle={() => setLeftCollapsed((value) => !value)} onAction={handleAction} structure={structure} workspaceObjects={workspaceObjects} workspaceGroups={workspaceGroups} activeObjectId={activeObjectId} coordinateFramePolicy={coordinateFramePolicy} onCoordinateFrameChange={setCoordinateFramePolicy} onObjectSelect={activateWorkspaceObject} onObjectToggle={toggleWorkspaceObject} onObjectStateCycle={cycleObjectState} onObjectAllStatesToggle={toggleObjectAllStates} projection={projection} selectedAtom={selectedAtom} activeSelection={activeSelection} onClearSelection={clearSelection} measurementMode={measurementMode} measurementSlots={measurementSlots} measurements={measurements} onMeasurementMode={setMeasurementMode} onMeasurementVisibility={updateMeasurementVisibility} onMeasurementDelete={deleteMeasurement} onMeasurementClear={clearMeasurementPicks} analysisResults={analysisResults} fittingResults={fittingResults} onAlignmentCommand={runConsoleCommand} canUndo={activeHistoryState?.canUndo} canRedo={activeHistoryState?.canRedo} loading={loadState === "loading"} error={loadError} namedSelections={namedSelections} onNamedSelectionAction={handleNamedSelectionAction} showOperations={false} renderReady={renderLifecycle === "ready"} />
