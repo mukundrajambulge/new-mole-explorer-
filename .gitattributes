@@ -1,3 +1,5 @@
 apps/api/src/docking/fixtures/d3-ir-02/** -text
 # Shell scripts run inside WSL/Linux and must keep LF line endings
 *.sh text eol=lf
+# Workflow scripts are loaded by Claude Code, which rejects CR characters
+.claude/workflows/*.js text eol=lf
