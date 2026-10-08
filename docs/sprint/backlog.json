@@ -213,7 +213,9 @@
         "T3"
       ],
       "est": "2-3 hours",
-      "status": "TODO"
+      "status": "TODO",
+      "branch": "sprint/W1/0.7",
+      "note": "W1 PARTIAL: evidencePath in place; done-when (e2e run leaves git status clean) not verified - run e2e then finish."
     },
     {
       "id": "0.8",
@@ -674,7 +676,7 @@
         "C3"
       ],
       "est": "Half a day",
-      "status": "TODO"
+      "status": "DONE"
     },
     {
       "id": "2.2",
@@ -1100,7 +1102,7 @@
       "done": "The baseline numbers are recorded.",
       "refs": [],
       "est": "Half a day",
-      "status": "TODO"
+      "status": "DONE"
     },
     {
       "id": "3.2",
@@ -1136,7 +1138,9 @@
         "F16"
       ],
       "est": "1 day",
-      "status": "TODO"
+      "status": "NEEDS_OWNER",
+      "branch": "sprint/W1/3.2",
+      "note": "W1: dirtyTracker + unit tests pass; needs 4V6F perf run proving hover does no JSON.stringify in App (fixture missing in agent worktree; fetch via scripts/fetch-fixtures.mjs)."
     },
     {
       "id": "3.3",
@@ -2005,8 +2009,9 @@
       "done": "The versions file is reviewed and the environment builds reproducibly.",
       "refs": [],
       "est": "1 day",
-      "status": "TODO",
-      "note": "WSL setup done 2026-10-08: vina 1.2.7 sha256 recorded in TOOLS.md; ~/mole-prep venv + docker present. PDBFixer not installed in venv. --python check needs workers/prep, which this task creates."
+      "status": "DONE",
+      "note": "Finished in main session 2026-10-08: hashed 19-pkg lock, PDBFixer 1.12.0, scipy+gemmi (undeclared Meeko deps), licences from metadata; OpenMM licence string non-standard, confirm upstream.",
+      "branch": "sprint/W1/5.1-fix"
     },
     {
       "id": "5.2",

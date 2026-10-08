@@ -1,0 +1,10 @@
+# Direct dependencies of the prep environment (Python 3.12.3), exact pins. See native/third_party/TOOLS.md.
+rdkit==2026.3.6
+meeko==0.8.0
+dimorphite_dl==2.1.0
+pdb2pqr==3.7.1
+propka==3.5.1
+pdbfixer==1.12.0
+# Imported by Meeko at module level but not declared in its metadata:
+scipy==1.18.1
+gemmi==0.7.5

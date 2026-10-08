@@ -157,6 +157,12 @@ export type CanonicalAtom = {
   /** Authoritative alternate-location identifier when supplied by the source. */
   altLoc?: string | null;
   secondaryStructure?: SecondaryStructureKind | null;
+  /** mmCIF label_* identity kept alongside the auth_* primary identity (chain/residueNumber/residueName/atomName). */
+  labelAsymId?: string;
+  labelSeqId?: number;
+  labelCompId?: string;
+  labelAtomId?: string;
+  labelEntityId?: string;
   /** Workspace-only scope metadata used by derived multi-object selection views. */
   workspaceObjectId?: string;
   workspaceObjectName?: string;
