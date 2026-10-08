@@ -1,13 +1,12 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { loadConfig } from "./config.js";
 import { f64Value, type BootstrapResponse, type CanonicalCommand, type D2SearchRegionV1, type HealthResponse, type ProjectSaveRequest } from "@molecular/contracts";
-import { IngestionError, StructureIngestionService } from "./structures/ingestion.js";
-import { assertDeclaredLength, consumeRequest, receiveMultipartFile } from "./structures/multipart.js";
+import { assertLocalFilenameAdmitted, IngestionError, LARGE_STRUCTURE_WARNING_BYTES, StructureIngestionService } from "./structures/ingestion.js";
+import { assertDeclaredLength, consumeRequest, readUploadText, receiveMultipartFile } from "./structures/multipart.js";
 import { ProjectStore } from "./projects/projectStore.js";
 import { SourceArtifactStore } from "./lifecycle/sourceArtifactStore.js";
 import { CommandDispatcher } from "./command/dispatcher.js";
@@ -59,6 +58,16 @@ const d2PreparationService = new D2PreparationService();
 
 const uploadTempDir = join(dataRoot, "tmp", "uploads");
 let activeUploads = 0;
+
+// Uploads stream to disk in parallel, but decoding and parsing a large file holds its text and
+// parse state in memory, so large files take turns: peak memory is one large parse, not two.
+let largeParseQueue: Promise<unknown> = Promise.resolve();
+const withParseSlot = <T>(bytes: number, run: () => Promise<T>): Promise<T> => {
+  if (bytes < LARGE_STRUCTURE_WARNING_BYTES) return run();
+  const turn = largeParseQueue.then(run);
+  largeParseQueue = turn.catch(() => undefined);
+  return turn;
+};
 
 const readJson = async (request: IncomingMessage, maxBytes = config.maxJsonBytes): Promise<Record<string, unknown>> => {
   const tooLarge = () => new IngestionError("PAYLOAD_TOO_LARGE", "The request body exceeds the size limit.");
@@ -248,12 +257,16 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       try {
         const file = await receiveMultipartFile(request, { maxFileBytes: config.maxUploadBytes, tempDir: uploadTempDir });
         try {
-          // Text structure formats never contain NUL; reject binaries before reading them back (.pse/.pze get their own refusal).
-          if (file.binary && !/\.(pse|pze)$/i.test(file.filename)) throw new IngestionError("UNSUPPORTED_FORMAT", "Binary files are not an admitted coordinate format.");
+          // Refuse by filename, then binaries (text structure formats never contain NUL), before reading anything back.
+          assertLocalFilenameAdmitted(file.filename);
+          if (file.binary) throw new IngestionError("UNSUPPORTED_FORMAT", "Binary files are not an admitted coordinate format.");
           const parentExportArtifactId = typeof request.headers["x-parent-export-artifact-id"] === "string" ? request.headers["x-parent-export-artifact-id"] : undefined;
-          // One exact-size read of a file already capped at maxUploadBytes (well below the ~400 MB string ceiling).
-          const bytes = await readFile(file.path);
-          sendJson(response, 200, await ingestionService.ingestLocal(file.filename, bytes, parentExportArtifactId ? { parentExportArtifactId } : {}));
+          const result = await withParseSlot(file.size, async () => {
+            // Streaming decode + hash of the server's own temp file; the whole file is never a Buffer.
+            const text = await readUploadText(file.path);
+            return ingestionService.ingestLocalText(file.filename, file.path, text, parentExportArtifactId ? { parentExportArtifactId } : {});
+          });
+          sendJson(response, 200, result);
         } finally {
           await file.dispose();
         }

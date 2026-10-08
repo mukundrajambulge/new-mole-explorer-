@@ -19,10 +19,11 @@ import type {
   StructureSourceKind,
   RemoteStructureProvider,
   FormatEvidence,
+  SourceArtifact,
 } from "@molecular/contracts";
 import { inferCanonicalChemistryRoles } from "./chemistryRoles.js";
 import { scientificHashFor, sha256Bytes, SCIENTIFIC_HASH_PROFILE } from "../lifecycle/canonicalSerialization.js";
-import { SourceArtifactStore } from "../lifecycle/sourceArtifactStore.js";
+import { SourceArtifactStore, type SourceArtifactSeal } from "../lifecycle/sourceArtifactStore.js";
 import { profileMark, profileSync } from "./ingestionProfiler.js";
 import { compactCanonicalFor } from "./compactCanonical.js";
 
@@ -40,6 +41,53 @@ export const assertStructureSize = (byteLength: number): void => {
   if (byteLength > MAX_STRUCTURE_BYTES) {
     throw new IngestionError("PAYLOAD_TOO_LARGE", "Structure files must be 512 MiB or smaller.");
   }
+};
+
+/**
+ * Yields exactly the lines `content.split(/\r?\n/)` would return, one at a time, so a large
+ * file's text is not duplicated by an array holding every line.
+ */
+export function* splitLines(content: string): Generator<string> {
+  let start = 0;
+  for (;;) {
+    const end = content.indexOf("\n", start);
+    if (end < 0) {
+      yield content.slice(start);
+      return;
+    }
+    yield content.slice(start, end > start && content.charCodeAt(end - 1) === 13 ? end - 1 : end);
+    start = end + 1;
+  }
+}
+
+const someLine = (content: string, test: (line: string) => boolean): boolean => {
+  for (const line of splitLines(content)) if (test(line)) return true;
+  return false;
+};
+
+const firstLines = (content: string, count: number): string[] => {
+  const lines: string[] = [];
+  for (const line of splitLines(content)) {
+    lines.push(line);
+    if (lines.length >= count) break;
+  }
+  return lines;
+};
+
+/** At least atomCount + 2 lines, and lines 2..atomCount+1 look like "El x ...". */
+const xyzFrameMatches = (content: string, atomCount: number): boolean => {
+  let index = 0;
+  for (const line of splitLines(content)) {
+    if (index >= 2 && !/^[A-Za-z]{1,3}\s+[-+]?\d/.test(line.trim())) return false;
+    index += 1;
+    if (index >= atomCount + 2) return true;
+  }
+  return false;
+};
+
+/** Filename-only refusals, checked before any upload bytes are read back. */
+export const assertLocalFilenameAdmitted = (filename: string): void => {
+  if (/\.(pse|pze)$/i.test(filename)) throw new IngestionError("SECURITY_REJECTED", "Foreign PyMOL session files are not executable input in R09; no pickle or arbitrary deserialization path is available.");
 };
 
 const WATER_RESIDUES = new Set(["HOH", "WAT", "H2O", "DOD"]);
@@ -144,7 +192,7 @@ const parsePdb = (content: string): ParsedSource => {
   let activeModel: number | null = null;
   let sawModelRecord = false;
   let unitCell: CanonicalUnitCell | undefined;
-  for (const line of content.split(/\r?\n/)) {
+  for (const line of splitLines(content)) {
     const record = line.slice(0, 6).trim();
     if (record === "CRYST1") {
       const nextUnitCell = makeUnitCell({ a: line.slice(6, 15).trim(), b: line.slice(15, 24).trim(), c: line.slice(24, 33).trim(), alpha: line.slice(33, 40).trim(), beta: line.slice(40, 47).trim(), gamma: line.slice(47, 54).trim(), spaceGroup: line.slice(55, 66).trim(), zValue: line.slice(66, 70).trim() }, "PDB_CRYST1");
@@ -248,7 +296,7 @@ const parsePdb = (content: string): ParsedSource => {
 const parsePqr = (content: string): ParsedSource => {
   const atoms: AtomSeed[] = [];
   const partialChargeBySourceIndex: Record<number, number> = {};
-  for (const line of content.split(/\r?\n/)) {
+  for (const line of splitLines(content)) {
     if (!/^(ATOM|HETATM)\s/.test(line)) continue;
     const fields = line.trim().split(/\s+/);
     if (fields.length < 10) throw new IngestionError("INVALID_INPUT", "PQR atom records require identity, XYZ coordinates, charge, and radius.");
@@ -383,7 +431,7 @@ const parseMol2 = (content: string): ParsedSource => {
 const parsePdbqt = (content: string): ParsedSource => {
   const atoms: AtomSeed[] = [];
   const partialChargeBySourceIndex: Record<number, number> = {};
-  for (const line of content.split(/\r?\n/)) {
+  for (const line of splitLines(content)) {
     const record = line.slice(0, 6).trim();
     if (record !== "ATOM" && record !== "HETATM") continue;
     const atomName = line.slice(12, 16).trim() || "X";
@@ -779,15 +827,16 @@ const formatEvidenceFor = (filename: string, content: string): { format: Structu
   const extension = filename.toLowerCase().split(".").pop();
   const filenameFormat: StructureFormat | undefined = extension === "pdb" ? "pdb" : extension === "cif" || extension === "mmcif" ? "mmcif" : extension === "pqr" ? "pqr" : extension === "sdf" || extension === "mol" ? "sdf" : extension === "xyz" ? "xyz" : extension === "mol2" ? "mol2" : extension === "pdbqt" ? "pdbqt" : undefined;
   if (!filenameFormat) throw new IngestionError("UNSUPPORTED_FORMAT", "This file is not an admitted coordinate format. Supported coordinate formats are PDB, mmCIF, PQR, SDF/MOL, XYZ, MOL2, and PDBQT.");
-  const lines = content.split(/\r?\n/);
-  const hasPdbSignature = lines.some((line) => /^(HEADER|TITLE\s|ATOM\s{2}|HETATM|MODEL\s|CRYST1|CONECT|HELIX\s|SHEET\s)/.test(line));
+  // Lines are walked lazily (never one array of every line) so large files do not double in memory.
+  const head = firstLines(content, 4);
+  const hasPdbSignature = someLine(content, (line) => /^(HEADER|TITLE\s|ATOM\s{2}|HETATM|MODEL\s|CRYST1|CONECT|HELIX\s|SHEET\s)/.test(line));
   const hasMmcifSignature = /^\s*data_[^\s]*/im.test(content) && /_atom_site\./i.test(content);
-  const hasPqrSignature = lines.some((line) => /^(ATOM|HETATM)\s+\d+\s+\S+\s+\S+(?:\s+\S+)?\s+-?\d+\s+-?\d/.test(line));
-  const hasSdfSignature = lines.length >= 4 && /V2000\s*$/i.test(lines[3] ?? "");
-  const declaredXyzAtoms = Number.parseInt(lines[0]?.trim() ?? "", 10);
-  const hasXyzSignature = filenameFormat === "xyz" && Number.isInteger(declaredXyzAtoms) && declaredXyzAtoms > 0 && lines.length >= declaredXyzAtoms + 2 && lines.slice(2, declaredXyzAtoms + 2).every((line) => /^[A-Za-z]{1,3}\s+[-+]?\d/.test(line.trim()));
-  const hasMol2Signature = content.split(/\r?\n/).some((line) => /^@<TRIPOS>(MOLECULE|ATOM|BOND)\s*$/i.test(line.trim()));
-  const hasPdbqtSignature = lines.some((line) => /^(ATOM|HETATM)\s/.test(line) && line.length >= 54 && line.slice(70).trim().length > 0);
+  const hasPqrSignature = someLine(content, (line) => /^(ATOM|HETATM)\s+\d+\s+\S+\s+\S+(?:\s+\S+)?\s+-?\d+\s+-?\d/.test(line));
+  const hasSdfSignature = head.length >= 4 && /V2000\s*$/i.test(head[3] ?? "");
+  const declaredXyzAtoms = Number.parseInt(head[0]?.trim() ?? "", 10);
+  const hasXyzSignature = filenameFormat === "xyz" && Number.isInteger(declaredXyzAtoms) && declaredXyzAtoms > 0 && xyzFrameMatches(content, declaredXyzAtoms);
+  const hasMol2Signature = someLine(content, (line) => /^@<TRIPOS>(MOLECULE|ATOM|BOND)\s*$/i.test(line.trim()));
+  const hasPdbqtSignature = someLine(content, (line) => /^(ATOM|HETATM)\s/.test(line) && line.length >= 54 && line.slice(70).trim().length > 0);
   const signature: FormatEvidence | undefined = hasMmcifSignature ? { kind: "CONTENT_SIGNATURE", value: "mmCIF data_ + _atom_site loop" } : filenameFormat === "sdf" && hasSdfSignature ? { kind: "CONTENT_SIGNATURE", value: "MDL V2000 molfile" } : filenameFormat === "xyz" && hasXyzSignature ? { kind: "CONTENT_SIGNATURE", value: "XYZ atom-count coordinate frame" } : filenameFormat === "pqr" && hasPqrSignature ? { kind: "CONTENT_SIGNATURE", value: "PQR whitespace atom records" } : filenameFormat === "mol2" && hasMol2Signature ? { kind: "CONTENT_SIGNATURE", value: "SYBYL MOL2 TRIPOS sections" } : filenameFormat === "pdbqt" && hasPdbqtSignature ? { kind: "CONTENT_SIGNATURE", value: "PDBQT charged atom records" } : hasPdbSignature ? { kind: "CONTENT_SIGNATURE", value: "PDB record columns" } : undefined;
   const signatureFormat = signature?.value.startsWith("mmCIF") ? "mmcif" : signature?.value.startsWith("MDL") ? "sdf" : signature?.value.startsWith("XYZ") ? "xyz" : signature?.value.startsWith("PQR") ? "pqr" : signature?.value.startsWith("SYBYL") ? "mol2" : signature?.value.startsWith("PDBQT") ? "pdbqt" : signature?.value.startsWith("PDB") ? "pdb" : undefined;
   if (signatureFormat && filenameFormat !== signatureFormat) {
@@ -958,6 +1007,10 @@ const peptideSequenceChainsFor = (hierarchy: CanonicalHierarchy): Record<string,
     } satisfies PeptideSequenceChain];
   }));
 
+type IngestAcquisition = { mediaType?: string; accession?: string; providerMetadata?: Readonly<Record<string, string>>; parentExportArtifactId?: string };
+/** Decoded parser text plus the digest of the exact received bytes and how to seal them. */
+type DecodedSource = { content: string; sha256: string; byteLength: number; seal: (input: SourceArtifactSeal) => Promise<SourceArtifact> };
+
 export class StructureIngestionService {
   private readonly structures = new Map<string, CanonicalMolecularStructure>();
   /** Coalesce and retain successful online acquisitions for the lifetime of the API process. */
@@ -967,7 +1020,7 @@ export class StructureIngestionService {
   constructor(private readonly sourceArtifacts = new SourceArtifactStore()) {}
 
   async ingestLocal(filename: string, buffer: Buffer, options: { parentExportArtifactId?: string } = {}): Promise<StructureLoadResult> {
-    if (/\.(pse|pze)$/i.test(filename)) throw new IngestionError("SECURITY_REJECTED", "Foreign PyMOL session files are not executable input in R09; no pickle or arbitrary deserialization path is available.");
+    assertLocalFilenameAdmitted(filename);
     return this.ingest("LOCAL_FILE", filename, buffer, undefined, undefined, options);
   }
 
@@ -1030,21 +1083,37 @@ export class StructureIngestionService {
     throw new IngestionError("REMOTE_FETCH_FAILED", "RCSB/wwPDB could not be reached. Check the network and try again.", 502);
   }
 
-  private async ingest(kind: StructureSourceKind, filename: string, buffer: Buffer, uri?: string, provider?: RemoteStructureProvider, acquisition: { mediaType?: string; accession?: string; providerMetadata?: Readonly<Record<string, string>>; parentExportArtifactId?: string } = {}): Promise<StructureLoadResult> {
+  /**
+   * Ingest an upload the server streamed to `path`. `text` must come from the server's own
+   * streaming read of that file (see readUploadText), so no whole-file Buffer is ever held and
+   * the source artifact is copied on disk rather than kept in memory.
+   */
+  async ingestLocalText(filename: string, path: string, text: { content: string; sha256: string; byteLength: number }, options: { parentExportArtifactId?: string } = {}): Promise<StructureLoadResult> {
+    assertLocalFilenameAdmitted(filename);
+    assertStructureSize(text.byteLength);
+    return this.ingestDecoded("LOCAL_FILE", filename, { ...text, seal: (input) => this.sourceArtifacts.sealFile(input, path, text.sha256, text.byteLength) }, undefined, undefined, options);
+  }
+
+  private async ingest(kind: StructureSourceKind, filename: string, buffer: Buffer, uri?: string, provider?: RemoteStructureProvider, acquisition: IngestAcquisition = {}): Promise<StructureLoadResult> {
     assertStructureSize(buffer.length);
-    const safeFilename = basename(filename).replace(/[^A-Za-z0-9._-]/g, "_");
-    profileMark("FILE_READ_DECODE", "START", { filename: safeFilename, bytes: buffer.length });
     // This is intentionally before Buffer decoding.  The SourceArtifact
     // digest is evidence for the received byte stream, not parser text.
-    const hash = sha256Bytes(buffer);
-    const content = buffer.toString("utf8");
+    const sha256 = sha256Bytes(buffer);
+    return this.ingestDecoded(kind, filename, { content: buffer.toString("utf8"), sha256, byteLength: buffer.length, seal: (input) => this.sourceArtifacts.seal(input, buffer) }, uri, provider, acquisition);
+  }
+
+  private async ingestDecoded(kind: StructureSourceKind, filename: string, decoded: DecodedSource, uri?: string, provider?: RemoteStructureProvider, acquisition: IngestAcquisition = {}): Promise<StructureLoadResult> {
+    const safeFilename = basename(filename).replace(/[^A-Za-z0-9._-]/g, "_");
+    profileMark("FILE_READ_DECODE", "START", { filename: safeFilename, bytes: decoded.byteLength });
+    const hash = decoded.sha256;
+    const content = decoded.content;
     if (!content.trim()) throw new IngestionError("INVALID_INPUT", "The structure input is empty.");
     profileMark("FILE_READ_DECODE", "END", { filename: safeFilename, contentChars: content.length });
     profileMark("FORMAT_EVIDENCE", "START");
     const formatEvidence = formatEvidenceFor(safeFilename, content);
     profileMark("FORMAT_EVIDENCE", "END", { format: formatEvidence.format, evidenceCount: formatEvidence.evidence.length });
     profileMark("SOURCE_ARTIFACT_SEAL", "START");
-    const sourceArtifact = await this.sourceArtifacts.seal({
+    const sourceArtifact = await decoded.seal({
       acquisitionKind: kind === "RCSB" ? "REMOTE_HTTP" : "LOCAL_UPLOAD",
       originalFilename: safeFilename,
       mediaType: acquisition.mediaType ?? (formatEvidence.format === "pdb" ? "chemical/x-pdb" : formatEvidence.format === "pqr" ? "chemical/x-pqr" : formatEvidence.format === "sdf" ? "chemical/x-mdl-sdfile" : formatEvidence.format === "xyz" ? "chemical/x-xyz" : formatEvidence.format === "mol2" ? "chemical/x-mol2" : formatEvidence.format === "pdbqt" ? "chemical/x-pdbqt" : "chemical/x-mmcif"),
@@ -1056,7 +1125,7 @@ export class StructureIngestionService {
       ...(acquisition.accession ? { accession: acquisition.accession } : {}),
       ...(acquisition.providerMetadata ? { providerMetadata: acquisition.providerMetadata } : {}),
       ...(acquisition.parentExportArtifactId ? { parentExportArtifactId: acquisition.parentExportArtifactId, acquisitionKind: "DERIVED_EXPORT" as const } : {}),
-    }, buffer);
+    });
     profileMark("SOURCE_ARTIFACT_SEAL", "END", { sourceArtifactId: sourceArtifact.sourceArtifactId });
     const parsed = parseSource(safeFilename, content);
     const atomIdsBySerial = new Map<number, string[]>();
@@ -1088,7 +1157,7 @@ export class StructureIngestionService {
       originalFilename: safeFilename,
       format: parsed.format,
       sha256: hash,
-      byteLength: buffer.length,
+      byteLength: decoded.byteLength,
       ...(uri ? { uri } : {}),
       ...(provider ? { provider } : {}),
       ingestedAt: new Date().toISOString(),
@@ -1138,7 +1207,7 @@ export class StructureIngestionService {
       const scientificPayload = scientificPayloadFor(atoms, bonds, hierarchy, coordinateStates, stateOrder, summary, parsed, sourceChargeMap, hasCompleteSourceCharges, peptideSequenceChains, chemistryRoles);
       scientificHash = profileSync("CANONICAL_HASH", () => scientificHashFor(scientificPayload), { atomCount: atoms.length, bondCount: bonds.length, residueCount: Object.keys(hierarchy.residues).length });
     }
-    const useCompactWire = buffer.length >= LARGE_STRUCTURE_WARNING_BYTES;
+    const useCompactWire = decoded.byteLength >= LARGE_STRUCTURE_WARNING_BYTES;
     const compact = useCompactWire
       ? profileSync("COMPACT_CANONICAL_PAYLOAD", () => compactCanonicalFor(atoms, bonds, hierarchy, coordinateStates, stateOrder, chemistryRoles), { atomCount: atoms.length, bondCount: bonds.length, chainCount: hierarchy.chainIds.length })
       : undefined;

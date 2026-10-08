@@ -46,7 +46,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ApiConfig => {
     tokenDir: env.MOLE_TOKEN_DIR || fileURLToPath(new URL("../../../.mole", import.meta.url)),
     maxJsonBytes: intEnv(env, "MAX_JSON_BYTES", 8 * MIB, 1024, 256 * MIB),
     maxProjectJsonBytes: intEnv(env, "MAX_PROJECT_JSON_BYTES", 64 * MIB, 1024, 256 * MIB),
-    // Ingestion still decodes the whole file to one string, so the ceiling stays below ~400 MB.
+    // Parsers still need the decoded text as one string (streamed in, never a whole-file Buffer); keep it far below V8's ~512 Mi-char limit.
     maxUploadBytes: intEnv(env, "MAX_UPLOAD_BYTES", 256 * MIB, 1024, 384 * MIB),
     maxConcurrentUploads: intEnv(env, "MAX_CONCURRENT_UPLOADS", 2, 1, 16),
   };

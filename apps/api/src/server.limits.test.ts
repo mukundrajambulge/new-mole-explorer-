@@ -37,7 +37,7 @@ describe("request size limits", () => {
   });
 
   /** Raw request so the test controls framing (declared length vs chunked) and never buffers the body itself. */
-  const send = (options: { method: string; path: string; headers?: Record<string, string | number>; head?: Buffer; bodyBytes?: number; tail?: Buffer; fill?: number; hold?: boolean }) => {
+  const send = (options: { method: string; path: string; headers?: Record<string, string | number>; head?: Buffer; bodyBytes?: number; tail?: Buffer; fill?: number; chunk?: Buffer; hold?: boolean }) => {
     let req!: ClientRequest;
     const reply = new Promise<Reply>((resolve, reject) => {
       req = httpRequest({ host: "127.0.0.1", port, method: options.method, path: options.path, headers: { "x-mole-token": token, ...options.headers } }, (res) => {
@@ -49,7 +49,7 @@ describe("request size limits", () => {
       let answered = false;
       req.on("response", () => { answered = true; });
       req.on("error", (error) => { if (!answered) reject(error); });
-      const chunk = Buffer.alloc(MIB, options.fill ?? 0x20);
+      const chunk = options.chunk ?? Buffer.alloc(MIB, options.fill ?? 0x20);
       let left = options.bodyBytes ?? 0;
       const pump = () => {
         while (left > 0 && !answered && !req.destroyed) {
@@ -68,12 +68,13 @@ describe("request size limits", () => {
     return { reply, abort: () => req.destroy() };
   };
 
-  const upload = (filename: string, bytes: number, extra: { declare?: boolean; fill?: number; hold?: boolean } = {}) => {
+  /** `chunk` repeats as the first `bytes` of the file; `fileTail` (if any) ends the file. */
+  const upload = (filename: string, bytes: number, extra: { declare?: boolean; fill?: number; chunk?: Buffer; fileTail?: Buffer; hold?: boolean } = {}) => {
     const head = Buffer.from(`--${BOUNDARY}\r\ncontent-disposition: form-data; name="file"; filename="${filename}"\r\ncontent-type: application/octet-stream\r\n\r\n`);
-    const tail = Buffer.from(`\r\n--${BOUNDARY}--\r\n`);
+    const tail = Buffer.concat([extra.fileTail ?? Buffer.alloc(0), Buffer.from(`\r\n--${BOUNDARY}--\r\n`)]);
     const headers: Record<string, string | number> = { "content-type": `multipart/form-data; boundary=${BOUNDARY}` };
     if (extra.declare) headers["content-length"] = head.length + bytes + tail.length;
-    return send({ method: "POST", path: "/api/structures/upload", headers, head, bodyBytes: bytes, tail, fill: extra.fill, hold: extra.hold });
+    return send({ method: "POST", path: "/api/structures/upload", headers, head, bodyBytes: bytes, tail, fill: extra.fill, chunk: extra.chunk, hold: extra.hold });
   };
 
   const waitFor = async (condition: () => boolean, timeoutMs = 10_000) => {
@@ -159,20 +160,39 @@ describe("request size limits", () => {
     expect(code(after)).toBe("UNSUPPORTED_FORMAT");
   }, 30_000);
 
-  it("keeps server memory under 1 GB while two 200 MB uploads stream", async () => {
-    let peak = process.memoryUsage().rss;
+  it("keeps server memory under 1 GB while two valid 200 MB structure uploads stream, decode and parse", async () => {
+    // A real fixture behind 200 MiB of 64-byte PDB REMARK lines: valid text that runs the whole
+    // receive -> streaming decode -> hash -> seal -> parse path. The two files differ so neither dedupes.
+    const fixture = readFileSync(join(process.cwd(), "..", "..", "tests", "fixtures", "mini-protein.pdb"));
+    const remarkChunk = (tag: string) => Buffer.from(`REMARK 999 ${tag.padEnd(52, ".")}\n`.repeat(MIB / 64));
+    const chunks = [remarkChunk("first upload padding"), remarkChunk("second upload padding")];
+    expect(chunks[0]!.length).toBe(MIB);
+    const expected = chunks.map((chunk) => {
+      const hash = createHash("sha256");
+      for (let i = 0; i < 200; i += 1) hash.update(chunk);
+      return hash.update(fixture).digest("hex");
+    });
+    const before = process.memoryUsage().rss;
+    let peak = before;
     const timer = setInterval(() => { peak = Math.max(peak, process.memoryUsage().rss); }, 25);
+    let replies: Reply[];
     try {
-      const replies = await Promise.all([upload("one.pdb", 200 * MIB, { fill: 0, declare: true }).reply, upload("two.pdb", 200 * MIB, { fill: 0 }).reply]);
-      for (const reply of replies) {
-        expect(reply.status).toBe(400);
-        expect(code(reply)).toBe("UNSUPPORTED_FORMAT");
-      }
+      replies = await Promise.all([
+        upload("one.pdb", 200 * MIB, { chunk: chunks[0], fileTail: fixture, declare: true }).reply,
+        upload("two.pdb", 200 * MIB, { chunk: chunks[1], fileTail: fixture }).reply,
+      ]);
     } finally {
       clearInterval(timer);
     }
     peak = Math.max(peak, process.memoryUsage().rss);
+    replies.forEach((reply, index) => {
+      expect(reply.status, reply.body.slice(0, 300)).toBe(200);
+      const result = JSON.parse(reply.body) as { sourceArtifact?: { byteLength?: number; sha256?: string } };
+      expect(result.sourceArtifact?.byteLength).toBe(200 * MIB + fixture.length);
+      expect(result.sourceArtifact?.sha256).toBe(expected[index]);
+    });
+    console.info(`[limits] rss before ${Math.round(before / MIB)} MiB, peak ${Math.round(peak / MIB)} MiB`);
     expect(peak).toBeLessThan(1024 * MIB);
     await waitFor(() => pending() === 0);
-  }, 180_000);
+  }, 300_000);
 });
