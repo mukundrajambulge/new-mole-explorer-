@@ -183,6 +183,7 @@ const parsePdb = (content: string): ParsedSource => {
   const modelAtoms = new Map<number, AtomSeed[]>();
   let activeModel: number | null = null;
   let sawModelRecord = false;
+  let preModelAtomLine = 0;
   let unitCell: CanonicalUnitCell | undefined;
   let lineNumber = 0;
   for (const line of content.split(/\r?\n/)) {
@@ -257,9 +258,13 @@ const parsePdb = (content: string): ParsedSource => {
     } satisfies AtomSeed;
     if (activeModel !== null) modelAtoms.get(activeModel)?.push(atom);
     else if (sawModelRecord) throw new IngestionError("INVALID_INPUT", `PDB line ${lineNumber} has an ${record} record outside any MODEL/ENDMDL block; refusing to drop or guess its model.`);
-    else atoms.push(atom);
+    else {
+      if (atoms.length === 0) preModelAtomLine = lineNumber;
+      atoms.push(atom);
+    }
   }
   if (modelAtoms.size > 0) {
+    if (atoms.length > 0) throw new IngestionError("INVALID_INPUT", `PDB line ${preModelAtomLine} has an atom record outside any MODEL/ENDMDL block (before the first MODEL); refusing to drop or guess its model.`);
     const orderedModels = [...modelAtoms.entries()].sort(([a], [b]) => a - b);
     const firstAtoms = orderedModels[0]?.[1] ?? [];
     if (firstAtoms.length === 0) throw new IngestionError("INVALID_INPUT", "PDB MODEL records did not contain any atom coordinates.");

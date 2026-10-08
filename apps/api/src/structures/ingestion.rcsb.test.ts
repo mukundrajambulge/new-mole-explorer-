@@ -229,6 +229,11 @@ describe("PDB reader details", () => {
     await expect(ingest("o.pdb", content)).rejects.toThrow(/line 4.*outside any MODEL/);
   });
 
+  it("rejects atoms placed before the first MODEL record", async () => {
+    const content = [atom(1, 1), "MODEL        1", atom(2, 2), "ENDMDL", "END"].join("\n");
+    await expect(ingest("o.pdb", content)).rejects.toThrow(/line 1.*outside any MODEL/);
+  });
+
   it("assigns helix and sheet by residue identity including insertion codes", async () => {
     const helix = "HELIX    1   1 ALA A    2  ALA A    3  1                                   2";
     const sheet = "SHEET    1   A 1 ALA A   5  ALA A   5  0";
