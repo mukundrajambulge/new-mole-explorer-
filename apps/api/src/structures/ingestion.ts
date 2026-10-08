@@ -114,7 +114,7 @@ export class IngestionError extends Error {
 
 type AtomSeed = Omit<CanonicalAtom, "stableId">;
 type BondSeed = { atom1Serial: number; atom2Serial: number; order: BondOrder; source: CanonicalBond["source"] };
-type SecondarySpan = { kind: Exclude<SecondaryStructureKind, "LOOP">; chain: string; start: number; end: number; labelSystem?: boolean };
+type SecondarySpan = { kind: Exclude<SecondaryStructureKind, "LOOP">; chain: string; start: number; end: number; startIns?: string; endIns?: string; labelSystem?: boolean };
 type CoordinateSeed = { sourceIndex: number; x: number; y: number; z: number };
 type ParsedSource = { format: StructureFormat; atoms: AtomSeed[]; bonds: BondSeed[]; coordinateStates?: Array<{ sourceModelNumber: number; coordinates: CoordinateSeed[] }>; secondaryStructureSource?: string; polymerTypingSource?: string; unitCell?: CanonicalUnitCell; partialChargeValues?: Record<string, number>; partialChargeBySourceIndex?: Record<number, number> };
 
@@ -191,6 +191,46 @@ const classifyAtom = (recordType: "ATOM" | "HETATM", residueName: string, elemen
 const atomCorrespondenceKey = (atom: AtomSeed): string => [atom.atomName, atom.residueName, atom.residueNumber, atom.insertionCode ?? "", atom.chain, atom.altLoc ?? ""].join("\u0000");
 const componentAtomKey = (component: string, atomName: string): string => `${component.trim().toUpperCase()}\u0000${atomName.trim()}`;
 
+/**
+ * Builds one (chain, residue number, insertion code) -> kind map from the
+ * HELIX/SHEET spans, walking residues in file order so insertion codes fall
+ * inside spans correctly, then assigns atoms by a single lookup each.
+ * The first span listed wins, as before.
+ */
+const assignPdbSecondaryStructure = (atoms: AtomSeed[], spans: readonly SecondarySpan[]): void => {
+  if (spans.length === 0) return;
+  const residueKey = (chain: string, number: number, ins: string | undefined) => `${chain} ${number} ${ins ?? ""}`;
+  const order = new Map<string, string[]>();
+  const index = new Map<string, number>();
+  for (const atom of atoms) {
+    const key = residueKey(atom.chain, atom.residueNumber, atom.insertionCode);
+    if (index.has(key)) continue;
+    let list = order.get(atom.chain);
+    if (!list) order.set(atom.chain, (list = []));
+    index.set(key, list.length);
+    list.push(key);
+  }
+  const kindByResidue = new Map<string, SecondarySpan["kind"]>();
+  for (const span of spans) {
+    const list = order.get(span.chain);
+    if (!list) continue;
+    const from = index.get(residueKey(span.chain, span.start, span.startIns));
+    const to = index.get(residueKey(span.chain, span.end, span.endIns));
+    if (from !== undefined && to !== undefined && from <= to) {
+      for (let i = from; i <= to; i += 1) if (!kindByResidue.has(list[i]!)) kindByResidue.set(list[i]!, span.kind);
+    } else {
+      for (const key of list) {
+        const number = Number(key.split(" ")[1]);
+        if (number >= span.start && number <= span.end && !kindByResidue.has(key)) kindByResidue.set(key, span.kind);
+      }
+    }
+  }
+  for (const atom of atoms) {
+    const kind = kindByResidue.get(residueKey(atom.chain, atom.residueNumber, atom.insertionCode));
+    if (kind) atom.secondaryStructure = kind;
+  }
+};
+
 const parsePdb = (content: string): ParsedSource => {
   const atoms: AtomSeed[] = [];
   const bonds: BondSeed[] = [];
@@ -198,8 +238,11 @@ const parsePdb = (content: string): ParsedSource => {
   const modelAtoms = new Map<number, AtomSeed[]>();
   let activeModel: number | null = null;
   let sawModelRecord = false;
+  let preModelAtomLine = 0;
   let unitCell: CanonicalUnitCell | undefined;
+  let lineNumber = 0;
   for (const line of splitLines(content)) {
+    lineNumber += 1;
     const record = line.slice(0, 6).trim();
     if (record === "CRYST1") {
       const nextUnitCell = makeUnitCell({ a: line.slice(6, 15).trim(), b: line.slice(15, 24).trim(), c: line.slice(24, 33).trim(), alpha: line.slice(33, 40).trim(), beta: line.slice(40, 47).trim(), gamma: line.slice(47, 54).trim(), spaceGroup: line.slice(55, 66).trim(), zValue: line.slice(66, 70).trim() }, "PDB_CRYST1");
@@ -222,9 +265,11 @@ const parsePdb = (content: string): ParsedSource => {
       const isHelix = record === "HELIX";
       const chain = line.slice(isHelix ? 19 : 21, isHelix ? 20 : 22).trim();
       const endChain = line.slice(isHelix ? 31 : 32, isHelix ? 32 : 33).trim() || chain;
-      const start = parseInteger(line.slice(isHelix ? 21 : 22, isHelix ? 25 : 26).trim(), Number.NaN);
-      const end = parseInteger(line.slice(isHelix ? 33 : 33, isHelix ? 37 : 37).trim(), Number.NaN);
-      if (chain && endChain === chain && Number.isFinite(start) && Number.isFinite(end)) secondarySpans.push({ kind: isHelix ? "HELIX" : "SHEET", chain, start, end });
+      const start = parseHybrid36(line.slice(isHelix ? 21 : 22, isHelix ? 25 : 26), 4, Number.NaN);
+      const end = parseHybrid36(line.slice(33, 37), 4, Number.NaN);
+      const startIns = line.slice(isHelix ? 25 : 26, isHelix ? 26 : 27).trim() || undefined;
+      const endIns = line.slice(37, 38).trim() || undefined;
+      if (chain && endChain === chain && Number.isFinite(start) && Number.isFinite(end)) secondarySpans.push({ kind: isHelix ? "HELIX" : "SHEET", chain, start, end, ...(startIns ? { startIns } : {}), ...(endIns ? { endIns } : {}) });
       continue;
     }
     if (record === "CONECT") {
@@ -266,10 +311,15 @@ const parsePdb = (content: string): ParsedSource => {
       formalCharge: parsePdbFormalCharge(line.slice(78, 80)),
       ...classifyAtom(recordType, residueName, element),
     } satisfies AtomSeed;
-    if (sawModelRecord || activeModel !== null) modelAtoms.get(activeModel ?? 1)?.push(atom);
-    else atoms.push(atom);
+    if (activeModel !== null) modelAtoms.get(activeModel)?.push(atom);
+    else if (sawModelRecord) throw new IngestionError("INVALID_INPUT", `PDB line ${lineNumber} has an ${record} record outside any MODEL/ENDMDL block; refusing to drop or guess its model.`);
+    else {
+      if (atoms.length === 0) preModelAtomLine = lineNumber;
+      atoms.push(atom);
+    }
   }
   if (modelAtoms.size > 0) {
+    if (atoms.length > 0) throw new IngestionError("INVALID_INPUT", `PDB line ${preModelAtomLine} has an atom record outside any MODEL/ENDMDL block (before the first MODEL); refusing to drop or guess its model.`);
     const orderedModels = [...modelAtoms.entries()].sort(([a], [b]) => a - b);
     const firstAtoms = orderedModels[0]?.[1] ?? [];
     if (firstAtoms.length === 0) throw new IngestionError("INVALID_INPUT", "PDB MODEL records did not contain any atom coordinates.");
@@ -280,17 +330,11 @@ const parsePdb = (content: string): ParsedSource => {
     }
     atoms.push(...firstAtoms);
     const coordinateStates = orderedModels.map(([sourceModelNumber, stateAtoms]) => ({ sourceModelNumber, coordinates: stateAtoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }));
-    for (const atom of atoms) {
-      const span = secondarySpans.find((candidate) => candidate.chain === atom.chain && atom.residueNumber >= candidate.start && atom.residueNumber <= candidate.end);
-      if (span) atom.secondaryStructure = span.kind;
-    }
+    assignPdbSecondaryStructure(atoms, secondarySpans);
     return { format: "pdb", atoms, bonds, coordinateStates, ...(secondarySpans.length ? { secondaryStructureSource: "PDB HELIX/SHEET records" } : {}), ...(unitCell ? { unitCell } : {}) };
   }
   if (atoms.length === 0) throw new IngestionError("INVALID_INPUT", "No ATOM or HETATM records with coordinates were found.");
-  for (const atom of atoms) {
-    const span = secondarySpans.find((candidate) => candidate.chain === atom.chain && atom.residueNumber >= candidate.start && atom.residueNumber <= candidate.end);
-    if (span) atom.secondaryStructure = span.kind;
-  }
+  assignPdbSecondaryStructure(atoms, secondarySpans);
 
   return { format: "pdb", atoms, bonds, coordinateStates: [{ sourceModelNumber: 1, coordinates: atoms.map((atom, sourceIndex) => ({ sourceIndex, x: atom.x, y: atom.y, z: atom.z })) }], ...(secondarySpans.length ? { secondaryStructureSource: "PDB HELIX/SHEET records" } : {}), ...(unitCell ? { unitCell } : {}) };
 };
