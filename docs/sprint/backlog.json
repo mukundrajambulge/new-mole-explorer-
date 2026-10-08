@@ -1739,7 +1739,9 @@
         "D10"
       ],
       "est": "1 day",
-      "status": "TODO"
+      "status": "NEEDS_OWNER",
+      "branch": "sprint/W6/4.1",
+      "note": "W6 BLOCKED: needs real CI runs on Windows MSVC and macOS clang (push the branch); agent wanted to drop /WX (denied). Owner: push sprint/W6/4.1 to see CI logs"
     },
     {
       "id": "4.2",
@@ -1812,7 +1814,9 @@
         "C5"
       ],
       "est": "2-3 hours",
-      "status": "TODO"
+      "status": "TODO",
+      "branch": "sprint/W6/4.3",
+      "note": "W6: C++ case-insensitive Cl/Br works + fixtures; review: TS normalizer unused (dead code), test hand-parses PDBQT instead of the real TS->C++ path, asserts only valid not finite score"
     },
     {
       "id": "4.4",
@@ -2178,8 +2182,8 @@
       "refs": [],
       "est": "1 week",
       "status": "TODO",
-      "note": "Part 1 merged (prep worker CLI plan/apply, 10 real complexes deterministic, generated H/coords PREVIEW_UNQUALIFIED, spawn wrapper). Part 2 (job store, routes, prepSeal, pin check) running as 5.2b in W6.",
-      "branch": "sprint/W5/5.2"
+      "note": "Part 1 merged. Part 2 on sprint/W6/5.2b PARTIAL: routes, job store, pin check, artifact upload done; BLOCKER receptor seal hardcoded BLOCKED (D2 dependency digests undefined) so SEALED unreachable; also pin check ignores the installed venv, prep-artifacts store lacks quota/GC/concurrency limit, no SEALED/PROPKA end-to-end tests.",
+      "branch": "sprint/W6/5.2b"
     },
     {
       "id": "5.3",
