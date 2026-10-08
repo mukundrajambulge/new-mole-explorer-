@@ -142,7 +142,7 @@ export const App = () => {
   const pendingImportModeRef = useRef<"replace" | "add">("replace");
   const historyServiceRef = useRef(new ScientificHistoryService());
   const sceneStoreRef = useRef(new SceneStore());
-  const savedFingerprintRef = useRef<string | null>(null);
+  const savedRevisionRef = useRef<number | null>(null);
   // The active object's presentation is authoritative in `projection`.
   // Workspace objects keep durable snapshots for inactive objects and are
   // updated by explicit workspace actions; the active overlay below feeds the
@@ -151,26 +151,36 @@ export const App = () => {
   const alignmentOverlays = useMemo(() => overlaysForAlignment(fittingResults), [fittingResults]);
   const viewerWorkspaceObjects = useMemo(() => workspaceObjects.map((object) => object.objectId === activeObjectId ? { ...object, projection } : object), [activeObjectId, projection, workspaceObjects]);
   const activeHistoryState = activeObjectId ? historyServiceRef.current.historyState(activeObjectId) : null;
-  // Selection membership is already content-addressed by the immutable
-  // SelectionResult.  Including every stable AtomUID in this dirty-state
-  // fingerprint made large compact selections needlessly stringify hundreds
-  // of thousands of IDs after every console command.
+  // Dirty tracking uses a revision counter bumped when a saved slice changes by
+  // reference.  Hover only rewrites interaction.hoveredAtomId, so a hover-only
+  // projection change keeps the previous persisted projection and bumps nothing.
+  const persistedProjectionRef = useRef(projection);
+  {
+    const prev = persistedProjectionRef.current;
+    if (prev !== projection) {
+      let same = prev.interaction.selectedAtomIds === projection.interaction.selectedAtomIds
+        && prev.interaction.pickedAtomId === projection.interaction.pickedAtomId
+        && prev.interaction.measurementPickAtomIds === projection.interaction.measurementPickAtomIds;
+      if (same) {
+        for (const key of Object.keys(projection) as (keyof RenderProjection)[]) {
+          if (key !== "interaction" && prev[key] !== projection[key]) { same = false; break; }
+        }
+      }
+      if (!same) persistedProjectionRef.current = projection;
+    }
+  }
+  const persistedProjection = persistedProjectionRef.current;
+  const [workspaceRevision, setWorkspaceRevision] = useState(0);
   const activeSelectionResultId = activeSelection?.resultId;
-  const activeSelectionMembershipHash = activeSelection?.membershipHash;
-  const activeSelectionCount = activeSelection?.count;
-  const activeSelectionMolecularRevision = activeSelection?.molecularRevision;
-  const workspaceFingerprint = useMemo(() => {
-    const activeSelectionFingerprint = activeSelectionResultId !== undefined
-      ? { resultId: activeSelectionResultId, membershipHash: activeSelectionMembershipHash, count: activeSelectionCount, molecularRevision: activeSelectionMolecularRevision }
-      : null;
-    return JSON.stringify({ workspaceObjects, workspaceGroups, activeObjectId, globalFrameIndex, coordinateFramePolicy, activeSelection: activeSelectionFingerprint, namedSelections, measurements, analysisResults, fittingResults, sceneCollection, projection, biologicalData });
-  }, [activeObjectId, activeSelectionCount, activeSelectionMembershipHash, activeSelectionMolecularRevision, activeSelectionResultId, analysisResults, biologicalData, coordinateFramePolicy, fittingResults, globalFrameIndex, measurements, namedSelections, projection, sceneCollection, workspaceGroups, workspaceObjects]);
+  useEffect(() => {
+    setWorkspaceRevision((value) => value + 1);
+  }, [activeObjectId, activeSelectionResultId, analysisResults, biologicalData, coordinateFramePolicy, fittingResults, globalFrameIndex, measurements, namedSelections, persistedProjection, sceneCollection, workspaceGroups, workspaceObjects]);
 
   useEffect(() => {
     if (!project) return;
-    if (savedFingerprintRef.current === null) { savedFingerprintRef.current = workspaceFingerprint; return; }
-    if (savedFingerprintRef.current !== workspaceFingerprint) setDirty(true);
-  }, [project, workspaceFingerprint]);
+    if (savedRevisionRef.current === null) { savedRevisionRef.current = workspaceRevision; return; }
+    if (savedRevisionRef.current !== workspaceRevision) setDirty(true);
+  }, [project, workspaceRevision]);
 
   const presentationSelectionContext = (): SelectionPresentationContext | undefined => {
     if (!viewerWorkspaceObjects.length) return undefined;
@@ -661,7 +671,7 @@ export const App = () => {
     try {
       const created = await apiClient.createProject();
       setProject(created);
-      savedFingerprintRef.current = null;
+      savedRevisionRef.current = null;
       setDirty(false);
       sceneStoreRef.current = new SceneStore();
       setSceneCollection(sceneStoreRef.current.value);
@@ -726,7 +736,7 @@ export const App = () => {
       sceneStoreRef.current = new SceneStore(opened.session?.sceneCollection);
       setSceneCollection(sceneStoreRef.current.value);
       setProject(opened);
-      savedFingerprintRef.current = null;
+      savedRevisionRef.current = null;
       setDirty(false);
       setLoadError(null);
       setLoadState("idle");
@@ -743,7 +753,7 @@ export const App = () => {
       const draft = buildSessionDraft({ project: target, workspaceObjects: workspaceForSave, workspaceGroups: workspaceGroupsRef.current, activeObjectId, globalFrameIndex, coordinateFramePolicy, activeSelection: activeSelectionResultRef.current, namedSelectionStore: namedSelectionsRef.current, measurements, analysisResults, fittingResults, sceneStore: sceneStoreRef.current, history: historyServiceRef.current, projection });
       const saved = await apiClient.saveProject(target.id, { name: target.name, structure: structure ?? null, presentation: toProjectPresentation(projection), session: draft, expectedRevision: project ? project.revision : target.revision });
       setProject(saved);
-      savedFingerprintRef.current = workspaceFingerprint;
+      savedRevisionRef.current = workspaceRevision;
       setDirty(false);
       setLoadError(null);
       setLoadState("idle");
