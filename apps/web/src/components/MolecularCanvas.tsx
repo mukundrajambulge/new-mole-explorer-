@@ -78,6 +78,8 @@ export const MolecularCanvas = ({
   const pickRef = useRef(onPick);
   const hoverRef = useRef(onHover);
   const pointerGestureRef = useRef(false);
+  /** Background pick candidate: armed on pointerdown, fires on pointerup only when the pointer did not drag. */
+  const backgroundPickRef = useRef<{ x: number; y: number } | null>(null);
   const renderLoadInProgressRef = useRef(false);
   pickRef.current = onPick;
   hoverRef.current = onHover;
@@ -248,7 +250,7 @@ export const MolecularCanvas = ({
 
   const gestureMode = activeTool === "Rotate" ? "rotate" : activeTool === "Pan" ? "pan" : activeTool === "Zoom" ? "zoom" : null;
   const beginPointerGesture = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!gestureMode && event.button === 0 && event.target instanceof HTMLCanvasElement) onBackgroundPick();
+    if (!gestureMode && event.button === 0 && event.target instanceof HTMLCanvasElement) backgroundPickRef.current = { x: event.clientX, y: event.clientY };
     if (!gestureMode || event.button !== 0 || (event.target instanceof HTMLElement && Boolean(event.target.closest("button")))) return;
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -261,6 +263,9 @@ export const MolecularCanvas = ({
     adapterRef.current?.updateGesture(event.clientX, event.clientY);
   };
   const endPointerGesture = (event: React.PointerEvent<HTMLDivElement>) => {
+    const armed = backgroundPickRef.current;
+    backgroundPickRef.current = null;
+    if (armed && event.type === "pointerup" && Math.hypot(event.clientX - armed.x, event.clientY - armed.y) <= 4) onBackgroundPick();
     if (!pointerGestureRef.current) return;
     pointerGestureRef.current = false;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
