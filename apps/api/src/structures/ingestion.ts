@@ -440,10 +440,14 @@ const tokenizeCif = (content: string): CifTokens => {
       continue;
     }
     if (code === 39 || code === 34) {
+      // A quote opens only at a token start and closes only when whitespace or
+      // end of input follows it, so `'C1'' ` style names stay intact. An
+      // unterminated quote ends at the end of its line (CR or LF).
       let cursor = index + 1;
       while (cursor < length) {
-        if (content.charCodeAt(cursor) === code && (cursor + 1 >= length || isSpace(content.charCodeAt(cursor + 1)))) break;
-        if (content.charCodeAt(cursor) === 10) break;
+        const next = content.charCodeAt(cursor);
+        if (next === code && (cursor + 1 >= length || isSpace(content.charCodeAt(cursor + 1)))) break;
+        if (next === 10 || next === 13) break;
         cursor += 1;
       }
       tokens.push(content.slice(index + 1, cursor));
@@ -463,11 +467,20 @@ const tokenizeCif = (content: string): CifTokens => {
 
 type CifLoop = { headers: string[]; rows: string[][] };
 
+/** Reserved words are case-insensitive in CIF; quoted/text-field tokens never are keywords. */
+const isCifReservedWord = (token: string): boolean => {
+  if (token.length < 5 || !token.includes("_")) return false;
+  const lower = token.toLowerCase();
+  return lower.startsWith("data_") || lower.startsWith("save_") || lower === "loop_" || lower === "global_" || lower === "stop_";
+};
+
 const isCifKeyword = (cif: CifTokens, index: number): boolean => {
   if (cif.literal[index]) return false;
   const token = cif.tokens[index]!;
-  return token.startsWith("_") || token.startsWith("data_") || token.toLowerCase() === "loop_" || token.startsWith("data_");
+  return token.startsWith("_") || isCifReservedWord(token);
 };
+
+const isCifDataBlock = (cif: CifTokens, index: number): boolean => !cif.literal[index] && cif.tokens[index]!.length >= 5 && cif.tokens[index]!.slice(0, 5).toLowerCase() === "data_";
 
 /**
  * Reads loop_ categories and key/value items. Single-row categories written as
@@ -479,27 +492,39 @@ const readCifBlocks = (cif: CifTokens): { loops: CifLoop[]; items: Map<string, s
   const { tokens, literal } = cif;
   const loops: CifLoop[] = [];
   const items = new Map<string, string>();
+  // Only the first data block is read: a PDBx entry is one block, and mixing
+  // categories from later blocks would silently merge unrelated structures.
   let cursor = 0;
-  while (cursor < tokens.length) {
+  while (cursor < tokens.length && !isCifDataBlock(cif, cursor)) cursor += 1;
+  let end = tokens.length;
+  for (let scan = cursor + 1; scan < tokens.length; scan += 1) {
+    if (isCifDataBlock(cif, scan)) {
+      end = scan;
+      break;
+    }
+  }
+  if (cursor >= tokens.length) cursor = 0;
+  while (cursor < end) {
     const token = tokens[cursor]!;
     if (!literal[cursor] && token.toLowerCase() === "loop_") {
       cursor += 1;
       const headers: string[] = [];
-      while (cursor < tokens.length && !literal[cursor] && tokens[cursor]!.startsWith("_")) {
+      while (cursor < end && !literal[cursor] && tokens[cursor]!.startsWith("_")) {
         headers.push(tokens[cursor]!);
         cursor += 1;
       }
       if (headers.length === 0) continue;
-      const rows: string[][] = [];
-      while (cursor < tokens.length && !isCifKeyword(cif, cursor)) {
-        if (cursor + headers.length > tokens.length) break;
-        rows.push(tokens.slice(cursor, cursor + headers.length));
-        cursor += headers.length;
+      let valuesEnd = cursor;
+      while (valuesEnd < end && !isCifKeyword(cif, valuesEnd)) valuesEnd += 1;
+      if ((valuesEnd - cursor) % headers.length !== 0) {
+        throw new IngestionError("INVALID_INPUT", `mmCIF loop ${headers[0]!.split(".")[0]} has ${valuesEnd - cursor} values, which is not a multiple of its ${headers.length} columns.`);
       }
+      const rows: string[][] = [];
+      for (; cursor < valuesEnd; cursor += headers.length) rows.push(tokens.slice(cursor, cursor + headers.length));
       loops.push({ headers, rows });
       continue;
     }
-    if (!literal[cursor] && token.startsWith("_") && cursor + 1 < tokens.length && !isCifKeyword(cif, cursor + 1)) {
+    if (!literal[cursor] && token.startsWith("_") && cursor + 1 < end && !isCifKeyword(cif, cursor + 1)) {
       if (!items.has(token)) items.set(token, tokens[cursor + 1]!);
       cursor += 2;
       continue;
