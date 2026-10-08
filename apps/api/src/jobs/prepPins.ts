@@ -9,8 +9,11 @@ import { PREP_PROFILE_ID } from "@molecular/contracts";
  * - the lock digest (sha256 of workers/prep/requirements.lock.txt, LF-normalised) against TOOLS.md
  * - every direct pin in workers/prep/requirements.in against the TOOLS.md package table
  * - the Vina sha256 in TOOLS.md against the one scripts/wsl-setup.sh enforces
- * - the prep profile ID and entry point rows
+ * - the prep profile ID, entry point and worker version rows
  * Any mismatch fails closed: the job store refuses to plan (PROVENANCE_REPLAY).
+ * Fix round: the installed ~/mole-prep venv is checked too (checkInstalledTools on the worker's own --versions
+ * report, before the first plan), and the seal compares every manifest stages[].version with TOOLS.md
+ * (checkStageVersions). Drift in either fails closed.
  */
 export const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..");
 
