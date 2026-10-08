@@ -975,7 +975,8 @@
         "C9"
       ],
       "est": "Half a day",
-      "status": "TODO"
+      "status": "DONE",
+      "note": "W6 merged (conflict with 1.3 resolved: splitLines + line numbers)"
     },
     {
       "id": "2.7",
