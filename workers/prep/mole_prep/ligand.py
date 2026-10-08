@@ -142,20 +142,30 @@ def _apply_dimorphite(mol, ph: float):
             b.SetIsAromatic(False)
         return g.GetMol()
 
-    match = graph(heavy).GetSubstructMatch(graph(dm))
-    if len(match) != heavy.GetNumAtoms() or dm.GetNumAtoms() != heavy.GetNumAtoms():
+    if dm.GetNumAtoms() != heavy.GetNumAtoms():
         raise Blocked("TOOL_FAILED", "Dimorphite-DL state does not map onto the submitted ligand")
-    rw = Chem.RWMol(heavy)
-    for qi, ti in enumerate(match):
-        a = rw.GetAtomWithIdx(ti)
-        a.SetFormalCharge(dm.GetAtomWithIdx(qi).GetFormalCharge())
-        a.SetNumExplicitHs(0)
-        a.SetNoImplicit(False)
-    try:
-        Chem.SanitizeMol(rw)
-    except Exception:
-        raise Blocked("TOOL_FAILED", "Dimorphite-DL changed bonding; state not applied") from None
-    return rw.GetMol(), out[0]
+    # The bond-order-free graph match is ambiguous for symmetric groups (carboxylate O vs O=): try the
+    # deterministic match list and keep the first that reproduces Dimorphite's state exactly.
+    target = Chem.MolToSmiles(dm, isomericSmiles=False)
+    matches = graph(heavy).GetSubstructMatches(graph(dm), uniquify=False, maxMatches=1000)
+    for match in matches:
+        if len(match) != heavy.GetNumAtoms():
+            continue
+        rw = Chem.RWMol(heavy)
+        for qi, ti in enumerate(match):
+            a = rw.GetAtomWithIdx(ti)
+            a.SetFormalCharge(dm.GetAtomWithIdx(qi).GetFormalCharge())
+            a.SetNumExplicitHs(0)
+            a.SetNoImplicit(False)
+        try:
+            Chem.SanitizeMol(rw)
+        except Exception:  # RDKit raises several sanitize exception types
+            continue
+        if Chem.MolToSmiles(Chem.RemoveHs(rw), isomericSmiles=False) == target:
+            return rw.GetMol(), out[0]
+    if not matches:
+        raise Blocked("TOOL_FAILED", "Dimorphite-DL state does not map onto the submitted ligand")
+    raise Blocked("TOOL_FAILED", "Dimorphite-DL changed bonding; state not applied")
 
 
 def prepare(text: str, fmt: str, template: str | None, opts: dict) -> dict:
