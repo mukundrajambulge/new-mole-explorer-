@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Starts the full dev stack with the docking wizard pointed at the MOCK job server (5.0).
-// Use it to try the wizard end to end before the real job runner (5.4/5.5) exists.
-// Every docking number it shows is fake and labelled MOCK in the UI.
+// Without VITE_DOCKING_MOCK=1 the wizard talks to the real API (task 5.7c); this script is the only way to get the
+// mock. Every docking number it shows is fake and labelled MOCK in the UI.
 //   node scripts/dev-docking-mock.mjs
 import { spawn } from "node:child_process";
 

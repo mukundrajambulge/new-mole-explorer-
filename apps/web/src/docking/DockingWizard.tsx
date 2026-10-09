@@ -4,6 +4,7 @@ import { dockingClient as defaultClient, isAbortError, isTerminal, type DockingC
 import type { D2SearchRegionAuthority } from "./dockingApiAdapter";
 import { numericSearchRegionDraft, type SearchRegionDraft } from "./dockingUiState";
 import { SearchRegionEditor } from "./SearchRegionEditor";
+import { VINA_EXPERIMENTAL_BANNER, prepBlockReason, preparedIds } from "./wizardPrepGate";
 import {
   WIZARD_STEPS, boxAroundAtoms, boxProblem, formatScore, hbondLines, isStaleForStructure, ligandPdbFromAtoms, parsePoseAtoms, prepFormatForFile, rmsd, splitByRole,
   type PoseAtom, type PoseOverlay, type WizardStep,
@@ -11,8 +12,6 @@ import {
 
 const POLL_MS = 500;
 const SMILES_MAX = 2000;
-/** Owner decision 2026-10-09 (RESEARCH-DIGEST section 7): the Vina run is the separate EXPERIMENTAL capability. */
-export const VINA_EXPERIMENTAL_BANNER = "Vina comparator preview — EXPERIMENTAL. Implemented, not yet verified or evaluated. Scores are empirical Vina scores, not binding free energies.";
 const ENABLE_HINT = "To enable it, start the API with FEATURE_DOCKING_RUN=1 (needs WSL Ubuntu-24.04 with the pinned Vina 1.2.7 and the prep environment).";
 const errText = (e: unknown, fallback: string) => (e instanceof Error && e.message ? e.message : fallback);
 const sleep = (ms: number, signal: AbortSignal) => new Promise<void>((resolve, reject) => {
@@ -40,23 +39,6 @@ export type DockingWizardProps = {
 type UploadedLigand = { file: File; name: string; format: "pdb" | "sdf" | "mol" | "mol2" };
 
 const Err = ({ message, testId = "wizard-error" }: { message: string | null; testId?: string }) => message ? <div className="docking-inline-diagnostic" role="alert" data-testid={testId}>{message}</div> : null;
-
-/** Why a preparation cannot feed a docking run, or null when it can. */
-export const prepBlockReason = (prep: PrepJobStateV1 | null): string | null => {
-  if (!prep) return null;
-  const plan = prep.plan;
-  const why = (list: readonly string[] | undefined) => (list && list.length > 0 ? `: ${list.slice(0, 6).join("; ")}` : ".");
-  if (plan?.status === "BLOCKED" || plan?.status === "UNSUPPORTED") return `Preparation is ${plan.status}${why(plan.diagnostics ?? plan.warnings)}`;
-  if (prep.state === "FAILED" || prep.state === "EXPIRED") return `Preparation ${prep.state}${prep.error ? `: ${prep.error}` : why(plan?.diagnostics)}`;
-  if (prep.state === "SUCCEEDED" && !preparedIds(prep)) return `Preparation finished but its seal is ${prep.seal?.status ?? "missing"}${why(prep.seal?.reasonCodes)} No dockable ids were issued.`;
-  return null;
-};
-const preparedIds = (prep: PrepJobStateV1 | null): { receptor: string; ligand: string } | null => {
-  if (!prep || prep.state !== "SUCCEEDED") return null;
-  if (prep.preparedReceptorId && prep.preparedLigandId) return { receptor: prep.preparedReceptorId, ligand: prep.preparedLigandId };
-  if (prep.previewReceptorId && prep.previewLigandId) return { receptor: prep.previewReceptorId, ligand: prep.previewLigandId };
-  return null;
-};
 
 export const DockingWizard = ({ structure, sourceArtifactId, draft, coordinateFrame, committedRegion, commitMessage, commitBusy, onDraftChange, onReplaceDraft, onShowDraft, onCommit, onPoseOverlay, onImport, client = defaultClient }: DockingWizardProps) => {
   const structureHash = structure?.structure.scientificHash ?? null;

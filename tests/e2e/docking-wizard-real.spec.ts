@@ -59,6 +59,10 @@ test("wizard docks 1STP biotin with real Vina via the API and overlays the top-r
   await wizard.getByRole("button", { name: "Next: Run" }).click();
   await expect(wizard.getByTestId("run-unavailable")).toHaveCount(0);
   await wizard.getByLabel("Exhaustiveness").fill("4");
+  // A fresh seed per run so the API cannot dedupe onto an earlier COMPLETED job: every pass is a real Vina run.
+  const seed = 1 + Math.floor(Math.random() * 1_000_000);
+  await wizard.getByLabel("Seed").fill(String(seed));
+  mark(`seed ${seed}`);
   await wizard.getByTestId("run-start").click();
   await expect(wizard.getByTestId("run-status-text")).toContainText(/QUEUED|RUNNING|COMPLETED/, { timeout: 60_000 });
 

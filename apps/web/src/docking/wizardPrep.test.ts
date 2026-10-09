@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import type { CanonicalAtom, PrepJobStateV1 } from "@molecular/contracts";
 import { ligandPdbFromAtoms, prepFormatForFile } from "./wizardLogic";
-import { prepBlockReason, VINA_EXPERIMENTAL_BANNER } from "./DockingWizard";
+import { prepBlockReason, VINA_EXPERIMENTAL_BANNER } from "./wizardPrepGate";
 
 const pdb = readFileSync(fileURLToPath(new URL("../../../../tests/fixtures/rcsb/1STP.pdb", import.meta.url)), "utf8");
 const btnLines = pdb.split(/\r?\n/).filter((l) => l.startsWith("HETATM") && l.slice(17, 20) === "BTN");
