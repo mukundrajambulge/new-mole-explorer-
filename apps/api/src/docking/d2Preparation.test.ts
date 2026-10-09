@@ -231,6 +231,12 @@ describe("D2 representation and explicit-state sealing", () => {
     expect(isPoseAdmissibleInSearchRegion(region.value!, [[2, 1, 0]])).toBe(true);
     expect(isPoseAdmissibleInSearchRegion(region.value!, [[2 + (2 * Number.EPSILON), 1, 0]])).toBe(false);
     expect(region.value!.fullExtents.map(f64Value)).toEqual([3, 3, 3]);
+    // -0 normalisation is an input step at SearchRegion sealing; the encoder itself stays bit-exact.
+    const base = { bindingSiteRef: "site:test", preparedReceptor: receptor.value!, preparedLigand: ligand, coordinateFrame: fixture.coordinate.coordinateFrame, max: [2, 2, 2], derivationMode: "EXPLICIT_BOUNDS", fixedAcrossLigandStates: true } as const;
+    const zeroBox = sealSearchRegion({ ...base, min: [0, -1, -1], paddingAngstrom: [0, 0, 0] });
+    const negZeroBox = sealSearchRegion({ ...base, min: [-0, -1, -1], paddingAngstrom: [-0, 0, 0] });
+    expect(negZeroBox.value!.digest).toBe(zeroBox.value!.digest);
+    expect(f64Bits(-0)).not.toEqual(f64Bits(0));
   });
 
   it("ME-DCK-V1-AT-0058 hashes explicit receptor typing/scoring dependency references and rejects mismatches", () => {
