@@ -1,4 +1,5 @@
 import type { CanonicalAtom, CanonicalMolecularStructure, DockResult } from "@molecular/contracts";
+import { DOCK_SCORE_LABEL } from "@molecular/contracts";
 
 /** Pure helpers for the docking wizard. Nothing here invents scientific values. */
 
@@ -141,7 +142,7 @@ export const hbondLines = (pose: readonly PoseAtom[], receptor: readonly Canonic
 export type PoseOverlay = Readonly<{ rank: number; format: "sdf" | "pdbqt"; text: string; hbonds: readonly HBondLine[]; structureHash: string }>;
 
 export const resultAsJson = (result: DockResult, mock: boolean, rmsdByRank: Readonly<Record<number, number | null>>): string =>
-  JSON.stringify({ mock, scoreStatus: result.scoreStatus, jobId: result.jobId, poses: result.poses.map((p) => ({ ...p, rmsdToBest: rmsdByRank[p.rank] ?? null })) }, null, 2);
+  JSON.stringify({ mock, scoreStatus: result.scoreStatus, scoreLabel: result.scoreLabel ?? DOCK_SCORE_LABEL, jobId: result.jobId, poses: result.poses.map((p) => ({ ...p, rmsdToBest: rmsdByRank[p.rank] ?? null })) }, null, 2);
 
 export const formatScore = (v: number | null): string => (v === null ? "n/a" : v.toFixed(2));
 
