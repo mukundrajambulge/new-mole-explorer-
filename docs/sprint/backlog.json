@@ -1052,7 +1052,7 @@
       "est": "1 hour",
       "status": "NEEDS_OWNER",
       "branch": "sprint/W7/2.8",
-      "note": "Science decision: task says a -0 box must get the same digest as a 0 box, but d1Contracts.test.ts:77 asserts CoordinateStateDigest(+0) != (-0). Owner: should -0 normalise to 0 for geometry digests only, or everywhere? Also combineSelections still hashes unsorted ids"
+      "note": "Science decision: task says a -0 box must get the same digest as a 0 box, but d1Contracts.test.ts:77 asserts CoordinateStateDigest(+0) != (-0). Owner: should -0 normalise to 0 for geometry digests only, or everywhere? Also combineSelections still hashes unsorted ids | Research C2: hash encoder must stay bit-exact (signed zero kept) [AT-0152]; any -0 to 0 canonicalisation only as an explicit SearchRegion input step, geometry only. Owner Q5."
     },
     {
       "id": "2.9",
@@ -2004,7 +2004,8 @@
         "D3"
       ],
       "est": "3 days",
-      "status": "TODO"
+      "status": "BLOCKED",
+      "note": "Research conflict C1 (blocker): out-of-box poses must be REJECTED [AT-0084]; a penalty may exist only as an explicit, versioned E_search term from PHD-V2-07 (not yet read) and never in DockingScore. Read PHD-V2-07 and rewrite this task before building. See docs/sprint/RESEARCH-DIGEST.md"
     },
     {
       "id": "4.9",
@@ -2231,6 +2232,302 @@
       "note": "Part 1 merged: mole-dock run (zod job, Vina sha/version pinned, no shell, result.json PREVIEW_UNQUALIFIED, exit codes). Redock seed 20261009 exh 8: 1STP biotin 0.386 A / -7.241; 1IEP imatinib 0.923 A / -12.931 (symmetry-naive, deterministic). Part 2: mole-score C++ re-score (meScore UNAVAILABLE now), poses.sdf, cap pose output, 3 more complexes for the 4-of-5 done-when."
     },
     {
+      "id": "R.8",
+      "title": "Read PHD-V2-03..14 (esp. PHD-V2-07 E_search) into the digest",
+      "phase": "P5",
+      "wave": "W3",
+      "lane": "L9",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "general-purpose",
+      "owns": "docs/sprint/RESEARCH-DIGEST.md",
+      "contextFiles": [
+        ".github/workflows/ci.yml",
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "The acceptance spec cites PHD-V2-03..14, which were not read; PHD-V2-07 defines the search energy and decides 4.8 [digest Q4].",
+      "how": "- Read them from Drive and extend RESEARCH-DIGEST.md; rewrite 4.8 accordingly.",
+      "done": "Digest updated; 4.8 unblocked with a research-correct definition.",
+      "refs": [
+        "RESEARCH"
+      ],
+      "est": "1 week",
+      "status": "TODO",
+      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+    },
+    {
+      "id": "R.7",
+      "title": "Seeds uint64 and box digest from sealed min/max",
+      "phase": "P5",
+      "wave": "W3",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        ".github/workflows/ci.yml",
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "Seed must be uint64 with 0 valid; an omitted seed drawn from the OS CSPRNG and persisted [C13, AT-0117/0118]; the job digest must use the sealed min/max SearchRegion, not center+size [C16, AT-0081].",
+      "how": "- Canonical request seed uint64; map deterministically to Vina range and record both.\n- inputDigest from sealed min/max.",
+      "done": "Tests for seed 0, omitted seed persisted, min/max digest stable.",
+      "refs": [
+        "RESEARCH"
+      ],
+      "est": "1 week",
+      "status": "TODO",
+      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+    },
+    {
+      "id": "R.6",
+      "title": "Histidine states listed and acknowledged",
+      "phase": "P5",
+      "wave": "W3",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        ".github/workflows/ci.yml",
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "His protonation is implicit (Meeko templates) [C10, AT-0052].",
+      "how": "- List HID/HIE/HIP per His in plan.json; site His need acknowledgement.",
+      "done": "Plan shows every His state; site His require ack.",
+      "refs": [
+        "RESEARCH"
+      ],
+      "est": "1 week",
+      "status": "TODO",
+      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+    },
+    {
+      "id": "R.5",
+      "title": "Metals and cofactors in the site make the task UNSUPPORTED",
+      "phase": "P5",
+      "wave": "W3",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "high",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        ".github/workflows/ci.yml",
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "Removing metals/cofactors with one acknowledgement conflicts with AT-0057/0131 [C8].",
+      "how": "- Classify hetero groups within 8 A of the site; a metal or cofactor in the site gives UNSUPPORTED (CHEMISTRY_UNSUPPORTED) instead of removal.",
+      "done": "Tests with a metalloprotein fixture.",
+      "refs": [
+        "RESEARCH"
+      ],
+      "est": "1 week",
+      "status": "TODO",
+      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+    },
+    {
+      "id": "R.4",
+      "title": "Ligand stereochemistry from CCD isomeric SMILES",
+      "phase": "P5",
+      "wave": "W3",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "high",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        ".github/workflows/ci.yml",
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "Templates without stereo (1STP biotin), with stereo taken from 3D, conflict with AT-0063 [C7].",
+      "how": "- Use CCD isomeric SMILES for templates; BLOCK when a stereocentre is undefined and not resolved explicitly; record the decision in plan.json.",
+      "done": "Tests: biotin keeps its 3 stereocentres; an undefined stereocentre gives BLOCKED.",
+      "refs": [
+        "RESEARCH"
+      ],
+      "est": "1 week",
+      "status": "TODO",
+      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+    },
+    {
+      "id": "R.3",
+      "title": "Honest score labels",
+      "phase": "P5",
+      "wave": "W3",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "low",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        ".github/workflows/ci.yml",
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "run.mjs writes vinaScoreUnits \"kcal/mol (Vina estimate)\", read as an energy, which the claim register forbids [C11, V2-01 App.C].",
+      "how": "- Use scoreName/direction/profile fields; label \"Vina score (empirical, kcal/mol-scaled; not a binding free energy)\" in result.json, UI and exports.\n- Record the Vina commit (8eb4040) as well as the version [C12].",
+      "done": "No output or UI text presents a score as an affinity or energy.",
+      "refs": [
+        "RESEARCH"
+      ],
+      "est": "1 week",
+      "status": "TODO",
+      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+    },
+    {
+      "id": "R.2",
+      "title": "Research job states: Created/Queued/Running/Completed/Failed/Cancelled",
+      "phase": "P5",
+      "wave": "W3",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        ".github/workflows/ci.yml",
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "Our states QUEUED/PREPARING/RUNNING/SUCCEEDED/FAILED/CANCELLED (+BLOCKED as a status) differ from the required six [C5, AT-0227/0228].",
+      "how": "- Rename SUCCEEDED to Completed, add Created, move PREPARING into an ExecutionAttempt stage/event field, BLOCKED is a reason not a status.\n- Update contracts (jobs.ts), the job runner, the mock server and the wizard together; do it before 5.5 freezes the HTTP API.",
+      "done": "Contracts, runner, mock and UI use exactly the six states; tests updated.",
+      "refs": [
+        "RESEARCH"
+      ],
+      "est": "1 week",
+      "status": "TODO",
+      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+    },
+    {
+      "id": "R.1",
+      "title": "Scientific smoke redock (symmetric RMSD, 5 A box, RDKit start, 3 seeds)",
+      "phase": "P5",
+      "wave": "W3",
+      "lane": "L6",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "high",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general",
+        "risk"
+      ],
+      "maxFix": 2,
+      "agentType": "docking-pipeline-engineer",
+      "owns": "workers/**, tools/mole-dock/**, native/third_party/TOOLS.md, apps/api/src/jobs/**, apps/api/src/docking/routes.ts, packages/contracts/src/docking/jobs.ts",
+      "contextFiles": [
+        ".github/workflows/ci.yml",
+        "apps/api/src/docking/d2PreparationService.ts",
+        "packages/contracts/src/docking/requests.ts",
+        "packages/contracts/src/docking/status.ts"
+      ],
+      "checkFlags": "--quick --python",
+      "what": "redock.mjs is symmetry-naive, starts from the crystal ligand, cube box max(22, extent+10), 1 seed [C4]. Make it a proper implementation-sanity smoke per AT-0143/0172/0173/0174.",
+      "how": "- Symmetry-exact (automorphism) heavy-atom RMSD in the receptor frame, no superposition; keep the direct RMSD too; undefined (no fallback) if no valid mapping.\n- Box = ligand envelope + 5 A per face.\n- Start from an RDKit-embedded conformer from the CCD isomeric SMILES, not the crystal pose.\n- At least 3 seeds; report success at 1/1.5/2/2.5/3 A.\n- 5 Astex-style complexes; label the output SMOKE (implementation sanity), never validated.",
+      "done": "Report table per complex x seed, symmetric and direct RMSD, all thresholds; labelled smoke.",
+      "refs": [
+        "RESEARCH"
+      ],
+      "est": "1 week",
+      "status": "TODO",
+      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+    },
+    {
       "id": "5.0",
       "title": "Docking job API contract (zod schemas) for UI and backend",
       "phase": "P5",
@@ -2372,7 +2669,8 @@
         "R8"
       ],
       "est": "Half a day",
-      "status": "TODO"
+      "status": "TODO",
+      "note": "Research C3: keep DOCKING.RUN (Mole engine) UNAVAILABLE until D8 [AT-0262]; expose the Vina preview as its own capability (e.g. VINA_COMPARATOR_PREVIEW) EXPERIMENTAL / IMPLEMENTED_UNVERIFIED / NOT_EVALUATED, all three axes in result.json and exports. Owner Q1. See docs/sprint/RESEARCH-DIGEST.md"
     },
     {
       "id": "5.7a",
