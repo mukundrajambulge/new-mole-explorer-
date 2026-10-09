@@ -1818,9 +1818,9 @@
         "C5"
       ],
       "est": "2-3 hours",
-      "status": "TODO",
+      "status": "DONE",
       "branch": "sprint/W6/4.3",
-      "note": "W6: C++ case-insensitive Cl/Br works + fixtures; review: TS normalizer unused (dead code), test hand-parses PDBQT instead of the real TS->C++ path, asserts only valid not finite score"
+      "note": "Merged: case-insensitive C++ typing, Cl/Br/I fixtures, shared oracle fixture checked by TS and C++. Follow-up: one true TS->C++ scoring path test (needs a native binding)."
     },
     {
       "id": "4.4",
@@ -2185,8 +2185,8 @@
       "done": "10 test pairs prepare without errors, and the output is identical on re-run.",
       "refs": [],
       "est": "1 week",
-      "status": "TODO",
-      "note": "Part 1 merged. Part 2 on sprint/W6/5.2b PARTIAL: routes, job store, pin check, artifact upload done; BLOCKER receptor seal hardcoded BLOCKED (D2 dependency digests undefined) so SEALED unreachable; also pin check ignores the installed venv, prep-artifacts store lacks quota/GC/concurrency limit, no SEALED/PROPKA end-to-end tests.",
+      "status": "NEEDS_OWNER",
+      "note": "Merged parts 1+2: worker, job store, HTTP routes, pin + version checks, upload quota, plan-bound qualification. Receptor seal BLOCKED in production: SERVER_D2_RECEPTOR_DEPENDENCIES is empty because the 3 D2 profile digests are not published (none invented). Owner: publish/approve those digests. Follow-up: require the core stages to be present in the manifest (prepPins.ts:186).",
       "branch": "sprint/W6/5.2b"
     },
     {
@@ -2446,7 +2446,8 @@
         "F13"
       ],
       "est": "1.5 weeks",
-      "status": "TODO"
+      "status": "TODO",
+      "note": "Partial merged: real 1STP fixture, wizard e2e on 1STP passes in 8.7 s incl. restored SearchRegion-blocked assertions. Still to do: error messages, per-structure cache, abort on leave, stale replies, SDF/PDBQT/JSON downloads"
     },
     {
       "id": "5.7c",

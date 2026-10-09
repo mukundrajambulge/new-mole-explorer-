@@ -34,10 +34,17 @@
       "est": 335000,
       "windowBefore": 3,
       "windowAfter": 44
+    },
+    {
+      "wave": "W8",
+      "spent": 245701,
+      "est": 200000,
+      "windowBefore": 0,
+      "windowAfter": 35
     }
   ],
   "calibration": {
-    "tokensPerWindowPct": 7348,
+    "tokensPerWindowPct": 6814,
     "estMultiplier": 1.13
   }
 }
