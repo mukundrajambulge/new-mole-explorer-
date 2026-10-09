@@ -1,12 +1,11 @@
 # Sprint state (generated: do not edit; run `node scripts/sprint/sprint.mjs state`)
 
-Status: DONE: 28 · TODO: 65 · NEEDS_OWNER: 3 · BLOCKED: 2 · DEFERRED: 8
+Status: DONE: 28 · TODO: 66 · NEEDS_OWNER: 2 · BLOCKED: 2 · DEFERRED: 8
 Done by tier: core 26/53 · strong 2/38 · stretch 0/7
 Calibration: 6814 output tokens per 1% of the 5-hour window; estimate multiplier 1.13
 Last waves: W4 131k (3%→28%), W6 336k (3%→44%), W8 246k (0%→35%)
 
 ## Needs the owner
-- 2.8 Selection and fingerprint fixes: NEEDS_OWNER (Science decision: task says a -0 box must get the same digest as a 0 box, but d1Contracts.test.ts:77 asserts CoordinateStateDigest(+0) != (-0). Owner: should -0 normalise to 0 for geometry digests only, or everywhere? Also combineSelections still hashes unsorted ids | Research C2: hash encoder must stay bit-exact (signed zero kept) [AT-0152]; any -0 to 0 canonicalisation only as an explicit SearchRegion input step, geometry only. Owner Q5.)
 - 4.1 Build and test the C++ in CI: NEEDS_OWNER (W6 BLOCKED: needs real CI runs on Windows MSVC and macOS clang (push the branch); agent wanted to drop /WX (denied). Owner: push sprint/W6/4.1 to see CI logs)
 - 4.4 Send numbers over JSON correctly: BLOCKED (Waits for 5.2: box seal must take {jobId, bounds} from a real prep job (see design note))
 - 4.8 Ready for search: gradients and out-of-box penalty: BLOCKED (Research conflict C1 (blocker): out-of-box poses must be REJECTED [AT-0084]; a penalty may exist only as an explicit, versioned E_search term from PHD-V2-07 (not yet read) and never in DockingScore. Read PHD-V2-07 and rewrite this task before building. See docs/sprint/RESEARCH-DIGEST.md)

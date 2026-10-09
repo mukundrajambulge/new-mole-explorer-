@@ -268,3 +268,10 @@ enumeration, no 2D→3D embedding, no minimization and no automatic rotor or tor
 Not read: PHD-V2-03..14 (cited by AccSpec, but not in the list), the plans (skipped on purpose). R01 was read for scoring, search and RMSD
 only. R03-14 covers PyMOL-selection implementation and is of low docking relevance; its rule is "open an OPEN_QUESTION, never change
 the oracle to pass tests" [R03-14 §8].
+
+## 7. Owner decisions (2026-10-09)
+- Q1 Preview capability: **separate EXPERIMENTAL capability** (VINA_COMPARATOR_PREVIEW). DOCKING.RUN stays UNAVAILABLE until D8. Docking on PREVIEW_UNQUALIFIED preparations is allowed, labelled.
+- Q2 Store: **interim deviation accepted** (file store), recorded as an ADR; keep the store swappable for SQLite WAL.
+- Q3 Redock bar: no presentation-driven claim; follow the research at our own speed. The redock is labelled smoke (implementation sanity), never validated.
+- Q5 -0 in the box: **normalise at SearchRegion input** (explicit, geometry only); the hash encoder stays bit-exact.
+- Still open: Q4 (E_search / PHD-V2-07, task R.8), Q6 (direct-vs-grid threshold), Q7 (Meeko 0.7.1 comparator lane), Q8 (generated-chemistry profile id), Q9 (model/altloc defaults).

@@ -1050,9 +1050,9 @@
         "C10"
       ],
       "est": "1 hour",
-      "status": "NEEDS_OWNER",
+      "status": "TODO",
       "branch": "sprint/W7/2.8",
-      "note": "Science decision: task says a -0 box must get the same digest as a 0 box, but d1Contracts.test.ts:77 asserts CoordinateStateDigest(+0) != (-0). Owner: should -0 normalise to 0 for geometry digests only, or everywhere? Also combineSelections still hashes unsorted ids | Research C2: hash encoder must stay bit-exact (signed zero kept) [AT-0152]; any -0 to 0 canonicalisation only as an explicit SearchRegion input step, geometry only. Owner Q5."
+      "note": "OWNER DECISION 2026-10-09: keep the hash encoder bit-exact (signed zero preserved) [AT-0152]; normalise -0 to 0 as an explicit, documented step in the SearchRegion constructor (geometry only) before sealing. Do not change the D1 contract test. Also sort ids in combineSelections hash. Branch sprint/W7/2.8 has the old approach - redo."
     },
     {
       "id": "2.9",
@@ -2525,7 +2525,7 @@
       ],
       "est": "1 week",
       "status": "TODO",
-      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md OWNER: do not plan around the presentation; go at research speed. Label smoke, never validated."
     },
     {
       "id": "5.0",
@@ -2597,7 +2597,8 @@
         "M10"
       ],
       "est": "1 week",
-      "status": "TODO"
+      "status": "TODO",
+      "note": "OWNER DECISION 2026-10-09: the file store is an accepted interim deviation from SQLite WAL [AT-0252]; record an ADR and keep the store swappable. Review fix round in progress on sprint/W10/5.4."
     },
     {
       "id": "5.5",
@@ -2670,7 +2671,7 @@
       ],
       "est": "Half a day",
       "status": "TODO",
-      "note": "Research C3: keep DOCKING.RUN (Mole engine) UNAVAILABLE until D8 [AT-0262]; expose the Vina preview as its own capability (e.g. VINA_COMPARATOR_PREVIEW) EXPERIMENTAL / IMPLEMENTED_UNVERIFIED / NOT_EVALUATED, all three axes in result.json and exports. Owner Q1. See docs/sprint/RESEARCH-DIGEST.md"
+      "note": "OWNER DECISION 2026-10-09: Vina docking is offered as a SEPARATE capability VINA_COMPARATOR_PREVIEW = EXPERIMENTAL / IMPLEMENTED_UNVERIFIED / NOT_EVALUATED; DOCKING.RUN (Mole engine) stays UNAVAILABLE until D8 [AT-0262]. Docking on PREVIEW_UNQUALIFIED preparations allowed, labelled. See docs/sprint/RESEARCH-DIGEST.md"
     },
     {
       "id": "5.7a",
