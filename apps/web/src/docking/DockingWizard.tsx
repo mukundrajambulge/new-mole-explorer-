@@ -11,7 +11,7 @@ import {
 } from "./wizardLogic";
 
 const POLL_MS = 500;
-const TERMINAL = new Set(["SUCCEEDED", "FAILED", "CANCELLED"]);
+const TERMINAL = new Set(["COMPLETED", "FAILED", "CANCELLED"]);
 const errText = (e: unknown, fallback: string) => (e instanceof Error && e.message ? e.message : fallback);
 const sleep = (ms: number, signal: AbortSignal) => new Promise<void>((resolve, reject) => {
   const t = setTimeout(resolve, ms);

@@ -4,6 +4,7 @@ import {
   DockJobRequestSchema,
   PrepConfirmationV1Schema,
   PrepareRequestSchema,
+  type DockJobStage,
   type DockJobStatusName,
   type DockResult,
   type JobEvent,
@@ -82,13 +83,14 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
     job.events.push(event);
     for (const l of job.listeners) l.write(`id: ${event.seq}\nevent: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
   };
-  const setStatus = (job: Job, status: DockJobStatusName, progress: number, message?: string, error?: string) => {
-    job.status = { ...job.status, status, progress, updatedAt: now(), ...(message ? { message } : {}), ...(error ? { error } : {}) };
-    emit(job, { type: "status", status });
+  const setStatus = (job: Job, status: DockJobStatusName, progress: number, message?: string, error?: string, stage?: DockJobStage) => {
+    const { stage: _old, ...rest } = job.status;
+    job.status = { ...rest, status, progress, updatedAt: now(), ...(stage ? { stage } : {}), ...(message ? { message } : {}), ...(error ? { error } : {}) };
+    emit(job, { type: "status", status, ...(stage ? { stage } : {}) });
     emit(job, { type: "progress", progress, ...(message ? { message } : {}) });
-    if (status === "SUCCEEDED") emit(job, { type: "result", resultReady: true });
+    if (status === "COMPLETED") emit(job, { type: "result", resultReady: true });
     if (status === "FAILED" && error) emit(job, { type: "error", message: error });
-    if (["SUCCEEDED", "FAILED", "CANCELLED"].includes(status)) {
+    if (["COMPLETED", "FAILED", "CANCELLED"].includes(status)) {
       for (const l of job.listeners) l.end();
       job.listeners.clear();
     }
@@ -96,9 +98,10 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
 
   const runJob = (job: Job, seed: number, center: readonly [number, number, number]) => {
     const steps: Array<() => void> = [
-      () => setStatus(job, "PREPARING", 0.1, "preparing inputs (mock)"),
-      () => setStatus(job, "RUNNING", 0.4, "search (mock)"),
-      () => setStatus(job, "RUNNING", 0.8, "re-scoring (mock)"),
+      () => setStatus(job, "QUEUED", 0, "queued (mock)"),
+      () => setStatus(job, "RUNNING", 0.1, "preparing inputs (mock)", undefined, "PREPARING"),
+      () => setStatus(job, "RUNNING", 0.4, "search (mock)", undefined, "DOCKING"),
+      () => setStatus(job, "RUNNING", 0.8, "re-scoring (mock)", undefined, "RESCORING"),
       () => {
         if (seed === options.failSeed) return setStatus(job, "FAILED", 0.8, undefined, "mock failure");
         job.result = {
@@ -114,7 +117,7 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
           scoreStatus: "PREVIEW_UNQUALIFIED",
         };
         for (const pose of job.result.poses) poseTexts.set(pose.poseArtifactId, mockPosePdbqt(pose.rank, center));
-        setStatus(job, "SUCCEEDED", 1);
+        setStatus(job, "COMPLETED", 1);
       },
     ];
     let i = 0;
@@ -216,9 +219,9 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
       if (!parsed.success) return err(res, 400, "invalid request");
       const jobId = randomUUID();
       const t = now();
-      const job: Job = { status: { jobId, status: "QUEUED", progress: 0, createdAt: t, updatedAt: t }, events: [], listeners: new Set() };
+      const job: Job = { status: { jobId, status: "CREATED", progress: 0, createdAt: t, updatedAt: t }, events: [], listeners: new Set() };
       jobs.set(jobId, job);
-      emit(job, { type: "status", status: "QUEUED" });
+      emit(job, { type: "status", status: "CREATED" });
       runJob(job, parsed.data.seed, parsed.data.boxCenter);
       return send(res, 202, job.status);
     }
@@ -231,7 +234,7 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
       return job.result ? send(res, 200, job.result) : err(res, 409, "result not available");
     }
     if (method === "POST" && parts[3] === "cancel") {
-      if (["SUCCEEDED", "FAILED", "CANCELLED"].includes(job.status.status)) return err(res, 409, "job already finished");
+      if (["COMPLETED", "FAILED", "CANCELLED"].includes(job.status.status)) return err(res, 409, "job already finished");
       if (job.timer) clearTimeout(job.timer);
       setStatus(job, "CANCELLED", job.status.progress);
       return send(res, 200, job.status);
@@ -240,7 +243,7 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
       res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache", "access-control-allow-origin": "*" });
       const last = Number(req.headers["last-event-id"] ?? -1);
       for (const e of job.events) if (e.seq > last) res.write(`id: ${e.seq}\nevent: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`);
-      if (["SUCCEEDED", "FAILED", "CANCELLED"].includes(job.status.status)) return res.end();
+      if (["COMPLETED", "FAILED", "CANCELLED"].includes(job.status.status)) return res.end();
       job.listeners.add(res);
       req.on("close", () => job.listeners.delete(res));
       return;
