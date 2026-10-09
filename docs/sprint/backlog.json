@@ -1998,14 +1998,14 @@
       ],
       "checkFlags": "--quick --native",
       "what": "The optimizer needs to know which way is better, and atoms leaving the box must be pushed back, not rejected.",
-      "how": "- Add evaluate_with_gradient(point), the analytic gradient of trilinear interpolation.\n              \n- Add a clamped mode: clamp the point into the grid and add slope × distance outside (Vina's rule, slope configurable in the profile).\n              \n- Keep the strict mode for D3 oracle tests.",
-      "done": "Gradients match finite differences (relative error < 1e-6) at 10,000 random points, including near boundaries.",
+      "how": "Per docs/sprint/RESEARCH-DIGEST.md section 8.2 (PHD-V2-07/13):\n- evaluate_with_gradient: analytic trilinear gradient per term, weights applied after interpolation.\n- E_search = E_inter + E_intra_nonbonded; NO box/slope term; remove the clamped mode; outside the field domain -> INVALID (SCORING_FIELD_OUT_OF_DOMAIN).\n- Separate admissibility check: every heavy atom inside the closed box (faces count), no epsilon, before scoring; line search halves the step, 10 out-of-box trials -> BOUNDARY_BLOCKED.\n- r=0 gradient flagged invalid; non-finite aborts the attempt.\n- Tolerances: finite differences rel <= 1e-6 away from cell faces (sanity); grid vs scalar reference <= 1e-10 per term; gradient abs <= 1e-8 AND rel <= 1e-7.",
+      "done": "Gradient tests at the research tolerances pass; out-of-box poses are rejected, never penalised; no box term in any reported score.",
       "refs": [
         "D3"
       ],
       "est": "3 days",
-      "status": "BLOCKED",
-      "note": "Research conflict C1 (blocker): out-of-box poses must be REJECTED [AT-0084]; a penalty may exist only as an explicit, versioned E_search term from PHD-V2-07 (not yet read) and never in DockingScore. Read PHD-V2-07 and rewrite this task before building. See docs/sprint/RESEARCH-DIGEST.md"
+      "status": "TODO",
+      "note": "Unblocked by R.8 (PHD-V2-07 read). Research-correct spec in RESEARCH-DIGEST.md 8.2."
     },
     {
       "id": "4.9",
@@ -2265,8 +2265,8 @@
         "RESEARCH"
       ],
       "est": "1 week",
-      "status": "TODO",
-      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+      "status": "DONE",
+      "note": "Digest section 8 added (b94b339)."
     },
     {
       "id": "R.7",
