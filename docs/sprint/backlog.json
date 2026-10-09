@@ -2597,8 +2597,8 @@
         "M10"
       ],
       "est": "1 week",
-      "status": "TODO",
-      "note": "OWNER DECISION 2026-10-09: the file store is an accepted interim deviation from SQLite WAL [AT-0252]; record an ADR and keep the store swappable. Review fix round in progress on sprint/W10/5.4."
+      "status": "DONE",
+      "note": "Merged after deep review + fix round: real WSL kill tested (Vina cancel <=777 ms, pgrep clean), no orphaned engine, server-minted preview ids, lock takeover, ligand provenance. File store = accepted interim deviation (ADR in TOOLS.md). Job state names to align with research in R.2."
     },
     {
       "id": "5.5",
