@@ -189,7 +189,8 @@ describe("request size limits", () => {
     // The streamed temp file holds exactly the uploaded bytes.
     expect(result.sourceArtifact?.byteLength).toBe(fixture.length);
     expect(result.sourceArtifact?.sha256).toContain(createHash("sha256").update(fixture).digest("hex"));
-    expect(pending()).toBe(0);
+    // The temp file is unlinked right after the reply is sent, so wait for it instead of racing it.
+    await expect.poll(pending, { timeout: 5_000 }).toBe(0);
   }, 30_000);
 
   it("rejects malformed multipart without leaving files behind", async () => {
