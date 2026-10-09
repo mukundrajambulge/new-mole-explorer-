@@ -101,6 +101,9 @@ struct Decomposition final {
 struct Result final {
   bool valid{};
   bool gradient_valid{true};
+  // INVALID_GRADIENT when a ligand/receptor pair has r = 0: the score stays
+  // finite but no gradient direction exists (never zeroed or perturbed).
+  std::string gradient_diagnostic_code;
   std::string diagnostic_code;
   std::string diagnostic;
   Decomposition decomposition;
