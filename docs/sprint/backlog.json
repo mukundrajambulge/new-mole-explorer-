@@ -659,7 +659,8 @@
         "M9"
       ],
       "est": "1-2 days",
-      "status": "TODO"
+      "status": "DONE",
+      "note": "Merged: zod schemas + parseOr400 for every server.ts route; fuzz test 1000+ requests, no 500s. Follow-ups: export api schemas from @molecular/contracts index; validate docking/prep routes (jobs lane)"
     },
     {
       "id": "1.8",
