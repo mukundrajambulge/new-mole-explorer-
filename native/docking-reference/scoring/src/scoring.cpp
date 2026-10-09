@@ -407,6 +407,7 @@ Result score_direct(const Request& request) {
   Result result;
   result.valid = true;
   result.gradient_valid = gradient_valid;
+  if (!gradient_valid) result.gradient_diagnostic_code = "INVALID_GRADIENT";
   result.receptor_state_digest = request.receptor_state_digest;
   result.ligand_state_digest = request.ligand_state_digest;
   result.coordinate_state_digest = request.coordinate_state_digest;

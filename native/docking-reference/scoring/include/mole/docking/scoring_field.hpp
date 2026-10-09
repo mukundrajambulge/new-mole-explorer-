@@ -164,13 +164,38 @@ struct ScoringFieldStorageIdentity final {
 [[nodiscard]] bool validate_scoring_field_storage_identity(
     const ScoringFieldStorageIdentity& identity) noexcept;
 
-enum class ScoringFieldStatus { Valid, OutOfDomain, ChannelMissing, InvalidField };
+enum class ScoringFieldStatus { Valid, OutOfDomain, ChannelMissing, InvalidField, NonFinite };
+
+// Stable diagnostic codes: Valid -> "", OutOfDomain -> SCORING_FIELD_OUT_OF_DOMAIN,
+// ChannelMissing -> SCORING_FIELD_CHANNEL_MISSING, InvalidField ->
+// SCORING_FIELD_INVALID, NonFinite -> SEARCH_OBJECTIVE_NONFINITE.
+[[nodiscard]] std::string_view scoring_field_status_code(ScoringFieldStatus status) noexcept;
 
 struct ScoringFieldSample final {
   ScoringFieldStatus status{ScoringFieldStatus::InvalidField};
   RawTerms raw{};
   RawTerms weighted{};
   double inter_score{};
+};
+
+// Value plus analytic trilinear gradient (PHD-V2-06 section 13; RESEARCH-DIGEST 8.2).
+// raw/raw_gradient are the interpolated per-term channels; weights are applied
+// after interpolation. The gradient is piecewise linear and discontinuous at
+// cell faces: on a grid plane the higher cell is used when one exists, otherwise
+// the last cell with fraction 1 (cell_lower records the cell actually used).
+// There is no clamped, extrapolating or zero-filling mode: any query outside
+// [origin, domain_maximum] on any axis is OutOfDomain.
+struct ScoringFieldGradientSample final {
+  ScoringFieldStatus status{ScoringFieldStatus::InvalidField};
+  std::string_view diagnostic_code{"SCORING_FIELD_INVALID"};
+  RawTerms raw{};
+  RawTerms weighted{};
+  std::array<Vec3, kTermCount> raw_gradient{};
+  std::array<Vec3, kTermCount> weighted_gradient{};
+  double inter_score{};
+  Vec3 inter_gradient{};
+  bool gradient_valid{};
+  std::array<std::size_t, 3> cell_lower{};
 };
 
 class ScoringField final {
@@ -198,6 +223,8 @@ class ScoringField final {
       std::size_t point_index) const noexcept;
   [[nodiscard]] ScoringFieldSample interpolate(std::string_view ligand_xs_type,
                                                const Vec3& coordinate) const noexcept;
+  [[nodiscard]] ScoringFieldGradientSample evaluate_with_gradient(
+      std::string_view ligand_xs_type, const Vec3& coordinate) const noexcept;
 
  private:
   friend struct ScoringFieldBuildResult;

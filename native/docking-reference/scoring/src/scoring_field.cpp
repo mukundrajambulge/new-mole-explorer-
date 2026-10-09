@@ -979,6 +979,115 @@ ScoringFieldSample ScoringField::interpolate(std::string_view ligand_xs_type,
   return sample;
 }
 
+std::string_view scoring_field_status_code(ScoringFieldStatus status) noexcept {
+  switch (status) {
+    case ScoringFieldStatus::Valid: return {};
+    case ScoringFieldStatus::OutOfDomain: return "SCORING_FIELD_OUT_OF_DOMAIN";
+    case ScoringFieldStatus::ChannelMissing: return "SCORING_FIELD_CHANNEL_MISSING";
+    case ScoringFieldStatus::InvalidField: return "SCORING_FIELD_INVALID";
+    case ScoringFieldStatus::NonFinite: return "SEARCH_OBJECTIVE_NONFINITE";
+  }
+  return "SCORING_FIELD_INVALID";
+}
+
+ScoringFieldGradientSample ScoringField::evaluate_with_gradient(std::string_view ligand_xs_type,
+                                                                const Vec3& coordinate) const noexcept {
+  ScoringFieldGradientSample sample;
+  const auto fail = [](ScoringFieldStatus status) noexcept {
+    ScoringFieldGradientSample failed;
+    failed.status = status;
+    failed.diagnostic_code = scoring_field_status_code(status);
+    failed.gradient_valid = false;
+    return failed;
+  };
+  if (!field_runtime_valid(*this)) return fail(ScoringFieldStatus::InvalidField);
+  if (!finite_vec3(coordinate)) return fail(ScoringFieldStatus::NonFinite);
+  const auto ligand_xs = xs_id(ligand_xs_type);
+  if (!ligand_xs) return fail(ScoringFieldStatus::ChannelMissing);
+
+  std::size_t lower[3]{};
+  double fraction[3]{};
+  const double point[3]{coordinate.x, coordinate.y, coordinate.z};
+  const double origin[3]{geometry_.origin.x, geometry_.origin.y, geometry_.origin.z};
+  const double domain[3]{geometry_.domain_maximum.x, geometry_.domain_maximum.y,
+                         geometry_.domain_maximum.z};
+  for (std::size_t axis = 0; axis < 3U; ++axis) {
+    if (point[axis] < origin[axis] || point[axis] > domain[axis] ||
+        !axis_cell(point[axis], origin[axis], geometry_.spacing_angstrom,
+                   geometry_.point_counts[axis], &lower[axis], &fraction[axis])) {
+      return fail(ScoringFieldStatus::OutOfDomain);
+    }
+  }
+  const double spacing = geometry_.spacing_angstrom;
+  for (std::size_t term = 0; term < kTermCount; ++term) {
+    const std::size_t logical = logical_channel_id(*ligand_xs, term);
+    double v[2][2][2]{};
+    double value_sum = 0.0;
+    for (std::size_t a = 0; a < 2U; ++a) {
+      const double wx = a == 0U ? 1.0 - fraction[0] : fraction[0];
+      for (std::size_t b = 0; b < 2U; ++b) {
+        const double wy = b == 0U ? 1.0 - fraction[1] : fraction[1];
+        for (std::size_t c = 0; c < 2U; ++c) {
+          const double wz = c == 0U ? 1.0 - fraction[2] : fraction[2];
+          const std::size_t point_index =
+              ((lower[0] + a) * geometry_.point_counts[1] + (lower[1] + b)) *
+                  geometry_.point_counts[2] + (lower[2] + c);
+          const auto value = logical_raw_value(logical, point_index);
+          if (!value) return fail(ScoringFieldStatus::InvalidField);
+          if (!std::isfinite(*value)) return fail(ScoringFieldStatus::NonFinite);
+          v[a][b][c] = *value;
+          // Same weight expression and corner order as interpolate(), so the
+          // value is bit-identical to the strict-mode interpolation.
+          value_sum += *value * ((wx * wy) * wz);
+        }
+      }
+    }
+    // Analytic derivative of the trilinear form, written with corner
+    // differences so a constant cell has an exactly zero gradient.
+    const double tx[2]{1.0 - fraction[0], fraction[0]};
+    const double ty[2]{1.0 - fraction[1], fraction[1]};
+    const double tz[2]{1.0 - fraction[2], fraction[2]};
+    double gx = 0.0;
+    double gy = 0.0;
+    double gz = 0.0;
+    for (std::size_t p = 0; p < 2U; ++p) {
+      for (std::size_t q = 0; q < 2U; ++q) {
+        gx += (v[1][p][q] - v[0][p][q]) * (ty[p] * tz[q]);
+        gy += (v[p][1][q] - v[p][0][q]) * (tx[p] * tz[q]);
+        gz += (v[p][q][1] - v[p][q][0]) * (tx[p] * ty[q]);
+      }
+    }
+    const Vec3 gradient{gx / spacing, gy / spacing, gz / spacing};
+    const double coefficient = kScoringTermCoefficients[term];
+    if (!std::isfinite(value_sum) || !finite_vec3(gradient)) return fail(ScoringFieldStatus::NonFinite);
+    sample.raw[term] = value_sum;
+    sample.weighted[term] = value_sum * coefficient;
+    sample.raw_gradient[term] = gradient;
+    sample.weighted_gradient[term] =
+        Vec3{gradient.x * coefficient, gradient.y * coefficient, gradient.z * coefficient};
+  }
+  NeumaierSum inter_score;
+  NeumaierSum inter_x;
+  NeumaierSum inter_y;
+  NeumaierSum inter_z;
+  for (std::size_t term = 0; term < kTermCount; ++term) {
+    inter_score.add(sample.weighted[term]);
+    inter_x.add(sample.weighted_gradient[term].x);
+    inter_y.add(sample.weighted_gradient[term].y);
+    inter_z.add(sample.weighted_gradient[term].z);
+  }
+  sample.inter_score = inter_score.value();
+  sample.inter_gradient = Vec3{inter_x.value(), inter_y.value(), inter_z.value()};
+  if (!std::isfinite(sample.inter_score) || !finite_vec3(sample.inter_gradient)) {
+    return fail(ScoringFieldStatus::NonFinite);
+  }
+  sample.cell_lower = {lower[0], lower[1], lower[2]};
+  sample.status = ScoringFieldStatus::Valid;
+  sample.diagnostic_code = {};
+  sample.gradient_valid = true;
+  return sample;
+}
+
 ScoringFieldBuildResult build_scoring_field(const ScoringFieldBuildRequest& request) try {
   ScoringFieldBuildResult result;
   const auto fail = [&result](std::string code, std::string message) {
