@@ -1,3 +1,4 @@
+/* global process, setInterval, clearInterval */
 // Test support for dockJobs.test.ts (task 5.4).
 // - fakeEngine(): the run.mjs engine interface, but dock() spawns a real long-running node process (through the
 //   same prep.mjs runProcess, so abort tree-kills it) that writes its pid to the pidfile, then copies the real
