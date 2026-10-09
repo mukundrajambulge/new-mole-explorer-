@@ -6,6 +6,7 @@ import {
   PrepareRequestSchema,
   type DockJobStage,
   type DockJobStatusName,
+  DOCK_SCORE_LABEL,
   type DockResult,
   type JobEvent,
   type JobStatus,
@@ -116,6 +117,7 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
           })),
           manifestRef: { artifactId: `mock-manifest-${job.status.jobId.slice(0, 8)}` },
           scoreStatus: "PREVIEW_UNQUALIFIED",
+          scoreLabel: { ...DOCK_SCORE_LABEL },
         };
         for (const pose of job.result.poses) poseTexts.set(pose.poseArtifactId, mockPosePdbqt(pose.rank, center));
         setStatus(job, "COMPLETED", 1);

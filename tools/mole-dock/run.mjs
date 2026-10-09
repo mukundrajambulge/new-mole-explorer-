@@ -17,6 +17,8 @@ import { PREP_DISTRO, runProcess, scrubOutput, toWslPath } from "./prep.mjs";
 export const EXIT_OK = 0;
 export const EXIT_BAD_INPUT = 2;
 export const EXIT_ENGINE = 3;
+/** Vina v1.2.7 source commit per the research comparator pin; native/third_party/TOOLS.md does not record it (reported, not verified there). */
+export const VINA_SOURCE_COMMIT = "8eb4040";
 export const RESULT_LABEL = "PREVIEW_UNQUALIFIED";
 export const VINA_VERSION = "1.2.7";
 export const JOB_FILE_CAP = 64 * 1024;
@@ -449,7 +451,7 @@ export async function runDockJob({ input, out, root }, { engineImpl, signal, pid
       schemaVersion: 1,
       status: "OK",
       label: RESULT_LABEL,
-      engine: { name: "AutoDock Vina", version: pin.version, versionReported: verified.versionLine, binarySha256: verified.binarySha256, pinnedSha256: pin.sha256 },
+      engine: { name: "AutoDock Vina", version: pin.version, sourceCommit: VINA_SOURCE_COMMIT, versionReported: verified.versionLine, binarySha256: verified.binarySha256, pinnedSha256: pin.sha256 },
       inputs: {
         jobSha256: sha256(raw),
         receptor: { sha256: inputs.receptor.sha256, bytes: inputs.receptor.bytes.length, atoms: inputs.receptor.atoms },
@@ -457,7 +459,10 @@ export async function runDockJob({ input, out, root }, { engineImpl, signal, pid
       },
       params: { box: job.box, exhaustiveness: job.exhaustiveness, numPoses: job.numPoses, energyRange: job.energyRange, seed: job.seed, cpu: job.cpu },
       vinaScore: poses[0].vinaScore,
-      vinaScoreUnits: "kcal/mol (Vina estimate)",
+      scoreName: "Vina score",
+      scoreDirection: "lower is better",
+      scoringProfile: `AutoDock Vina ${pin.version} default scoring`,
+      unitsNote: "empirical, kcal/mol-scaled; not a binding free energy",
       meScore: null,
       meScoreStatus: { status: "UNAVAILABLE", reason: "MOLE_SCORE_CLI_NOT_BUILT" }, // TODO(5.3 part 2): mole-score re-score per pose
       poses: poses.map((p) => ({ rank: p.rank, vinaScore: p.vinaScore, rmsdLbFromBest: p.rmsdLb, rmsdUbFromBest: p.rmsdUb, atomCount: p.atoms.length, meScore: null, terms: null })),
