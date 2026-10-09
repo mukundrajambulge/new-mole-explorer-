@@ -1,7 +1,7 @@
 # Sprint state (generated: do not edit; run `node scripts/sprint/sprint.mjs state`)
 
-Status: DONE: 30 · TODO: 65 · NEEDS_OWNER: 2 · BLOCKED: 1 · DEFERRED: 8
-Done by tier: core 28/53 · strong 2/38 · stretch 0/7
+Status: DONE: 34 · TODO: 61 · NEEDS_OWNER: 2 · BLOCKED: 1 · DEFERRED: 8
+Done by tier: core 31/53 · strong 3/38 · stretch 0/7
 Calibration: 6814 output tokens per 1% of the 5-hour window; estimate multiplier 1.13
 Last waves: W4 131k (3%→28%), W6 336k (3%→44%), W8 246k (0%→35%)
 
@@ -12,9 +12,6 @@ Last waves: W4 131k (3%→28%), W6 336k (3%→44%), W8 246k (0%→35%)
 
 ## Next ready tasks (critical path first)
 - ★ R.7 [L6 S/medium] Seeds uint64 and box digest from sealed min/max
-- ★ R.6 [L6 S/medium] Histidine states listed and acknowledged
-- ★ R.5 [L6 S/high] Metals and cofactors in the site make the task UNSUPPORTED
-- ★ R.4 [L6 S/high] Ligand stereochemistry from CCD isomeric SMILES
 - ★ R.3 [L6 S/low] Honest score labels
 - ★ R.2 [L6 S/medium] Research job states: Created/Queued/Running/Completed/Failed/Cancelled
 - ★ R.1 [L6 S/high] Scientific smoke redock (symmetric RMSD, 5 A box, RDKit start, 3 seeds)
@@ -23,3 +20,6 @@ Last waves: W4 131k (3%→28%), W6 336k (3%→44%), W8 246k (0%→35%)
 - ★ 5.8 [L6 M/medium] Provenance from day one
 - 0.8 [L1 S/low] Pin the Node.js version
 - 0.9 [L1 S/low] Write ONE honest status document
+- 1.3a [L2 S/high] Prove the memory limit with a dense structure
+- 1.3b [L2 S/high] Keep the parse slot until the reply is sent
+- 1.3c [L2 S/high] Idle timeouts for slow clients

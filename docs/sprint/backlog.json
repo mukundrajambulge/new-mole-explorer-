@@ -2004,8 +2004,8 @@
         "D3"
       ],
       "est": "3 days",
-      "status": "TODO",
-      "note": "Unblocked by R.8 (PHD-V2-07 read). Research-correct spec in RESEARCH-DIGEST.md 8.2."
+      "status": "DONE",
+      "note": "Merged: analytic trilinear gradients, strict field domain, closed-box admissibility (SEARCH_POSE_OUTSIDE_REGION), Armijo line search -> BOUNDARY_BLOCKED, no box term. Max errors: grid vs ref 5.3e-15, grad abs 7.8e-15 / rel 8.3e-9, FD rel 3.8e-8."
     },
     {
       "id": "4.9",
@@ -2339,8 +2339,8 @@
         "RESEARCH"
       ],
       "est": "1 week",
-      "status": "TODO",
-      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+      "status": "DONE",
+      "note": "Merged: CCD isomeric-SMILES stereo (STEREO_UNDEFINED/MISMATCH), metal/cofactor in site -> UNSUPPORTED (3HS4 Zn fixture), His states listed + site ack. Follow-ups: prepJobs shows UNSUPPORTED as BLOCKED text; owner to confirm H-only C=N E/Z ack (0KP)."
     },
     {
       "id": "R.5",
@@ -2376,8 +2376,8 @@
         "RESEARCH"
       ],
       "est": "1 week",
-      "status": "TODO",
-      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+      "status": "DONE",
+      "note": "Merged: CCD isomeric-SMILES stereo (STEREO_UNDEFINED/MISMATCH), metal/cofactor in site -> UNSUPPORTED (3HS4 Zn fixture), His states listed + site ack. Follow-ups: prepJobs shows UNSUPPORTED as BLOCKED text; owner to confirm H-only C=N E/Z ack (0KP)."
     },
     {
       "id": "R.4",
@@ -2413,8 +2413,8 @@
         "RESEARCH"
       ],
       "est": "1 week",
-      "status": "TODO",
-      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+      "status": "DONE",
+      "note": "Merged: CCD isomeric-SMILES stereo (STEREO_UNDEFINED/MISMATCH), metal/cofactor in site -> UNSUPPORTED (3HS4 Zn fixture), His states listed + site ack. Follow-ups: prepJobs shows UNSUPPORTED as BLOCKED text; owner to confirm H-only C=N E/Z ack (0KP)."
     },
     {
       "id": "R.3",
