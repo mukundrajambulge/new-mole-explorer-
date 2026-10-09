@@ -225,7 +225,12 @@ const pct = (x) => (x === null || x === undefined ? "n/a" : `${(100 * x).toFixed
 export function renderReport(summary) {
   const L = [];
   L.push(`# Smoke redock ${summary.date}`, "", `**${SMOKE_LABEL}.** Not a benchmark, not a qualification, not the D9 campaign (40 replicates, Wilson CI, paired bootstrap).`);
-  L.push("Nothing was tuned on these numbers. The cases are Astex Diverse Set members (a D9 regression set), so they must never be used to tune any parameter.", "");
+  L.push("Nothing was tuned on these numbers. The cases are Astex-diverse-style; membership in the Astex Diverse Set (a D9 regression set) was not verified here, so treat all of them as holdout-adjacent and never tune any parameter on them.", "");
+  L.push("## Caveats", "");
+  L.push("- 3 replicates per case, 5 cases: no confidence interval is meaningful at this size. Replicates of one case share the receptor, box and start conformer, so they are not independent.");
+  L.push("- Protonation is the CCD template state as submitted (EXPLICIT_SUBMITTED): biotin is a neutral acid and benzamidine a neutral amidine, so their O/O and N/N pairs are chemically distinct and do not count as symmetric.");
+  L.push("- The box is derived from the crystal ligand (redocking), so the search region already encodes the answer's location; this checks the pipeline, not pocket finding.");
+  L.push("- Direct RMSD uses one arbitrary canonical-order mapping; where it is far above the symmetric value (for example a C2-symmetric ligand) the pose is a symmetry image, not a failure.", "");
   L.push("## Protocol", "");
   L.push(`- Tool: \`node tools/mole-dock/redock.mjs --report\` (git ${summary.git}); RMSD helper workers/prep/mole_prep/redock_smoke.py.`);
   L.push(`- Engine: AutoDock Vina ${summary.versions.vina} (\`${summary.versions.vinaReported}\`), binary sha256 ${summary.versions.vinaSha256}. Vina commit: not recorded by the release binary (official v1.2.7 Linux x86_64 release; the research comparator pin 8eb4040 is not verified for this binary).`);

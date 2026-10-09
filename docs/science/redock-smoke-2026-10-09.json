@@ -1,0 +1,1503 @@
+{
+  "label": "SMOKE: implementation sanity, not validation",
+  "date": "2026-10-09",
+  "git": "7e895b9",
+  "versions": {
+    "vina": "1.2.7",
+    "vinaReported": "AutoDock Vina v1.2.7",
+    "vinaSha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644",
+    "rdkit": "2026.3.6",
+    "meeko": "0.8.0"
+  },
+  "params": {
+    "exhaustiveness": 8,
+    "numPoses": 9,
+    "cpu": 4,
+    "replicates": 3
+  },
+  "rmsdMethod": "heavy-atom RMSD in the receptor frame, no superposition; symmetric = min over exact graph isomorphisms (RDKit GetSubstructMatches uniquify=False useChirality=True, then element/charge/aromaticity/H-count/bond-order/CIP checks); budget 1048576 mappings; direct = canonical-order identity mapping; UNDEFINED when no valid mapping",
+  "thresholds": [
+    1,
+    1.5,
+    2,
+    2.5,
+    3
+  ],
+  "cases": [
+    {
+      "id": "1STP",
+      "ligand": "BTN A300",
+      "source": "tests/fixtures/rcsb/1STP.pdb",
+      "template": "OC(=O)CCCC[C@@H]1SC[C@@H]2NC(=O)N[C@H]12",
+      "templateSource": "CCD BTN SMILES_CANONICAL CACTVS (tests/fixtures/rcsb/ccd-BTN.cif)",
+      "prepOptions": {
+        "pH": 7.4,
+        "protonation": "EXPLICIT_SUBMITTED",
+        "ligandProtonation": "EXPLICIT_SUBMITTED",
+        "chainIds": [
+          "A"
+        ],
+        "keepWaters": false,
+        "addMissingAtoms": false
+      },
+      "status": "OK",
+      "rmsdStatus": "OK",
+      "directRmsdStatus": "OK",
+      "validMappings": 1,
+      "heavyAtoms": 16,
+      "crystalHeavyAtoms": 16,
+      "prep": {
+        "qualification": "PREVIEW_UNQUALIFIED",
+        "acknowledged": [
+          "HETERO",
+          "MISSING_HEAVY_ATOMS",
+          "RECEPTOR_TEMPLATE_HYDROGENS",
+          "HIS_SITE_STATES",
+          "LIGAND_BOND_ORDERS",
+          "LIGAND_HYDROGENS"
+        ],
+        "profileId": "ME_PREP_INTERIM_V0",
+        "lockDigest": "e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9"
+      },
+      "start": {
+        "method": "RDKit ETKDGv3",
+        "conformerSeed": 61453,
+        "torsions": 6,
+        "smiles": "O=C(O)CCCC[C@@H]1SC[C@@H]2NC(=O)N[C@@H]21",
+        "notCrystalPose": true
+      },
+      "box": {
+        "min": [
+          3.147,
+          -5.631,
+          -20.132
+        ],
+        "max": [
+          19.692,
+          10.373,
+          -2.613
+        ],
+        "center": [
+          11.4195,
+          2.371,
+          -11.3725
+        ],
+        "size": [
+          16.545,
+          16.004,
+          17.519
+        ],
+        "padding": 5
+      },
+      "params": {
+        "exhaustiveness": 8,
+        "numPoses": 9,
+        "cpu": 4,
+        "replicates": 3
+      },
+      "replicates": [
+        {
+          "replicate": 0,
+          "seed": {
+            "replicate": 0,
+            "u64": "15226016028502684090",
+            "vina": 1508494222
+          },
+          "top1VinaScore": -7.27,
+          "top1SymmetricRmsd": 0.691,
+          "top1DirectRmsd": 0.691,
+          "bestOfNSymmetricRmsd": 0.691,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -7.27,
+              "symmetricRmsd": 0.691,
+              "directRmsd": 0.691
+            },
+            {
+              "rank": 2,
+              "vinaScore": -5.611,
+              "symmetricRmsd": 6.499,
+              "directRmsd": 6.499
+            },
+            {
+              "rank": 3,
+              "vinaScore": -5.582,
+              "symmetricRmsd": 4.885,
+              "directRmsd": 4.885
+            },
+            {
+              "rank": 4,
+              "vinaScore": -5.521,
+              "symmetricRmsd": 8.022,
+              "directRmsd": 8.022
+            },
+            {
+              "rank": 5,
+              "vinaScore": -5.516,
+              "symmetricRmsd": 7.748,
+              "directRmsd": 7.748
+            },
+            {
+              "rank": 6,
+              "vinaScore": -5.434,
+              "symmetricRmsd": 5.941,
+              "directRmsd": 5.941
+            },
+            {
+              "rank": 7,
+              "vinaScore": -5.256,
+              "symmetricRmsd": 6.706,
+              "directRmsd": 6.706
+            },
+            {
+              "rank": 8,
+              "vinaScore": -5.24,
+              "symmetricRmsd": 2.321,
+              "directRmsd": 2.321
+            },
+            {
+              "rank": 9,
+              "vinaScore": -5.058,
+              "symmetricRmsd": 4.547,
+              "directRmsd": 4.547
+            }
+          ],
+          "vinaMs": 5522
+        },
+        {
+          "replicate": 1,
+          "seed": {
+            "replicate": 1,
+            "u64": "2648766464918498357",
+            "vina": 871615064
+          },
+          "top1VinaScore": -7.301,
+          "top1SymmetricRmsd": 0.757,
+          "top1DirectRmsd": 0.757,
+          "bestOfNSymmetricRmsd": 0.757,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -7.301,
+              "symmetricRmsd": 0.757,
+              "directRmsd": 0.757
+            },
+            {
+              "rank": 2,
+              "vinaScore": -6.143,
+              "symmetricRmsd": 2.979,
+              "directRmsd": 2.979
+            },
+            {
+              "rank": 3,
+              "vinaScore": -5.818,
+              "symmetricRmsd": 1.814,
+              "directRmsd": 1.814
+            },
+            {
+              "rank": 4,
+              "vinaScore": -5.579,
+              "symmetricRmsd": 6.46,
+              "directRmsd": 6.46
+            },
+            {
+              "rank": 5,
+              "vinaScore": -5.469,
+              "symmetricRmsd": 4.742,
+              "directRmsd": 4.742
+            },
+            {
+              "rank": 6,
+              "vinaScore": -5.4,
+              "symmetricRmsd": 5.864,
+              "directRmsd": 5.864
+            },
+            {
+              "rank": 7,
+              "vinaScore": -5.175,
+              "symmetricRmsd": 4.278,
+              "directRmsd": 4.278
+            },
+            {
+              "rank": 8,
+              "vinaScore": -5.068,
+              "symmetricRmsd": 5.909,
+              "directRmsd": 5.909
+            },
+            {
+              "rank": 9,
+              "vinaScore": -4.982,
+              "symmetricRmsd": 6.695,
+              "directRmsd": 6.695
+            }
+          ],
+          "vinaMs": 4790
+        },
+        {
+          "replicate": 2,
+          "seed": {
+            "replicate": 2,
+            "u64": "16020843928819374632",
+            "vina": 267094916
+          },
+          "top1VinaScore": -7.311,
+          "top1SymmetricRmsd": 1.062,
+          "top1DirectRmsd": 1.062,
+          "bestOfNSymmetricRmsd": 1.062,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -7.311,
+              "symmetricRmsd": 1.062,
+              "directRmsd": 1.062
+            },
+            {
+              "rank": 2,
+              "vinaScore": -6.679,
+              "symmetricRmsd": 2.615,
+              "directRmsd": 2.615
+            },
+            {
+              "rank": 3,
+              "vinaScore": -5.525,
+              "symmetricRmsd": 2.398,
+              "directRmsd": 2.398
+            },
+            {
+              "rank": 4,
+              "vinaScore": -5.443,
+              "symmetricRmsd": 6.89,
+              "directRmsd": 6.89
+            },
+            {
+              "rank": 5,
+              "vinaScore": -5.364,
+              "symmetricRmsd": 5.424,
+              "directRmsd": 5.424
+            },
+            {
+              "rank": 6,
+              "vinaScore": -5.338,
+              "symmetricRmsd": 7.949,
+              "directRmsd": 7.949
+            },
+            {
+              "rank": 7,
+              "vinaScore": -5.081,
+              "symmetricRmsd": 3.413,
+              "directRmsd": 3.413
+            },
+            {
+              "rank": 8,
+              "vinaScore": -4.981,
+              "symmetricRmsd": 5.064,
+              "directRmsd": 5.064
+            },
+            {
+              "rank": 9,
+              "vinaScore": -4.86,
+              "symmetricRmsd": 5.398,
+              "directRmsd": 5.398
+            }
+          ],
+          "vinaMs": 4437
+        }
+      ],
+      "engine": {
+        "name": "AutoDock Vina",
+        "version": "1.2.7",
+        "versionReported": "AutoDock Vina v1.2.7",
+        "binarySha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644",
+        "pinnedSha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644"
+      },
+      "versions": {
+        "vina": "1.2.7",
+        "vinaReported": "AutoDock Vina v1.2.7",
+        "vinaSha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644",
+        "rdkit": "2026.3.6",
+        "meeko": "0.8.0"
+      },
+      "rmsdMethod": "heavy-atom RMSD in the receptor frame, no superposition; symmetric = min over exact graph isomorphisms (RDKit GetSubstructMatches uniquify=False useChirality=True, then element/charge/aromaticity/H-count/bond-order/CIP checks); budget 1048576 mappings; direct = canonical-order identity mapping; UNDEFINED when no valid mapping",
+      "successRates": {
+        "1.0": {
+          "top1": 0.6666666666666666,
+          "bestOfN": 0.6666666666666666
+        },
+        "1.5": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "2.0": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "2.5": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "3.0": {
+          "top1": 1,
+          "bestOfN": 1
+        }
+      },
+      "bestPoseRmsd": 0.691,
+      "bestPoseVinaScore": -7.27
+    },
+    {
+      "id": "1IEP",
+      "ligand": "STI A201",
+      "source": "tests/fixtures/rcsb/1IEP.pdb",
+      "template": "CN1CCN(CC1)Cc2ccc(cc2)C(=O)Nc3ccc(C)c(Nc4nccc(n4)c5cccnc5)c3",
+      "templateSource": "CCD STI SMILES_CANONICAL CACTVS (tests/fixtures/rcsb/ccd-STI.cif)",
+      "prepOptions": {
+        "pH": 7.4,
+        "protonation": "EXPLICIT_SUBMITTED",
+        "ligandProtonation": "EXPLICIT_SUBMITTED",
+        "chainIds": [
+          "A"
+        ],
+        "keepWaters": false,
+        "addMissingAtoms": false
+      },
+      "status": "OK",
+      "rmsdStatus": "OK",
+      "directRmsdStatus": "OK",
+      "validMappings": 4,
+      "heavyAtoms": 37,
+      "crystalHeavyAtoms": 37,
+      "prep": {
+        "qualification": "PREVIEW_UNQUALIFIED",
+        "acknowledged": [
+          "HETERO_SITE",
+          "HETERO",
+          "MISSING_HEAVY_ATOMS",
+          "RECEPTOR_TEMPLATE_HYDROGENS",
+          "HIS_SITE_STATES",
+          "LIGAND_BOND_ORDERS",
+          "LIGAND_HYDROGENS"
+        ],
+        "profileId": "ME_PREP_INTERIM_V0",
+        "lockDigest": "e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9"
+      },
+      "start": {
+        "method": "RDKit ETKDGv3",
+        "conformerSeed": 61453,
+        "torsions": 7,
+        "smiles": "Cc1ccc(NC(=O)c2ccc(CN3CCN(C)CC3)cc2)cc1Nc1nccc(-c2cccnc2)n1",
+        "notCrystalPose": true
+      },
+      "box": {
+        "min": [
+          5.858,
+          40.533,
+          5.154
+        ],
+        "max": [
+          24.522,
+          67.272,
+          28.68
+        ],
+        "center": [
+          15.19,
+          53.9025,
+          16.917
+        ],
+        "size": [
+          18.664,
+          26.739,
+          23.526
+        ],
+        "padding": 5
+      },
+      "params": {
+        "exhaustiveness": 8,
+        "numPoses": 9,
+        "cpu": 4,
+        "replicates": 3
+      },
+      "replicates": [
+        {
+          "replicate": 0,
+          "seed": {
+            "replicate": 0,
+            "u64": "17221706623354711102",
+            "vina": 1292648990
+          },
+          "top1VinaScore": -12.093,
+          "top1SymmetricRmsd": 1.29,
+          "top1DirectRmsd": 1.426,
+          "bestOfNSymmetricRmsd": 1.29,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -12.093,
+              "symmetricRmsd": 1.29,
+              "directRmsd": 1.426
+            },
+            {
+              "rank": 2,
+              "vinaScore": -11.151,
+              "symmetricRmsd": 13.121,
+              "directRmsd": 13.121
+            },
+            {
+              "rank": 3,
+              "vinaScore": -9.211,
+              "symmetricRmsd": 12.2,
+              "directRmsd": 12.21
+            }
+          ],
+          "vinaMs": 34394
+        },
+        {
+          "replicate": 1,
+          "seed": {
+            "replicate": 1,
+            "u64": "11113150576070690935",
+            "vina": 1519564701
+          },
+          "top1VinaScore": -12.029,
+          "top1SymmetricRmsd": 1.286,
+          "top1DirectRmsd": 1.425,
+          "bestOfNSymmetricRmsd": 1.286,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -12.029,
+              "symmetricRmsd": 1.286,
+              "directRmsd": 1.425
+            },
+            {
+              "rank": 2,
+              "vinaScore": -10.99,
+              "symmetricRmsd": 13.199,
+              "directRmsd": 13.199
+            },
+            {
+              "rank": 3,
+              "vinaScore": -10.356,
+              "symmetricRmsd": 2.105,
+              "directRmsd": 2.317
+            },
+            {
+              "rank": 4,
+              "vinaScore": -9.268,
+              "symmetricRmsd": 12.184,
+              "directRmsd": 12.195
+            }
+          ],
+          "vinaMs": 25287
+        },
+        {
+          "replicate": 2,
+          "seed": {
+            "replicate": 2,
+            "u64": "12173998140463606256",
+            "vina": 880730001
+          },
+          "top1VinaScore": -12.062,
+          "top1SymmetricRmsd": 1.275,
+          "top1DirectRmsd": 1.416,
+          "bestOfNSymmetricRmsd": 1.275,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -12.062,
+              "symmetricRmsd": 1.275,
+              "directRmsd": 1.416
+            },
+            {
+              "rank": 2,
+              "vinaScore": -11.125,
+              "symmetricRmsd": 13.132,
+              "directRmsd": 13.132
+            },
+            {
+              "rank": 3,
+              "vinaScore": -9.208,
+              "symmetricRmsd": 12.06,
+              "directRmsd": 12.071
+            }
+          ],
+          "vinaMs": 31731
+        }
+      ],
+      "engine": {
+        "name": "AutoDock Vina",
+        "version": "1.2.7",
+        "versionReported": "AutoDock Vina v1.2.7",
+        "binarySha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644",
+        "pinnedSha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644"
+      },
+      "versions": {
+        "vina": "1.2.7",
+        "vinaReported": "AutoDock Vina v1.2.7",
+        "vinaSha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644",
+        "rdkit": "2026.3.6",
+        "meeko": "0.8.0"
+      },
+      "rmsdMethod": "heavy-atom RMSD in the receptor frame, no superposition; symmetric = min over exact graph isomorphisms (RDKit GetSubstructMatches uniquify=False useChirality=True, then element/charge/aromaticity/H-count/bond-order/CIP checks); budget 1048576 mappings; direct = canonical-order identity mapping; UNDEFINED when no valid mapping",
+      "successRates": {
+        "1.0": {
+          "top1": 0,
+          "bestOfN": 0
+        },
+        "1.5": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "2.0": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "2.5": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "3.0": {
+          "top1": 1,
+          "bestOfN": 1
+        }
+      },
+      "bestPoseRmsd": 1.29,
+      "bestPoseVinaScore": -12.093
+    },
+    {
+      "id": "3PTB",
+      "ligand": "BEN A1",
+      "source": "tests/fixtures/rcsb/3PTB.pdb",
+      "template": "NC(=N)c1ccccc1",
+      "templateSource": "CCD BEN SMILES_CANONICAL CACTVS (tests/fixtures/rcsb/ccd-BEN.cif)",
+      "prepOptions": {
+        "pH": 7.4,
+        "protonation": "EXPLICIT_SUBMITTED",
+        "ligandProtonation": "EXPLICIT_SUBMITTED",
+        "chainIds": [
+          "A"
+        ],
+        "keepWaters": false,
+        "addMissingAtoms": false
+      },
+      "status": "OK",
+      "rmsdStatus": "OK",
+      "directRmsdStatus": "OK",
+      "validMappings": 2,
+      "heavyAtoms": 9,
+      "crystalHeavyAtoms": 9,
+      "prep": {
+        "qualification": "PREVIEW_UNQUALIFIED",
+        "acknowledged": [
+          "HETERO",
+          "RECEPTOR_TEMPLATE_HYDROGENS",
+          "HIS_SITE_STATES",
+          "LIGAND_BOND_ORDERS",
+          "LIGAND_STEREO_H_ONLY",
+          "LIGAND_HYDROGENS"
+        ],
+        "profileId": "ME_PREP_INTERIM_V0",
+        "lockDigest": "e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9"
+      },
+      "start": {
+        "method": "RDKit ETKDGv3",
+        "conformerSeed": 61453,
+        "torsions": 1,
+        "smiles": "N=C(N)c1ccccc1",
+        "notCrystalPose": true
+      },
+      "box": {
+        "min": [
+          -7.797,
+          7.391,
+          9.491
+        ],
+        "max": [
+          4.086,
+          21.341,
+          24.005
+        ],
+        "center": [
+          -1.8555,
+          14.366,
+          16.748
+        ],
+        "size": [
+          11.883,
+          13.95,
+          14.514
+        ],
+        "padding": 5
+      },
+      "params": {
+        "exhaustiveness": 8,
+        "numPoses": 9,
+        "cpu": 4,
+        "replicates": 3
+      },
+      "replicates": [
+        {
+          "replicate": 0,
+          "seed": {
+            "replicate": 0,
+            "u64": "11112270830452303513",
+            "vina": 494458240
+          },
+          "top1VinaScore": -6.025,
+          "top1SymmetricRmsd": 0.375,
+          "top1DirectRmsd": 1.588,
+          "bestOfNSymmetricRmsd": 0.375,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -6.025,
+              "symmetricRmsd": 0.375,
+              "directRmsd": 1.588
+            },
+            {
+              "rank": 2,
+              "vinaScore": -5.915,
+              "symmetricRmsd": 0.475,
+              "directRmsd": 0.475
+            },
+            {
+              "rank": 3,
+              "vinaScore": -5.189,
+              "symmetricRmsd": 1.289,
+              "directRmsd": 2.014
+            },
+            {
+              "rank": 4,
+              "vinaScore": -5.049,
+              "symmetricRmsd": 3.435,
+              "directRmsd": 3.435
+            },
+            {
+              "rank": 5,
+              "vinaScore": -4.921,
+              "symmetricRmsd": 3.95,
+              "directRmsd": 3.95
+            },
+            {
+              "rank": 6,
+              "vinaScore": -4.883,
+              "symmetricRmsd": 3.972,
+              "directRmsd": 4.265
+            },
+            {
+              "rank": 7,
+              "vinaScore": -4.131,
+              "symmetricRmsd": 3.366,
+              "directRmsd": 3.498
+            },
+            {
+              "rank": 8,
+              "vinaScore": -4.097,
+              "symmetricRmsd": 3.462,
+              "directRmsd": 3.462
+            },
+            {
+              "rank": 9,
+              "vinaScore": -3.598,
+              "symmetricRmsd": 4.702,
+              "directRmsd": 4.954
+            }
+          ],
+          "vinaMs": 1365
+        },
+        {
+          "replicate": 1,
+          "seed": {
+            "replicate": 1,
+            "u64": "10274356729246814528",
+            "vina": 59917128
+          },
+          "top1VinaScore": -6.033,
+          "top1SymmetricRmsd": 0.386,
+          "top1DirectRmsd": 1.583,
+          "bestOfNSymmetricRmsd": 0.386,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -6.033,
+              "symmetricRmsd": 0.386,
+              "directRmsd": 1.583
+            },
+            {
+              "rank": 2,
+              "vinaScore": -5.904,
+              "symmetricRmsd": 0.488,
+              "directRmsd": 0.488
+            },
+            {
+              "rank": 3,
+              "vinaScore": -4.982,
+              "symmetricRmsd": 3.364,
+              "directRmsd": 3.504
+            },
+            {
+              "rank": 4,
+              "vinaScore": -4.782,
+              "symmetricRmsd": 2.225,
+              "directRmsd": 2.225
+            },
+            {
+              "rank": 5,
+              "vinaScore": -4.779,
+              "symmetricRmsd": 4.026,
+              "directRmsd": 4.026
+            },
+            {
+              "rank": 6,
+              "vinaScore": -4.057,
+              "symmetricRmsd": 2.746,
+              "directRmsd": 3.025
+            },
+            {
+              "rank": 7,
+              "vinaScore": -3.625,
+              "symmetricRmsd": 5.336,
+              "directRmsd": 5.336
+            },
+            {
+              "rank": 8,
+              "vinaScore": -3.53,
+              "symmetricRmsd": 5.544,
+              "directRmsd": 5.702
+            },
+            {
+              "rank": 9,
+              "vinaScore": -3.236,
+              "symmetricRmsd": 6.478,
+              "directRmsd": 6.478
+            }
+          ],
+          "vinaMs": 2232
+        },
+        {
+          "replicate": 2,
+          "seed": {
+            "replicate": 2,
+            "u64": "4354528174628409056",
+            "vina": 772069245
+          },
+          "top1VinaScore": -6.025,
+          "top1SymmetricRmsd": 0.364,
+          "top1DirectRmsd": 1.581,
+          "bestOfNSymmetricRmsd": 0.364,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -6.025,
+              "symmetricRmsd": 0.364,
+              "directRmsd": 1.581
+            },
+            {
+              "rank": 2,
+              "vinaScore": -5.882,
+              "symmetricRmsd": 0.467,
+              "directRmsd": 0.467
+            },
+            {
+              "rank": 3,
+              "vinaScore": -5.253,
+              "symmetricRmsd": 3.62,
+              "directRmsd": 3.935
+            },
+            {
+              "rank": 4,
+              "vinaScore": -4.871,
+              "symmetricRmsd": 3.341,
+              "directRmsd": 3.341
+            },
+            {
+              "rank": 5,
+              "vinaScore": -4.839,
+              "symmetricRmsd": 4.01,
+              "directRmsd": 4.01
+            },
+            {
+              "rank": 6,
+              "vinaScore": -4.188,
+              "symmetricRmsd": 3.45,
+              "directRmsd": 3.45
+            },
+            {
+              "rank": 7,
+              "vinaScore": -4.157,
+              "symmetricRmsd": 3.425,
+              "directRmsd": 3.425
+            },
+            {
+              "rank": 8,
+              "vinaScore": -3.567,
+              "symmetricRmsd": 5.573,
+              "directRmsd": 5.573
+            },
+            {
+              "rank": 9,
+              "vinaScore": -3.423,
+              "symmetricRmsd": 4.525,
+              "directRmsd": 4.67
+            }
+          ],
+          "vinaMs": 2012
+        }
+      ],
+      "engine": {
+        "name": "AutoDock Vina",
+        "version": "1.2.7",
+        "versionReported": "AutoDock Vina v1.2.7",
+        "binarySha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644",
+        "pinnedSha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644"
+      },
+      "versions": {
+        "vina": "1.2.7",
+        "vinaReported": "AutoDock Vina v1.2.7",
+        "vinaSha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644",
+        "rdkit": "2026.3.6",
+        "meeko": "0.8.0"
+      },
+      "rmsdMethod": "heavy-atom RMSD in the receptor frame, no superposition; symmetric = min over exact graph isomorphisms (RDKit GetSubstructMatches uniquify=False useChirality=True, then element/charge/aromaticity/H-count/bond-order/CIP checks); budget 1048576 mappings; direct = canonical-order identity mapping; UNDEFINED when no valid mapping",
+      "successRates": {
+        "1.0": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "1.5": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "2.0": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "2.5": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "3.0": {
+          "top1": 1,
+          "bestOfN": 1
+        }
+      },
+      "bestPoseRmsd": 0.375,
+      "bestPoseVinaScore": -6.025
+    },
+    {
+      "id": "1HVR",
+      "ligand": "XK2 A263",
+      "source": "tests/fixtures/rcsb/1HVR.pdb",
+      "template": "O[C@@H]1[C@@H](O)[C@@H](Cc2ccccc2)N(Cc3ccc4ccccc4c3)C(=O)N(Cc5ccc6ccccc6c5)[C@@H]1Cc7ccccc7",
+      "templateSource": "CCD XK2 SMILES_CANONICAL CACTVS (tests/fixtures/rcsb/ccd-XK2.cif)",
+      "prepOptions": {
+        "pH": 7.4,
+        "protonation": "EXPLICIT_SUBMITTED",
+        "ligandProtonation": "EXPLICIT_SUBMITTED",
+        "chainIds": [
+          "A",
+          "B"
+        ],
+        "keepWaters": false,
+        "addMissingAtoms": false
+      },
+      "status": "OK",
+      "rmsdStatus": "OK",
+      "directRmsdStatus": "OK",
+      "validMappings": 8,
+      "heavyAtoms": 46,
+      "crystalHeavyAtoms": 46,
+      "prep": {
+        "qualification": "PREVIEW_UNQUALIFIED",
+        "acknowledged": [
+          "HETERO",
+          "RECEPTOR_TEMPLATE_HYDROGENS",
+          "LIGAND_BOND_ORDERS",
+          "LIGAND_HYDROGENS"
+        ],
+        "profileId": "ME_PREP_INTERIM_V0",
+        "lockDigest": "e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9"
+      },
+      "start": {
+        "method": "RDKit ETKDGv3",
+        "conformerSeed": 61453,
+        "torsions": 10,
+        "smiles": "O=C1N(Cc2ccc3ccccc3c2)[C@H](Cc2ccccc2)[C@H](O)[C@@H](O)[C@@H](Cc2ccccc2)N1Cc1ccc2ccccc2c1",
+        "notCrystalPose": true
+      },
+      "box": {
+        "min": [
+          -18.7,
+          6.814,
+          14.349
+        ],
+        "max": [
+          1.27,
+          24.274,
+          41.451
+        ],
+        "center": [
+          -8.715,
+          15.544,
+          27.9
+        ],
+        "size": [
+          19.97,
+          17.46,
+          27.102
+        ],
+        "padding": 5
+      },
+      "params": {
+        "exhaustiveness": 8,
+        "numPoses": 9,
+        "cpu": 4,
+        "replicates": 3
+      },
+      "replicates": [
+        {
+          "replicate": 0,
+          "seed": {
+            "replicate": 0,
+            "u64": "12853299494904409415",
+            "vina": 1581014239
+          },
+          "top1VinaScore": -11.588,
+          "top1SymmetricRmsd": 0.645,
+          "top1DirectRmsd": 0.935,
+          "bestOfNSymmetricRmsd": 0.645,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -11.588,
+              "symmetricRmsd": 0.645,
+              "directRmsd": 0.935
+            },
+            {
+              "rank": 2,
+              "vinaScore": -10.074,
+              "symmetricRmsd": 7.133,
+              "directRmsd": 7.133
+            },
+            {
+              "rank": 3,
+              "vinaScore": -9.073,
+              "symmetricRmsd": 5.214,
+              "directRmsd": 8.806
+            },
+            {
+              "rank": 4,
+              "vinaScore": -8.81,
+              "symmetricRmsd": 4.64,
+              "directRmsd": 9.826
+            },
+            {
+              "rank": 5,
+              "vinaScore": -8.77,
+              "symmetricRmsd": 4.574,
+              "directRmsd": 9.73
+            }
+          ],
+          "vinaMs": 146267
+        },
+        {
+          "replicate": 1,
+          "seed": {
+            "replicate": 1,
+            "u64": "4733934177796869026",
+            "vina": 621702079
+          },
+          "top1VinaScore": -11.593,
+          "top1SymmetricRmsd": 0.689,
+          "top1DirectRmsd": 0.689,
+          "bestOfNSymmetricRmsd": 0.639,
+          "bestOfNRank": 2,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -11.593,
+              "symmetricRmsd": 0.689,
+              "directRmsd": 0.689
+            },
+            {
+              "rank": 2,
+              "vinaScore": -11.499,
+              "symmetricRmsd": 0.639,
+              "directRmsd": 9.944
+            },
+            {
+              "rank": 3,
+              "vinaScore": -9.244,
+              "symmetricRmsd": 5.274,
+              "directRmsd": 5.31
+            },
+            {
+              "rank": 4,
+              "vinaScore": -8.836,
+              "symmetricRmsd": 3.957,
+              "directRmsd": 3.957
+            },
+            {
+              "rank": 5,
+              "vinaScore": -8.626,
+              "symmetricRmsd": 4.838,
+              "directRmsd": 4.838
+            }
+          ],
+          "vinaMs": 148999
+        },
+        {
+          "replicate": 2,
+          "seed": {
+            "replicate": 2,
+            "u64": "236422380237553167",
+            "vina": 2106777565
+          },
+          "top1VinaScore": -11.568,
+          "top1SymmetricRmsd": 0.624,
+          "top1DirectRmsd": 9.923,
+          "bestOfNSymmetricRmsd": 0.624,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -11.568,
+              "symmetricRmsd": 0.624,
+              "directRmsd": 9.923
+            },
+            {
+              "rank": 2,
+              "vinaScore": -11.546,
+              "symmetricRmsd": 0.675,
+              "directRmsd": 0.972
+            },
+            {
+              "rank": 3,
+              "vinaScore": -9.256,
+              "symmetricRmsd": 5.144,
+              "directRmsd": 5.144
+            },
+            {
+              "rank": 4,
+              "vinaScore": -8.916,
+              "symmetricRmsd": 4.796,
+              "directRmsd": 9.754
+            },
+            {
+              "rank": 5,
+              "vinaScore": -8.855,
+              "symmetricRmsd": 5.198,
+              "directRmsd": 8.848
+            },
+            {
+              "rank": 6,
+              "vinaScore": -8.66,
+              "symmetricRmsd": 4.683,
+              "directRmsd": 4.746
+            }
+          ],
+          "vinaMs": 156141
+        }
+      ],
+      "engine": {
+        "name": "AutoDock Vina",
+        "version": "1.2.7",
+        "versionReported": "AutoDock Vina v1.2.7",
+        "binarySha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644",
+        "pinnedSha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644"
+      },
+      "versions": {
+        "vina": "1.2.7",
+        "vinaReported": "AutoDock Vina v1.2.7",
+        "vinaSha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644",
+        "rdkit": "2026.3.6",
+        "meeko": "0.8.0"
+      },
+      "rmsdMethod": "heavy-atom RMSD in the receptor frame, no superposition; symmetric = min over exact graph isomorphisms (RDKit GetSubstructMatches uniquify=False useChirality=True, then element/charge/aromaticity/H-count/bond-order/CIP checks); budget 1048576 mappings; direct = canonical-order identity mapping; UNDEFINED when no valid mapping",
+      "successRates": {
+        "1.0": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "1.5": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "2.0": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "2.5": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "3.0": {
+          "top1": 1,
+          "bestOfN": 1
+        }
+      },
+      "bestPoseRmsd": 0.645,
+      "bestPoseVinaScore": -11.588
+    },
+    {
+      "id": "4DJW",
+      "ligand": "0KP A501",
+      "source": "tests/fixtures/rcsb/4DJW.pdb",
+      "template": "CN1C(=N)N[C@](C1=O)(c2ccccc2)c3cccc(c3)c4cccnc4",
+      "templateSource": "CCD 0KP SMILES_CANONICAL CACTVS (tests/fixtures/rcsb/ccd-0KP.cif)",
+      "prepOptions": {
+        "pH": 7.4,
+        "protonation": "EXPLICIT_SUBMITTED",
+        "ligandProtonation": "EXPLICIT_SUBMITTED",
+        "chainIds": [
+          "A"
+        ],
+        "keepWaters": false,
+        "addMissingAtoms": true
+      },
+      "status": "OK",
+      "rmsdStatus": "OK",
+      "directRmsdStatus": "OK",
+      "validMappings": 2,
+      "heavyAtoms": 26,
+      "crystalHeavyAtoms": 26,
+      "prep": {
+        "qualification": "PREVIEW_UNQUALIFIED",
+        "acknowledged": [
+          "HETERO",
+          "MISSING_HEAVY_ATOMS",
+          "TERMINAL_OXT",
+          "RECEPTOR_TEMPLATE_HYDROGENS",
+          "LIGAND_BOND_ORDERS",
+          "LIGAND_STEREO_H_ONLY",
+          "LIGAND_HYDROGENS"
+        ],
+        "profileId": "ME_PREP_INTERIM_V0",
+        "lockDigest": "e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9"
+      },
+      "start": {
+        "method": "RDKit ETKDGv3",
+        "conformerSeed": 61453,
+        "torsions": 3,
+        "smiles": "CN1C(=N)N[C@](c2ccccc2)(c2cccc(-c3cccnc3)c2)C1=O",
+        "notCrystalPose": true
+      },
+      "box": {
+        "min": [
+          13.28,
+          4.111,
+          13.243
+        ],
+        "max": [
+          34.854,
+          18.063,
+          30.018
+        ],
+        "center": [
+          24.067,
+          11.087,
+          21.6305
+        ],
+        "size": [
+          21.574,
+          13.952,
+          16.775
+        ],
+        "padding": 5
+      },
+      "params": {
+        "exhaustiveness": 8,
+        "numPoses": 9,
+        "cpu": 4,
+        "replicates": 3
+      },
+      "replicates": [
+        {
+          "replicate": 0,
+          "seed": {
+            "replicate": 0,
+            "u64": "17728863686615224900",
+            "vina": 1410922871
+          },
+          "top1VinaScore": -9.714,
+          "top1SymmetricRmsd": 1.289,
+          "top1DirectRmsd": 1.536,
+          "bestOfNSymmetricRmsd": 1.289,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -9.714,
+              "symmetricRmsd": 1.289,
+              "directRmsd": 1.536
+            },
+            {
+              "rank": 2,
+              "vinaScore": -9.099,
+              "symmetricRmsd": 7.476,
+              "directRmsd": 7.476
+            },
+            {
+              "rank": 3,
+              "vinaScore": -8.627,
+              "symmetricRmsd": 7.335,
+              "directRmsd": 7.335
+            },
+            {
+              "rank": 4,
+              "vinaScore": -8.489,
+              "symmetricRmsd": 7.754,
+              "directRmsd": 7.776
+            },
+            {
+              "rank": 5,
+              "vinaScore": -8.467,
+              "symmetricRmsd": 7.004,
+              "directRmsd": 7.004
+            },
+            {
+              "rank": 6,
+              "vinaScore": -8.421,
+              "symmetricRmsd": 7.982,
+              "directRmsd": 7.982
+            },
+            {
+              "rank": 7,
+              "vinaScore": -8.368,
+              "symmetricRmsd": 7.151,
+              "directRmsd": 7.151
+            },
+            {
+              "rank": 8,
+              "vinaScore": -8.358,
+              "symmetricRmsd": 6.959,
+              "directRmsd": 7.005
+            },
+            {
+              "rank": 9,
+              "vinaScore": -8.328,
+              "symmetricRmsd": 5.981,
+              "directRmsd": 6.01
+            }
+          ],
+          "vinaMs": 8640
+        },
+        {
+          "replicate": 1,
+          "seed": {
+            "replicate": 1,
+            "u64": "1639334110192305580",
+            "vina": 934392077
+          },
+          "top1VinaScore": -9.731,
+          "top1SymmetricRmsd": 1.307,
+          "top1DirectRmsd": 1.547,
+          "bestOfNSymmetricRmsd": 1.307,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -9.731,
+              "symmetricRmsd": 1.307,
+              "directRmsd": 1.547
+            },
+            {
+              "rank": 2,
+              "vinaScore": -9.08,
+              "symmetricRmsd": 3.142,
+              "directRmsd": 3.188
+            },
+            {
+              "rank": 3,
+              "vinaScore": -8.84,
+              "symmetricRmsd": 4.882,
+              "directRmsd": 4.959
+            },
+            {
+              "rank": 4,
+              "vinaScore": -8.837,
+              "symmetricRmsd": 7.38,
+              "directRmsd": 7.38
+            },
+            {
+              "rank": 5,
+              "vinaScore": -8.578,
+              "symmetricRmsd": 7.262,
+              "directRmsd": 7.262
+            },
+            {
+              "rank": 6,
+              "vinaScore": -8.571,
+              "symmetricRmsd": 7.17,
+              "directRmsd": 7.216
+            },
+            {
+              "rank": 7,
+              "vinaScore": -8.509,
+              "symmetricRmsd": 7.737,
+              "directRmsd": 7.759
+            },
+            {
+              "rank": 8,
+              "vinaScore": -8.443,
+              "symmetricRmsd": 8.112,
+              "directRmsd": 8.158
+            },
+            {
+              "rank": 9,
+              "vinaScore": -8.441,
+              "symmetricRmsd": 7.452,
+              "directRmsd": 7.48
+            }
+          ],
+          "vinaMs": 9181
+        },
+        {
+          "replicate": 2,
+          "seed": {
+            "replicate": 2,
+            "u64": "9240254457344432641",
+            "vina": 1421086453
+          },
+          "top1VinaScore": -9.708,
+          "top1SymmetricRmsd": 1.296,
+          "top1DirectRmsd": 1.543,
+          "bestOfNSymmetricRmsd": 1.296,
+          "bestOfNRank": 1,
+          "poses": [
+            {
+              "rank": 1,
+              "vinaScore": -9.708,
+              "symmetricRmsd": 1.296,
+              "directRmsd": 1.543
+            },
+            {
+              "rank": 2,
+              "vinaScore": -9.106,
+              "symmetricRmsd": 7.467,
+              "directRmsd": 7.467
+            },
+            {
+              "rank": 3,
+              "vinaScore": -9.055,
+              "symmetricRmsd": 3.038,
+              "directRmsd": 3.12
+            },
+            {
+              "rank": 4,
+              "vinaScore": -8.676,
+              "symmetricRmsd": 7.482,
+              "directRmsd": 7.482
+            },
+            {
+              "rank": 5,
+              "vinaScore": -8.668,
+              "symmetricRmsd": 5.418,
+              "directRmsd": 5.485
+            },
+            {
+              "rank": 6,
+              "vinaScore": -8.549,
+              "symmetricRmsd": 7.25,
+              "directRmsd": 7.25
+            },
+            {
+              "rank": 7,
+              "vinaScore": -8.521,
+              "symmetricRmsd": 7.052,
+              "directRmsd": 7.052
+            },
+            {
+              "rank": 8,
+              "vinaScore": -8.468,
+              "symmetricRmsd": 7.073,
+              "directRmsd": 7.123
+            },
+            {
+              "rank": 9,
+              "vinaScore": -8.3,
+              "symmetricRmsd": 7.116,
+              "directRmsd": 7.153
+            }
+          ],
+          "vinaMs": 8891
+        }
+      ],
+      "engine": {
+        "name": "AutoDock Vina",
+        "version": "1.2.7",
+        "versionReported": "AutoDock Vina v1.2.7",
+        "binarySha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644",
+        "pinnedSha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644"
+      },
+      "versions": {
+        "vina": "1.2.7",
+        "vinaReported": "AutoDock Vina v1.2.7",
+        "vinaSha256": "f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644",
+        "rdkit": "2026.3.6",
+        "meeko": "0.8.0"
+      },
+      "rmsdMethod": "heavy-atom RMSD in the receptor frame, no superposition; symmetric = min over exact graph isomorphisms (RDKit GetSubstructMatches uniquify=False useChirality=True, then element/charge/aromaticity/H-count/bond-order/CIP checks); budget 1048576 mappings; direct = canonical-order identity mapping; UNDEFINED when no valid mapping",
+      "successRates": {
+        "1.0": {
+          "top1": 0,
+          "bestOfN": 0
+        },
+        "1.5": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "2.0": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "2.5": {
+          "top1": 1,
+          "bestOfN": 1
+        },
+        "3.0": {
+          "top1": 1,
+          "bestOfN": 1
+        }
+      },
+      "bestPoseRmsd": 1.289,
+      "bestPoseVinaScore": -9.714
+    }
+  ],
+  "overall": {
+    "1.0": {
+      "top1": 0.5333333333333333,
+      "bestOfN": 0.5333333333333333,
+      "cases": 5
+    },
+    "1.5": {
+      "top1": 1,
+      "bestOfN": 1,
+      "cases": 5
+    },
+    "2.0": {
+      "top1": 1,
+      "bestOfN": 1,
+      "cases": 5
+    },
+    "2.5": {
+      "top1": 1,
+      "bestOfN": 1,
+      "cases": 5
+    },
+    "3.0": {
+      "top1": 1,
+      "bestOfN": 1,
+      "cases": 5
+    }
+  }
+}
