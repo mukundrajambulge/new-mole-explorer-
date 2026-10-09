@@ -1050,9 +1050,9 @@
         "C10"
       ],
       "est": "1 hour",
-      "status": "TODO",
+      "status": "DONE",
       "branch": "sprint/W7/2.8",
-      "note": "OWNER DECISION 2026-10-09: keep the hash encoder bit-exact (signed zero preserved) [AT-0152]; normalise -0 to 0 as an explicit, documented step in the SearchRegion constructor (geometry only) before sealing. Do not change the D1 contract test. Also sort ids in combineSelections hash. Branch sprint/W7/2.8 has the old approach - redo."
+      "note": "Merged: -0 normalised at SearchRegion input (geometry only), encoder bit-exact; sorted/deduped selection hashes"
     },
     {
       "id": "2.9",
@@ -2450,8 +2450,8 @@
         "RESEARCH"
       ],
       "est": "1 week",
-      "status": "TODO",
-      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+      "status": "DONE",
+      "note": "Merged (5.5 after deep review MERGE_WITH_FOLLOWUPS; R.3 + engine.sourceCommit schema fix)"
     },
     {
       "id": "R.2",
@@ -2634,7 +2634,8 @@
       "done": "Route tests cover every state.",
       "refs": [],
       "est": "3 days",
-      "status": "TODO"
+      "status": "DONE",
+      "note": "Merged (5.5 after deep review MERGE_WITH_FOLLOWUPS; R.3 + engine.sourceCommit schema fix)"
     },
     {
       "id": "5.6",
