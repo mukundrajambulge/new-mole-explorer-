@@ -173,7 +173,7 @@ describe.skipIf(!E2E)("real WSL kill path (5.4, MOLE_DOCK_E2E=1)", () => {
     expect(g.code).toBe(0);
     await store.idle();
     await store.close();
-    const left = await wslSh("/usr/bin/pgrep -a -f mole-tools/vina || true");
+    const left = await wslSh("/usr/bin/pgrep -a -f '[m]ole-tools/vina' || true");
     expect(left.out.trim()).toBe("");
     expect(ms).toBeLessThan(2000);
     console.log(`[5.4 e2e] real Vina cancel -> group empty in <= ${ms} ms; pgrep vina: none`);

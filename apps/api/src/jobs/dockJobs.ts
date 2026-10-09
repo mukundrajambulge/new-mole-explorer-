@@ -220,7 +220,7 @@ export class DockJobStore {
   private active: { jobId: string; ac: AbortController; done: Promise<void>; dockStarted: boolean; kill?: Promise<KillReport> } | null = null;
   private readonly engineStartWaitMs: number;
   private heartbeat: NodeJS.Timeout | undefined;
-  private readonly kills = new Set<Promise<void>>();
+  private readonly kills = new Set<Promise<unknown>>();
   private lockHeld = false;
   private closed = false;
 

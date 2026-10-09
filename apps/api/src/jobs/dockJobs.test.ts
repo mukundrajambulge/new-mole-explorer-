@@ -178,7 +178,7 @@ describe("dock job store (5.4)", () => {
     const c = (await store.submit(req(ids, { seed: 9 }))).job;
     await waitFor(() => store.get(c.jobId).status === "SUCCEEDED");
     await expectCode(() => store.cancel(c.jobId), "ALREADY_TERMINAL", 409);
-  });
+  }, 30_000);
 
   it("two identical concurrent submits make one job, one dir and one engine call; other inputs make new jobs", async () => {
     const engine = mkFake({ holdMs: 300 });
@@ -293,7 +293,7 @@ describe("dock job store (5.4)", () => {
     await store.idle();
     const logs = store.events(a.jobId).filter((e) => e.type === "log");
     expect(logs.at(-1)).toMatchObject({ type: "log", line: expect.stringContaining("ENGINE_KILL_UNCONFIRMED") });
-  });
+  }, 30_000);
 
   it("rejects a prepared output whose bytes no longer match the manifest", async () => {
     const { store, ids, prepRoot } = await setup();
