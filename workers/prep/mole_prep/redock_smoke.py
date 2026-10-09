@@ -31,11 +31,19 @@ H_TYPES = frozenset({"H", "HD", "HS"})
 COORD_MATCH_TOL = 0.0015  # PDBQT writes %8.3f: at most 0.0005 A per component rounding
 
 
+DUMMY_TYPE = re.compile(r"^G\d*$")  # Meeko macrocycle ring-closure pseudo atoms (G0..); CG0.. are real carbons
+
+
 def _pdbqt_atoms(text: str) -> list[dict]:
+    """Real atoms only (pseudo atoms of a Meeko-opened macrocycle are dropped)."""
     out = []
     for ln in text.splitlines():
         if ln.startswith(("ATOM", "HETATM")):
-            out.append({"type": ln[77:79].strip() or ln[76:79].strip(), "xyz": (float(ln[30:38]), float(ln[38:46]), float(ln[46:54]))})
+            t = ln[77:].split()
+            typ = t[0] if t else ""
+            if DUMMY_TYPE.match(typ):
+                continue
+            out.append({"type": typ, "xyz": (float(ln[30:38]), float(ln[38:46]), float(ln[46:54]))})
     return out
 
 

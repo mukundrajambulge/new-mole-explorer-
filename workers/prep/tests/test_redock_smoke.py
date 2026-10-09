@@ -46,6 +46,13 @@ def test_start_ligand_is_an_etkdg_conformer_with_a_complete_pdbqt_map():
     assert r["stereo"]["source"] == "ISOMERIC_SMILES"
 
 
+def test_macrocycle_pseudo_atoms_are_not_ligand_atoms():
+    """XK2 (1HVR cyclic urea): Meeko opens the 7-ring with G0 pseudo atoms; only the 46 real heavy atoms are mapped."""
+    r = _start("XK2")
+    assert any(ln[77:].split()[:1] == ["G0"] for ln in r["pdbqt"].splitlines() if ln.startswith(("ATOM", "HETATM")))
+    assert len(r["pdbqtHeavyToAtom"]) == 46 and len(set(r["pdbqtHeavyToAtom"])) == 46
+
+
 def test_start_ligand_is_not_the_crystal_pose():
     """1STP BTN A300 crystal coordinates are nowhere near the ETKDG conformer (which sits near the origin)."""
     pdb = open(os.path.join(ccd.FIX, "1STP.pdb")).read().splitlines()
