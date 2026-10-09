@@ -817,6 +817,8 @@ export class DockJobStore {
           return this.failIfLive(jobId, "OUTPUT_REJECTED", e instanceof DockOutputError ? e.reason : "The engine output could not be verified.");
         }
         writeAtomicRetry(join(dir, ...DOCK_LAYOUT.result.split("/")), JSON.stringify(result, null, 1) + "\n");
+        // Record the manifest digest outside out/ so artifact serving can verify the manifest like the other files.
+        writeAtomicRetry(join(dir, MANIFEST_DIGEST_FILE), sha256(readFileSync(join(dir, DOCK_LAYOUT.outDir, "manifest.json"))) + "\n");
         const latest = this.states.get(jobId)!;
         if (!LIVE.has(latest.status)) return;
         this.transition(latest, "COMPLETED", { provenance: result.provenance });

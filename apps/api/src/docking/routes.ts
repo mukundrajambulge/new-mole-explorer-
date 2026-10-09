@@ -294,9 +294,7 @@ export const createDockJobRoutes = (o: DockJobRoutesOptions): DockJobRoutes => {
     let stall: NodeJS.Timeout | undefined;
     let reachedEnd = false;
     const heartbeat = setInterval(() => {
-      if (!closed && !waiting) res.write(": heartbeat
-
-");
+      if (!closed && !waiting) res.write(": heartbeat\n\n");
     }, heartbeatMs);
     heartbeat.unref();
     const finish = () => {
@@ -322,11 +320,7 @@ export const createDockJobRoutes = (o: DockJobRoutesOptions): DockJobRoutes => {
     const pump = (): void => {
       while (!closed && !waiting && queue.length) {
         const e = queue.shift()!;
-        if (!res.write(`id: ${e.seq}
-event: ${e.type}
-data: ${JSON.stringify(e)}
-
-`)) {
+        if (!res.write(`id: ${e.seq}\nevent: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`)) {
           waiting = true;
           res.once("drain", onDrain);
           stall = setTimeout(() => {
