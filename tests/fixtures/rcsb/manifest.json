@@ -265,6 +265,50 @@
       "bytes": 7019,
       "tracked": true,
       "purpose": "CCD component (isomeric SMILES source for prep bond-order/stereo templates)"
+    },
+    {
+      "name": "3PTB.pdb",
+      "pdbId": "3PTB",
+      "format": "pdb",
+      "url": "https://files.rcsb.org/download/3PTB.pdb",
+      "downloaded": "2026-10-09",
+      "sha256": "288f7954d4d013fa8eab3808e1037e2958e2dcd12c9eca65a3f1014404a9f9a2",
+      "bytes": 183384,
+      "tracked": true,
+      "purpose": "trypsin + benzamidine (BEN A1); Astex diverse set member; R.1 smoke redock"
+    },
+    {
+      "name": "1HVR.pdb",
+      "pdbId": "1HVR",
+      "format": "pdb",
+      "url": "https://files.rcsb.org/download/1HVR.pdb",
+      "downloaded": "2026-10-09",
+      "sha256": "c8d3f238d3269a66823454d4681b71467b4677a18751ce094047961620b338cb",
+      "bytes": 190431,
+      "tracked": true,
+      "purpose": "HIV-1 protease dimer + cyclic urea XK2 (XK2 A263); Astex diverse set member; R.1 smoke redock"
+    },
+    {
+      "name": "ccd-BEN.cif",
+      "pdbId": "BEN",
+      "format": "ccd-mmcif",
+      "url": "https://files.rcsb.org/ligands/download/BEN.cif",
+      "downloaded": "2026-10-09",
+      "sha256": "a7ce813cbbac599168d4772f635ae23d7c6edb4d83a9891ebabcbe9e8bb66849",
+      "bytes": 5434,
+      "tracked": true,
+      "purpose": "CCD component (isomeric SMILES source for prep bond-order/stereo templates); R.1 smoke redock"
+    },
+    {
+      "name": "ccd-XK2.cif",
+      "pdbId": "XK2",
+      "format": "ccd-mmcif",
+      "url": "https://files.rcsb.org/ligands/download/XK2.cif",
+      "downloaded": "2026-10-09",
+      "sha256": "0cdc6c31a4a97321d29a691915eb590e9ecc7d7093b4fd227b5b4a777f3b40df",
+      "bytes": 13454,
+      "tracked": true,
+      "purpose": "CCD component (isomeric SMILES source for prep bond-order/stereo templates); R.1 smoke redock"
     }
   ]
 }
