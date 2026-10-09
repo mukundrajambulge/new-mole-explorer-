@@ -84,7 +84,8 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
     for (const l of job.listeners) l.write(`id: ${event.seq}\nevent: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
   };
   const setStatus = (job: Job, status: DockJobStatusName, progress: number, message?: string, error?: string, stage?: DockJobStage) => {
-    const { stage: _old, ...rest } = job.status;
+    const rest = { ...job.status };
+    delete rest.stage; // the previous stage must not leak into the new status
     job.status = { ...rest, status, progress, updatedAt: now(), ...(stage ? { stage } : {}), ...(message ? { message } : {}), ...(error ? { error } : {}) };
     emit(job, { type: "status", status, ...(stage ? { stage } : {}) });
     emit(job, { type: "progress", progress, ...(message ? { message } : {}) });
