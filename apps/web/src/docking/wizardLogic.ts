@@ -1,5 +1,4 @@
-import type { CanonicalAtom, CanonicalMolecularStructure, DockResult } from "@molecular/contracts";
-import { DOCK_SCORE_LABEL } from "@molecular/contracts";
+import type { CanonicalAtom, CanonicalMolecularStructure } from "@molecular/contracts";
 
 /** Pure helpers for the docking wizard. Nothing here invents scientific values. */
 
@@ -141,10 +140,38 @@ export const hbondLines = (pose: readonly PoseAtom[], receptor: readonly Canonic
 /** Pose handed to the shared viewer (second argument of renderViewer). */
 export type PoseOverlay = Readonly<{ rank: number; format: "sdf" | "pdbqt"; text: string; hbonds: readonly HBondLine[]; structureHash: string }>;
 
-export const resultAsJson = (result: DockResult, mock: boolean, rmsdByRank: Readonly<Record<number, number | null>>): string =>
-  JSON.stringify({ mock, scoreStatus: result.scoreStatus, scoreLabel: result.scoreLabel ?? DOCK_SCORE_LABEL, jobId: result.jobId, poses: result.poses.map((p) => ({ ...p, rmsdToBest: rmsdByRank[p.rank] ?? null })) }, null, 2);
-
 export const formatScore = (v: number | null): string => (v === null ? "n/a" : v.toFixed(2));
+
+/** Preparation artifact format for an uploaded ligand file, by extension (the prep worker admits these only). */
+export const prepFormatForFile = (name: string): "pdb" | "sdf" | "mol" | "mol2" | null => {
+  const ext = name.toLowerCase().split(".").pop() ?? "";
+  return ext === "pdb" || ext === "sdf" || ext === "mol" || ext === "mol2" ? ext : null;
+};
+
+const col = (s: string, w: number, right = false) => (s.length >= w ? s.slice(0, w) : right ? s.padStart(w) : s.padEnd(w));
+const coord = (v: number) => col(v.toFixed(3), 8, true);
+
+/**
+ * PDB HETATM records for one ligand component of the loaded structure, written from its parsed coordinates and
+ * identity (no new chemistry: no bonds, charges or hydrogens are added). Bond orders come from the SMILES template.
+ */
+export const ligandPdbFromAtoms = (atoms: readonly CanonicalAtom[]): string => {
+  const lines: string[] = [];
+  let serial = 1;
+  for (const a of atoms) {
+    if (a.altLoc && a.altLoc !== "A") continue; // first alternate location only
+    const el = (a.element || "").trim().toUpperCase().slice(0, 2);
+    const name = a.atomName.trim();
+    const nameField = name.length >= 4 || el.length === 2 ? col(name, 4) : ` ${col(name, 3)}`;
+    lines.push(
+      "HETATM" + col(String(serial), 5, true) + " " + nameField + " " + col(a.residueName, 3, true) + " " + col(a.chain || "A", 1) + col(String(a.residueNumber), 4, true) + col(a.insertionCode ?? "", 1) +
+        "   " + coord(a.x) + coord(a.y) + coord(a.z) + col((a.occupancy ?? 1).toFixed(2), 6, true) + col((a.bFactor ?? 0).toFixed(2), 6, true) + "          " + col(el, 2, true),
+    );
+    serial += 1;
+  }
+  lines.push("END");
+  return lines.join("\n") + "\n";
+};
 
 /**
  * Source artifact ids look like source_<kind>_<sha256> and can exceed the 64 character job-contract limit.
