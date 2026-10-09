@@ -1,3 +1,4 @@
+import { Readable } from "node:stream";
 import { createHash, randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
@@ -60,9 +61,10 @@ const makeFake = (): Fake => {
         poses: [-7.241, -5.853, -5.845].map((v, i) => ({ rank: i + 1, vinaScore: v, rmsdLbFromBest: i === 0 ? 0 : 4, rmsdUbFromBest: i === 0 ? 0 : 6, atomCount: 16, meScore: null })),
         posesSha256: createHash("sha256").update(POSES).digest("hex"), provenance,
       }),
-      artifact: (_id, name) => {
-        if (name !== "poses.pdbqt") return { body: Buffer.from("{}"), contentType: "application/json", sha256: hex("{}") };
-        return { body: POSES, contentType: "chemical/x-pdbqt", sha256: hex("p") };
+      // 5.5 follow-up: artifacts are streamed (DockArtifactStream), not returned as a buffer.
+      artifact: async (_id, name) => {
+        const body = name === "poses.pdbqt" ? POSES : Buffer.from("{}");
+        return { stream: Readable.from([body]), size: body.length, contentType: name === "poses.pdbqt" ? "chemical/x-pdbqt" : "application/json", sha256: name === "poses.pdbqt" ? hex("p") : hex("{}") };
       },
       close: async () => undefined,
     },
