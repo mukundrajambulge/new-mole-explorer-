@@ -124,16 +124,28 @@ std::optional<double> xs_radius(std::string_view type) noexcept {
   return std::nullopt;
 }
 
+bool element_is(std::string_view actual, std::string_view expected) noexcept {
+  if (actual.size() != expected.size()) return false;
+  for (std::size_t i = 0; i < actual.size(); ++i) {
+    char a = actual[i];
+    char b = expected[i];
+    if (a >= 'a' && a <= 'z') a = static_cast<char>(a - 'a' + 'A');
+    if (b >= 'a' && b <= 'z') b = static_cast<char>(b - 'a' + 'A');
+    if (a != b) return false;
+  }
+  return true;
+}
+
 bool xs_element_matches(std::string_view type, std::string_view element) noexcept {
-  if (type == "C_H" || type == "C_P") return element == "C";
-  if (type == "N_P" || type == "N_D" || type == "N_A" || type == "N_DA") return element == "N";
-  if (type == "O_P" || type == "O_D" || type == "O_A" || type == "O_DA") return element == "O";
-  if (type == "S_P") return element == "S";
-  if (type == "P_P") return element == "P";
-  if (type == "F_H") return element == "F";
-  if (type == "Cl_H") return element == "Cl";
-  if (type == "Br_H") return element == "Br";
-  if (type == "I_H") return element == "I";
+  if (type == "C_H" || type == "C_P") return element_is(element, "C");
+  if (type == "N_P" || type == "N_D" || type == "N_A" || type == "N_DA") return element_is(element, "N");
+  if (type == "O_P" || type == "O_D" || type == "O_A" || type == "O_DA") return element_is(element, "O");
+  if (type == "S_P") return element_is(element, "S");
+  if (type == "P_P") return element_is(element, "P");
+  if (type == "F_H") return element_is(element, "F");
+  if (type == "Cl_H") return element_is(element, "Cl");
+  if (type == "Br_H") return element_is(element, "Br");
+  if (type == "I_H") return element_is(element, "I");
   return false;
 }
 
@@ -144,7 +156,7 @@ TypingAssignment assign_xs_type(const TypingFeatures& features) noexcept {
     return (!features.donor.has_value() || !*features.donor) &&
            (!features.acceptor.has_value() || !*features.acceptor);
   };
-  if (features.element == "C") {
+  if (element_is(features.element, "C")) {
     if (!features.carbon_bonded_to_heteroatom.has_value() || !no_positive_role()) {
       return {TypingStatus::Ambiguous, {}, kAmbiguous};
     }
@@ -154,11 +166,11 @@ TypingAssignment assign_xs_type(const TypingFeatures& features) noexcept {
   if (features.carbon_bonded_to_heteroatom.has_value()) {
     return {TypingStatus::Ambiguous, {}, kAmbiguous};
   }
-  if (features.element == "N" || features.element == "O") {
+  if (element_is(features.element, "N") || element_is(features.element, "O")) {
     if (!features.donor.has_value() || !features.acceptor.has_value()) {
       return {TypingStatus::Ambiguous, {}, kAmbiguous};
     }
-    if (features.element == "N") {
+    if (element_is(features.element, "N")) {
       if (*features.donor && *features.acceptor) return {TypingStatus::Supported, "N_DA", {}};
       if (*features.donor) return {TypingStatus::Supported, "N_D", {}};
       if (*features.acceptor) return {TypingStatus::Supported, "N_A", {}};
@@ -172,12 +184,12 @@ TypingAssignment assign_xs_type(const TypingFeatures& features) noexcept {
   if (features.donor.value_or(false) || features.acceptor.value_or(false)) {
     return {TypingStatus::Unsupported, {}, kUnsupported};
   }
-  if (features.element == "S") return {TypingStatus::Supported, "S_P", {}};
-  if (features.element == "P") return {TypingStatus::Supported, "P_P", {}};
-  if (features.element == "F") return {TypingStatus::Supported, "F_H", {}};
-  if (features.element == "Cl") return {TypingStatus::Supported, "Cl_H", {}};
-  if (features.element == "Br") return {TypingStatus::Supported, "Br_H", {}};
-  if (features.element == "I") return {TypingStatus::Supported, "I_H", {}};
+  if (element_is(features.element, "S")) return {TypingStatus::Supported, "S_P", {}};
+  if (element_is(features.element, "P")) return {TypingStatus::Supported, "P_P", {}};
+  if (element_is(features.element, "F")) return {TypingStatus::Supported, "F_H", {}};
+  if (element_is(features.element, "Cl")) return {TypingStatus::Supported, "Cl_H", {}};
+  if (element_is(features.element, "Br")) return {TypingStatus::Supported, "Br_H", {}};
+  if (element_is(features.element, "I")) return {TypingStatus::Supported, "I_H", {}};
   return {TypingStatus::Unsupported, {}, kUnsupported};
 }
 

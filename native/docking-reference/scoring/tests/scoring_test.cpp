@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <fstream>
 #include <cstdlib>
 #include <iostream>
 #include <limits>
@@ -372,7 +373,98 @@ void test_profile_site_and_provenance_rejection() {
 
 }  // namespace
 
+void test_halogen_element_case() {
+  const char* spellings[][2] = {{"Cl", "CL"}, {"Br", "BR"}, {"I", "I"}};
+  const char* types[] = {"Cl_H", "Br_H", "I_H"};
+  const auto unknown = mole::docking::assign_xs_type({"XX", std::nullopt, false, false});
+  require(unknown.status == mole::docking::TypingStatus::Unsupported, "unknown element yields a diagnostic, not a type");
+  for (int i = 0; i < 3; ++i) {
+    for (const char* sp : spellings[i]) {
+      const auto a = mole::docking::assign_xs_type({sp, std::nullopt, false, false});
+      require(a.status == mole::docking::TypingStatus::Supported && a.type_id == types[i],
+              "halogen element spelling is case-insensitive");
+      Request request = base_request();
+      request.receptor_atoms = {atom("r1", "C_H", "C", Vec3{0.0, 0.0, 0.0}, 0)};
+      request.ligand_atoms = {atom("l1", types[i], sp, Vec3{4.0, 0.0, 0.0}, 0)};
+      require(mole::docking::score_direct(request).valid, "halogen ligand scores with any element case");
+    }
+  }
+}
+
+// Reads atoms from a PDBQT fixture as the TypeScript boundary hands them over:
+// element upper-cased (CL, BR) from the AutoDock atom-type column.
+std::vector<Atom> read_pdbqt_fixture(const std::string& path, const std::string& prefix) {
+  std::ifstream in(path);
+  require(in.good(), "fixture readable: " + path);
+  std::vector<Atom> atoms;
+  std::string line;
+  while (std::getline(in, line)) {
+    while (!line.empty() && (line.back() == 0x0D || line.back() == ' ')) line.pop_back();
+    if (line.rfind("ATOM", 0) != 0 || line.size() < 54) continue;
+    const double x = std::stod(line.substr(30, 8));
+    const double y = std::stod(line.substr(38, 8));
+    const double z = std::stod(line.substr(46, 8));
+    const std::string t = line.substr(line.find_last_of(' ') + 1);
+    if (t == "HD") continue;  // hydrogens are not scoring atoms
+    std::string el = t;
+    std::string type;
+    if (t == "N") type = "N_P";
+    else if (t == "OA") { type = "O_A"; el = "O"; }
+    else if (t == "SA") { type = "S_P"; el = "S"; }
+    else {
+      // C and halogens: type through the production element table, from the upper-case spelling.
+      const auto assigned = mole::docking::assign_xs_type({el, el == "C" ? std::optional<bool>(false) : std::nullopt, false, false});
+      require(assigned.status == mole::docking::TypingStatus::Supported, "fixture element typed: " + el);
+      type = assigned.type_id;
+    }
+    atoms.push_back(atom(prefix + std::to_string(atoms.size()), type, el, Vec3{x, y, z}, 0, t != "HD"));
+  }
+  return atoms;
+}
+
+void test_halogen_fixture_scores_against_multitype_receptor() {
+  const std::string dir = MOLE_FIXTURE_DIR;
+  // Shared oracle: the TypeScript adapter test (d2Preparation.test.ts) asserts it emits exactly
+  // these ligand element spellings from the same halogen-ligand.pdbqt; the expected scores were
+  // computed independently (Vina terms, frozen coefficients) outside this code base.
+  std::ifstream oracle_in(dir + "/halogen-oracle.txt");
+  require(oracle_in.good(), "halogen oracle readable");
+  std::vector<std::string> elements;
+  double n_tors = -1, expected_inter = 0, expected_empirical = 0;
+  std::string key;
+  while (oracle_in >> key) {
+    if (key == "ligand_elements") {
+      for (int i = 0; i < 4; ++i) { std::string e; oracle_in >> e; elements.push_back(e); }
+    } else if (key == "n_tors_vina") oracle_in >> n_tors;
+    else if (key == "expected_inter_score") oracle_in >> expected_inter;
+    else if (key == "expected_empirical_score") oracle_in >> expected_empirical;
+  }
+  const auto receptor = read_pdbqt_fixture(dir + "/multitype-receptor.pdbqt", "r");
+  const auto ligand = read_pdbqt_fixture(dir + "/halogen-ligand.pdbqt", "l");
+  require(receptor.size() == 4 && ligand.size() == 4 && elements.size() == 4, "fixtures parsed");
+  for (std::size_t i = 0; i < ligand.size(); ++i)
+    require(ligand[i].element == elements[i], "ligand element matches TS adapter spelling: " + elements[i]);
+  Request request = base_request();
+  request.receptor_atoms = receptor;
+  request.ligand_atoms = ligand;
+  set_n_tors(request, n_tors);
+  const auto scored = mole::docking::score_direct(request);
+  require(scored.valid, "Cl/Br/I ligand scores against multi-type receptor: " + scored.diagnostic);
+  require(std::isfinite(scored.decomposition.inter_score) && std::isfinite(scored.decomposition.empirical_score),
+          "halogen score is finite");
+  require(std::abs(scored.decomposition.inter_score - expected_inter) < 1e-12,
+          "halogen E_inter matches independent oracle");
+  require(std::abs(scored.decomposition.empirical_score - expected_empirical) < 1e-12,
+          "halogen empirical score matches independent oracle");
+  // Negative control: an unknown element spelling is rejected with a diagnostic, not scored.
+  Request bad = request;
+  bad.ligand_atoms[1].element = "XX";
+  require(!mole::docking::score_direct(bad).valid, "unknown element is rejected");
+}
+
 int main() {
+  test_halogen_fixture_scores_against_multitype_receptor();
+  test_halogen_element_case();
   test_xs_type_table();
   test_independent_pair_oracle_and_decomposition();
   test_hydrophobic_piecewise_and_cutoff();

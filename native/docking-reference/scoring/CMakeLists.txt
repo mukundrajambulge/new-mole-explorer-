@@ -13,6 +13,7 @@ endif()
 
 add_executable(mole_docking_reference_tests tests/scoring_test.cpp)
 target_link_libraries(mole_docking_reference_tests PRIVATE mole_docking_reference)
+target_compile_definitions(mole_docking_reference_tests PRIVATE MOLE_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../../../tests/fixtures")
 add_test(NAME mole_docking_reference_tests COMMAND mole_docking_reference_tests)
 add_executable(mole_docking_reference_field_tests tests/scoring_field_test.cpp)
 target_link_libraries(mole_docking_reference_field_tests PRIVATE mole_docking_reference)

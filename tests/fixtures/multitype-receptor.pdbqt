@@ -1,0 +1,6 @@
+REMARK multi-type receptor fixture: C N OA SA HD
+ATOM      1  C1  UNL R   1       0.000   0.000   0.000  1.00  0.00    +0.000 C
+ATOM      2  N1  UNL R   1       3.000   3.000   0.000  1.00  0.00    -0.300 N
+ATOM      3  O1  UNL R   1      -3.000   0.000   3.000  1.00  0.00    -0.300 OA
+ATOM      4  S1  UNL R   1       0.000  -3.500  -2.000  1.00  0.00    -0.100 SA
+ATOM      5  H1  UNL R   1       3.000   4.000   0.000  1.00  0.00    +0.200 HD

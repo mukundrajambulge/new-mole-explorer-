@@ -1,0 +1,4 @@
+ligand_elements C CL BR I
+n_tors_vina 1.0
+expected_inter_score 5.005924743753529
+expected_empirical_score 4.729441588490381
