@@ -368,7 +368,7 @@ export const MoleDockRunResultV1Schema = z
     schemaVersion: z.literal(1),
     status: z.literal("OK"),
     label: z.literal("PREVIEW_UNQUALIFIED"),
-    engine: z.object({ name: z.string().max(64), version: z.string().max(32), versionReported: z.string().max(80), binarySha256: hex64, pinnedSha256: hex64 }).strict(),
+    engine: z.object({ name: z.string().max(64), version: z.string().max(32), sourceCommit: z.string().regex(/^[0-9a-f]{7,40}$/).optional(), versionReported: z.string().max(80), binarySha256: hex64, pinnedSha256: hex64 }).strict(),
     inputs: z.object({ jobSha256: hex64, receptor: z.object({ sha256: hex64 }).passthrough(), ligand: z.object({ sha256: hex64 }).passthrough() }).strict(),
     vinaScore: finite,
     meScore: z.null(),
@@ -442,12 +442,30 @@ export const DockPoseSchema = z
   })
   .strict();
 
+/** Claim semantics for a docking score (RESEARCH-DIGEST section 1): an empirical ranking score, never an energy or affinity. */
+export const DOCK_SCORE_LABEL = {
+  scoreName: "Vina score",
+  scoreDirection: "lower is better",
+  scoringProfile: "AutoDock Vina 1.2.7 default scoring",
+  unitsNote: "empirical, kcal/mol-scaled; not a binding free energy",
+} as const;
+export const DockScoreLabelSchema = z
+  .object({
+    scoreName: z.literal(DOCK_SCORE_LABEL.scoreName),
+    scoreDirection: z.literal(DOCK_SCORE_LABEL.scoreDirection),
+    scoringProfile: z.string().min(1).max(120),
+    unitsNote: z.literal(DOCK_SCORE_LABEL.unitsNote),
+  })
+  .strict();
+export type DockScoreLabel = z.infer<typeof DockScoreLabelSchema>;
+
 export const DockResultSchema = z
   .object({
     jobId: JobIdSchema,
     poses: z.array(DockPoseSchema).max(JOB_CAPS.posesMax),
     manifestRef: z.object({ artifactId: ArtifactIdSchema }).strict(),
     scoreStatus: z.enum(["QUALIFIED", "PREVIEW_UNQUALIFIED", "UNAVAILABLE"]),
+    scoreLabel: DockScoreLabelSchema.optional(),
   })
   .strict();
 export type DockResult = z.infer<typeof DockResultSchema>;

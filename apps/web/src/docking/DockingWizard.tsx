@@ -357,7 +357,7 @@ export const DockingWizard = ({ structure, sourceArtifactId, draft, coordinateFr
       {step === "Results" && result && <div data-testid="wizard-results">
         <p className="docking-help">Score status: <strong>{result.scoreStatus}</strong>. {result.scoreStatus !== "QUALIFIED" && "These numbers are not scientifically qualified."}</p>
         <table className="docking-results-table" data-testid="results-table">
-          <thead><tr><th>Rank</th><th>Vina score</th><th>ME score</th><th>RMSD to best</th></tr></thead>
+          <thead><tr><th>Rank</th><th title="not a binding free energy">Vina score (empirical, lower is better)</th><th title="not a binding free energy">ME score (empirical)</th><th>RMSD to best</th></tr></thead>
           <tbody>{sortedPoses.map((p) => <tr key={p.rank} aria-selected={p.rank === selectedRank} data-testid={`pose-row-${p.rank}`} onClick={() => selectPose(p.rank)} style={{ cursor: "pointer", fontWeight: p.rank === selectedRank ? 700 : 400 }}><td>{p.rank}</td><td>{formatScore(p.vinaScore)}</td><td>{formatScore(p.meScore)}</td><td>{rmsdByRank[p.rank] == null ? "n/a" : rmsdByRank[p.rank]!.toFixed(2)}</td></tr>)}</tbody>
         </table>
         {sortedPoses.length === 0 && <p role="status">The job finished but returned no poses.</p>}
