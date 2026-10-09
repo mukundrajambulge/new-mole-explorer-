@@ -260,6 +260,12 @@ describe("canonical selection engine", () => {
     expect(store.delete("binding_site")).toBe(true);
     expect(selectionForStableIds(["l1", "a1", "l1"], structure).stableAtomIds).toEqual(["a1", "l1"]);
     expect(combineSelections(result, selectionForStableIds(["l1"], structure), "add").stableAtomIds).toEqual(["a1", "a2", "a3", "l1"]);
+    const once = combineSelections(result, selectionForStableIds(["l1"], structure), "add");
+    const twice = combineSelections(once, selectionForStableIds(["l1"], structure), "add");
+    expect(twice.count).toBe(once.count);
+    const forward = combineSelections(selectionForStableIds(["a1", "a2"], structure), selectionForStableIds(["l1"], structure), "add");
+    const reversed = combineSelections(selectionForStableIds(["l1"], structure), selectionForStableIds(["a2", "a1"], structure), "add");
+    expect(forward.membershipHash).toBe(reversed.membershipHash);
   });
 
   it("invalidates the selection cache when a workspace object display name changes", () => {
