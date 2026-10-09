@@ -230,6 +230,12 @@ export const PrepJobStateV1Schema = z
     manifest: PrepManifestV1Schema.optional(),
     preparedReceptorId: ArtifactIdSchema.optional(),
     preparedLigandId: ArtifactIdSchema.optional(),
+    /**
+     * Server-minted opaque handles for a PREVIEW_UNQUALIFIED result (task 5.4): pvrec_/pvlig_ + job + random
+     * token. Dockable only as PREVIEW_UNQUALIFIED (owner decision; capability VINA_COMPARATOR_PREVIEW, 5.6).
+     */
+    previewReceptorId: ArtifactIdSchema.optional(),
+    previewLigandId: ArtifactIdSchema.optional(),
     seal: PrepSealSummaryV1Schema.optional(),
     error: shortText.optional(),
     createdAt: z.string().max(40),
@@ -271,7 +277,10 @@ export const DockJobProvenanceV1Schema = z
   .object({
     preparedReceptorId: ArtifactIdSchema,
     preparedLigandId: ArtifactIdSchema,
+    /** Preparation job of the receptor. */
     prepJobId: JobIdSchema,
+    /** Preparation job of the ligand (may differ from the receptor's). */
+    ligandPrepJobId: JobIdSchema,
     prepSealStatus: z.enum(["SEALED", "PREVIEW_UNQUALIFIED"]),
     prepQualification: z.enum(PREP_QUALIFICATION),
     receptorSha256: hex64,

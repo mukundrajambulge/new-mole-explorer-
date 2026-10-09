@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { JobIdSchema, PrepareRequestSchema, type DockJobResultV1, type DockJobStateV1, type JobEvent } from "@molecular/contracts";
-import { createPrepResolver, DockJobStore, type DockSubmitResult } from "../jobs/dockJobs.js";
+import { createPrepResolver, DockJobStore, type DockJobStoreOptions, type DockSubmitResult } from "../jobs/dockJobs.js";
 import type { DockRunner } from "../jobs/dockRunner.js";
 import { PREP_MAX_ARTIFACT_BYTES, PrepError, type PrepJobStore } from "../jobs/prepJobs.js";
 import type { PrepArtifactStore } from "../jobs/prepArtifacts.js";
@@ -141,6 +141,11 @@ export type DockJobServiceDeps = Readonly<{
   root: string;
   prep: PrepJobStore;
   runner?: DockRunner;
+  /**
+   * Store seam: the file store (DockJobStore) is an accepted interim deviation from the SQLite WAL requirement;
+   * a SQLite store implementing DockJobService can be plugged in here without changing callers.
+   */
+  createStore?: (o: DockJobStoreOptions) => DockJobService;
 }>;
 
 export type DockJobService = Readonly<{
@@ -156,7 +161,8 @@ export type DockJobService = Readonly<{
 }>;
 
 export const createDockJobService = (deps: DockJobServiceDeps): DockJobService => {
-  const store = new DockJobStore({ root: deps.root, resolvePrepared: createPrepResolver(deps.prep), ...(deps.runner ? { runner: deps.runner } : {}) });
+  const options: DockJobStoreOptions = { root: deps.root, resolvePrepared: createPrepResolver(deps.prep), ...(deps.runner ? { runner: deps.runner } : {}) };
+  const store: DockJobService = deps.createStore ? deps.createStore(options) : new DockJobStore(options);
   return Object.freeze({
     init: () => store.init(),
     submit: (req: unknown) => store.submit(req),

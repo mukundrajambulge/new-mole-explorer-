@@ -55,8 +55,9 @@ const LOCK_HEARTBEAT_MS = 10_000;
 const LOCK_STALE_MS = 60_000;
 const PDBQT_CAP = 16 * 1024 * 1024;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-const PREC_RE = /^prec_([0-9a-f]{32})$/;
-const PLIG_RE = /^plig_([0-9a-f]{32})$/;
+// SEALED ids (prec_/plig_) and server-minted PREVIEW_UNQUALIFIED ids (pvrec_/pvlig_ + random token).
+const REC_ID_RE = /^(?:prec_([0-9a-f]{32})|pvrec_([0-9a-f]{32})_[0-9a-f]{24})$/;
+const LIG_ID_RE = /^(?:plig_([0-9a-f]{32})|pvlig_([0-9a-f]{32})_[0-9a-f]{24})$/;
 
 export class DockJobError extends Error {
   constructor(readonly code: string, readonly httpStatus: number, message: string) {
@@ -109,14 +110,17 @@ export type ResolvedInput = Readonly<{ receptor: Buffer; ligand: Buffer; provena
 export type PreparedResolver = (receptorId: string, ligandId: string) => Promise<ResolvedInput>;
 
 /**
- * Prepared ids -> PDBQT bytes, through the prep job store only. The prep job must be SUCCEEDED with seal
- * SEALED (ids must match the minted ones) or PREVIEW_UNQUALIFIED; BLOCKED/REJECTED is 400. The manifest sha256
- * of each PDBQT is re-verified before the bytes are used.
+ * Prepared ids -> PDBQT bytes, through the prep job store only. Every accepted id must equal one the prep store
+ * minted: prec_/plig_ for a SEALED result, pvrec_/pvlig_ (random token) for a PREVIEW_UNQUALIFIED one (owner
+ * decision: preview preparations stay dockable, labelled PREVIEW_UNQUALIFIED). BLOCKED/REJECTED is 400. The
+ * manifest sha256 of each PDBQT is re-verified before the bytes are used.
  */
 export const createPrepResolver = (prep: PrepJobStore): PreparedResolver => async (receptorId, ligandId) => {
-  const r = PREC_RE.exec(receptorId);
-  const l = PLIG_RE.exec(ligandId);
-  if (!r || !l) throw new DockJobError("BAD_INPUT", 400, "Prepared ids must be prec_<id> and plig_<id>.");
+  const rm = REC_ID_RE.exec(receptorId);
+  const lm = LIG_ID_RE.exec(ligandId);
+  if (!rm || !lm) throw new DockJobError("BAD_INPUT", 400, "Prepared ids must be server-minted receptor and ligand ids.");
+  const r = [receptorId, rm[1] ?? rm[2]!] as const;
+  const l = [ligandId, lm[1] ?? lm[2]!] as const;
   const load = (compact: string): PrepJobStateV1 => {
     try {
       return prep.get(uuidOf(compact));
@@ -130,7 +134,9 @@ export const createPrepResolver = (prep: PrepJobStore): PreparedResolver => asyn
   const read = async (job: PrepJobStateV1, role: "RECEPTOR_PDBQT" | "LIGAND_PDBQT", id: string): Promise<Buffer> => {
     const seal = job.seal?.status;
     if (job.state !== "SUCCEEDED" || (seal !== "SEALED" && seal !== "PREVIEW_UNQUALIFIED")) throw new DockJobError("BAD_INPUT", 400, "The prepared input is not sealed (BLOCKED, REJECTED or unfinished).");
-    if (seal === "SEALED" && (role === "RECEPTOR_PDBQT" ? job.preparedReceptorId : job.preparedLigandId) !== id) throw new DockJobError("BAD_INPUT", 400, "The prepared id does not match its preparation job.");
+    const rec = role === "RECEPTOR_PDBQT";
+    const minted = seal === "SEALED" ? (rec ? job.preparedReceptorId : job.preparedLigandId) : rec ? job.previewReceptorId : job.previewLigandId;
+    if (typeof minted !== "string" || minted !== id) throw new DockJobError("BAD_INPUT", 400, "The prepared id does not match its preparation job.");
     const out = job.manifest?.outputs.find((o) => o.role === role);
     if (!out) throw new DockJobError("BAD_INPUT", 400, "The prepared output is missing.");
     let bytes: Buffer;
@@ -154,6 +160,7 @@ export const createPrepResolver = (prep: PrepJobStore): PreparedResolver => asyn
       preparedReceptorId: receptorId,
       preparedLigandId: ligandId,
       prepJobId: recJob.jobId,
+      ligandPrepJobId: ligJob.jobId,
       prepSealStatus: seals.every((s) => s === "SEALED") ? "SEALED" : "PREVIEW_UNQUALIFIED",
       prepQualification: quals.every((q) => q === "INTERIM") ? "INTERIM" : "PREVIEW_UNQUALIFIED",
       receptorSha256: sha256(receptor),
