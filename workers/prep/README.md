@@ -15,9 +15,20 @@ Tests: `node scripts/sprint/check.mjs --python` (lock completeness, pins vs TOOL
 Spawned only by `tools/mole-dock/prep.mjs` (argv, no shell, `env -i`, cwd = job dir, 120 s per pipeline stage capped at 15 min, tree kill):
 `python -I workers/prep/run_prep.py --plan` reads `job.json` and writes `plan.json` (every choice with before/after
 atom counts, input sha256s, `planDigest = sha256(canonical plan JSON || lock digest)`); `--apply` re-runs the plan, checks the
-`confirmation.json` digest and acks, and writes `out/*` plus `prep-manifest.json`. Exit 0 ok, 3 BLOCKED, 2 bad job, 1 internal.
+`confirmation.json` digest and acks, and writes `out/*` plus `prep-manifest.json`. Exit 0 ok, 3 BLOCKED or UNSUPPORTED, 2 bad job, 1 internal.
 Defaults keep submitted protonation (EXPLICIT_SUBMITTED). ANY generated state marks the result PREVIEW_UNQUALIFIED:
 PDBFixer atoms (generated OXT placed by ideal geometry), PROPKA, Dimorphite-DL, Meeko template hydrogens
 (protonationSource MEEKO_TEMPLATES_PREVIEW), RDKit-added ligand hydrogens and ETKDG coordinates. INTERIM only when nothing
 was generated. PDB ligands need a SMILES bond-order template, otherwise BLOCKED (MISSING_BOND_ORDERS).
 Done-when pairs (`tests/pairs.json`) are 10 real complexes: ligand cut from the same RCSB entry, bound to the chosen chain.
+
+Research rules (digest C7, C8, C10):
+- Stereo (R.4, AT-0063): the template must be the CCD isomeric SMILES. An undefined stereo element blocks (STEREO_UNDEFINED).
+  PDB coordinates that contradict the template also block (STEREO_MISMATCH). `plan.ligandStereo` records the source and
+  every assignment. A C=N-H whose E/Z only places a hydrogen is listed and needs an ack (LIGAND_STEREO_H_ONLY).
+- Metals/cofactors (R.5, AT-0057/0131): hetero groups of the model are classified within 8 A of the submitted ligand
+  (`plan.siteHetero`). A metal or cofactor in the site makes the plan UNSUPPORTED (CHEMISTRY_UNSUPPORTED, exit 3). The same
+  happens when the site is undetermined (no submitted ligand coordinates). Groups outside the site are removed with a
+  recorded HETERO decision; other groups in the site need HETERO_SITE.
+- His (R.6, AT-0052): `plan.histidines` gives HID/HIE/HIP per His and its source (SUBMITTED_H, MEEKO_TEMPLATE, PROPKA).
+  His within 8 A of the ligand need the HIS_SITE_STATES ack.
