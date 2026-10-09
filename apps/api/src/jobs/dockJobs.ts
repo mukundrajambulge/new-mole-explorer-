@@ -1,9 +1,11 @@
 import { createHash, randomUUID } from "node:crypto";
-import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, statSync, truncateSync, unlinkSync, utimesSync, writeFileSync, writeSync } from "node:fs";
+import { appendFileSync, closeSync, existsSync, lstatSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, statSync, truncateSync, unlinkSync, utimesSync, writeFileSync, writeSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { uptime } from "node:os";
 import { join, resolve } from "node:path";
 import {
+  DOCK_JOB_ARTIFACTS,
+  type DockJobArtifactName,
   DOCK_JOB_TERMINAL_STATUSES,
   DockJobRequestSchema,
   DockJobResultV1Schema,
@@ -60,6 +62,8 @@ export const DOCK_MAX_JOBS = 32;
 export const DOCK_MAX_BYTES = 2 * 1024 * 1024 * 1024;
 export const DOCK_CPU = 4;
 export const DOCK_TIMEOUT_MS = 600_000;
+/** Size cap for a served artifact (poses.pdbqt is capped at 32 MB by the runner; JSON files are far smaller). */
+export const DOCK_ARTIFACT_MAX_BYTES = 32 * 1024 * 1024;
 /** Bound on a WSL cold start: a cancelled engine's pidfile is waited for this long before the queue moves on. */
 export const DOCK_ENGINE_START_WAIT_MS = 20_000;
 const LOCK_HEARTBEAT_MS = 10_000;
@@ -479,6 +483,44 @@ export class DockJobStore {
     }
     if (parsed.jobId !== s.jobId || parsed.inputDigest !== s.inputDigest) throw new DockJobError("RESULT_UNAVAILABLE", 409, "The stored result is for another job.");
     return parsed;
+  }
+
+  /**
+   * Task 5.5: a whitelisted output file of a COMPLETED job (poses.pdbqt, result.json, manifest.json), read from
+   * the confined out/ dir only (no symlinks, size-capped) and re-checked against the digests recorded at
+   * completion. Anything else is 404; a job that is not COMPLETED is 409.
+   */
+  artifact(jobId: string, name: string): { body: Buffer; contentType: string; sha256: string } {
+    const s = this.get(jobId);
+    if (typeof name !== "string" || !Object.hasOwn(DOCK_JOB_ARTIFACTS, name)) throw new DockJobError("NOT_FOUND", 404, "Artifact not found.");
+    if (s.status !== "COMPLETED") throw new DockJobError("RESULT_UNAVAILABLE", 409, `Docking job is ${s.status}; no artifacts.`);
+    const unreadable = () => new DockJobError("RESULT_UNAVAILABLE", 409, "The stored artifact could not be read.");
+    const out = join(this.jobDir(jobId), DOCK_LAYOUT.outDir);
+    const read = (rel: string): Buffer => {
+      try {
+        const p = confinedPath(out, rel);
+        const st = lstatSync(p);
+        if (!st.isFile() || st.size > DOCK_ARTIFACT_MAX_BYTES) throw unreadable();
+        const b = readFileSync(p);
+        if (b.length > DOCK_ARTIFACT_MAX_BYTES) throw unreadable();
+        return b;
+      } catch {
+        throw unreadable();
+      }
+    };
+    const body = read(name);
+    const digest = sha256(body);
+    let manifestFiles: Record<string, unknown> = {};
+    if (name !== "manifest.json") {
+      try {
+        manifestFiles = ((JSON.parse(read("manifest.json").toString("utf8")) as { files?: Record<string, unknown> }).files ?? {}) as Record<string, unknown>;
+      } catch {
+        throw unreadable();
+      }
+    }
+    if (name === "poses.pdbqt" && (digest !== this.result(jobId).posesSha256 || manifestFiles["poses.pdbqt"] !== digest)) throw unreadable();
+    if (name === "result.json" && manifestFiles["result.json"] !== digest) throw unreadable();
+    return { body, contentType: DOCK_JOB_ARTIFACTS[name as DockJobArtifactName], sha256: digest };
   }
 
   // ---- gc / quota ------------------------------------------------------------------------------------------

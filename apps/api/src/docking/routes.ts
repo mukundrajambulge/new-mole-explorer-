@@ -1,9 +1,28 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { JobIdSchema, PrepareRequestSchema, type DockJobResultV1, type DockJobStateV1, type JobEvent } from "@molecular/contracts";
-import { createPrepResolver, DockJobStore, type DockJobStoreOptions, type DockSubmitResult } from "../jobs/dockJobs.js";
+import {
+  DOCK_JOB_ARTIFACTS,
+  DOCK_JOB_TERMINAL_STATUSES,
+  DOCKING_PREVIEW_NOTICE,
+  DockJobRequestSchema,
+  DockJobResultResponseV1Schema,
+  JobIdSchema,
+  JOB_CAPS,
+  PrepareRequestSchema,
+  VINA_SCORE_SEMANTICS,
+  vinaComparatorCapability,
+  type DockJobResultResponseV1,
+  type DockJobResultV1,
+  type DockJobStateV1,
+  type DockJobStatusName,
+  type DockJobSubmitResponseV1,
+  type JobEvent,
+} from "@molecular/contracts";
+import { createPrepResolver, DockJobError, DockJobStore, type DockJobStoreOptions, type DockSubmitResult } from "../jobs/dockJobs.js";
 import type { DockRunner } from "../jobs/dockRunner.js";
 import { PREP_MAX_ARTIFACT_BYTES, PrepError, type PrepJobStore } from "../jobs/prepJobs.js";
 import type { PrepArtifactStore } from "../jobs/prepArtifacts.js";
+import { decodeSegment, parseOr400 } from "../projects/parseOr400.js";
+import { IngestionError } from "../structures/ingestion.js";
 
 /**
  * Preparation routes (task 5.2b, design 5.2 step 7). Mounted by server.ts under "/api":
@@ -20,6 +39,8 @@ import type { PrepArtifactStore } from "../jobs/prepArtifacts.js";
 export const PREP_BODY_CAP_BYTES = 64 * 1024;
 const FORBIDDEN_KEYS = new Set(["sha256", "profileDigest", "profileId", "lockDigest", "relPath", "path", "outputs", "manifest"]);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+/** Job ids in a path: server-minted UUIDs only (no path parts, no dots). */
+const UuidIdSchema = JobIdSchema.regex(UUID_RE, "must be a server-minted job id");
 
 const send = (res: ServerResponse, status: number, body: unknown) => {
   const s = JSON.stringify(body);
@@ -109,13 +130,12 @@ const handlePrep = async (o: PrepRoutesOptions, req: IncomingMessage, res: Serve
     if (method === "POST" && parts.length === 1 && parts[0] === "plan") {
       const body = await readBody(req);
       if (hasForbiddenKey(body)) return fail(res, 400, "SECURITY_REJECTION", "Clients send artifact ids and options only; digests and paths are computed by the server.");
-      const parsed = PrepareRequestSchema.safeParse(body);
-      if (!parsed.success) return fail(res, 400, "INVALID_INPUT", "The preparation request is invalid.");
-      const state = await o.store.plan(parsed.data);
+      // 1.7 follow-up: one validation helper (field + rule in the message, never the value or a path).
+      const parsed = parseOr400(PrepareRequestSchema, body, "preparation request");
+      const state = await o.store.plan(parsed);
       return send(res, state.state === "FAILED" ? 422 : 201, state);
     }
-    const id = parts[0];
-    if (!id || !JobIdSchema.safeParse(id).success || !UUID_RE.test(id)) return fail(res, 400, "INVALID_INPUT", "The job id is invalid.");
+    const id = parseOr400(UuidIdSchema, decodeSegment(parts[0] ?? ""), "job id");
     if (method === "GET" && parts.length === 1) return send(res, 200, o.store.get(id));
     if (method === "POST" && parts.length === 2 && parts[1] === "confirm") {
       const body = await readBody(req);
@@ -128,6 +148,7 @@ const handlePrep = async (o: PrepRoutesOptions, req: IncomingMessage, res: Serve
     // Discard (never buffer) whatever is left of a rejected body so the client still reads the answer.
     if (!req.readableEnded) req.resume();
     if (e instanceof PrepError) return fail(res, e.httpStatus, e.code, e.message);
+    if (e instanceof IngestionError) return fail(res, e.status, e.code, e.message);
     return fail(res, 500, "INTERNAL_ERROR", "The request could not be completed.");
   }
 };
@@ -157,6 +178,8 @@ export type DockJobService = Readonly<{
   events(id: string, afterSeq?: number): JobEvent[];
   subscribe(id: string, afterSeq: number, cb: (e: JobEvent) => void): () => void;
   result(id: string): DockJobResultV1;
+  /** Task 5.5: a whitelisted, digest-checked output file of a COMPLETED job. */
+  artifact(id: string, name: string): { body: Buffer; contentType: string; sha256: string };
   close(): Promise<void>;
 }>;
 
@@ -172,6 +195,214 @@ export const createDockJobService = (deps: DockJobServiceDeps): DockJobService =
     events: (id: string, afterSeq = 0) => store.events(id, afterSeq),
     subscribe: (id: string, afterSeq: number, cb: (e: JobEvent) => void) => store.subscribe(id, afterSeq, cb),
     result: (id: string) => store.result(id),
+    artifact: (id: string, name: string) => store.artifact(id, name),
     close: () => store.close(),
+  });
+};
+
+// ---- Docking job HTTP + SSE routes (task 5.5) --------------------------------------------------------------
+// Mounted by server.ts under "/api" (behind the host, origin and token checks):
+//   POST {prefix}/docking/jobs                      DockJobRequest (prepared ids + box + options) -> 202 {jobId, deduped, job}
+//   GET  {prefix}/docking/jobs                      {jobs}
+//   GET  {prefix}/docking/jobs/:id                  DockJobStateV1
+//   GET  {prefix}/docking/jobs/:id/events           SSE: replay after Last-Event-ID (non-numeric -> 0), then live,
+//                                                   heartbeat comments, closed once the job is terminal
+//   POST {prefix}/docking/jobs/:id/cancel           DockJobStateV1 (409 when already terminal)
+//   GET  {prefix}/docking/jobs/:id/result           COMPLETED only; PREVIEW_UNQUALIFIED, meScore null, score semantics
+//   GET  {prefix}/docking/jobs/:id/artifacts/:name  poses.pdbqt | result.json | manifest.json (COMPLETED only)
+//   GET  {prefix}/docking/capabilities              VINA_COMPARATOR_PREVIEW record + DOCKING.RUN (always UNAVAILABLE)
+// The job routes exist only when FEATURE_DOCKING_RUN=1: otherwise they fall through to the server's 404 and the
+// job store is never opened. Clients never send paths or digests (SECURITY_REJECTION).
+
+export const DOCK_BODY_CAP_BYTES = 16 * 1024;
+export const DOCK_SSE_MAX_CONNECTIONS = 16;
+export const DOCK_SSE_HEARTBEAT_MS = 15_000;
+/** A stream whose client stops reading is dropped once this much output is buffered. */
+const SSE_MAX_BUFFERED = 1024 * 1024;
+const TERMINAL_STATUSES = new Set<DockJobStatusName>(DOCK_JOB_TERMINAL_STATUSES);
+/** A docking request never names files: any path-, file- or dir-like key at any depth is a security rejection. */
+const DOCK_PATH_KEY = /(?:path|file|dir|directory|root|url)$/i;
+const hasDockPathKey = (v: unknown, depth = 0): boolean => {
+  if (depth > 8 || !v || typeof v !== "object") return false;
+  for (const [k, x] of Object.entries(v as Record<string, unknown>)) if (DOCK_PATH_KEY.test(k) || hasDockPathKey(x, depth + 1)) return true;
+  return false;
+};
+
+/** The feature flag: the run routes (and the job store) exist only when FEATURE_DOCKING_RUN is exactly "1". */
+export const dockingRunEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => env.FEATURE_DOCKING_RUN === "1";
+
+/** Capability records: VINA_COMPARATOR_PREVIEW follows the flag; DOCKING.RUN (Mole engine) stays UNAVAILABLE. */
+export const dockingCapabilities = (enabled: boolean) => ({
+  VINA_COMPARATOR_PREVIEW: vinaComparatorCapability(enabled),
+  "DOCKING.RUN": { state: "UNAVAILABLE" as const, reason: "The Mole docking engine is not released (gate D8); only the separate Vina comparator preview can run." },
+});
+
+export type DockJobRoutesOptions = Readonly<{
+  enabled: boolean;
+  /** The opened service; only called when enabled (the server opens the store lazily, once). */
+  service: () => Promise<DockJobService>;
+  prefix?: string;
+  maxSseConnections?: number;
+  heartbeatMs?: number;
+}>;
+
+export type DockJobRoutes = ((req: IncomingMessage, res: ServerResponse, pathname: string) => Promise<boolean>) &
+  Readonly<{ openStreams: () => number; closeStreams: () => void }>;
+
+const lastEventId = (req: IncomingMessage): number => {
+  const raw = req.headers["last-event-id"];
+  const v = (Array.isArray(raw) ? raw[0] : raw)?.trim() ?? "";
+  return /^\d{1,9}$/.test(v) ? Math.min(Number(v), JOB_CAPS.eventsMax) : 0;
+};
+
+const resultResponse = (r: DockJobResultV1): DockJobResultResponseV1 =>
+  DockJobResultResponseV1Schema.parse({ ...r, capability: vinaComparatorCapability(true, r.provenance.vinaPin.version), notice: DOCKING_PREVIEW_NOTICE, vinaScoreSemantics: { ...VINA_SCORE_SEMANTICS } });
+
+export const createDockJobRoutes = (o: DockJobRoutesOptions): DockJobRoutes => {
+  const prefix = o.prefix ?? "/api";
+  const base = `${prefix}/docking/jobs`;
+  const capabilitiesPath = `${prefix}/docking/capabilities`;
+  const maxSse = o.maxSseConnections ?? DOCK_SSE_MAX_CONNECTIONS;
+  const heartbeatMs = o.heartbeatMs ?? DOCK_SSE_HEARTBEAT_MS;
+  const streams = new Set<() => void>();
+
+  const stream = (service: DockJobService, req: IncomingMessage, res: ServerResponse, id: string): void => {
+    service.get(id); // 404 before any SSE header
+    if (streams.size >= maxSse) {
+      res.setHeader("retry-after", "5");
+      return fail(res, 429, "SSE_BUSY", "Too many event streams are open; try again shortly.");
+    }
+    const after = lastEventId(req);
+    res.writeHead(200, { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store", connection: "keep-alive", "x-accel-buffering": "no" });
+    res.write("retry: 2000\n\n");
+    let closed = false;
+    let unsub: (() => void) | undefined;
+    const heartbeat = setInterval(() => {
+      if (!closed) res.write(": heartbeat\n\n");
+    }, heartbeatMs);
+    heartbeat.unref();
+    const finish = () => {
+      if (closed) return;
+      closed = true;
+      streams.delete(finish);
+      clearInterval(heartbeat);
+      unsub?.();
+      if (!res.writableEnded) res.end();
+    };
+    streams.add(finish);
+    res.on("close", finish);
+    const terminalAt = (): number | undefined => {
+      try {
+        const s = service.get(id);
+        return TERMINAL_STATUSES.has(s.status) ? s.seq : undefined;
+      } catch {
+        return -1; // the job is gone (gc): nothing more will come
+      }
+    };
+    const deliver = (e: JobEvent) => {
+      if (closed) return;
+      res.write(`id: ${e.seq}\nevent: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`);
+      if (res.writableLength > SSE_MAX_BUFFERED) {
+        res.destroy();
+        return finish();
+      }
+      // A terminal commit writes status, progress and result/error together: close after the last of them.
+      const end = terminalAt();
+      if (end !== undefined && e.seq >= end) finish();
+    };
+    const u = service.subscribe(id, after, deliver);
+    if (closed) return u();
+    unsub = u;
+    // Replay is synchronous and complete: a job that is already terminal has nothing more to send.
+    if (terminalAt() !== undefined) finish();
+  };
+
+  const handle = async (req: IncomingMessage, res: ServerResponse, parts: string[], method: string): Promise<void> => {
+    try {
+      let service: DockJobService;
+      try {
+        service = await o.service();
+      } catch (e) {
+        if (e instanceof DockJobError) throw e;
+        throw new DockJobError("UNAVAILABLE", 503, "Docking jobs are unavailable: the job store could not be opened.");
+      }
+      if (parts.length === 0) {
+        if (method === "POST") {
+          const raw = await readRaw(req, DOCK_BODY_CAP_BYTES);
+          let body: unknown;
+          try {
+            body = JSON.parse(raw.toString("utf8") || "null");
+          } catch {
+            return fail(res, 400, "INVALID_INPUT", "The request body must be JSON.");
+          }
+          if (hasForbiddenKey(body) || hasDockPathKey(body)) return fail(res, 400, "SECURITY_REJECTION", "Clients send prepared ids, box and options only; paths and digests are computed by the server.");
+          const parsed = parseOr400(DockJobRequestSchema, body, "docking request");
+          const { job, deduped } = await service.submit(parsed);
+          const answer: DockJobSubmitResponseV1 = { jobId: job.jobId, deduped, job };
+          return send(res, 202, answer);
+        }
+        if (method === "GET") return send(res, 200, { jobs: service.list() });
+        return fail(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
+      }
+      const id = parseOr400(UuidIdSchema, decodeSegment(parts[0]!), "job id");
+      if (parts.length === 1 && method === "GET") return send(res, 200, service.get(id));
+      if (parts.length === 2 && parts[1] === "events" && method === "GET") return stream(service, req, res, id);
+      if (parts.length === 2 && parts[1] === "cancel" && method === "POST") {
+        await readRaw(req, DOCK_BODY_CAP_BYTES); // a cancel carries no body; anything sent is drained under the cap
+        // Over HTTP every terminal job (including an already CANCELLED one) answers 409; the store stays idempotent.
+        const cur = service.get(id);
+        if (TERMINAL_STATUSES.has(cur.status)) return fail(res, 409, "ALREADY_TERMINAL", `Docking job is already ${cur.status}.`);
+        return send(res, 200, service.cancel(id));
+      }
+      if (parts.length === 2 && parts[1] === "result" && method === "GET") return send(res, 200, resultResponse(service.result(id)));
+      if (parts.length === 3 && parts[1] === "artifacts" && method === "GET") {
+        const name = decodeSegment(parts[2]!);
+        if (!Object.hasOwn(DOCK_JOB_ARTIFACTS, name)) {
+          service.get(id);
+          return fail(res, 404, "NOT_FOUND", "Artifact not found.");
+        }
+        const a = service.artifact(id, name);
+        res.writeHead(200, {
+          "content-type": a.contentType,
+          "content-length": String(a.body.length),
+          "content-disposition": `attachment; filename="${name}"`,
+          "cache-control": "no-store",
+          "x-content-type-options": "nosniff",
+          "x-mole-sha256": a.sha256,
+          "x-mole-label": "PREVIEW_UNQUALIFIED",
+        });
+        res.end(a.body);
+        return;
+      }
+      return fail(res, 404, "NOT_FOUND", "Not found.");
+    } catch (e) {
+      if (!req.readableEnded) req.resume();
+      if (res.headersSent) {
+        res.destroy();
+        return;
+      }
+      if (e instanceof DockJobError) return fail(res, e.httpStatus, e.code, e.message);
+      if (e instanceof PrepError) return fail(res, e.httpStatus, e.code, e.message);
+      if (e instanceof IngestionError) return fail(res, e.status, e.code, e.message);
+      return fail(res, 500, "INTERNAL_ERROR", "The request could not be completed.");
+    }
+  };
+
+  const handler = async (req: IncomingMessage, res: ServerResponse, pathname: string): Promise<boolean> => {
+    if (pathname === capabilitiesPath && (req.method ?? "GET") === "GET") {
+      send(res, 200, dockingCapabilities(o.enabled));
+      return true;
+    }
+    if (pathname !== base && !pathname.startsWith(`${base}/`)) return false;
+    // Flag off: unreachable. The caller answers its plain 404, exactly as for an unknown route.
+    if (!o.enabled) return false;
+    await handle(req, res, pathname.slice(base.length).split("/").filter(Boolean), req.method ?? "GET");
+    return true;
+  };
+  return Object.assign(handler, {
+    openStreams: () => streams.size,
+    closeStreams: () => {
+      for (const f of [...streams]) f();
+    },
   });
 };

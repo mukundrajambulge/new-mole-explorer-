@@ -462,3 +462,72 @@ export const JobEventSchema = z.discriminatedUnion("type", [
   z.object({ ...evBase, type: z.literal("error"), message: shortText }).strict(),
 ]);
 export type JobEvent = z.infer<typeof JobEventSchema>;
+
+// ---- Docking job HTTP surface (task 5.5) ----
+
+/**
+ * Owner decision 2026-10-09 (RESEARCH-DIGEST section 7, Q1): the Vina run is a separate EXPERIMENTAL capability,
+ * VINA_COMPARATOR_PREVIEW, reported on separate axes (never collapsed). DOCKING.RUN (Mole engine) stays
+ * UNAVAILABLE until D8 [AT-0240, AT-0262]. The run routes answer only when FEATURE_DOCKING_RUN=1.
+ */
+export const VINA_COMPARATOR_PREVIEW_ID = "VINA_COMPARATOR_PREVIEW" as const;
+export const DOCKING_PREVIEW_NOTICE = "Preview. Results are not scientifically qualified. Scores are empirical ranking scores, not binding affinities." as const;
+export const VinaComparatorCapabilityV1Schema = z
+  .object({
+    id: z.literal(VINA_COMPARATOR_PREVIEW_ID),
+    /** Runtime availability: false unless FEATURE_DOCKING_RUN=1. */
+    available: z.boolean(),
+    capability: z.enum(["EXPERIMENTAL", "UNAVAILABLE"]),
+    implementation: z.literal("IMPLEMENTED_UNVERIFIED"),
+    validation: z.literal("NOT_EVALUATED"),
+    engine: z.object({ name: z.literal("AutoDock Vina"), version: z.string().min(1).max(32) }).strict(),
+    resultLabel: z.literal("PREVIEW_UNQUALIFIED"),
+    notice: z.literal(DOCKING_PREVIEW_NOTICE),
+    /** Why it is unavailable and what would resolve it (V2-01 section 19). */
+    unavailableReason: shortText.optional(),
+  })
+  .strict();
+export type VinaComparatorCapabilityV1 = z.infer<typeof VinaComparatorCapabilityV1Schema>;
+
+export const vinaComparatorCapability = (available: boolean, vinaVersion = "1.2.7"): VinaComparatorCapabilityV1 => ({
+  id: VINA_COMPARATOR_PREVIEW_ID,
+  available,
+  capability: available ? "EXPERIMENTAL" : "UNAVAILABLE",
+  implementation: "IMPLEMENTED_UNVERIFIED",
+  validation: "NOT_EVALUATED",
+  engine: { name: "AutoDock Vina", version: vinaVersion },
+  resultLabel: "PREVIEW_UNQUALIFIED",
+  notice: DOCKING_PREVIEW_NOTICE,
+  ...(available ? {} : { unavailableReason: "The Vina comparator preview is off. Start the API with FEATURE_DOCKING_RUN=1 to enable it." }),
+});
+
+/** Score semantics carried with every result: name, kind, direction, scale, profile [AT-0107, AT-0108; V2-01 App.C]. */
+export const VINA_SCORE_SEMANTICS = Object.freeze({
+  name: "Vina docking score",
+  kind: "EMPIRICAL_RANKING_SCORE",
+  direction: "LOWER_IS_BETTER",
+  scale: "Vina empirical ranking scale (kcal/mol-like units; not a binding free energy or affinity)",
+  profile: "AutoDock Vina 1.2.7, vina scoring function, pinned binary",
+} as const);
+
+/** POST /api/docking/jobs answer (202). */
+export const DockJobSubmitResponseV1Schema = z.object({ jobId: JobIdSchema, deduped: z.boolean(), job: DockJobStateV1Schema }).strict();
+export type DockJobSubmitResponseV1 = z.infer<typeof DockJobSubmitResponseV1Schema>;
+
+/** GET /api/docking/jobs/:id/result: the stored result plus its capability axes and claim labels. */
+export const DockJobResultResponseV1Schema = DockJobResultV1Schema.extend({
+  capability: VinaComparatorCapabilityV1Schema,
+  notice: z.literal(DOCKING_PREVIEW_NOTICE),
+  vinaScoreSemantics: z
+    .object({ name: z.string().max(64), kind: z.literal("EMPIRICAL_RANKING_SCORE"), direction: z.literal("LOWER_IS_BETTER"), scale: z.string().max(160), profile: z.string().max(160) })
+    .strict(),
+}).strict();
+export type DockJobResultResponseV1 = z.infer<typeof DockJobResultResponseV1Schema>;
+
+/** Downloadable files of a COMPLETED job (whitelist; nothing else under the job dir is ever served). */
+export const DOCK_JOB_ARTIFACTS: Readonly<Record<"poses.pdbqt" | "result.json" | "manifest.json", string>> = Object.freeze({
+  "poses.pdbqt": "chemical/x-pdbqt; charset=utf-8",
+  "result.json": "application/json; charset=utf-8",
+  "manifest.json": "application/json; charset=utf-8",
+});
+export type DockJobArtifactName = keyof typeof DOCK_JOB_ARTIFACTS;
