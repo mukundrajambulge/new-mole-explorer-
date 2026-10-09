@@ -15,6 +15,8 @@ import { profileMark, profileTransport } from "./structures/ingestionProfiler.js
 import { D2PreparationService } from "./docking/d2PreparationService.js";
 import type { D2SearchRegionInput } from "./docking/d2Preparation.js";
 import { createPrepService } from "./jobs/prepService.js";
+import { parseOr400, decodeSegment } from "./projects/parseOr400.js";
+import { bodyObjectSchema, commandBatchBodySchema, commandBodySchema, commandExecuteBodySchema, commandReplayBodySchema, d2AdaptBodySchema, d2SearchRegionBodySchema, pathIdSchema, projectCreateBodySchema, projectIdSchema, projectOpenQuerySchema, projectSaveBodySchema, rcsbBodySchema, revisionIdSchema, uploadHeadersSchema } from "../../../packages/contracts/src/api/index.js";
 
 const config = loadConfig();
 
@@ -128,15 +130,28 @@ const readJson = async (request: IncomingMessage, response: ServerResponse, maxB
     parts.push(decoder.end());
     const text = parts.join("");
     parts.length = 0;
-    try {
-      return JSON.parse(text) as Record<string, unknown>;
-    } catch {
-      throw new IngestionError("INVALID_INPUT", "The request body was not valid JSON.");
-    }
+    let parsed: unknown;
+    try { parsed = JSON.parse(text); } catch { throw new IngestionError("INVALID_INPUT", "The request body was not valid JSON."); }
+    return parseOr400(bodyObjectSchema, parsed, "request body");
   } catch (error) {
     release();
     throw error;
   }
+};
+
+/** Run a service call on client-supplied structures; a non-domain exception means the input shape was wrong, so answer 400. */
+const malformedAs400 = <T>(message: string, run: () => T): T => {
+  try {
+    return run();
+  } catch (error) {
+    if (error instanceof IngestionError) throw error;
+    throw new IngestionError("INVALID_INPUT", message);
+  }
+};
+
+const headerValue = (request: IncomingMessage, name: string): string | undefined => {
+  const value = request.headers[name];
+  return typeof value === "string" ? value : undefined;
 };
 
 const errorResponse = (response: ServerResponse, error: unknown) => {
@@ -197,7 +212,8 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
   }
 
   try {
-    const url = new URL(request.url ?? "/", "http://localhost");
+    let url: URL;
+    try { url = new URL(request.url ?? "/", "http://localhost"); } catch { throw new IngestionError("INVALID_INPUT", "The request URL is malformed."); }
     if (request.method === "GET" && url.pathname === "/api/health") {
       sendJson(response, 200, { ...health, timestamp: new Date().toISOString() });
       return;
@@ -220,15 +236,15 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
     }
     if (request.method === "POST" && url.pathname === "/api/docking/d2/adapt") {
       const body = await readJson(request, response);
-      if (!body.structure || typeof body.structure !== "object") throw new IngestionError("INVALID_INPUT", "D2 adaptation requires a canonical structure.");
-      const result = d2PreparationService.adaptStructure(body.structure as never, body.sourceArtifact && typeof body.sourceArtifact === "object" ? body.sourceArtifact as never : undefined);
+      const parsed = parseOr400(d2AdaptBodySchema, body, "D2 adaptation request");
+      const result = malformedAs400("The D2 structure is malformed.", () => d2PreparationService.adaptStructure(parsed.structure as never, parsed.sourceArtifact as never));
       sendJson(response, 200, result);
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/docking/d2/search-region") {
       const body = await readJson(request, response);
-      if (!body.input || typeof body.input !== "object") throw new IngestionError("INVALID_INPUT", "D2 SearchRegion commit requires an explicit preparation input.");
-      const result = d2PreparationService.sealSearchRegion(body.input as unknown as D2SearchRegionInput);
+      const parsed = parseOr400(d2SearchRegionBodySchema, body, "D2 SearchRegion request");
+      const result = malformedAs400("The D2 SearchRegion input is malformed.", () => d2PreparationService.sealSearchRegion(parsed.input as unknown as D2SearchRegionInput));
       const value = result.value as D2SearchRegionV1 | undefined;
       sendJson(response, 200, {
         status: result.status,
@@ -251,51 +267,52 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
     }
     if (request.method === "POST" && url.pathname === "/api/commands/batch") {
       const body = await readJson(request, response);
-      if (typeof body.rawCommand !== "string") throw new IngestionError("INVALID_INPUT", "A bounded batch requires rawCommand text.");
-      const result = commandDispatcher.dispatchBatch({ rawCommand: body.rawCommand, surface: "BATCH", requestedMode: body.requestedMode === "ASYNC" || body.requestedMode === "AUTO" ? body.requestedMode : "SYNC", correlationId: typeof body.correlationId === "string" ? body.correlationId : request.headers["x-correlation-id"]?.toString(), idempotencyKey: typeof body.idempotencyKey === "string" ? body.idempotencyKey : request.headers["x-idempotency-key"]?.toString() });
+      const parsed = parseOr400(commandBatchBodySchema, body, "batch request");
+      const result = commandDispatcher.dispatchBatch({ rawCommand: parsed.rawCommand, surface: "BATCH", requestedMode: parsed.requestedMode ?? "SYNC", correlationId: parsed.correlationId ?? headerValue(request, "x-correlation-id"), idempotencyKey: parsed.idempotencyKey ?? headerValue(request, "x-idempotency-key") });
       sendJson(response, result.status === "FAILED" ? 422 : 200, result);
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/commands") {
       const body = await readJson(request, response);
-      const rawCommand = typeof body.rawCommand === "string" ? body.rawCommand : undefined;
-      const canonicalCommand = body.command && typeof body.command === "object" ? body.command as unknown as CanonicalCommand : undefined;
-      const requestedMode = body.requestedMode === "ASYNC" || body.requestedMode === "AUTO" ? body.requestedMode : body.requestedMode === "SYNC" ? "SYNC" : undefined;
-      const result = commandDispatcher.dispatch({ rawCommand, command: canonicalCommand, surface: body.surface === "GUI" || body.surface === "SDK" || body.surface === "MACRO" || body.surface === "BATCH" ? body.surface : "REST", requestedMode, correlationId: typeof body.correlationId === "string" ? body.correlationId : request.headers["x-correlation-id"]?.toString(), idempotencyKey: typeof body.idempotencyKey === "string" ? body.idempotencyKey : request.headers["x-idempotency-key"]?.toString() });
+      const parsed = parseOr400(commandBodySchema, body, "command request");
+      const result = commandDispatcher.dispatch({ rawCommand: parsed.rawCommand, command: parsed.command as unknown as CanonicalCommand | undefined, surface: parsed.surface === "CONSOLE" || parsed.surface === undefined ? "REST" : parsed.surface, requestedMode: parsed.requestedMode, correlationId: parsed.correlationId ?? headerValue(request, "x-correlation-id"), idempotencyKey: parsed.idempotencyKey ?? headerValue(request, "x-idempotency-key") });
       sendJson(response, result.status === "FAILED" ? 422 : 200, result);
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/v1/commands/execute") {
       const body = await readJson(request, response);
-      const canonicalCommand = body.command && typeof body.command === "object" ? body.command as unknown as CanonicalCommand : body.commandType ? body as unknown as CanonicalCommand : undefined;
-      const result = commandDispatcher.dispatch({ command: canonicalCommand, surface: "REST", requestedMode: body.requestedMode === "ASYNC" || body.requestedMode === "AUTO" ? body.requestedMode : "SYNC", correlationId: typeof body.correlationId === "string" ? body.correlationId : request.headers["x-correlation-id"]?.toString(), idempotencyKey: typeof body.idempotencyKey === "string" ? body.idempotencyKey : request.headers["x-idempotency-key"]?.toString() });
+      const parsed = parseOr400(commandExecuteBodySchema, body, "command");
+      const canonicalCommand = ("command" in parsed ? parsed.command : parsed) as unknown as CanonicalCommand;
+      const meta = parsed as { requestedMode?: "SYNC" | "ASYNC" | "AUTO"; correlationId?: string; idempotencyKey?: string };
+      const result = commandDispatcher.dispatch({ command: canonicalCommand, surface: "REST", requestedMode: meta.requestedMode === "ASYNC" || meta.requestedMode === "AUTO" ? meta.requestedMode : "SYNC", correlationId: meta.correlationId ?? headerValue(request, "x-correlation-id"), idempotencyKey: meta.idempotencyKey ?? headerValue(request, "x-idempotency-key") });
       sendJson(response, result.status === "FAILED" ? 422 : 200, result);
       return;
     }
     const commandReplayMatch = url.pathname.match(/^\/api\/commands\/history\/([^/]+)\/replay$/);
     if (commandReplayMatch && request.method === "POST") {
       const body = await readJson(request, response);
-      const mode = body.mode === "REVIEW" || body.mode === "REPRODUCTION_ATTEMPT" ? body.mode : "COMMAND_REPLAY";
-      sendJson(response, 200, commandDispatcher.replay(decodeURIComponent(commandReplayMatch[1]!), mode));
+      const id = parseOr400(pathIdSchema, decodeSegment(commandReplayMatch[1]!), "action record ID");
+      const mode = parseOr400(commandReplayBodySchema, body, "replay request").mode ?? "COMMAND_REPLAY";
+      sendJson(response, 200, commandDispatcher.replay(id, mode));
       return;
     }
     const commandJobMatch = url.pathname.match(/^\/api\/commands\/jobs\/([^/]+)$/);
     if (commandJobMatch && request.method === "GET") {
-      const job = commandDispatcher.getJob(decodeURIComponent(commandJobMatch[1]!));
+      const job = commandDispatcher.getJob(parseOr400(pathIdSchema, decodeSegment(commandJobMatch[1]!), "job ID"));
       if (!job) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "Command job was not found." } }); return; }
       sendJson(response, 200, job);
       return;
     }
     const commandCancelMatch = url.pathname.match(/^\/api\/commands\/jobs\/([^/]+)\/cancel$/);
     if (commandCancelMatch && request.method === "POST") {
-      const job = commandDispatcher.cancel(decodeURIComponent(commandCancelMatch[1]!));
+      const job = commandDispatcher.cancel(parseOr400(pathIdSchema, decodeSegment(commandCancelMatch[1]!), "job ID"));
       if (!job) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "Command job was not found." } }); return; }
       sendJson(response, 200, job);
       return;
     }
     const commandRetryMatch = url.pathname.match(/^\/api\/commands\/jobs\/([^/]+)\/retry$/);
     if (commandRetryMatch && request.method === "POST") {
-      const job = commandDispatcher.retry(decodeURIComponent(commandRetryMatch[1]!));
+      const job = commandDispatcher.retry(parseOr400(pathIdSchema, decodeSegment(commandRetryMatch[1]!), "job ID"));
       if (!job) { sendJson(response, 409, { error: { code: "RETRY_UNAVAILABLE", message: "Only a failed command job with retained canonical input can be retried." } }); return; }
       sendJson(response, 200, job);
       return;
@@ -307,7 +324,7 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
           // Refuse by filename, then binaries (text structure formats never contain NUL), before reading anything back.
           assertLocalFilenameAdmitted(file.filename);
           if (file.binary) throw new IngestionError("UNSUPPORTED_FORMAT", "Binary files are not an admitted coordinate format.");
-          const parentExportArtifactId = typeof request.headers["x-parent-export-artifact-id"] === "string" ? request.headers["x-parent-export-artifact-id"] : undefined;
+          const parentExportArtifactId = parseOr400(uploadHeadersSchema, { parentExportArtifactId: headerValue(request, "x-parent-export-artifact-id") }, "upload headers").parentExportArtifactId;
           const result = await withParseSlot(file.size, async () => {
             // Streaming decode + hash of the server's own temp file; the whole file is never a Buffer.
             const text = await readTextFile(file.path);
@@ -322,35 +339,36 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
     }
     if (request.method === "POST" && url.pathname === "/api/structures/rcsb") {
       const body = await readJson(request, response);
-      const pdbId = body.pdbId;
-      if (typeof pdbId !== "string") throw new IngestionError("INVALID_INPUT", "A PDB ID is required.");
+      const { pdbId } = parseOr400(rcsbBodySchema, body, "RCSB request");
       // The remote body streams to disk under a transfer slot and decodes under the parse slot.
       sendJson(response, 200, await withTransferSlot(response, () => ingestionService.ingestRcsb(pdbId)));
       return;
     }
     if (request.method === "POST" && url.pathname === "/api/projects") {
       const body = await readJson(request, response);
-      sendJson(response, 201, await projectStore.create(typeof body.name === "string" ? body.name : undefined));
+      sendJson(response, 201, await projectStore.create(parseOr400(projectCreateBodySchema, body, "project").name));
       return;
     }
     const revisionsMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/revisions$/);
     if (revisionsMatch && request.method === "GET") {
-      sendJson(response, 200, { revisions: await projectStore.listRevisions(revisionsMatch[1]!) });
+      sendJson(response, 200, { revisions: await projectStore.listRevisions(parseOr400(projectIdSchema, decodeSegment(revisionsMatch[1]!), "project ID")) });
       return;
     }
     const revisionMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/revisions\/([^/]+)$/);
     if (revisionMatch && request.method === "GET") {
-      sendJson(response, 200, await projectStore.open(revisionMatch[1]!, revisionMatch[2]!));
+      sendJson(response, 200, await projectStore.open(parseOr400(projectIdSchema, decodeSegment(revisionMatch[1]!), "project ID"), parseOr400(revisionIdSchema, decodeSegment(revisionMatch[2]!), "revision ID")));
       return;
     }
     const projectMatch = url.pathname.match(/^\/api\/projects\/([^/]+)$/);
     if (projectMatch && request.method === "GET") {
-      sendJson(response, 200, await projectStore.open(projectMatch[1], url.searchParams.get("revision") ?? undefined));
+      sendJson(response, 200, await projectStore.open(parseOr400(projectIdSchema, decodeSegment(projectMatch[1]!), "project ID"), parseOr400(projectOpenQuerySchema, { revision: url.searchParams.get("revision") ?? undefined }, "query").revision));
       return;
     }
     if (projectMatch && request.method === "PUT") {
       const body = await readJson(request, response, config.maxProjectJsonBytes);
-      sendJson(response, 200, await projectStore.save(projectMatch[1], body as unknown as ProjectSaveRequest));
+      const id = parseOr400(projectIdSchema, decodeSegment(projectMatch[1]!), "project ID");
+      const save = parseOr400(projectSaveBodySchema, body, "project save request");
+      sendJson(response, 200, await projectStore.save(id, save as unknown as ProjectSaveRequest));
       return;
     }
     if (await prepService.handle(request, response, url.pathname)) return;
