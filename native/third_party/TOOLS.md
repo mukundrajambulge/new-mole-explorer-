@@ -10,6 +10,7 @@ Pinned versions and licences of the third-party tools used by the docking pipeli
 | Binary | `vina_1.2.7_linux_x86_64` |
 | Source | https://github.com/ccsb-scripps/AutoDock-Vina/releases/download/v1.2.7/vina_1.2.7_linux_x86_64 |
 | sha256 | `f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644` (checked by `scripts/wsl-setup.sh`) |
+| Source commit | `8eb40404f4f45608acb3b01427587ac049f27c1f`: the commit tag `v1.2.7` points to (GitHub API `repos/ccsb-scripps/AutoDock-Vina/git/ref/tags/v1.2.7`, checked 2026-10-09). It matches the research comparator pin (RESEARCH-DIGEST C12). The release binary is assumed to be built from this tag; this was not rebuilt or verified here. |
 | Licence | Apache-2.0 |
 | Install | `scripts/wsl-setup.sh` -> `~/mole-tools/vina` (WSL Ubuntu-24.04) |
 | Recorded | 2026-10-08 |
