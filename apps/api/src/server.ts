@@ -15,7 +15,7 @@ import { profileMark, profileTransport } from "./structures/ingestionProfiler.js
 import { D2PreparationService } from "./docking/d2PreparationService.js";
 import type { D2SearchRegionInput } from "./docking/d2Preparation.js";
 import { createPrepService } from "./jobs/prepService.js";
-import { createDockJobRoutes, createDockJobService, dockingRunEnabled, type DockJobService } from "./docking/routes.js";
+import { createDockJobRoutes, createDockJobService, DOCKING_HOSTED_REFUSAL, dockingRunEnabled, type DockJobService } from "./docking/routes.js";
 import { vinaComparatorCapability } from "@molecular/contracts";
 import { parseOr400, decodeSegment } from "./projects/parseOr400.js";
 import { bodyObjectSchema, commandBatchBodySchema, commandBodySchema, commandExecuteBodySchema, commandReplayBodySchema, d2AdaptBodySchema, d2SearchRegionBodySchema, pathIdSchema, projectCreateBodySchema, projectIdSchema, projectOpenQuerySchema, projectSaveBodySchema, rcsbBodySchema, revisionIdSchema, uploadHeadersSchema } from "../../../packages/contracts/src/api/index.js";
@@ -35,8 +35,10 @@ const sendJson = (response: ServerResponse, status: number, body: unknown) => {
 const health: HealthResponse = { service: "molecular-api", status: "ok", gate: "G1C", timestamp: new Date().toISOString() };
 
 // Task 5.5/5.6: the Vina comparator preview (owner decision 2026-10-09) exists only with FEATURE_DOCKING_RUN=1.
-const dockingRun = dockingRunEnabled();
-const vinaPreview = vinaComparatorCapability(dockingRun);
+const dockingFlag = dockingRunEnabled();
+const dockingHostedRefused = dockingFlag && config.mode === "hosted";
+const dockingRun = dockingFlag && !dockingHostedRefused;
+const vinaPreview = { ...vinaComparatorCapability(dockingRun), ...(dockingHostedRefused ? { unavailableReason: DOCKING_HOSTED_REFUSAL } : {}) };
 
 const bootstrap: BootstrapResponse = {
   product: "Molecular Workstation",
@@ -98,7 +100,7 @@ const openDockService = (): Promise<DockJobService> => {
   );
   return dockServiceReady;
 };
-export const dockRoutes = createDockJobRoutes({ enabled: dockingRun, service: openDockService });
+export const dockRoutes = createDockJobRoutes({ enabled: dockingRun, ...(dockingHostedRefused ? { refusal: DOCKING_HOSTED_REFUSAL } : {}), service: openDockService });
 
 // Structure transfers (uploads and RCSB fetches) share one small pool of slots; more answer 429.
 let activeTransfers = 0;
@@ -424,6 +426,18 @@ process.on("unhandledRejection", (reason) => console.error("unhandledRejection",
 export const server = createServer((request, response) => {
   route(request, response).catch((error) => fail(response, error));
 });
+
+// Shutdown (task 5.5 follow-up): server.close() must not hang on open SSE streams, and the job store must release
+// its lock and stop the active job. Streams are ended first; the store closes once the server has closed.
+const closeServer = server.close.bind(server);
+server.close = ((callback?: (error?: Error) => void) => {
+  dockRoutes.closeStreams();
+  return closeServer((error?: Error) => {
+    const done = () => callback?.(error);
+    if (!dockService || !dockServiceReady) return done();
+    dockService.close().then(done, done);
+  });
+}) as typeof server.close;
 
 export const startServer = (port = config.port, host = config.host) =>
   new Promise<void>((resolve, reject) => {

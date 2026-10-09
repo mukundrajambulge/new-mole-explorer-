@@ -379,3 +379,103 @@ describe("docking job routes (5.5)", () => {
     for (const j of (await call(s.base, "GET", "/jobs")).json.jobs as Json[]) await call(s.base, "POST", `/jobs/${j.jobId}/cancel`);
   }, 30_000);
 });
+
+// 5.5 follow-ups: bounded streamed downloads, link refusal, manifest verification, hosted refusal, paged SSE replay.
+describe("docking job routes, deep-review follow-ups (5.5)", () => {
+  const completed = async (): Promise<{ s: Setup; id: string }> => {
+    const s = await setup({ engine: fakeEngine({ holdMs: 0 }) as Fake });
+    const id = (await call(s.base, "POST", "/jobs", dockRequest(s.ids))).json.jobId as string;
+    await waitStatus(s, id, "COMPLETED");
+    return { s, id };
+  };
+
+  it("caps concurrent artifact downloads (429 DOWNLOAD_BUSY) and frees the slot when a stream closes", async () => {
+    const { s, id } = await completed();
+    const held = [];
+    for (let i = 0; i < 4; i++) held.push(await s.service.artifact(id, "poses.pdbqt"));
+    await expect(s.service.artifact(id, "poses.pdbqt")).rejects.toMatchObject({ httpStatus: 429, code: "DOWNLOAD_BUSY" });
+    expect((await call(s.base, "GET", `/jobs/${id}/artifacts/poses.pdbqt`)).status).toBe(429);
+    held[0]!.stream.destroy();
+    await new Promise((r) => setTimeout(r, 100));
+    const again = await call(s.base, "GET", `/jobs/${id}/artifacts/poses.pdbqt`);
+    expect(again.status).toBe(200);
+    for (const h of held) h.stream.destroy();
+  }, 30_000);
+
+  it("refuses a link planted in out/ (file symlink or a junction replacing out/) and a tampered manifest", async () => {
+    const { renameSync, rmSync: rm, symlinkSync, writeFileSync, readFileSync } = await import("node:fs");
+    const { s, id } = await completed();
+    const out = join(s.root, id, "out");
+    const url = `/jobs/${id}/artifacts/poses.pdbqt`;
+    expect((await call(s.base, "GET", url)).status).toBe(200);
+    // A manifest edited after completion is not served and no longer vouches for the other files.
+    const manifest = join(out, "manifest.json");
+    const original = readFileSync(manifest);
+    writeFileSync(manifest, original.toString("utf8").replace(/\s*$/, " \n"));
+    expect((await call(s.base, "GET", `/jobs/${id}/artifacts/manifest.json`)).status).toBe(409);
+    expect((await call(s.base, "GET", url)).status).toBe(409);
+    writeFileSync(manifest, original);
+    expect((await call(s.base, "GET", url)).status).toBe(200);
+    // A junction (directory link) in place of out/ redirects every artifact: refused.
+    const real = join(s.root, id, "out-real");
+    renameSync(out, real);
+    symlinkSync(real, out, "junction");
+    expect((await call(s.base, "GET", url)).status).toBe(409);
+    expect((await call(s.base, "GET", `/jobs/${id}/artifacts/manifest.json`)).status).toBe(409);
+    rm(out, { recursive: true, force: true });
+    renameSync(real, out);
+    expect((await call(s.base, "GET", url)).status).toBe(200);
+    // A symlink as the file itself (needs a symlink privilege on Windows: skipped there when denied).
+    const outside = join(s.root, id, "outside.pdbqt");
+    writeFileSync(outside, readFileSync(join(out, "poses.pdbqt")));
+    rm(join(out, "poses.pdbqt"));
+    try {
+      symlinkSync(outside, join(out, "poses.pdbqt"), "file");
+      expect((await call(s.base, "GET", url)).status).toBe(409);
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code !== "EPERM") throw e;
+    }
+  }, 30_000);
+
+  it("refuses the job routes with a clear reason when configured as refused (hosted mode)", async () => {
+    const reason = "Docking jobs are unavailable in hosted mode until per-user accounts exist.";
+    const routes = createDockJobRoutes({ enabled: false, refusal: reason, service: () => Promise.reject(new Error("never")) });
+    const reply = async (path: string) => {
+      let status = 0;
+      let body = "";
+      const handled = await routes({ method: "GET", url: path, headers: {} } as never, { writeHead: (c: number) => void (status = c), end: (b: string) => void (body = b) } as never, path);
+      return { handled, status, body };
+    };
+    const jobs = await reply("/api/docking/jobs");
+    expect(jobs).toMatchObject({ handled: true, status: 404 });
+    expect(JSON.parse(jobs.body).error).toEqual({ code: "UNAVAILABLE", message: reason });
+    const caps = JSON.parse((await reply("/api/docking/capabilities")).body);
+    expect(caps.VINA_COMPARATOR_PREVIEW).toMatchObject({ available: false, capability: "UNAVAILABLE", unavailableReason: reason });
+  });
+
+  it("pages a replay far larger than the buffer cap instead of destroying the client", async () => {
+    const id = "00000000-0000-4000-8000-0000000000aa";
+    const n = 9000; // ~2 MB of frames, written to the socket in one synchronous subscribe() before the fix
+    const pad = "x".repeat(200);
+    const events = Array.from({ length: n }, (_, i) => ({ type: "log", line: pad, seq: i + 1, jobId: id, at: "2026-10-09T00:00:00.000Z" }));
+    const status = { status: "COMPLETED", seq: n, jobId: id };
+    const service = {
+      get: () => status,
+      subscribe: (_id: string, _after: number, cb: (e: unknown) => void) => {
+        for (const e of events) cb(e);
+        return () => undefined;
+      },
+    } as unknown as DockJobService;
+    const routes = createDockJobRoutes({ enabled: true, service: () => Promise.resolve(service) });
+    const server = createServer((req, res) => void routes(req, res, new URL(req.url ?? "/", "http://x").pathname));
+    await new Promise<void>((r) => server.listen(0, "127.0.0.1", () => r()));
+    cleanups.push(async () => {
+      server.closeAllConnections();
+      await new Promise<void>((r) => server.close(() => r()));
+    });
+    const sse = await readSse(`http://127.0.0.1:${(server.address() as AddressInfo).port}/api/docking/jobs/${id}/events`, {}, { ms: 20_000 });
+    expect(sse.ended).toBe(true);
+    expect(sse.events).toHaveLength(n);
+    expect(sse.events.at(-1)?.id).toBe(n);
+  }, 30_000);
+});
