@@ -53,6 +53,30 @@ describe("hosted mode and startup failures", () => {
     }
   });
 
+  it("hosted mode refuses the docking job routes and reports the capability UNAVAILABLE even with FEATURE_DOCKING_RUN=1", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "mole-hosted-dock-"));
+    const secret = "s".repeat(40);
+    try {
+      await withEnv({ ...hostedEnv, MOLE_TOKEN: secret, MOLECULAR_DATA_DIR: dir, FEATURE_DOCKING_RUN: "1" }, async () => {
+        const mod = await import("./server.js");
+        expect(mod.dockService).toBeUndefined();
+        await mod.startServer(0, "127.0.0.1");
+        const base = `http://127.0.0.1:${(mod.server.address() as AddressInfo).port}`;
+        const headers = { "x-mole-token": secret };
+        const list = await fetch(`${base}/api/docking/jobs`, { headers });
+        expect(list.status).toBe(404);
+        expect((await list.json()).error).toMatchObject({ code: "UNAVAILABLE", message: expect.stringMatching(/hosted mode.*accounts/) });
+        const caps = await (await fetch(`${base}/api/docking/capabilities`, { headers })).json();
+        expect(caps.VINA_COMPARATOR_PREVIEW).toMatchObject({ available: false, capability: "UNAVAILABLE" });
+        const boot = await (await fetch(`${base}/api/bootstrap`, { headers })).json();
+        expect(boot.capabilities.VINA_COMPARATOR_PREVIEW.state).toBe("UNAVAILABLE");
+        await new Promise<void>((resolve) => mod.server.close(() => resolve()));
+      });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it("local startServer rejects when the token dir is unwritable", async () => {
     const dir = mkdtempSync(join(tmpdir(), "mole-badtok-"));
     writeFileSync(join(dir, "file"), "x");

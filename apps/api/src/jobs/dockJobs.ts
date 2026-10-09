@@ -1,6 +1,8 @@
 import { createHash, randomUUID } from "node:crypto";
 import { appendFileSync, closeSync, existsSync, lstatSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, statSync, truncateSync, unlinkSync, utimesSync, writeFileSync, writeSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { constants } from "node:fs";
+import { open as open_, readFile, type FileHandle } from "node:fs/promises";
+import { Readable } from "node:stream";
 import { uptime } from "node:os";
 import { join, resolve } from "node:path";
 import {
@@ -64,6 +66,12 @@ export const DOCK_CPU = 4;
 export const DOCK_TIMEOUT_MS = 600_000;
 /** Size cap for a served artifact (poses.pdbqt is capped at 32 MB by the runner; JSON files are far smaller). */
 export const DOCK_ARTIFACT_MAX_BYTES = 32 * 1024 * 1024;
+/** Concurrent artifact downloads (streamed); beyond this 429 DOWNLOAD_BUSY. */
+export const DOCK_MAX_DOWNLOADS = 4;
+const MANIFEST_MAX_BYTES = 1024 * 1024;
+/** <jobDir>/manifest.sha256: sha256 of out/manifest.json recorded at completion (outside the engine-writable out/). */
+const MANIFEST_DIGEST_FILE = "manifest.sha256";
+export type DockArtifactStream = { stream: Readable; size: number; contentType: string; sha256: string };
 /** Bound on a WSL cold start: a cancelled engine's pidfile is waited for this long before the queue moves on. */
 export const DOCK_ENGINE_START_WAIT_MS = 20_000;
 const LOCK_HEARTBEAT_MS = 10_000;
@@ -237,6 +245,7 @@ export class DockJobStore {
   private heartbeat: NodeJS.Timeout | undefined;
   private readonly kills = new Set<Promise<unknown>>();
   private lockHeld = false;
+  private activeDownloads = 0;
   private closed = false;
 
   constructor(options: DockJobStoreOptions) {
@@ -490,37 +499,87 @@ export class DockJobStore {
    * the confined out/ dir only (no symlinks, size-capped) and re-checked against the digests recorded at
    * completion. Anything else is 404; a job that is not COMPLETED is 409.
    */
-  artifact(jobId: string, name: string): { body: Buffer; contentType: string; sha256: string } {
+  async artifact(jobId: string, name: string): Promise<DockArtifactStream> {
     const s = this.get(jobId);
     if (typeof name !== "string" || !Object.hasOwn(DOCK_JOB_ARTIFACTS, name)) throw new DockJobError("NOT_FOUND", 404, "Artifact not found.");
     if (s.status !== "COMPLETED") throw new DockJobError("RESULT_UNAVAILABLE", 409, `Docking job is ${s.status}; no artifacts.`);
-    const unreadable = () => new DockJobError("RESULT_UNAVAILABLE", 409, "The stored artifact could not be read.");
-    const out = join(this.jobDir(jobId), DOCK_LAYOUT.outDir);
-    const read = (rel: string): Buffer => {
-      try {
+    if (this.activeDownloads >= DOCK_MAX_DOWNLOADS) throw new DockJobError("DOWNLOAD_BUSY", 429, "Too many artifact downloads are running; try again shortly.");
+    this.activeDownloads++;
+    let released = false;
+    const release = () => {
+      if (released) return;
+      released = true;
+      this.activeDownloads--;
+    };
+    let fh: FileHandle | undefined;
+    try {
+      const unreadable = () => new DockJobError("RESULT_UNAVAILABLE", 409, "The stored artifact could not be read.");
+      const dir = this.jobDir(jobId);
+      const out = join(dir, DOCK_LAYOUT.outDir);
+      // out/ itself must be a real directory (a symlink or junction there would redirect every artifact).
+      const outSt = lstatSync(out);
+      if (!outSt.isDirectory() || outSt.isSymbolicLink()) throw unreadable();
+      /** Open without following links, on a stable fd; hash it in bounded chunks; size-capped. */
+      const open = async (rel: string): Promise<{ fh: FileHandle; size: number; digest: string }> => {
         const p = confinedPath(out, rel);
         const st = lstatSync(p);
-        if (!st.isFile() || st.size > DOCK_ARTIFACT_MAX_BYTES) throw unreadable();
-        const b = readFileSync(p);
-        if (b.length > DOCK_ARTIFACT_MAX_BYTES) throw unreadable();
-        return b;
-      } catch {
-        throw unreadable();
-      }
-    };
-    const body = read(name);
-    const digest = sha256(body);
-    let manifestFiles: Record<string, unknown> = {};
-    if (name !== "manifest.json") {
+        if (!st.isFile() || st.isSymbolicLink() || st.size > DOCK_ARTIFACT_MAX_BYTES) throw unreadable();
+        const h = await open_(p, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0));
+        try {
+          const fst = await h.stat();
+          if (!fst.isFile() || fst.size > DOCK_ARTIFACT_MAX_BYTES || fst.size !== st.size || (st.ino !== 0 && fst.ino !== st.ino)) throw unreadable();
+          const hash = createHash("sha256");
+          const buf = Buffer.allocUnsafe(64 * 1024);
+          let pos = 0;
+          while (pos < fst.size) {
+            const { bytesRead } = await h.read(buf, 0, Math.min(buf.length, fst.size - pos), pos);
+            if (bytesRead === 0) throw unreadable();
+            hash.update(buf.subarray(0, bytesRead));
+            pos += bytesRead;
+          }
+          return { fh: h, size: fst.size, digest: hash.digest("hex") };
+        } catch (e) {
+          await h.close().catch(() => undefined);
+          throw e;
+        }
+      };
+      const mf = await open("manifest.json");
+      let manifestFiles: Record<string, unknown> = {};
       try {
-        manifestFiles = ((JSON.parse(read("manifest.json").toString("utf8")) as { files?: Record<string, unknown> }).files ?? {}) as Record<string, unknown>;
+        // The manifest is itself checked against the digest recorded in the job dir at completion.
+        const recorded = readFileSync(join(dir, MANIFEST_DIGEST_FILE), "utf8").trim();
+        if (recorded !== mf.digest || mf.size > MANIFEST_MAX_BYTES) throw unreadable();
+        const raw = Buffer.alloc(mf.size);
+        const { bytesRead } = await mf.fh.read(raw, 0, mf.size, 0);
+        if (bytesRead !== mf.size) throw unreadable();
+        manifestFiles = ((JSON.parse(raw.toString("utf8")) as { files?: Record<string, unknown> }).files ?? {}) as Record<string, unknown>;
       } catch {
+        await mf.fh.close().catch(() => undefined);
         throw unreadable();
       }
+      let picked = mf;
+      if (name !== "manifest.json") {
+        await mf.fh.close().catch(() => undefined);
+        picked = await open(name);
+        if (name === "poses.pdbqt" && (picked.digest !== this.result(jobId).posesSha256 || manifestFiles["poses.pdbqt"] !== picked.digest)) {
+          await picked.fh.close().catch(() => undefined);
+          throw unreadable();
+        }
+        if (name === "result.json" && manifestFiles["result.json"] !== picked.digest) {
+          await picked.fh.close().catch(() => undefined);
+          throw unreadable();
+        }
+      }
+      fh = picked.fh;
+      const stream = picked.size === 0 ? Readable.from([]) : fh.createReadStream({ start: 0, end: picked.size - 1, autoClose: true });
+      stream.once("close", release);
+      if (picked.size === 0) await fh.close().catch(() => undefined);
+      return { stream, size: picked.size, contentType: DOCK_JOB_ARTIFACTS[name as DockJobArtifactName], sha256: picked.digest };
+    } catch (e) {
+      release();
+      if (e instanceof DockJobError) throw e;
+      throw new DockJobError("RESULT_UNAVAILABLE", 409, "The stored artifact could not be read.");
     }
-    if (name === "poses.pdbqt" && (digest !== this.result(jobId).posesSha256 || manifestFiles["poses.pdbqt"] !== digest)) throw unreadable();
-    if (name === "result.json" && manifestFiles["result.json"] !== digest) throw unreadable();
-    return { body, contentType: DOCK_JOB_ARTIFACTS[name as DockJobArtifactName], sha256: digest };
   }
 
   // ---- gc / quota ------------------------------------------------------------------------------------------
@@ -758,6 +817,8 @@ export class DockJobStore {
           return this.failIfLive(jobId, "OUTPUT_REJECTED", e instanceof DockOutputError ? e.reason : "The engine output could not be verified.");
         }
         writeAtomicRetry(join(dir, ...DOCK_LAYOUT.result.split("/")), JSON.stringify(result, null, 1) + "\n");
+        // Record the manifest digest outside out/ so artifact serving can verify the manifest like the other files.
+        writeAtomicRetry(join(dir, MANIFEST_DIGEST_FILE), sha256(readFileSync(join(dir, DOCK_LAYOUT.outDir, "manifest.json"))) + "\n");
         const latest = this.states.get(jobId)!;
         if (!LIVE.has(latest.status)) return;
         this.transition(latest, "COMPLETED", { provenance: result.provenance });

@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { pipeline } from "node:stream";
 import {
   DOCK_JOB_ARTIFACTS,
   DOCK_JOB_TERMINAL_STATUSES,
@@ -17,7 +18,7 @@ import {
   type DockJobSubmitResponseV1,
   type JobEvent,
 } from "@molecular/contracts";
-import { createPrepResolver, DockJobError, DockJobStore, type DockJobStoreOptions, type DockSubmitResult } from "../jobs/dockJobs.js";
+import { createPrepResolver, DockJobError, DockJobStore, type DockArtifactStream, type DockJobStoreOptions, type DockSubmitResult } from "../jobs/dockJobs.js";
 import type { DockRunner } from "../jobs/dockRunner.js";
 import { PREP_MAX_ARTIFACT_BYTES, PrepError, type PrepJobStore } from "../jobs/prepJobs.js";
 import type { PrepArtifactStore } from "../jobs/prepArtifacts.js";
@@ -179,7 +180,7 @@ export type DockJobService = Readonly<{
   subscribe(id: string, afterSeq: number, cb: (e: JobEvent) => void): () => void;
   result(id: string): DockJobResultV1;
   /** Task 5.5: a whitelisted, digest-checked output file of a COMPLETED job. */
-  artifact(id: string, name: string): { body: Buffer; contentType: string; sha256: string };
+  artifact(id: string, name: string): Promise<DockArtifactStream>;
   close(): Promise<void>;
 }>;
 
@@ -217,6 +218,8 @@ export const createDockJobService = (deps: DockJobServiceDeps): DockJobService =
 export const DOCK_BODY_CAP_BYTES = 16 * 1024;
 export const DOCK_SSE_MAX_CONNECTIONS = 16;
 export const DOCK_SSE_HEARTBEAT_MS = 15_000;
+/** A client that leaves the socket blocked (no drain) this long is dropped. */
+export const DOCK_SSE_STALL_MS = 30_000;
 /** A stream whose client stops reading is dropped once this much output is buffered. */
 const SSE_MAX_BUFFERED = 1024 * 1024;
 const TERMINAL_STATUSES = new Set<DockJobStatusName>(DOCK_JOB_TERMINAL_STATUSES);
@@ -231,9 +234,12 @@ const hasDockPathKey = (v: unknown, depth = 0): boolean => {
 /** The feature flag: the run routes (and the job store) exist only when FEATURE_DOCKING_RUN is exactly "1". */
 export const dockingRunEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => env.FEATURE_DOCKING_RUN === "1";
 
+/** Hosted mode has no caller scope (dedupe and listing are global) until accounts exist (task 7.3): refuse there. */
+export const DOCKING_HOSTED_REFUSAL = "Docking jobs are unavailable in hosted mode until per-user accounts exist (task 7.3); run the API in local mode.";
+
 /** Capability records: VINA_COMPARATOR_PREVIEW follows the flag; DOCKING.RUN (Mole engine) stays UNAVAILABLE. */
-export const dockingCapabilities = (enabled: boolean) => ({
-  VINA_COMPARATOR_PREVIEW: vinaComparatorCapability(enabled),
+export const dockingCapabilities = (enabled: boolean, refusal?: string) => ({
+  VINA_COMPARATOR_PREVIEW: refusal ? { ...vinaComparatorCapability(false), unavailableReason: refusal } : vinaComparatorCapability(enabled),
   "DOCKING.RUN": { state: "UNAVAILABLE" as const, reason: "The Mole docking engine is not released (gate D8); only the separate Vina comparator preview can run." },
 });
 
@@ -244,6 +250,9 @@ export type DockJobRoutesOptions = Readonly<{
   prefix?: string;
   maxSseConnections?: number;
   heartbeatMs?: number;
+  stallMs?: number;
+  /** Set when the routes are refused on purpose (hosted mode until accounts exist): job routes answer 404 UNAVAILABLE with this reason. */
+  refusal?: string;
 }>;
 
 export type DockJobRoutes = ((req: IncomingMessage, res: ServerResponse, pathname: string) => Promise<boolean>) &
@@ -265,6 +274,7 @@ export const createDockJobRoutes = (o: DockJobRoutesOptions): DockJobRoutes => {
   const maxSse = o.maxSseConnections ?? DOCK_SSE_MAX_CONNECTIONS;
   const heartbeatMs = o.heartbeatMs ?? DOCK_SSE_HEARTBEAT_MS;
   const streams = new Set<() => void>();
+  const stallMs = o.stallMs ?? DOCK_SSE_STALL_MS;
 
   const stream = (service: DockJobService, req: IncomingMessage, res: ServerResponse, id: string): void => {
     service.get(id); // 404 before any SSE header
@@ -277,8 +287,14 @@ export const createDockJobRoutes = (o: DockJobRoutesOptions): DockJobRoutes => {
     res.write("retry: 2000\n\n");
     let closed = false;
     const subscription: { off?: () => void } = {};
+    // Events are queued and written only while the socket accepts data (backpressure): a replay larger than the
+    // buffer cap is paged out on 'drain'. Only a client that stays blocked for stallMs is dropped.
+    const queue: JobEvent[] = [];
+    let waiting = false;
+    let stall: NodeJS.Timeout | undefined;
+    let reachedEnd = false;
     const heartbeat = setInterval(() => {
-      if (!closed) res.write(": heartbeat\n\n");
+      if (!closed && !waiting) res.write(": heartbeat\n\n");
     }, heartbeatMs);
     heartbeat.unref();
     const finish = () => {
@@ -286,6 +302,8 @@ export const createDockJobRoutes = (o: DockJobRoutesOptions): DockJobRoutes => {
       closed = true;
       streams.delete(finish);
       clearInterval(heartbeat);
+      if (stall) clearTimeout(stall);
+      res.off("drain", onDrain);
       subscription.off?.();
       if (!res.writableEnded) res.end();
     };
@@ -299,22 +317,47 @@ export const createDockJobRoutes = (o: DockJobRoutesOptions): DockJobRoutes => {
         return -1; // the job is gone (gc): nothing more will come
       }
     };
+    const pump = (): void => {
+      while (!closed && !waiting && queue.length) {
+        const e = queue.shift()!;
+        if (!res.write(`id: ${e.seq}\nevent: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`)) {
+          waiting = true;
+          res.once("drain", onDrain);
+          stall = setTimeout(() => {
+            res.destroy();
+            finish();
+          }, stallMs);
+          stall.unref();
+        }
+      }
+      if (!closed && !waiting && reachedEnd && queue.length === 0) finish();
+    };
+    function onDrain(): void {
+      waiting = false;
+      if (stall) clearTimeout(stall);
+      if (!closed && res.writableLength > SSE_MAX_BUFFERED) {
+        res.destroy();
+        return finish();
+      }
+      pump();
+    }
     const deliver = (e: JobEvent) => {
       if (closed) return;
-      res.write(`id: ${e.seq}\nevent: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`);
-      if (res.writableLength > SSE_MAX_BUFFERED) {
+      queue.push(e);
+      if (queue.length > 2 * JOB_CAPS.eventsMax) {
         res.destroy();
         return finish();
       }
       // A terminal commit writes status, progress and result/error together: close after the last of them.
       const end = terminalAt();
-      if (end !== undefined && e.seq >= end) finish();
+      if (end !== undefined && e.seq >= end) reachedEnd = true;
+      pump();
     };
     const u = service.subscribe(id, after, deliver);
     if (closed) return u();
     subscription.off = u;
-    // Replay is synchronous and complete: a job that is already terminal has nothing more to send.
-    if (terminalAt() !== undefined) finish();
+    if (terminalAt() !== undefined) reachedEnd = true;
+    pump();
   };
 
   const handle = async (req: IncomingMessage, res: ServerResponse, parts: string[], method: string): Promise<void> => {
@@ -361,17 +404,18 @@ export const createDockJobRoutes = (o: DockJobRoutesOptions): DockJobRoutes => {
           service.get(id);
           return fail(res, 404, "NOT_FOUND", "Artifact not found.");
         }
-        const a = service.artifact(id, name);
+        const a = await service.artifact(id, name);
         res.writeHead(200, {
           "content-type": a.contentType,
-          "content-length": String(a.body.length),
+          "content-length": String(a.size),
           "content-disposition": `attachment; filename="${name}"`,
           "cache-control": "no-store",
           "x-content-type-options": "nosniff",
           "x-mole-sha256": a.sha256,
           "x-mole-label": "PREVIEW_UNQUALIFIED",
         });
-        res.end(a.body);
+        // Streamed (never buffered); a client that disconnects destroys the file stream and frees the download slot.
+        await new Promise<void>((done) => pipeline(a.stream, res, () => done()));
         return;
       }
       return fail(res, 404, "NOT_FOUND", "Not found.");
@@ -390,12 +434,16 @@ export const createDockJobRoutes = (o: DockJobRoutesOptions): DockJobRoutes => {
 
   const handler = async (req: IncomingMessage, res: ServerResponse, pathname: string): Promise<boolean> => {
     if (pathname === capabilitiesPath && (req.method ?? "GET") === "GET") {
-      send(res, 200, dockingCapabilities(o.enabled));
+      send(res, 200, dockingCapabilities(o.enabled, o.refusal));
       return true;
     }
     if (pathname !== base && !pathname.startsWith(`${base}/`)) return false;
     // Flag off: unreachable. The caller answers its plain 404, exactly as for an unknown route.
-    if (!o.enabled) return false;
+    if (!o.enabled) {
+      if (!o.refusal) return false;
+      fail(res, 404, "UNAVAILABLE", o.refusal);
+      return true;
+    }
     await handle(req, res, pathname.slice(base.length).split("/").filter(Boolean), req.method ?? "GET");
     return true;
   };
