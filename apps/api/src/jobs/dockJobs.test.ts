@@ -126,17 +126,17 @@ const expectCode = async (p: Promise<unknown> | (() => unknown), code: string, s
 };
 
 describe("dock job store (5.4)", () => {
-  it("runs a job to SUCCEEDED with a PREVIEW_UNQUALIFIED result, meScore null and full provenance", async () => {
+  it("runs a job to COMPLETED with a PREVIEW_UNQUALIFIED result, meScore null and full provenance", async () => {
     const { store, ids } = await setup();
     const { job, deduped } = await store.submit(req(ids));
     expect(deduped).toBe(false);
-    await waitFor(() => store.get(job.jobId).status === "SUCCEEDED");
+    await waitFor(() => store.get(job.jobId).status === "COMPLETED");
     const r = store.result(job.jobId);
     expect(r).toMatchObject({ label: "PREVIEW_UNQUALIFIED", meScore: null, jobId: job.jobId, inputDigest: job.inputDigest });
     expect(r.poses.every((p) => p.meScore === null)).toBe(true);
     expect(r.provenance).toMatchObject({ receptorSha256: sha(REC), ligandSha256: sha(LIG), seed: 42, prepSealStatus: "SEALED", prepQualification: "INTERIM", vinaPin: { sha256: PIN, version: "1.2.7" }, vina: { binarySha256: PIN } });
     const evs = store.events(job.jobId);
-    expect(evs.filter((e) => e.type === "status").map((e) => (e as { status: string }).status)).toEqual(["QUEUED", "PREPARING", "RUNNING", "SUCCEEDED"]);
+    expect(evs.filter((e) => e.type === "status").map((e) => (e as { status: string }).status)).toEqual(["CREATED", "QUEUED", "RUNNING", "COMPLETED"]);
     expect(evs.filter((e) => e.type === "progress").map((e) => (e as { progress: number }).progress)).toEqual([0.05, 0.1, 1]);
     expect(evs.map((e) => e.seq)).toEqual(evs.map((_e, i) => i + 1));
     expect(store.get(job.jobId).seq).toBe(evs.length);
@@ -176,7 +176,7 @@ describe("dock job store (5.4)", () => {
     expect(existsSync(join(store.jobDir(a.jobId), "out", "job-result.json"))).toBe(false);
     expect(engine.calls.dock).toBe(1); // b never ran
     const c = (await store.submit(req(ids, { seed: 9 }))).job;
-    await waitFor(() => store.get(c.jobId).status === "SUCCEEDED");
+    await waitFor(() => store.get(c.jobId).status === "COMPLETED");
     await expectCode(() => store.cancel(c.jobId), "ALREADY_TERMINAL", 409);
   }, 30_000);
 
@@ -187,8 +187,8 @@ describe("dock job store (5.4)", () => {
     expect(x.job.jobId).toBe(y.job.jobId);
     expect([x.deduped, y.deduped].sort()).toEqual([false, true]);
     expect(readdirSync(root).filter((n) => !n.startsWith("."))).toHaveLength(1);
-    await waitFor(() => store.get(x.job.jobId).status === "SUCCEEDED");
-    expect((await store.submit(req(ids))).deduped).toBe(true); // SUCCEEDED is reused
+    await waitFor(() => store.get(x.job.jobId).status === "COMPLETED");
+    expect((await store.submit(req(ids))).deduped).toBe(true); // COMPLETED is reused
     expect(engine.calls.dock).toBe(1);
     const other = await store.submit(req(ids, { boxSize: [20, 22, 22] }));
     expect(other.deduped).toBe(false);
@@ -229,7 +229,7 @@ describe("dock job store (5.4)", () => {
     const sa = store.get(a!);
     expect(sa).toMatchObject({ status: "FAILED", error: { code: "API_RESTARTED" }, bootId: store.bootId });
     await waitFor(() => !alive(msg.childPid), 5000);
-    await waitFor(() => store.get(b!).status === "SUCCEEDED", 15_000);
+    await waitFor(() => store.get(b!).status === "COMPLETED", 15_000);
     const evs = store.events(a!);
     expect(evs.map((e) => e.seq)).toEqual(evs.map((_e, i) => i + 1));
     expect(evs.length).toBeGreaterThan(seqBefore);
@@ -259,7 +259,7 @@ describe("dock job store (5.4)", () => {
     // mixed: SEALED receptor + preview ligand from another prep job; both prep jobs are recorded
     const m = await store.submit(req({ receptorPreparedId: ids.receptorPreparedId, ligandPreparedId: preview.ligandPreparedId }, { seed: 77 }));
     expect(m.job.provenance).toMatchObject({ prepSealStatus: "PREVIEW_UNQUALIFIED", prepJobId: SEALED_ID, ligandPrepJobId: PREVIEW_ID });
-    await waitFor(() => store.get(p.job.jobId).status === "SUCCEEDED");
+    await waitFor(() => store.get(p.job.jobId).status === "COMPLETED");
     expect(store.result(p.job.jobId)).toMatchObject({ label: "PREVIEW_UNQUALIFIED", provenance: { prepSealStatus: "PREVIEW_UNQUALIFIED", ligandPrepJobId: PREVIEW_ID } });
   });
 
@@ -302,16 +302,48 @@ describe("dock job store (5.4)", () => {
   });
 
   it("transition table: illegal moves are 409; terminal states have no outgoing moves", async () => {
-    for (const t of ["SUCCEEDED", "FAILED", "CANCELLED"] as const) expect(DOCK_TRANSITIONS[t]).toEqual([]);
+    for (const t of ["COMPLETED", "FAILED", "CANCELLED"] as const) expect(DOCK_TRANSITIONS[t]).toEqual([]);
     const { store, ids } = await setup({ engine: mkFake({ holdMs: 60_000 }) });
     const a = (await store.submit(req(ids))).job;
     const b = (await store.submit(req(ids, { seed: 3 }))).job;
-    await expectCode(() => store.move(b.jobId, "SUCCEEDED"), "ILLEGAL_TRANSITION", 409);
-    await expectCode(() => store.move(b.jobId, "RUNNING"), "ILLEGAL_TRANSITION", 409);
+    await expectCode(() => store.move(b.jobId, "COMPLETED"), "ILLEGAL_TRANSITION", 409);
+    await expectCode(() => store.move(b.jobId, "CREATED"), "ILLEGAL_TRANSITION", 409);
     store.cancel(b.jobId);
     await expectCode(() => store.move(b.jobId, "QUEUED"), "ALREADY_TERMINAL", 409);
     store.cancel(a.jobId);
     await store.idle();
+  });
+
+  it("R.2 transition table is exactly the six research states; BLOCKED is not a status", () => {
+    expect(DOCK_TRANSITIONS).toEqual({
+      CREATED: ["QUEUED", "CANCELLED", "FAILED"],
+      QUEUED: ["RUNNING", "CANCELLED", "FAILED"],
+      RUNNING: ["COMPLETED", "CANCELLED", "FAILED"],
+      COMPLETED: [],
+      FAILED: [],
+      CANCELLED: [],
+    });
+    expect(Object.keys(DOCK_TRANSITIONS)).not.toContain("BLOCKED");
+  });
+
+  it("R.2 migration: an old state.json with SUCCEEDED and a PREPARING event are read as COMPLETED / RUNNING(stage PREPARING), and noted", async () => {
+    const { store, ids, root, prepRoot, engine } = await setup({ engine: mkFake({ holdMs: 60_000 }) });
+    const a = (await store.submit(req(ids))).job;
+    store.cancel(a.jobId);
+    await store.idle();
+    await store.close();
+    const sp = join(root, a.jobId, "state.json");
+    const legacy = JSON.parse(readFileSync(sp, "utf8"));
+    writeFileSync(sp, JSON.stringify({ ...legacy, status: "SUCCEEDED", cancelRequested: false }));
+    appendFileSync(join(root, a.jobId, "events.ndjson"), JSON.stringify({ type: "status", status: "PREPARING", jobId: a.jobId, seq: 99, at: "x" }) + "\n");
+    const prep = new PrepJobStore({ root: prepRoot, resolveArtifact: async () => undefined, installedTools: async () => [] });
+    prep.init();
+    const reborn = new DockJobStore({ root, resolvePrepared: createPrepResolver(prep), runner: createMoleDockRunner({ engine }) });
+    await reborn.init();
+    stores.push(reborn);
+    expect(reborn.get(a.jobId).status).toBe("COMPLETED");
+    expect(reborn.events(a.jobId).some((e) => e.type === "log" && e.line.startsWith("MIGRATED_LEGACY_STATE: SUCCEEDED -> COMPLETED"))).toBe(true);
+    expect(reborn.events(a.jobId).some((e) => e.type === "status" && e.status === "RUNNING" && e.stage === "PREPARING")).toBe(true);
   });
 
   it("queue full is 429 QUEUE_FULL; quota and gc spare live jobs", async () => {
@@ -346,12 +378,12 @@ describe("dock job store (5.4)", () => {
     const b = (await store.submit(req(ids, { seed: 8 }))).job;
     const seen: number[] = [];
     const unsub = store.subscribe(b.jobId, 0, (e) => seen.push(e.seq));
-    expect(seen).toEqual([1]);
+    expect(seen).toEqual([1, 2]);
     store.cancel(b.jobId);
-    expect(seen).toEqual([1, 2, 3]);
+    expect(seen).toEqual([1, 2, 3, 4]);
     unsub();
-    appendFileSync(join(store.jobDir(b.jobId), "events.ndjson"), '{"jobId":"torn","seq":4,"ty');
-    expect(store.events(b.jobId, 1).map((e) => e.seq)).toEqual([2, 3]);
+    appendFileSync(join(store.jobDir(b.jobId), "events.ndjson"), '{"jobId":"torn","seq":5,"ty');
+    expect(store.events(b.jobId, 1).map((e) => e.seq)).toEqual([2, 3, 4]);
     store.cancel(a.jobId);
     await store.idle();
     await store.close();
@@ -367,7 +399,7 @@ describe("dock job store (5.4)", () => {
     expect(reborn.list().map((s) => s.jobId).sort()).toEqual([a.jobId, b.jobId].sort());
     expect(existsSync(join(root, `.corrupt-${corruptId}`))).toBe(true);
     expect(readFileSync(join(reborn.jobDir(b.jobId), "events.ndjson"), "utf8").endsWith("\n")).toBe(true);
-    expect(reborn.get(b.jobId).seq).toBe(3);
+    expect(reborn.get(b.jobId).seq).toBe(4);
   });
 
   it("engine failures are FAILED ENGINE with no absolute paths in the error (Windows, forward-slash, /mnt and repo forms)", async () => {

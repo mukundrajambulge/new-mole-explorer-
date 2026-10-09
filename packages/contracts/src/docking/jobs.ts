@@ -297,9 +297,22 @@ export const DockJobRequestSchema = z
   .strict();
 export type DockJobRequest = z.infer<typeof DockJobRequestSchema>;
 
-export const DOCK_JOB_STATUSES = ["QUEUED", "PREPARING", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"] as const;
+/**
+ * R.2: exactly the six research job states (AT-0227/0228). BLOCKED is never a job status (it is a failure
+ * reason or diagnostic). Old PREPARING/SUCCEEDED values are legacy: see DOCK_LEGACY_STATUS_MAP.
+ */
+export const DOCK_JOB_STATUSES = ["CREATED", "QUEUED", "RUNNING", "COMPLETED", "FAILED", "CANCELLED"] as const;
 export type DockJobStatusName = (typeof DOCK_JOB_STATUSES)[number];
-export const DOCK_JOB_TERMINAL_STATUSES = ["SUCCEEDED", "FAILED", "CANCELLED"] as const;
+export const DOCK_JOB_TERMINAL_STATUSES = ["COMPLETED", "FAILED", "CANCELLED"] as const;
+/** The current stage of a RUNNING job (a field, not a status). */
+export const DOCK_JOB_STAGES = ["PREPARING", "DOCKING", "RESCORING"] as const;
+export type DockJobStage = (typeof DOCK_JOB_STAGES)[number];
+const stageSchema = z.enum(DOCK_JOB_STAGES);
+/** Persisted pre-R.2 states: SUCCEEDED -> COMPLETED; PREPARING -> RUNNING with stage PREPARING. */
+export const DOCK_LEGACY_STATUS_MAP: Readonly<Record<string, { status: DockJobStatusName; stage?: DockJobStage }>> = Object.freeze({
+  SUCCEEDED: { status: "COMPLETED" },
+  PREPARING: { status: "RUNNING", stage: "PREPARING" },
+});
 
 /**
  * Persisted docking job state (task 5.4, design 5.4): <root>/<jobId>/state.json. The server resolves the
@@ -332,10 +345,12 @@ export const DockJobStateV1Schema = z
     jobId: JobIdSchema,
     inputDigest: hex64,
     status: z.enum(DOCK_JOB_STATUSES),
+    /** Current stage while RUNNING (a field, never a status). */
+    stage: stageSchema.optional(),
     /** Process boot that last owned this job; a different boot means the run was interrupted. */
     bootId: z.string().regex(/^[0-9a-f-]{36}$/),
     cancelRequested: z.boolean(),
-    /** Only real stage points: 0 queued, 0.05 preparing, 0.1 running, 1 done. */
+    /** Only real stage points: 0 created/queued, 0.05 running/preparing, 0.1 running/docking, 1 done. */
     progress: z.number().min(0).max(1),
     error: z.object({ code: z.string().min(1).max(64), message: shortText }).strict().optional(),
     provenance: DockJobProvenanceV1Schema,
@@ -369,7 +384,7 @@ export const MoleDockRunManifestV1Schema = z
   .object({ schemaVersion: z.literal(1), kind: z.literal("mole-dock-run"), status: z.literal("OK"), files: z.record(z.string().max(64), hex64), engineSha256: hex64 })
   .passthrough();
 
-/** Result of a SUCCEEDED docking job, bound to its jobId and inputDigest. Vina scores only; meScore is null. */
+/** Result of a COMPLETED docking job, bound to its jobId and inputDigest. Vina scores only; meScore is null. */
 export const DockJobResultV1Schema = z
   .object({
     schemaVersion: z.literal(1),
@@ -404,6 +419,7 @@ export const JobStatusSchema = z
   .object({
     jobId: JobIdSchema,
     status: z.enum(DOCK_JOB_STATUSES),
+    stage: stageSchema.optional(),
     progress: z.number().min(0).max(1),
     message: shortText.optional(),
     error: shortText.optional(),
@@ -438,7 +454,8 @@ export type DockResult = z.infer<typeof DockResultSchema>;
 
 const evBase = { jobId: JobIdSchema, seq: z.number().int().min(0).max(JOB_CAPS.eventsMax), at: z.string().max(40) };
 export const JobEventSchema = z.discriminatedUnion("type", [
-  z.object({ ...evBase, type: z.literal("status"), status: z.enum(DOCK_JOB_STATUSES) }).strict(),
+  z.object({ ...evBase, type: z.literal("status"), status: z.enum(DOCK_JOB_STATUSES), stage: stageSchema.optional() }).strict(),
+  z.object({ ...evBase, type: z.literal("stage"), stage: stageSchema }).strict(),
   z.object({ ...evBase, type: z.literal("progress"), progress: z.number().min(0).max(1), message: shortText.optional() }).strict(),
   z.object({ ...evBase, type: z.literal("log"), line: z.string().max(1000) }).strict(),
   z.object({ ...evBase, type: z.literal("result"), resultReady: z.literal(true) }).strict(),

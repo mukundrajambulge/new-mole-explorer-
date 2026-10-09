@@ -103,14 +103,14 @@ describe("mock job server lifecycle", () => {
     expect(done.state).toBe("SUCCEEDED");
   });
 
-  it("job runs to SUCCEEDED with SSE events and a valid result", async () => {
+  it("job runs to COMPLETED with SSE events and a valid result", async () => {
     const st = JobStatusSchema.parse(await (await post("/docking/jobs", validDock)).json());
     const sse = await (await fetch(`${base}/docking/jobs/${st.jobId}/events`)).text();
     const events = sse.split("\n\n").filter((b) => b.includes("data: ")).map((b) => JobEventSchema.parse(JSON.parse(b.split("data: ")[1]!)));
     expect(events.at(-1)?.type).toBe("result");
     expect(events.some((e) => e.type === "status" && e.status === "RUNNING")).toBe(true);
     const final = JobStatusSchema.parse(await (await fetch(`${base}/docking/jobs/${st.jobId}`)).json());
-    expect(final.status).toBe("SUCCEEDED");
+    expect(final.status).toBe("COMPLETED");
     const result = DockResultSchema.parse(await (await fetch(`${base}/docking/jobs/${st.jobId}/result`)).json());
     expect(result.scoreStatus).toBe("PREVIEW_UNQUALIFIED");
     const pose = await fetch(`${base}/docking/artifacts/${result.poses[0]!.poseArtifactId}?format=pdbqt`);
