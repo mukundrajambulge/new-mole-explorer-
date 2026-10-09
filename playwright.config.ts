@@ -2,6 +2,9 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  // The docking wizard specs need their own stacks (mock web build / FEATURE_DOCKING_RUN API):
+  // playwright.docking-mock.config.ts and playwright.docking-real.config.ts.
+  testIgnore: ["docking-wizard-*.spec.ts"],
   fullyParallel: true,
   // Real 3Dmol surface generation is GPU/memory intensive. A single browser
   // worker keeps the complete visual suite deterministic on the supported
