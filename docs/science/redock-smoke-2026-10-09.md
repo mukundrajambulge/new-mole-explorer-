@@ -13,7 +13,7 @@ Nothing was tuned on these numbers. The cases are Astex-diverse-style; membershi
 ## Protocol
 
 - Tool: `node tools/mole-dock/redock.mjs --report` (git 7e895b9); RMSD helper workers/prep/mole_prep/redock_smoke.py.
-- Engine: AutoDock Vina 1.2.7 (`AutoDock Vina v1.2.7`), binary sha256 f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644. Vina commit: not recorded by the release binary (official v1.2.7 Linux x86_64 release; the research comparator pin 8eb4040 is not verified for this binary).
+- Engine: AutoDock Vina 1.2.7 (`AutoDock Vina v1.2.7`), binary sha256 f31f774f723bba7bbe6e9d1c47577020eea9a8da16424284c043d22593570644. Vina commit: the official v1.2.7 release binary; tag v1.2.7 points to 8eb40404f4f45608acb3b01427587ac049f27c1f (GitHub API, checked 2026-10-09; matches the research comparator pin). That the binary was built from that tag is assumed, not rebuilt here.
 - Preparation: prep worker ME_PREP_INTERIM_V0, RDKit 2026.3.6, Meeko 0.8.0 (the research comparator lane is Meeko 0.7.1; digest C12). Prep acks were all given automatically (listed per case in the JSON).
 - Starting ligand: prepared from the CCD isomeric SMILES alone, RDKit ETKDGv3 conformer (seed below), Gasteiger charges, Meeko torsion tree. Never the crystal pose.
 - Box: crystal-ligand heavy-atom envelope + 5.0 A on every face (axis-aligned, not a cube); Vina snaps the grid to 0.375 A.
