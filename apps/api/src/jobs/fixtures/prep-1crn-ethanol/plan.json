@@ -1,0 +1,92 @@
+{
+ "chargeModel": "gasteiger",
+ "decisions": [
+  {
+   "atomsAfter": 327,
+   "atomsBefore": 327,
+   "choice": "keep submitted hydrogens (0); no pKa model",
+   "key": "RECEPTOR_PROTONATION",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 640,
+   "atomsBefore": 327,
+   "choice": "Meeko residue templates set hydrogens 0 -> 313 (generated, PREVIEW_UNQUALIFIED)",
+   "key": "RECEPTOR_TEMPLATE_HYDROGENS",
+   "requiresAck": true
+  },
+  {
+   "atomsAfter": 640,
+   "atomsBefore": 640,
+   "choice": "Gasteiger charges from Meeko residue templates",
+   "key": "RECEPTOR_CHARGES",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 3,
+   "atomsBefore": 3,
+   "choice": "explicit bond orders from the submitted SDF file",
+   "key": "LIGAND_BOND_ORDERS",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 3,
+   "atomsBefore": 3,
+   "choice": "keep submitted protonation and formal charge (0)",
+   "key": "LIGAND_PROTONATION",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 9,
+   "atomsBefore": 3,
+   "choice": "6 implicit hydrogens made explicit (valence model of the submitted chemistry)",
+   "key": "LIGAND_HYDROGENS",
+   "requiresAck": true
+  },
+  {
+   "atomsAfter": 9,
+   "atomsBefore": 9,
+   "choice": "no 3D coordinates submitted; ETKDGv3 embedding (seed 61453)",
+   "key": "LIGAND_3D_EMBED",
+   "requiresAck": true
+  },
+  {
+   "atomsAfter": 9,
+   "atomsBefore": 9,
+   "choice": "Gasteiger partial charges (Meeko)",
+   "key": "LIGAND_CHARGES",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 9,
+   "atomsBefore": 9,
+   "choice": "1 rotatable bonds (Meeko default rules; amides rigid)",
+   "key": "LIGAND_TORSIONS",
+   "requiresAck": false
+  }
+ ],
+ "diagnostics": [],
+ "jobId": "fixture-1crn-ethanol",
+ "ligandArtifactId": "lethanol",
+ "lockDigest": "e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9",
+ "options": {
+  "addMissingAtoms": false,
+  "chainIds": null,
+  "keepWaters": false,
+  "ligandProtonation": "EXPLICIT_SUBMITTED",
+  "ligandTemplate": false,
+  "pH": 7.4,
+  "protonation": "EXPLICIT_SUBMITTED"
+ },
+ "pH": 7.4,
+ "planDigest": "7f7019202a4d0f904299cc1d35188a1317f57736acde24153bdebb6ca5f83563",
+ "profileId": "ME_PREP_INTERIM_V0",
+ "protonationSource": "EXPLICIT_SUBMITTED",
+ "qualification": "PREVIEW_UNQUALIFIED",
+ "receptorArtifactId": "r1crn",
+ "rotatableBonds": 1,
+ "schemaVersion": 1,
+ "status": "READY",
+ "tautomer": "AS_SUBMITTED",
+ "warnings": []
+}

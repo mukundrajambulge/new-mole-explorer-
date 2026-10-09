@@ -2,6 +2,7 @@
 
   python -I <worker>/run_prep.py --plan            reads job.json, writes plan.json (no structure output)
   python -I <worker>/run_prep.py --apply           reads job.json, plan.json, confirmation.json; writes out/* and prep-manifest.json
+  python -I <worker>/run_prep.py --versions        prints the installed tool versions, worker version and lock digest (JSON)
 
 Exit codes: 0 READY/PREPARED, 3 BLOCKED (plan.json / prep-manifest.json say why), 2 usage or job file error, 1 internal error.
 The worker never seals anything; the API re-hashes every output and seals with server-side profiles.
@@ -234,13 +235,32 @@ def cmd_apply(root: str, job: dict) -> int:
     return finish(manifest)
 
 
+def cmd_versions() -> int:
+    """Report the installed toolchain (one canonical JSON line on stdout) for the API's startup pin check.
+    It reads package metadata only: no job directory, no structure input, nothing written."""
+    from .manifest import PROFILE_ID, WORKER_VERSION, canonical_bytes, lock_digest, tool_versions
+
+    try:
+        limits.check_determinism_env()
+    except Blocked as e:
+        print(limits.scrub(f"JOB_INVALID: {e.diagnostic()}"), file=sys.stderr)
+        return 2
+    report = {"schemaVersion": 1, "profileId": PROFILE_ID, "workerVersion": WORKER_VERSION, "lockDigest": lock_digest(),
+              "python": ".".join(str(v) for v in sys.version_info[:3]), "tools": tool_versions()}
+    sys.stdout.write(canonical_bytes(report).decode("ascii") + "\n")
+    return 0
+
+
 def main(argv=None) -> int:
     limits.harden_process()
     p = argparse.ArgumentParser(prog="mole_prep", add_help=True)
     g = p.add_mutually_exclusive_group(required=True)
     g.add_argument("--plan", action="store_true")
     g.add_argument("--apply", action="store_true")
+    g.add_argument("--versions", action="store_true")
     args = p.parse_args(argv)
+    if args.versions:
+        return cmd_versions()
     root = os.getcwd()
     try:
         limits.check_determinism_env()

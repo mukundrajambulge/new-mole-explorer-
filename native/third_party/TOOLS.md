@@ -35,3 +35,19 @@ Direct pins: `workers/prep/requirements.in`. Full transitive lock with sha256 ha
 
 Licence check: no GPL code; the two LGPL tools (Meeko, PROPKA) and OpenMM are only ever run as separate
 processes and are not linked into or bundled with our code.
+
+## Preparation worker (task 5.2, profile ME_PREP_INTERIM_V0)
+
+Machine-checked at API startup by `apps/api/src/jobs/prepPins.ts` (any mismatch fails closed: no prep jobs).
+
+| Field | Value |
+|---|---|
+| Profile ID | `ME_PREP_INTERIM_V0` |
+| Worker version | `0.1.0` (`mole_prep.manifest.WORKER_VERSION`; manifest stage `mole_prep.receptor_clean`) |
+| Installed check | `run_prep.py --versions` (via `tools/mole-dock/prep.mjs` `probePrepVersions`) must report this lock digest, this worker version and, for every tool, the version in the lock and in the table above; checked before the first plan, any drift fails closed (PROVENANCE_REPLAY) |
+| Manifest check | every `prep-manifest.json` `stages[].version` must equal the table above (PDB2PQR/PROPKA as `x/y`; PDBFixer's `params.openmm` against OpenMM); drift rejects the seal (`TOOL_VERSION_DRIFT:<tool>`) |
+| Entry point | `workers/prep/run_prep.py` (`python -I`, `--plan` / `--apply`), spawned only by `tools/mole-dock/prep.mjs` |
+| Interpreter | `~/mole-prep/bin/python` (WSL Ubuntu-24.04), env `PYTHONHASHSEED=0`, one thread |
+| Seed | ETKDGv3 `randomSeed` `61453` (`0xF00D`, `workers/prep/mole_prep/ligand.py`) |
+| Lock digest | `e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9` (sha256 of `workers/prep/requirements.lock.txt`, LF-normalised) |
+| Default protonation | `EXPLICIT_SUBMITTED`; PROPKA / Dimorphite-DL are opt-in and seal as PREVIEW_UNQUALIFIED |
