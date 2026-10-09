@@ -2225,7 +2225,9 @@
         "D1"
       ],
       "est": "1 week",
-      "status": "TODO"
+      "status": "TODO",
+      "branch": "sprint/W9/5.3",
+      "note": "Part 1 merged: mole-dock run (zod job, Vina sha/version pinned, no shell, result.json PREVIEW_UNQUALIFIED, exit codes). Redock seed 20261009 exh 8: 1STP biotin 0.386 A / -7.241; 1IEP imatinib 0.923 A / -12.931 (symmetry-naive, deterministic). Part 2: mole-score C++ re-score (meScore UNAVAILABLE now), poses.sdf, cap pose output, 3 more complexes for the 4-of-5 done-when."
     },
     {
       "id": "5.0",
