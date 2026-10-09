@@ -1,7 +1,7 @@
 # Sprint state (generated: do not edit; run `node scripts/sprint/sprint.mjs state`)
 
-Status: DONE: 39 · TODO: 56 · NEEDS_OWNER: 2 · BLOCKED: 1 · DEFERRED: 8
-Done by tier: core 36/53 · strong 3/38 · stretch 0/7
+Status: DONE: 41 · TODO: 54 · NEEDS_OWNER: 2 · BLOCKED: 1 · DEFERRED: 8
+Done by tier: core 38/53 · strong 3/38 · stretch 0/7
 Calibration: 6814 output tokens per 1% of the 5-hour window; estimate multiplier 1.13
 Last waves: W4 131k (3%→28%), W6 336k (3%→44%), W8 246k (0%→35%)
 
@@ -12,7 +12,6 @@ Last waves: W4 131k (3%→28%), W6 336k (3%→44%), W8 246k (0%→35%)
 
 ## Next ready tasks (critical path first)
 - ★ R.7 [L6 S/medium] Seeds uint64 and box digest from sealed min/max
-- ★ 5.6 [L6 S/medium] Capability flag and honest labels
 - ★ 5.7b [L7 M/medium] Box + Run steps: progress, cancel, error states
 - ★ 5.8 [L6 M/medium] Provenance from day one
 - 0.8 [L1 S/low] Pin the Node.js version
@@ -23,3 +22,4 @@ Last waves: W4 131k (3%→28%), W6 336k (3%→44%), W8 246k (0%→35%)
 - 1.4 [L2 S/medium] Stop sending the whole file text back
 - 1.8 [L2 S/high] Do not trust "sealed" objects sent by the browser
 - 1.9 [L2 S/low] Fix the vulnerable development tools
+- 1.10 [L2 M/medium] HTTP route tests

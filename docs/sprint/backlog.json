@@ -2671,8 +2671,8 @@
         "R8"
       ],
       "est": "Half a day",
-      "status": "TODO",
-      "note": "OWNER DECISION 2026-10-09: Vina docking is offered as a SEPARATE capability VINA_COMPARATOR_PREVIEW = EXPERIMENTAL / IMPLEMENTED_UNVERIFIED / NOT_EVALUATED; DOCKING.RUN (Mole engine) stays UNAVAILABLE until D8 [AT-0262]. Docking on PREVIEW_UNQUALIFIED preparations allowed, labelled. See docs/sprint/RESEARCH-DIGEST.md"
+      "status": "DONE",
+      "note": "VINA_COMPARATOR_PREVIEW EXPERIMENTAL capability (API in 5.5, UI banner in 5.7c); DOCKING.RUN stays UNAVAILABLE; hosted mode refuses (5.5 fix)"
     },
     {
       "id": "5.7a",
@@ -2784,7 +2784,8 @@
       "done": "The e2e test runs the full flow on the 1STP fixture in under 2 minutes.",
       "refs": [],
       "est": "1.5 weeks",
-      "status": "TODO"
+      "status": "DONE",
+      "note": "Merged: wizard uses the real API (fetch-SSE), capability gate, EXPERIMENTAL banner, real prep plan/acks, real poses overlay; real 1STP e2e passes (31 s)"
     },
     {
       "id": "5.8",
