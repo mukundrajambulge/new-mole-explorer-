@@ -83,13 +83,92 @@ def _count_h(atoms) -> int:
     return sum(1 for a in atoms if a["el"] == "H")
 
 
-def clean(text: str, opts: dict) -> tuple[list[dict], list[dict], list[str]]:
+SITE_RADIUS_A = 8.0  # research digest C8: hetero groups within 8 A of the ligand are in the site
+LIGAND_SELF_TOL_A = 0.05  # a hetero group whose heavy atoms all coincide with the submitted ligand IS the ligand
+# Metal ions by element (AT-0057/0131: metals that may control binding are UNSUPPORTED, never silently deleted).
+METAL_ELEMENTS = frozenset(
+    "Li Be Na Mg Al K Ca Sc Ti V Cr Mn Fe Co Ni Cu Zn Ga Rb Sr Y Zr Nb Mo Tc Ru Rh Pd Ag Cd In Sn Cs Ba La Ce Pr Nd Sm Eu Gd Tb Dy "
+    "Ho Er Tm Yb Lu Hf Ta W Re Os Ir Pt Au Hg Tl Pb Bi U".split()
+)
+# Interim list of common enzyme cofactors by CCD component id (hemes, flavins, nicotinamides, nucleotide cofactors,
+# CoA, SAM/SAH, PLP, ThDP, pterins, quinones, Fe-S clusters, chlorophylls). Unknown groups stay OTHER.
+COFACTOR_CCD = frozenset(
+    "HEM HEC HEA HEB HDD HAS DHE FAD FDA FMN RBF NAD NAI NAP NDP NDC NMN ATP ADP ANP ACP GTP GDP GNP GCP COA ACO SCA "
+    "SAM SAH SFG PLP PMP TPP TDP H4B BH4 HBI MTE MGD PQQ TPQ UQ1 UQ2 U10 PL9 MQ7 F43 SF4 FES F3S CLA CHL BCL BPH LPA "
+    "B12 CNC COB".split()
+)
+
+
+def _group_label(k) -> str:
+    return f"{k[0]}:{k[1].strip() or '_'}:{k[2]}{k[3].strip()}"
+
+
+def _min_dist(a: dict, site: list) -> float:
+    ax, ay, az = a["x"], a["y"], a["z"]
+    return math.sqrt(min((ax - x) ** 2 + (ay - y) ** 2 + (az - z) ** 2 for x, y, z in site))
+
+
+def classify_hetero(atoms: list[dict], site: list | None) -> dict:
+    """Classify every non-water hetero group of the selected model (all chains) as LIGAND (the submitted ligand
+    itself, matched by coordinates), METAL, COFACTOR or OTHER, with its distance to the submitted ligand."""
+    groups: dict = {}
+    for a in atoms:
+        if a["het"] and a["res"] not in limits.WATER_RESIDUES:
+            groups.setdefault((a["res"], a["chain"], a["seq"], a["icode"]), []).append(a)
+    out = {}
+    for k, members in groups.items():
+        if k[0] in COFACTOR_CCD:
+            cls = "COFACTOR"
+        elif any(m["el"] in METAL_ELEMENTS for m in members):
+            cls = "METAL"
+        else:
+            cls = "OTHER"
+        dist = None
+        if site:
+            dist = min(_min_dist(m, site) for m in members)
+            heavy = [m for m in members if m["el"] != "H"]
+            if heavy and len(heavy) <= len(site) and all(_min_dist(m, site) <= LIGAND_SELF_TOL_A for m in heavy):
+                cls = "LIGAND"
+        out[k] = {"cls": cls, "dist": dist, "inSite": dist is None or dist <= SITE_RADIUS_A}
+    return out
+
+
+def _site_decisions(hetero: dict, site: list | None, n: int) -> list[dict]:
+    """R.5: metal or cofactor in the site -> CHEMISTRY_UNSUPPORTED; other site groups are removed with an ack."""
+    critical = sorted((k for k, g in hetero.items() if g["cls"] in ("METAL", "COFACTOR") and g["inSite"]), key=lambda k: (k[1], k[2], k[3], k[0]))
+    if critical:
+        if site:
+            shown = ", ".join(f"{_group_label(k)} ({hetero[k]['cls']}, {hetero[k]['dist']:.2f} A)" for k in critical[:12])
+            where = f"within {SITE_RADIUS_A:.1f} A of the ligand"
+        else:
+            shown = ", ".join(f"{_group_label(k)} ({hetero[k]['cls']})" for k in critical[:12])
+            where = "possibly in the site (no submitted ligand coordinates, so the site is undetermined)"
+        raise Blocked("CHEMISTRY_UNSUPPORTED", f"{len(critical)} metal/cofactor groups {where}: {shown}; the interim profile cannot model them and will not delete them (AT-0057, AT-0131)")
+    other = sorted((k for k, g in hetero.items() if g["cls"] == "OTHER" and g["inSite"] and site), key=lambda k: (k[1], k[2], k[3], k[0]))
+    if not other:
+        return []
+    shown = ", ".join(f"{_group_label(k)} {hetero[k]['dist']:.2f} A" for k in other[:20]) + (f" (+{len(other) - 20} more)" if len(other) > 20 else "")
+    return [_decision("HETERO_SITE", f"{len(other)} non-metal, non-cofactor hetero groups within {SITE_RADIUS_A:.1f} A of the ligand are removed: {shown}", n, n, True)]
+
+
+def site_hetero_record(hetero: dict) -> list[dict]:
+    rows = [{"group": _group_label(k), "class": g["cls"], "distance": None if g["dist"] is None else round(g["dist"], 2), "inSite": g["inSite"]}
+            for k, g in sorted(hetero.items(), key=lambda kv: (kv[0][1], kv[0][2], kv[0][3], kv[0][0]))]
+    return rows[:500]
+
+
+def clean(text: str, opts: dict, site: list | None = None, hetero_out: list | None = None) -> tuple[list[dict], list[dict], list[str]]:
     atoms, models = parse_pdb(text)
     decisions, warnings = [], []
     n0 = len(atoms)
     if models > 1:
         atoms = [a for a in atoms if a["model"] == 1]
         decisions.append(_decision("MODEL", f"keep model 1 of {models}", n0, len(atoms), True))
+    # Classified on the whole selected model, before the chain filter: a metal in another chain can still be in the site.
+    hetero = classify_hetero(atoms, site)
+    decisions.extend(_site_decisions(hetero, site, len(atoms)))
+    if hetero_out is not None:
+        hetero_out.extend(site_hetero_record(hetero))
     chains = opts.get("chainIds")
     if chains:
         present = sorted({a["chain"] for a in atoms})
@@ -115,11 +194,13 @@ def clean(text: str, opts: dict) -> tuple[list[dict], list[dict], list[str]]:
             k = (a["res"], a["chain"], a["seq"], a["icode"])
             if k not in seen:
                 seen.add(k)
-                groups.append(f"{a['res']}:{a['chain'].strip() or '_'}:{a['seq']}")
+                g = hetero[k]
+                tag = "" if g["cls"] == "OTHER" else f" [{g['cls']}]"
+                groups.append(f"{_group_label(k)}{tag}")
         shown = ", ".join(groups[:20]) + (f" (+{len(groups) - 20} more)" if len(groups) > 20 else "")
         before = len(atoms)
         atoms = [a for a in atoms if not a["het"]]
-        decisions.append(_decision("HETERO", f"remove {len(groups)} hetero groups: {shown}", before, len(atoms), True))
+        decisions.append(_decision("HETERO", f"remove {len(groups)} hetero groups (none is a metal or cofactor in the site): {shown}", before, len(atoms), True))
     alts = [a for a in atoms if a["alt"] != " "]
     if alts:
         # Group by residue identity (chain, resSeq, iCode), not resName: microheterogeneity (alt A SER / alt B ALA)
@@ -276,13 +357,60 @@ def parse_pdbqt_atoms(pdbqt: str) -> list[dict]:
     return rows
 
 
-def prepare(text: str, opts: dict, workdir: str) -> dict:
-    atoms, decisions, warnings = clean(text, opts)
+HIS_NAMES = frozenset({"HIS", "HID", "HIE", "HIP", "HSD", "HSE", "HSP"})
+
+
+def his_states(out_atoms: list[dict], submitted: list[dict], protonation: str, site: list | None) -> list[dict]:
+    """R.6 / AT-0052: the HID/HIE/HIP microstate of every His, read from the ring-N hydrogens actually written,
+    with its source (submitted H, PROPKA or Meeko template) and whether it lies in the site."""
+    sub_h = {}
+    for a in submitted:
+        if a["res"] in HIS_NAMES and a["el"] == "H":
+            sub_h.setdefault((a["chain"], a["seq"], a["icode"]), set()).add(a["name"].strip())
+    res: dict = {}
+    for a in out_atoms:
+        if a["res"] in HIS_NAMES:
+            res.setdefault((a["chain"], a["seq"], a["icode"]), []).append(a)
+    rows = []
+    for k in sorted(res, key=lambda k: (k[0], k[1], k[2])):
+        names = {a["name"].strip() for a in res[k]}
+        d1, e2 = "HD1" in names, "HE2" in names
+        state = "HIP" if d1 and e2 else "HID" if d1 else "HIE" if e2 else "UNPROTONATED"
+        if protonation == "PROPKA_PREVIEW":
+            source = "PROPKA"
+        elif sub_h.get(k, set()) & {"HD1", "HE2"}:
+            source = "SUBMITTED_H"
+        else:
+            source = "MEEKO_TEMPLATE"
+        dist = None if not site else min(_min_dist(a, site) for a in res[k])
+        rows.append({"chain": k[0].strip() or "_", "resSeq": k[1], "iCode": k[2].strip(), "state": state, "source": source,
+                     "distance": None if dist is None else round(dist, 2), "inSite": dist is None or dist <= SITE_RADIUS_A})
+    return rows
+
+
+def _his_decisions(rows: list[dict], site: list | None, n: int) -> list[dict]:
+    if not rows:
+        return []
+    counts = {s: sum(1 for r in rows if r["state"] == s) for s in ("HID", "HIE", "HIP", "UNPROTONATED")}
+    sources = sorted({r["source"] for r in rows})
+    out = [_decision("HIS_STATES", f"{len(rows)} His: " + ", ".join(f"{v} {k}" for k, v in counts.items() if v) + f"; source {'/'.join(sources)}; per-residue list in plan.histidines",
+                     n, n, False)]
+    in_site = [r for r in rows if r["inSite"]]
+    if in_site:
+        where = f"within {SITE_RADIUS_A:.1f} A of the ligand" if site else "with an undetermined site (no submitted ligand coordinates)"
+        shown = ", ".join(f"{r['chain']}:{r['resSeq']}{r['iCode']}={r['state']}({r['source']})" for r in in_site[:20])
+        out.append(_decision("HIS_SITE_STATES", f"{len(in_site)} His {where}; confirm each microstate: {shown}", n, n, True))
+    return out
+
+
+def prepare(text: str, opts: dict, workdir: str, site: list | None = None) -> dict:
+    hetero_rows: list = []
+    atoms, decisions, warnings = clean(text, opts, site, hetero_rows)
     stages = []
     raw_sha = sha256_text(text)
     h_sub = _count_h(atoms)
     cleaned = write_pdb(atoms)
-    stages.append(stage("mole_prep.receptor_clean", "0.1.0", {"model": 1, "waters": "removed", "hetero": "removed", "altloc": "max-occupancy"},
+    stages.append(stage("mole_prep.receptor_clean", "0.1.0", {"model": 1, "waters": "removed", "hetero": "classified in an 8 A site; metal/cofactor in site UNSUPPORTED, others removed", "altloc": "max-occupancy"},
                         raw_sha, sha256_text(cleaned), [d["key"] for d in decisions]))
     generated = False
     current = cleaned
@@ -337,6 +465,8 @@ def prepare(text: str, opts: dict, workdir: str) -> dict:
         generated = True
         decisions.append(_decision("RECEPTOR_TEMPLATE_HYDROGENS", f"Meeko residue templates set hydrogens {h_in} -> {h_out} (generated, PREVIEW_UNQUALIFIED; protonation source {source})", n_atoms, len(out_atoms), True))
     decisions.append(_decision("RECEPTOR_CHARGES", "Gasteiger charges from Meeko residue templates", len(out_atoms), len(out_atoms), False))
+    histidines = his_states(out_atoms, atoms, protonation, site)
+    decisions.extend(_his_decisions(histidines, site, len(out_atoms)))
     stages.append(stage("meeko.receptor", tool_version("meeko"), {"templates": "default", "charge_model": "gasteiger(template)", "allow_bad_res": False},
                         sha256_text(current), sha256_text(rigid), ["RECEPTOR_CHARGES"]))
     pdbqt_atoms = parse_pdbqt_atoms(rigid)
@@ -344,5 +474,6 @@ def prepare(text: str, opts: dict, workdir: str) -> dict:
         "decisions": decisions, "warnings": warnings, "stages": stages, "generated": generated, "protonationSource": source,
         "pdbqt": rigid, "clean_pdb": prepared_pdb if prepared_pdb.endswith("\n") else prepared_pdb + "\n",
         "canonical": {"schemaVersion": 1, "subject": "receptor", "atoms": pdbqt_atoms, "bonds": None, "bondsSource": "UNAVAILABLE (residue templates; not exported in 5.2 part 1)"},
+        "histidines": histidines, "siteHetero": hetero_rows,
         "atoms": len(pdbqt_atoms), "hSubmitted": h_sub, "hAdded": max(0, h_out - h_in) if protonation != "PROPKA_PREVIEW" else max(0, h_out - h_sub),
     }

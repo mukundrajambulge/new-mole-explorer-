@@ -166,6 +166,105 @@
       "bytes": 38137644,
       "tracked": false,
       "purpose": "large ribosome entry, fetched not committed"
+    },
+    {
+      "name": "3HS4.pdb",
+      "pdbId": "3HS4",
+      "format": "pdb",
+      "url": "https://files.rcsb.org/download/3HS4.pdb",
+      "downloaded": "2026-10-09",
+      "sha256": "318c38f8cac9a06b3a42f9f9b1017421668f895621300b8d20abb3cdb254b6bb",
+      "bytes": 436185,
+      "tracked": true,
+      "purpose": "carbonic anhydrase II (Zn) + acetazolamide (AZM); metal in the binding site"
+    },
+    {
+      "name": "ccd-BTN.cif",
+      "pdbId": "BTN",
+      "format": "ccd-mmcif",
+      "url": "https://files.rcsb.org/ligands/download/BTN.cif",
+      "downloaded": "2026-10-09",
+      "sha256": "9fff069dc9e0387d49c3ef62cab0867a10dae56274931a779fb87f377b9c11ea",
+      "bytes": 9167,
+      "tracked": true,
+      "purpose": "CCD component (isomeric SMILES source for prep bond-order/stereo templates)"
+    },
+    {
+      "name": "ccd-STI.cif",
+      "pdbId": "STI",
+      "format": "ccd-mmcif",
+      "url": "https://files.rcsb.org/ligands/download/STI.cif",
+      "downloaded": "2026-10-09",
+      "sha256": "2829bd3174ecf9e9dff3e76c080017fe5436858aa3d65756e4078615020a728c",
+      "bytes": 13561,
+      "tracked": true,
+      "purpose": "CCD component (isomeric SMILES source for prep bond-order/stereo templates)"
+    },
+    {
+      "name": "ccd-0KP.cif",
+      "pdbId": "0KP",
+      "format": "ccd-mmcif",
+      "url": "https://files.rcsb.org/ligands/download/0KP.cif",
+      "downloaded": "2026-10-09",
+      "sha256": "235cc226d354cacb68be437e4b5a1c4138b03333d1ca4f328779f787f4015456",
+      "bytes": 8982,
+      "tracked": true,
+      "purpose": "CCD component (isomeric SMILES source for prep bond-order/stereo templates)"
+    },
+    {
+      "name": "ccd-TLA.cif",
+      "pdbId": "TLA",
+      "format": "ccd-mmcif",
+      "url": "https://files.rcsb.org/ligands/download/TLA.cif",
+      "downloaded": "2026-10-09",
+      "sha256": "476d446c857693871e8a26fd277cb0a1a5110b6c3db0dfb49bbe0499911bb871",
+      "bytes": 6535,
+      "tracked": true,
+      "purpose": "CCD component (isomeric SMILES source for prep bond-order/stereo templates)"
+    },
+    {
+      "name": "ccd-GAL.cif",
+      "pdbId": "GAL",
+      "format": "ccd-mmcif",
+      "url": "https://files.rcsb.org/ligands/download/GAL.cif",
+      "downloaded": "2026-10-09",
+      "sha256": "404cefc4700fba1eb89e24f7cdaf5b831138c7056cd796ed7ef24e82ce0bc45a",
+      "bytes": 9091,
+      "tracked": true,
+      "purpose": "CCD component (isomeric SMILES source for prep bond-order/stereo templates)"
+    },
+    {
+      "name": "ccd-BMA.cif",
+      "pdbId": "BMA",
+      "format": "ccd-mmcif",
+      "url": "https://files.rcsb.org/ligands/download/BMA.cif",
+      "downloaded": "2026-10-09",
+      "sha256": "3663ac87ab4fbdab73c7c80915c1e0d15cac7e61f3f43f14df9eb3d5261974b8",
+      "bytes": 9034,
+      "tracked": true,
+      "purpose": "CCD component (isomeric SMILES source for prep bond-order/stereo templates)"
+    },
+    {
+      "name": "ccd-NAG.cif",
+      "pdbId": "NAG",
+      "format": "ccd-mmcif",
+      "url": "https://files.rcsb.org/ligands/download/NAG.cif",
+      "downloaded": "2026-10-09",
+      "sha256": "eada750ebb20e7abd76ef486c0a8278e461309e1cdde415545bb1c63c09bfb0f",
+      "bytes": 11333,
+      "tracked": true,
+      "purpose": "CCD component (isomeric SMILES source for prep bond-order/stereo templates)"
+    },
+    {
+      "name": "ccd-AZM.cif",
+      "pdbId": "AZM",
+      "format": "ccd-mmcif",
+      "url": "https://files.rcsb.org/ligands/download/AZM.cif",
+      "downloaded": "2026-10-09",
+      "sha256": "9afddb10dce8ffc0a481c46ee659eae0adfc75e42eb92388a5d4165d49ec7445",
+      "bytes": 7019,
+      "tracked": true,
+      "purpose": "CCD component (isomeric SMILES source for prep bond-order/stereo templates)"
     }
   ]
 }

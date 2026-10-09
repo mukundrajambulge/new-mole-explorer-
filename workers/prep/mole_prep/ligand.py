@@ -46,7 +46,7 @@ def _check_bond_orders(mol, what: str) -> None:
 
 
 def load(text: str, fmt: str, template: str | None):
-    """Return (mol, source decision text, decisions). Never perceives bond orders from geometry."""
+    """Return (mol, decisions, stereo record). Never perceives bond orders or stereo from geometry alone."""
     from rdkit import Chem
 
     decisions = []
@@ -105,8 +105,24 @@ def load(text: str, fmt: str, template: str | None):
             Chem.SanitizeMol(mol)
         except Exception as e:
             raise Blocked("SANITIZE_FAILED", f"templated ligand chemistry is invalid: {type(e).__name__}") from None
-        Chem.AssignStereochemistryFrom3D(mol)
         decisions.append(_decision("LIGAND_BOND_ORDERS", "bond orders and formal charges from the supplied SMILES template (submitted PDB hydrogens replaced by template hydrogens)", n_sub, mol.GetNumAtoms(), True))
+        # R.4 / AT-0063: stereo comes from the isomeric template (CCD SMILES), never from the PDB geometry alone.
+        # The coordinates are only checked against it.
+        tpl_elems = stereo_elements(tpl, lambda i: _atom_label(mol, match[i]))
+        _require_defined(tpl_elems, "ligand template SMILES (use the CCD isomeric SMILES)")
+        Chem.AssignStereochemistryFrom3D(mol)
+        mol_elems = {e["key"]: e for e in stereo_elements(mol, lambda i: _atom_label(mol, i))}
+        bad = []
+        for e in tpl_elems:
+            if e["hOnly"]:
+                continue
+            key = tuple(sorted(match[i] for i in e["key"]))
+            got = mol_elems.get(key)
+            if got is None or got["label"] != e["label"]:
+                bad.append(f"{'/'.join(e['atoms'])} template {e['label']}, coordinates {got['label'] if got else 'none'}")
+        if bad:
+            raise Blocked("STEREO_MISMATCH", f"ligand coordinates contradict the template stereo: {'; '.join(bad[:8])}")
+        stereo = _stereo_record("ISOMERIC_SMILES_TEMPLATE", "isomeric SMILES template (CCD); PDB coordinates agree", tpl_elems)
     else:
         _check_bond_orders(mol, "ligand")
         try:
@@ -115,8 +131,76 @@ def load(text: str, fmt: str, template: str | None):
             raise Blocked("SANITIZE_FAILED", f"ligand chemistry is invalid: {type(e).__name__}") from None
         if mol.GetNumConformers() and mol.GetConformer().Is3D():
             Chem.AssignStereochemistryFrom3D(mol)
+            src, what = "SUBMITTED_3D", f"3D coordinates of the submitted {fmt.upper()} file"
+        elif fmt == "smi":
+            Chem.AssignStereochemistry(mol, cleanIt=True, force=True)
+            src, what = "ISOMERIC_SMILES", "submitted isomeric SMILES"
+        else:  # 2D molfile: wedge/hash bonds and the 2D layout only
+            Chem.AssignChiralTypesFromBondDirs(mol)
+            Chem.DetectBondStereochemistry(mol)
+            Chem.AssignStereochemistry(mol, cleanIt=True, force=True)
+            src, what = "SUBMITTED_2D_WEDGES", f"wedge bonds of the submitted 2D {fmt.upper()} file"
+        elems = stereo_elements(mol, lambda i: _atom_label(mol, i))
+        _require_defined(elems, what)
+        stereo = _stereo_record(src, what, elems)
         decisions.append(_decision("LIGAND_BOND_ORDERS", f"explicit bond orders from the submitted {fmt.upper()} file", mol.GetNumAtoms(), mol.GetNumAtoms(), False))
-    return mol, decisions
+    n = mol.GetNumAtoms()
+    material = [e for e in stereo["elements"] if not e["hOnly"]]
+    shown = ", ".join(f"{'/'.join(e['atoms'])}={e['label']}" for e in material) or "none"
+    decisions.append(_decision("LIGAND_STEREO", f"{len(material)} stereo elements from the {stereo['detail']}: {shown}", n, n, False))
+    h_only = [e for e in stereo["elements"] if e["hOnly"]]
+    if h_only:
+        decisions.append(_decision("LIGAND_STEREO_H_ONLY", f"{len(h_only)} double bonds whose E/Z only places a hydrogen are undefined in the source ({', '.join('/'.join(e['atoms']) for e in h_only)}); "
+                                   "the hydrogen position is generated (PREVIEW_UNQUALIFIED)", n, n, True))
+    return mol, decisions, stereo
+
+
+def _atom_label(mol, idx: int) -> str:
+    info = mol.GetAtomWithIdx(idx).GetPDBResidueInfo()
+    name = info.GetName().strip() if info is not None else ""
+    return name or f"{mol.GetAtomWithIdx(idx).GetSymbol()}#{idx + 1}"
+
+
+def stereo_elements(mol, label) -> list[dict]:
+    """Every potential stereo element (RDKit FindPotentialStereo) with its CIP label, or 'UNDEFINED'.
+
+    hOnly marks double bonds where one end carries only hydrogens (for example C=N-H): their E/Z
+    places a hydrogen, not a heavy atom, so it is reported but does not block."""
+    from rdkit import Chem
+    from rdkit.Chem import rdCIPLabeler
+
+    m = Chem.Mol(mol)
+    rdCIPLabeler.AssignCIPLabels(m)
+    out = []
+    for s in Chem.FindPotentialStereo(m, cleanIt=True, flagPossible=True):
+        specified = s.specified == Chem.StereoSpecified.Specified
+        if s.type == Chem.StereoType.Atom_Tetrahedral:
+            a = m.GetAtomWithIdx(s.centeredOn)
+            code = a.GetProp("_CIPCode") if a.HasProp("_CIPCode") else ("DEFINED" if specified else "")
+            out.append({"kind": "TETRAHEDRAL", "key": (s.centeredOn,), "atoms": [label(s.centeredOn)], "label": code if specified and code else "UNDEFINED", "hOnly": False})
+        elif s.type == Chem.StereoType.Bond_Double:
+            b = m.GetBondWithIdx(s.centeredOn)
+            i, j = b.GetBeginAtomIdx(), b.GetEndAtomIdx()
+            h_only = any(all(n.GetAtomicNum() == 1 or n.GetIdx() == other for n in m.GetAtomWithIdx(end).GetNeighbors())
+                         for end, other in ((i, j), (j, i)))
+            code = b.GetProp("_CIPCode") if b.HasProp("_CIPCode") else ("DEFINED" if specified else "")
+            out.append({"kind": "DOUBLE_BOND", "key": tuple(sorted((i, j))), "atoms": [label(i), label(j)], "label": code if specified and code else "UNDEFINED", "hOnly": h_only})
+        else:
+            out.append({"kind": str(s.type).split(".")[-1].upper(), "key": (s.centeredOn,), "atoms": [label(s.centeredOn)],
+                        "label": "DEFINED" if specified else "UNDEFINED", "hOnly": False})
+    return sorted(out, key=lambda e: e["key"])
+
+
+def _require_defined(elems: list[dict], what: str) -> None:
+    undefined = [e for e in elems if e["label"] == "UNDEFINED" and not e["hOnly"]]
+    if undefined:
+        shown = ", ".join(f"{e['kind'].lower()} {'/'.join(e['atoms'])}" for e in undefined[:12])
+        raise Blocked("STEREO_UNDEFINED", f"{len(undefined)} stereo elements are undefined in the {what}: {shown}; stereo is never inferred (AT-0063)")
+
+
+def _stereo_record(source: str, detail: str, elems: list[dict]) -> dict:
+    return {"source": source, "detail": detail,
+            "elements": [{"kind": e["kind"], "atoms": e["atoms"], "label": e["label"], "hOnly": e["hOnly"]} for e in elems][:128]}
 
 
 def _apply_dimorphite(mol, ph: float):
@@ -172,12 +256,17 @@ def prepare(text: str, fmt: str, template: str | None, opts: dict) -> dict:
     from rdkit import Chem
     from rdkit.Chem import AllChem
 
-    mol, decisions = load(text, fmt, template)
+    mol, decisions, stereo = load(text, fmt, template)
     warnings: list[str] = []
     stages = []
     generated = False
     in_sha = sha256_text(text + ("\n#template\n" + template if template is not None else ""))
     has3d = mol.GetNumConformers() > 0 and mol.GetConformer().Is3D()
+    # Binding-site reference for the receptor (R.5/R.6): submitted heavy-atom coordinates only, never generated ones.
+    site = None
+    if has3d:
+        conf0 = mol.GetConformer()
+        site = [tuple(conf0.GetAtomPosition(a.GetIdx())) for a in mol.GetAtoms() if a.GetAtomicNum() > 1]
     n_before = mol.GetNumAtoms()
     tautomer = "AS_SUBMITTED"
     if opts["ligandProtonation"] == "DIMORPHITE_PREVIEW":
@@ -258,5 +347,5 @@ def prepare(text: str, fmt: str, template: str | None, opts: dict) -> dict:
     return {
         "decisions": decisions, "warnings": warnings, "stages": stages, "generated": generated, "tautomer": tautomer,
         "pdbqt": pdbqt, "sdf": sdf, "canonical": canonical, "atoms": mol.GetNumAtoms(), "hAdded": h_added,
-        "formalCharge": Chem.GetFormalCharge(mol), "embedded": embedded, "torsions": torsions,
+        "formalCharge": Chem.GetFormalCharge(mol), "embedded": embedded, "torsions": torsions, "stereo": stereo, "site": site,
     }

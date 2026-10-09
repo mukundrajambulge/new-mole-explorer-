@@ -112,6 +112,33 @@ export const PrepDecisionSchema = z
   })
   .strict();
 
+/** R.4: where the ligand stereo came from and every stereo element's assignment (never inferred from PDB geometry alone). */
+export const PrepLigandStereoSchema = z
+  .object({
+    source: z.enum(["ISOMERIC_SMILES_TEMPLATE", "ISOMERIC_SMILES", "SUBMITTED_3D", "SUBMITTED_2D_WEDGES"]),
+    detail: shortText,
+    elements: z
+      .array(z.object({ kind: z.string().min(1).max(32), atoms: z.array(z.string().min(1).max(16)).min(1).max(2), label: z.string().min(1).max(16), hOnly: z.boolean() }).strict())
+      .max(128),
+  })
+  .strict();
+/** R.5: each hetero group of the selected model, classified, with its distance to the submitted ligand (null: site undetermined). */
+export const PrepSiteHeteroSchema = z
+  .object({ group: z.string().min(1).max(24), class: z.enum(["LIGAND", "METAL", "COFACTOR", "OTHER"]), distance: finite.min(0).nullable(), inSite: z.boolean() })
+  .strict();
+/** R.6: the microstate written for every His and its source. */
+export const PrepHistidineSchema = z
+  .object({
+    chain: z.string().min(1).max(1),
+    resSeq: z.number().int(),
+    iCode: z.string().max(1),
+    state: z.enum(["HID", "HIE", "HIP", "UNPROTONATED"]),
+    source: z.enum(["SUBMITTED_H", "MEEKO_TEMPLATE", "PROPKA"]),
+    distance: finite.min(0).nullable(),
+    inSite: z.boolean(),
+  })
+  .strict();
+
 export const PrepPlanV1Schema = z
   .object({
     schemaVersion: z.literal(1),
@@ -127,7 +154,8 @@ export const PrepPlanV1Schema = z
     warnings: z.array(shortText).max(JOB_CAPS.diagnosticsMax),
     planDigest: hex64,
     // 5.2 worker fields (optional for older producers; the worker always writes them).
-    status: z.enum(["READY", "BLOCKED"]).optional(),
+    // UNSUPPORTED: chemistry the profile cannot model (CHEMISTRY_UNSUPPORTED, e.g. a metal or cofactor in the site; R.5).
+    status: z.enum(["READY", "BLOCKED", "UNSUPPORTED"]).optional(),
     diagnostics: z.array(shortText).max(JOB_CAPS.diagnosticsMax).optional(),
     profileId: z.literal(PREP_PROFILE_ID).optional(),
     qualification: z.enum(PREP_QUALIFICATION).optional(),
@@ -138,6 +166,10 @@ export const PrepPlanV1Schema = z
       .object({ receptorSha256: hex64.nullable(), ligandSha256: hex64.nullable(), ligandTemplateSha256: hex64.nullable() })
       .strict()
       .optional(),
+    // R.4-R.6 evidence (worker writes them on READY plans).
+    ligandStereo: PrepLigandStereoSchema.optional(),
+    siteHetero: z.array(PrepSiteHeteroSchema).max(500).optional(),
+    histidines: z.array(PrepHistidineSchema).max(2000).optional(),
   })
   .strict();
 export type PrepPlanV1 = z.infer<typeof PrepPlanV1Schema>;

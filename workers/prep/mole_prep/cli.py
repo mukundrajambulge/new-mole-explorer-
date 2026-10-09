@@ -4,7 +4,7 @@
   python -I <worker>/run_prep.py --apply           reads job.json, plan.json, confirmation.json; writes out/* and prep-manifest.json
   python -I <worker>/run_prep.py --versions        prints the installed tool versions, worker version and lock digest (JSON)
 
-Exit codes: 0 READY/PREPARED, 3 BLOCKED (plan.json / prep-manifest.json say why), 2 usage or job file error, 1 internal error.
+Exit codes: 0 READY/PREPARED, 3 BLOCKED or UNSUPPORTED (plan.json / prep-manifest.json say why), 2 usage or job file error, 1 internal error.
 The worker never seals anything; the API re-hashes every output and seals with server-side profiles.
 """
 from __future__ import annotations
@@ -98,7 +98,7 @@ def run_pipeline(root: str, job: dict) -> dict:
     lig_text = limits.decode_ascii(lig_raw, "ligand")
     tpl = None if tpl_raw is None else limits.decode_ascii(tpl_raw, "ligand template")
     lig = ligand.prepare(lig_text, job["ligand"]["format"], tpl, opts)
-    rec = receptor.prepare(rec_text, opts, os.path.join(root, "work"))
+    rec = receptor.prepare(rec_text, opts, os.path.join(root, "work"), lig["site"])
     return {"rec": rec, "lig": lig, "opts": opts, "inputs": inputs}
 
 
@@ -138,12 +138,18 @@ def build_plan(job: dict, result: dict | None, blocked: Blocked | None, inputs: 
         plan["rotatableBonds"] = lig["torsions"]
         plan["tautomer"] = lig["tautomer"]
         plan["protonationSource"] = rec["protonationSource"]
+        # R.4-R.6 evidence: ligand stereo source and assignments, site hetero classification, every His microstate.
+        plan["ligandStereo"] = lig["stereo"]
+        plan["siteHetero"] = rec["siteHetero"]
+        plan["histidines"] = rec["histidines"][:2000]
         plan["status"] = "READY"
         # Owner rule: ANY generated hydrogens, charges states or coordinates -> PREVIEW_UNQUALIFIED.
         if preview or rec["generated"] or lig["generated"]:
             plan["qualification"] = "PREVIEW_UNQUALIFIED"
     if blocked is not None:
         plan["diagnostics"] = [blocked.diagnostic()]
+        if blocked.code == "CHEMISTRY_UNSUPPORTED":
+            plan["status"] = "UNSUPPORTED"
     plan["planDigest"] = plan_digest(plan, plan["lockDigest"])
     return plan
 
