@@ -208,25 +208,68 @@ export function resolveVinaPath({ platform = process.platform, env = process.env
   return `${home}/mole-tools/vina`;
 }
 
+/**
+ * Fixed pidfile wrapper (task 5.4): setsid -w makes a new session (forking if needed, waiting for it), the inner sh writes its pid (= pgid, kept by
+ * exec) to the pidfile given as $1, then execs the timeout command. Positional args only, nothing interpolated.
+ */
+export const PIDFILE_WRAPPER = ["/usr/bin/setsid", "-w", "/bin/sh", "-c", 'echo $$ > "$1"; shift; exec "$@"', "sh"];
+
 /** {command,args,options} for one engine-side program under timeout + env -i. Exported for tests. */
-export function buildEngineInvocation({ program, args, cwd, timeoutMs, platform = process.platform }) {
+export function buildEngineInvocation({ program, args, cwd, timeoutMs, platform = process.platform, pidfile }) {
   if (!SAFE_POSIX_PATH.test(program)) throw engine("VINA_UNAVAILABLE", "engine path rejected");
   const secs = String(Math.max(1, Math.ceil(timeoutMs / 1000)));
   if (platform === "win32") {
     const wslCwd = toWslPath(cwd);
+    const wslPid = pidfile ? toWslPath(pidfile) : null;
+    if (wslPid !== null && !SAFE_POSIX_PATH.test(wslPid)) throw engine("VINA_UNAVAILABLE", "pidfile path rejected");
     return {
       command: "wsl.exe",
-      args: ["-d", PREP_DISTRO, "--cd", wslCwd, "--exec", "/usr/bin/timeout", "-k", "5", secs, "/usr/bin/env", "-i", ...ENGINE_ENV, program, ...args],
+      args: ["-d", PREP_DISTRO, "--cd", wslCwd, "--exec", ...(wslPid ? [...PIDFILE_WRAPPER, wslPid] : []), "/usr/bin/timeout", "-k", "5", secs, "/usr/bin/env", "-i", ...ENGINE_ENV, program, ...args],
       options: { cwd, shell: false, windowsHide: true, env: { SystemRoot: process.env.SystemRoot || "C:\\Windows", WSLENV: "" } },
-      scrub: [cwd, wslCwd, REPO_ROOT],
+      scrub: [cwd, wslCwd, REPO_ROOT, ...(wslPid ? [wslPid] : [])],
     };
   }
+  if (pidfile && !SAFE_POSIX_PATH.test(pidfile)) throw engine("VINA_UNAVAILABLE", "pidfile path rejected");
+  const pre = pidfile ? [...PIDFILE_WRAPPER, pidfile] : [];
   return {
-    command: "/usr/bin/timeout",
-    args: ["-k", "5", secs, "/usr/bin/env", "-i", ...ENGINE_ENV, program, ...args],
+    command: pidfile ? pre[0] : "/usr/bin/timeout",
+    args: [...pre.slice(1), ...(pidfile ? ["/usr/bin/timeout"] : []), "-k", "5", secs, "/usr/bin/env", "-i", ...ENGINE_ENV, program, ...args],
     options: { cwd, shell: false, env: {} },
     scrub: [cwd, REPO_ROOT],
   };
+}
+
+/** Read a pidfile written by PIDFILE_WRAPPER: digits only (else null). */
+export function readPidfile(pidfile) {
+  try {
+    const s = readFileSync(pidfile, "utf8").trim();
+    if (!/^[0-9]{1,9}$/.test(s)) return null;
+    const n = Number(s);
+    return n > 1 ? n : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Kill the engine's process group named by the pidfile (async; never throws). The group is killed only when
+ * /proc/<pgid>/cwd is still the job's out dir, so a reused pid is never hit. Polls briefly for a late pidfile.
+ */
+export async function killEngineGroup({ pidfile, cwd, platform = process.platform, waitMs = 1000 }) {
+  let pgid = readPidfile(pidfile);
+  for (const t0 = Date.now(); pgid === null && Date.now() - t0 < waitMs; pgid = readPidfile(pidfile)) await new Promise((r) => setTimeout(r, 50));
+  if (pgid === null) return { killed: false, reason: "NO_PIDFILE" };
+  const script = '[ "$(readlink /proc/$1/cwd)" = "$2" ] && exec /bin/kill -KILL -- "-$1"';
+  if (platform === "win32") {
+    const wslCwd = toWslPath(cwd);
+    const r = await runProcess(
+      { command: "wsl.exe", args: ["-d", PREP_DISTRO, "--exec", "/bin/sh", "-c", script, "sh", String(pgid), wslCwd], options: { shell: false, windowsHide: true, env: { SystemRoot: process.env.SystemRoot || "C:\\Windows", WSLENV: "" } } },
+      { timeoutMs: 15_000, platform },
+    );
+    return { killed: r.status === "OK", pgid };
+  }
+  const r = await runProcess({ command: "/bin/sh", args: ["-c", script, "sh", String(pgid), realpathSync(cwd)], options: { shell: false, env: {} } }, { timeoutMs: 10_000, platform });
+  return { killed: r.status === "OK", pgid };
 }
 
 
@@ -273,8 +316,12 @@ export function createVinaEngine({ platform = process.platform, env = process.en
       if (v.status !== "OK" || !line.includes(`v${pin.version}`)) throw engine("VINA_VERSION_MISMATCH", `Vina does not report v${pin.version}`);
       return { vina, binarySha256: got[1], versionLine: line.slice(0, 80) };
     },
-    async dock(outDir, job, verified, { signal } = {}) {
-      const inv = buildEngineInvocation({ program: verified.vina, args: vinaArgs(job), cwd: outDir, timeoutMs: job.timeoutMs, platform });
+    /** Group kill for a cancelled or orphaned run (task 5.4). */
+    killGroup(pidfile, outDir) {
+      return killEngineGroup({ pidfile, cwd: outDir, platform });
+    },
+    async dock(outDir, job, verified, { signal, pidfile } = {}) {
+      const inv = buildEngineInvocation({ program: verified.vina, args: vinaArgs(job), cwd: outDir, timeoutMs: job.timeoutMs, platform, pidfile });
       const r = await runProcess(inv, { timeoutMs: job.timeoutMs + 10_000, signal, platform });
       const timedOut = r.status === "TIMEOUT" || r.exitCode === 124 || r.exitCode === 137;
       if (timedOut) throw engine("VINA_TIMEOUT", `Vina exceeded ${job.timeoutMs} ms`);
@@ -321,7 +368,14 @@ const writeJson = (dir, name, obj) => {
 /**
  * Run one job. Returns {exitCode, result?, error?}; never throws. `engine` is injectable for tests.
  */
-export async function runDockJob({ input, out, root }, { engineImpl, signal } = {}) {
+export async function runDockJob({ input, out, root }, { engineImpl, signal, pidfile, onStage } = {}) {
+  const stage = (name) => {
+    try {
+      onStage?.(name);
+    } catch {
+      /* a progress hook never breaks the run */
+    }
+  };
   const t0 = Date.now();
   let outDir = null;
   try {
@@ -343,7 +397,10 @@ export async function runDockJob({ input, out, root }, { engineImpl, signal } = 
     writeFileSync(join(outDir, "job.json"), raw);
     const verified = await eng.verify(outDir, pin);
     const tVerified = Date.now();
-    const docked = await eng.dock(outDir, job, verified, { signal });
+    if (signal?.aborted) throw engine("CANCELLED", "the job was cancelled");
+    stage("dock");
+    const docked = await eng.dock(outDir, job, verified, { signal, pidfile });
+    stage("docked");
     const posesPath = join(outDir, "poses.pdbqt");
     if (!existsSync(posesPath)) throw engine("VINA_NO_OUTPUT", "Vina wrote no poses");
     const posesBuf = readCapped(posesPath, POSES_CAP, "poses.pdbqt");
