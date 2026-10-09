@@ -81,6 +81,8 @@ const serve = async (store: PrepJobStore) => {
 };
 
 const PLAN_BODY = { receptorArtifactId: "r1crn", ligandArtifactId: "lethanol", pH: 7.4 };
+/** PLAN_BODY as the route parses it (schema defaults applied); store.plan takes a parsed request. */
+const PLAN_REQ = { ...PLAN_BODY, protonation: "EXPLICIT_SUBMITTED", ligandProtonation: "EXPLICIT_SUBMITTED", keepWaters: false, addMissingAtoms: false } as const;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test JSON is checked by assertions
 const acksOf = (state: Record<string, any>) => (state.plan.decisions as { key: string; requiresAck: boolean }[]).filter((d) => d.requiresAck).map((d) => d.key);
 
@@ -150,7 +152,7 @@ describe("prep job store and routes (5.2b)", () => {
 
   it("rejects a tampered manifest and outputs written by the worker", async () => {
     const store = makeStore({ runner: replayRunner((dir) => writeFileSync(join(dir, "out", "receptor.pdbqt"), "tampered\n")) });
-    const p = await store.plan(PLAN_BODY as never);
+    const p = await store.plan(PLAN_REQ as never);
     const { done } = store.confirm(p.jobId, { jobId: p.jobId, planDigest: p.plan!.planDigest, acks: acksOf(p as never) });
     const f = await done;
     expect(f.state).toBe("FAILED");
@@ -158,7 +160,7 @@ describe("prep job store and routes (5.2b)", () => {
     expect(f.seal?.reasonCodes).toContain("OUTPUT_TAMPERED");
 
     const store2 = makeStore();
-    const p2 = await store2.plan(PLAN_BODY as never);
+    const p2 = await store2.plan(PLAN_REQ as never);
     const ok = await store2.confirm(p2.jobId, { jobId: p2.jobId, planDigest: p2.plan!.planDigest, acks: acksOf(p2 as never) }).done;
     expect(ok.state).toBe("SUCCEEDED");
     const mp = join(store2.jobDir(p2.jobId), "prep-manifest.json");
@@ -203,13 +205,13 @@ describe("prep job store and routes (5.2b)", () => {
       return mod.runProcess({ command: process.execPath, args: ["-e", script], options: { cwd: dir, shell: false, env: {} }, scrub: [dir] }, { timeoutMs });
     };
     const crash = makeStore({ runner: nodeRun(`process.stderr.write("boom at " + process.cwd()); process.exit(1)`, 20_000) });
-    const p = await crash.plan(PLAN_BODY as never);
+    const p = await crash.plan(PLAN_REQ as never);
     const f = await crash.confirm(p.jobId, { jobId: p.jobId, planDigest: p.plan!.planDigest, acks: acksOf(p as never) }).done;
     expect(f.state).toBe("FAILED");
     expect(f.error).toContain("APPLY_FAILED: FAILED");
     expect(f.error).not.toContain(crash.root);
     const slow = makeStore({ runner: nodeRun("setTimeout(() => {}, 60000)", 500) });
-    const p2 = await slow.plan(PLAN_BODY as never);
+    const p2 = await slow.plan(PLAN_REQ as never);
     const f2 = await slow.confirm(p2.jobId, { jobId: p2.jobId, planDigest: p2.plan!.planDigest, acks: acksOf(p2 as never) }).done;
     expect(f2.state).toBe("FAILED");
     expect(f2.error).toContain("TIMEOUT");
@@ -218,7 +220,7 @@ describe("prep job store and routes (5.2b)", () => {
     let release: () => void = () => {};
     const hang: PrepRunner = async (mode, dir) => (mode === "plan" ? replayRunner()(mode, dir) : new Promise((r) => (release = () => r({ status: "FAILED", stderr: "" }))));
     const store = makeStore({ runner: hang });
-    const p3 = await store.plan(PLAN_BODY as never);
+    const p3 = await store.plan(PLAN_REQ as never);
     store.confirm(p3.jobId, { jobId: p3.jobId, planDigest: p3.plan!.planDigest, acks: acksOf(p3 as never) });
     expect(store.get(p3.jobId).state).toBe("APPLYING");
     const reborn = new PrepJobStore({ root: store.root, resolveArtifact: resolver, runner: replayRunner() });
@@ -229,7 +231,7 @@ describe("prep job store and routes (5.2b)", () => {
 
     let t = Date.now();
     const ttl = makeStore({ now: () => t });
-    const p4 = await ttl.plan(PLAN_BODY as never);
+    const p4 = await ttl.plan(PLAN_REQ as never);
     t += 31 * 60_000;
     expect(ttl.get(p4.jobId).state).toBe("EXPIRED");
     expect(() => ttl.confirm(p4.jobId, { jobId: p4.jobId, planDigest: p4.plan!.planDigest, acks: [] })).toThrow(/can no longer be confirmed/);
@@ -239,8 +241,8 @@ describe("prep job store and routes (5.2b)", () => {
     let release: () => void = () => {};
     const gate: PrepRunner = (mode, dir) => new Promise((r) => (release = () => void replayRunner()(mode, dir).then(r)));
     const store = makeStore({ runner: gate });
-    const first = store.plan(PLAN_BODY as never);
-    await expect(store.plan(PLAN_BODY as never)).rejects.toMatchObject({ code: "BUSY", httpStatus: 429 });
+    const first = store.plan(PLAN_REQ as never);
+    await expect(store.plan(PLAN_REQ as never)).rejects.toMatchObject({ code: "BUSY", httpStatus: 429 });
     release();
     expect((await first).state).toBe("AWAITING_CONFIRMATION");
 
@@ -250,7 +252,7 @@ describe("prep job store and routes (5.2b)", () => {
     expect(checkPrepPins({ ...files, wslSetup: files.wslSetup.replace(/f31f774f/g, "00000000") }).mismatches).toContain("VINA_SHA256");
     expect(checkPrepPins({ ...files, requirementsIn: files.requirementsIn.replace("meeko==0.8.0", "meeko==0.9.0") }).mismatches).toContain("PIN:meeko");
     const bad = makeStore({ pins: () => ({ ok: false, lockDigest: "", mismatches: ["LOCK_DIGEST"] }) });
-    await expect(bad.plan(PLAN_BODY as never)).rejects.toMatchObject({ code: "PROVENANCE_REPLAY" });
+    await expect(bad.plan(PLAN_REQ as never)).rejects.toMatchObject({ code: "PROVENANCE_REPLAY" });
     expect(existsSync(join(FX, "prep-manifest.json"))).toBe(true);
   });
 
@@ -289,14 +291,14 @@ describe("prep job store and routes (5.2b)", () => {
     const drifted = new PrepJobStore({ root: mkdtempSync(join(tmpdir(), "prepjobs-")), resolveArtifact: resolver, runner: replayRunner(), installedTools: check });
     roots.push(drifted.root);
     drifted.init();
-    await expect(drifted.plan(PLAN_BODY as never)).rejects.toMatchObject({ code: "PROVENANCE_REPLAY", httpStatus: 503 });
+    await expect(drifted.plan(PLAN_REQ as never)).rejects.toMatchObject({ code: "PROVENANCE_REPLAY", httpStatus: 503 });
 
     // Manifest stages of every real fixture run the pinned tools; any version off TOOLS.md is named.
-    for (const fx of ["prep-1crn-ethanol", "prep-1d3z-ethanolh", "prep-1d3z-ethanolh-propka"]) {
+    for (const fx of ["prep-1crn-ethanol", "prep-1d3z-sti-ideal", "prep-1iep-a-sti", "prep-1iep-a-sti-propka"]) {
       const m = readJson(join(here, "fixtures", fx, "prep-manifest.json")) as { stages: { tool: string; version: string; params: Record<string, unknown> }[] };
       expect(checkStageVersions(m.stages, pins), fx).toEqual([]);
     }
-    const stages = (readJson(join(here, "fixtures", "prep-1d3z-ethanolh-propka", "prep-manifest.json")) as { stages: { tool: string; version: string }[] }).stages;
+    const stages = (readJson(join(here, "fixtures", "prep-1iep-a-sti-propka", "prep-manifest.json")) as { stages: { tool: string; version: string }[] }).stages;
     expect(checkStageVersions(stages.map((s) => (s.tool === "pdb2pqr+propka" ? { ...s, version: "3.7.1/3.6.0" } : s)), pins)).toEqual(["TOOL_VERSION_DRIFT:pdb2pqr+propka"]);
     expect(checkStageVersions([...stages, { tool: "openbabel", version: "3.1.1" }], pins)).toEqual(["TOOL_VERSION_DRIFT:openbabel"]);
     expect(checkStageVersions([{ tool: "pdbfixer", version: "1.12.0", params: { openmm: "8.7.0" } }], pins)).toEqual(["TOOL_VERSION_DRIFT:openmm"]);

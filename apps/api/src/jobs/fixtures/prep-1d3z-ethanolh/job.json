@@ -1,1 +1,0 @@
-{"schemaVersion":1,"jobId":"fixture-interim-ethanol","receptor":{"artifactId":"rinterim","relPath":"in/receptor.pdb","format":"pdb"},"ligand":{"artifactId":"lethanolh","relPath":"in/ligand.sdf","format":"sdf"},"options":{"pH":7.4,"protonation":"EXPLICIT_SUBMITTED","ligandProtonation":"EXPLICIT_SUBMITTED","chainIds":null,"keepWaters":false,"addMissingAtoms":false}}

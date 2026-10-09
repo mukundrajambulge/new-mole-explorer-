@@ -1,0 +1,1 @@
+{"schemaVersion":1,"jobId":"fixture-prep-1d3z-sti-ideal","receptor":{"artifactId":"rfixture","relPath":"in/receptor.pdb","format":"pdb"},"ligand":{"artifactId":"lfixture","relPath":"in/ligand.sdf","format":"sdf"},"options":{"pH":7.4,"ligandProtonation":"EXPLICIT_SUBMITTED","keepWaters":false,"addMissingAtoms":false,"protonation":"EXPLICIT_SUBMITTED","chainIds":null}}

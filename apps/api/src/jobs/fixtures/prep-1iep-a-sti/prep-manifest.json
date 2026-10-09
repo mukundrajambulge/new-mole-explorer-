@@ -1,0 +1,131 @@
+{
+ "diagnostics": [
+  "1 missing heavy/terminal atoms were not added; Meeko templates may reject affected residues"
+ ],
+ "jobId": "fixture-prep-1iep-a-sti",
+ "lockDigest": "e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9",
+ "outputs": [
+  {
+   "bytes": 215920,
+   "relPath": "out/receptor.pdbqt",
+   "role": "RECEPTOR_PDBQT",
+   "sha256": "44e57740d5b31dd546bc837df60f69e18093bf69c070a2491351d853681bf89e"
+  },
+  {
+   "bytes": 352640,
+   "relPath": "out/receptor.clean.pdb",
+   "role": "RECEPTOR_CLEAN",
+   "sha256": "744b3f7177c9b4e9f52093b3d523a939309aa9a151aa9c655a9b5422746a6b73"
+  },
+  {
+   "bytes": 431136,
+   "relPath": "out/receptor.canonical.json",
+   "role": "CANONICAL_JSON",
+   "sha256": "63476190e2897ff628fae394b777fb75f9651eda846020513a7aeb701cc51e80"
+  },
+  {
+   "bytes": 3751,
+   "relPath": "out/ligand.pdbqt",
+   "role": "LIGAND_PDBQT",
+   "sha256": "eaac5bf528ada999bc7b8cc2204aebc612d68f3db07acf046b64adf391f572f4"
+  },
+  {
+   "bytes": 5779,
+   "relPath": "out/ligand.clean.sdf",
+   "role": "LIGAND_CLEAN",
+   "sha256": "bfd45e9929116a821399ad781c0d6f623e540842cf4cade8f280ebd097667397"
+  },
+  {
+   "bytes": 12564,
+   "relPath": "out/ligand.canonical.json",
+   "role": "CANONICAL_JSON",
+   "sha256": "bc192227ebd08cd441ef1572fad6d0d26a41d05dff0b0f9ae7ce048b738d77d9"
+  }
+ ],
+ "planDigest": "6f8f216fbb63a23fb604d7cb6d9a2b9f2f96cb6cc98580f600165b53dac80594",
+ "profileDigest": "94178174aff487e97837269773f21156f064b8af44c64b3989de36ed8a8a5d36",
+ "profileId": "ME_PREP_INTERIM_V0",
+ "qualification": "PREVIEW_UNQUALIFIED",
+ "schemaVersion": 1,
+ "stages": [
+  {
+   "decisions": [
+    "CHAINS",
+    "WATERS",
+    "HETERO"
+   ],
+   "inSha": "577386b4b8bc58a570facba0c8a843386842caef5ed7b60106c685d0f68d4218",
+   "outSha": "9094aa2e2f7b1f062a2d556d2917f8b6ca7f299698697f3a1eacf64ac6500398",
+   "params": {
+    "altloc": "max-occupancy",
+    "hetero": "removed",
+    "model": 1,
+    "waters": "removed"
+   },
+   "tool": "mole_prep.receptor_clean",
+   "version": "0.1.0"
+  },
+  {
+   "decisions": [
+    "RECEPTOR_CHARGES"
+   ],
+   "inSha": "9094aa2e2f7b1f062a2d556d2917f8b6ca7f299698697f3a1eacf64ac6500398",
+   "outSha": "44e57740d5b31dd546bc837df60f69e18093bf69c070a2491351d853681bf89e",
+   "params": {
+    "allow_bad_res": false,
+    "charge_model": "gasteiger(template)",
+    "templates": "default"
+   },
+   "tool": "meeko.receptor",
+   "version": "0.8.0"
+  },
+  {
+   "decisions": [
+    "LIGAND_BOND_ORDERS",
+    "LIGAND_PROTONATION",
+    "LIGAND_HYDROGENS"
+   ],
+   "inSha": "a8840bdcb005be4e5de90c12d5e46edf57b6e5841246f7cd9b6cef7986f8a0da",
+   "outSha": "bfd45e9929116a821399ad781c0d6f623e540842cf4cade8f280ebd097667397",
+   "params": {
+    "addHs": true,
+    "canonical_order": true,
+    "etkdg": false,
+    "etkdg_seed": 61453,
+    "format": "pdb",
+    "template": true
+   },
+   "tool": "rdkit.ligand",
+   "version": "2026.3.6"
+  },
+  {
+   "decisions": [
+    "LIGAND_CHARGES",
+    "LIGAND_TORSIONS"
+   ],
+   "inSha": "bfd45e9929116a821399ad781c0d6f623e540842cf4cade8f280ebd097667397",
+   "outSha": "eaac5bf528ada999bc7b8cc2204aebc612d68f3db07acf046b64adf391f572f4",
+   "params": {
+    "charge_model": "gasteiger",
+    "flexible_amides": false,
+    "merge_these_atom_types": "H"
+   },
+   "tool": "meeko.ligand",
+   "version": "0.8.0"
+  }
+ ],
+ "status": "PREPARED",
+ "summary": {
+  "chargeModel": "gasteiger",
+  "ligandAtoms": 68,
+  "ligandEmbedded3d": false,
+  "ligandFormalCharge": 0,
+  "ligandHydrogensAdded": 31,
+  "ligandProtonation": "EXPLICIT_SUBMITTED",
+  "protonationSource": "MEEKO_TEMPLATES_PREVIEW",
+  "receptorAtoms": 2699,
+  "receptorHydrogensAdded": 2179,
+  "receptorHydrogensSubmitted": 0,
+  "rotatableBonds": 7
+ }
+}

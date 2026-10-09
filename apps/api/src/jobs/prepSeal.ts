@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync, statSync } from "node:fs";
-import { PREP_PROFILE_ID, type D2PreparedLigandStateV1, type D2PreparedReceptorStateV2,type PrepComponentSealV1, type PrepManifestV1, type PrepSealSummaryV1 } from "@molecular/contracts";
+import { PREP_PROFILE_ID, type D2PreparedLigandStateV1, type D2PreparedReceptorStateV2,type PrepComponentSealV1, type PrepManifestV1, type PrepPlanV1, type PrepSealSummaryV1 } from "@molecular/contracts";
 import { sealLigandFromPdbqt, type LigandD2Outcome } from "./prepLigandD2.js";
 import { adaptCanonicalStructure, type D2AdaptedRepresentation } from "../docking/d2Adapters.js";
 import { StructureIngestionService } from "../structures/ingestion.js";
@@ -81,6 +81,35 @@ const adapt = async (ingestion: StructureIngestionService, filename: string, byt
   }
 };
 
+/** Stages that generate protonation state; each must run exactly when the confirmed plan asked for it. */
+const PROTONATION_STAGES = [
+  ["pdb2pqr+propka", (o: PrepPlanV1["options"]) => o?.protonation === "PROPKA_PREVIEW"],
+  ["dimorphite_dl", (o: PrepPlanV1["options"]) => o?.ligandProtonation === "DIMORPHITE_PREVIEW"],
+] as const;
+
+/**
+ * Qualification is bound to the confirmed plan, never taken from the worker manifest alone (5.2b review).
+ * The plan's options were checked against the server-side request when the plan was stored (prepJobs.plan).
+ * INTERIM needs the plan (qualification, protonationSource, requested receptor and ligand protonation) and the
+ * manifest (qualification, summary sources) to agree on explicit submitted state, with no protonation stage run.
+ * Any disagreement between plan and manifest, or a protonation stage that ran without (or despite) the plan
+ * asking for it, is a misreporting manifest: REJECTED, fail closed.
+ */
+export const bindQualificationToPlan = (plan: PrepPlanV1 | undefined, manifest: PrepManifestV1): { qualification: PrepSealSummaryV1["qualification"]; codes: string[] } => {
+  const codes: string[] = [];
+  if (!plan) return { qualification: "PREVIEW_UNQUALIFIED", codes: ["PLAN_MISSING"] };
+  const o = plan.options;
+  const sm = manifest.summary;
+  const planInterim = plan.qualification === "INTERIM" && plan.protonationSource === "EXPLICIT_SUBMITTED" && o?.protonation === "EXPLICIT_SUBMITTED" && o.ligandProtonation === "EXPLICIT_SUBMITTED";
+  const manifestInterim = manifest.qualification === "INTERIM" && sm?.protonationSource === "EXPLICIT_SUBMITTED" && sm.ligandProtonation === "EXPLICIT_SUBMITTED";
+  if (planInterim !== manifestInterim || (plan.qualification ?? "PREVIEW_UNQUALIFIED") !== (manifest.qualification ?? "PREVIEW_UNQUALIFIED")) codes.push("QUALIFICATION_PLAN_MISMATCH");
+  if (!sm || sm.protonationSource !== plan.protonationSource || (o && sm.ligandProtonation !== o.ligandProtonation)) codes.push("PROTONATION_PLAN_MISMATCH");
+  for (const [tool, wanted] of PROTONATION_STAGES) {
+    if (manifest.stages.some((s) => s.tool === tool) !== wanted(o)) codes.push(`PROTONATION_STAGE_MISMATCH:${tool}`);
+  }
+  return { qualification: planInterim && manifestInterim && !codes.length ? "INTERIM" : "PREVIEW_UNQUALIFIED", codes };
+};
+
 export const sealFromPrepManifest = async (store: PrepJobStore, jobId: string, options: PrepSealOptions = {}): Promise<PrepSealOutcome> => {
   const pins = options.pins ?? repoPrepPins;
   const dependencies = options.receptorDependencies ?? SERVER_D2_RECEPTOR_DEPENDENCIES;
@@ -92,9 +121,9 @@ export const sealFromPrepManifest = async (store: PrepJobStore, jobId: string, o
   } catch (e) {
     return reject([e instanceof PrepError ? "MANIFEST_REJECTED" : "MANIFEST_UNREADABLE"], 0, "PREVIEW_UNQUALIFIED");
   }
-  const qualification: PrepSealSummaryV1["qualification"] =
-    manifest.qualification === "INTERIM" && manifest.summary?.protonationSource === "EXPLICIT_SUBMITTED" && manifest.summary.ligandProtonation === "EXPLICIT_SUBMITTED" ? "INTERIM" : "PREVIEW_UNQUALIFIED";
-  const codes: string[] = [];
+  const bound = bindQualificationToPlan(state.plan, manifest);
+  const qualification = bound.qualification;
+  const codes: string[] = [...bound.codes];
   if (state.manifest && canonical(state.manifest) !== canonical(manifest)) codes.push("MANIFEST_TAMPERED");
   if (manifest.status !== "PREPARED") codes.push("MANIFEST_NOT_PREPARED");
   if (manifest.profileId !== PREP_PROFILE_ID) codes.push("PROFILE_ID_MISMATCH");
@@ -182,7 +211,7 @@ export const sealFromPrepManifest = async (store: PrepJobStore, jobId: string, o
   } else {
     const pdbqt = get("out/ligand.pdbqt");
     const sm = manifest.summary;
-    const explicit = sm && sm.ligandProtonation === "EXPLICIT_SUBMITTED" && sm.ligandHydrogensAdded === 0 && !sm.ligandEmbedded3d && state.plan?.tautomer === "AS_SUBMITTED" && manifest.planDigest === state.plan.planDigest;
+    const explicit = sm && qualification === "INTERIM" && state.plan?.options?.ligandProtonation === "EXPLICIT_SUBMITTED" && sm.ligandProtonation === "EXPLICIT_SUBMITTED" && sm.ligandHydrogensAdded === 0 && !sm.ligandEmbedded3d && state.plan?.tautomer === "AS_SUBMITTED" && manifest.planDigest === state.plan.planDigest;
     ligandD2 = sealLigandFromPdbqt({ adapted: ligand, pdbqt: pdbqt.toString("ascii"), pdbqtSha256: sha256(pdbqt), chargeModel, ...(explicit ? { explicitSubmittedPlanDigest: state.plan!.planDigest } : {}) });
     typedAtoms = ligandD2.typedAtoms;
     ligandSeal = { status: ligandD2.status, reasonCodes: [...ligandD2.reasonCodes].slice(0, 50), ...(ligandD2.ligand ? { digest: ligandD2.ligand.digest } : {}) };
@@ -201,7 +230,7 @@ export const sealFromPrepManifest = async (store: PrepJobStore, jobId: string, o
     blockers.push("RECEPTOR_SEAL_INPUTS_INVALID");
   } else {
     const sm = manifest.summary;
-    const explicit = !!sm && sm.protonationSource === "EXPLICIT_SUBMITTED" && sm.receptorHydrogensAdded === 0 && manifest.planDigest === state.plan.planDigest;
+    const explicit = !!sm && qualification === "INTERIM" && state.plan.protonationSource === "EXPLICIT_SUBMITTED" && state.plan.options?.protonation === "EXPLICIT_SUBMITTED" && sm.protonationSource === "EXPLICIT_SUBMITTED" && sm.receptorHydrogensAdded === 0 && manifest.planDigest === state.plan.planDigest;
     receptorD2 = sealReceptorFromPrep({ adapted: receptor, plan: state.plan, explicitSubmitted: explicit, dependencies });
     receptorSeal = { status: receptorD2.status, reasonCodes: [...receptorD2.reasonCodes].slice(0, 50), ...(receptorD2.receptor ? { digest: receptorD2.receptor.digest } : {}) };
     for (const c of receptorD2.reasonCodes) blockers.push(c);

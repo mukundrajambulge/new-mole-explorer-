@@ -1,49 +1,49 @@
 {
  "diagnostics": [],
- "jobId": "7f2fd051-ddc4-4c25-a8d0-3aa82dbfe28b",
+ "jobId": "fixture-prep-1d3z-sti-ideal",
  "lockDigest": "e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9",
  "outputs": [
   {
    "bytes": 59680,
    "relPath": "out/receptor.pdbqt",
    "role": "RECEPTOR_PDBQT",
-   "sha256": "dd41aa4eff17a18618ab8aa8104d306d4db541601c480505f204476ec8d86fec"
+   "sha256": "26f941789303a169158dc8316e28ac91d0b0d6f4dc49efdc421b2e2b9a31d5ab"
   },
   {
    "bytes": 98480,
    "relPath": "out/receptor.clean.pdb",
    "role": "RECEPTOR_CLEAN",
-   "sha256": "475d1092a9bd2ea4470e5cafe66cc76414d6c4c09a41393a274d2c6a9c62d831"
+   "sha256": "cd1029d3fe1fb14d829398362e8a5c196cc238f80f3ccd85b1978e060ed409a8"
   },
   {
-   "bytes": 119405,
+   "bytes": 119410,
    "relPath": "out/receptor.canonical.json",
    "role": "CANONICAL_JSON",
-   "sha256": "075b4c6fc5abb6e20d57184a30bad5e8b14dfb49ec270c92403a57fb8865d295"
+   "sha256": "2f1576166e55d306155e19924c4a28eae3c8a51e87b65a1f71f93ea6b7d24a46"
   },
   {
-   "bytes": 444,
+   "bytes": 3751,
    "relPath": "out/ligand.pdbqt",
    "role": "LIGAND_PDBQT",
-   "sha256": "32a54f1694d70b71181ac45992054bfe5484939a1c7f292a84dc228a75aedaaf"
+   "sha256": "2c33279aa0cc545ae0ddfe3d02db4d752f54d569bdfebdf237ce96acb018367f"
   },
   {
-   "bytes": 817,
+   "bytes": 5779,
    "relPath": "out/ligand.clean.sdf",
    "role": "LIGAND_CLEAN",
-   "sha256": "b099b5f66f4460e846fe91dd3e2a8e9e3a710daed833988e5bcf199b3b92b1e1"
+   "sha256": "f5bf33bfbe96e19239a5c68f031b00b7f1c56600ec7e5ff2f01e27d767801019"
   },
   {
-   "bytes": 1685,
+   "bytes": 12370,
    "relPath": "out/ligand.canonical.json",
    "role": "CANONICAL_JSON",
-   "sha256": "a1d82a179ecd532f5d0552b79a81aa794f865a79d58e30782a56a02e953db839"
+   "sha256": "5eed2f5554ab81f973ac2fd86b253d782387fd8cd1269efbe21d725bee96915c"
   }
  ],
- "planDigest": "fd3f0e1a95be41a04752b747b1c4eb2c248780c2fb54f1f4417f3046bd11f4c0",
- "profileDigest": "f814cc92143168b5b8612389bfdff28a9a2e35394ab151e1b7f6591fc4723a4e",
+ "planDigest": "10f538765526e20a02212010ea60d6593ce7f150181566b2ec68087a90ae4cfa",
+ "profileDigest": "9911da7d64c5c1632e01aa014430c39bcacb010267d8c5a9eb5e95db9b87d764",
  "profileId": "ME_PREP_INTERIM_V0",
- "qualification": "PREVIEW_UNQUALIFIED",
+ "qualification": "INTERIM",
  "schemaVersion": 1,
  "stages": [
   {
@@ -63,24 +63,10 @@
   },
   {
    "decisions": [
-    "RECEPTOR_PROTONATION"
-   ],
-   "inSha": "fcee7d8dfe2444f50abeda0e5b95c986018a98b507488b26def5e11b85098b89",
-   "outSha": "78c7a0a947c179ec461d7f2d6f205d47b5d089f32c4e6d5f4654d3a2d549e82e",
-   "params": {
-    "ff": "AMBER",
-    "pH": 7.4,
-    "titration": "propka"
-   },
-   "tool": "pdb2pqr+propka",
-   "version": "3.7.1/3.5.1"
-  },
-  {
-   "decisions": [
     "RECEPTOR_CHARGES"
    ],
-   "inSha": "78c7a0a947c179ec461d7f2d6f205d47b5d089f32c4e6d5f4654d3a2d549e82e",
-   "outSha": "dd41aa4eff17a18618ab8aa8104d306d4db541601c480505f204476ec8d86fec",
+   "inSha": "fcee7d8dfe2444f50abeda0e5b95c986018a98b507488b26def5e11b85098b89",
+   "outSha": "26f941789303a169158dc8316e28ac91d0b0d6f4dc49efdc421b2e2b9a31d5ab",
    "params": {
     "allow_bad_res": false,
     "charge_model": "gasteiger(template)",
@@ -95,8 +81,8 @@
     "LIGAND_PROTONATION",
     "LIGAND_HYDROGENS"
    ],
-   "inSha": "b099b5f66f4460e846fe91dd3e2a8e9e3a710daed833988e5bcf199b3b92b1e1",
-   "outSha": "b099b5f66f4460e846fe91dd3e2a8e9e3a710daed833988e5bcf199b3b92b1e1",
+   "inSha": "40632f45778eb6d01bfb78502d777559590559d4ae7feb452be911501b9958cd",
+   "outSha": "f5bf33bfbe96e19239a5c68f031b00b7f1c56600ec7e5ff2f01e27d767801019",
    "params": {
     "addHs": true,
     "canonical_order": true,
@@ -113,8 +99,8 @@
     "LIGAND_CHARGES",
     "LIGAND_TORSIONS"
    ],
-   "inSha": "b099b5f66f4460e846fe91dd3e2a8e9e3a710daed833988e5bcf199b3b92b1e1",
-   "outSha": "32a54f1694d70b71181ac45992054bfe5484939a1c7f292a84dc228a75aedaaf",
+   "inSha": "f5bf33bfbe96e19239a5c68f031b00b7f1c56600ec7e5ff2f01e27d767801019",
+   "outSha": "2c33279aa0cc545ae0ddfe3d02db4d752f54d569bdfebdf237ce96acb018367f",
    "params": {
     "charge_model": "gasteiger",
     "flexible_amides": false,
@@ -127,15 +113,15 @@
  "status": "PREPARED",
  "summary": {
   "chargeModel": "gasteiger",
-  "ligandAtoms": 9,
+  "ligandAtoms": 68,
   "ligandEmbedded3d": false,
   "ligandFormalCharge": 0,
   "ligandHydrogensAdded": 0,
   "ligandProtonation": "EXPLICIT_SUBMITTED",
-  "protonationSource": "PROPKA_PREVIEW",
+  "protonationSource": "EXPLICIT_SUBMITTED",
   "receptorAtoms": 746,
   "receptorHydrogensAdded": 0,
   "receptorHydrogensSubmitted": 629,
-  "rotatableBonds": 1
+  "rotatableBonds": 7
  }
 }

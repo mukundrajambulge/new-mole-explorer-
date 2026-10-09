@@ -339,6 +339,13 @@ export class PrepJobStore {
         this.persist(failed);
         return failed;
       }
+      // The plan's options must echo the server-side request; the sealer binds qualification to them (prepSeal).
+      const po = plan.options;
+      if (po && (po.protonation !== request.protonation || po.ligandProtonation !== request.ligandProtonation || po.pH !== request.pH || po.keepWaters !== request.keepWaters || po.addMissingAtoms !== request.addMissingAtoms || po.ligandTemplate !== !!request.ligandTemplateArtifactId)) {
+        const failed: PrepJobStateV1 = { ...base, state: "FAILED", error: "PLAN_FAILED: PLAN_OPTIONS_MISMATCH" };
+        this.persist(failed);
+        return failed;
+      }
       if (plan.status === "BLOCKED" || run.status === "BLOCKED") {
         const blocked: PrepJobStateV1 = { ...base, state: "FAILED", plan, error: scrubText(`BLOCKED: ${(plan.diagnostics ?? []).join("; ") || "the worker blocked this plan"}`, [dir, this.root]) };
         this.persist(blocked);

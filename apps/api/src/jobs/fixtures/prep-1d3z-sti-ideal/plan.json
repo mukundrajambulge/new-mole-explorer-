@@ -23,44 +23,49 @@
    "requiresAck": false
   },
   {
-   "atomsAfter": 9,
-   "atomsBefore": 9,
+   "atomsAfter": 68,
+   "atomsBefore": 68,
    "choice": "explicit bond orders from the submitted SDF file",
    "key": "LIGAND_BOND_ORDERS",
    "requiresAck": false
   },
   {
-   "atomsAfter": 9,
-   "atomsBefore": 9,
+   "atomsAfter": 68,
+   "atomsBefore": 68,
    "choice": "keep submitted protonation and formal charge (0)",
    "key": "LIGAND_PROTONATION",
    "requiresAck": false
   },
   {
-   "atomsAfter": 9,
-   "atomsBefore": 9,
-   "choice": "-6 implicit hydrogens made explicit (valence model of the submitted chemistry)",
+   "atomsAfter": 68,
+   "atomsBefore": 68,
+   "choice": "keep the 31 submitted hydrogens; none generated",
    "key": "LIGAND_HYDROGENS",
-   "requiresAck": true
+   "requiresAck": false
   },
   {
-   "atomsAfter": 9,
-   "atomsBefore": 9,
+   "atomsAfter": 68,
+   "atomsBefore": 68,
    "choice": "Gasteiger partial charges (Meeko)",
    "key": "LIGAND_CHARGES",
    "requiresAck": false
   },
   {
-   "atomsAfter": 9,
-   "atomsBefore": 9,
-   "choice": "1 rotatable bonds (Meeko default rules; amides rigid)",
+   "atomsAfter": 68,
+   "atomsBefore": 68,
+   "choice": "7 rotatable bonds (Meeko default rules; amides rigid)",
    "key": "LIGAND_TORSIONS",
    "requiresAck": false
   }
  ],
  "diagnostics": [],
- "jobId": "fixture-interim-ethanol",
- "ligandArtifactId": "lethanolh",
+ "inputs": {
+  "ligandSha256": "40632f45778eb6d01bfb78502d777559590559d4ae7feb452be911501b9958cd",
+  "ligandTemplateSha256": null,
+  "receptorSha256": "21099cb88231455fdfab4095dddfadcc85cc4213e105cf5f9cfff2ca21993378"
+ },
+ "jobId": "fixture-prep-1d3z-sti-ideal",
+ "ligandArtifactId": "lfixture",
  "lockDigest": "e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9",
  "options": {
   "addMissingAtoms": false,
@@ -72,12 +77,12 @@
   "protonation": "EXPLICIT_SUBMITTED"
  },
  "pH": 7.4,
- "planDigest": "4d974fb73927d76172bd1151e74d11998406301d45f3c0172439c2f44b1c1c32",
+ "planDigest": "10f538765526e20a02212010ea60d6593ce7f150181566b2ec68087a90ae4cfa",
  "profileId": "ME_PREP_INTERIM_V0",
  "protonationSource": "EXPLICIT_SUBMITTED",
  "qualification": "INTERIM",
- "receptorArtifactId": "rinterim",
- "rotatableBonds": 1,
+ "receptorArtifactId": "rfixture",
+ "rotatableBonds": 7,
  "schemaVersion": 1,
  "status": "READY",
  "tautomer": "AS_SUBMITTED",

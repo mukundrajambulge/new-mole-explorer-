@@ -10,19 +10,40 @@ import { PrepJobStore, type PrepRunner } from "./prepJobs.js";
 import { REPO_ROOT } from "./prepPins.js";
 import { createPrepSummarySealer, prepSummarySealer, sealFromPrepManifest } from "./prepSeal.js";
 
-// Task 5.2b fix round: the prep routes through the real server (server.ts), plus the seal on a real INTERIM job.
-// fixtures/prep-1d3z-ethanolh is real worker output (workers/prep via tools/mole-dock/prep.mjs in WSL) for
-// tests/fixtures/rcsb/1D3Z.pdb (NMR, explicit hydrogens) and the explicit-H, 3D ethanol SDF that the worker
-// itself wrote in fixtures/prep-1crn-ethanol. Nothing is generated, so the plan and manifest are INTERIM.
+// Task 5.2b fix round: the prep routes through the real server (server.ts), plus the seal on real jobs.
+// Every replayed fixture is real worker output (workers/prep via tools/mole-dock/prep.mjs runPrep in WSL
+// ~/mole-prep), produced from exactly the bytes these tests upload: each fixture plan.json records the sha256
+// of its inputs and the tests assert them, so no worker output is ever fed back in as submitted chemistry.
+//  - prep-1iep-a-sti: the real complex. tests/fixtures/rcsb/1IEP.pdb chain A, plus the chain-A STI HETATM
+//    records of the same file with the wwPDB CCD STI SMILES as bond-order template. X-ray: no submitted
+//    hydrogens, so Meeko templates and RDKit generate them; plan and manifest are PREVIEW_UNQUALIFIED.
+//  - prep-1iep-a-sti-propka: the same inputs with the PROPKA opt-in (PREVIEW_UNQUALIFIED).
+//  - prep-1d3z-sti-ideal: the explicit-state path. 1D3Z.pdb (NMR, 629 submitted hydrogens) plus
+//    fixtures/inputs/STI_ideal.sdf, the wwPDB CCD ideal imatinib (https://files.rcsb.org/ligands/download/
+//    STI_ideal.sdf, 68 atoms incl. 31 explicit H, 3D). Nothing is generated, so it is INTERIM. 1D3Z+STI is
+//    not a biological complex; no real complex in tests/fixtures carries submitted hydrogens.
 const here = dirname(fileURLToPath(import.meta.url));
-const FX = join(here, "fixtures", "prep-1d3z-ethanolh");
-const RECEPTOR = readFileSync(resolve(REPO_ROOT, "tests", "fixtures", "rcsb", "1D3Z.pdb"));
-const LIGAND = readFileSync(join(here, "fixtures", "prep-1crn-ethanol", "out", "ligand.clean.sdf"));
+const RCSB = resolve(REPO_ROOT, "tests", "fixtures", "rcsb");
+const FX = join(here, "fixtures", "prep-1d3z-sti-ideal");
+const RECEPTOR = readFileSync(join(RCSB, "1D3Z.pdb"));
+const LIGAND = readFileSync(join(here, "fixtures", "inputs", "STI_ideal.sdf"));
 const readJson = (p: string) => JSON.parse(readFileSync(p, "utf8")) as Record<string, unknown>;
+const hex = (b: Buffer | string) => createHash("sha256").update(b).digest("hex");
 
-// fixtures/prep-1d3z-ethanolh-propka: the same real inputs prepared by the real worker with the PROPKA opt-in
-// (protonation PROPKA_PREVIEW), so plan and manifest are PREVIEW_UNQUALIFIED.
-const FX_PROPKA = join(here, "fixtures", "prep-1d3z-ethanolh-propka");
+const FX_1IEP = join(here, "fixtures", "prep-1iep-a-sti");
+const FX_PROPKA = join(here, "fixtures", "prep-1iep-a-sti-propka");
+const RECEPTOR_1IEP = readFileSync(join(RCSB, "1IEP.pdb"));
+/** The chain-A imatinib of 1IEP itself (heavy atoms only, as deposited). */
+const STI_1IEP_A = Buffer.from(RECEPTOR_1IEP.toString("latin1").split(/\r?\n/).filter((l) => l.startsWith("HETATM") && l.slice(17, 20) === "STI" && l[21] === "A").join("\n") + "\nEND\n");
+/** wwPDB CCD STI SMILES (OpenEye canonical): bond orders and hydrogen counts for the PDB ligand. */
+const STI_TEMPLATE = Buffer.from("Cc1ccc(cc1Nc2nccc(n2)c3cccnc3)NC(=O)c4ccc(cc4)CN5CCN(CC5)C\n");
+type Inputs = Readonly<{ receptor: Buffer; ligand: Buffer; ligandFormat: "sdf" | "pdb"; template?: Buffer; chainIds?: string[] }>;
+const EXPLICIT_INPUTS: Inputs = { receptor: RECEPTOR, ligand: LIGAND, ligandFormat: "sdf" };
+const COMPLEX_1IEP_A: Inputs = { receptor: RECEPTOR_1IEP, ligand: STI_1IEP_A, ligandFormat: "pdb", template: STI_TEMPLATE, chainIds: ["A"] };
+/** The fixture was produced from exactly these bytes (sha256 recorded by the worker in plan.inputs). */
+const expectProvenance = (fx: string, inputs: Inputs) => {
+  expect(readJson(join(fx, "plan.json")).inputs).toEqual({ receptorSha256: hex(inputs.receptor), ligandSha256: hex(inputs.ligand), ligandTemplateSha256: inputs.template ? hex(inputs.template) : null });
+};
 
 /** Replays real worker output into the job dir, rebinding jobId/planDigest like the worker would. */
 const replayFrom = (fx: string, tamperManifest?: (m: Record<string, unknown>) => void): PrepRunner => async (mode, dir) => {
@@ -92,6 +113,7 @@ describe("prep routes mounted in the real server (5.2b)", () => {
   });
 
   it("uploads, maps source ids, plans, confirms once and seals the ligand from a real INTERIM job", async () => {
+    expectProvenance(FX, EXPLICIT_INPUTS);
     const rec = await call("POST", "/api/docking/prep/artifacts?format=pdb", undefined, { raw: RECEPTOR, type: "application/octet-stream" });
     expect(rec.status).toBe(201);
     expect(rec.json.artifactId).toMatch(/^pa_pdb_[0-9a-f]{40}$/);
@@ -148,18 +170,29 @@ describe("prep routes mounted in the real server (5.2b)", () => {
     const s2 = await sealFromPrepManifest(store, id);
     expect(s1.ligandState?.digest).toBe(final.seal?.components?.ligand.digest);
     expect(s2.ligandState?.digest).toBe(s1.ligandState?.digest);
-    expect(s1.ligandState?.atomTyping).toHaveLength(9);
-    expect(s1.ligandState?.atomTyping.filter((t) => t.typeId === "H_MERGED")).toHaveLength(5);
-    expect(s1.ligandState?.kinematicModel.searchTorsionCount).toBe(1);
+    // CCD STI ideal: 68 atoms; every hydrogen on carbon is merged, the torsion count matches the worker's.
+    const sdf = LIGAND.toString("latin1").split(/\r?\n/);
+    const nAtoms = Number(sdf[3]!.slice(0, 3));
+    const elements = sdf.slice(4, 4 + nAtoms).map((l) => l.slice(31, 34).trim());
+    const hOnCarbon = sdf.slice(4 + nAtoms, 4 + nAtoms + Number(sdf[3]!.slice(3, 6))).filter((l) => {
+      const [a, b] = [Number(l.slice(0, 3)) - 1, Number(l.slice(3, 6)) - 1].map((i) => elements[i]);
+      return (a === "H" && b === "C") || (a === "C" && b === "H");
+    }).length;
+    expect(nAtoms).toBe(68);
+    expect(s1.ligandState?.atomTyping).toHaveLength(68);
+    expect(s1.ligandState?.atomTyping.filter((t) => t.typeId === "H_MERGED")).toHaveLength(hOnCarbon);
+    expect(s1.ligandState?.kinematicModel.searchTorsionCount).toBe((readJson(join(FX, "prep-manifest.json")).summary as { rotatableBonds: number }).rotatableBonds);
     writeFileSync(join(store.jobDir(id), "out", "ligand.pdbqt"), "REMARK tampered\n");
     expect((await sealFromPrepManifest(store, id)).reasonCodes).toContain("OUTPUT_TAMPERED");
   }, 60_000);
 
   /** Upload the real inputs, plan with `options`, confirm with the plan's acks and wait for the final state. */
-  const runJob = async (options: Record<string, unknown> = {}) => {
-    const rec = await call("POST", "/api/docking/prep/artifacts?format=pdb", undefined, { raw: RECEPTOR, type: "application/octet-stream" });
-    const lig = await call("POST", "/api/docking/prep/artifacts?format=sdf", undefined, { raw: LIGAND, type: "application/octet-stream" });
-    const a = await call("POST", "/api/docking/prep/plan", { receptorArtifactId: rec.json.artifactId, ligandArtifactId: lig.json.artifactId, pH: 7.4, ...options });
+  const runJob = async (options: Record<string, unknown> = {}, inputs: Inputs = EXPLICIT_INPUTS) => {
+    const upload = async (raw: Buffer, format: string) => (await call("POST", `/api/docking/prep/artifacts?format=${format}`, undefined, { raw, type: "application/octet-stream" })).json.artifactId as string;
+    const tpl = inputs.template ? { ligandTemplateArtifactId: await upload(inputs.template, "smi") } : {};
+    const chains = inputs.chainIds ? { chainIds: inputs.chainIds } : {};
+    const body = { receptorArtifactId: await upload(inputs.receptor, "pdb"), ligandArtifactId: await upload(inputs.ligand, inputs.ligandFormat), pH: 7.4, ...tpl, ...chains, ...options };
+    const a = await call("POST", "/api/docking/prep/plan", body);
     expect(a.status, JSON.stringify(a.json.error)).toBe(201);
     const planned = PrepJobStateV1Schema.parse(a.json);
     const id = planned.jobId;
@@ -173,7 +206,52 @@ describe("prep routes mounted in the real server (5.2b)", () => {
     return { planned, final, id };
   };
 
-  it("a real INTERIM complex (1D3Z + explicit-H ethanol) prepares to SEALED end to end over HTTP once the receptor dependency digests exist", async () => {
+  it("the real complex 1IEP/A + STI prepares end to end over HTTP: generated hydrogens seal PREVIEW_UNQUALIFIED, never SEALED", async () => {
+    expectProvenance(FX_1IEP, COMPLEX_1IEP_A);
+    store.replaceRunner(replayFrom(FX_1IEP));
+    try {
+      // Production sealer and the test-only dependency digests alike: generated chemistry is never D2-sealed.
+      for (const sealer of [prepSummarySealer, createPrepSummarySealer({ receptorDependencies: TEST_ONLY_RECEPTOR_DEPENDENCIES })]) {
+        store.replaceSealer(sealer);
+        const { planned, final } = await runJob({}, COMPLEX_1IEP_A);
+        expect(planned.plan?.options).toMatchObject({ protonation: "EXPLICIT_SUBMITTED", chainIds: ["A"], ligandTemplate: true });
+        expect(planned.plan?.qualification).toBe("PREVIEW_UNQUALIFIED");
+        expect(planned.plan?.protonationSource).toBe("MEEKO_TEMPLATES_PREVIEW");
+        expect(final.state, final.error).toBe("SUCCEEDED");
+        expect(final.manifest?.summary).toMatchObject({ receptorHydrogensSubmitted: 0, ligandAtoms: 68, ligandHydrogensAdded: 31 });
+        expect(final.seal).toEqual({
+          status: "PREVIEW_UNQUALIFIED",
+          qualification: "PREVIEW_UNQUALIFIED",
+          reasonCodes: ["GENERATED_CHEMICAL_STATE"],
+          verifiedOutputs: 6,
+          components: { receptor: { status: "PREVIEW_UNQUALIFIED", reasonCodes: ["GENERATED_CHEMICAL_STATE"] }, ligand: { status: "PREVIEW_UNQUALIFIED", reasonCodes: ["GENERATED_CHEMICAL_STATE"] } },
+        });
+        expect(final.preparedReceptorId).toBeUndefined();
+        expect(final.preparedLigandId).toBeUndefined();
+      }
+    } finally {
+      store.replaceRunner(replay);
+      store.replaceSealer(prepSummarySealer);
+    }
+  }, 60_000);
+
+  it("explicit submitted state (1D3Z + CCD STI ideal): the production sealer is BLOCKED naming each unpublished digest", async () => {
+    expectProvenance(FX, EXPLICIT_INPUTS);
+    store.replaceRunner(replay);
+    store.replaceSealer(prepSummarySealer);
+    const { planned, final } = await runJob();
+    expect(planned.plan?.qualification).toBe("INTERIM");
+    expect(final.state, final.error).toBe("SUCCEEDED");
+    expect(final.seal?.status).toBe("BLOCKED");
+    expect(final.seal?.qualification).toBe("INTERIM");
+    expect(final.seal?.components?.ligand.status).toBe("SEALED");
+    expect(final.seal?.components?.receptor).toEqual({ status: "BLOCKED", reasonCodes: UNPUBLISHED });
+    expect(final.seal?.reasonCodes).toEqual(UNPUBLISHED);
+    expect(final.preparedReceptorId).toBeUndefined();
+    expect(final.preparedLigandId).toBeUndefined();
+  }, 60_000);
+
+  it("explicit submitted state (1D3Z + CCD STI ideal) reaches SEALED over HTTP only with TEST-ONLY receptor dependency digests", async () => {
     store.replaceRunner(replay);
     store.replaceSealer(createPrepSummarySealer({ receptorDependencies: TEST_ONLY_RECEPTOR_DEPENDENCIES }));
     try {
@@ -281,12 +359,13 @@ describe("prep routes mounted in the real server (5.2b)", () => {
     }
   }, 120_000);
 
-  it("the PROPKA opt-in (real worker output) seals PREVIEW_UNQUALIFIED: generated protonation is never D2-sealed", async () => {
+  it("the PROPKA opt-in (real worker output, 1IEP/A + STI) seals PREVIEW_UNQUALIFIED: generated protonation is never D2-sealed", async () => {
+    expectProvenance(FX_PROPKA, COMPLEX_1IEP_A);
     store.replaceRunner(replayFrom(FX_PROPKA));
     try {
       for (const sealer of [prepSummarySealer, createPrepSummarySealer({ receptorDependencies: TEST_ONLY_RECEPTOR_DEPENDENCIES })]) {
         store.replaceSealer(sealer);
-        const { planned, final } = await runJob({ protonation: "PROPKA_PREVIEW" });
+        const { planned, final } = await runJob({ protonation: "PROPKA_PREVIEW" }, COMPLEX_1IEP_A);
         expect(planned.plan?.qualification).toBe("PREVIEW_UNQUALIFIED");
         expect(planned.plan?.protonationSource).toBe("PROPKA_PREVIEW");
         expect(final.state, final.error).toBe("SUCCEEDED");
@@ -306,6 +385,58 @@ describe("prep routes mounted in the real server (5.2b)", () => {
       store.replaceSealer(prepSummarySealer);
     }
   }, 60_000);
+
+  it("qualification is bound to the confirmed plan: a manifest misreporting its protonation is REJECTED", async () => {
+    const cases: [string, string, Inputs, Record<string, unknown>, (m: Record<string, unknown>) => void, string[]][] = [
+      // PROPKA ran (plan PROPKA_PREVIEW) but the manifest claims explicit submitted INTERIM state.
+      ["PROPKA reported as explicit", FX_PROPKA, COMPLEX_1IEP_A, { protonation: "PROPKA_PREVIEW" }, (m) => {
+        m.qualification = "INTERIM";
+        Object.assign(m.summary as object, { protonationSource: "EXPLICIT_SUBMITTED" });
+      }, ["QUALIFICATION_PLAN_MISMATCH", "PROTONATION_PLAN_MISMATCH"]],
+      // ... and the same lie with the PROPKA stage removed from the manifest as well.
+      ["PROPKA stage hidden", FX_PROPKA, COMPLEX_1IEP_A, { protonation: "PROPKA_PREVIEW" }, (m) => {
+        m.qualification = "INTERIM";
+        Object.assign(m.summary as object, { protonationSource: "EXPLICIT_SUBMITTED" });
+        m.stages = (m.stages as { tool: string }[]).filter((s) => s.tool !== "pdb2pqr+propka");
+      }, ["QUALIFICATION_PLAN_MISMATCH", "PROTONATION_PLAN_MISMATCH", "PROTONATION_STAGE_MISMATCH:pdb2pqr+propka"]],
+      // An explicit plan whose manifest shows a PROPKA run it never asked for (pinned version, so no drift code).
+      ["unrequested PROPKA stage", FX, EXPLICIT_INPUTS, {}, (m) => {
+        (m.stages as unknown[]).splice(1, 0, { ...(m.stages as Record<string, unknown>[])[0], tool: "pdb2pqr+propka", version: "3.7.1/3.5.1", params: {} });
+      }, ["PROTONATION_STAGE_MISMATCH:pdb2pqr+propka"]],
+    ];
+    store.replaceSealer(createPrepSummarySealer({ receptorDependencies: TEST_ONLY_RECEPTOR_DEPENDENCIES }));
+    try {
+      for (const [label, fx, inputs, options, tamper, expected] of cases) {
+        store.replaceRunner(replayFrom(fx, tamper));
+        const { final } = await runJob(options, inputs);
+        expect(final.state, label).toBe("FAILED");
+        expect(final.seal?.status, label).toBe("REJECTED");
+        expect(final.seal?.qualification, label).toBe("PREVIEW_UNQUALIFIED");
+        expect([...(final.seal?.reasonCodes ?? [])].sort(), label).toEqual([...expected].sort());
+        expect(final.preparedReceptorId, label).toBeUndefined();
+      }
+    } finally {
+      store.replaceRunner(replay);
+      store.replaceSealer(prepSummarySealer);
+    }
+    // A plan whose options do not echo the request (worker asked for EXPLICIT, plan says PROPKA) never becomes a job.
+    store.replaceRunner(async (mode, jobDir) => {
+      const r = await replay(mode, jobDir);
+      if (mode === "plan") {
+        const p = readJson(join(jobDir, "plan.json"));
+        writeFileSync(join(jobDir, "plan.json"), JSON.stringify({ ...p, options: { ...(p.options as object), protonation: "PROPKA_PREVIEW" } }));
+      }
+      return r;
+    });
+    try {
+      const rec = await call("POST", "/api/docking/prep/artifacts?format=pdb", undefined, { raw: RECEPTOR, type: "application/octet-stream" });
+      const lig = await call("POST", "/api/docking/prep/artifacts?format=sdf", undefined, { raw: LIGAND, type: "application/octet-stream" });
+      const a = await call("POST", "/api/docking/prep/plan", { receptorArtifactId: rec.json.artifactId, ligandArtifactId: lig.json.artifactId, pH: 7.4 });
+      expect(PrepJobStateV1Schema.parse(a.json)).toMatchObject({ state: "FAILED", error: "PLAN_FAILED: PLAN_OPTIONS_MISMATCH" });
+    } finally {
+      store.replaceRunner(replay);
+    }
+  }, 120_000);
 
   it("tool drift fails closed: a manifest stage version off TOOLS.md fails the job; a drifted venv refuses plans (503)", async () => {
     store.replaceRunner(replayFrom(FX, (m) => {
