@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { pipeline } from "node:stream";
 import {
   DOCK_JOB_ARTIFACTS,
   DOCK_JOB_TERMINAL_STATUSES,
@@ -17,7 +18,7 @@ import {
   type DockJobSubmitResponseV1,
   type JobEvent,
 } from "@molecular/contracts";
-import { createPrepResolver, DockJobError, DockJobStore, type DockJobStoreOptions, type DockSubmitResult } from "../jobs/dockJobs.js";
+import { createPrepResolver, DockJobError, DockJobStore, type DockArtifactStream, type DockJobStoreOptions, type DockSubmitResult } from "../jobs/dockJobs.js";
 import type { DockRunner } from "../jobs/dockRunner.js";
 import { PREP_MAX_ARTIFACT_BYTES, PrepError, type PrepJobStore } from "../jobs/prepJobs.js";
 import type { PrepArtifactStore } from "../jobs/prepArtifacts.js";
@@ -179,7 +180,7 @@ export type DockJobService = Readonly<{
   subscribe(id: string, afterSeq: number, cb: (e: JobEvent) => void): () => void;
   result(id: string): DockJobResultV1;
   /** Task 5.5: a whitelisted, digest-checked output file of a COMPLETED job. */
-  artifact(id: string, name: string): { body: Buffer; contentType: string; sha256: string };
+  artifact(id: string, name: string): Promise<DockArtifactStream>;
   close(): Promise<void>;
 }>;
 
@@ -361,17 +362,18 @@ export const createDockJobRoutes = (o: DockJobRoutesOptions): DockJobRoutes => {
           service.get(id);
           return fail(res, 404, "NOT_FOUND", "Artifact not found.");
         }
-        const a = service.artifact(id, name);
+        const a = await service.artifact(id, name);
         res.writeHead(200, {
           "content-type": a.contentType,
-          "content-length": String(a.body.length),
+          "content-length": String(a.size),
           "content-disposition": `attachment; filename="${name}"`,
           "cache-control": "no-store",
           "x-content-type-options": "nosniff",
           "x-mole-sha256": a.sha256,
           "x-mole-label": "PREVIEW_UNQUALIFIED",
         });
-        res.end(a.body);
+        // Streamed (never buffered); a client that disconnects destroys the file stream and frees the download slot.
+        await new Promise<void>((done) => pipeline(a.stream, res, () => done()));
         return;
       }
       return fail(res, 404, "NOT_FOUND", "Not found.");
