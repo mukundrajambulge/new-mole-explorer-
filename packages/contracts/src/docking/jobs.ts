@@ -306,6 +306,28 @@ export const DockJobStateV1Schema = z
   .strict();
 export type DockJobStateV1 = z.infer<typeof DockJobStateV1Schema>;
 
+/** tools/mole-dock/run.mjs result.json on exit 0 (the fields the API re-checks; other keys pass through). */
+export const MoleDockRunResultV1Schema = z
+  .object({
+    schemaVersion: z.literal(1),
+    status: z.literal("OK"),
+    label: z.literal("PREVIEW_UNQUALIFIED"),
+    engine: z.object({ name: z.string().max(64), version: z.string().max(32), versionReported: z.string().max(80), binarySha256: hex64, pinnedSha256: hex64 }).strict(),
+    inputs: z.object({ jobSha256: hex64, receptor: z.object({ sha256: hex64 }).passthrough(), ligand: z.object({ sha256: hex64 }).passthrough() }).strict(),
+    vinaScore: finite,
+    meScore: z.null(),
+    meScoreStatus: z.object({ status: z.literal("UNAVAILABLE"), reason: z.string().min(1).max(64) }).strict(),
+    poses: z
+      .array(z.object({ rank: z.number().int().min(1), vinaScore: finite, rmsdLbFromBest: finite.nullable(), rmsdUbFromBest: finite.nullable(), atomCount: z.number().int().min(1), meScore: z.null(), terms: z.null() }).strict())
+      .min(1)
+      .max(JOB_CAPS.posesMax),
+    outputs: z.object({ "poses.pdbqt": hex64 }).strict(),
+  })
+  .passthrough();
+export const MoleDockRunManifestV1Schema = z
+  .object({ schemaVersion: z.literal(1), kind: z.literal("mole-dock-run"), status: z.literal("OK"), files: z.record(z.string().max(64), hex64), engineSha256: hex64 })
+  .passthrough();
+
 /** Result of a SUCCEEDED docking job, bound to its jobId and inputDigest. Vina scores only; meScore is null. */
 export const DockJobResultV1Schema = z
   .object({
