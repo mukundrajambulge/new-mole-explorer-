@@ -22,7 +22,8 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       "/api": {
-        target: "http://localhost:8100",
+        // MOLE_API_PROXY_TARGET: a second local API (e.g. the FEATURE_DOCKING_RUN=1 e2e stack on :8110).
+        target: process.env.MOLE_API_PROXY_TARGET || "http://localhost:8100",
         changeOrigin: true,
         configure: (proxy) => {
           proxy.on("proxyReq", (proxyReq) => {

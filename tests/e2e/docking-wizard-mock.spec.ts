@@ -6,6 +6,7 @@ import { createMockJobServer } from "../../apps/api/src/jobs/mockServer";
 /**
  * Full wizard flow (Inputs, Prepare, Box, Run, Results) against the 5.0 MOCK job server.
  * Every /api/docking request from the page is forwarded to the in-process mock; nothing here is a real docking result.
+ * Needs the web app built with VITE_DOCKING_MOCK=1: run with playwright.docking-mock.config.ts (task 5.7c).
  */
 let mock: Server;
 let mockPort = 0;
