@@ -146,6 +146,17 @@
       "purpose": "ABL kinase + imatinib (STI) complex, chains A/B; prep pairs and redock sanity target"
     },
     {
+      "name": "1STP.pdb",
+      "pdbId": "1STP",
+      "format": "pdb",
+      "url": "https://files.rcsb.org/download/1STP.pdb",
+      "downloaded": "2026-10-09",
+      "sha256": "6fbb3d5c324e717fe7284703426e74ea58191431720daab1b2faa0bbb6430f30",
+      "bytes": 117855,
+      "tracked": true,
+      "purpose": "streptavidin + biotin (BTN); wizard e2e flow"
+    },
+    {
       "name": "4V6F.cif",
       "pdbId": "4V6F",
       "format": "mmcif",

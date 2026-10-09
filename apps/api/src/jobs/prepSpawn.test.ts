@@ -155,4 +155,25 @@ describe("mole-dock prep spawn wrapper", () => {
       rmSync(job, { recursive: true, force: true });
     }
   }, 30_000);
+
+  it("builds the --versions probe through the same argv and shape-checks its report", async () => {
+    const m = (await load()) as Mod & { parseVersionsReport(s: string): { tools: Record<string, string>; lockDigest: string } | null };
+    const job = mkdtempSync(join(tmpdir(), "prepver-"));
+    try {
+      const inv = m.buildPrepInvocation({ mode: "versions", jobDir: job, python: "/home/u/mole-prep/bin/python", platform: process.platform });
+      expect(inv.args.slice(-3)).toEqual(["-I", expect.stringMatching(/run_prep\.py$/), "--versions"]);
+      expect(inv.args).toContain("PYTHONHASHSEED=0");
+      expect(inv.options.shell).toBe(false);
+    } finally {
+      rmSync(job, { recursive: true, force: true });
+    }
+    const ok = { schemaVersion: 1, profileId: "ME_PREP_INTERIM_V0", workerVersion: "0.1.0", lockDigest: "e".repeat(64), python: "3.12.3", tools: { rdkit: "2026.3.6", mole_prep: "0.1.0" } };
+    expect(m.parseVersionsReport(JSON.stringify(ok) + "\n")).toMatchObject({ lockDigest: "e".repeat(64), tools: { rdkit: "2026.3.6" } });
+    expect(m.parseVersionsReport("")).toBeNull();
+    expect(m.parseVersionsReport("not json")).toBeNull();
+    expect(m.parseVersionsReport(`${JSON.stringify(ok)}\n${JSON.stringify(ok)}`)).toBeNull();
+    expect(m.parseVersionsReport(JSON.stringify({ ...ok, lockDigest: "x" }))).toBeNull();
+    expect(m.parseVersionsReport(JSON.stringify({ ...ok, tools: { rdkit: "1.0 ; rm -rf /" } }))).toBeNull();
+    expect(m.parseVersionsReport(JSON.stringify({ ...ok, tools: { "../x": "1.0" } }))).toBeNull();
+  });
 });

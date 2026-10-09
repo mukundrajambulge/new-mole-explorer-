@@ -1,0 +1,122 @@
+{
+ "chargeModel": "gasteiger",
+ "decisions": [
+  {
+   "atomsAfter": 2369,
+   "atomsBefore": 4710,
+   "choice": "keep chains A of A,B",
+   "key": "CHAINS",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 2270,
+   "atomsBefore": 2369,
+   "choice": "remove 99 water atoms",
+   "key": "WATERS",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 2229,
+   "atomsBefore": 2270,
+   "choice": "remove 5 hetero groups: CL:A:1, CL:A:2, CL:A:4, CL:A:5, STI:A:201",
+   "key": "HETERO",
+   "requiresAck": true
+  },
+  {
+   "atomsAfter": 2229,
+   "atomsBefore": 2229,
+   "choice": "1 missing heavy/terminal atoms: not added (opt-in)",
+   "key": "MISSING_HEAVY_ATOMS",
+   "requiresAck": true
+  },
+  {
+   "atomsAfter": 2229,
+   "atomsBefore": 2229,
+   "choice": "keep submitted hydrogens (0); no pKa model",
+   "key": "RECEPTOR_PROTONATION",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 4408,
+   "atomsBefore": 2229,
+   "choice": "Meeko residue templates set hydrogens 0 -> 2179 (generated, PREVIEW_UNQUALIFIED; protonation source MEEKO_TEMPLATES_PREVIEW)",
+   "key": "RECEPTOR_TEMPLATE_HYDROGENS",
+   "requiresAck": true
+  },
+  {
+   "atomsAfter": 4408,
+   "atomsBefore": 4408,
+   "choice": "Gasteiger charges from Meeko residue templates",
+   "key": "RECEPTOR_CHARGES",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 37,
+   "atomsBefore": 37,
+   "choice": "bond orders and formal charges from the supplied SMILES template (submitted PDB hydrogens replaced by template hydrogens)",
+   "key": "LIGAND_BOND_ORDERS",
+   "requiresAck": true
+  },
+  {
+   "atomsAfter": 37,
+   "atomsBefore": 37,
+   "choice": "keep submitted protonation and formal charge (0)",
+   "key": "LIGAND_PROTONATION",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 68,
+   "atomsBefore": 37,
+   "choice": "31 hydrogens generated from the SMILES template; coordinates placed by RDKit (PREVIEW_UNQUALIFIED)",
+   "key": "LIGAND_HYDROGENS",
+   "requiresAck": true
+  },
+  {
+   "atomsAfter": 68,
+   "atomsBefore": 68,
+   "choice": "Gasteiger partial charges (Meeko)",
+   "key": "LIGAND_CHARGES",
+   "requiresAck": false
+  },
+  {
+   "atomsAfter": 68,
+   "atomsBefore": 68,
+   "choice": "7 rotatable bonds (Meeko default rules; amides rigid)",
+   "key": "LIGAND_TORSIONS",
+   "requiresAck": false
+  }
+ ],
+ "diagnostics": [],
+ "inputs": {
+  "ligandSha256": "6dee0ced42266816c9d322eeac6390664763cf564bbf243e91dd2880c9d65e9d",
+  "ligandTemplateSha256": "ac50ddc2d7fd67e2a93f17fcc5d3e52d8befe4aab05c21ad74e1b0c4baf2340f",
+  "receptorSha256": "577386b4b8bc58a570facba0c8a843386842caef5ed7b60106c685d0f68d4218"
+ },
+ "jobId": "fixture-prep-1iep-a-sti",
+ "ligandArtifactId": "lfixture",
+ "lockDigest": "e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9",
+ "options": {
+  "addMissingAtoms": false,
+  "chainIds": [
+   "A"
+  ],
+  "keepWaters": false,
+  "ligandProtonation": "EXPLICIT_SUBMITTED",
+  "ligandTemplate": true,
+  "pH": 7.4,
+  "protonation": "EXPLICIT_SUBMITTED"
+ },
+ "pH": 7.4,
+ "planDigest": "6f8f216fbb63a23fb604d7cb6d9a2b9f2f96cb6cc98580f600165b53dac80594",
+ "profileId": "ME_PREP_INTERIM_V0",
+ "protonationSource": "MEEKO_TEMPLATES_PREVIEW",
+ "qualification": "PREVIEW_UNQUALIFIED",
+ "receptorArtifactId": "rfixture",
+ "rotatableBonds": 7,
+ "schemaVersion": 1,
+ "status": "READY",
+ "tautomer": "AS_SUBMITTED",
+ "warnings": [
+  "1 missing heavy/terminal atoms were not added; Meeko templates may reject affected residues"
+ ]
+}

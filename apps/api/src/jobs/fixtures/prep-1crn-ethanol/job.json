@@ -1,0 +1,1 @@
+{"schemaVersion":1,"jobId":"fixture-1crn-ethanol","receptor":{"artifactId":"r1crn","relPath":"in/receptor.pdb","format":"pdb"},"ligand":{"artifactId":"lethanol","relPath":"in/ligand.sdf","format":"sdf"},"options":{"pH":7.4,"protonation":"EXPLICIT_SUBMITTED","ligandProtonation":"EXPLICIT_SUBMITTED","chainIds":null,"keepWaters":false,"addMissingAtoms":false}}
