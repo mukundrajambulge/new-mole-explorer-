@@ -517,8 +517,8 @@ export class DockJobStore {
   }
 
   /** inputDigest = sha256(canonical JSON of {receptorSha, ligandSha, box, exhaustiveness, numPoses, seed, vinaPin}). */
-  static inputDigest(req: DockJobRequest, receptorSha: string, ligandSha: string, pin: VinaPin): string {
-    return sha256(canonicalJson({ receptorSha, ligandSha, box: { center: req.boxCenter, size: req.boxSize }, exhaustiveness: req.exhaustiveness, numPoses: req.numPoses, seed: req.seed, vinaPin: { version: pin.version, sha256: pin.sha256 } }));
+  static inputDigest(req: DockJobRequest, receptorSha: string, ligandSha: string, pin: VinaPin, prepSealStatus: "SEALED" | "PREVIEW_UNQUALIFIED" = "SEALED"): string {
+    return sha256(canonicalJson({ receptorSha, ligandSha, box: { center: req.boxCenter, size: req.boxSize }, exhaustiveness: req.exhaustiveness, numPoses: req.numPoses, seed: req.seed, vinaPin: { version: pin.version, sha256: pin.sha256 }, prepSealStatus }));
   }
 
   async submit(body: unknown): Promise<DockSubmitResult> {
@@ -528,7 +528,8 @@ export class DockJobStore {
     const req = parsed.data;
     const pin = await this.pinOr503();
     const input = await this.resolvePrepared(req.receptorPreparedId, req.ligandPreparedId);
-    const digest = DockJobStore.inputDigest(req, input.provenance.receptorSha256, input.provenance.ligandSha256, pin);
+    // The seal status is part of the identity: a SEALED request never dedupes onto a PREVIEW_UNQUALIFIED job.
+    const digest = DockJobStore.inputDigest(req, input.provenance.receptorSha256, input.provenance.ligandSha256, pin, input.provenance.prepSealStatus);
     // ---- synchronous from here: lookup + insert cannot interleave with another submit ----
     const existingId = this.byDigest.get(digest);
     const existing = existingId ? this.states.get(existingId) : undefined;

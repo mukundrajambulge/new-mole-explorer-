@@ -22,14 +22,33 @@ const CHILD = [
   "setTimeout(()=>{fs.copyFileSync(process.argv[2],'poses.pdbqt');process.exit(0)},Number(process.argv[3]));",
 ].join("");
 
-export function fakeEngine({ holdMs = 60_000, calls = { dock: 0 }, ignoreSignal = false, noKill = false, orphanable = false, failWith } = {}) {
+// Late start: like a Linux engine launched after wsl.exe was already killed (WSL cold start). The pidfile appears
+// only after delayMs; the process then lives for holdMs unless killed.
+const LATE_CHILD = [
+  "const fs=require('fs');",
+  "setTimeout(()=>{fs.writeFileSync(process.argv[1],String(process.pid));setTimeout(()=>process.exit(0),Number(process.argv[3]))},Number(process.argv[2]));",
+].join("");
+
+export function fakeEngine({ holdMs = 60_000, calls = { dock: 0, live: [] }, ignoreSignal = false, noKill = false, orphanable = false, failWith, failMessage, lateStartMs } = {}) {
   return {
     calls,
     pin: async () => ({ sha256: PIN, version: "1.2.7" }),
     verify: async () => ({ vina: "/opt/vina", binarySha256: PIN, versionLine: "AutoDock Vina v1.2.7" }),
     async dock(outDir, _job, _v, { signal, pidfile } = {}) {
       calls.dock++;
-      if (failWith) throw Object.assign(new Error(`${failWith} at ${outDir}`), { exitCode: 3, code: "VINA_FAILED" });
+      calls.live = calls.live ?? [];
+      if (failWith) throw Object.assign(new Error(failMessage ? failMessage(outDir) : `${failWith} at ${outDir}`), { exitCode: 3, code: "VINA_FAILED" });
+      if (lateStartMs !== undefined) {
+        // wsl.exe is "killed" on abort, but the detached engine still starts later and is not in the Windows tree.
+        const c = spawn(process.execPath, ["-e", LATE_CHILD, pidfile, String(lateStartMs), String(holdMs)], { cwd: outDir, detached: true, stdio: "ignore", windowsHide: true });
+        c.unref();
+        calls.live.push(c.pid);
+        await new Promise((ok) => {
+          if (signal?.aborted) return ok();
+          signal?.addEventListener("abort", ok, { once: true });
+        });
+        throw Object.assign(new Error("cancelled"), { exitCode: 3, code: "CANCELLED" });
+      }
       const args = ["-e", CHILD, pidfile, POSES_FIXTURE, String(holdMs)];
       if (orphanable) {
         // Like Vina inside WSL: outside this process's Windows job object, so it survives an API crash.
@@ -50,13 +69,23 @@ export function fakeEngine({ holdMs = 60_000, calls = { dock: 0 }, ignoreSignal 
       return { durationMs: r.durationMs, log: "" };
     },
     async killGroup(pidfile) {
-      if (noKill || !existsSync(pidfile)) return;
+      calls.kills = (calls.kills ?? 0) + 1;
+      if (noKill || !existsSync(pidfile)) return undefined;
       const pid = Number(readFileSync(pidfile, "utf8").trim());
       try {
         process.kill(pid, "SIGKILL");
       } catch {
-        /* gone */
+        return { killed: false, gone: true, pgid: pid, reason: "NOT_RUNNING" };
       }
+      for (let i = 0; i < 40; i++) {
+        try {
+          process.kill(pid, 0);
+        } catch {
+          return { killed: true, gone: true, pgid: pid };
+        }
+        await new Promise((r) => setTimeout(r, 25));
+      }
+      return { killed: false, gone: false, pgid: pid, reason: "STILL_ALIVE" };
     },
   };
 }

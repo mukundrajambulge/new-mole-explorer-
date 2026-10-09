@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { fork } from "node:child_process";
+import { fork, spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -68,11 +68,13 @@ const seedPrepJob = (prepRoot: string, seal: "SEALED" | "PREVIEW_UNQUALIFIED" | 
     },
     seal: { status: seal, qualification: seal === "SEALED" ? "INTERIM" : "PREVIEW_UNQUALIFIED", reasonCodes: [], verifiedOutputs: 2 },
     ...(seal === "SEALED" ? { preparedReceptorId: `prec_${compact}`, preparedLigandId: `plig_${compact}` } : {}),
+    ...(seal === "PREVIEW_UNQUALIFIED" ? { previewReceptorId: `pvrec_${compact}_${"ab".repeat(12)}`, previewLigandId: `pvlig_${compact}_${"cd".repeat(12)}` } : {}),
     createdAt: t,
     expiresAt: t,
     updatedAt: t,
   };
   writeFileSync(join(dir, "state.json"), JSON.stringify(state));
+  if (seal === "PREVIEW_UNQUALIFIED") return { receptorPreparedId: state.previewReceptorId!, ligandPreparedId: state.previewLigandId! };
   return { receptorPreparedId: `prec_${compact}`, ligandPreparedId: `plig_${compact}` };
 };
 
@@ -245,8 +247,52 @@ describe("dock job store (5.4)", () => {
     await expectCode(store.submit(req(ids, { boxSize: [41, 20, 20] })), "BAD_INPUT", 400);
     await expectCode(store.submit({ ...req(ids), sha256: PIN }), "BAD_INPUT", 400);
     await expectCode(() => store.get("../../etc"), "NOT_FOUND", 404);
+    // a client cannot construct an id for a preview prep from its (client-known) job id
+    const pc = PREVIEW_ID.replace(/-/g, "");
+    await expectCode(store.submit(req({ receptorPreparedId: `prec_${pc}`, ligandPreparedId: `plig_${pc}` })), "BAD_INPUT", 400);
+    await expectCode(store.submit(req({ receptorPreparedId: `pvrec_${pc}_${"0".repeat(24)}`, ligandPreparedId: `pvlig_${pc}_${"0".repeat(24)}` })), "BAD_INPUT", 400);
+    // nor use a preview id shape on a SEALED job
+    const sc = SEALED_ID.replace(/-/g, "");
+    await expectCode(store.submit(req({ receptorPreparedId: `pvrec_${sc}_${"ab".repeat(12)}`, ligandPreparedId: ids.ligandPreparedId })), "BAD_INPUT", 400);
     const p = await store.submit(req(preview));
-    expect(p.job.provenance).toMatchObject({ prepSealStatus: "PREVIEW_UNQUALIFIED", prepQualification: "PREVIEW_UNQUALIFIED" });
+    expect(p.job.provenance).toMatchObject({ prepSealStatus: "PREVIEW_UNQUALIFIED", prepQualification: "PREVIEW_UNQUALIFIED", prepJobId: PREVIEW_ID, ligandPrepJobId: PREVIEW_ID });
+    // mixed: SEALED receptor + preview ligand from another prep job; both prep jobs are recorded
+    const m = await store.submit(req({ receptorPreparedId: ids.receptorPreparedId, ligandPreparedId: preview.ligandPreparedId }, { seed: 77 }));
+    expect(m.job.provenance).toMatchObject({ prepSealStatus: "PREVIEW_UNQUALIFIED", prepJobId: SEALED_ID, ligandPrepJobId: PREVIEW_ID });
+    await waitFor(() => store.get(p.job.jobId).status === "SUCCEEDED");
+    expect(store.result(p.job.jobId)).toMatchObject({ label: "PREVIEW_UNQUALIFIED", provenance: { prepSealStatus: "PREVIEW_UNQUALIFIED", ligandPrepJobId: PREVIEW_ID } });
+  });
+
+  it("cancel with a pidfile that appears after 1 s (WSL cold start): the late engine is killed before the next job starts", async () => {
+    const engine = mkFake({ lateStartMs: 1500, holdMs: 60_000 });
+    const { store, ids } = await setup({ engine });
+    const a = (await store.submit(req(ids))).job;
+    const b = (await store.submit(req(ids, { seed: 11 }))).job;
+    await waitFor(() => store.get(a.jobId).status === "RUNNING");
+    store.cancel(a.jobId);
+    // the fast kill gives up after 1 s (NO_PIDFILE); the queue must still wait
+    await new Promise((r) => setTimeout(r, 1200));
+    expect(engine.calls.dock).toBe(1);
+    expect(store.get(b.jobId).status).toBe("QUEUED");
+    const late = (engine.calls as unknown as { live: number[] }).live[0]!;
+    orphans.push(late);
+    await waitFor(() => store.get(b.jobId).status !== "QUEUED", 10_000);
+    expect(alive(late)).toBe(false); // killed when its pidfile appeared, before b started
+    expect(engine.calls.dock).toBe(2);
+    store.cancel(b.jobId);
+    await store.idle();
+    expect(store.get(a.jobId).status).toBe("CANCELLED");
+  }, 30_000);
+
+  it("a kill that cannot be confirmed is surfaced as a log event", async () => {
+    const engine = mkFake({ holdMs: 300, ignoreSignal: true, noKill: true });
+    const { store, ids } = await setup({ engine });
+    const a = (await store.submit(req(ids))).job;
+    await waitFor(() => store.get(a.jobId).status === "RUNNING" && existsSync(join(store.jobDir(a.jobId), "pid")));
+    store.cancel(a.jobId);
+    await store.idle();
+    const logs = store.events(a.jobId).filter((e) => e.type === "log");
+    expect(logs.at(-1)).toMatchObject({ type: "log", line: expect.stringContaining("ENGINE_KILL_UNCONFIRMED") });
   });
 
   it("rejects a prepared output whose bytes no longer match the manifest", async () => {
@@ -324,15 +370,56 @@ describe("dock job store (5.4)", () => {
     expect(reborn.get(b.jobId).seq).toBe(3);
   });
 
-  it("engine failures are FAILED ENGINE with no absolute paths in the error", async () => {
-    const { store, ids, root } = await setup({ engine: mkFake({ failWith: "boom" }) });
+  it("engine failures are FAILED ENGINE with no absolute paths in the error (Windows, forward-slash, /mnt and repo forms)", async () => {
+    const wsl = (p: string) => p.replace(/^([A-Za-z]):[\\/]/, (_m, d: string) => `/mnt/${d.toLowerCase()}/`).replace(/\\/g, "/");
+    const failMessage = (outDir: string) => `boom at ${outDir} cwd=${wsl(outDir)} fwd=${outDir.replace(/\\/g, "/")} repo=${repo} wrepo=${wsl(repo)}/tools`;
+    const { store, ids, root } = await setup({ engine: mkFake({ failWith: "boom", failMessage }) });
     const { job } = await store.submit(req(ids));
     await waitFor(() => store.get(job.jobId).status === "FAILED");
     const s = store.get(job.jobId);
     expect(s.error?.code).toBe("ENGINE");
     expect(s.error?.message).toContain("VINA_FAILED");
-    expect(JSON.stringify(s)).not.toContain(root);
-    expect(JSON.stringify(store.events(job.jobId))).not.toMatch(/[A-Za-z]:[\\/]/);
+    const all = JSON.stringify(s) + JSON.stringify(store.events(job.jobId));
+    for (const leak of [root, repo, wsl(root), wsl(repo), root.replace(/\\/g, "/")]) expect(all).not.toContain(leak);
+    expect(all).not.toMatch(/[A-Za-z]:[\\/]|\/mnt\/[a-z]\//);
+  });
+
+  it("stale lock takeover: dead pid, earlier OS boot, stopped heartbeat; a live fresh lock stays LOCKED", async () => {
+    const { root, prepRoot, store } = await setup();
+    await store.close();
+    const lock = join(root, ".lock");
+    const prep = new PrepJobStore({ root: prepRoot, resolveArtifact: async () => undefined, installedTools: async () => [] });
+    const open = async () => {
+      const s = new DockJobStore({ root, resolvePrepared: createPrepResolver(prep), runner: createMoleDockRunner({ engine: mkFake() }) });
+      stores.push(s);
+      await s.init();
+      expect(JSON.parse(readFileSync(lock, "utf8"))).toMatchObject({ pid: process.pid, bootId: s.bootId });
+      await s.close();
+      expect(existsSync(lock)).toBe(false);
+    };
+    // a live foreign pid (a real child process) to stand in for a reused pid
+    const child = spawn(process.execPath, ["-e", "setTimeout(()=>{},60000)"], { stdio: "ignore", windowsHide: true });
+    orphans.push(child.pid!);
+    const old = new Date(Date.now() - 5 * 60_000);
+    writeFileSync(lock, JSON.stringify({ pid: 999_999_99, bootId: "00000000-0000-4000-8000-000000000000" }));
+    await open(); // dead pid
+    writeFileSync(lock, JSON.stringify({ pid: child.pid, bootId: "00000000-0000-4000-8000-000000000000", osBootAt: 1000 }));
+    await open(); // alive pid from an earlier OS boot
+    writeFileSync(lock, JSON.stringify({ pid: child.pid, bootId: "00000000-0000-4000-8000-000000000000", osBootAt: Date.now() }));
+    utimesSync(lock, old, old);
+    await open(); // alive pid but no heartbeat for 5 min
+    writeFileSync(lock, JSON.stringify({ pid: child.pid, bootId: "00000000-0000-4000-8000-000000000000", osBootAt: Date.now() }));
+    const s = new DockJobStore({ root, resolvePrepared: createPrepResolver(prep), runner: createMoleDockRunner({ engine: mkFake() }) });
+    await expectCode(s.init(), "LOCKED", 503);
+    // concurrent takers on a dead lock: exactly one wins and the winner's lock survives
+    writeFileSync(lock, JSON.stringify({ pid: 999_999_99, bootId: "00000000-0000-4000-8000-000000000000" }));
+    const takers = [0, 1, 2].map(() => new DockJobStore({ root, resolvePrepared: createPrepResolver(prep), runner: createMoleDockRunner({ engine: mkFake() }) }));
+    const results = await Promise.allSettled(takers.map((t) => t.init()));
+    const won = takers.filter((_t, i) => results[i]!.status === "fulfilled");
+    expect(won).toHaveLength(1);
+    expect(JSON.parse(readFileSync(lock, "utf8")).bootId).toBe(won[0]!.bootId);
+    stores.push(won[0]!);
+    child.kill();
   });
 
   it("a second store on the same root while the first is open is LOCKED", async () => {
