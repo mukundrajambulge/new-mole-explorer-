@@ -25,17 +25,18 @@ describe("dockingClient against the 5.0 mock server", () => {
     let prep = await c.getPrep(plan.jobId, sig());
     for (let i = 0; i < 50 && prep.state !== "SUCCEEDED"; i += 1) { await wait(10); prep = await c.getPrep(plan.jobId, sig()); }
     expect(prep.preparedReceptorId).toBeTruthy();
-    const job = await c.startJob({ receptorPreparedId: prep.preparedReceptorId!, ligandPreparedId: prep.preparedLigandId!, boxCenter: [0, 0, 0], boxSize: [10, 10, 10], exhaustiveness: 8, numPoses: 3, seed: 1 }, sig());
+    const { job } = await c.startJob({ receptorPreparedId: prep.preparedReceptorId!, ligandPreparedId: prep.preparedLigandId!, boxCenter: [0, 0, 0], boxSize: [10, 10, 10], exhaustiveness: 8, numPoses: 3, seed: 1 }, sig());
     let st = job;
     for (let i = 0; i < 100 && st.status !== "COMPLETED"; i += 1) { await wait(10); st = await c.getJob(job.jobId, sig()); }
     const result = await c.getResult(job.jobId, sig());
-    expect(result.scoreStatus).toBe("PREVIEW_UNQUALIFIED");
+    expect(result).toMatchObject({ label: "PREVIEW_UNQUALIFIED", mock: true });
+    expect(Object.keys(await c.getPoseTexts(result, sig()))).toHaveLength(3);
     expect(result.poses).toHaveLength(3);
   });
   it("shows real server errors and cancels", async () => {
     const c = createDockingClient(base, true);
     await expect(c.getJob("nope-1", sig())).rejects.toMatchObject({ status: 404, message: expect.stringContaining("not found") });
-    const job = await c.startJob({ receptorPreparedId: "a", ligandPreparedId: "b", boxCenter: [0, 0, 0], boxSize: [10, 10, 10], exhaustiveness: 8, numPoses: 3, seed: 2 }, sig());
+    const { job } = await c.startJob({ receptorPreparedId: "a", ligandPreparedId: "b", boxCenter: [0, 0, 0], boxSize: [10, 10, 10], exhaustiveness: 8, numPoses: 3, seed: 2 }, sig());
     expect((await c.cancelJob(job.jobId, sig())).status).toBe("CANCELLED");
     await expect(c.cancelJob(job.jobId, sig())).rejects.toBeInstanceOf(DockingClientError);
   });
