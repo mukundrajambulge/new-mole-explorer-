@@ -56,7 +56,7 @@ describe("prep artifact store: streaming, quota, retention, concurrency (5.2b)",
     await expect(store.putStream(chunks(Buffer.alloc(0)), "sdf")).rejects.toMatchObject({ code: "INVALID_INPUT" });
     expect(tmpFiles(store.root)).toEqual([]);
     expect(readdirSync(store.root)).toEqual([]);
-  });
+  }, 30_000); // streams 20 MB to disk; the 5 s default timed out while WSL docking ran in parallel
 
   it("allows at most two concurrent uploads; the third answers 429 BUSY", async () => {
     const store = new PrepArtifactStore(tmpRoot());
