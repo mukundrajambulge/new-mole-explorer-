@@ -12,6 +12,12 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["scripts/dev-docking-mock.mjs"],
       "port": 3101
+    },
+    {
+      "name": "workstation-docking-real",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/dev-docking-real.mjs"],
+      "port": 3101
     }
   ]
 }
