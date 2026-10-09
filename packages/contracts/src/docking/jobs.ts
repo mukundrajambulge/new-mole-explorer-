@@ -368,7 +368,7 @@ export const MoleDockRunResultV1Schema = z
     schemaVersion: z.literal(1),
     status: z.literal("OK"),
     label: z.literal("PREVIEW_UNQUALIFIED"),
-    engine: z.object({ name: z.string().max(64), version: z.string().max(32), versionReported: z.string().max(80), binarySha256: hex64, pinnedSha256: hex64 }).strict(),
+    engine: z.object({ name: z.string().max(64), version: z.string().max(32), sourceCommit: z.string().regex(/^[0-9a-f]{7,40}$/).optional(), versionReported: z.string().max(80), binarySha256: hex64, pinnedSha256: hex64 }).strict(),
     inputs: z.object({ jobSha256: hex64, receptor: z.object({ sha256: hex64 }).passthrough(), ligand: z.object({ sha256: hex64 }).passthrough() }).strict(),
     vinaScore: finite,
     meScore: z.null(),

@@ -18,7 +18,7 @@ export const EXIT_OK = 0;
 export const EXIT_BAD_INPUT = 2;
 export const EXIT_ENGINE = 3;
 /** Vina v1.2.7 source commit per the research comparator pin; native/third_party/TOOLS.md does not record it (reported, not verified there). */
-export const VINA_SOURCE_COMMIT = "8eb4040";
+export const VINA_SOURCE_COMMIT = "8eb40404f4f45608acb3b01427587ac049f27c1f";
 export const RESULT_LABEL = "PREVIEW_UNQUALIFIED";
 export const VINA_VERSION = "1.2.7";
 export const JOB_FILE_CAP = 64 * 1024;
