@@ -2753,6 +2753,74 @@
       "note": "Partial merged: real 1STP fixture, wizard e2e on 1STP passes in 8.7 s incl. restored SearchRegion-blocked assertions. Still to do: error messages, per-structure cache, abort on leave, stale replies, SDF/PDBQT/JSON downloads"
     },
     {
+      "id": "U.2",
+      "title": "Box around ligand follows the research rule",
+      "phase": "P5",
+      "wave": "W5",
+      "lane": "L7",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "docking-ui-engineer",
+      "owns": "apps/web/src/docking/**, apps/web/src/lib/dockingClient.ts, docs/user-guide/**",
+      "contextFiles": [
+        "apps/web/src/docking/dockingApiAdapter.ts",
+        "apps/web/src/docking/DockingWorkspace.tsx"
+      ],
+      "checkFlags": "--quick",
+      "what": "The wizard Box around ligand made 22.5 x 22.0 x 23.5 A for biotin; the research rule is the ligand heavy-atom envelope + 5 A on every face [AT-0172] (16.5 x 16.0 x 17.5 A, as R.1 uses).",
+      "how": "- Compute the box from the ligand heavy-atom envelope + 5.0 A per face (axis-aligned), same function as tools/mole-dock/redock.mjs; show the rule in the UI; keep the 1-40 A per-edge service limit.",
+      "done": "1STP Box around ligand gives the R.1 box; a unit test shares the rule with redock.mjs.",
+      "refs": [
+        "RESEARCH"
+      ],
+      "est": "1.5 weeks",
+      "status": "TODO",
+      "note": "Found in the owner-facing browser walkthrough 2026-10-09 (1STP, real Vina)."
+    },
+    {
+      "id": "U.1",
+      "title": "Fill the CCD isomeric SMILES template automatically",
+      "phase": "P5",
+      "wave": "W5",
+      "lane": "L7",
+      "tier": "core",
+      "critical": true,
+      "deps": [],
+      "size": "S",
+      "risk": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "lenses": [
+        "general"
+      ],
+      "maxFix": 1,
+      "agentType": "docking-ui-engineer",
+      "owns": "apps/web/src/docking/**, apps/web/src/lib/dockingClient.ts, docs/user-guide/**",
+      "contextFiles": [
+        "apps/web/src/docking/dockingApiAdapter.ts",
+        "apps/web/src/docking/DockingWorkspace.tsx"
+      ],
+      "checkFlags": "--quick",
+      "what": "For a PDB ligand with a CCD code (e.g. BTN), Prepare is BLOCKED (MISSING_BOND_ORDERS) until the user types a SMILES template by hand.",
+      "how": "- When the picked ligand has a CCD component id, look up its isomeric SMILES (local CCD cache from tests/fixtures/rcsb/ccd-*.cif first, then a pinned RCSB CCD fetch through the API with caching) and prefill the template field, showing the source (CCD id, program, version) for confirmation. Never guess stereo; if no CCD entry, keep the current BLOCKED message.",
+      "done": "Loading 1STP and choosing BTN prepares without typing anything; the template source is shown and recorded in the plan.",
+      "refs": [
+        "RESEARCH"
+      ],
+      "est": "1.5 weeks",
+      "status": "TODO",
+      "note": "Found in the owner-facing browser walkthrough 2026-10-09 (1STP, real Vina)."
+    },
+    {
       "id": "5.7c",
       "title": "Results: ranked table, pose overlay, downloads, preview banner; wire to the real API",
       "phase": "P5",
