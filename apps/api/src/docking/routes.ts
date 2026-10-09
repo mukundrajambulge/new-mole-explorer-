@@ -276,7 +276,7 @@ export const createDockJobRoutes = (o: DockJobRoutesOptions): DockJobRoutes => {
     res.writeHead(200, { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store", connection: "keep-alive", "x-accel-buffering": "no" });
     res.write("retry: 2000\n\n");
     let closed = false;
-    let unsub: (() => void) | undefined;
+    const subscription: { off?: () => void } = {};
     const heartbeat = setInterval(() => {
       if (!closed) res.write(": heartbeat\n\n");
     }, heartbeatMs);
@@ -286,7 +286,7 @@ export const createDockJobRoutes = (o: DockJobRoutesOptions): DockJobRoutes => {
       closed = true;
       streams.delete(finish);
       clearInterval(heartbeat);
-      unsub?.();
+      subscription.off?.();
       if (!res.writableEnded) res.end();
     };
     streams.add(finish);
@@ -312,7 +312,7 @@ export const createDockJobRoutes = (o: DockJobRoutesOptions): DockJobRoutes => {
     };
     const u = service.subscribe(id, after, deliver);
     if (closed) return u();
-    unsub = u;
+    subscription.off = u;
     // Replay is synchronous and complete: a job that is already terminal has nothing more to send.
     if (terminalAt() !== undefined) finish();
   };
