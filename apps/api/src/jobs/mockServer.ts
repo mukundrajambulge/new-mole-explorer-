@@ -127,6 +127,12 @@ export function createMockJobServer(options: MockServerOptions = {}): Server {
   };
 
   const server = createServer((req, res) => {
+    // Browsers preflight cross-origin JSON POSTs (the dev UI on :3101 calls this server directly).
+    if (req.method === "OPTIONS") {
+      res.writeHead(204, { "access-control-allow-origin": "*", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-allow-headers": "content-type, last-event-id", "access-control-max-age": "600" });
+      res.end();
+      return;
+    }
     void handle(req, res).catch((e: unknown) => {
       const m = e instanceof Error ? e.message : "error";
       if (!res.headersSent) err(res, m === "body too large" ? 413 : 400, m);
