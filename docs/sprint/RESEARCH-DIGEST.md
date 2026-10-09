@@ -12,8 +12,9 @@ Short names used in citations:
 - **R03-03 / R03-14**: Research 03 v2 (mmCIF identity/altlocs; implementation spec/handoff).
 - **R01**: Research 01 v2.0 DEEP, Mathematics/Physics/Docking Theory.
 
-AccSpec cites PHD-V2-06/07/09/10/11/13. Those documents were not in the reading list, so exact equations they own (for example E_search
-and the line-search constants) are named here only where AccSpec states them.
+- **V2-xx** (section 8 only): PHD-V2-03..14 v1.0, cited [PHD-V2-xx §n]. Read 2026-10-09 (part 2, task R.8).
+
+Sections 1-7 were written before PHD-V2-03..14 were read. Section 8 adds them and supersedes earlier text where it says so.
 
 ## 1. Claim semantics
 
@@ -179,26 +180,7 @@ enumeration, no 2D→3D embedding, no minimization and no automatic rotor or tor
 - Pin Vina by commit 8eb4040, not only by version [AT-0177].
 - R15 asks for a quality-matched comparison and a resource-matched comparison, with end-to-end timing [R15 §7.4].
 
-**4.8 gradients and out-of-box behaviour**
-- Gradients are defined in 6+N generalized coordinates [AT-0111].
-- Out-of-box poses are inadmissible. They must not be clipped, wrapped, projected or given a hidden score penalty, and this status is distinct from SCORING_FIELD_OUT_OF_DOMAIN [AT-0083..0085].
-- The field domain covers every admissible coordinate plus the interpolation halo [AT-0091].
-- R01 adds: hard constraints and penalties are "not scientifically equivalent" and need separate specification [R01 §14].
-
-**8.1 movement model and search**
-- Explicit sealed torsion tree: root and branch order are inputs, never chosen by the engine [AT-0072..0075].
-- Rings, amides and terminal-H rotors stay rigid [AT-0073, 0074].
-- Search: Vina-family Monte Carlo / basin-hopping [AT-0112].
-- Local optimizer: full-memory BFGS with Armijo backtracking [AT-0113, 0114], minimizing E_search, not DockingScore [AT-0115].
-- Initial orientation: Shoemake quaternion [AT-0121].
-- Budget: G = 105·(50+H) with H = A + 10(6+N); L = ⌊(25+A)/3⌋; MAX_EVAL = G(1+10L); E·MAX_EVAL ≤ 1e9 [AT-0123..0126].
-- Exhaustiveness: default 8, maximum 256 [AT-0122].
-- RNG: Philox4x32-10, uint64 master seed (0 is valid), streams addressed by trajectory and purpose, never by thread [AT-0116..0120].
-
-**5.8 provenance and replay**
-- Bind: states and their hashes, profile IDs and digests, seed/PRNG/stream policy, build, environment fingerprint, budget, output hashes, score semantics, evidence status and claim policy [V2-01 §20; AT-0154, 0155, 0158; R15 §9].
-- Retries never overwrite earlier records [V2-01 §20].
-- Cache keys include every material parent digest. Corrupted entries are quarantined [AT-0159, 0161].
+**4.8, 8.1, 5.8**: superseded by sections 8.2-8.4. AccSpec points kept there: gradients in 6+N coordinates [AT-0111]; out-of-box inadmissible, never clipped or penalized [AT-0083..0085]; the field covers admissible coordinates plus the halo [AT-0091]; search family, BFGS and RNG [AT-0112..0126]; provenance binding [V2-01 §20; AT-0154..0161].
 
 **2.8 (-0 versus 0 in the digest)**
 - Scientific hashes use ME_CANONICAL_CBOR_V1_1_0 with SHA-256 framed envelopes, not the viewer's canonical-JSON profile [AT-0151, 0153].
@@ -208,11 +190,7 @@ enumeration, no 2D→3D embedding, no minimization and no automatic rotor or tor
 
 ## 5. Conflicts
 
-1. **[blocker] 4.8 out-of-box rule.** The backlog says atoms leaving the box are "pushed back, not rejected", with a slope penalty. The research forbids clipping/projection and hidden penalties, and says out-of-box poses are inadmissible [AT-0084]. Recommendation:
-   - A penalty may exist only as an explicit, profile-versioned term of E_search (taken from PHD-V2-07, which must be read first).
-   - Every terminal candidate is checked for admissibility (all heavy atoms inside the closed box), and inadmissible candidates are rejected.
-   - The penalty never enters DockingScore.
-   - Keep BOX_INADMISSIBLE separate from SCORING_FIELD_OUT_OF_DOMAIN.
+1. **[RESOLVED by PHD-V2-07] 4.8 out-of-box rule.** The backlog's "pushed back, slope penalty" design is rejected. E_search has no box term, and out-of-box poses are rejected unscored [PHD-V2-07 §8, §13]. See the replacement spec in 8.2.
 2. **[major] 2.8 normalizes −0 to 0 before hashing**, which conflicts with F64Bits signed-zero semantics [AT-0152, INT-FX-017]. Recommendation:
    - Keep the hash encoder bit-exact.
    - If −0 and 0 boxes should be equal, do it as an explicit, documented input-canonicalization step in the SearchRegion constructor before sealing. Apply it to geometry only, never to scores or weights.
@@ -265,7 +243,7 @@ enumeration, no 2D→3D embedding, no minimization and no automatic rotor or tor
 8. **Generated chemistry.** Should a "generated chemistry" profile (PROPKA, Dimorphite, Meeko torsion tree) get a named, versioned profile ID? The research allows this only as a separately validated non-core profile [AT-0068, 0075].
 9. **Model and altloc defaults.** Should model 1 and the max-occupancy altloc remain defaults with an acknowledgement, or become AMBIGUOUS blocks per AT-0047/0048?
 
-Not read: PHD-V2-03..14 (cited by AccSpec, but not in the list), the plans (skipped on purpose). R01 was read for scoring, search and RMSD
+Not read in part 1: PHD-V2-03..14 (now covered in section 8), the plans (skipped on purpose). R01 was read for scoring, search and RMSD
 only. R03-14 covers PyMOL-selection implementation and is of low docking relevance; its rule is "open an OPEN_QUESTION, never change
 the oracle to pass tests" [R03-14 §8].
 
@@ -274,4 +252,153 @@ the oracle to pass tests" [R03-14 §8].
 - Q2 Store: **interim deviation accepted** (file store), recorded as an ADR; keep the store swappable for SQLite WAL.
 - Q3 Redock bar: no presentation-driven claim; follow the research at our own speed. The redock is labelled smoke (implementation sanity), never validated.
 - Q5 -0 in the box: **normalise at SearchRegion input** (explicit, geometry only); the hash encoder stays bit-exact.
-- Still open: Q4 (E_search / PHD-V2-07, task R.8), Q6 (direct-vs-grid threshold), Q7 (Meeko 0.7.1 comparator lane), Q8 (generated-chemistry profile id), Q9 (model/altloc defaults).
+- Still open after part 1: Q4, Q6, Q7, Q8, Q9. Part 2 status is in section 8.5: Q4 answered by research, Q9 answered by research (owner confirms), Q8 sharpened, Q6 and Q7 still owner decisions.
+
+## 8. From PHD-V2-03..14
+
+Read: PHD-V2-03, 04, 05, 06, 07 (in full), 09, 10, 11, 13 (in depth); 08, 12, 14 (only where relevant to the tasks). All are "implementation
+authority: NONE / HOLD until PHD-V2-15". So they define what the science must be, not permission to ship a claim.
+
+### 8.1 Key facts
+
+**Search objective (closes Q4)** [PHD-V2-07 §1, §8, §9]
+- `E_search = E_inter + E_intra_nonbonded`. Both terms are PHD-V2-06 scorer outputs (ME_DOCKING_V1_VINA_CLASSIC_1_0). No new physical term.
+- Excluded from E_search: the torsion divisor, preparation force-field/conformer energy, **box/barrier energy**, reference RMSD, hidden clash penalties beyond E_intra, and ML/rerank terms.
+- DockingScore stays `E_inter/(1+0.05846·N_tors_vina)`. It is never the search objective, and E_search is never the ranking score [PHD-V2-09 §23 Q20-21].
+- The older "out-of-box penalty" language (P1-R13, P2-S05) is explicitly SUPERSEDED [PHD-V2-07 §3]. Vina's out-of-grid penalty and capped "hunt" objective are deliberately not inherited.
+
+**SearchRegion** [PHD-V2-05 §1, §6, §11, §12, §16]
+- Rule ALL_LIGAND_HEAVY_ATOMS_IN_CLOSED_REGION_V1: after the full pose is realized (torsions, then rigid body), every heavy atom must satisfy `min ≤ x ≤ max` on all axes. On a face is inside. Hydrogens do not count. The result does not depend on the root.
+- Outside: inadmissible. Never clipped, projected, wrapped, auto-enlarged or penalized. Status SEARCH_REGION_BOUNDARY_VIOLATION / SEARCH_POSE_OUTSIDE_REGION.
+- A floating-point tolerance must not enlarge the closed set.
+- SearchRegion (what poses are admissible) and ScoringFieldDomain (where the field can be evaluated) are separate. Required: ScoringFieldDomain ⊇ every admissible coordinate plus the interpolation stencil.
+- Preflight feasibility is PROVEN_FEASIBLE, PROVEN_IMPOSSIBLE or UNKNOWN. No invented ligand-size cutoff.
+
+**Grid and field** [PHD-V2-06 §12-13, §16]
+- The direct pairwise scorer is the oracle. The grid (ME_VINA_GRID_V1_1_0) is the production path.
+- Grid: h = 0.375 Å, origin = Smin − h, `Ncells = ceil((Smax−Smin+2h)/h)`, points = Ncells+1. Halo = one h per axis. The SearchRegion is never snapped.
+- Per-term, type-conditioned channels. Weights are applied after interpolation.
+- Gradient: analytic per cell, piecewise linear and discontinuous at cell faces. No smoothness claim.
+- At r = 0 the score is finite but the gradient is invalid (a flag, never an invented direction).
+- Outside the ScoringFieldDomain: INVALID / SCORING_FIELD_OUT_OF_DOMAIN. No zero, no extrapolation, no direct fallback, no grid growth.
+- Logical field = 80 channels (16 XS × 5 terms), with 59 physical arrays allowed only for proven-zero channels [PHD-V2-13 amendment v1.1].
+- Reference arithmetic: binary64, stable AtomUID pair order, Neumaier summation per term.
+
+**Search and optimizer** [PHD-V2-07 §5-19]
+- Pose: C = (t, q, φ1..φN), dimension 6+N, rigid receptor. Body origin o0 = heavy-atom centroid of the starting conformer, so `r_i = t + R(q)(y_i(φ) − o0)` does not depend on the root.
+- Representation: φ wraps to [−π, π) (+π serializes as −π). q is stored (w,x,y,z) with the w > 0 representative and updated through an exponential-map 3-vector, never as 4 free components.
+- Initialization: Shoemake orientation; torsions U[−π, π); translation uniform in the exact feasible per-axis interval `[Smin−min z, Smax−max z]`. If the ligand does not fit, resample (at most G attempts), then SEARCH_INITIALIZATION_EXHAUSTED. The crystal pose is never read.
+- Global move: pick one entity uniformly from {T, R, φ1..φN}. Translation +2.0 Å × unit-ball vector; rotation (2.0/Rg) × unit-ball vector, with Rg = heavy-atom gyration radius about o0; torsion full reset U[−π, π).
+- An out-of-box proposal is rejected unscored and still consumes the step. Every admissible proposal is BFGS-refined, then Metropolis with T = 1.2 (equal energies accepted). The first eligible minimum is accepted unconditionally.
+- BFGS: H0 = I; Armijo c1 = 1e-4, α0 = 1, factor 0.5, at most 10 trials.
+  - An out-of-box trial is not scored: halve α. All 10 out of box: BOUNDARY_BLOCKED. Feasible trials but none passes Armijo: LINE_SEARCH_FAILED.
+  - Converged when ‖g‖₂ < 1e-5 on the new gradient. At most L = ⌊(25+A)/3⌋ iterations, else MAX_ITERATIONS (still eligible). If sᵀy ≤ 0 or unresolved, reset H = I.
+- Gradient chain rule (g_i = ∂E/∂r_i): `g_t = Σ g_i`; `g_ω = Σ (r_i − t) × g_i`; `g_φj = a_j · Σ_{i∈M_j} (r_i − p_j) × g_i`.
+- Budget: G = 105·(50 + A + 10(6+N)), MAX_EVAL = G(1+10L). E trajectories (default 8, at most 256), with E·MAX_EVAL ≤ 1e9 [PHD-V2-13 §PERF-REQ-028]. No early stop or wall-clock stop. Each trajectory emits one best eligible minimum; clustering is downstream.
+
+**RNG** [PHD-V2-07 §17]: Philox4x32-10, key = uint64 seed (low word, high word). Counter = (block low, block high, trajectory_id, domain_id), with fixed domains 1-8 (INIT_ORIENTATION … ACCEPTANCE). `u = x·2⁻³²`. No normal distribution and no stdlib distributions.
+
+**Pose processing** [PHD-V2-09 §8-16, §23]: profile ME_DOCKING_V1_POSE_POSTPROCESS_1_0.
+- RMSD: direct by AtomUID, plus symmetric (minimum over exact automorphisms). Receptor frame, heavy atoms, no fit, no Hungarian or nearest-element mapping.
+- Plausibility gate ME_POSE_PLAUSIBILITY_VDW_0_75_V1_1_0: every ligand/receptor heavy pair needs d ≥ 0.75(r_i + r_j), boundary inclusive. A failing pose is stored but ineligible for clusters. The score is never changed; the radii table is versioned with no carbon fallback.
+- Clustering ME_DOCKING_V1_CLUSTER_SYM_RMSD_2A_BESTFIRST_1_0: representative-radius, best-first, 2.0 Å inclusive, no single-link merge, no centroid pose.
+- Ties: Q_score = roundTiesToEven(score/1e-6), then trajectory ordinal. Final modes (ME_DOCKING_V1_FINAL_MODES_9_ERANGE3_1_0): at most 9, within best + 3.0. No cross-state "best protomer/tautomer" pick.
+
+**Provenance and replay** [PHD-V2-10 §1, §6, §11-15]
+- Six layers: source bytes, scientific content, lineage, audit, cache, replay.
+- Never in scientific identity: timestamps, host, PID, temporary paths, UI or camera state.
+- Hashing: ME_CANONICAL_CBOR_V1_1_0 plus SHA-256 with domain separation; F64Bits keeps −0 distinct; NaN/Inf rejected; no rounding to stabilize hashes. This confirms owner decision Q5: normalize −0 at SearchRegion input, never in the encoder.
+- RNGProvenance: profile and digest, master seed, seed_origin USER | OS_CSPRNG, E, trajectory ids, domain map, consumed blocks per (trajectory, domain), bounded counts, status.
+- A retry is a new ExecutionAttemptId. Cancelled attempts are diagnostic only. There is no checkpoint/resume.
+- The environment fingerprint is split into numerically material fields (commit, dirty-tree digest, compiler and flags, ISA/SIMD, FTZ/DAZ/FMA, dependency lock, profile digests) and audit-only fields (time, host, memory). It must never hold secrets or personal absolute paths.
+
+**Ligand kinematics** [PHD-V2-04 §14, §19.3, §31-32]
+- A rotor is an acyclic, non-aromatic, localized single bond whose cut separates the graph, that is not in the rigid-motif library, and that moves heavy atoms.
+- The rigid-motif library covers amide, urea, carbamate, sulfonamide, thioamide and amidine/guanidinium; element pairs alone are not enough.
+- Terminal H-only rotors are not search DOFs. search_torsion_count ≠ N_tors_vina/TORSDOF.
+- The root uses a named deterministic policy: candidate = largest rigid fragment, then centrality, then AtomUID. Re-rooting changes KinematicModelHash, never the chemical identity.
+- Macrocycles and covalent docking are UNSUPPORTED.
+
+**Receptor state (answers Q9)** [PHD-V2-03 §9-11, §18 REC-D02/D03/D04/D10]
+- Model: one admissible model may be auto-selected (recorded). With more than one model, never silently take model 1: RECEPTOR_MODEL_SELECTION_REQUIRED → AMBIGUOUS until an explicit selection, which yields a new PreparedReceptorState hash.
+- Assembly: never silently take assembly 1.
+- Altlocs: COHERENT_MAX_OCCUPANCY_V1 only when a coherent group has a unique maximum. Ties, partial labels or coupled alternatives → RECEPTOR_ALTLOC_AMBIGUOUS. No per-atom mixing.
+- His: explicit per residue. A material site ambiguity → RECEPTOR_HISTIDINE_AMBIGUOUS.
+- Site relevance uses SiteInfluenceRequirement: the SearchRegion envelope dilated by 8.649519052838329 Å, not "8 Å from centre" [PHD-V2-05 §12; PHD-V2-08 §29 Q3-4]. This sharpens C8.
+
+**Comparator (Q7 context)** [PHD-V2-11 §19]
+- Two lanes: controlled-input (engine core) and package-native (Meeko 0.7.1 f4a8c1e + Vina 8eb4040).
+- Frozen Vina fields include num_modes = 9, energy_range = 3.0, a box identical to the SearchRegion, and PDBQT digests.
+- A newer Meeko or Vina version needs a new comparator profile digest.
+
+### 8.2 Replacement spec for task 4.8: "Search-ready field: gradients and hard SearchRegion"
+Replaces the clamp/slope design, which the research rejects [PHD-V2-07 §3, §8, §13; PHD-V2-05 §1; PHD-V2-06 §13.6].
+1. **Field gradient.** `evaluate_with_gradient(x)` returns each raw term channel's value and its analytic trilinear ∂/∂x,y,z, using the same 8 corners and the cell-selection rule of [PHD-V2-06 §13.3]: on a grid plane, take the higher cell when one exists.
+   - Weights are applied after interpolation.
+   - Return a per-term decomposition plus the weighted total.
+2. **No out-of-box term.** E_search has no box, barrier or slope term, and no clamped or extrapolating mode may exist in the canonical path.
+   - Outside the ScoringFieldDomain (or with an incomplete stencil): return INVALID SCORING_FIELD_OUT_OF_DOMAIN.
+   - Keep the strict mode. Delete the "clamped mode" item.
+3. **Admissibility check.** Add a separate `search_region_admissible(heavy_atoms, region)`: closed AABB, all heavy atoms, hydrogens ignored, no epsilon. It returns SEARCH_POSE_OUTSIDE_REGION.
+   - It runs *before* any field call. Callers (initializer, mutation, line search) reject the pose unscored; the line search halves α, giving BOUNDARY_BLOCKED after 10 trials.
+   - Test the invariant: any admissible pose implies every heavy-atom stencil is inside the ScoringFieldDomain. An out-of-domain result for an admissible pose is an invariant failure that aborts the attempt.
+4. **Gradient validity.** At r = 0 in the direct path, report a finite score with gradient_valid = false (INVALID_GRADIENT). Non-finite values → SEARCH_OBJECTIVE_NONFINITE. Never zero, never perturbed.
+5. **Tolerances.**
+   - Analytic versus central finite difference: a sanity test only, at points away from cell faces (the gradient is discontinuous there). Use relative error ≤ 1e-6 with a declared step.
+   - Grid backend versus scalar reference: interpolated term abs ≤ 1e-10, gradient abs ≤ 1e-8 / rel ≤ 1e-7 componentwise [PHD-V2-13 §PERF-REQ-062, 064].
+   - PHD-V2-13 writes the gradient rule as "OR" in §47 but "and" in PERF-REQ-064. Use the stricter "and" until the owner says otherwise.
+   - Face-boundary classification must be exact.
+
+   Done when: 10k random interior points pass; face and corner points pick the documented cell; every out-of-domain query is INVALID; a pose exactly on a face is admissible; a pose at max + 1 ulp is inadmissible.
+
+### 8.3 Research requirements for 8.1 (D4 part 1: ligand movement model)
+- **Input** is a sealed LigandKinematicModel [PHD-V2-04 §18.6]: rigid fragments, rotor edges (axis AtomUIDs), moving sets, reference dihedrals, root, branch order and provenance. The rotor rules and rigid motifs are listed in 8.1.
+  - Build it from the D3 topology with a *named* deterministic root policy.
+  - Never take Meeko or PDBQT ROOT/TORSDOF as truth; that is evidence only, with differences recorded.
+- **Pose → coordinates**:
+  1. apply the torsions in tree order to get y_i(φ);
+  2. compute `u_i = y_i − o0`, with o0 = heavy-atom centroid of the starting conformer;
+  3. compute `r_i = t + R(q)u_i`.
+  - Results must be the same for re-rooted equivalent models [PHD-V2-07 §5, AT-012].
+  - q and −q must give identical coordinates. Zero or non-finite q fails.
+- **E_intra_nonbonded** uses the same five Vina-classical terms on heavy-atom XS centres as a separate channel, never in DockingScore [PHD-V2-06 §11, REQ-045].
+  - *Gap:* PHD-V2-06/07 do not pin the intraligand pair-exclusion rule (the backlog's "more than 3 bonds apart") or the intra cutoff. Take them from the pinned Vina 1.2.7 `model.cpp`, record them as an explicit profile rule, and flag this to the owner. Do not invent them.
+- **Derivatives** use the chain rule in 8.1, with gradients from E_inter + E_intra. The dimension is 6+N, and rigid ligands keep 6.
+- **Tests (done when)**:
+  - SEARCH-FX-001..006, 011-015 and 019 analogues: 1-atom (Rg = 0), diatomic, 1-, 3-torsion and branched ligands; quadratic, periodic, rotation-only and translation-only toys; and r = 0.
+  - Pose → coordinates → pose round trip: the 1e-10 Å component tolerance is the primitive-transform bound [PHD-V2-13 §PERF-REQ-063]. "Exact" holds only for the canonical (wrapped, w > 0) representation.
+  - Amide/sulfonamide not rotors; terminal methyl/hydroxyl not DOFs.
+- **Open:** what A = n_movable_atoms counts (heavy atoms only, or including H) is not defined in PHD-V2-07. It changes G and L, so it needs an owner decision before search budgets are coded.
+
+### 8.4 Research requirements for 5.8 (provenance)
+- **manifest.json** = an interim DockingReplayManifestV1 subset [PHD-V2-10 §15]. It contains:
+  - source artifact SHA-256 and conversion/loss records;
+  - prepared receptor/ligand state digests and the preparation profile id + digest;
+  - the SearchRegion as min/max;
+  - scoring, grid and search profile ids (or "external Vina 1.2.7 8eb4040" for the comparator preview);
+  - capability axes (8.5 Q1);
+  - RNGProvenance (seed, seed_origin, engine seed mapping as in C13);
+  - the material environment fingerprint and an audit block kept separately;
+  - output digests, final status and requested reproducibility class.
+- No timestamps or host data inside the scientific digest. No secrets, no environment dump, no absolute personal paths [PHD-V2-10 §14].
+- A retry gets a new attempt id and never overwrites. Cancelled runs are never published as results [PHD-V2-10 §13].
+- **Done when** a same-machine replay is classed honestly. With Vina's own RNG and multithreading, claim EXACT_EXECUTION_REPLAY only if the output digests match. Otherwise report the weaker class it actually passes, never a silent downgrade [PHD-V2-10 §11-12].
+- Hash the manifest with the canonical CBOR profile once 2.8 lands. Until then, label the hash as an interim (non-canonical) digest.
+
+### 8.5 Open-question status (updates section 6)
+- **Q4 E_search: ANSWERED** [PHD-V2-07 §8]. It is E_inter + E_intra_nonbonded and has no out-of-box term. Conflict C1 is resolved by the spec in 8.2, which unblocks 4.8.
+- **Q6 direct-versus-grid threshold: STILL OPEN, sharpened.**
+  - PHD-V2-06 makes the same-pose direct/grid differential mandatory (total and per term, over fractional coordinates and boundaries), but delegates the number to PHD-V2-11 [PHD-V2-06 AT-034, §27].
+  - PHD-V2-11 sets none. The PHD-V2-13 amendment says explicitly that "no direct-versus-grid numerical threshold … is set" [PHD-V2-13 v1.1].
+  - The 1e-10 tolerances compare a grid backend with the grid reference, not grid with direct.
+  - So 4.7/4.8/4.9 must *record* the direct-versus-grid error distribution (max/p95 per term and total, plus search-outcome sensitivity [PHD-V2-07 §29]) and must not set a pass bar. The owner picks the number.
+- **Q7 Meeko: owner decision, sharpened.** The research needs Meeko 0.7.1 only for the package-native comparator lane [PHD-V2-11 §19.2]. Keeping 0.8.0 for our own preparation is compatible if labelled.
+- **Q8 generated chemistry: SHARPENED.**
+  - Generation (protomers at an explicit target_pH, tautomers, opt-in stereo enumeration, conformers, minimization, rotor perception) is legitimate only under a *named, versioned profile* that records the tool, version, rules, pH, caps and pruning, and creates separate ChemicalStates [PHD-V2-04 §17, §32 items 7-16; PHD-V2-03 §19].
+  - The research names PRESERVE_SUBMITTED_STATE but defines no generator profile ID. Concrete generator profiles are left to PHD-V2-11/15.
+  - Recommendation: give our PROPKA/Dimorphite/Meeko pipeline its own profile id + digest, status EXPERIMENTAL / NOT_EVALUATED. That id is an owner decision.
+- **Q9 model/altloc defaults: ANSWERED by research** [PHD-V2-03 REC-D03/D04]. "Default plus acknowledgement" is not allowed:
+  - a single model may be automatic;
+  - multiple models → AMBIGUOUS until an explicit user choice;
+  - altlocs need a coherent unique maximum, and ties → AMBIGUOUS.
+  - Owner to confirm, so that C9 becomes a task.
