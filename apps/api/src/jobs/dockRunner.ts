@@ -22,13 +22,21 @@ export type DockEngine = Readonly<{
   dock(outDir: string, job: unknown, verified: unknown, o: { signal?: AbortSignal; pidfile?: string }): Promise<{ durationMs: number; log: string }>;
   killGroup?(pidfile: string, outDir: string): Promise<unknown>;
 }>;
+/** Outcome of a group kill. gone: the engine group is confirmed empty (killed now, or already not running). */
+export type KillReport = Readonly<{ gone: boolean; killed: boolean; pgid?: number; reason?: string }>;
+export type KillOptions = Readonly<{
+  /** How long to wait for a late pidfile (WSL cold start); 0 looks once. */
+  waitMs?: number;
+  /** Stop waiting for the pidfile early when this returns true. */
+  stopWaiting?: () => boolean;
+}>;
 export type DockRunOutcome = Readonly<{ exitCode: number; error?: { code: string; message: string } }>;
 export interface DockRunner {
   /** Vina pin from TOOLS.md; rejects when it is missing. */
   pin(): Promise<VinaPin>;
   run(o: { jobDir: string; signal: AbortSignal; onStage: (s: DockStage) => void }): Promise<DockRunOutcome>;
-  /** Best-effort pgid kill from <jobDir>/pid (async, never throws). */
-  kill(jobDir: string): Promise<void>;
+  /** pgid kill from <jobDir>/pid (async, never throws); waits up to waitMs for a late pidfile. */
+  kill(jobDir: string, o?: KillOptions): Promise<KillReport>;
 }
 
 type RunModule = {
@@ -53,14 +61,38 @@ export const createMoleDockRunner = (options: { engine?: DockEngine } = {}): Doc
         { engineImpl: eng, signal, pidfile: join(jobDir, DOCK_LAYOUT.pid), onStage: (s) => (s === "dock" || s === "docked" ? onStage(s) : undefined) },
       );
     },
-    async kill(jobDir) {
+    async kill(jobDir, o = {}) {
+      const pidfile = join(jobDir, DOCK_LAYOUT.pid);
+      const waitMs = Math.max(0, o.waitMs ?? 1000);
       try {
         const eng = await getEngine();
-        if (eng.killGroup && existsSync(join(jobDir, DOCK_LAYOUT.outDir))) await eng.killGroup(join(jobDir, DOCK_LAYOUT.pid), join(jobDir, DOCK_LAYOUT.outDir));
+        if (!eng.killGroup) return { gone: false, killed: false, reason: "NO_KILL_SUPPORT" };
+        // A late pidfile (WSL cold start) is waited for here, bounded by waitMs.
+        for (const t0 = Date.now(); !hasPid(pidfile) && Date.now() - t0 < waitMs && !o.stopWaiting?.(); ) await new Promise((r) => setTimeout(r, 50));
+        if (!hasPid(pidfile)) return { gone: false, killed: false, reason: "NO_PIDFILE" };
+        return toReport(await eng.killGroup(pidfile, join(jobDir, DOCK_LAYOUT.outDir)));
       } catch {
-        // best effort: the coreutils timeout inside WSL is the backstop
+        return { gone: false, killed: false, reason: "KILL_ERROR" };
       }
     },
+  };
+};
+
+const hasPid = (pidfile: string): boolean => {
+  try {
+    return /^[0-9]{1,9}$/.test(readFileSync(pidfile, "utf8").trim());
+  } catch {
+    return false;
+  }
+};
+const toReport = (r: unknown): KillReport => {
+  const o = (r && typeof r === "object" ? r : {}) as Record<string, unknown>;
+  const reason = typeof o.reason === "string" ? o.reason.slice(0, 32) : undefined;
+  return {
+    gone: o.gone === true,
+    killed: o.killed === true,
+    ...(Number.isSafeInteger(o.pgid) ? { pgid: o.pgid as number } : {}),
+    ...(reason ? { reason } : o.gone === true ? {} : { reason: "UNCONFIRMED" }),
   };
 };
 

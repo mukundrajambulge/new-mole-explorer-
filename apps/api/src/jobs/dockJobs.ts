@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
-import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, statSync, truncateSync, unlinkSync, writeFileSync, writeSync } from "node:fs";
+import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, statSync, truncateSync, unlinkSync, utimesSync, writeFileSync, writeSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { uptime } from "node:os";
 import { join, resolve } from "node:path";
 import {
   DOCK_JOB_TERMINAL_STATUSES,
@@ -17,8 +18,9 @@ import {
   type JobEvent,
   type PrepJobStateV1,
 } from "@molecular/contracts";
-import { collectDockResult, createMoleDockRunner, DOCK_LAYOUT, DockOutputError, type DockRunner, type VinaPin } from "./dockRunner.js";
+import { collectDockResult, createMoleDockRunner, DOCK_LAYOUT, DockOutputError, type DockRunner, type KillReport, type VinaPin } from "./dockRunner.js";
 import { confinedPath, PrepError, readCappedJson, scrubText, type PrepJobStore } from "./prepJobs.js";
+import { REPO_ROOT } from "./prepPins.js";
 
 /**
  * Docking job store and runner loop (task 5.4, design docs/sprint/design/5.4.md).
@@ -47,6 +49,10 @@ export const DOCK_MAX_JOBS = 32;
 export const DOCK_MAX_BYTES = 2 * 1024 * 1024 * 1024;
 export const DOCK_CPU = 4;
 export const DOCK_TIMEOUT_MS = 600_000;
+/** Bound on a WSL cold start: a cancelled engine's pidfile is waited for this long before the queue moves on. */
+export const DOCK_ENGINE_START_WAIT_MS = 20_000;
+const LOCK_HEARTBEAT_MS = 10_000;
+const LOCK_STALE_MS = 60_000;
 const PDBQT_CAP = 16 * 1024 * 1024;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const PREC_RE = /^prec_([0-9a-f]{32})$/;
@@ -167,6 +173,8 @@ export type DockJobStoreOptions = Readonly<{
   retainTerminalMs?: number;
   retainSucceededMs?: number;
   timeoutMs?: number;
+  /** After a cancel, how long to wait for a late pidfile (WSL cold start) before the next job may start. */
+  engineStartWaitMs?: number;
 }>;
 export type DockSubmitResult = Readonly<{ job: DockJobStateV1; deduped: boolean }>;
 type Listener = (e: JobEvent) => void;
@@ -202,7 +210,9 @@ export class DockJobStore {
   private readonly byDigest = new Map<string, string>();
   private readonly listeners = new Map<string, Set<Listener>>();
   private readonly queue: string[] = [];
-  private active: { jobId: string; ac: AbortController; done: Promise<void> } | null = null;
+  private active: { jobId: string; ac: AbortController; done: Promise<void>; dockStarted: boolean; kill?: Promise<KillReport> } | null = null;
+  private readonly engineStartWaitMs: number;
+  private heartbeat: NodeJS.Timeout | undefined;
   private readonly kills = new Set<Promise<void>>();
   private lockHeld = false;
   private closed = false;
@@ -218,40 +228,111 @@ export class DockJobStore {
     this.retainTerminalMs = options.retainTerminalMs ?? 60 * 60_000;
     this.retainSucceededMs = options.retainSucceededMs ?? 24 * 60 * 60_000;
     this.timeoutMs = options.timeoutMs ?? DOCK_TIMEOUT_MS;
+    this.engineStartWaitMs = options.engineStartWaitMs ?? DOCK_ENGINE_START_WAIT_MS;
   }
 
   // ---- lock ------------------------------------------------------------------------------------------------
 
-  /** root/.lock (O_EXCL) holds {pid, bootId}; a stale lock is taken over only when its pid is dead. */
+  /**
+   * root/.lock (O_EXCL) holds {pid, bootId, startedAt, osBootAt}; the owner refreshes its mtime every 10 s.
+   * A lock is stale when its pid is dead, when it was written in an earlier OS boot (so its pid may be reused), or
+   * when its heartbeat stopped for 60 s (a reused pid that is alive but not ours). Takeover is serialised by a
+   * second O_EXCL file (.lock.takeover): only its holder re-checks staleness, unlinks and re-creates the lock, and
+   * the new lock is read back to confirm it is ours. A takeover file left by a crashed taker expires after 10 s.
+   */
   private acquireLock(): void {
     const lock = join(this.root, ".lock");
-    const body = JSON.stringify({ pid: process.pid, bootId: this.bootId });
-    for (let attempt = 0; attempt < 2; attempt++) {
+    const token = join(this.root, ".lock.takeover");
+    const osBootAt = Date.now() - uptime() * 1000;
+    const body = JSON.stringify({ pid: process.pid, bootId: this.bootId, startedAt: Math.round(Date.now() - process.uptime() * 1000), osBootAt: Math.round(osBootAt) });
+    const create = (): boolean => {
       try {
         const fd = openSync(lock, "wx");
-        writeSync(fd, body);
-        closeSync(fd);
-        this.lockHeld = true;
-        return;
+        try {
+          writeSync(fd, body);
+        } finally {
+          closeSync(fd);
+        }
+        return true;
       } catch (e) {
         if ((e as NodeJS.ErrnoException).code !== "EEXIST") throw e;
+        return false;
       }
-      let pid = 0;
+    };
+    const stale = (): boolean => {
+      let held: { pid?: unknown; bootId?: unknown; osBootAt?: unknown } = {};
+      let mtime = 0;
       try {
-        const held = JSON.parse(readFileSync(lock, "utf8")) as { pid?: unknown };
-        pid = Number.isSafeInteger(held.pid) ? (held.pid as number) : 0;
-      } catch {
-        pid = 0;
+        mtime = statSync(lock).mtimeMs;
+        held = JSON.parse(readFileSync(lock, "utf8")) as typeof held;
+      } catch (e) {
+        if ((e as NodeJS.ErrnoException).code === "ENOENT") return true;
+        held = {}; // unparseable: stale only once its heartbeat is old too
       }
-      if (pid > 0 && pid !== process.pid && isAlive(pid)) throw new DockJobError("LOCKED", 503, "Another API process owns the docking job store.");
-      if (pid === process.pid) throw new DockJobError("LOCKED", 503, "The docking job store is already open in this process.");
+      const pid = Number.isSafeInteger(held.pid) ? (held.pid as number) : 0;
+      if (pid === process.pid && held.bootId !== this.bootId && isAlive(pid) && typeof held.bootId === "string") {
+        throw new DockJobError("LOCKED", 503, "The docking job store is already open in this process.");
+      }
+      if (pid <= 0) return Date.now() - mtime > LOCK_STALE_MS;
+      if (!isAlive(pid)) return true;
+      if (typeof held.osBootAt === "number" && held.osBootAt < osBootAt - 60_000) return true; // written before this OS boot
+      return Date.now() - mtime > LOCK_STALE_MS; // alive pid, heartbeat stopped: a reused pid
+    };
+    const finish = (): void => {
+      let ours = false;
       try {
-        unlinkSync(lock);
+        ours = (JSON.parse(readFileSync(lock, "utf8")) as { bootId?: unknown }).bootId === this.bootId;
       } catch {
-        // raced with another taker; the next O_EXCL attempt decides
+        ours = false;
+      }
+      if (!ours) throw new DockJobError("LOCKED", 503, "The docking job store lock could not be taken.");
+      this.lockHeld = true;
+      this.heartbeat = setInterval(() => {
+        try {
+          if (this.lockIsOurs()) utimesSync(lock, new Date(), new Date());
+        } catch {
+          // the next tick retries
+        }
+      }, LOCK_HEARTBEAT_MS);
+      this.heartbeat.unref();
+    };
+    if (create()) return finish();
+    for (let attempt = 0; attempt < 50; attempt++) {
+      if (!stale()) throw new DockJobError("LOCKED", 503, "Another API process owns the docking job store.");
+      let tfd: number;
+      try {
+        tfd = openSync(token, "wx");
+      } catch (e) {
+        if ((e as NodeJS.ErrnoException).code !== "EEXIST") throw e;
+        try {
+          if (Date.now() - statSync(token).mtimeMs > 10_000) unlinkSync(token);
+        } catch {
+          // another taker removed it
+        }
+        const until = Date.now() + 20;
+        while (Date.now() < until) {
+          /* another taker holds the token for a few ms */
+        }
+        continue;
+      }
+      try {
+        closeSync(tfd);
+        if (!stale()) throw new DockJobError("LOCKED", 503, "Another API process owns the docking job store.");
+        rmSync(lock, { force: true });
+        if (create()) return finish();
+      } finally {
+        rmSync(token, { force: true });
       }
     }
     throw new DockJobError("LOCKED", 503, "The docking job store lock could not be taken.");
+  }
+
+  private lockIsOurs(): boolean {
+    try {
+      return (JSON.parse(readFileSync(join(this.root, ".lock"), "utf8")) as { bootId?: unknown }).bootId === this.bootId;
+    } catch {
+      return false;
+    }
   }
 
   // ---- persistence -----------------------------------------------------------------------------------------
@@ -291,7 +372,7 @@ export class DockJobStore {
       throw new DockJobError("ILLEGAL_TRANSITION", 409, `Docking job cannot move from ${s.status} to ${to}.`);
     }
     const next: DockJobStateV1 = { ...s, ...patch, status: to, progress: PROGRESS[to] };
-    if (patch.error) next.error = { code: patch.error.code.slice(0, 64), message: scrubText(patch.error.message, [this.jobDir(s.jobId), this.root]).slice(0, 500) };
+    if (patch.error) next.error = { code: patch.error.code.slice(0, 64), message: this.scrub(s.jobId, patch.error.message).slice(0, 500) };
     const events: Array<Omit<JobEvent, "seq" | "jobId" | "at">> = [{ type: "status", status: to } as Omit<JobEvent, "seq" | "jobId" | "at">];
     if (next.progress !== s.progress) events.push({ type: "progress", progress: next.progress } as Omit<JobEvent, "seq" | "jobId" | "at">);
     if (to === "FAILED" && next.error) events.push({ type: "error", message: `${next.error.code}: ${next.error.message}`.slice(0, 500) } as Omit<JobEvent, "seq" | "jobId" | "at">);
@@ -501,11 +582,13 @@ export class DockJobStore {
     if (!next) return;
     const ac = new AbortController();
     const jobId = next.jobId;
-    const done = this.execute(jobId, ac).finally(() => {
+    const slot: NonNullable<DockJobStore["active"]> = { jobId, ac, done: Promise.resolve(), dockStarted: false };
+    this.active = slot;
+    // The next job starts only after execute() has reaped this job's engine group (one Vina at a time).
+    slot.done = this.execute(jobId, ac, slot).finally(() => {
       this.active = null;
       this.kick();
     });
-    this.active = { jobId, ac, done };
   }
 
   private inputsIntact(s: DockJobStateV1): boolean {
@@ -528,7 +611,47 @@ export class DockJobStore {
     if (cur && LIVE.has(cur.status)) this.transition(cur, "FAILED", { error: { code, message } });
   }
 
-  private async execute(jobId: string, ac: AbortController): Promise<void> {
+  /** Append a diagnostic log event (also after a terminal state; never changes the status). */
+  private note(jobId: string, line: string): void {
+    const cur = this.states.get(jobId);
+    if (cur) this.commit(cur, [{ type: "log", line: this.scrub(jobId, line).slice(0, 500) } as Omit<JobEvent, "seq" | "jobId" | "at">]);
+  }
+
+  private scrub(jobId: string, text: string): string {
+    const dir = this.jobDir(jobId);
+    const forms = new Set<string>();
+    for (const p of [dir, this.root, REPO_ROOT]) {
+      forms.add(p);
+      forms.add(p.replace(/\\/g, "/"));
+      const m = /^([A-Za-z]):[\\/](.*)$/.exec(p);
+      if (m) {
+        const rest = m[2]!.replace(/\\/g, "/").replace(/\/+$/, "");
+        forms.add(`/mnt/${m[1]!.toLowerCase()}/${rest}`);
+        forms.add(`/mnt/${m[1]!.toUpperCase()}/${rest}`);
+      }
+    }
+    return scrubText(text, [...forms]);
+  }
+
+  /**
+   * Make sure the engine group of a job is gone before the queue moves on. After a cancel or stop the pidfile is
+   * waited for up to engineStartWaitMs (a WSL cold start can launch the engine after wsl.exe was killed) and the
+   * group is killed when it appears; a kill that could not be confirmed is surfaced as a log event.
+   */
+  private async reap(jobId: string, slot: NonNullable<DockJobStore["active"]>, failed: boolean): Promise<void> {
+    if (!slot.dockStarted) return;
+    const dir = this.jobDir(jobId);
+    let rep: KillReport | undefined = slot.kill ? await slot.kill.catch(() => undefined) : undefined;
+    if (!rep?.gone) {
+      if (slot.ac.signal.aborted) rep = await this.runner.kill(dir, { waitMs: this.engineStartWaitMs });
+      else if (failed && existsSync(join(dir, DOCK_LAYOUT.pid))) rep = await this.runner.kill(dir, { waitMs: 0 });
+      else return; // the engine exited by itself (exit 0 or a reported failure with no group left to kill)
+    }
+    if (!rep.gone) this.note(jobId, `ENGINE_KILL_UNCONFIRMED: ${rep.reason ?? "UNKNOWN"}; the in-WSL timeout and stdin watcher remain as backstops.`);
+  }
+
+  private async execute(jobId: string, ac: AbortController, slot: NonNullable<DockJobStore["active"]>): Promise<void> {
+    let failed = true;
     const start = this.states.get(jobId);
     if (!start || start.status !== "QUEUED") return;
     this.transition(start, "PREPARING");
@@ -547,10 +670,12 @@ export class DockJobStore {
         jobDir: dir,
         signal: ac.signal,
         onStage: (stage) => {
+          if (stage === "dock") slot.dockStarted = true;
           const cur = this.states.get(jobId);
           if (stage === "dock" && cur?.status === "PREPARING") this.transition(cur, "RUNNING");
         },
       });
+      failed = outcome.exitCode !== 0;
       const cur = this.states.get(jobId);
       if (!cur || TERMINAL.has(cur.status)) return; // late exit (even exit 0) after cancel: discarded
       if (outcome.exitCode === 0) {
@@ -573,7 +698,11 @@ export class DockJobStore {
     } catch {
       return this.failIfLive(jobId, "INTERNAL", "The docking job could not be completed.");
     } finally {
-      rmSync(join(dir, DOCK_LAYOUT.pid), { force: true });
+      try {
+        await this.reap(jobId, slot, failed);
+      } finally {
+        rmSync(join(dir, DOCK_LAYOUT.pid), { force: true });
+      }
     }
   }
 
@@ -590,14 +719,20 @@ export class DockJobStore {
       throw new DockJobError("ALREADY_TERMINAL", 409, `Docking job is already ${s.status}.`);
     }
     const saved = this.transition({ ...s, cancelRequested: true }, "CANCELLED");
-    if (this.active?.jobId === jobId) {
-      this.active.ac.abort();
-      this.trackKill(this.runner.kill(this.jobDir(jobId)));
-    }
+    if (this.active?.jobId === jobId) this.abortActive();
     return saved;
   }
 
-  private trackKill(p: Promise<void>): void {
+  /** Abort the active run and start the fast pgid kill; execute() awaits it (and a late-pidfile retry) before the next job. */
+  private abortActive(): void {
+    const slot = this.active;
+    if (!slot || slot.ac.signal.aborted) return;
+    slot.ac.abort();
+    slot.kill = this.runner.kill(this.jobDir(slot.jobId), { waitMs: 1000 });
+    this.trackKill(slot.kill);
+  }
+
+  private trackKill(p: Promise<unknown>): void {
     const t = p.catch(() => undefined).finally(() => this.kills.delete(t));
     this.kills.add(t);
   }
@@ -659,8 +794,16 @@ export class DockJobStore {
       s = { ...s, seq: this.repairEvents(name) };
       this.states.set(name, s);
       if ((s.status === "PREPARING" || s.status === "RUNNING") && s.bootId !== this.bootId) {
-        kills.push(this.runner.kill(dir).finally(() => rmSync(join(dir, DOCK_LAYOUT.pid), { force: true })));
+        const id = name;
         this.transition(s, "FAILED", { error: { code: "API_RESTARTED", message: "The API restarted while this job was running; it was not resumed." } });
+        kills.push(
+          this.runner
+            .kill(dir, { waitMs: 0 })
+            .then((rep) => {
+              if (!rep.gone && rep.reason !== "NO_PIDFILE") this.note(id, `ENGINE_KILL_UNCONFIRMED: ${rep.reason ?? "UNKNOWN"}`);
+            })
+            .finally(() => rmSync(join(dir, DOCK_LAYOUT.pid), { force: true })),
+        );
       } else if (s.status === "QUEUED") {
         if (this.inputsIntact(s)) requeue.push(s);
         else this.transition(s, "FAILED", { error: { code: "INPUT_CHANGED", message: "The staged inputs no longer match their digests." } });
@@ -687,11 +830,12 @@ export class DockJobStore {
     if (this.active) {
       const id = this.active.jobId;
       this.failIfLive(id, "API_STOPPED", "The API stopped while this job was running; it was not resumed.");
-      this.active.ac.abort();
-      this.trackKill(this.runner.kill(this.jobDir(id)));
+      this.abortActive();
     }
     await this.idle();
-    if (this.lockHeld) rmSync(join(this.root, ".lock"), { force: true });
+    if (this.heartbeat) clearInterval(this.heartbeat);
+    this.heartbeat = undefined;
+    if (this.lockHeld && this.lockIsOurs()) rmSync(join(this.root, ".lock"), { force: true });
     this.lockHeld = false;
   }
 }
