@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -400,8 +400,13 @@ export class PrepJobStore {
       if (seal.status === "REJECTED") return this.transition(applying, "FAILED", { manifest, seal, error: `OUTPUT_REJECTED: ${seal.reasonCodes.join(",")}` });
       // SUCCEEDED means the worker finished and every output re-hashed. Prepared ids (the only handles a later
       // docking step accepts) are minted for a SEALED result only; BLOCKED/PREVIEW_UNQUALIFIED stay unsealed.
-      if (seal.status !== "SEALED") return this.transition(applying, "SUCCEEDED", { manifest, seal });
+      // A PREVIEW_UNQUALIFIED result gets separate opaque preview ids instead (job + 96-bit random token, never
+      // derivable from the client-known job id); docking accepts them only as PREVIEW_UNQUALIFIED (task 5.4).
       const compact = applying.jobId.replace(/-/g, "");
+      if (seal.status === "PREVIEW_UNQUALIFIED") {
+        return this.transition(applying, "SUCCEEDED", { manifest, seal, previewReceptorId: `pvrec_${compact}_${randomBytes(12).toString("hex")}`, previewLigandId: `pvlig_${compact}_${randomBytes(12).toString("hex")}` });
+      }
+      if (seal.status !== "SEALED") return this.transition(applying, "SUCCEEDED", { manifest, seal });
       return this.transition(applying, "SUCCEEDED", { manifest, seal, preparedReceptorId: `prec_${compact}`, preparedLigandId: `plig_${compact}` });
     } catch (e) {
       const latest = this.states.get(applying.jobId) ?? applying;

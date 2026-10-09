@@ -1,5 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { JobIdSchema, PrepareRequestSchema } from "@molecular/contracts";
+import { JobIdSchema, PrepareRequestSchema, type DockJobResultV1, type DockJobStateV1, type JobEvent } from "@molecular/contracts";
+import { createPrepResolver, DockJobStore, type DockJobStoreOptions, type DockSubmitResult } from "../jobs/dockJobs.js";
+import type { DockRunner } from "../jobs/dockRunner.js";
 import { PREP_MAX_ARTIFACT_BYTES, PrepError, type PrepJobStore } from "../jobs/prepJobs.js";
 import type { PrepArtifactStore } from "../jobs/prepArtifacts.js";
 
@@ -128,4 +130,48 @@ const handlePrep = async (o: PrepRoutesOptions, req: IncomingMessage, res: Serve
     if (e instanceof PrepError) return fail(res, e.httpStatus, e.code, e.message);
     return fail(res, 500, "INTERNAL_ERROR", "The request could not be completed.");
   }
+};
+
+// ---- Docking jobs (task 5.4) -------------------------------------------------------------------------------
+// The job service only; HTTP and SSE routes over it are task 5.5. DockJobError carries code + httpStatus
+// (400 BAD_INPUT, 404 NOT_FOUND, 409 ILLEGAL_TRANSITION/ALREADY_TERMINAL, 429 QUEUE_FULL, 503 ENGINE_PIN_MISMATCH).
+
+export type DockJobServiceDeps = Readonly<{
+  /** Fixed data dir without spaces, e.g. <dataRoot>/dock-jobs. */
+  root: string;
+  prep: PrepJobStore;
+  runner?: DockRunner;
+  /**
+   * Store seam: the file store (DockJobStore) is an accepted interim deviation from the SQLite WAL requirement;
+   * a SQLite store implementing DockJobService can be plugged in here without changing callers.
+   */
+  createStore?: (o: DockJobStoreOptions) => DockJobService;
+}>;
+
+export type DockJobService = Readonly<{
+  init(): Promise<void>;
+  submit(req: unknown): Promise<DockSubmitResult>;
+  get(id: string): DockJobStateV1;
+  list(): DockJobStateV1[];
+  cancel(id: string): DockJobStateV1;
+  events(id: string, afterSeq?: number): JobEvent[];
+  subscribe(id: string, afterSeq: number, cb: (e: JobEvent) => void): () => void;
+  result(id: string): DockJobResultV1;
+  close(): Promise<void>;
+}>;
+
+export const createDockJobService = (deps: DockJobServiceDeps): DockJobService => {
+  const options: DockJobStoreOptions = { root: deps.root, resolvePrepared: createPrepResolver(deps.prep), ...(deps.runner ? { runner: deps.runner } : {}) };
+  const store: DockJobService = deps.createStore ? deps.createStore(options) : new DockJobStore(options);
+  return Object.freeze({
+    init: () => store.init(),
+    submit: (req: unknown) => store.submit(req),
+    get: (id: string) => store.get(id),
+    list: () => store.list(),
+    cancel: (id: string) => store.cancel(id),
+    events: (id: string, afterSeq = 0) => store.events(id, afterSeq),
+    subscribe: (id: string, afterSeq: number, cb: (e: JobEvent) => void) => store.subscribe(id, afterSeq, cb),
+    result: (id: string) => store.result(id),
+    close: () => store.close(),
+  });
 };

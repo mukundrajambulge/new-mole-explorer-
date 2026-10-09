@@ -230,6 +230,12 @@ export const PrepJobStateV1Schema = z
     manifest: PrepManifestV1Schema.optional(),
     preparedReceptorId: ArtifactIdSchema.optional(),
     preparedLigandId: ArtifactIdSchema.optional(),
+    /**
+     * Server-minted opaque handles for a PREVIEW_UNQUALIFIED result (task 5.4): pvrec_/pvlig_ + job + random
+     * token. Dockable only as PREVIEW_UNQUALIFIED (owner decision; capability VINA_COMPARATOR_PREVIEW, 5.6).
+     */
+    previewReceptorId: ArtifactIdSchema.optional(),
+    previewLigandId: ArtifactIdSchema.optional(),
     seal: PrepSealSummaryV1Schema.optional(),
     error: shortText.optional(),
     createdAt: z.string().max(40),
@@ -253,7 +259,8 @@ export const DockJobRequestSchema = z
     boxSize: z.tuple([boxEdge, boxEdge, boxEdge]),
     exhaustiveness: z.number().int().min(1).max(64).default(8),
     numPoses: z.number().int().min(1).max(20).default(9),
-    seed: z.number().int().min(0).max(2_147_483_647),
+    // Vina needs seed >= 1 (tools/mole-dock/run.mjs); the contract follows the stricter side (task 5.4).
+    seed: z.number().int().min(1).max(2_147_483_647),
   })
   .strict();
 export type DockJobRequest = z.infer<typeof DockJobRequestSchema>;
@@ -261,6 +268,105 @@ export type DockJobRequest = z.infer<typeof DockJobRequestSchema>;
 export const DOCK_JOB_STATUSES = ["QUEUED", "PREPARING", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"] as const;
 export type DockJobStatusName = (typeof DOCK_JOB_STATUSES)[number];
 export const DOCK_JOB_TERMINAL_STATUSES = ["SUCCEEDED", "FAILED", "CANCELLED"] as const;
+
+/**
+ * Persisted docking job state (task 5.4, design 5.4): <root>/<jobId>/state.json. The server resolves the
+ * prepared ids; everything in provenance is server-computed. Results stay PREVIEW_UNQUALIFIED (meScore null).
+ */
+export const DockJobProvenanceV1Schema = z
+  .object({
+    preparedReceptorId: ArtifactIdSchema,
+    preparedLigandId: ArtifactIdSchema,
+    /** Preparation job of the receptor. */
+    prepJobId: JobIdSchema,
+    /** Preparation job of the ligand (may differ from the receptor's). */
+    ligandPrepJobId: JobIdSchema,
+    prepSealStatus: z.enum(["SEALED", "PREVIEW_UNQUALIFIED"]),
+    prepQualification: z.enum(PREP_QUALIFICATION),
+    receptorSha256: hex64,
+    ligandSha256: hex64,
+    seed: z.number().int().min(1).max(2_147_483_647),
+    /** Vina pin from native/third_party/TOOLS.md. */
+    vinaPin: z.object({ version: z.string().min(1).max(32), sha256: hex64 }).strict(),
+    /** What the engine reported on this run (null until the run verified the binary). */
+    vina: z.object({ versionReported: z.string().max(80), binarySha256: hex64 }).strict().nullable(),
+  })
+  .strict();
+export type DockJobProvenanceV1 = z.infer<typeof DockJobProvenanceV1Schema>;
+
+export const DockJobStateV1Schema = z
+  .object({
+    schemaVersion: z.literal(1),
+    jobId: JobIdSchema,
+    inputDigest: hex64,
+    status: z.enum(DOCK_JOB_STATUSES),
+    /** Process boot that last owned this job; a different boot means the run was interrupted. */
+    bootId: z.string().regex(/^[0-9a-f-]{36}$/),
+    cancelRequested: z.boolean(),
+    /** Only real stage points: 0 queued, 0.05 preparing, 0.1 running, 1 done. */
+    progress: z.number().min(0).max(1),
+    error: z.object({ code: z.string().min(1).max(64), message: shortText }).strict().optional(),
+    provenance: DockJobProvenanceV1Schema,
+    /** Last event seq written for this job. */
+    seq: z.number().int().min(0).max(JOB_CAPS.eventsMax),
+    createdAt: z.string().max(40),
+    updatedAt: z.string().max(40),
+  })
+  .strict();
+export type DockJobStateV1 = z.infer<typeof DockJobStateV1Schema>;
+
+/** tools/mole-dock/run.mjs result.json on exit 0 (the fields the API re-checks; other keys pass through). */
+export const MoleDockRunResultV1Schema = z
+  .object({
+    schemaVersion: z.literal(1),
+    status: z.literal("OK"),
+    label: z.literal("PREVIEW_UNQUALIFIED"),
+    engine: z.object({ name: z.string().max(64), version: z.string().max(32), versionReported: z.string().max(80), binarySha256: hex64, pinnedSha256: hex64 }).strict(),
+    inputs: z.object({ jobSha256: hex64, receptor: z.object({ sha256: hex64 }).passthrough(), ligand: z.object({ sha256: hex64 }).passthrough() }).strict(),
+    vinaScore: finite,
+    meScore: z.null(),
+    meScoreStatus: z.object({ status: z.literal("UNAVAILABLE"), reason: z.string().min(1).max(64) }).strict(),
+    poses: z
+      .array(z.object({ rank: z.number().int().min(1), vinaScore: finite, rmsdLbFromBest: finite.nullable(), rmsdUbFromBest: finite.nullable(), atomCount: z.number().int().min(1), meScore: z.null(), terms: z.null() }).strict())
+      .min(1)
+      .max(JOB_CAPS.posesMax),
+    outputs: z.object({ "poses.pdbqt": hex64 }).strict(),
+  })
+  .passthrough();
+export const MoleDockRunManifestV1Schema = z
+  .object({ schemaVersion: z.literal(1), kind: z.literal("mole-dock-run"), status: z.literal("OK"), files: z.record(z.string().max(64), hex64), engineSha256: hex64 })
+  .passthrough();
+
+/** Result of a SUCCEEDED docking job, bound to its jobId and inputDigest. Vina scores only; meScore is null. */
+export const DockJobResultV1Schema = z
+  .object({
+    schemaVersion: z.literal(1),
+    jobId: JobIdSchema,
+    inputDigest: hex64,
+    label: z.literal("PREVIEW_UNQUALIFIED"),
+    vinaScore: finite,
+    meScore: z.null(),
+    meScoreStatus: z.object({ status: z.literal("UNAVAILABLE"), reason: z.string().min(1).max(64) }).strict(),
+    poses: z
+      .array(
+        z
+          .object({
+            rank: z.number().int().min(1).max(JOB_CAPS.posesMax),
+            vinaScore: finite,
+            rmsdLbFromBest: finite.nullable(),
+            rmsdUbFromBest: finite.nullable(),
+            atomCount: z.number().int().min(1).max(100_000),
+            meScore: z.null(),
+          })
+          .strict(),
+      )
+      .min(1)
+      .max(JOB_CAPS.posesMax),
+    posesSha256: hex64,
+    provenance: DockJobProvenanceV1Schema,
+  })
+  .strict();
+export type DockJobResultV1 = z.infer<typeof DockJobResultV1Schema>;
 
 export const JobStatusSchema = z
   .object({
