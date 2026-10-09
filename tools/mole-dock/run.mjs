@@ -381,7 +381,8 @@ export async function runDockJob({ input, out, root }, { engineImpl, signal } = 
     });
     return { exitCode: EXIT_OK, result };
   } catch (e) {
-    const err = e instanceof DockError ? e : engine("INTERNAL", String(e?.code || "unexpected error"));
+    const typed = e instanceof DockError || (e && typeof e.exitCode === "number" && typeof e.code === "string");
+    const err = typed ? e : engine("INTERNAL", String(e?.code || "unexpected error"));
     const error = { code: err.code, message: scrubOutput(err.message, 800, [outDir, root, input].filter(Boolean)) };
     if (outDir) {
       try {
