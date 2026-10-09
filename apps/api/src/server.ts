@@ -15,6 +15,8 @@ import { profileMark, profileTransport } from "./structures/ingestionProfiler.js
 import { D2PreparationService } from "./docking/d2PreparationService.js";
 import type { D2SearchRegionInput } from "./docking/d2Preparation.js";
 import { createPrepService } from "./jobs/prepService.js";
+import { createDockJobRoutes, createDockJobService, dockingRunEnabled, type DockJobService } from "./docking/routes.js";
+import { vinaComparatorCapability } from "@molecular/contracts";
 import { parseOr400, decodeSegment } from "./projects/parseOr400.js";
 import { bodyObjectSchema, commandBatchBodySchema, commandBodySchema, commandExecuteBodySchema, commandReplayBodySchema, d2AdaptBodySchema, d2SearchRegionBodySchema, pathIdSchema, projectCreateBodySchema, projectIdSchema, projectOpenQuerySchema, projectSaveBodySchema, rcsbBodySchema, revisionIdSchema, uploadHeadersSchema } from "../../../packages/contracts/src/api/index.js";
 
@@ -32,6 +34,10 @@ const sendJson = (response: ServerResponse, status: number, body: unknown) => {
 
 const health: HealthResponse = { service: "molecular-api", status: "ok", gate: "G1C", timestamp: new Date().toISOString() };
 
+// Task 5.5/5.6: the Vina comparator preview (owner decision 2026-10-09) exists only with FEATURE_DOCKING_RUN=1.
+const dockingRun = dockingRunEnabled();
+const vinaPreview = vinaComparatorCapability(dockingRun);
+
 const bootstrap: BootstrapResponse = {
   product: "Molecular Workstation",
   gate: "G1C",
@@ -48,7 +54,10 @@ const bootstrap: BootstrapResponse = {
     "FILE.EXPORT": { state: "SUPPORTED_WITH_LIMITATIONS", label: "Supported with limitations", description: "The web client provides typed PDB/mmCIF writers with exact-byte hashes and explicit loss manifests." },
     "SELECTION.EVALUATE": { state: "SUPPORTED", label: "Supported", description: "The web client evaluates the typed canonical selection language against the loaded molecular revision." },
     "SELECTION.CREATE_NAMED": { state: "SUPPORTED", label: "Supported", description: "The web client can create immutable named selection snapshots for the active molecular revision." },
-    "DOCKING.RUN": { state: "UNAVAILABLE", label: "Unavailable", description: "No docking engine or scores are available in this foundation." },
+    "DOCKING.RUN": { state: "UNAVAILABLE", label: "Unavailable", description: "The Mole docking engine is not released (gate D8). No Mole docking scores are available." },
+    VINA_COMPARATOR_PREVIEW: dockingRun
+      ? { state: "EXPERIMENTAL", label: "Experimental preview", description: `${vinaPreview.notice} AutoDock Vina ${vinaPreview.engine.version} comparator: implementation ${vinaPreview.implementation}, validation ${vinaPreview.validation}; results are ${vinaPreview.resultLabel}.` }
+      : { state: "UNAVAILABLE", label: "Unavailable", description: vinaPreview.unavailableReason ?? "Unavailable." },
     "COMMAND.CANONICAL": { state: "SUPPORTED", label: "Supported", description: "GUI, safe console, REST, SDK and bounded macro requests converge through the versioned command registry." },
     "COMMAND.PYMOL_COMPAT": { state: "SUPPORTED_WITH_LIMITATIONS", label: "Supported with limitations", description: "The SAFE_PYMOL_COMPAT profile accepts bounded scientific syntax and rejects code/process execution." },
   },
@@ -74,6 +83,22 @@ const commandDispatcher = new CommandDispatcher({ dataRoot });
 const d2PreparationService = new D2PreparationService();
 // Task 5.2b: preparation jobs. The TOOLS.md pin check runs here, at start-up; a mismatch fails every prep route closed.
 export const prepService = createPrepService({ dataRoot });
+// Task 5.5: docking jobs. With the flag off the store is never created or opened and the job routes fall through to 404.
+export const dockService: DockJobService | undefined = dockingRun ? createDockJobService({ root: join(dataRoot, "dock-jobs"), prep: prepService.store }) : undefined;
+let dockServiceReady: Promise<DockJobService> | undefined;
+const openDockService = (): Promise<DockJobService> => {
+  const service = dockService;
+  if (!service) return Promise.reject(new Error("docking jobs are disabled"));
+  dockServiceReady ??= service.init().then(
+    () => service,
+    (error: unknown) => {
+      dockServiceReady = undefined; // a later request may retry (for example once a stale lock is released)
+      throw error;
+    },
+  );
+  return dockServiceReady;
+};
+export const dockRoutes = createDockJobRoutes({ enabled: dockingRun, service: openDockService });
 
 // Structure transfers (uploads and RCSB fetches) share one small pool of slots; more answer 429.
 let activeTransfers = 0;
@@ -372,6 +397,7 @@ const route = async (request: IncomingMessage, response: ServerResponse) => {
       return;
     }
     if (await prepService.handle(request, response, url.pathname)) return;
+    if (await dockRoutes(request, response, url.pathname)) return;
     sendJson(response, 404, { error: { code: "NOT_FOUND", message: "Route was not found." } });
   } catch (error) {
     if (response.headersSent) throw error;
@@ -410,6 +436,8 @@ export const startServer = (port = config.port, host = config.host) =>
       server.off("error", onError);
       try {
         if (config.mode === "local") issueLocalToken();
+        // Crash recovery runs at start-up (not on the first request) when the flag is on.
+        if (dockService) openDockService().catch((error: unknown) => console.error("docking job store unavailable:", error instanceof Error ? error.message : "unknown"));
       } catch (error) {
         server.close();
         reject(error);
