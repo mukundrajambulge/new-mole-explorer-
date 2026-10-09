@@ -292,7 +292,15 @@ const coordinateValuesFor = (state: D2CoordinateStateV1, atomUid: D2AtomUID): re
 
 export const isPoseAdmissibleInSearchRegion = (region: D2SearchRegionV1, heavyAtomCoordinates: readonly (readonly [number, number, number])[]): boolean => heavyAtomCoordinates.every((coordinate) => coordinate.every((value, index) => value >= f64Value(region.min[index]!) && value <= f64Value(region.max[index]!)));
 
-export const sealSearchRegion = (input: D2SearchRegionInput): D2SealResult<D2SearchRegionV1> => {
+/**
+ * Input canonicalisation for SearchRegion geometry only (box min/max/padding): -0 becomes +0 so that
+ * a -0 box and a 0 box seal to the same digest. The f64 hash encoder stays bit-exact (f64Bits(-0) != f64Bits(0));
+ * this must never be applied to scores or weights.
+ */
+const canonicalGeometryZero = <T extends readonly number[]>(values: T): T => values.map((value) => (value === 0 ? 0 : value)) as unknown as T;
+
+export const sealSearchRegion = (rawInput: D2SearchRegionInput): D2SealResult<D2SearchRegionV1> => {
+  const input: D2SearchRegionInput = { ...rawInput, min: canonicalGeometryZero(rawInput.min), max: canonicalGeometryZero(rawInput.max), paddingAngstrom: canonicalGeometryZero(rawInput.paddingAngstrom) };
   const diagnostics: D2Diagnostic[] = [];
   if (!input.bindingSiteRef.trim()) diagnostics.push(d2Error("INVALID_BINDING_SITE_REF", "BindingSiteIdentity reference must be explicit and non-empty."));
   if (input.preparedReceptor.coordinateState.coordinateFrame !== input.coordinateFrame) diagnostics.push(d2Error("INVALID_SEARCH_REGION_FRAME", "SearchRegion must use the exact prepared-receptor coordinate frame."));
