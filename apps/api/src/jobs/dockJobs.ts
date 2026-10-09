@@ -14,7 +14,9 @@ import {
   type DockJobRequest,
   type DockJobResultV1,
   type DockJobStateV1,
+  type DockJobStage,
   type DockJobStatusName,
+  DOCK_LEGACY_STATUS_MAP,
   type JobEvent,
   type PrepJobStateV1,
 } from "@molecular/contracts";
@@ -27,23 +29,32 @@ import { REPO_ROOT } from "./prepPins.js";
  * - file store on the prepJobs patterns: one UUID dir per job under <root>/, atomic state.json, append-only
  *   events.ndjson (monotonic seq, torn last line dropped), one transition table, TTL + gc, quota
  * - one Vina at a time (FIFO), queue max 8; cancel writes CANCELLED first, then aborts and kills the pgid
- * - crash recovery: a new bootId per start; PREPARING/RUNNING from another boot -> FAILED API_RESTARTED
+ * - crash recovery: a new bootId per start; RUNNING from another boot -> FAILED API_RESTARTED
  *   (never resumed); QUEUED with intact inputs is requeued; corrupt dirs are quarantined
- * - dedupe: inputDigest over server-resolved inputs; live or SUCCEEDED jobs are reused
+ * - dedupe: inputDigest over server-resolved inputs; CREATED/QUEUED/RUNNING/COMPLETED jobs are reused
  * Results stay PREVIEW_UNQUALIFIED with meScore null. HTTP/SSE is task 5.5.
  */
 
 export const DOCK_TRANSITIONS: Readonly<Record<DockJobStatusName, readonly DockJobStatusName[]>> = Object.freeze({
-  QUEUED: ["PREPARING", "CANCELLED", "FAILED"],
-  PREPARING: ["RUNNING", "CANCELLED", "FAILED"],
-  RUNNING: ["SUCCEEDED", "CANCELLED", "FAILED"],
-  SUCCEEDED: [],
+  CREATED: ["QUEUED", "CANCELLED", "FAILED"],
+  QUEUED: ["RUNNING", "CANCELLED", "FAILED"],
+  RUNNING: ["COMPLETED", "CANCELLED", "FAILED"],
+  COMPLETED: [],
   FAILED: [],
   CANCELLED: [],
 });
 const TERMINAL = new Set<DockJobStatusName>(DOCK_JOB_TERMINAL_STATUSES);
-const LIVE = new Set<DockJobStatusName>(["QUEUED", "PREPARING", "RUNNING"]);
-const PROGRESS: Readonly<Record<DockJobStatusName, number>> = { QUEUED: 0, PREPARING: 0.05, RUNNING: 0.1, SUCCEEDED: 1, FAILED: 1, CANCELLED: 1 };
+const LIVE = new Set<DockJobStatusName>(["CREATED", "QUEUED", "RUNNING"]);
+const PROGRESS: Readonly<Record<DockJobStatusName, number>> = { CREATED: 0, QUEUED: 0, RUNNING: 0.05, COMPLETED: 1, FAILED: 1, CANCELLED: 1 };
+/** R.2: map a pre-R.2 status event (SUCCEEDED/PREPARING) onto the six research states. */
+function legacyEvent(e: unknown): unknown {
+  if (e && typeof e === "object" && (e as { type?: unknown }).type === "status") {
+    const st = String((e as { status?: unknown }).status);
+    const m = Object.hasOwn(DOCK_LEGACY_STATUS_MAP, st) ? DOCK_LEGACY_STATUS_MAP[st] : undefined;
+    if (m) return { ...(e as object), status: m.status, ...(m.stage ? { stage: m.stage } : {}) };
+  }
+  return e;
+}
 export const DOCK_MAX_QUEUE = 8;
 export const DOCK_MAX_JOBS = 32;
 export const DOCK_MAX_BYTES = 2 * 1024 * 1024 * 1024;
@@ -379,12 +390,22 @@ export class DockJobStore {
       throw new DockJobError("ILLEGAL_TRANSITION", 409, `Docking job cannot move from ${s.status} to ${to}.`);
     }
     const next: DockJobStateV1 = { ...s, ...patch, status: to, progress: PROGRESS[to] };
+    if (to === "RUNNING") next.stage = patch.stage ?? "PREPARING";
+    else delete next.stage;
     if (patch.error) next.error = { code: patch.error.code.slice(0, 64), message: this.scrub(s.jobId, patch.error.message).slice(0, 500) };
-    const events: Array<Omit<JobEvent, "seq" | "jobId" | "at">> = [{ type: "status", status: to } as Omit<JobEvent, "seq" | "jobId" | "at">];
+    const events: Array<Omit<JobEvent, "seq" | "jobId" | "at">> = [{ type: "status", status: to, ...(next.stage ? { stage: next.stage } : {}) } as Omit<JobEvent, "seq" | "jobId" | "at">];
     if (next.progress !== s.progress) events.push({ type: "progress", progress: next.progress } as Omit<JobEvent, "seq" | "jobId" | "at">);
     if (to === "FAILED" && next.error) events.push({ type: "error", message: `${next.error.code}: ${next.error.message}`.slice(0, 500) } as Omit<JobEvent, "seq" | "jobId" | "at">);
-    if (to === "SUCCEEDED") events.push({ type: "result", resultReady: true } as Omit<JobEvent, "seq" | "jobId" | "at">);
+    if (to === "COMPLETED") events.push({ type: "result", resultReady: true } as Omit<JobEvent, "seq" | "jobId" | "at">);
     return this.commit(next, events);
+  }
+
+  /** A stage change inside RUNNING (status unchanged): persisted on the state and emitted as a stage event. */
+  private setStage(s: DockJobStateV1, stage: DockJobStage, progress: number): DockJobStateV1 {
+    return this.commit({ ...s, stage, progress }, [
+      { type: "stage", stage } as Omit<JobEvent, "seq" | "jobId" | "at">,
+      { type: "progress", progress } as Omit<JobEvent, "seq" | "jobId" | "at">,
+    ]);
   }
 
   /** Test seam and runner path: move a job along the transition table (409 on an illegal move). */
@@ -403,7 +424,7 @@ export class DockJobStore {
       if (!line) continue;
       let ev: JobEvent;
       try {
-        ev = JobEventSchema.parse(JSON.parse(line));
+        ev = JobEventSchema.parse(legacyEvent(JSON.parse(line)));
       } catch {
         continue;
       }
@@ -449,7 +470,7 @@ export class DockJobStore {
   /** Result of a SUCCEEDED job only: zod-parsed, PREVIEW_UNQUALIFIED, meScore null, bound to jobId + inputDigest. */
   result(jobId: string): DockJobResultV1 {
     const s = this.get(jobId);
-    if (s.status !== "SUCCEEDED") throw new DockJobError("RESULT_UNAVAILABLE", 409, `Docking job is ${s.status}; no result.`);
+    if (s.status !== "COMPLETED") throw new DockJobError("RESULT_UNAVAILABLE", 409, `Docking job is ${s.status}; no result.`);
     let parsed: DockJobResultV1;
     try {
       parsed = DockJobResultV1Schema.parse(readCappedJson(join(this.jobDir(jobId), ...DOCK_LAYOUT.result.split("/"))));
@@ -469,7 +490,7 @@ export class DockJobStore {
 
   private expired(s: DockJobStateV1): boolean {
     if (!TERMINAL.has(s.status)) return false;
-    return this.ageMs(s) >= (s.status === "SUCCEEDED" ? this.retainSucceededMs : this.retainTerminalMs);
+    return this.ageMs(s) >= (s.status === "COMPLETED" ? this.retainSucceededMs : this.retainTerminalMs);
   }
 
   private removeJob(jobId: string): void {
@@ -533,9 +554,9 @@ export class DockJobStore {
     // ---- synchronous from here: lookup + insert cannot interleave with another submit ----
     const existingId = this.byDigest.get(digest);
     const existing = existingId ? this.states.get(existingId) : undefined;
-    if (existing && (LIVE.has(existing.status) || (existing.status === "SUCCEEDED" && !this.expired(existing)))) return { job: existing, deduped: true };
+    if (existing && (LIVE.has(existing.status) || (existing.status === "COMPLETED" && !this.expired(existing)))) return { job: existing, deduped: true };
     let queued = 0;
-    for (const s of this.states.values()) if (s.status === "QUEUED") queued++;
+    for (const s of this.states.values()) if (s.status === "QUEUED" || s.status === "CREATED") queued++;
     if (queued >= this.maxQueue) throw new DockJobError("QUEUE_FULL", 429, `The docking queue is full (${this.maxQueue} jobs); try again later.`);
     const usage = this.gc(1);
     if (usage.jobs >= this.maxJobs || usage.bytes >= this.maxBytes) throw new DockJobError("QUOTA_EXCEEDED", 429, "Too many docking jobs are stored; wait for running jobs to finish.");
@@ -562,7 +583,7 @@ export class DockJobStore {
       schemaVersion: 1,
       jobId,
       inputDigest: digest,
-      status: "QUEUED",
+      status: "CREATED",
       bootId: this.bootId,
       cancelRequested: false,
       progress: 0,
@@ -571,8 +592,9 @@ export class DockJobStore {
       createdAt: t,
       updatedAt: t,
     };
-    const saved = this.commit(state, [{ type: "status", status: "QUEUED" } as Omit<JobEvent, "seq" | "jobId" | "at">]);
+    const created = this.commit(state, [{ type: "status", status: "CREATED" } as Omit<JobEvent, "seq" | "jobId" | "at">]);
     this.byDigest.set(digest, jobId);
+    const saved = this.transition(created, "QUEUED");
     this.queue.push(jobId);
     queueMicrotask(() => this.kick());
     return { job: saved, deduped: false };
@@ -662,7 +684,7 @@ export class DockJobStore {
     let failed = true;
     const start = this.states.get(jobId);
     if (!start || start.status !== "QUEUED") return;
-    this.transition(start, "PREPARING");
+    this.transition(start, "RUNNING", { stage: "PREPARING" });
     const dir = this.jobDir(jobId);
     try {
       if (!this.inputsIntact(start)) return this.failIfLive(jobId, "INPUT_CHANGED", "The staged inputs no longer match their digests.");
@@ -673,14 +695,14 @@ export class DockJobStore {
         return this.failIfLive(jobId, "ENGINE_PIN_MISMATCH", "The Vina pin in TOOLS.md is missing or invalid.");
       }
       if (pin.sha256 !== start.provenance.vinaPin.sha256 || pin.version !== start.provenance.vinaPin.version) return this.failIfLive(jobId, "ENGINE_PIN_MISMATCH", "The Vina pin changed since the job was queued.");
-      if (ac.signal.aborted || this.states.get(jobId)?.status !== "PREPARING") return;
+      if (ac.signal.aborted || this.states.get(jobId)?.status !== "RUNNING") return;
       const outcome = await this.runner.run({
         jobDir: dir,
         signal: ac.signal,
         onStage: (stage) => {
           if (stage === "dock") slot.dockStarted = true;
           const cur = this.states.get(jobId);
-          if (stage === "dock" && cur?.status === "PREPARING") this.transition(cur, "RUNNING");
+          if (stage === "dock" && cur?.status === "RUNNING" && cur.stage === "PREPARING") this.setStage(cur, "DOCKING", 0.1);
         },
       });
       failed = outcome.exitCode !== 0;
@@ -696,8 +718,7 @@ export class DockJobStore {
         writeAtomicRetry(join(dir, ...DOCK_LAYOUT.result.split("/")), JSON.stringify(result, null, 1) + "\n");
         const latest = this.states.get(jobId)!;
         if (!LIVE.has(latest.status)) return;
-        const running = latest.status === "PREPARING" ? this.transition(latest, "RUNNING") : latest;
-        this.transition(running, "SUCCEEDED", { provenance: result.provenance });
+        this.transition(latest, "COMPLETED", { provenance: result.provenance });
         return;
       }
       const err = outcome.error ?? { code: "UNKNOWN", message: "the engine failed" };
@@ -763,7 +784,7 @@ export class DockJobStore {
     let last = 0;
     for (const line of raw.split("\n")) {
       try {
-        const ev = JobEventSchema.parse(JSON.parse(line));
+        const ev = JobEventSchema.parse(legacyEvent(JSON.parse(line)));
         if (ev.jobId === jobId && ev.seq > last) last = ev.seq;
       } catch {
         // dropped
@@ -780,13 +801,21 @@ export class DockJobStore {
     mkdirSync(this.root, { recursive: true });
     this.acquireLock();
     const requeue: DockJobStateV1[] = [];
+    const migratedNotes = new Map<string, string>();
     const kills: Promise<void>[] = [];
     for (const name of readdirSync(this.root)) {
       if (!UUID_RE.test(name)) continue;
       const dir = join(this.root, name);
       let s: DockJobStateV1 | undefined;
       try {
-        s = DockJobStateV1Schema.parse(readCappedJson(join(dir, DOCK_LAYOUT.state)));
+        const raw = readCappedJson(join(dir, DOCK_LAYOUT.state));
+        const from = raw && typeof raw === "object" ? String((raw as { status?: unknown }).status) : "";
+        const legacy = Object.hasOwn(DOCK_LEGACY_STATUS_MAP, from) ? DOCK_LEGACY_STATUS_MAP[from] : undefined;
+        if (legacy) {
+          // R.2 migration: SUCCEEDED -> COMPLETED; PREPARING -> RUNNING with stage PREPARING. Recorded as a log event.
+          s = DockJobStateV1Schema.parse({ ...(raw as object), status: legacy.status, ...(legacy.stage ? { stage: legacy.stage } : {}) });
+          if (s.jobId === name) migratedNotes.set(name, `MIGRATED_LEGACY_STATE: ${from} -> ${legacy.status}${legacy.stage ? ` (stage ${legacy.stage})` : ""}`);
+        } else s = DockJobStateV1Schema.parse(raw);
         if (s.jobId !== name) s = undefined;
       } catch {
         s = undefined;
@@ -800,8 +829,10 @@ export class DockJobStore {
         continue;
       }
       s = { ...s, seq: this.repairEvents(name) };
+      const note = migratedNotes.get(name);
+      if (note) s = this.commit(s, [{ type: "log", line: note } as Omit<JobEvent, "seq" | "jobId" | "at">]);
       this.states.set(name, s);
-      if ((s.status === "PREPARING" || s.status === "RUNNING") && s.bootId !== this.bootId) {
+      if (s.status === "RUNNING" && s.bootId !== this.bootId) {
         const id = name;
         this.transition(s, "FAILED", { error: { code: "API_RESTARTED", message: "The API restarted while this job was running; it was not resumed." } });
         kills.push(
@@ -812,8 +843,8 @@ export class DockJobStore {
             })
             .finally(() => rmSync(join(dir, DOCK_LAYOUT.pid), { force: true })),
         );
-      } else if (s.status === "QUEUED") {
-        if (this.inputsIntact(s)) requeue.push(s);
+      } else if (s.status === "QUEUED" || s.status === "CREATED") {
+        if (this.inputsIntact(s)) requeue.push(s.status === "CREATED" ? this.transition(s, "QUEUED") : s);
         else this.transition(s, "FAILED", { error: { code: "INPUT_CHANGED", message: "The staged inputs no longer match their digests." } });
       }
     }
@@ -822,7 +853,7 @@ export class DockJobStore {
       if (this.expired(s)) continue;
       const cur = this.byDigest.get(s.inputDigest);
       const prev = cur ? this.states.get(cur) : undefined;
-      const reusable = (x: DockJobStateV1) => LIVE.has(x.status) || x.status === "SUCCEEDED";
+      const reusable = (x: DockJobStateV1) => LIVE.has(x.status) || x.status === "COMPLETED";
       if (!prev || (!reusable(prev) && reusable(s))) this.byDigest.set(s.inputDigest, s.jobId);
     }
     this.gc();

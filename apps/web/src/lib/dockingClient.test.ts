@@ -27,7 +27,7 @@ describe("dockingClient against the 5.0 mock server", () => {
     expect(prep.preparedReceptorId).toBeTruthy();
     const job = await c.startJob({ receptorPreparedId: prep.preparedReceptorId!, ligandPreparedId: prep.preparedLigandId!, boxCenter: [0, 0, 0], boxSize: [10, 10, 10], exhaustiveness: 8, numPoses: 3, seed: 1 }, sig());
     let st = job;
-    for (let i = 0; i < 100 && st.status !== "SUCCEEDED"; i += 1) { await wait(10); st = await c.getJob(job.jobId, sig()); }
+    for (let i = 0; i < 100 && st.status !== "COMPLETED"; i += 1) { await wait(10); st = await c.getJob(job.jobId, sig()); }
     const result = await c.getResult(job.jobId, sig());
     expect(result.scoreStatus).toBe("PREVIEW_UNQUALIFIED");
     expect(result.poses).toHaveLength(3);
