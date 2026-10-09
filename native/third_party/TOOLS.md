@@ -51,3 +51,11 @@ Machine-checked at API startup by `apps/api/src/jobs/prepPins.ts` (any mismatch 
 | Seed | ETKDGv3 `randomSeed` `61453` (`0xF00D`, `workers/prep/mole_prep/ligand.py`) |
 | Lock digest | `e9584f9e12a2dd2f554eb5d3bcd75865c08e55eea715c0d1963f34605e538ce9` (sha256 of `workers/prep/requirements.lock.txt`, LF-normalised) |
 | Default protonation | `EXPLICIT_SUBMITTED`; PROPKA / Dimorphite-DL are opt-in and seal as PREVIEW_UNQUALIFIED |
+
+## Docking job store (task 5.4)
+
+| Item | Value |
+| --- | --- |
+| Store | Plain files under the API data dir (`<root>/<jobId>/state.json`, `events.ndjson`, `in/`, `out/`, `pid`; `<root>/.lock`), no new dependency |
+| Rejected | `better-sqlite3` (native addon, no compiler on the host, no checked Node 24 win32 prebuild); `node:sqlite` (experimental on Node 24: warning, unstable API) |
+| Engine launch | `wsl.exe --exec /usr/bin/setsid -w /bin/sh -c 'echo $$ > "$1"; shift; exec "$@"' sh <pidfile> /usr/bin/timeout -k 5 ...` (pgid in the pidfile; cancel kills `-<pgid>` only when `/proc/<pgid>/cwd` is the job's out dir) |
