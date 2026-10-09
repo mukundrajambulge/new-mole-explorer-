@@ -2524,8 +2524,8 @@
         "RESEARCH"
       ],
       "est": "1 week",
-      "status": "TODO",
-      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md OWNER: do not plan around the presentation; go at research speed. Label smoke, never validated."
+      "status": "DONE",
+      "note": "Merged: symmetric RMSD, envelope+5 A box, ETKDG start from CCD, 3 seeds, 5 cases (1STP 3PTB 1HVR 1IEP 4DJW). Top-1 sym RMSD all <= 1.31 A; success 100% at 1.5 A, 53% at 1.0 A. Labelled SMOKE. Report docs/science/redock-smoke-2026-10-09.md"
     },
     {
       "id": "5.0",
