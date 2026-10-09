@@ -1,7 +1,7 @@
 # Sprint state (generated: do not edit; run `node scripts/sprint/sprint.mjs state`)
 
-Status: DONE: 27 · TODO: 59 · NEEDS_OWNER: 3 · BLOCKED: 1 · DEFERRED: 8
-Done by tier: core 26/45 · strong 1/38 · stretch 0/7
+Status: DONE: 28 · TODO: 58 · NEEDS_OWNER: 3 · BLOCKED: 1 · DEFERRED: 8
+Done by tier: core 26/45 · strong 2/38 · stretch 0/7
 Calibration: 6814 output tokens per 1% of the 5-hour window; estimate multiplier 1.13
 Last waves: W4 131k (3%→28%), W6 336k (3%→44%), W8 246k (0%→35%)
 
@@ -19,7 +19,7 @@ Last waves: W4 131k (3%→28%), W6 336k (3%→44%), W8 246k (0%→35%)
 - 1.3b [L2 S/high] Keep the parse slot until the reply is sent
 - 1.3c [L2 S/high] Idle timeouts for slow clients
 - 1.4 [L2 S/medium] Stop sending the whole file text back
-- 1.7 [L2 M/medium] Check the shape of every request
+- 1.8 [L2 S/high] Do not trust "sealed" objects sent by the browser
 - 1.9 [L2 S/low] Fix the vulnerable development tools
 - 1.10 [L2 M/medium] HTTP route tests
 - 2.2 [L3 S/low] Tests no longer need the internet
