@@ -659,9 +659,8 @@ export class DockJobStore {
       s = { ...s, seq: this.repairEvents(name) };
       this.states.set(name, s);
       if ((s.status === "PREPARING" || s.status === "RUNNING") && s.bootId !== this.bootId) {
-        kills.push(this.runner.kill(dir));
+        kills.push(this.runner.kill(dir).finally(() => rmSync(join(dir, DOCK_LAYOUT.pid), { force: true })));
         this.transition(s, "FAILED", { error: { code: "API_RESTARTED", message: "The API restarted while this job was running; it was not resumed." } });
-        rmSync(join(dir, DOCK_LAYOUT.pid), { force: true });
       } else if (s.status === "QUEUED") {
         if (this.inputsIntact(s)) requeue.push(s);
         else this.transition(s, "FAILED", { error: { code: "INPUT_CHANGED", message: "The staged inputs no longer match their digests." } });

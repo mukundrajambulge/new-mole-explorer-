@@ -187,6 +187,7 @@ export function runProcess({ command, args, options, scrub = [] }, { timeoutMs =
       killTree(child, platform);
     };
     signal?.addEventListener("abort", onAbort, { once: true });
+    if (signal?.aborted) onAbort(); // aborted before the spawn: kill at once (task 5.4)
     let settled = false;
     const done = (code, spawnError) => {
       if (settled) return;
