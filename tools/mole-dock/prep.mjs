@@ -158,7 +158,7 @@ function killTree(child, platform) {
  * {status: OK|BLOCKED|FAILED|TIMEOUT|CANCELLED, exitCode, stdout, stderr, durationMs}.
  * Exit code 0 = OK, 3 = BLOCKED (worker wrote a diagnostic), anything else FAILED.
  */
-export function runProcess({ command, args, options, scrub = [] }, { timeoutMs = PREP_STAGE_TIMEOUT_MS, signal, platform = process.platform } = {}) {
+export function runProcess({ command, args, options, scrub = [], stdin = "ignore" }, { timeoutMs = PREP_STAGE_TIMEOUT_MS, signal, platform = process.platform } = {}) {
   return new Promise((resolveRun) => {
     const t0 = Date.now();
     let out = "";
@@ -167,11 +167,13 @@ export function runProcess({ command, args, options, scrub = [] }, { timeoutMs =
     let cancelled = false;
     let child;
     try {
-      child = spawn(command, args, { ...options, shell: false, stdio: ["ignore", "pipe", "pipe"], detached: platform !== "win32" });
+      child = spawn(command, args, { ...options, shell: false, stdio: [stdin === "pipe" ? "pipe" : "ignore", "pipe", "pipe"], detached: platform !== "win32" });
     } catch (e) {
       resolveRun({ status: "FAILED", exitCode: null, stdout: "", stderr: scrubOutput(`SPAWN_FAILED: ${e?.code || "error"}`, STDERR_CAP, scrub), durationMs: 0 });
       return;
     }
+    // stdin "pipe" (task 5.4): held open and never written; its EOF tells the WSL pidfile wrapper that wsl.exe or this process died.
+    child.stdin?.on("error", () => undefined);
     child.stdout.on("data", (d) => {
       if (out.length < STDOUT_CAP + 1) out += d.toString("utf8");
     });

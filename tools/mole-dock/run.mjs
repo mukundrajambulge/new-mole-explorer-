@@ -209,10 +209,20 @@ export function resolveVinaPath({ platform = process.platform, env = process.env
 }
 
 /**
- * Fixed pidfile wrapper (task 5.4): setsid -w makes a new session (forking if needed, waiting for it), the inner sh writes its pid (= pgid, kept by
- * exec) to the pidfile given as $1, then execs the timeout command. Positional args only, nothing interpolated.
+ * Fixed pidfile wrapper (task 5.4). setsid -w starts a new session and process group; the inner sh writes its pid
+ * (= pgid, kept by exec) to the pidfile given as $1, starts a watcher on the inherited stdin (a pipe the API holds
+ * open and never writes), then execs the timeout command with stdin from /dev/null. When that pipe reaches EOF
+ * (wsl.exe killed by cancel, or the API process died) the watcher SIGKILLs the whole group, so an engine that
+ * started late (WSL cold start) or outlived wsl.exe cannot keep running. Positional args only, nothing interpolated.
  */
-export const PIDFILE_WRAPPER = ["/usr/bin/setsid", "-w", "/bin/sh", "-c", 'echo $$ > "$1"; shift; exec "$@"', "sh"];
+export const PIDFILE_WRAPPER = [
+  "/usr/bin/setsid",
+  "-w",
+  "/bin/sh",
+  "-c",
+  'echo $$ > "$1"; shift; exec 3<&0; ( while read -r _; do :; done; exec /bin/kill -KILL -- "-$$" ) <&3 >/dev/null 2>&1 & exec "$@" </dev/null 3<&-',
+  "sh",
+];
 
 /** {command,args,options} for one engine-side program under timeout + env -i. Exported for tests. */
 export function buildEngineInvocation({ program, args, cwd, timeoutMs, platform = process.platform, pidfile }) {
@@ -227,6 +237,7 @@ export function buildEngineInvocation({ program, args, cwd, timeoutMs, platform 
       args: ["-d", PREP_DISTRO, "--cd", wslCwd, "--exec", ...(wslPid ? [...PIDFILE_WRAPPER, wslPid] : []), "/usr/bin/timeout", "-k", "5", secs, "/usr/bin/env", "-i", ...ENGINE_ENV, program, ...args],
       options: { cwd, shell: false, windowsHide: true, env: { SystemRoot: process.env.SystemRoot || "C:\\Windows", WSLENV: "" } },
       scrub: [cwd, wslCwd, REPO_ROOT, ...(wslPid ? [wslPid] : [])],
+      ...(wslPid ? { stdin: "pipe" } : {}),
     };
   }
   if (pidfile && !SAFE_POSIX_PATH.test(pidfile)) throw engine("VINA_UNAVAILABLE", "pidfile path rejected");
@@ -236,6 +247,7 @@ export function buildEngineInvocation({ program, args, cwd, timeoutMs, platform 
     args: [...pre.slice(1), ...(pidfile ? ["/usr/bin/timeout"] : []), "-k", "5", secs, "/usr/bin/env", "-i", ...ENGINE_ENV, program, ...args],
     options: { cwd, shell: false, env: {} },
     scrub: [cwd, REPO_ROOT],
+    ...(pidfile ? { stdin: "pipe" } : {}),
   };
 }
 
@@ -252,24 +264,49 @@ export function readPidfile(pidfile) {
 }
 
 /**
- * Kill the engine's process group named by the pidfile (async; never throws). The group is killed only when
- * /proc/<pgid>/cwd is still the job's out dir, so a reused pid is never hit. Polls briefly for a late pidfile.
+ * Group kill script (positional: $1 pgid, $2 the job's out dir). Exit 0: killed and no member of the group is left;
+ * 3: no process in the group (already gone); 4: cwd guard failed (a reused pgid; nothing killed); 5: kill failed;
+ * 6: members still alive after 2 s. The guard compares device + inode (`-ef`), so case, junction and short-name
+ * spellings of the same directory match, while a reused pgid with another cwd never does.
+ */
+export const KILL_GROUP_SCRIPT = [
+  'm=$(/usr/bin/pgrep -g "$1" | /usr/bin/head -n 1); [ -n "$m" ] || exit 3',
+  '[ "/proc/$m/cwd" -ef "$2" ] || exit 4',
+  '/bin/kill -KILL -- "-$1" 2>/dev/null || exit 5',
+  'i=0; while [ "$i" -lt 40 ]; do /usr/bin/pgrep -g "$1" >/dev/null || exit 0; /bin/sleep 0.05; i=$((i+1)); done; exit 6',
+].join("\n");
+const KILL_REASONS = { 3: "NOT_RUNNING", 4: "CWD_MISMATCH", 5: "KILL_FAILED", 6: "STILL_ALIVE" };
+
+/**
+ * Kill the engine's process group named by the pidfile (async; never throws). Returns {killed, gone, pgid?, reason?}:
+ * gone is true only when the group is confirmed empty (killed now, or already not running). killed:false carries a
+ * reason (NO_PIDFILE, NOT_RUNNING, CWD_MISMATCH, KILL_FAILED, STILL_ALIVE, WSL_FAILED) for the caller to surface.
  */
 export async function killEngineGroup({ pidfile, cwd, platform = process.platform, waitMs = 1000 }) {
   let pgid = readPidfile(pidfile);
   for (const t0 = Date.now(); pgid === null && Date.now() - t0 < waitMs; pgid = readPidfile(pidfile)) await new Promise((r) => setTimeout(r, 50));
-  if (pgid === null) return { killed: false, reason: "NO_PIDFILE" };
-  const script = '[ "$(readlink /proc/$1/cwd)" = "$2" ] && exec /bin/kill -KILL -- "-$1"';
-  if (platform === "win32") {
-    const wslCwd = toWslPath(cwd);
-    const r = await runProcess(
-      { command: "wsl.exe", args: ["-d", PREP_DISTRO, "--exec", "/bin/sh", "-c", script, "sh", String(pgid), wslCwd], options: { shell: false, windowsHide: true, env: { SystemRoot: process.env.SystemRoot || "C:\\Windows", WSLENV: "" } } },
-      { timeoutMs: 15_000, platform },
-    );
-    return { killed: r.status === "OK", pgid };
+  if (pgid === null) return { killed: false, gone: false, reason: "NO_PIDFILE" };
+  let canon = cwd;
+  try {
+    canon = realpathSync.native(cwd);
+  } catch {
+    /* the dir is gone: -ef then fails closed (CWD_MISMATCH) */
   }
-  const r = await runProcess({ command: "/bin/sh", args: ["-c", script, "sh", String(pgid), realpathSync(cwd)], options: { shell: false, env: {} } }, { timeoutMs: 10_000, platform });
-  return { killed: r.status === "OK", pgid };
+  let r;
+  try {
+    r =
+      platform === "win32"
+        ? await runProcess(
+            { command: "wsl.exe", args: ["-d", PREP_DISTRO, "--exec", "/bin/sh", "-c", KILL_GROUP_SCRIPT, "sh", String(pgid), toWslPath(canon)], options: { shell: false, windowsHide: true, env: { SystemRoot: process.env.SystemRoot || "C:\\Windows", WSLENV: "" } } },
+            { timeoutMs: 15_000, platform },
+          )
+        : await runProcess({ command: "/bin/sh", args: ["-c", KILL_GROUP_SCRIPT, "sh", String(pgid), canon], options: { shell: false, env: {} } }, { timeoutMs: 10_000, platform });
+  } catch {
+    return { killed: false, gone: false, pgid, reason: "WSL_FAILED" };
+  }
+  if (r.exitCode === 0) return { killed: true, gone: true, pgid };
+  const reason = KILL_REASONS[r.exitCode] ?? "WSL_FAILED";
+  return { killed: false, gone: reason === "NOT_RUNNING", pgid, reason };
 }
 
 
