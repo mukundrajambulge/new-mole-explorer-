@@ -2487,8 +2487,8 @@
         "RESEARCH"
       ],
       "est": "1 week",
-      "status": "TODO",
-      "note": "From the research digest (2026-10-09). See docs/sprint/RESEARCH-DIGEST.md"
+      "status": "DONE",
+      "note": "Merged: CREATED/QUEUED/RUNNING/COMPLETED/FAILED/CANCELLED, stage field, legacy state migration logged"
     },
     {
       "id": "R.1",
